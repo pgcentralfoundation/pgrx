@@ -61,13 +61,13 @@ macro_rules! __pgrx_c_args_AssertTransactionIdInAllowableRange {
         )
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::AssertTransactionIdInAllowableRange!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro AssertTransactionIdInAllowableRange from transam.h:301
@@ -125,7 +125,7 @@ macro_rules! AssertTransactionIdInAllowableRange {
         )
     };
     (@__pgrx_emit_place; $xid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_AssertTransactionIdInAllowableRange!(
@@ -134,7 +134,7 @@ macro_rules! AssertTransactionIdInAllowableRange {
         )
     };
     (@__pgrx_emit_read_place; $xid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_AssertTransactionIdInAllowableRange!(
@@ -148,7 +148,7 @@ macro_rules! AssertTransactionIdInAllowableRange {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -168,7 +168,7 @@ macro_rules! AssertTransactionIdInAllowableRange {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -290,6 +290,13 @@ macro_rules! __pgrx_c_args_EpochFromFullTransactionId {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_EpochFromFullTransactionId] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_EpochFromFullTransactionId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -327,6 +334,13 @@ macro_rules! __pgrx_c_args_EpochFromFullTransactionId {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_EpochFromFullTransactionId] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_EpochFromFullTransactionId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -343,7 +357,7 @@ macro_rules! __pgrx_c_args_EpochFromFullTransactionId {
         $crate::EpochFromFullTransactionId!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro EpochFromFullTransactionId from transam.h:47
@@ -416,13 +430,13 @@ macro_rules! EpochFromFullTransactionId {
         $crate::__pgrx_c_args_EpochFromFullTransactionId!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_EpochFromFullTransactionId!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_EpochFromFullTransactionId!(
@@ -438,7 +452,7 @@ macro_rules! EpochFromFullTransactionId {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -477,7 +491,7 @@ macro_rules! EpochFromFullTransactionId {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -606,6 +620,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdAdvance {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdAdvance] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_FullTransactionIdAdvance!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -643,6 +664,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdAdvance {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdAdvance] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdAdvance!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -659,7 +687,7 @@ macro_rules! __pgrx_c_args_FullTransactionIdAdvance {
         $crate::FullTransactionIdAdvance!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function FullTransactionIdAdvance from transam.h:127
@@ -741,13 +769,13 @@ macro_rules! FullTransactionIdAdvance {
         $crate::__pgrx_c_args_FullTransactionIdAdvance!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $dest:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdAdvance!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $dest:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdAdvance!(
@@ -763,7 +791,7 @@ macro_rules! FullTransactionIdAdvance {
                         $crate::__pgrx_c_operand!(@check_safety; $dest);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::FullTransactionIdAdvance(
@@ -795,7 +823,7 @@ macro_rules! FullTransactionIdAdvance {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -913,6 +941,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdEquals {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdEquals] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdEquals!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -976,6 +1011,11 @@ macro_rules! __pgrx_c_args_FullTransactionIdEquals {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdEquals] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_FullTransactionIdEquals!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1013,6 +1053,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdEquals {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdEquals] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdEquals!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1029,7 +1076,7 @@ macro_rules! __pgrx_c_args_FullTransactionIdEquals {
         $crate::FullTransactionIdEquals!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro FullTransactionIdEquals from transam.h:50
@@ -1093,13 +1140,13 @@ macro_rules! FullTransactionIdEquals {
         $crate::__pgrx_c_args_FullTransactionIdEquals!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdEquals!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdEquals!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1113,7 +1160,7 @@ macro_rules! FullTransactionIdEquals {
                         $crate::__pgrx_c_operand!(@check_safety; $b);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -1140,7 +1187,7 @@ macro_rules! FullTransactionIdEquals {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1254,6 +1301,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdFollows {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdFollows] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdFollows!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1317,6 +1371,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdFollows {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdFollows] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_FullTransactionIdFollows!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1354,6 +1415,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdFollows {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdFollows] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdFollows!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1370,7 +1438,7 @@ macro_rules! __pgrx_c_args_FullTransactionIdFollows {
         $crate::FullTransactionIdFollows!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro FullTransactionIdFollows from transam.h:53
@@ -1434,13 +1502,13 @@ macro_rules! FullTransactionIdFollows {
         $crate::__pgrx_c_args_FullTransactionIdFollows!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdFollows!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdFollows!(
@@ -1457,7 +1525,7 @@ macro_rules! FullTransactionIdFollows {
                         $crate::__pgrx_c_operand!(@check_safety; $b);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::gt(
@@ -1484,7 +1552,7 @@ macro_rules! FullTransactionIdFollows {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1601,6 +1669,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdFollowsOrEquals {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdFollowsOrEquals] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdFollowsOrEquals!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1667,6 +1742,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdFollowsOrEquals {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdFollowsOrEquals] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_FullTransactionIdFollowsOrEquals!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1704,6 +1786,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdFollowsOrEquals {
             ] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdFollowsOrEquals] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdFollowsOrEquals!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1720,7 +1809,7 @@ macro_rules! __pgrx_c_args_FullTransactionIdFollowsOrEquals {
         $crate::FullTransactionIdFollowsOrEquals!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro FullTransactionIdFollowsOrEquals from transam.h:54
@@ -1787,7 +1876,7 @@ macro_rules! FullTransactionIdFollowsOrEquals {
         )
     };
     (@__pgrx_emit_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdFollowsOrEquals!(
@@ -1796,7 +1885,7 @@ macro_rules! FullTransactionIdFollowsOrEquals {
         )
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdFollowsOrEquals!(
@@ -1813,7 +1902,7 @@ macro_rules! FullTransactionIdFollowsOrEquals {
                         $crate::__pgrx_c_operand!(@check_safety; $b);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ge(
@@ -1840,7 +1929,7 @@ macro_rules! FullTransactionIdFollowsOrEquals {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1966,6 +2055,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdFromAllowableAt {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdFromAllowableAt] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdFromAllowableAt!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2032,6 +2128,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdFromAllowableAt {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdFromAllowableAt] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_FullTransactionIdFromAllowableAt!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2069,6 +2172,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdFromAllowableAt {
             ] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdFromAllowableAt] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdFromAllowableAt!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2085,7 +2195,7 @@ macro_rules! __pgrx_c_args_FullTransactionIdFromAllowableAt {
         $crate::FullTransactionIdFromAllowableAt!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function FullTransactionIdFromAllowableAt from transam.h:380
@@ -2166,7 +2276,7 @@ macro_rules! FullTransactionIdFromAllowableAt {
                     $crate::__pgrx_c_bindings::FullTransactionId
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_e0f5cf71a44025dd031f9c9949c6500d(
+                $crate::__pgrx_c_generated::Inline_871a7a0f99cb967bfb97d1ecc5ce5add(
                     <
                         $crate::__pgrx_c_macros::expression::CRawRecord<
                             $crate::__pgrx_c_bindings::FullTransactionId
@@ -2212,7 +2322,7 @@ macro_rules! FullTransactionIdFromAllowableAt {
         )
     };
     (@__pgrx_emit_place; $nextFullXid:tt, $xid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdFromAllowableAt!(
@@ -2221,7 +2331,7 @@ macro_rules! FullTransactionIdFromAllowableAt {
         )
     };
     (@__pgrx_emit_read_place; $nextFullXid:tt, $xid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdFromAllowableAt!(
@@ -2238,7 +2348,7 @@ macro_rules! FullTransactionIdFromAllowableAt {
                         $crate::__pgrx_c_operand!(@check_safety; $xid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2246,7 +2356,7 @@ macro_rules! FullTransactionIdFromAllowableAt {
                                     $crate::__pgrx_c_bindings::FullTransactionId
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_e0f5cf71a44025dd031f9c9949c6500d(
+                                $crate::__pgrx_c_generated::Inline_871a7a0f99cb967bfb97d1ecc5ce5add(
                                     <
                                         $crate::__pgrx_c_macros::expression::CRawRecord<
                                             $crate::__pgrx_c_bindings::FullTransactionId
@@ -2294,7 +2404,7 @@ macro_rules! FullTransactionIdFromAllowableAt {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2312,7 +2422,7 @@ macro_rules! FullTransactionIdFromAllowableAt {
                         $crate::__pgrx_c_bindings::FullTransactionId
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_e0f5cf71a44025dd031f9c9949c6500d(
+                    $crate::__pgrx_c_generated::Inline_871a7a0f99cb967bfb97d1ecc5ce5add(
                         <
                             $crate::__pgrx_c_macros::expression::CRawRecord<
                                 $crate::__pgrx_c_bindings::FullTransactionId
@@ -2442,6 +2552,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdFromEpochAndXid {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdFromEpochAndXid] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdFromEpochAndXid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2508,6 +2625,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdFromEpochAndXid {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdFromEpochAndXid] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_FullTransactionIdFromEpochAndXid!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2545,6 +2669,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdFromEpochAndXid {
             ] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdFromEpochAndXid] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdFromEpochAndXid!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2561,7 +2692,7 @@ macro_rules! __pgrx_c_args_FullTransactionIdFromEpochAndXid {
         $crate::FullTransactionIdFromEpochAndXid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function FullTransactionIdFromEpochAndXid from transam.h:70
@@ -2616,7 +2747,7 @@ macro_rules! FullTransactionIdFromEpochAndXid {
                     $crate::__pgrx_c_bindings::FullTransactionId
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_93b8ea3bdebe2b5d12b6d9d0c972fd81(
+                $crate::__pgrx_c_generated::Inline_ad6761d8a3f840a48614a43f123eb68e(
                     <
                         $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
@@ -2658,7 +2789,7 @@ macro_rules! FullTransactionIdFromEpochAndXid {
         )
     };
     (@__pgrx_emit_place; $epoch:tt, $xid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdFromEpochAndXid!(
@@ -2667,7 +2798,7 @@ macro_rules! FullTransactionIdFromEpochAndXid {
         )
     };
     (@__pgrx_emit_read_place; $epoch:tt, $xid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdFromEpochAndXid!(
@@ -2684,7 +2815,7 @@ macro_rules! FullTransactionIdFromEpochAndXid {
                         $crate::__pgrx_c_operand!(@check_safety; $xid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2692,7 +2823,7 @@ macro_rules! FullTransactionIdFromEpochAndXid {
                                     $crate::__pgrx_c_bindings::FullTransactionId
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_93b8ea3bdebe2b5d12b6d9d0c972fd81(
+                                $crate::__pgrx_c_generated::Inline_ad6761d8a3f840a48614a43f123eb68e(
                                     <
                                         $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
@@ -2731,7 +2862,7 @@ macro_rules! FullTransactionIdFromEpochAndXid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2749,7 +2880,7 @@ macro_rules! FullTransactionIdFromEpochAndXid {
                         $crate::__pgrx_c_bindings::FullTransactionId
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_93b8ea3bdebe2b5d12b6d9d0c972fd81(
+                    $crate::__pgrx_c_generated::Inline_ad6761d8a3f840a48614a43f123eb68e(
                         <
                             $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
@@ -2881,6 +3012,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdFromU64 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdFromU64] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_FullTransactionIdFromU64!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2918,6 +3056,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdFromU64 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdFromU64] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdFromU64!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2934,7 +3079,7 @@ macro_rules! __pgrx_c_args_FullTransactionIdFromU64 {
         $crate::FullTransactionIdFromU64!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function FullTransactionIdFromU64 from transam.h:80
@@ -2988,7 +3133,7 @@ macro_rules! FullTransactionIdFromU64 {
                     $crate::__pgrx_c_bindings::FullTransactionId
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_8d8d0d5a990cb8738790e6666ade36c3(
+                $crate::__pgrx_c_generated::Inline_084c4a7fccdc0d192292f6ce132da1c3(
                     <
                         $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
@@ -3009,13 +3154,13 @@ macro_rules! FullTransactionIdFromU64 {
         $crate::__pgrx_c_args_FullTransactionIdFromU64!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $value:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdFromU64!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $value:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdFromU64!(
@@ -3031,7 +3176,7 @@ macro_rules! FullTransactionIdFromU64 {
                         $crate::__pgrx_c_operand!(@check_safety; $value);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -3039,7 +3184,7 @@ macro_rules! FullTransactionIdFromU64 {
                                     $crate::__pgrx_c_bindings::FullTransactionId
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_8d8d0d5a990cb8738790e6666ade36c3(
+                                $crate::__pgrx_c_generated::Inline_084c4a7fccdc0d192292f6ce132da1c3(
                                     <
                                         $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
@@ -3059,7 +3204,7 @@ macro_rules! FullTransactionIdFromU64 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3074,7 +3219,7 @@ macro_rules! FullTransactionIdFromU64 {
                         $crate::__pgrx_c_bindings::FullTransactionId
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_8d8d0d5a990cb8738790e6666ade36c3(
+                    $crate::__pgrx_c_generated::Inline_084c4a7fccdc0d192292f6ce132da1c3(
                         <
                             $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
@@ -3182,6 +3327,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdIsNormal {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdIsNormal] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_FullTransactionIdIsNormal!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3219,6 +3371,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdIsNormal {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdIsNormal] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdIsNormal!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3235,7 +3394,7 @@ macro_rules! __pgrx_c_args_FullTransactionIdIsNormal {
         $crate::FullTransactionIdIsNormal!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro FullTransactionIdIsNormal from transam.h:58
@@ -3298,7 +3457,7 @@ macro_rules! FullTransactionIdIsNormal {
                                             $crate::__pgrx_c_bindings::FullTransactionId
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_93b8ea3bdebe2b5d12b6d9d0c972fd81(
+                                        $crate::__pgrx_c_generated::Inline_ad6761d8a3f840a48614a43f123eb68e(
                                             <
                                                 $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -3357,13 +3516,13 @@ macro_rules! FullTransactionIdIsNormal {
         $crate::__pgrx_c_args_FullTransactionIdIsNormal!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdIsNormal!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdIsNormal!(
@@ -3380,7 +3539,7 @@ macro_rules! FullTransactionIdIsNormal {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ge(
@@ -3408,7 +3567,7 @@ macro_rules! FullTransactionIdIsNormal {
                                                         $crate::__pgrx_c_bindings::FullTransactionId
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_93b8ea3bdebe2b5d12b6d9d0c972fd81(
+                                                    $crate::__pgrx_c_generated::Inline_ad6761d8a3f840a48614a43f123eb68e(
                                                         <
                                                             $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -3464,7 +3623,7 @@ macro_rules! FullTransactionIdIsNormal {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3497,7 +3656,7 @@ macro_rules! FullTransactionIdIsNormal {
                                             $crate::__pgrx_c_bindings::FullTransactionId
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_93b8ea3bdebe2b5d12b6d9d0c972fd81(
+                                        $crate::__pgrx_c_generated::Inline_ad6761d8a3f840a48614a43f123eb68e(
                                             <
                                                 $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -3642,6 +3801,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdIsValid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdIsValid] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_FullTransactionIdIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3679,6 +3845,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdIsValid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdIsValid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3695,7 +3868,7 @@ macro_rules! __pgrx_c_args_FullTransactionIdIsValid {
         $crate::FullTransactionIdIsValid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro FullTransactionIdIsValid from transam.h:55
@@ -3756,8 +3929,8 @@ macro_rules! FullTransactionIdIsValid {
                             )
                         )
                     )
-                ] [compile_error!("C expression is not a place in this operation")] [
-                    compile_error!("C expression is not a place in this operation")
+                ] [::core::compile_error!("C expression is not a place in this operation")] [
+                    ::core::compile_error!("C expression is not a place in this operation")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -3766,7 +3939,7 @@ macro_rules! FullTransactionIdIsValid {
                                     $crate::__pgrx_c_operand!(@check_safety; $x);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
@@ -3791,7 +3964,7 @@ macro_rules! FullTransactionIdIsValid {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -3825,8 +3998,8 @@ macro_rules! FullTransactionIdIsValid {
                             )
                         )
                     )
-                ] [compile_error!("C expression is not a place in this operation")] [
-                    compile_error!("C expression is not a place in this operation")
+                ] [::core::compile_error!("C expression is not a place in this operation")] [
+                    ::core::compile_error!("C expression is not a place in this operation")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -3835,7 +4008,7 @@ macro_rules! FullTransactionIdIsValid {
                                     $crate::__pgrx_c_operand!(@check_safety; $x);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
@@ -3860,7 +4033,7 @@ macro_rules! FullTransactionIdIsValid {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -3894,8 +4067,8 @@ macro_rules! FullTransactionIdIsValid {
                             )
                         )
                     )
-                ] [compile_error!("C expression is not a place in this operation")] [
-                    compile_error!("C expression is not a place in this operation")
+                ] [::core::compile_error!("C expression is not a place in this operation")] [
+                    ::core::compile_error!("C expression is not a place in this operation")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -3904,7 +4077,7 @@ macro_rules! FullTransactionIdIsValid {
                                     $crate::__pgrx_c_operand!(@check_safety; $x);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
@@ -3929,7 +4102,7 @@ macro_rules! FullTransactionIdIsValid {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -3966,8 +4139,8 @@ macro_rules! FullTransactionIdIsValid {
                             )
                         )
                     )
-                ] [compile_error!("C expression is not a place in this operation")] [
-                    compile_error!("C expression is not a place in this operation")
+                ] [::core::compile_error!("C expression is not a place in this operation")] [
+                    ::core::compile_error!("C expression is not a place in this operation")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -3976,7 +4149,7 @@ macro_rules! FullTransactionIdIsValid {
                                     $crate::__pgrx_c_operand!(@check_safety; $x);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
@@ -4001,7 +4174,7 @@ macro_rules! FullTransactionIdIsValid {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -4035,8 +4208,8 @@ macro_rules! FullTransactionIdIsValid {
                             )
                         )
                     )
-                ] [compile_error!("C expression is not a place in this operation")] [
-                    compile_error!("C expression is not a place in this operation")
+                ] [::core::compile_error!("C expression is not a place in this operation")] [
+                    ::core::compile_error!("C expression is not a place in this operation")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -4045,7 +4218,7 @@ macro_rules! FullTransactionIdIsValid {
                                     $crate::__pgrx_c_operand!(@check_safety; $x);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
@@ -4070,7 +4243,7 @@ macro_rules! FullTransactionIdIsValid {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -4158,6 +4331,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdNewer {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdNewer] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdNewer!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4221,6 +4401,11 @@ macro_rules! __pgrx_c_args_FullTransactionIdNewer {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdNewer] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_FullTransactionIdNewer!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4258,6 +4443,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdNewer {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdNewer] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdNewer!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4274,7 +4466,7 @@ macro_rules! __pgrx_c_args_FullTransactionIdNewer {
         $crate::FullTransactionIdNewer!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function FullTransactionIdNewer from transam.h:359
@@ -4333,7 +4525,7 @@ macro_rules! FullTransactionIdNewer {
                     $crate::__pgrx_c_bindings::FullTransactionId
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_4192bcc067e77da20fa10b04987ff5d6(
+                $crate::__pgrx_c_generated::Inline_2cf7a490b09d4ced5e75ae5a65d2d5ed(
                     <
                         $crate::__pgrx_c_macros::expression::CRawRecord<
                             $crate::__pgrx_c_bindings::FullTransactionId
@@ -4374,13 +4566,13 @@ macro_rules! FullTransactionIdNewer {
         $crate::__pgrx_c_args_FullTransactionIdNewer!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdNewer!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdNewer!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4394,7 +4586,7 @@ macro_rules! FullTransactionIdNewer {
                         $crate::__pgrx_c_operand!(@check_safety; $b);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -4402,7 +4594,7 @@ macro_rules! FullTransactionIdNewer {
                                     $crate::__pgrx_c_bindings::FullTransactionId
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4192bcc067e77da20fa10b04987ff5d6(
+                                $crate::__pgrx_c_generated::Inline_2cf7a490b09d4ced5e75ae5a65d2d5ed(
                                     <
                                         $crate::__pgrx_c_macros::expression::CRawRecord<
                                             $crate::__pgrx_c_bindings::FullTransactionId
@@ -4443,7 +4635,7 @@ macro_rules! FullTransactionIdNewer {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4458,7 +4650,7 @@ macro_rules! FullTransactionIdNewer {
                         $crate::__pgrx_c_bindings::FullTransactionId
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_4192bcc067e77da20fa10b04987ff5d6(
+                    $crate::__pgrx_c_generated::Inline_2cf7a490b09d4ced5e75ae5a65d2d5ed(
                         <
                             $crate::__pgrx_c_macros::expression::CRawRecord<
                                 $crate::__pgrx_c_bindings::FullTransactionId
@@ -4577,6 +4769,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdPrecedes {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdPrecedes] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdPrecedes!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4640,6 +4839,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdPrecedes {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdPrecedes] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_FullTransactionIdPrecedes!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4677,6 +4883,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdPrecedes {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdPrecedes] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdPrecedes!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4693,7 +4906,7 @@ macro_rules! __pgrx_c_args_FullTransactionIdPrecedes {
         $crate::FullTransactionIdPrecedes!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro FullTransactionIdPrecedes from transam.h:51
@@ -4757,13 +4970,13 @@ macro_rules! FullTransactionIdPrecedes {
         $crate::__pgrx_c_args_FullTransactionIdPrecedes!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdPrecedes!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdPrecedes!(
@@ -4780,7 +4993,7 @@ macro_rules! FullTransactionIdPrecedes {
                         $crate::__pgrx_c_operand!(@check_safety; $b);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::lt(
@@ -4807,7 +5020,7 @@ macro_rules! FullTransactionIdPrecedes {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4924,6 +5137,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdPrecedesOrEquals {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdPrecedesOrEquals] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdPrecedesOrEquals!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4990,6 +5210,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdPrecedesOrEquals {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdPrecedesOrEquals] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_FullTransactionIdPrecedesOrEquals!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5027,6 +5254,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdPrecedesOrEquals {
             ] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdPrecedesOrEquals] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdPrecedesOrEquals!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5043,7 +5277,7 @@ macro_rules! __pgrx_c_args_FullTransactionIdPrecedesOrEquals {
         $crate::FullTransactionIdPrecedesOrEquals!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro FullTransactionIdPrecedesOrEquals from transam.h:52
@@ -5110,7 +5344,7 @@ macro_rules! FullTransactionIdPrecedesOrEquals {
         )
     };
     (@__pgrx_emit_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdPrecedesOrEquals!(
@@ -5119,7 +5353,7 @@ macro_rules! FullTransactionIdPrecedesOrEquals {
         )
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdPrecedesOrEquals!(
@@ -5136,7 +5370,7 @@ macro_rules! FullTransactionIdPrecedesOrEquals {
                         $crate::__pgrx_c_operand!(@check_safety; $b);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::le(
@@ -5163,7 +5397,7 @@ macro_rules! FullTransactionIdPrecedesOrEquals {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5295,6 +5529,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdRetreat {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdRetreat] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_FullTransactionIdRetreat!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5332,6 +5573,13 @@ macro_rules! __pgrx_c_args_FullTransactionIdRetreat {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FullTransactionIdRetreat] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdRetreat!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5348,7 +5596,7 @@ macro_rules! __pgrx_c_args_FullTransactionIdRetreat {
         $crate::FullTransactionIdRetreat!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function FullTransactionIdRetreat from transam.h:102
@@ -5438,13 +5686,13 @@ macro_rules! FullTransactionIdRetreat {
         $crate::__pgrx_c_args_FullTransactionIdRetreat!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $dest:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdRetreat!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $dest:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FullTransactionIdRetreat!(
@@ -5460,7 +5708,7 @@ macro_rules! FullTransactionIdRetreat {
                         $crate::__pgrx_c_operand!(@check_safety; $dest);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::FullTransactionIdRetreat(
@@ -5492,7 +5740,7 @@ macro_rules! FullTransactionIdRetreat {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5610,6 +5858,13 @@ macro_rules! __pgrx_c_args_NormalTransactionIdFollows {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_NormalTransactionIdFollows] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_NormalTransactionIdFollows!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5673,6 +5928,13 @@ macro_rules! __pgrx_c_args_NormalTransactionIdFollows {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_NormalTransactionIdFollows] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_NormalTransactionIdFollows!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5710,6 +5972,13 @@ macro_rules! __pgrx_c_args_NormalTransactionIdFollows {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_NormalTransactionIdFollows] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_NormalTransactionIdFollows!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5726,7 +5995,7 @@ macro_rules! __pgrx_c_args_NormalTransactionIdFollows {
         $crate::NormalTransactionIdFollows!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro NormalTransactionIdFollows from transam.h:152
@@ -5848,13 +6117,13 @@ macro_rules! NormalTransactionIdFollows {
         $crate::__pgrx_c_args_NormalTransactionIdFollows!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $id1:tt, $id2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NormalTransactionIdFollows!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $id1:tt, $id2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NormalTransactionIdFollows!(
@@ -5872,7 +6141,7 @@ macro_rules! NormalTransactionIdFollows {
                         $crate::__pgrx_c_operand!(@check_safety; $id2);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -5961,7 +6230,7 @@ macro_rules! NormalTransactionIdFollows {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6129,6 +6398,13 @@ macro_rules! __pgrx_c_args_NormalTransactionIdOlder {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_NormalTransactionIdOlder] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_NormalTransactionIdOlder!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6192,6 +6468,13 @@ macro_rules! __pgrx_c_args_NormalTransactionIdOlder {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_NormalTransactionIdOlder] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_NormalTransactionIdOlder!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6229,6 +6512,13 @@ macro_rules! __pgrx_c_args_NormalTransactionIdOlder {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_NormalTransactionIdOlder] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_NormalTransactionIdOlder!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6245,7 +6535,7 @@ macro_rules! __pgrx_c_args_NormalTransactionIdOlder {
         $crate::NormalTransactionIdOlder!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function NormalTransactionIdOlder from transam.h:348
@@ -6346,13 +6636,13 @@ macro_rules! NormalTransactionIdOlder {
         $crate::__pgrx_c_args_NormalTransactionIdOlder!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NormalTransactionIdOlder!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NormalTransactionIdOlder!(
@@ -6369,7 +6659,7 @@ macro_rules! NormalTransactionIdOlder {
                         $crate::__pgrx_c_operand!(@check_safety; $b);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -6423,7 +6713,7 @@ macro_rules! NormalTransactionIdOlder {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6562,6 +6852,13 @@ macro_rules! __pgrx_c_args_NormalTransactionIdPrecedes {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_NormalTransactionIdPrecedes] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_NormalTransactionIdPrecedes!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6625,6 +6922,13 @@ macro_rules! __pgrx_c_args_NormalTransactionIdPrecedes {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_NormalTransactionIdPrecedes] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_NormalTransactionIdPrecedes!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6662,6 +6966,13 @@ macro_rules! __pgrx_c_args_NormalTransactionIdPrecedes {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_NormalTransactionIdPrecedes] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_NormalTransactionIdPrecedes!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6678,7 +6989,7 @@ macro_rules! __pgrx_c_args_NormalTransactionIdPrecedes {
         $crate::NormalTransactionIdPrecedes!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro NormalTransactionIdPrecedes from transam.h:147
@@ -6800,13 +7111,13 @@ macro_rules! NormalTransactionIdPrecedes {
         $crate::__pgrx_c_args_NormalTransactionIdPrecedes!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $id1:tt, $id2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NormalTransactionIdPrecedes!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $id1:tt, $id2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NormalTransactionIdPrecedes!(
@@ -6824,7 +7135,7 @@ macro_rules! NormalTransactionIdPrecedes {
                         $crate::__pgrx_c_operand!(@check_safety; $id2);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -6913,7 +7224,7 @@ macro_rules! NormalTransactionIdPrecedes {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7079,13 +7390,13 @@ macro_rules! ReadNextTransactionId {
         $crate::ReadNextTransactionId!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::ReadNextTransactionId!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::ReadNextTransactionId!(@__pgrx_emit_read_place; $($raw)*)
@@ -7096,7 +7407,7 @@ macro_rules! ReadNextTransactionId {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -7109,7 +7420,7 @@ macro_rules! ReadNextTransactionId {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7132,13 +7443,13 @@ macro_rules! ReadNextTransactionId {
         $crate::ReadNextTransactionId!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::ReadNextTransactionId!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 
@@ -7224,6 +7535,13 @@ macro_rules! __pgrx_c_args_StoreInvalidTransactionId {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_StoreInvalidTransactionId] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_StoreInvalidTransactionId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7261,6 +7579,13 @@ macro_rules! __pgrx_c_args_StoreInvalidTransactionId {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_StoreInvalidTransactionId] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_StoreInvalidTransactionId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7277,7 +7602,7 @@ macro_rules! __pgrx_c_args_StoreInvalidTransactionId {
         $crate::StoreInvalidTransactionId!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro StoreInvalidTransactionId from transam.h:45
@@ -7336,13 +7661,13 @@ macro_rules! StoreInvalidTransactionId {
         $crate::__pgrx_c_args_StoreInvalidTransactionId!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $dest:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_StoreInvalidTransactionId!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $dest:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_StoreInvalidTransactionId!(
@@ -7358,7 +7683,7 @@ macro_rules! StoreInvalidTransactionId {
                         $crate::__pgrx_c_operand!(@check_safety; $dest);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -7384,7 +7709,7 @@ macro_rules! StoreInvalidTransactionId {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7501,6 +7826,11 @@ macro_rules! __pgrx_c_args_TransactionIdAdvance {
             @argument [__pgrx_c_args_TransactionIdAdvance] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TransactionIdAdvance] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TransactionIdAdvance!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7538,6 +7868,13 @@ macro_rules! __pgrx_c_args_TransactionIdAdvance {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TransactionIdAdvance] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdAdvance!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7554,7 +7891,7 @@ macro_rules! __pgrx_c_args_TransactionIdAdvance {
         $crate::TransactionIdAdvance!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TransactionIdAdvance from transam.h:91
@@ -7641,7 +7978,7 @@ macro_rules! TransactionIdAdvance {
         $crate::__pgrx_c_args_TransactionIdAdvance!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdAdvance!(@collect __pgrx_emit_public []; $($raw)*)
@@ -7718,6 +8055,13 @@ macro_rules! __pgrx_c_args_TransactionIdEquals {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TransactionIdEquals] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdEquals!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7779,6 +8123,11 @@ macro_rules! __pgrx_c_args_TransactionIdEquals {
             @argument [__pgrx_c_args_TransactionIdEquals] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TransactionIdEquals] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TransactionIdEquals!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7816,6 +8165,13 @@ macro_rules! __pgrx_c_args_TransactionIdEquals {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TransactionIdEquals] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdEquals!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7832,7 +8188,7 @@ macro_rules! __pgrx_c_args_TransactionIdEquals {
         $crate::TransactionIdEquals!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TransactionIdEquals from transam.h:43
@@ -7885,13 +8241,13 @@ macro_rules! TransactionIdEquals {
         $crate::__pgrx_c_args_TransactionIdEquals!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $id1:tt, $id2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdEquals!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $id1:tt, $id2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdEquals!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7905,7 +8261,7 @@ macro_rules! TransactionIdEquals {
                         $crate::__pgrx_c_operand!(@check_safety; $id2);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -7924,7 +8280,7 @@ macro_rules! TransactionIdEquals {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8037,6 +8393,11 @@ macro_rules! __pgrx_c_args_TransactionIdIsNormal {
             @argument [__pgrx_c_args_TransactionIdIsNormal] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TransactionIdIsNormal] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TransactionIdIsNormal!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8074,6 +8435,13 @@ macro_rules! __pgrx_c_args_TransactionIdIsNormal {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TransactionIdIsNormal] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdIsNormal!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8090,7 +8458,7 @@ macro_rules! __pgrx_c_args_TransactionIdIsNormal {
         $crate::TransactionIdIsNormal!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TransactionIdIsNormal from transam.h:42
@@ -8142,13 +8510,13 @@ macro_rules! TransactionIdIsNormal {
         $crate::__pgrx_c_args_TransactionIdIsNormal!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $xid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdIsNormal!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $xid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdIsNormal!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8161,7 +8529,7 @@ macro_rules! TransactionIdIsNormal {
                         $crate::__pgrx_c_operand!(@check_safety; $xid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ge(
@@ -8182,7 +8550,7 @@ macro_rules! TransactionIdIsNormal {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8295,6 +8663,11 @@ macro_rules! __pgrx_c_args_TransactionIdIsValid {
             @argument [__pgrx_c_args_TransactionIdIsValid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TransactionIdIsValid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TransactionIdIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8332,6 +8705,13 @@ macro_rules! __pgrx_c_args_TransactionIdIsValid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TransactionIdIsValid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8348,7 +8728,7 @@ macro_rules! __pgrx_c_args_TransactionIdIsValid {
         $crate::TransactionIdIsValid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TransactionIdIsValid from transam.h:41
@@ -8402,13 +8782,13 @@ macro_rules! TransactionIdIsValid {
         $crate::__pgrx_c_args_TransactionIdIsValid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $xid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdIsValid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $xid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdIsValid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8421,7 +8801,7 @@ macro_rules! TransactionIdIsValid {
                         $crate::__pgrx_c_operand!(@check_safety; $xid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -8444,7 +8824,7 @@ macro_rules! TransactionIdIsValid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8549,6 +8929,13 @@ macro_rules! __pgrx_c_args_TransactionIdOlder {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TransactionIdOlder] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdOlder!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8610,6 +8997,11 @@ macro_rules! __pgrx_c_args_TransactionIdOlder {
             @argument [__pgrx_c_args_TransactionIdOlder] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TransactionIdOlder] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TransactionIdOlder!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8647,6 +9039,13 @@ macro_rules! __pgrx_c_args_TransactionIdOlder {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TransactionIdOlder] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdOlder!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8663,7 +9062,7 @@ macro_rules! __pgrx_c_args_TransactionIdOlder {
         $crate::TransactionIdOlder!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function TransactionIdOlder from transam.h:333
@@ -8765,13 +9164,13 @@ macro_rules! TransactionIdOlder {
         $crate::__pgrx_c_args_TransactionIdOlder!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdOlder!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdOlder!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8785,7 +9184,7 @@ macro_rules! TransactionIdOlder {
                         $crate::__pgrx_c_operand!(@check_safety; $b);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -8839,7 +9238,7 @@ macro_rules! TransactionIdOlder {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8978,6 +9377,13 @@ macro_rules! __pgrx_c_args_TransactionIdRetreatedBy {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TransactionIdRetreatedBy] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdRetreatedBy!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9041,6 +9447,13 @@ macro_rules! __pgrx_c_args_TransactionIdRetreatedBy {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TransactionIdRetreatedBy] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TransactionIdRetreatedBy!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9078,6 +9491,13 @@ macro_rules! __pgrx_c_args_TransactionIdRetreatedBy {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TransactionIdRetreatedBy] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdRetreatedBy!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9094,7 +9514,7 @@ macro_rules! __pgrx_c_args_TransactionIdRetreatedBy {
         $crate::TransactionIdRetreatedBy!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function TransactionIdRetreatedBy from transam.h:321
@@ -9190,13 +9610,13 @@ macro_rules! TransactionIdRetreatedBy {
         $crate::__pgrx_c_args_TransactionIdRetreatedBy!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $xid:tt, $amount:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdRetreatedBy!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $xid:tt, $amount:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdRetreatedBy!(
@@ -9213,7 +9633,7 @@ macro_rules! TransactionIdRetreatedBy {
                         $crate::__pgrx_c_operand!(@check_safety; $amount);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -9261,7 +9681,7 @@ macro_rules! TransactionIdRetreatedBy {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9391,6 +9811,13 @@ macro_rules! __pgrx_c_args_TransactionIdStore {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TransactionIdStore] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdStore!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9452,6 +9879,11 @@ macro_rules! __pgrx_c_args_TransactionIdStore {
             @argument [__pgrx_c_args_TransactionIdStore] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TransactionIdStore] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TransactionIdStore!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9489,6 +9921,13 @@ macro_rules! __pgrx_c_args_TransactionIdStore {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TransactionIdStore] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdStore!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9505,7 +9944,7 @@ macro_rules! __pgrx_c_args_TransactionIdStore {
         $crate::TransactionIdStore!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TransactionIdStore from transam.h:44
@@ -9560,13 +9999,13 @@ macro_rules! TransactionIdStore {
         $crate::__pgrx_c_args_TransactionIdStore!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $xid:tt, $dest:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdStore!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $xid:tt, $dest:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdStore!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -9580,7 +10019,7 @@ macro_rules! TransactionIdStore {
                         $crate::__pgrx_c_operand!(@check_safety; $dest);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -9602,7 +10041,7 @@ macro_rules! TransactionIdStore {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9719,6 +10158,13 @@ macro_rules! __pgrx_c_args_U64FromFullTransactionId {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_U64FromFullTransactionId] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_U64FromFullTransactionId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9756,6 +10202,13 @@ macro_rules! __pgrx_c_args_U64FromFullTransactionId {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_U64FromFullTransactionId] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_U64FromFullTransactionId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9772,7 +10225,7 @@ macro_rules! __pgrx_c_args_U64FromFullTransactionId {
         $crate::U64FromFullTransactionId!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro U64FromFullTransactionId from transam.h:49
@@ -9856,7 +10309,7 @@ macro_rules! U64FromFullTransactionId {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_value,
@@ -9866,7 +10319,7 @@ macro_rules! U64FromFullTransactionId {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9976,6 +10429,13 @@ macro_rules! __pgrx_c_args_XidFromFullTransactionId {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XidFromFullTransactionId] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XidFromFullTransactionId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10013,6 +10473,13 @@ macro_rules! __pgrx_c_args_XidFromFullTransactionId {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XidFromFullTransactionId] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XidFromFullTransactionId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10029,7 +10496,7 @@ macro_rules! __pgrx_c_args_XidFromFullTransactionId {
         $crate::XidFromFullTransactionId!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XidFromFullTransactionId from transam.h:48
@@ -10091,13 +10558,13 @@ macro_rules! XidFromFullTransactionId {
         $crate::__pgrx_c_args_XidFromFullTransactionId!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XidFromFullTransactionId!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XidFromFullTransactionId!(
@@ -10113,7 +10580,7 @@ macro_rules! XidFromFullTransactionId {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -10135,7 +10602,7 @@ macro_rules! XidFromFullTransactionId {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

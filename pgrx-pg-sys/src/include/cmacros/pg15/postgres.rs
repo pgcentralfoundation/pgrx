@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_BoolGetDatum {
             @argument [__pgrx_c_args_BoolGetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BoolGetDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BoolGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -116,6 +121,11 @@ macro_rules! __pgrx_c_args_BoolGetDatum {
             @argument [__pgrx_c_args_BoolGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BoolGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BoolGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -132,7 +142,7 @@ macro_rules! __pgrx_c_args_BoolGetDatum {
         $crate::BoolGetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BoolGetDatum from postgres.h:446
@@ -223,13 +233,13 @@ macro_rules! BoolGetDatum {
         $crate::__pgrx_c_args_BoolGetDatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BoolGetDatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BoolGetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -242,7 +252,7 @@ macro_rules! BoolGetDatum {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -296,7 +306,7 @@ macro_rules! BoolGetDatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -441,6 +451,11 @@ macro_rules! __pgrx_c_args_CStringGetDatum {
             @argument [__pgrx_c_args_CStringGetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_CStringGetDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_CStringGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -478,6 +493,13 @@ macro_rules! __pgrx_c_args_CStringGetDatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_CStringGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_CStringGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -494,7 +516,7 @@ macro_rules! __pgrx_c_args_CStringGetDatum {
         $crate::CStringGetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro CStringGetDatum from postgres.h:622
@@ -640,6 +662,11 @@ macro_rules! __pgrx_c_args_CharGetDatum {
             @argument [__pgrx_c_args_CharGetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_CharGetDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_CharGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -675,6 +702,11 @@ macro_rules! __pgrx_c_args_CharGetDatum {
             @argument [__pgrx_c_args_CharGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_CharGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_CharGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -691,7 +723,7 @@ macro_rules! __pgrx_c_args_CharGetDatum {
         $crate::CharGetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro CharGetDatum from postgres.h:460
@@ -749,13 +781,13 @@ macro_rules! CharGetDatum {
         $crate::__pgrx_c_args_CharGetDatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_CharGetDatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_CharGetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -768,7 +800,7 @@ macro_rules! CharGetDatum {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -789,7 +821,7 @@ macro_rules! CharGetDatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -901,6 +933,11 @@ macro_rules! __pgrx_c_args_CommandIdGetDatum {
             @argument [__pgrx_c_args_CommandIdGetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_CommandIdGetDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_CommandIdGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -938,6 +975,13 @@ macro_rules! __pgrx_c_args_CommandIdGetDatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_CommandIdGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_CommandIdGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -954,7 +998,7 @@ macro_rules! __pgrx_c_args_CommandIdGetDatum {
         $crate::CommandIdGetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro CommandIdGetDatum from postgres.h:586
@@ -1012,13 +1056,13 @@ macro_rules! CommandIdGetDatum {
         $crate::__pgrx_c_args_CommandIdGetDatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_CommandIdGetDatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_CommandIdGetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1031,7 +1075,7 @@ macro_rules! CommandIdGetDatum {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -1052,7 +1096,7 @@ macro_rules! CommandIdGetDatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1164,6 +1208,11 @@ macro_rules! __pgrx_c_args_DatumGetBool {
             @argument [__pgrx_c_args_DatumGetBool] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetBool] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetBool!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1199,6 +1248,11 @@ macro_rules! __pgrx_c_args_DatumGetBool {
             @argument [__pgrx_c_args_DatumGetBool] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetBool] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetBool!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1215,7 +1269,7 @@ macro_rules! __pgrx_c_args_DatumGetBool {
         $crate::DatumGetBool!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DatumGetBool from postgres.h:437
@@ -1280,13 +1334,13 @@ macro_rules! DatumGetBool {
         $crate::__pgrx_c_args_DatumGetBool!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetBool!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetBool!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1300,7 +1354,7 @@ macro_rules! DatumGetBool {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -1334,7 +1388,7 @@ macro_rules! DatumGetBool {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1453,6 +1507,11 @@ macro_rules! __pgrx_c_args_DatumGetCString {
             @argument [__pgrx_c_args_DatumGetCString] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetCString] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetCString!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1490,6 +1549,13 @@ macro_rules! __pgrx_c_args_DatumGetCString {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetCString] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetCString!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1506,7 +1572,7 @@ macro_rules! __pgrx_c_args_DatumGetCString {
         $crate::DatumGetCString!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DatumGetCString from postgres.h:610
@@ -1580,13 +1646,13 @@ macro_rules! DatumGetCString {
         $crate::__pgrx_c_args_DatumGetCString!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetCString!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetCString!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1600,7 +1666,7 @@ macro_rules! DatumGetCString {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -1637,7 +1703,7 @@ macro_rules! DatumGetCString {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1765,6 +1831,11 @@ macro_rules! __pgrx_c_args_DatumGetChar {
             @argument [__pgrx_c_args_DatumGetChar] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetChar] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetChar!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1800,6 +1871,11 @@ macro_rules! __pgrx_c_args_DatumGetChar {
             @argument [__pgrx_c_args_DatumGetChar] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetChar] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetChar!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1816,7 +1892,7 @@ macro_rules! __pgrx_c_args_DatumGetChar {
         $crate::DatumGetChar!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DatumGetChar from postgres.h:453
@@ -1867,13 +1943,13 @@ macro_rules! DatumGetChar {
         $crate::__pgrx_c_args_DatumGetChar!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetChar!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetChar!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1886,7 +1962,7 @@ macro_rules! DatumGetChar {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -1903,7 +1979,7 @@ macro_rules! DatumGetChar {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2008,6 +2084,11 @@ macro_rules! __pgrx_c_args_DatumGetCommandId {
             @argument [__pgrx_c_args_DatumGetCommandId] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetCommandId] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetCommandId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2045,6 +2126,13 @@ macro_rules! __pgrx_c_args_DatumGetCommandId {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetCommandId] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetCommandId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2061,7 +2149,7 @@ macro_rules! __pgrx_c_args_DatumGetCommandId {
         $crate::DatumGetCommandId!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DatumGetCommandId from postgres.h:579
@@ -2116,13 +2204,13 @@ macro_rules! DatumGetCommandId {
         $crate::__pgrx_c_args_DatumGetCommandId!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetCommandId!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetCommandId!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2135,7 +2223,7 @@ macro_rules! DatumGetCommandId {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -2153,7 +2241,7 @@ macro_rules! DatumGetCommandId {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2262,6 +2350,11 @@ macro_rules! __pgrx_c_args_DatumGetFloat4 {
             @argument [__pgrx_c_args_DatumGetFloat4] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetFloat4] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetFloat4!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2299,6 +2392,11 @@ macro_rules! __pgrx_c_args_DatumGetFloat4 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetFloat4] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetFloat4!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2315,7 +2413,7 @@ macro_rules! __pgrx_c_args_DatumGetFloat4 {
         $crate::DatumGetFloat4!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function DatumGetFloat4 from postgres.h:707
@@ -2394,13 +2492,13 @@ macro_rules! DatumGetFloat4 {
         $crate::__pgrx_c_args_DatumGetFloat4!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetFloat4!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetFloat4!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2413,7 +2511,7 @@ macro_rules! DatumGetFloat4 {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2445,7 +2543,7 @@ macro_rules! DatumGetFloat4 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2567,6 +2665,11 @@ macro_rules! __pgrx_c_args_DatumGetFloat8 {
             @argument [__pgrx_c_args_DatumGetFloat8] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetFloat8] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetFloat8!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2604,6 +2707,11 @@ macro_rules! __pgrx_c_args_DatumGetFloat8 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetFloat8] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetFloat8!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2620,7 +2728,7 @@ macro_rules! __pgrx_c_args_DatumGetFloat8 {
         $crate::DatumGetFloat8!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function DatumGetFloat8 from postgres.h:745
@@ -2699,13 +2807,13 @@ macro_rules! DatumGetFloat8 {
         $crate::__pgrx_c_args_DatumGetFloat8!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetFloat8!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetFloat8!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2718,7 +2826,7 @@ macro_rules! DatumGetFloat8 {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2750,7 +2858,7 @@ macro_rules! DatumGetFloat8 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2872,6 +2980,11 @@ macro_rules! __pgrx_c_args_DatumGetInt16 {
             @argument [__pgrx_c_args_DatumGetInt16] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetInt16] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetInt16!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2909,6 +3022,11 @@ macro_rules! __pgrx_c_args_DatumGetInt16 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetInt16] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetInt16!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2925,7 +3043,7 @@ macro_rules! __pgrx_c_args_DatumGetInt16 {
         $crate::DatumGetInt16!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DatumGetInt16 from postgres.h:488
@@ -2980,13 +3098,13 @@ macro_rules! DatumGetInt16 {
         $crate::__pgrx_c_args_DatumGetInt16!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetInt16!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetInt16!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2999,7 +3117,7 @@ macro_rules! DatumGetInt16 {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -3017,7 +3135,7 @@ macro_rules! DatumGetInt16 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3126,6 +3244,11 @@ macro_rules! __pgrx_c_args_DatumGetInt32 {
             @argument [__pgrx_c_args_DatumGetInt32] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetInt32] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetInt32!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3163,6 +3286,11 @@ macro_rules! __pgrx_c_args_DatumGetInt32 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetInt32] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetInt32!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3179,7 +3307,7 @@ macro_rules! __pgrx_c_args_DatumGetInt32 {
         $crate::DatumGetInt32!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DatumGetInt32 from postgres.h:516
@@ -3234,13 +3362,13 @@ macro_rules! DatumGetInt32 {
         $crate::__pgrx_c_args_DatumGetInt32!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetInt32!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetInt32!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3253,7 +3381,7 @@ macro_rules! DatumGetInt32 {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -3271,7 +3399,7 @@ macro_rules! DatumGetInt32 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3380,6 +3508,11 @@ macro_rules! __pgrx_c_args_DatumGetInt64 {
             @argument [__pgrx_c_args_DatumGetInt64] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetInt64] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetInt64!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3417,6 +3550,11 @@ macro_rules! __pgrx_c_args_DatumGetInt64 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetInt64] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetInt64!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3433,7 +3571,7 @@ macro_rules! __pgrx_c_args_DatumGetInt64 {
         $crate::DatumGetInt64!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DatumGetInt64 from postgres.h:649
@@ -3488,13 +3626,13 @@ macro_rules! DatumGetInt64 {
         $crate::__pgrx_c_args_DatumGetInt64!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetInt64!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetInt64!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3507,7 +3645,7 @@ macro_rules! DatumGetInt64 {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -3525,7 +3663,7 @@ macro_rules! DatumGetInt64 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3634,6 +3772,11 @@ macro_rules! __pgrx_c_args_DatumGetName {
             @argument [__pgrx_c_args_DatumGetName] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetName] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetName!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3669,6 +3812,11 @@ macro_rules! __pgrx_c_args_DatumGetName {
             @argument [__pgrx_c_args_DatumGetName] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetName] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetName!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3685,7 +3833,7 @@ macro_rules! __pgrx_c_args_DatumGetName {
         $crate::DatumGetName!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DatumGetName from postgres.h:629
@@ -3762,13 +3910,13 @@ macro_rules! DatumGetName {
         $crate::__pgrx_c_args_DatumGetName!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetName!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetName!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3782,7 +3930,7 @@ macro_rules! DatumGetName {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -3822,7 +3970,7 @@ macro_rules! DatumGetName {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3953,6 +4101,11 @@ macro_rules! __pgrx_c_args_DatumGetObjectId {
             @argument [__pgrx_c_args_DatumGetObjectId] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetObjectId] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetObjectId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3990,6 +4143,13 @@ macro_rules! __pgrx_c_args_DatumGetObjectId {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetObjectId] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetObjectId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4006,7 +4166,7 @@ macro_rules! __pgrx_c_args_DatumGetObjectId {
         $crate::DatumGetObjectId!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DatumGetObjectId from postgres.h:544
@@ -4064,13 +4224,13 @@ macro_rules! DatumGetObjectId {
         $crate::__pgrx_c_args_DatumGetObjectId!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetObjectId!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetObjectId!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4083,7 +4243,7 @@ macro_rules! DatumGetObjectId {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -4104,7 +4264,7 @@ macro_rules! DatumGetObjectId {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4216,6 +4376,11 @@ macro_rules! __pgrx_c_args_DatumGetPointer {
             @argument [__pgrx_c_args_DatumGetPointer] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetPointer] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetPointer!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4253,6 +4418,13 @@ macro_rules! __pgrx_c_args_DatumGetPointer {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetPointer] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetPointer!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4269,7 +4441,7 @@ macro_rules! __pgrx_c_args_DatumGetPointer {
         $crate::DatumGetPointer!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DatumGetPointer from postgres.h:593
@@ -4330,13 +4502,13 @@ macro_rules! DatumGetPointer {
         $crate::__pgrx_c_args_DatumGetPointer!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetPointer!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetPointer!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4349,7 +4521,7 @@ macro_rules! DatumGetPointer {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -4373,7 +4545,7 @@ macro_rules! DatumGetPointer {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4491,6 +4663,11 @@ macro_rules! __pgrx_c_args_DatumGetTransactionId {
             @argument [__pgrx_c_args_DatumGetTransactionId] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetTransactionId] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetTransactionId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4528,6 +4705,13 @@ macro_rules! __pgrx_c_args_DatumGetTransactionId {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetTransactionId] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTransactionId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4544,7 +4728,7 @@ macro_rules! __pgrx_c_args_DatumGetTransactionId {
         $crate::DatumGetTransactionId!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DatumGetTransactionId from postgres.h:558
@@ -4602,13 +4786,13 @@ macro_rules! DatumGetTransactionId {
         $crate::__pgrx_c_args_DatumGetTransactionId!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTransactionId!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTransactionId!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4621,7 +4805,7 @@ macro_rules! DatumGetTransactionId {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -4642,7 +4826,7 @@ macro_rules! DatumGetTransactionId {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4754,6 +4938,11 @@ macro_rules! __pgrx_c_args_DatumGetUInt16 {
             @argument [__pgrx_c_args_DatumGetUInt16] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetUInt16] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetUInt16!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4791,6 +4980,11 @@ macro_rules! __pgrx_c_args_DatumGetUInt16 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetUInt16] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetUInt16!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4807,7 +5001,7 @@ macro_rules! __pgrx_c_args_DatumGetUInt16 {
         $crate::DatumGetUInt16!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DatumGetUInt16 from postgres.h:502
@@ -4862,13 +5056,13 @@ macro_rules! DatumGetUInt16 {
         $crate::__pgrx_c_args_DatumGetUInt16!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetUInt16!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetUInt16!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4881,7 +5075,7 @@ macro_rules! DatumGetUInt16 {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -4899,7 +5093,7 @@ macro_rules! DatumGetUInt16 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5008,6 +5202,11 @@ macro_rules! __pgrx_c_args_DatumGetUInt32 {
             @argument [__pgrx_c_args_DatumGetUInt32] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetUInt32] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetUInt32!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5045,6 +5244,11 @@ macro_rules! __pgrx_c_args_DatumGetUInt32 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetUInt32] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetUInt32!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5061,7 +5265,7 @@ macro_rules! __pgrx_c_args_DatumGetUInt32 {
         $crate::DatumGetUInt32!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DatumGetUInt32 from postgres.h:530
@@ -5116,13 +5320,13 @@ macro_rules! DatumGetUInt32 {
         $crate::__pgrx_c_args_DatumGetUInt32!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetUInt32!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetUInt32!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5135,7 +5339,7 @@ macro_rules! DatumGetUInt32 {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -5153,7 +5357,7 @@ macro_rules! DatumGetUInt32 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5262,6 +5466,11 @@ macro_rules! __pgrx_c_args_DatumGetUInt64 {
             @argument [__pgrx_c_args_DatumGetUInt64] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetUInt64] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetUInt64!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5299,6 +5508,11 @@ macro_rules! __pgrx_c_args_DatumGetUInt64 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetUInt64] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetUInt64!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5315,7 +5529,7 @@ macro_rules! __pgrx_c_args_DatumGetUInt64 {
         $crate::DatumGetUInt64!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DatumGetUInt64 from postgres.h:676
@@ -5370,13 +5584,13 @@ macro_rules! DatumGetUInt64 {
         $crate::__pgrx_c_args_DatumGetUInt64!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetUInt64!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetUInt64!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5389,7 +5603,7 @@ macro_rules! DatumGetUInt64 {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -5407,7 +5621,7 @@ macro_rules! DatumGetUInt64 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5516,6 +5730,11 @@ macro_rules! __pgrx_c_args_DatumGetUInt8 {
             @argument [__pgrx_c_args_DatumGetUInt8] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetUInt8] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetUInt8!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5553,6 +5772,11 @@ macro_rules! __pgrx_c_args_DatumGetUInt8 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetUInt8] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetUInt8!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5569,7 +5793,7 @@ macro_rules! __pgrx_c_args_DatumGetUInt8 {
         $crate::DatumGetUInt8!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DatumGetUInt8 from postgres.h:474
@@ -5624,13 +5848,13 @@ macro_rules! DatumGetUInt8 {
         $crate::__pgrx_c_args_DatumGetUInt8!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetUInt8!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetUInt8!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5643,7 +5867,7 @@ macro_rules! DatumGetUInt8 {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -5661,7 +5885,7 @@ macro_rules! DatumGetUInt8 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5770,6 +5994,11 @@ macro_rules! __pgrx_c_args_Float4GetDatum {
             @argument [__pgrx_c_args_Float4GetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_Float4GetDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_Float4GetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5807,6 +6036,11 @@ macro_rules! __pgrx_c_args_Float4GetDatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_Float4GetDatum] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_Float4GetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5823,7 +6057,7 @@ macro_rules! __pgrx_c_args_Float4GetDatum {
         $crate::Float4GetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function Float4GetDatum from postgres.h:724
@@ -5899,13 +6133,13 @@ macro_rules! Float4GetDatum {
         $crate::__pgrx_c_args_Float4GetDatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_Float4GetDatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_Float4GetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5918,7 +6152,7 @@ macro_rules! Float4GetDatum {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -5947,7 +6181,7 @@ macro_rules! Float4GetDatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6066,6 +6300,11 @@ macro_rules! __pgrx_c_args_Float8GetDatum {
             @argument [__pgrx_c_args_Float8GetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_Float8GetDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_Float8GetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6103,6 +6342,11 @@ macro_rules! __pgrx_c_args_Float8GetDatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_Float8GetDatum] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_Float8GetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6119,7 +6363,7 @@ macro_rules! __pgrx_c_args_Float8GetDatum {
         $crate::Float8GetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function Float8GetDatum from postgres.h:770
@@ -6195,13 +6439,13 @@ macro_rules! Float8GetDatum {
         $crate::__pgrx_c_args_Float8GetDatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_Float8GetDatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_Float8GetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6214,7 +6458,7 @@ macro_rules! Float8GetDatum {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -6243,7 +6487,7 @@ macro_rules! Float8GetDatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6362,6 +6606,11 @@ macro_rules! __pgrx_c_args_Float8GetDatumFast {
             @argument [__pgrx_c_args_Float8GetDatumFast] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_Float8GetDatumFast] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_Float8GetDatumFast!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6399,6 +6648,13 @@ macro_rules! __pgrx_c_args_Float8GetDatumFast {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_Float8GetDatumFast] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_Float8GetDatumFast!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6415,7 +6671,7 @@ macro_rules! __pgrx_c_args_Float8GetDatumFast {
         $crate::Float8GetDatumFast!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro Float8GetDatumFast from postgres.h:802
@@ -6479,13 +6735,13 @@ macro_rules! Float8GetDatumFast {
         $crate::__pgrx_c_args_Float8GetDatumFast!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_Float8GetDatumFast!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_Float8GetDatumFast!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6499,7 +6755,7 @@ macro_rules! Float8GetDatumFast {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -6528,7 +6784,7 @@ macro_rules! Float8GetDatumFast {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6648,6 +6904,11 @@ macro_rules! __pgrx_c_args_Int16GetDatum {
             @argument [__pgrx_c_args_Int16GetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_Int16GetDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_Int16GetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6685,6 +6946,11 @@ macro_rules! __pgrx_c_args_Int16GetDatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_Int16GetDatum] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_Int16GetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6701,7 +6967,7 @@ macro_rules! __pgrx_c_args_Int16GetDatum {
         $crate::Int16GetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro Int16GetDatum from postgres.h:495
@@ -6759,13 +7025,13 @@ macro_rules! Int16GetDatum {
         $crate::__pgrx_c_args_Int16GetDatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_Int16GetDatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_Int16GetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6778,7 +7044,7 @@ macro_rules! Int16GetDatum {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -6799,7 +7065,7 @@ macro_rules! Int16GetDatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6911,6 +7177,11 @@ macro_rules! __pgrx_c_args_Int32GetDatum {
             @argument [__pgrx_c_args_Int32GetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_Int32GetDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_Int32GetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6948,6 +7219,11 @@ macro_rules! __pgrx_c_args_Int32GetDatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_Int32GetDatum] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_Int32GetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6964,7 +7240,7 @@ macro_rules! __pgrx_c_args_Int32GetDatum {
         $crate::Int32GetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro Int32GetDatum from postgres.h:523
@@ -7022,13 +7298,13 @@ macro_rules! Int32GetDatum {
         $crate::__pgrx_c_args_Int32GetDatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_Int32GetDatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_Int32GetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7041,7 +7317,7 @@ macro_rules! Int32GetDatum {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -7062,7 +7338,7 @@ macro_rules! Int32GetDatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7174,6 +7450,11 @@ macro_rules! __pgrx_c_args_Int64GetDatum {
             @argument [__pgrx_c_args_Int64GetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_Int64GetDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_Int64GetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7211,6 +7492,11 @@ macro_rules! __pgrx_c_args_Int64GetDatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_Int64GetDatum] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_Int64GetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7227,7 +7513,7 @@ macro_rules! __pgrx_c_args_Int64GetDatum {
         $crate::Int64GetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro Int64GetDatum from postgres.h:663
@@ -7285,13 +7571,13 @@ macro_rules! Int64GetDatum {
         $crate::__pgrx_c_args_Int64GetDatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_Int64GetDatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_Int64GetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7304,7 +7590,7 @@ macro_rules! Int64GetDatum {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -7325,7 +7611,7 @@ macro_rules! Int64GetDatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7437,6 +7723,11 @@ macro_rules! __pgrx_c_args_Int64GetDatumFast {
             @argument [__pgrx_c_args_Int64GetDatumFast] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_Int64GetDatumFast] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_Int64GetDatumFast!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7474,6 +7765,13 @@ macro_rules! __pgrx_c_args_Int64GetDatumFast {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_Int64GetDatumFast] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_Int64GetDatumFast!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7490,7 +7788,7 @@ macro_rules! __pgrx_c_args_Int64GetDatumFast {
         $crate::Int64GetDatumFast!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro Int64GetDatumFast from postgres.h:801
@@ -7636,6 +7934,11 @@ macro_rules! __pgrx_c_args_Int8GetDatum {
             @argument [__pgrx_c_args_Int8GetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_Int8GetDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_Int8GetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7671,6 +7974,11 @@ macro_rules! __pgrx_c_args_Int8GetDatum {
             @argument [__pgrx_c_args_Int8GetDatum] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_Int8GetDatum] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_Int8GetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7687,7 +7995,7 @@ macro_rules! __pgrx_c_args_Int8GetDatum {
         $crate::Int8GetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro Int8GetDatum from postgres.h:467
@@ -7745,13 +8053,13 @@ macro_rules! Int8GetDatum {
         $crate::__pgrx_c_args_Int8GetDatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_Int8GetDatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_Int8GetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7764,7 +8072,7 @@ macro_rules! Int8GetDatum {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -7785,7 +8093,7 @@ macro_rules! Int8GetDatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7897,6 +8205,11 @@ macro_rules! __pgrx_c_args_MultiXactIdGetDatum {
             @argument [__pgrx_c_args_MultiXactIdGetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MultiXactIdGetDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_MultiXactIdGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7934,6 +8247,13 @@ macro_rules! __pgrx_c_args_MultiXactIdGetDatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MultiXactIdGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MultiXactIdGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7950,7 +8270,7 @@ macro_rules! __pgrx_c_args_MultiXactIdGetDatum {
         $crate::MultiXactIdGetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro MultiXactIdGetDatum from postgres.h:572
@@ -8008,13 +8328,13 @@ macro_rules! MultiXactIdGetDatum {
         $crate::__pgrx_c_args_MultiXactIdGetDatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MultiXactIdGetDatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MultiXactIdGetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8027,7 +8347,7 @@ macro_rules! MultiXactIdGetDatum {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -8048,7 +8368,7 @@ macro_rules! MultiXactIdGetDatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8160,6 +8480,11 @@ macro_rules! __pgrx_c_args_NameGetDatum {
             @argument [__pgrx_c_args_NameGetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_NameGetDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_NameGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8195,6 +8520,11 @@ macro_rules! __pgrx_c_args_NameGetDatum {
             @argument [__pgrx_c_args_NameGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_NameGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_NameGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8211,7 +8541,7 @@ macro_rules! __pgrx_c_args_NameGetDatum {
         $crate::NameGetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro NameGetDatum from postgres.h:639
@@ -8318,7 +8648,7 @@ macro_rules! NameGetDatum {
                                     $crate::__pgrx_c_operand!(@check_safety; $X);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::project::<
                                         $crate::__pgrx_c_generated::Field_data,
@@ -8339,7 +8669,7 @@ macro_rules! NameGetDatum {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -8422,7 +8752,7 @@ macro_rules! NameGetDatum {
                                     $crate::__pgrx_c_operand!(@check_safety; $X);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::project::<
                                         $crate::__pgrx_c_generated::Field_data,
@@ -8443,7 +8773,7 @@ macro_rules! NameGetDatum {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -8526,7 +8856,7 @@ macro_rules! NameGetDatum {
                                     $crate::__pgrx_c_operand!(@check_safety; $X);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::project::<
                                         $crate::__pgrx_c_generated::Field_data,
@@ -8547,7 +8877,7 @@ macro_rules! NameGetDatum {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -8630,7 +8960,7 @@ macro_rules! NameGetDatum {
                                     $crate::__pgrx_c_operand!(@check_safety; $X);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::project::<
                                         $crate::__pgrx_c_generated::Field_data,
@@ -8651,7 +8981,7 @@ macro_rules! NameGetDatum {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -8734,7 +9064,7 @@ macro_rules! NameGetDatum {
                                     $crate::__pgrx_c_operand!(@check_safety; $X);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::project::<
                                         $crate::__pgrx_c_generated::Field_data,
@@ -8755,7 +9085,7 @@ macro_rules! NameGetDatum {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -8847,6 +9177,11 @@ macro_rules! __pgrx_c_args_ObjectIdGetDatum {
             @argument [__pgrx_c_args_ObjectIdGetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ObjectIdGetDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ObjectIdGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8884,6 +9219,13 @@ macro_rules! __pgrx_c_args_ObjectIdGetDatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ObjectIdGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ObjectIdGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8900,7 +9242,7 @@ macro_rules! __pgrx_c_args_ObjectIdGetDatum {
         $crate::ObjectIdGetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ObjectIdGetDatum from postgres.h:551
@@ -8958,13 +9300,13 @@ macro_rules! ObjectIdGetDatum {
         $crate::__pgrx_c_args_ObjectIdGetDatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ObjectIdGetDatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ObjectIdGetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8977,7 +9319,7 @@ macro_rules! ObjectIdGetDatum {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -8998,7 +9340,7 @@ macro_rules! ObjectIdGetDatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9110,6 +9452,11 @@ macro_rules! __pgrx_c_args_PointerGetDatum {
             @argument [__pgrx_c_args_PointerGetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PointerGetDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PointerGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9147,6 +9494,13 @@ macro_rules! __pgrx_c_args_PointerGetDatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PointerGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PointerGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9163,7 +9517,7 @@ macro_rules! __pgrx_c_args_PointerGetDatum {
         $crate::PointerGetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PointerGetDatum from postgres.h:600
@@ -9221,13 +9575,13 @@ macro_rules! PointerGetDatum {
         $crate::__pgrx_c_args_PointerGetDatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PointerGetDatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PointerGetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -9240,7 +9594,7 @@ macro_rules! PointerGetDatum {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -9261,7 +9615,7 @@ macro_rules! PointerGetDatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9364,6 +9718,11 @@ macro_rules! __pgrx_c_args_SET_VARSIZE {
             @argument [__pgrx_c_args_SET_VARSIZE] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9425,6 +9784,11 @@ macro_rules! __pgrx_c_args_SET_VARSIZE {
             @argument [__pgrx_c_args_SET_VARSIZE] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_VARSIZE!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9460,6 +9824,11 @@ macro_rules! __pgrx_c_args_SET_VARSIZE {
             @argument [__pgrx_c_args_SET_VARSIZE] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9476,7 +9845,7 @@ macro_rules! __pgrx_c_args_SET_VARSIZE {
         $crate::SET_VARSIZE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_VARSIZE from postgres.h:342
@@ -9590,13 +9959,13 @@ macro_rules! SET_VARSIZE {
         $crate::__pgrx_c_args_SET_VARSIZE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -9611,7 +9980,7 @@ macro_rules! SET_VARSIZE {
                         $crate::__pgrx_c_operand!(@check_safety; $len);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -9705,7 +10074,7 @@ macro_rules! SET_VARSIZE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9865,6 +10234,11 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_1B {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_1B] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_1B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9926,6 +10300,11 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_1B {
             @argument [__pgrx_c_args_SET_VARSIZE_1B] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_1B] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_VARSIZE_1B!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9963,6 +10342,11 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_1B {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_1B] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_1B!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9979,7 +10363,7 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_1B {
         $crate::SET_VARSIZE_1B!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_VARSIZE_1B from postgres.h:273
@@ -10106,13 +10490,13 @@ macro_rules! SET_VARSIZE_1B {
         $crate::__pgrx_c_args_SET_VARSIZE_1B!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_1B!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_1B!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -10126,7 +10510,7 @@ macro_rules! SET_VARSIZE_1B {
                         $crate::__pgrx_c_operand!(@check_safety; $len);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -10229,7 +10613,7 @@ macro_rules! SET_VARSIZE_1B {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10402,6 +10786,11 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_4B] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10463,6 +10852,11 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B {
             @argument [__pgrx_c_args_SET_VARSIZE_4B] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_4B] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10500,6 +10894,11 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_4B] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10516,7 +10915,7 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B {
         $crate::SET_VARSIZE_4B!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_VARSIZE_4B from postgres.h:269
@@ -10629,13 +11028,13 @@ macro_rules! SET_VARSIZE_4B {
         $crate::__pgrx_c_args_SET_VARSIZE_4B!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -10649,7 +11048,7 @@ macro_rules! SET_VARSIZE_4B {
                         $crate::__pgrx_c_operand!(@check_safety; $len);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -10743,7 +11142,7 @@ macro_rules! SET_VARSIZE_4B {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10902,6 +11301,13 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B_C {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_4B_C] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10963,6 +11369,11 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B_C {
             @argument [__pgrx_c_args_SET_VARSIZE_4B_C] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_4B_C] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11000,6 +11411,13 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B_C {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_4B_C] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11016,7 +11434,7 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B_C {
         $crate::SET_VARSIZE_4B_C!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_VARSIZE_4B_C from postgres.h:271
@@ -11149,13 +11567,13 @@ macro_rules! SET_VARSIZE_4B_C {
         $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -11169,7 +11587,7 @@ macro_rules! SET_VARSIZE_4B_C {
                         $crate::__pgrx_c_operand!(@check_safety; $len);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -11278,7 +11696,7 @@ macro_rules! SET_VARSIZE_4B_C {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -11460,6 +11878,13 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_COMPRESSED {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_COMPRESSED] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11523,6 +11948,11 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_COMPRESSED {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_COMPRESSED] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11560,6 +11990,13 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_COMPRESSED {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_COMPRESSED] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11576,7 +12013,7 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_COMPRESSED {
         $crate::SET_VARSIZE_COMPRESSED!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_VARSIZE_COMPRESSED from postgres.h:344
@@ -11713,13 +12150,13 @@ macro_rules! SET_VARSIZE_COMPRESSED {
         $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -11734,7 +12171,7 @@ macro_rules! SET_VARSIZE_COMPRESSED {
                         $crate::__pgrx_c_operand!(@check_safety; $len);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -11843,7 +12280,7 @@ macro_rules! SET_VARSIZE_COMPRESSED {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -12023,6 +12460,13 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_SHORT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_SHORT] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12084,6 +12528,11 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_SHORT {
             @argument [__pgrx_c_args_SET_VARSIZE_SHORT] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_SHORT] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12121,6 +12570,13 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_SHORT {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_SHORT] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12137,7 +12593,7 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_SHORT {
         $crate::SET_VARSIZE_SHORT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_VARSIZE_SHORT from postgres.h:343
@@ -12265,13 +12721,13 @@ macro_rules! SET_VARSIZE_SHORT {
         $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -12286,7 +12742,7 @@ macro_rules! SET_VARSIZE_SHORT {
                         $crate::__pgrx_c_operand!(@check_safety; $len);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -12389,7 +12845,7 @@ macro_rules! SET_VARSIZE_SHORT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -12563,6 +13019,13 @@ macro_rules! __pgrx_c_args_SET_VARTAG_1B_E {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARTAG_1B_E] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_1B_E!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12624,6 +13087,11 @@ macro_rules! __pgrx_c_args_SET_VARTAG_1B_E {
             @argument [__pgrx_c_args_SET_VARTAG_1B_E] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARTAG_1B_E] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_VARTAG_1B_E!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12661,6 +13129,13 @@ macro_rules! __pgrx_c_args_SET_VARTAG_1B_E {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARTAG_1B_E] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_1B_E!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12677,7 +13152,7 @@ macro_rules! __pgrx_c_args_SET_VARTAG_1B_E {
         $crate::SET_VARTAG_1B_E!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_VARTAG_1B_E from postgres.h:275
@@ -12818,13 +13293,13 @@ macro_rules! SET_VARTAG_1B_E {
         $crate::__pgrx_c_args_SET_VARTAG_1B_E!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt, $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_1B_E!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt, $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_1B_E!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -12838,7 +13313,7 @@ macro_rules! SET_VARTAG_1B_E {
                         $crate::__pgrx_c_operand!(@check_safety; $tag);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -12948,7 +13423,7 @@ macro_rules! SET_VARTAG_1B_E {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -13135,6 +13610,13 @@ macro_rules! __pgrx_c_args_SET_VARTAG_EXTERNAL {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARTAG_EXTERNAL] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13196,6 +13678,11 @@ macro_rules! __pgrx_c_args_SET_VARTAG_EXTERNAL {
             @argument [__pgrx_c_args_SET_VARTAG_EXTERNAL] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARTAG_EXTERNAL] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13233,6 +13720,13 @@ macro_rules! __pgrx_c_args_SET_VARTAG_EXTERNAL {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARTAG_EXTERNAL] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13249,7 +13743,7 @@ macro_rules! __pgrx_c_args_SET_VARTAG_EXTERNAL {
         $crate::SET_VARTAG_EXTERNAL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_VARTAG_EXTERNAL from postgres.h:346
@@ -13391,13 +13885,13 @@ macro_rules! SET_VARTAG_EXTERNAL {
         $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt, $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt, $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -13412,7 +13906,7 @@ macro_rules! SET_VARTAG_EXTERNAL {
                         $crate::__pgrx_c_operand!(@check_safety; $tag);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -13522,7 +14016,7 @@ macro_rules! SET_VARTAG_EXTERNAL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -13720,6 +14214,11 @@ macro_rules! __pgrx_c_args_TransactionIdGetDatum {
             @argument [__pgrx_c_args_TransactionIdGetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TransactionIdGetDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TransactionIdGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13757,6 +14256,13 @@ macro_rules! __pgrx_c_args_TransactionIdGetDatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TransactionIdGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13773,7 +14279,7 @@ macro_rules! __pgrx_c_args_TransactionIdGetDatum {
         $crate::TransactionIdGetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TransactionIdGetDatum from postgres.h:565
@@ -13831,13 +14337,13 @@ macro_rules! TransactionIdGetDatum {
         $crate::__pgrx_c_args_TransactionIdGetDatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdGetDatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TransactionIdGetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -13850,7 +14356,7 @@ macro_rules! TransactionIdGetDatum {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -13871,7 +14377,7 @@ macro_rules! TransactionIdGetDatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -13983,6 +14489,11 @@ macro_rules! __pgrx_c_args_UInt16GetDatum {
             @argument [__pgrx_c_args_UInt16GetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_UInt16GetDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_UInt16GetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14020,6 +14531,11 @@ macro_rules! __pgrx_c_args_UInt16GetDatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_UInt16GetDatum] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_UInt16GetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14036,7 +14552,7 @@ macro_rules! __pgrx_c_args_UInt16GetDatum {
         $crate::UInt16GetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro UInt16GetDatum from postgres.h:509
@@ -14094,13 +14610,13 @@ macro_rules! UInt16GetDatum {
         $crate::__pgrx_c_args_UInt16GetDatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_UInt16GetDatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_UInt16GetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -14113,7 +14629,7 @@ macro_rules! UInt16GetDatum {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -14134,7 +14650,7 @@ macro_rules! UInt16GetDatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -14246,6 +14762,11 @@ macro_rules! __pgrx_c_args_UInt32GetDatum {
             @argument [__pgrx_c_args_UInt32GetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_UInt32GetDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_UInt32GetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14283,6 +14804,11 @@ macro_rules! __pgrx_c_args_UInt32GetDatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_UInt32GetDatum] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_UInt32GetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14299,7 +14825,7 @@ macro_rules! __pgrx_c_args_UInt32GetDatum {
         $crate::UInt32GetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro UInt32GetDatum from postgres.h:537
@@ -14357,13 +14883,13 @@ macro_rules! UInt32GetDatum {
         $crate::__pgrx_c_args_UInt32GetDatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_UInt32GetDatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_UInt32GetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -14376,7 +14902,7 @@ macro_rules! UInt32GetDatum {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -14397,7 +14923,7 @@ macro_rules! UInt32GetDatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -14509,6 +15035,11 @@ macro_rules! __pgrx_c_args_UInt64GetDatum {
             @argument [__pgrx_c_args_UInt64GetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_UInt64GetDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_UInt64GetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14546,6 +15077,11 @@ macro_rules! __pgrx_c_args_UInt64GetDatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_UInt64GetDatum] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_UInt64GetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14562,7 +15098,7 @@ macro_rules! __pgrx_c_args_UInt64GetDatum {
         $crate::UInt64GetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro UInt64GetDatum from postgres.h:690
@@ -14620,13 +15156,13 @@ macro_rules! UInt64GetDatum {
         $crate::__pgrx_c_args_UInt64GetDatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_UInt64GetDatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_UInt64GetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -14639,7 +15175,7 @@ macro_rules! UInt64GetDatum {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -14660,7 +15196,7 @@ macro_rules! UInt64GetDatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -14772,6 +15308,11 @@ macro_rules! __pgrx_c_args_UInt8GetDatum {
             @argument [__pgrx_c_args_UInt8GetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_UInt8GetDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_UInt8GetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14809,6 +15350,11 @@ macro_rules! __pgrx_c_args_UInt8GetDatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_UInt8GetDatum] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_UInt8GetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14825,7 +15371,7 @@ macro_rules! __pgrx_c_args_UInt8GetDatum {
         $crate::UInt8GetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro UInt8GetDatum from postgres.h:481
@@ -14883,13 +15429,13 @@ macro_rules! UInt8GetDatum {
         $crate::__pgrx_c_args_UInt8GetDatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_UInt8GetDatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_UInt8GetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -14902,7 +15448,7 @@ macro_rules! UInt8GetDatum {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -14923,7 +15469,7 @@ macro_rules! UInt8GetDatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -15038,6 +15584,11 @@ macro_rules! __pgrx_c_args_VARATT_CAN_MAKE_SHORT {
             @argument [__pgrx_c_args_VARATT_CAN_MAKE_SHORT] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_CAN_MAKE_SHORT] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15075,6 +15626,13 @@ macro_rules! __pgrx_c_args_VARATT_CAN_MAKE_SHORT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_CAN_MAKE_SHORT] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15091,7 +15649,7 @@ macro_rules! __pgrx_c_args_VARATT_CAN_MAKE_SHORT {
         $crate::VARATT_CAN_MAKE_SHORT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_CAN_MAKE_SHORT from postgres.h:295
@@ -15369,13 +15927,13 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
         $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -15389,7 +15947,7 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -15650,7 +16208,7 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -15987,6 +16545,13 @@ macro_rules! __pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16024,6 +16589,13 @@ macro_rules! __pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16040,7 +16612,7 @@ macro_rules! __pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE {
         $crate::VARATT_CONVERTED_SHORT_SIZE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_CONVERTED_SHORT_SIZE from postgres.h:298
@@ -16207,13 +16779,13 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
         $crate::__pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE!(
@@ -16230,7 +16802,7 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::add::<
@@ -16366,7 +16938,7 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -16595,6 +17167,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16632,6 +17211,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16648,7 +17234,7 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD {
         $crate::VARATT_EXTERNAL_GET_COMPRESS_METHOD!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_EXTERNAL_GET_COMPRESS_METHOD from postgres.h:373
@@ -16714,7 +17300,7 @@ macro_rules! VARATT_EXTERNAL_GET_COMPRESS_METHOD {
         )
     };
     (@__pgrx_emit_place; $toast_pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD!(
@@ -16723,7 +17309,7 @@ macro_rules! VARATT_EXTERNAL_GET_COMPRESS_METHOD {
         )
     };
     (@__pgrx_emit_read_place; $toast_pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD!(
@@ -16739,7 +17325,7 @@ macro_rules! VARATT_EXTERNAL_GET_COMPRESS_METHOD {
                         $crate::__pgrx_c_operand!(@check_safety; $toast_pointer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::shr(
@@ -16762,7 +17348,7 @@ macro_rules! VARATT_EXTERNAL_GET_COMPRESS_METHOD {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -16890,6 +17476,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16927,6 +17520,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16943,7 +17543,7 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE {
         $crate::VARATT_EXTERNAL_GET_EXTSIZE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_EXTERNAL_GET_EXTSIZE from postgres.h:371
@@ -17002,13 +17602,13 @@ macro_rules! VARATT_EXTERNAL_GET_EXTSIZE {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $toast_pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $toast_pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE!(
@@ -17024,7 +17624,7 @@ macro_rules! VARATT_EXTERNAL_GET_EXTSIZE {
                         $crate::__pgrx_c_operand!(@check_safety; $toast_pointer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -17047,7 +17647,7 @@ macro_rules! VARATT_EXTERNAL_GET_EXTSIZE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -17172,6 +17772,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17209,6 +17816,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17225,7 +17839,7 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED {
         $crate::VARATT_EXTERNAL_IS_COMPRESSED!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_EXTERNAL_IS_COMPRESSED from postgres.h:391
@@ -17333,7 +17947,7 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
         )
     };
     (@__pgrx_emit_place; $toast_pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED!(
@@ -17342,7 +17956,7 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
         )
     };
     (@__pgrx_emit_read_place; $toast_pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED!(
@@ -17359,7 +17973,7 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
                         $crate::__pgrx_c_operand!(@check_safety; $toast_pointer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::lt(
@@ -17451,7 +18065,7 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -17615,6 +18229,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17670,6 +18291,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
             @argument [__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD] [
                 p2 $mode [$($done)*] [$($rest)*]
             ] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -17738,6 +18366,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
             ] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD] [
+                p3 $mode [$($done)*] []
+            ] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17775,6 +18410,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
             ] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD] [
+                p3 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17791,7 +18433,7 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
         $crate::VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD from postgres.h:376
@@ -17923,7 +18565,7 @@ macro_rules! VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
         )
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
@@ -18010,6 +18652,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_1B {
             @argument [__pgrx_c_args_VARATT_IS_1B] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_1B] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_1B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18045,6 +18692,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_1B {
             @argument [__pgrx_c_args_VARATT_IS_1B] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_1B] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_1B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18061,7 +18713,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_1B {
         $crate::VARATT_IS_1B!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_1B from postgres.h:254
@@ -18164,13 +18816,13 @@ macro_rules! VARATT_IS_1B {
         $crate::__pgrx_c_args_VARATT_IS_1B!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_1B!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_1B!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -18183,7 +18835,7 @@ macro_rules! VARATT_IS_1B {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -18255,7 +18907,7 @@ macro_rules! VARATT_IS_1B {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -18412,6 +19064,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_1B_E {
             @argument [__pgrx_c_args_VARATT_IS_1B_E] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_1B_E] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_1B_E!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18449,6 +19106,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_1B_E {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_1B_E] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_1B_E!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18465,7 +19127,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_1B_E {
         $crate::VARATT_IS_1B_E!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_1B_E from postgres.h:256
@@ -18559,13 +19221,13 @@ macro_rules! VARATT_IS_1B_E {
         $crate::__pgrx_c_args_VARATT_IS_1B_E!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_1B_E!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_1B_E!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -18578,7 +19240,7 @@ macro_rules! VARATT_IS_1B_E {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -18635,7 +19297,7 @@ macro_rules! VARATT_IS_1B_E {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -18783,6 +19445,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B {
             @argument [__pgrx_c_args_VARATT_IS_4B] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_4B] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_4B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18818,6 +19485,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B {
             @argument [__pgrx_c_args_VARATT_IS_4B] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_4B] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18834,7 +19506,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B {
         $crate::VARATT_IS_4B!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_4B from postgres.h:248
@@ -18939,13 +19611,13 @@ macro_rules! VARATT_IS_4B {
         $crate::__pgrx_c_args_VARATT_IS_4B!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -18958,7 +19630,7 @@ macro_rules! VARATT_IS_4B {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -19032,7 +19704,7 @@ macro_rules! VARATT_IS_4B {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -19191,6 +19863,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B_C {
             @argument [__pgrx_c_args_VARATT_IS_4B_C] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_4B_C] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_C!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19228,6 +19905,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B_C {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_4B_C] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_C!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19244,7 +19926,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B_C {
         $crate::VARATT_IS_4B_C!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_4B_C from postgres.h:252
@@ -19347,13 +20029,13 @@ macro_rules! VARATT_IS_4B_C {
         $crate::__pgrx_c_args_VARATT_IS_4B_C!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_C!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_C!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -19366,7 +20048,7 @@ macro_rules! VARATT_IS_4B_C {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -19438,7 +20120,7 @@ macro_rules! VARATT_IS_4B_C {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -19595,6 +20277,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B_U {
             @argument [__pgrx_c_args_VARATT_IS_4B_U] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_4B_U] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_U!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19632,6 +20319,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B_U {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_4B_U] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_U!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19648,7 +20340,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B_U {
         $crate::VARATT_IS_4B_U!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_4B_U from postgres.h:250
@@ -19753,13 +20445,13 @@ macro_rules! VARATT_IS_4B_U {
         $crate::__pgrx_c_args_VARATT_IS_4B_U!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_U!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_U!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -19772,7 +20464,7 @@ macro_rules! VARATT_IS_4B_U {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -19846,7 +20538,7 @@ macro_rules! VARATT_IS_4B_U {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -20008,6 +20700,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_COMPRESSED {
             @argument [__pgrx_c_args_VARATT_IS_COMPRESSED] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_COMPRESSED] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20045,6 +20742,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_COMPRESSED {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_COMPRESSED] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20061,7 +20765,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_COMPRESSED {
         $crate::VARATT_IS_COMPRESSED!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_COMPRESSED from postgres.h:325
@@ -20165,13 +20869,13 @@ macro_rules! VARATT_IS_COMPRESSED {
         $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -20185,7 +20889,7 @@ macro_rules! VARATT_IS_COMPRESSED {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -20257,7 +20961,7 @@ macro_rules! VARATT_IS_COMPRESSED {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -20415,6 +21119,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTENDED {
             @argument [__pgrx_c_args_VARATT_IS_EXTENDED] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTENDED] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20452,6 +21161,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTENDED {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTENDED] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20468,7 +21184,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTENDED {
         $crate::VARATT_IS_EXTENDED!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_EXTENDED from postgres.h:340
@@ -20586,13 +21302,13 @@ macro_rules! VARATT_IS_EXTENDED {
         $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -20606,7 +21322,7 @@ macro_rules! VARATT_IS_EXTENDED {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::logical_not(
@@ -20694,7 +21410,7 @@ macro_rules! VARATT_IS_EXTENDED {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -20866,6 +21582,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL {
             @argument [__pgrx_c_args_VARATT_IS_EXTERNAL] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20903,6 +21624,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20919,7 +21647,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL {
         $crate::VARATT_IS_EXTERNAL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_EXTERNAL from postgres.h:326
@@ -21014,13 +21742,13 @@ macro_rules! VARATT_IS_EXTERNAL {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -21034,7 +21762,7 @@ macro_rules! VARATT_IS_EXTERNAL {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -21091,7 +21819,7 @@ macro_rules! VARATT_IS_EXTERNAL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -21245,6 +21973,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -21282,6 +22017,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -21298,7 +22040,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED {
         $crate::VARATT_IS_EXTERNAL_EXPANDED!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_EXTERNAL_EXPANDED from postgres.h:335
@@ -21499,13 +22241,13 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED!(
@@ -21522,7 +22264,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -21696,7 +22438,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -21959,6 +22701,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -21996,6 +22745,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -22012,7 +22768,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO {
         $crate::VARATT_IS_EXTERNAL_EXPANDED_RO!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_EXTERNAL_EXPANDED_RO from postgres.h:331
@@ -22181,7 +22937,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
         )
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO!(
@@ -22190,7 +22946,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
         )
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO!(
@@ -22207,7 +22963,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -22350,7 +23106,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -22584,6 +23340,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -22621,6 +23384,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -22637,7 +23407,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW {
         $crate::VARATT_IS_EXTERNAL_EXPANDED_RW!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_EXTERNAL_EXPANDED_RW from postgres.h:333
@@ -22806,7 +23576,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
         )
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW!(
@@ -22815,7 +23585,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
         )
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW!(
@@ -22832,7 +23602,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -22975,7 +23745,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -23206,6 +23976,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -23243,6 +24020,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -23259,7 +24043,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT {
         $crate::VARATT_IS_EXTERNAL_INDIRECT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_EXTERNAL_INDIRECT from postgres.h:329
@@ -23425,13 +24209,13 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT!(
@@ -23448,7 +24232,7 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -23591,7 +24375,7 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -23819,6 +24603,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -23856,6 +24647,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -23872,7 +24670,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED {
         $crate::VARATT_IS_EXTERNAL_NON_EXPANDED!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_EXTERNAL_NON_EXPANDED from postgres.h:337
@@ -24083,7 +24881,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
         )
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED!(
@@ -24092,7 +24890,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
         )
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED!(
@@ -24109,7 +24907,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -24287,7 +25085,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -24560,6 +25358,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -24597,6 +25402,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -24613,7 +25425,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK {
         $crate::VARATT_IS_EXTERNAL_ONDISK!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_EXTERNAL_ONDISK from postgres.h:327
@@ -24779,13 +25591,13 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK!(
@@ -24802,7 +25614,7 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -24945,7 +25757,7 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -25162,6 +25974,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_SHORT {
             @argument [__pgrx_c_args_VARATT_IS_SHORT] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_SHORT] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_SHORT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -25199,6 +26016,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_SHORT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_SHORT] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_SHORT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -25215,7 +26039,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_SHORT {
         $crate::VARATT_IS_SHORT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_SHORT from postgres.h:339
@@ -25319,13 +26143,13 @@ macro_rules! VARATT_IS_SHORT {
         $crate::__pgrx_c_args_VARATT_IS_SHORT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_SHORT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_SHORT!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -25339,7 +26163,7 @@ macro_rules! VARATT_IS_SHORT {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -25411,7 +26235,7 @@ macro_rules! VARATT_IS_SHORT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -25569,6 +26393,11 @@ macro_rules! __pgrx_c_args_VARATT_NOT_PAD_BYTE {
             @argument [__pgrx_c_args_VARATT_NOT_PAD_BYTE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_NOT_PAD_BYTE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -25606,6 +26435,13 @@ macro_rules! __pgrx_c_args_VARATT_NOT_PAD_BYTE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_NOT_PAD_BYTE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -25622,7 +26458,7 @@ macro_rules! __pgrx_c_args_VARATT_NOT_PAD_BYTE {
         $crate::VARATT_NOT_PAD_BYTE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_NOT_PAD_BYTE from postgres.h:258
@@ -25698,13 +26534,13 @@ macro_rules! VARATT_NOT_PAD_BYTE {
         $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -25717,7 +26553,7 @@ macro_rules! VARATT_NOT_PAD_BYTE {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -25764,7 +26600,7 @@ macro_rules! VARATT_NOT_PAD_BYTE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -25892,6 +26728,11 @@ macro_rules! __pgrx_c_args_VARDATA {
             @argument [__pgrx_c_args_VARDATA] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARDATA!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -25927,6 +26768,11 @@ macro_rules! __pgrx_c_args_VARDATA {
             @argument [__pgrx_c_args_VARDATA] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -25943,7 +26789,7 @@ macro_rules! __pgrx_c_args_VARDATA {
         $crate::VARDATA!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARDATA from postgres.h:315
@@ -26119,7 +26965,7 @@ macro_rules! VARDATA {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_va_data,
@@ -26167,7 +27013,7 @@ macro_rules! VARDATA {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -26303,6 +27149,11 @@ macro_rules! __pgrx_c_args_VARDATA_1B {
             @argument [__pgrx_c_args_VARDATA_1B] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_1B] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARDATA_1B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -26338,6 +27189,11 @@ macro_rules! __pgrx_c_args_VARDATA_1B {
             @argument [__pgrx_c_args_VARDATA_1B] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_1B] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_1B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -26354,7 +27210,7 @@ macro_rules! __pgrx_c_args_VARDATA_1B {
         $crate::VARDATA_1B!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARDATA_1B from postgres.h:283
@@ -26506,7 +27362,7 @@ macro_rules! VARDATA_1B {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_va_data,
@@ -26540,7 +27396,7 @@ macro_rules! VARDATA_1B {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -26669,6 +27525,11 @@ macro_rules! __pgrx_c_args_VARDATA_1B_E {
             @argument [__pgrx_c_args_VARDATA_1B_E] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_1B_E] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARDATA_1B_E!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -26704,6 +27565,11 @@ macro_rules! __pgrx_c_args_VARDATA_1B_E {
             @argument [__pgrx_c_args_VARDATA_1B_E] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_1B_E] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_1B_E!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -26720,7 +27586,7 @@ macro_rules! __pgrx_c_args_VARDATA_1B_E {
         $crate::VARDATA_1B_E!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARDATA_1B_E from postgres.h:284
@@ -26872,7 +27738,7 @@ macro_rules! VARDATA_1B_E {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_va_data,
@@ -26906,7 +27772,7 @@ macro_rules! VARDATA_1B_E {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -27035,6 +27901,11 @@ macro_rules! __pgrx_c_args_VARDATA_4B {
             @argument [__pgrx_c_args_VARDATA_4B] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_4B] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARDATA_4B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -27070,6 +27941,11 @@ macro_rules! __pgrx_c_args_VARDATA_4B {
             @argument [__pgrx_c_args_VARDATA_4B] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_4B] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_4B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -27086,7 +27962,7 @@ macro_rules! __pgrx_c_args_VARDATA_4B {
         $crate::VARDATA_4B!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARDATA_4B from postgres.h:281
@@ -27258,7 +28134,7 @@ macro_rules! VARDATA_4B {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_va_data,
@@ -27306,7 +28182,7 @@ macro_rules! VARDATA_4B {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -27441,6 +28317,11 @@ macro_rules! __pgrx_c_args_VARDATA_4B_C {
             @argument [__pgrx_c_args_VARDATA_4B_C] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_4B_C] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARDATA_4B_C!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -27476,6 +28357,11 @@ macro_rules! __pgrx_c_args_VARDATA_4B_C {
             @argument [__pgrx_c_args_VARDATA_4B_C] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_4B_C] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_4B_C!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -27492,7 +28378,7 @@ macro_rules! __pgrx_c_args_VARDATA_4B_C {
         $crate::VARDATA_4B_C!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARDATA_4B_C from postgres.h:282
@@ -27664,7 +28550,7 @@ macro_rules! VARDATA_4B_C {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_va_data,
@@ -27712,7 +28598,7 @@ macro_rules! VARDATA_4B_C {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -27847,6 +28733,11 @@ macro_rules! __pgrx_c_args_VARDATA_ANY {
             @argument [__pgrx_c_args_VARDATA_ANY] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_ANY] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARDATA_ANY!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -27882,6 +28773,11 @@ macro_rules! __pgrx_c_args_VARDATA_ANY {
             @argument [__pgrx_c_args_VARDATA_ANY] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_ANY] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_ANY!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -27898,7 +28794,7 @@ macro_rules! __pgrx_c_args_VARDATA_ANY {
         $crate::VARDATA_ANY!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARDATA_ANY from postgres.h:361
@@ -28119,13 +29015,13 @@ macro_rules! VARDATA_ANY {
         $crate::__pgrx_c_args_VARDATA_ANY!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_ANY!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_ANY!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -28139,7 +29035,7 @@ macro_rules! VARDATA_ANY {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -28336,7 +29232,7 @@ macro_rules! VARDATA_ANY {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -28622,6 +29518,13 @@ macro_rules! __pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD] [
+                p1 $mode [$($done)*] []
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -28659,6 +29562,13 @@ macro_rules! __pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -28675,7 +29585,7 @@ macro_rules! __pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
         $crate::VARDATA_COMPRESSED_GET_COMPRESS_METHOD!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARDATA_COMPRESSED_GET_COMPRESS_METHOD from postgres.h:367
@@ -28779,7 +29689,7 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
         )
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD!(
@@ -28788,7 +29698,7 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
         )
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD!(
@@ -28804,7 +29714,7 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::shr(
@@ -28865,7 +29775,7 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -29034,6 +29944,13 @@ macro_rules! __pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -29071,6 +29988,13 @@ macro_rules! __pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -29087,7 +30011,7 @@ macro_rules! __pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE {
         $crate::VARDATA_COMPRESSED_GET_EXTSIZE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARDATA_COMPRESSED_GET_EXTSIZE from postgres.h:365
@@ -29191,7 +30115,7 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
         )
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE!(
@@ -29200,7 +30124,7 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
         )
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE!(
@@ -29216,7 +30140,7 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -29277,7 +30201,7 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -29438,6 +30362,11 @@ macro_rules! __pgrx_c_args_VARDATA_EXTERNAL {
             @argument [__pgrx_c_args_VARDATA_EXTERNAL] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_EXTERNAL] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARDATA_EXTERNAL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -29475,6 +30404,13 @@ macro_rules! __pgrx_c_args_VARDATA_EXTERNAL {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_EXTERNAL] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_EXTERNAL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -29491,7 +30427,7 @@ macro_rules! __pgrx_c_args_VARDATA_EXTERNAL {
         $crate::VARDATA_EXTERNAL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARDATA_EXTERNAL from postgres.h:323
@@ -29647,7 +30583,7 @@ macro_rules! VARDATA_EXTERNAL {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_va_data,
@@ -29681,7 +30617,7 @@ macro_rules! VARDATA_EXTERNAL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -29811,6 +30747,11 @@ macro_rules! __pgrx_c_args_VARDATA_SHORT {
             @argument [__pgrx_c_args_VARDATA_SHORT] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_SHORT] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARDATA_SHORT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -29848,6 +30789,11 @@ macro_rules! __pgrx_c_args_VARDATA_SHORT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_SHORT] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_SHORT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -29864,7 +30810,7 @@ macro_rules! __pgrx_c_args_VARDATA_SHORT {
         $crate::VARDATA_SHORT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARDATA_SHORT from postgres.h:319
@@ -30020,7 +30966,7 @@ macro_rules! VARDATA_SHORT {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_va_data,
@@ -30054,7 +31000,7 @@ macro_rules! VARDATA_SHORT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -30182,6 +31128,11 @@ macro_rules! __pgrx_c_args_VARSIZE {
             @argument [__pgrx_c_args_VARSIZE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARSIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -30217,6 +31168,11 @@ macro_rules! __pgrx_c_args_VARSIZE {
             @argument [__pgrx_c_args_VARSIZE] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -30233,7 +31189,7 @@ macro_rules! __pgrx_c_args_VARSIZE {
         $crate::VARSIZE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARSIZE from postgres.h:316
@@ -30343,13 +31299,13 @@ macro_rules! VARSIZE {
         $crate::__pgrx_c_args_VARSIZE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -30363,7 +31319,7 @@ macro_rules! VARSIZE {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -30443,7 +31399,7 @@ macro_rules! VARSIZE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -30607,6 +31563,11 @@ macro_rules! __pgrx_c_args_VARSIZE_1B {
             @argument [__pgrx_c_args_VARSIZE_1B] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE_1B] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARSIZE_1B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -30642,6 +31603,11 @@ macro_rules! __pgrx_c_args_VARSIZE_1B {
             @argument [__pgrx_c_args_VARSIZE_1B] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE_1B] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_1B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -30658,7 +31624,7 @@ macro_rules! __pgrx_c_args_VARSIZE_1B {
         $crate::VARSIZE_1B!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARSIZE_1B from postgres.h:264
@@ -30761,13 +31727,13 @@ macro_rules! VARSIZE_1B {
         $crate::__pgrx_c_args_VARSIZE_1B!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_1B!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_1B!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -30780,7 +31746,7 @@ macro_rules! VARSIZE_1B {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -30852,7 +31818,7 @@ macro_rules! VARSIZE_1B {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -31009,6 +31975,11 @@ macro_rules! __pgrx_c_args_VARSIZE_4B {
             @argument [__pgrx_c_args_VARSIZE_4B] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE_4B] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARSIZE_4B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -31044,6 +32015,11 @@ macro_rules! __pgrx_c_args_VARSIZE_4B {
             @argument [__pgrx_c_args_VARSIZE_4B] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE_4B] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_4B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -31060,7 +32036,7 @@ macro_rules! __pgrx_c_args_VARSIZE_4B {
         $crate::VARSIZE_4B!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARSIZE_4B from postgres.h:262
@@ -31169,13 +32145,13 @@ macro_rules! VARSIZE_4B {
         $crate::__pgrx_c_args_VARSIZE_4B!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_4B!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_4B!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -31188,7 +32164,7 @@ macro_rules! VARSIZE_4B {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -31268,7 +32244,7 @@ macro_rules! VARSIZE_4B {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -31431,6 +32407,11 @@ macro_rules! __pgrx_c_args_VARSIZE_ANY {
             @argument [__pgrx_c_args_VARSIZE_ANY] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE_ANY] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARSIZE_ANY!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -31466,6 +32447,11 @@ macro_rules! __pgrx_c_args_VARSIZE_ANY {
             @argument [__pgrx_c_args_VARSIZE_ANY] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE_ANY] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_ANY!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -31482,7 +32468,7 @@ macro_rules! __pgrx_c_args_VARSIZE_ANY {
         $crate::VARSIZE_ANY!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARSIZE_ANY from postgres.h:348
@@ -32191,13 +33177,13 @@ macro_rules! VARSIZE_ANY {
         $crate::__pgrx_c_args_VARSIZE_ANY!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_ANY!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_ANY!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -32211,7 +33197,7 @@ macro_rules! VARSIZE_ANY {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -32899,7 +33885,7 @@ macro_rules! VARSIZE_ANY {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -33662,6 +34648,11 @@ macro_rules! __pgrx_c_args_VARSIZE_ANY_EXHDR {
             @argument [__pgrx_c_args_VARSIZE_ANY_EXHDR] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE_ANY_EXHDR] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -33699,6 +34690,13 @@ macro_rules! __pgrx_c_args_VARSIZE_ANY_EXHDR {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE_ANY_EXHDR] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -33715,7 +34713,7 @@ macro_rules! __pgrx_c_args_VARSIZE_ANY_EXHDR {
         $crate::VARSIZE_ANY_EXHDR!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARSIZE_ANY_EXHDR from postgres.h:354
@@ -34503,13 +35501,13 @@ macro_rules! VARSIZE_ANY_EXHDR {
         $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -34523,7 +35521,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -35299,7 +36297,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -36141,6 +37139,11 @@ macro_rules! __pgrx_c_args_VARSIZE_EXTERNAL {
             @argument [__pgrx_c_args_VARSIZE_EXTERNAL] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE_EXTERNAL] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -36178,6 +37181,13 @@ macro_rules! __pgrx_c_args_VARSIZE_EXTERNAL {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE_EXTERNAL] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -36194,7 +37204,7 @@ macro_rules! __pgrx_c_args_VARSIZE_EXTERNAL {
         $crate::VARSIZE_EXTERNAL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARSIZE_EXTERNAL from postgres.h:322
@@ -36555,13 +37565,13 @@ macro_rules! VARSIZE_EXTERNAL {
         $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -36575,7 +37585,7 @@ macro_rules! VARSIZE_EXTERNAL {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::add::<
@@ -36909,7 +37919,7 @@ macro_rules! VARSIZE_EXTERNAL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -37324,6 +38334,11 @@ macro_rules! __pgrx_c_args_VARSIZE_SHORT {
             @argument [__pgrx_c_args_VARSIZE_SHORT] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE_SHORT] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARSIZE_SHORT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -37361,6 +38376,11 @@ macro_rules! __pgrx_c_args_VARSIZE_SHORT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE_SHORT] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_SHORT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -37377,7 +38397,7 @@ macro_rules! __pgrx_c_args_VARSIZE_SHORT {
         $crate::VARSIZE_SHORT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARSIZE_SHORT from postgres.h:318
@@ -37481,13 +38501,13 @@ macro_rules! VARSIZE_SHORT {
         $crate::__pgrx_c_args_VARSIZE_SHORT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_SHORT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_SHORT!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -37501,7 +38521,7 @@ macro_rules! VARSIZE_SHORT {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -37573,7 +38593,7 @@ macro_rules! VARSIZE_SHORT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -37731,6 +38751,11 @@ macro_rules! __pgrx_c_args_VARTAG_1B_E {
             @argument [__pgrx_c_args_VARTAG_1B_E] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARTAG_1B_E] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARTAG_1B_E!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -37766,6 +38791,11 @@ macro_rules! __pgrx_c_args_VARTAG_1B_E {
             @argument [__pgrx_c_args_VARTAG_1B_E] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARTAG_1B_E] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_1B_E!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -37782,7 +38812,7 @@ macro_rules! __pgrx_c_args_VARTAG_1B_E {
         $crate::VARTAG_1B_E!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARTAG_1B_E from postgres.h:266
@@ -37934,7 +38964,7 @@ macro_rules! VARTAG_1B_E {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_va_tag,
@@ -37968,7 +38998,7 @@ macro_rules! VARTAG_1B_E {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -38097,6 +39127,11 @@ macro_rules! __pgrx_c_args_VARTAG_EXTERNAL {
             @argument [__pgrx_c_args_VARTAG_EXTERNAL] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARTAG_EXTERNAL] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARTAG_EXTERNAL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -38134,6 +39169,13 @@ macro_rules! __pgrx_c_args_VARTAG_EXTERNAL {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARTAG_EXTERNAL] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_EXTERNAL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -38150,7 +39192,7 @@ macro_rules! __pgrx_c_args_VARTAG_EXTERNAL {
         $crate::VARTAG_EXTERNAL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARTAG_EXTERNAL from postgres.h:321
@@ -38306,7 +39348,7 @@ macro_rules! VARTAG_EXTERNAL {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_va_tag,
@@ -38340,7 +39382,7 @@ macro_rules! VARTAG_EXTERNAL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -38470,6 +39512,11 @@ macro_rules! __pgrx_c_args_VARTAG_IS_EXPANDED {
             @argument [__pgrx_c_args_VARTAG_IS_EXPANDED] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARTAG_IS_EXPANDED] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -38507,6 +39554,13 @@ macro_rules! __pgrx_c_args_VARTAG_IS_EXPANDED {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARTAG_IS_EXPANDED] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -38523,7 +39577,7 @@ macro_rules! __pgrx_c_args_VARTAG_IS_EXPANDED {
         $crate::VARTAG_IS_EXPANDED!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARTAG_IS_EXPANDED from postgres.h:130
@@ -38593,13 +39647,13 @@ macro_rules! VARTAG_IS_EXPANDED {
         $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -38612,7 +39666,7 @@ macro_rules! VARTAG_IS_EXPANDED {
                         $crate::__pgrx_c_operand!(@check_safety; $tag);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -38653,7 +39707,7 @@ macro_rules! VARTAG_IS_EXPANDED {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -38781,6 +39835,11 @@ macro_rules! __pgrx_c_args_VARTAG_SIZE {
             @argument [__pgrx_c_args_VARTAG_SIZE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARTAG_SIZE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARTAG_SIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -38816,6 +39875,11 @@ macro_rules! __pgrx_c_args_VARTAG_SIZE {
             @argument [__pgrx_c_args_VARTAG_SIZE] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARTAG_SIZE] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_SIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -38832,7 +39896,7 @@ macro_rules! __pgrx_c_args_VARTAG_SIZE {
         $crate::VARTAG_SIZE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARTAG_SIZE from postgres.h:133
@@ -39041,13 +40105,13 @@ macro_rules! VARTAG_SIZE {
         $crate::__pgrx_c_args_VARTAG_SIZE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_SIZE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_SIZE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -39061,7 +40125,7 @@ macro_rules! VARTAG_SIZE {
                         $crate::__pgrx_c_operand!(@check_safety; $tag);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -39252,7 +40316,7 @@ macro_rules! VARTAG_SIZE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

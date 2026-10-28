@@ -4,6 +4,79 @@ This code is generated for documentation purposes, so that it is easy to referen
 */
 // Shared generated C macro support.
 
+#[doc(hidden)]
+#[derive(Clone, Copy)]
+pub struct Signature_039364c052cad4da9bf10066aa155f63;
+impl c::sealed::Sealed for Signature_039364c052cad4da9bf10066aa155f63 {}
+impl c::expression::NativeFunctionSignature for Signature_039364c052cad4da9bf10066aa155f63 {
+    type Physical = PhysicalFunction_C_unwind_1<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::JitProviderCallbacks) -> (),
+        >,
+    >;
+}
+const _: () = assert!(
+    ::core::mem::size_of::<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(
+                *mut crate::__pgrx_c_bindings::LWLock,
+                u32,
+                *mut ::core::ffi::c_void,
+            ) -> (),
+        >,
+    >() == 8
+);
+const _: () = assert!(
+    ::core::mem::align_of::<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(
+                *mut crate::__pgrx_c_bindings::LWLock,
+                u32,
+                *mut ::core::ffi::c_void,
+            ) -> (),
+        >,
+    >() == 8
+);
+#[doc(hidden)]
+#[derive(Clone, Copy)]
+pub struct Signature_4db2f04de7bd0d501f6bb0c7e5fd33a3;
+impl c::sealed::Sealed for Signature_4db2f04de7bd0d501f6bb0c7e5fd33a3 {}
+impl c::expression::NativeFunctionSignature for Signature_4db2f04de7bd0d501f6bb0c7e5fd33a3 {
+    type Physical = PhysicalFunction_C_unwind_3<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(
+                *mut crate::__pgrx_c_bindings::LWLock,
+                u32,
+                *mut ::core::ffi::c_void,
+            ) -> (),
+        >,
+    >;
+}
+const _: () = assert!(
+    ::core::mem::size_of::<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::List, u32, bool) -> (),
+        >,
+    >() == 8
+);
+const _: () = assert!(
+    ::core::mem::align_of::<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::List, u32, bool) -> (),
+        >,
+    >() == 8
+);
+#[doc(hidden)]
+#[derive(Clone, Copy)]
+pub struct Signature_ab8efb1b2512a938a94adcb12d26ca16;
+impl c::sealed::Sealed for Signature_ab8efb1b2512a938a94adcb12d26ca16 {}
+impl c::expression::NativeFunctionSignature for Signature_ab8efb1b2512a938a94adcb12d26ca16 {
+    type Physical = PhysicalFunction_C_unwind_3<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::List, u32, bool) -> (),
+        >,
+    >;
+}
 const _: () = assert!(
     ::core::mem::size_of::<
         ::core::option::Option<

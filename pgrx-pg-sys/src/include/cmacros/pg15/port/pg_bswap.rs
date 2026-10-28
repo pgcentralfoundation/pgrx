@@ -86,6 +86,11 @@ macro_rules! __pgrx_c_args_DatumBigEndianToNative {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumBigEndianToNative] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumBigEndianToNative!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -123,6 +128,13 @@ macro_rules! __pgrx_c_args_DatumBigEndianToNative {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumBigEndianToNative] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumBigEndianToNative!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -139,7 +151,7 @@ macro_rules! __pgrx_c_args_DatumBigEndianToNative {
         $crate::DatumBigEndianToNative!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DatumBigEndianToNative from pg_bswap.h:154
@@ -243,7 +255,7 @@ macro_rules! DatumBigEndianToNative {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -267,7 +279,7 @@ macro_rules! DatumBigEndianToNative {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -382,6 +394,11 @@ macro_rules! __pgrx_c_args_pg_bswap16 {
             @argument [__pgrx_c_args_pg_bswap16] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_bswap16] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_bswap16!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -417,6 +434,11 @@ macro_rules! __pgrx_c_args_pg_bswap16 {
             @argument [__pgrx_c_args_pg_bswap16] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_bswap16] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_bswap16!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -433,7 +455,7 @@ macro_rules! __pgrx_c_args_pg_bswap16 {
         $crate::pg_bswap16!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro pg_bswap16 from pg_bswap.h:33
@@ -534,7 +556,7 @@ macro_rules! pg_bswap16 {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -558,7 +580,7 @@ macro_rules! pg_bswap16 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -673,6 +695,11 @@ macro_rules! __pgrx_c_args_pg_bswap32 {
             @argument [__pgrx_c_args_pg_bswap32] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_bswap32] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_bswap32!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -708,6 +735,11 @@ macro_rules! __pgrx_c_args_pg_bswap32 {
             @argument [__pgrx_c_args_pg_bswap32] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_bswap32] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_bswap32!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -724,7 +756,7 @@ macro_rules! __pgrx_c_args_pg_bswap32 {
         $crate::pg_bswap32!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro pg_bswap32 from pg_bswap.h:55
@@ -825,7 +857,7 @@ macro_rules! pg_bswap32 {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -849,7 +881,7 @@ macro_rules! pg_bswap32 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -964,6 +996,11 @@ macro_rules! __pgrx_c_args_pg_bswap64 {
             @argument [__pgrx_c_args_pg_bswap64] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_bswap64] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_bswap64!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -999,6 +1036,11 @@ macro_rules! __pgrx_c_args_pg_bswap64 {
             @argument [__pgrx_c_args_pg_bswap64] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_bswap64] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_bswap64!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1015,7 +1057,7 @@ macro_rules! __pgrx_c_args_pg_bswap64 {
         $crate::pg_bswap64!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro pg_bswap64 from pg_bswap.h:79
@@ -1116,7 +1158,7 @@ macro_rules! pg_bswap64 {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1140,7 +1182,7 @@ macro_rules! pg_bswap64 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1255,6 +1297,11 @@ macro_rules! __pgrx_c_args_pg_hton16 {
             @argument [__pgrx_c_args_pg_hton16] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_hton16] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_hton16!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1290,6 +1337,11 @@ macro_rules! __pgrx_c_args_pg_hton16 {
             @argument [__pgrx_c_args_pg_hton16] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_hton16] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_hton16!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1306,7 +1358,7 @@ macro_rules! __pgrx_c_args_pg_hton16 {
         $crate::pg_hton16!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro pg_hton16 from pg_bswap.h:120
@@ -1407,7 +1459,7 @@ macro_rules! pg_hton16 {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1431,7 +1483,7 @@ macro_rules! pg_hton16 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1546,6 +1598,11 @@ macro_rules! __pgrx_c_args_pg_hton32 {
             @argument [__pgrx_c_args_pg_hton32] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_hton32] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_hton32!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1581,6 +1638,11 @@ macro_rules! __pgrx_c_args_pg_hton32 {
             @argument [__pgrx_c_args_pg_hton32] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_hton32] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_hton32!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1597,7 +1659,7 @@ macro_rules! __pgrx_c_args_pg_hton32 {
         $crate::pg_hton32!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro pg_hton32 from pg_bswap.h:121
@@ -1698,7 +1760,7 @@ macro_rules! pg_hton32 {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1722,7 +1784,7 @@ macro_rules! pg_hton32 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1837,6 +1899,11 @@ macro_rules! __pgrx_c_args_pg_hton64 {
             @argument [__pgrx_c_args_pg_hton64] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_hton64] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_hton64!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1872,6 +1939,11 @@ macro_rules! __pgrx_c_args_pg_hton64 {
             @argument [__pgrx_c_args_pg_hton64] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_hton64] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_hton64!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1888,7 +1960,7 @@ macro_rules! __pgrx_c_args_pg_hton64 {
         $crate::pg_hton64!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro pg_hton64 from pg_bswap.h:122
@@ -1989,7 +2061,7 @@ macro_rules! pg_hton64 {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2013,7 +2085,7 @@ macro_rules! pg_hton64 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2128,6 +2200,11 @@ macro_rules! __pgrx_c_args_pg_ntoh16 {
             @argument [__pgrx_c_args_pg_ntoh16] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_ntoh16] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_ntoh16!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2163,6 +2240,11 @@ macro_rules! __pgrx_c_args_pg_ntoh16 {
             @argument [__pgrx_c_args_pg_ntoh16] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_ntoh16] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_ntoh16!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2179,7 +2261,7 @@ macro_rules! __pgrx_c_args_pg_ntoh16 {
         $crate::pg_ntoh16!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro pg_ntoh16 from pg_bswap.h:124
@@ -2280,7 +2362,7 @@ macro_rules! pg_ntoh16 {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2304,7 +2386,7 @@ macro_rules! pg_ntoh16 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2419,6 +2501,11 @@ macro_rules! __pgrx_c_args_pg_ntoh32 {
             @argument [__pgrx_c_args_pg_ntoh32] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_ntoh32] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_ntoh32!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2454,6 +2541,11 @@ macro_rules! __pgrx_c_args_pg_ntoh32 {
             @argument [__pgrx_c_args_pg_ntoh32] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_ntoh32] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_ntoh32!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2470,7 +2562,7 @@ macro_rules! __pgrx_c_args_pg_ntoh32 {
         $crate::pg_ntoh32!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro pg_ntoh32 from pg_bswap.h:125
@@ -2571,7 +2663,7 @@ macro_rules! pg_ntoh32 {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2595,7 +2687,7 @@ macro_rules! pg_ntoh32 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2710,6 +2802,11 @@ macro_rules! __pgrx_c_args_pg_ntoh64 {
             @argument [__pgrx_c_args_pg_ntoh64] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_ntoh64] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_ntoh64!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2745,6 +2842,11 @@ macro_rules! __pgrx_c_args_pg_ntoh64 {
             @argument [__pgrx_c_args_pg_ntoh64] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_ntoh64] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_ntoh64!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2761,7 +2863,7 @@ macro_rules! __pgrx_c_args_pg_ntoh64 {
         $crate::pg_ntoh64!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro pg_ntoh64 from pg_bswap.h:126
@@ -2862,7 +2964,7 @@ macro_rules! pg_ntoh64 {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2886,7 +2988,7 @@ macro_rules! pg_ntoh64 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

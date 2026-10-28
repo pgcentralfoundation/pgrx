@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_IsPolymorphicType {
             @argument [__pgrx_c_args_IsPolymorphicType] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IsPolymorphicType] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IsPolymorphicType!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -118,6 +123,13 @@ macro_rules! __pgrx_c_args_IsPolymorphicType {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IsPolymorphicType] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsPolymorphicType!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -134,7 +146,7 @@ macro_rules! __pgrx_c_args_IsPolymorphicType {
         $crate::IsPolymorphicType!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IsPolymorphicType from pg_type_d.h:102
@@ -640,13 +652,13 @@ macro_rules! IsPolymorphicType {
         $crate::__pgrx_c_args_IsPolymorphicType!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $typid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IsPolymorphicType!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $typid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IsPolymorphicType!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -660,7 +672,7 @@ macro_rules! IsPolymorphicType {
                         $crate::__pgrx_c_operand!(@check_safety; $typid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -1146,7 +1158,7 @@ macro_rules! IsPolymorphicType {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1715,6 +1727,13 @@ macro_rules! __pgrx_c_args_IsPolymorphicTypeFamily1 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IsPolymorphicTypeFamily1] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily1!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1752,6 +1771,13 @@ macro_rules! __pgrx_c_args_IsPolymorphicTypeFamily1 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IsPolymorphicTypeFamily1] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily1!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1768,7 +1794,7 @@ macro_rules! __pgrx_c_args_IsPolymorphicTypeFamily1 {
         $crate::IsPolymorphicTypeFamily1!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IsPolymorphicTypeFamily1 from pg_type_d.h:107
@@ -2026,13 +2052,13 @@ macro_rules! IsPolymorphicTypeFamily1 {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily1!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $typid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily1!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $typid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily1!(
@@ -2048,7 +2074,7 @@ macro_rules! IsPolymorphicTypeFamily1 {
                         $crate::__pgrx_c_operand!(@check_safety; $typid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -2291,7 +2317,7 @@ macro_rules! IsPolymorphicTypeFamily1 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2609,6 +2635,13 @@ macro_rules! __pgrx_c_args_IsPolymorphicTypeFamily2 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IsPolymorphicTypeFamily2] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily2!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2646,6 +2679,13 @@ macro_rules! __pgrx_c_args_IsPolymorphicTypeFamily2 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IsPolymorphicTypeFamily2] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily2!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2662,7 +2702,7 @@ macro_rules! __pgrx_c_args_IsPolymorphicTypeFamily2 {
         $crate::IsPolymorphicTypeFamily2!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IsPolymorphicTypeFamily2 from pg_type_d.h:115
@@ -2872,13 +2912,13 @@ macro_rules! IsPolymorphicTypeFamily2 {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily2!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $typid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily2!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $typid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily2!(
@@ -2894,7 +2934,7 @@ macro_rules! IsPolymorphicTypeFamily2 {
                         $crate::__pgrx_c_operand!(@check_safety; $typid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -3091,7 +3131,7 @@ macro_rules! IsPolymorphicTypeFamily2 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3356,6 +3396,11 @@ macro_rules! __pgrx_c_args_IsTrueArrayType {
             @argument [__pgrx_c_args_IsTrueArrayType] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IsTrueArrayType] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IsTrueArrayType!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3393,6 +3438,13 @@ macro_rules! __pgrx_c_args_IsTrueArrayType {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IsTrueArrayType] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsTrueArrayType!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3409,7 +3461,7 @@ macro_rules! __pgrx_c_args_IsTrueArrayType {
         $crate::IsTrueArrayType!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IsTrueArrayType from pg_type_d.h:123
@@ -3553,13 +3605,13 @@ macro_rules! IsTrueArrayType {
         $crate::__pgrx_c_args_IsTrueArrayType!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $typeForm:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IsTrueArrayType!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $typeForm:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IsTrueArrayType!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3573,7 +3625,7 @@ macro_rules! IsTrueArrayType {
                         $crate::__pgrx_c_operand!(@check_safety; $typeForm);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -3692,7 +3744,7 @@ macro_rules! IsTrueArrayType {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

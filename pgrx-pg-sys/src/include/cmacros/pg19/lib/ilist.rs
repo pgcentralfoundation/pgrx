@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_dclist_count {
             @argument [__pgrx_c_args_dclist_count] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_count] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dclist_count!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -116,6 +121,11 @@ macro_rules! __pgrx_c_args_dclist_count {
             @argument [__pgrx_c_args_dclist_count] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_count] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_count!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -132,7 +142,7 @@ macro_rules! __pgrx_c_args_dclist_count {
         $crate::dclist_count!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dclist_count from ilist.h:931
@@ -208,13 +218,13 @@ macro_rules! dclist_count {
         $crate::__pgrx_c_args_dclist_count!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_count!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_count!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -227,7 +237,7 @@ macro_rules! dclist_count {
                         $crate::__pgrx_c_operand!(@check_safety; $head);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -263,7 +273,7 @@ macro_rules! dclist_count {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -382,6 +392,13 @@ macro_rules! __pgrx_c_args_dclist_delete_from {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_delete_from] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_delete_from!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -443,6 +460,11 @@ macro_rules! __pgrx_c_args_dclist_delete_from {
             @argument [__pgrx_c_args_dclist_delete_from] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_delete_from] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dclist_delete_from!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -480,6 +502,13 @@ macro_rules! __pgrx_c_args_dclist_delete_from {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_delete_from] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_delete_from!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -496,7 +525,7 @@ macro_rules! __pgrx_c_args_dclist_delete_from {
         $crate::dclist_delete_from!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dclist_delete_from from ilist.h:762
@@ -594,13 +623,13 @@ macro_rules! dclist_delete_from {
         $crate::__pgrx_c_args_dclist_delete_from!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_delete_from!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_delete_from!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -614,7 +643,7 @@ macro_rules! dclist_delete_from {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::dclist_delete_from(
@@ -669,7 +698,7 @@ macro_rules! dclist_delete_from {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -812,6 +841,13 @@ macro_rules! __pgrx_c_args_dclist_delete_from_thoroughly {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_delete_from_thoroughly] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_delete_from_thoroughly!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -878,6 +914,13 @@ macro_rules! __pgrx_c_args_dclist_delete_from_thoroughly {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_delete_from_thoroughly] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dclist_delete_from_thoroughly!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -915,6 +958,13 @@ macro_rules! __pgrx_c_args_dclist_delete_from_thoroughly {
             ] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_delete_from_thoroughly] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_delete_from_thoroughly!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -931,7 +981,7 @@ macro_rules! __pgrx_c_args_dclist_delete_from_thoroughly {
         $crate::dclist_delete_from_thoroughly!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dclist_delete_from_thoroughly from ilist.h:775
@@ -1035,7 +1085,7 @@ macro_rules! dclist_delete_from_thoroughly {
         )
     };
     (@__pgrx_emit_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_delete_from_thoroughly!(
@@ -1044,7 +1094,7 @@ macro_rules! dclist_delete_from_thoroughly {
         )
     };
     (@__pgrx_emit_read_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_delete_from_thoroughly!(
@@ -1061,7 +1111,7 @@ macro_rules! dclist_delete_from_thoroughly {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::dclist_delete_from_thoroughly(
@@ -1116,7 +1166,7 @@ macro_rules! dclist_delete_from_thoroughly {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1259,6 +1309,13 @@ macro_rules! __pgrx_c_args_dclist_has_next {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_has_next] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_has_next!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1320,6 +1377,11 @@ macro_rules! __pgrx_c_args_dclist_has_next {
             @argument [__pgrx_c_args_dclist_has_next] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_has_next] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dclist_has_next!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1357,6 +1419,13 @@ macro_rules! __pgrx_c_args_dclist_has_next {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_has_next] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_has_next!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1373,7 +1442,7 @@ macro_rules! __pgrx_c_args_dclist_has_next {
         $crate::dclist_has_next!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dclist_has_next from ilist.h:838
@@ -1473,13 +1542,13 @@ macro_rules! dclist_has_next {
         $crate::__pgrx_c_args_dclist_has_next!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_has_next!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_has_next!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1493,7 +1562,7 @@ macro_rules! dclist_has_next {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1552,7 +1621,7 @@ macro_rules! dclist_has_next {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1691,6 +1760,13 @@ macro_rules! __pgrx_c_args_dclist_has_prev {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_has_prev] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_has_prev!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1752,6 +1828,11 @@ macro_rules! __pgrx_c_args_dclist_has_prev {
             @argument [__pgrx_c_args_dclist_has_prev] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_has_prev] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dclist_has_prev!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1789,6 +1870,13 @@ macro_rules! __pgrx_c_args_dclist_has_prev {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_has_prev] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_has_prev!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1805,7 +1893,7 @@ macro_rules! __pgrx_c_args_dclist_has_prev {
         $crate::dclist_has_prev!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dclist_has_prev from ilist.h:853
@@ -1905,13 +1993,13 @@ macro_rules! dclist_has_prev {
         $crate::__pgrx_c_args_dclist_has_prev!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_has_prev!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_has_prev!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1925,7 +2013,7 @@ macro_rules! dclist_has_prev {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1984,7 +2072,7 @@ macro_rules! dclist_has_prev {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2126,6 +2214,13 @@ macro_rules! __pgrx_c_args_dclist_head_element_off {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_head_element_off] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_head_element_off!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2189,6 +2284,11 @@ macro_rules! __pgrx_c_args_dclist_head_element_off {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_head_element_off] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dclist_head_element_off!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2226,6 +2326,13 @@ macro_rules! __pgrx_c_args_dclist_head_element_off {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_head_element_off] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_head_element_off!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2242,7 +2349,7 @@ macro_rules! __pgrx_c_args_dclist_head_element_off {
         $crate::dclist_head_element_off!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dclist_head_element_off from ilist.h:887
@@ -2345,13 +2452,13 @@ macro_rules! dclist_head_element_off {
         $crate::__pgrx_c_args_dclist_head_element_off!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $off:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_head_element_off!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $off:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_head_element_off!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2365,7 +2472,7 @@ macro_rules! dclist_head_element_off {
                         $crate::__pgrx_c_operand!(@check_safety; $off);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2423,7 +2530,7 @@ macro_rules! dclist_head_element_off {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2570,6 +2677,11 @@ macro_rules! __pgrx_c_args_dclist_head_node {
             @argument [__pgrx_c_args_dclist_head_node] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_head_node] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dclist_head_node!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2607,6 +2719,13 @@ macro_rules! __pgrx_c_args_dclist_head_node {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_head_node] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_head_node!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2623,7 +2742,7 @@ macro_rules! __pgrx_c_args_dclist_head_node {
         $crate::dclist_head_node!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dclist_head_node from ilist.h:899
@@ -2706,13 +2825,13 @@ macro_rules! dclist_head_node {
         $crate::__pgrx_c_args_dclist_head_node!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_head_node!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_head_node!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2725,7 +2844,7 @@ macro_rules! dclist_head_node {
                         $crate::__pgrx_c_operand!(@check_safety; $head);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2766,7 +2885,7 @@ macro_rules! dclist_head_node {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2897,6 +3016,11 @@ macro_rules! __pgrx_c_args_dclist_init {
             @argument [__pgrx_c_args_dclist_init] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_init] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dclist_init!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2932,6 +3056,11 @@ macro_rules! __pgrx_c_args_dclist_init {
             @argument [__pgrx_c_args_dclist_init] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_init] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_init!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2948,7 +3077,7 @@ macro_rules! __pgrx_c_args_dclist_init {
         $crate::dclist_init!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dclist_init from ilist.h:670
@@ -3021,13 +3150,13 @@ macro_rules! dclist_init {
         $crate::__pgrx_c_args_dclist_init!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_init!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_init!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3040,7 +3169,7 @@ macro_rules! dclist_init {
                         $crate::__pgrx_c_operand!(@check_safety; $head);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::dclist_init(
@@ -3072,7 +3201,7 @@ macro_rules! dclist_init {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3187,6 +3316,13 @@ macro_rules! __pgrx_c_args_dclist_insert_after {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_insert_after] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_insert_after!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3238,6 +3374,13 @@ macro_rules! __pgrx_c_args_dclist_insert_after {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_dclist_insert_after] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_insert_after] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -3302,6 +3445,11 @@ macro_rules! __pgrx_c_args_dclist_insert_after {
             @argument [__pgrx_c_args_dclist_insert_after] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_insert_after] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dclist_insert_after!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3339,6 +3487,13 @@ macro_rules! __pgrx_c_args_dclist_insert_after {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_insert_after] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_insert_after!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3355,7 +3510,7 @@ macro_rules! __pgrx_c_args_dclist_insert_after {
         $crate::dclist_insert_after!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dclist_insert_after from ilist.h:726
@@ -3479,13 +3634,13 @@ macro_rules! dclist_insert_after {
         $crate::__pgrx_c_args_dclist_insert_after!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $after:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_insert_after!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $after:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_insert_after!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3500,7 +3655,7 @@ macro_rules! dclist_insert_after {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::dclist_insert_after(
@@ -3578,7 +3733,7 @@ macro_rules! dclist_insert_after {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3740,6 +3895,13 @@ macro_rules! __pgrx_c_args_dclist_insert_before {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_insert_before] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_insert_before!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3791,6 +3953,13 @@ macro_rules! __pgrx_c_args_dclist_insert_before {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_dclist_insert_before] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_insert_before] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -3855,6 +4024,11 @@ macro_rules! __pgrx_c_args_dclist_insert_before {
             @argument [__pgrx_c_args_dclist_insert_before] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_insert_before] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dclist_insert_before!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3892,6 +4066,13 @@ macro_rules! __pgrx_c_args_dclist_insert_before {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_insert_before] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_insert_before!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3908,7 +4089,7 @@ macro_rules! __pgrx_c_args_dclist_insert_before {
         $crate::dclist_insert_before!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dclist_insert_before from ilist.h:744
@@ -4032,13 +4213,13 @@ macro_rules! dclist_insert_before {
         $crate::__pgrx_c_args_dclist_insert_before!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $before:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_insert_before!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $before:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_insert_before!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4053,7 +4234,7 @@ macro_rules! dclist_insert_before {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::dclist_insert_before(
@@ -4131,7 +4312,7 @@ macro_rules! dclist_insert_before {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4297,6 +4478,11 @@ macro_rules! __pgrx_c_args_dclist_is_empty {
             @argument [__pgrx_c_args_dclist_is_empty] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_is_empty] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dclist_is_empty!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4334,6 +4520,13 @@ macro_rules! __pgrx_c_args_dclist_is_empty {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_is_empty] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_is_empty!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4350,7 +4543,7 @@ macro_rules! __pgrx_c_args_dclist_is_empty {
         $crate::dclist_is_empty!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dclist_is_empty from ilist.h:681
@@ -4425,13 +4618,13 @@ macro_rules! dclist_is_empty {
         $crate::__pgrx_c_args_dclist_is_empty!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_is_empty!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_is_empty!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4444,7 +4637,7 @@ macro_rules! dclist_is_empty {
                         $crate::__pgrx_c_operand!(@check_safety; $head);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -4480,7 +4673,7 @@ macro_rules! dclist_is_empty {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4597,6 +4790,13 @@ macro_rules! __pgrx_c_args_dclist_move_head {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_move_head] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_move_head!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4658,6 +4858,11 @@ macro_rules! __pgrx_c_args_dclist_move_head {
             @argument [__pgrx_c_args_dclist_move_head] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_move_head] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dclist_move_head!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4695,6 +4900,13 @@ macro_rules! __pgrx_c_args_dclist_move_head {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_move_head] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_move_head!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4711,7 +4923,7 @@ macro_rules! __pgrx_c_args_dclist_move_head {
         $crate::dclist_move_head!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dclist_move_head from ilist.h:807
@@ -4809,13 +5021,13 @@ macro_rules! dclist_move_head {
         $crate::__pgrx_c_args_dclist_move_head!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_move_head!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_move_head!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4829,7 +5041,7 @@ macro_rules! dclist_move_head {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::dclist_move_head(
@@ -4884,7 +5096,7 @@ macro_rules! dclist_move_head {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5021,6 +5233,13 @@ macro_rules! __pgrx_c_args_dclist_move_tail {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_move_tail] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_move_tail!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5082,6 +5301,11 @@ macro_rules! __pgrx_c_args_dclist_move_tail {
             @argument [__pgrx_c_args_dclist_move_tail] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_move_tail] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dclist_move_tail!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5119,6 +5343,13 @@ macro_rules! __pgrx_c_args_dclist_move_tail {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_move_tail] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_move_tail!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5135,7 +5366,7 @@ macro_rules! __pgrx_c_args_dclist_move_tail {
         $crate::dclist_move_tail!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dclist_move_tail from ilist.h:823
@@ -5233,13 +5464,13 @@ macro_rules! dclist_move_tail {
         $crate::__pgrx_c_args_dclist_move_tail!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_move_tail!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_move_tail!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5253,7 +5484,7 @@ macro_rules! dclist_move_tail {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::dclist_move_tail(
@@ -5308,7 +5539,7 @@ macro_rules! dclist_move_tail {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5445,6 +5676,13 @@ macro_rules! __pgrx_c_args_dclist_next_node {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_next_node] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_next_node!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5506,6 +5744,11 @@ macro_rules! __pgrx_c_args_dclist_next_node {
             @argument [__pgrx_c_args_dclist_next_node] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_next_node] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dclist_next_node!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5543,6 +5786,13 @@ macro_rules! __pgrx_c_args_dclist_next_node {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_next_node] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_next_node!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5559,7 +5809,7 @@ macro_rules! __pgrx_c_args_dclist_next_node {
         $crate::dclist_next_node!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dclist_next_node from ilist.h:866
@@ -5665,13 +5915,13 @@ macro_rules! dclist_next_node {
         $crate::__pgrx_c_args_dclist_next_node!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_next_node!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_next_node!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5685,7 +5935,7 @@ macro_rules! dclist_next_node {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -5749,7 +5999,7 @@ macro_rules! dclist_next_node {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5905,6 +6155,11 @@ macro_rules! __pgrx_c_args_dclist_pop_head_node {
             @argument [__pgrx_c_args_dclist_pop_head_node] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_pop_head_node] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dclist_pop_head_node!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5942,6 +6197,13 @@ macro_rules! __pgrx_c_args_dclist_pop_head_node {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_pop_head_node] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_pop_head_node!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5958,7 +6220,7 @@ macro_rules! __pgrx_c_args_dclist_pop_head_node {
         $crate::dclist_pop_head_node!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dclist_pop_head_node from ilist.h:788
@@ -6045,13 +6307,13 @@ macro_rules! dclist_pop_head_node {
         $crate::__pgrx_c_args_dclist_pop_head_node!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_pop_head_node!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_pop_head_node!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6064,7 +6326,7 @@ macro_rules! dclist_pop_head_node {
                         $crate::__pgrx_c_operand!(@check_safety; $head);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -6105,7 +6367,7 @@ macro_rules! dclist_pop_head_node {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6229,6 +6491,13 @@ macro_rules! __pgrx_c_args_dclist_prev_node {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_prev_node] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_prev_node!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6290,6 +6559,11 @@ macro_rules! __pgrx_c_args_dclist_prev_node {
             @argument [__pgrx_c_args_dclist_prev_node] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_prev_node] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dclist_prev_node!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6327,6 +6601,13 @@ macro_rules! __pgrx_c_args_dclist_prev_node {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_prev_node] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_prev_node!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6343,7 +6624,7 @@ macro_rules! __pgrx_c_args_dclist_prev_node {
         $crate::dclist_prev_node!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dclist_prev_node from ilist.h:878
@@ -6449,13 +6730,13 @@ macro_rules! dclist_prev_node {
         $crate::__pgrx_c_args_dclist_prev_node!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_prev_node!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_prev_node!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6469,7 +6750,7 @@ macro_rules! dclist_prev_node {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -6533,7 +6814,7 @@ macro_rules! dclist_prev_node {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6679,6 +6960,13 @@ macro_rules! __pgrx_c_args_dclist_push_head {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_push_head] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_push_head!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6740,6 +7028,11 @@ macro_rules! __pgrx_c_args_dclist_push_head {
             @argument [__pgrx_c_args_dclist_push_head] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_push_head] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dclist_push_head!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6777,6 +7070,13 @@ macro_rules! __pgrx_c_args_dclist_push_head {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_push_head] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_push_head!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6793,7 +7093,7 @@ macro_rules! __pgrx_c_args_dclist_push_head {
         $crate::dclist_push_head!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dclist_push_head from ilist.h:692
@@ -6894,13 +7194,13 @@ macro_rules! dclist_push_head {
         $crate::__pgrx_c_args_dclist_push_head!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_push_head!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_push_head!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6914,7 +7214,7 @@ macro_rules! dclist_push_head {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::dclist_push_head(
@@ -6969,7 +7269,7 @@ macro_rules! dclist_push_head {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7106,6 +7406,13 @@ macro_rules! __pgrx_c_args_dclist_push_tail {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_push_tail] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_push_tail!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7167,6 +7474,11 @@ macro_rules! __pgrx_c_args_dclist_push_tail {
             @argument [__pgrx_c_args_dclist_push_tail] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_push_tail] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dclist_push_tail!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7204,6 +7516,13 @@ macro_rules! __pgrx_c_args_dclist_push_tail {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_push_tail] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_push_tail!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7220,7 +7539,7 @@ macro_rules! __pgrx_c_args_dclist_push_tail {
         $crate::dclist_push_tail!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dclist_push_tail from ilist.h:708
@@ -7321,13 +7640,13 @@ macro_rules! dclist_push_tail {
         $crate::__pgrx_c_args_dclist_push_tail!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_push_tail!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_push_tail!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7341,7 +7660,7 @@ macro_rules! dclist_push_tail {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::dclist_push_tail(
@@ -7396,7 +7715,7 @@ macro_rules! dclist_push_tail {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7536,6 +7855,13 @@ macro_rules! __pgrx_c_args_dclist_tail_element_off {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_tail_element_off] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_tail_element_off!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7599,6 +7925,11 @@ macro_rules! __pgrx_c_args_dclist_tail_element_off {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_tail_element_off] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dclist_tail_element_off!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7636,6 +7967,13 @@ macro_rules! __pgrx_c_args_dclist_tail_element_off {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_tail_element_off] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_tail_element_off!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7652,7 +7990,7 @@ macro_rules! __pgrx_c_args_dclist_tail_element_off {
         $crate::dclist_tail_element_off!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dclist_tail_element_off from ilist.h:908
@@ -7755,13 +8093,13 @@ macro_rules! dclist_tail_element_off {
         $crate::__pgrx_c_args_dclist_tail_element_off!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $off:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_tail_element_off!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $off:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_tail_element_off!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7775,7 +8113,7 @@ macro_rules! dclist_tail_element_off {
                         $crate::__pgrx_c_operand!(@check_safety; $off);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -7833,7 +8171,7 @@ macro_rules! dclist_tail_element_off {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7980,6 +8318,11 @@ macro_rules! __pgrx_c_args_dclist_tail_node {
             @argument [__pgrx_c_args_dclist_tail_node] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_tail_node] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dclist_tail_node!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8017,6 +8360,13 @@ macro_rules! __pgrx_c_args_dclist_tail_node {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dclist_tail_node] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dclist_tail_node!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8033,7 +8383,7 @@ macro_rules! __pgrx_c_args_dclist_tail_node {
         $crate::dclist_tail_node!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dclist_tail_node from ilist.h:919
@@ -8116,13 +8466,13 @@ macro_rules! dclist_tail_node {
         $crate::__pgrx_c_args_dclist_tail_node!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_tail_node!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dclist_tail_node!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8135,7 +8485,7 @@ macro_rules! dclist_tail_node {
                         $crate::__pgrx_c_operand!(@check_safety; $head);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -8176,7 +8526,7 @@ macro_rules! dclist_tail_node {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8307,6 +8657,11 @@ macro_rules! __pgrx_c_args_dlist_check {
             @argument [__pgrx_c_args_dlist_check] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_check] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dlist_check!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8342,6 +8697,11 @@ macro_rules! __pgrx_c_args_dlist_check {
             @argument [__pgrx_c_args_dlist_check] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_check] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_check!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8358,7 +8718,7 @@ macro_rules! __pgrx_c_args_dlist_check {
         $crate::dlist_check!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro dlist_check from ilist.h:303
@@ -8405,13 +8765,13 @@ macro_rules! dlist_check {
         $crate::__pgrx_c_args_dlist_check!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_check!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_check!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8424,7 +8784,7 @@ macro_rules! dlist_check {
                         $crate::__pgrx_c_operand!(@check_safety; $head);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -8434,7 +8794,7 @@ macro_rules! dlist_check {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8535,6 +8895,11 @@ macro_rules! __pgrx_c_args_dlist_delete {
             @argument [__pgrx_c_args_dlist_delete] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_delete] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dlist_delete!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8570,6 +8935,11 @@ macro_rules! __pgrx_c_args_dlist_delete {
             @argument [__pgrx_c_args_dlist_delete] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_delete] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_delete!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8586,7 +8956,7 @@ macro_rules! __pgrx_c_args_dlist_delete {
         $crate::dlist_delete!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dlist_delete from ilist.h:404
@@ -8659,13 +9029,13 @@ macro_rules! dlist_delete {
         $crate::__pgrx_c_args_dlist_delete!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_delete!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_delete!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8678,7 +9048,7 @@ macro_rules! dlist_delete {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::dlist_delete(
@@ -8710,7 +9080,7 @@ macro_rules! dlist_delete {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8825,6 +9195,13 @@ macro_rules! __pgrx_c_args_dlist_delete_from {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_delete_from] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_delete_from!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8886,6 +9263,11 @@ macro_rules! __pgrx_c_args_dlist_delete_from {
             @argument [__pgrx_c_args_dlist_delete_from] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_delete_from] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dlist_delete_from!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8923,6 +9305,13 @@ macro_rules! __pgrx_c_args_dlist_delete_from {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_delete_from] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_delete_from!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8939,7 +9328,7 @@ macro_rules! __pgrx_c_args_dlist_delete_from {
         $crate::dlist_delete_from!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dlist_delete_from from ilist.h:428
@@ -9035,13 +9424,13 @@ macro_rules! dlist_delete_from {
         $crate::__pgrx_c_args_dlist_delete_from!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_delete_from!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_delete_from!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -9055,7 +9444,7 @@ macro_rules! dlist_delete_from {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::dlist_delete_from(
@@ -9110,7 +9499,7 @@ macro_rules! dlist_delete_from {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9253,6 +9642,13 @@ macro_rules! __pgrx_c_args_dlist_delete_from_thoroughly {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_delete_from_thoroughly] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_delete_from_thoroughly!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9319,6 +9715,13 @@ macro_rules! __pgrx_c_args_dlist_delete_from_thoroughly {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_delete_from_thoroughly] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dlist_delete_from_thoroughly!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9356,6 +9759,13 @@ macro_rules! __pgrx_c_args_dlist_delete_from_thoroughly {
             ] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_delete_from_thoroughly] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_delete_from_thoroughly!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9372,7 +9782,7 @@ macro_rules! __pgrx_c_args_dlist_delete_from_thoroughly {
         $crate::dlist_delete_from_thoroughly!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dlist_delete_from_thoroughly from ilist.h:439
@@ -9471,13 +9881,13 @@ macro_rules! dlist_delete_from_thoroughly {
         $crate::__pgrx_c_args_dlist_delete_from_thoroughly!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_delete_from_thoroughly!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_delete_from_thoroughly!(
@@ -9494,7 +9904,7 @@ macro_rules! dlist_delete_from_thoroughly {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::dlist_delete_from_thoroughly(
@@ -9549,7 +9959,7 @@ macro_rules! dlist_delete_from_thoroughly {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9704,6 +10114,11 @@ macro_rules! __pgrx_c_args_dlist_delete_thoroughly {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_delete_thoroughly] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dlist_delete_thoroughly!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9741,6 +10156,13 @@ macro_rules! __pgrx_c_args_dlist_delete_thoroughly {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_delete_thoroughly] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_delete_thoroughly!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9757,7 +10179,7 @@ macro_rules! __pgrx_c_args_dlist_delete_thoroughly {
         $crate::dlist_delete_thoroughly!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dlist_delete_thoroughly from ilist.h:415
@@ -9835,13 +10257,13 @@ macro_rules! dlist_delete_thoroughly {
         $crate::__pgrx_c_args_dlist_delete_thoroughly!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_delete_thoroughly!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_delete_thoroughly!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -9854,7 +10276,7 @@ macro_rules! dlist_delete_thoroughly {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::dlist_delete_thoroughly(
@@ -9886,7 +10308,7 @@ macro_rules! dlist_delete_thoroughly {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10001,6 +10423,11 @@ macro_rules! __pgrx_c_args_dlist_has_next {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_has_next] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_has_next!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10062,6 +10489,11 @@ macro_rules! __pgrx_c_args_dlist_has_next {
             @argument [__pgrx_c_args_dlist_has_next] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_has_next] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dlist_has_next!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10099,6 +10531,11 @@ macro_rules! __pgrx_c_args_dlist_has_next {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_has_next] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_has_next!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10115,7 +10552,7 @@ macro_rules! __pgrx_c_args_dlist_has_next {
         $crate::dlist_has_next!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dlist_has_next from ilist.h:502
@@ -10212,13 +10649,13 @@ macro_rules! dlist_has_next {
         $crate::__pgrx_c_args_dlist_has_next!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_has_next!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_has_next!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -10232,7 +10669,7 @@ macro_rules! dlist_has_next {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -10291,7 +10728,7 @@ macro_rules! dlist_has_next {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10430,6 +10867,11 @@ macro_rules! __pgrx_c_args_dlist_has_prev {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_has_prev] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_has_prev!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10491,6 +10933,11 @@ macro_rules! __pgrx_c_args_dlist_has_prev {
             @argument [__pgrx_c_args_dlist_has_prev] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_has_prev] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dlist_has_prev!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10528,6 +10975,11 @@ macro_rules! __pgrx_c_args_dlist_has_prev {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_has_prev] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_has_prev!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10544,7 +10996,7 @@ macro_rules! __pgrx_c_args_dlist_has_prev {
         $crate::dlist_has_prev!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dlist_has_prev from ilist.h:512
@@ -10641,13 +11093,13 @@ macro_rules! dlist_has_prev {
         $crate::__pgrx_c_args_dlist_has_prev!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_has_prev!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_has_prev!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -10661,7 +11113,7 @@ macro_rules! dlist_has_prev {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -10720,7 +11172,7 @@ macro_rules! dlist_has_prev {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10862,6 +11314,13 @@ macro_rules! __pgrx_c_args_dlist_head_element_off {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_head_element_off] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_head_element_off!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10925,6 +11384,11 @@ macro_rules! __pgrx_c_args_dlist_head_element_off {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_head_element_off] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dlist_head_element_off!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10962,6 +11426,13 @@ macro_rules! __pgrx_c_args_dlist_head_element_off {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_head_element_off] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_head_element_off!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10978,7 +11449,7 @@ macro_rules! __pgrx_c_args_dlist_head_element_off {
         $crate::dlist_head_element_off!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dlist_head_element_off from ilist.h:554
@@ -11080,13 +11551,13 @@ macro_rules! dlist_head_element_off {
         $crate::__pgrx_c_args_dlist_head_element_off!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $off:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_head_element_off!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $off:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_head_element_off!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -11100,7 +11571,7 @@ macro_rules! dlist_head_element_off {
                         $crate::__pgrx_c_operand!(@check_safety; $off);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -11158,7 +11629,7 @@ macro_rules! dlist_head_element_off {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -11305,6 +11776,11 @@ macro_rules! __pgrx_c_args_dlist_head_node {
             @argument [__pgrx_c_args_dlist_head_node] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_head_node] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dlist_head_node!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11342,6 +11818,13 @@ macro_rules! __pgrx_c_args_dlist_head_node {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_head_node] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_head_node!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11358,7 +11841,7 @@ macro_rules! __pgrx_c_args_dlist_head_node {
         $crate::dlist_head_node!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dlist_head_node from ilist.h:564
@@ -11439,13 +11922,13 @@ macro_rules! dlist_head_node {
         $crate::__pgrx_c_args_dlist_head_node!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_head_node!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_head_node!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -11458,7 +11941,7 @@ macro_rules! dlist_head_node {
                         $crate::__pgrx_c_operand!(@check_safety; $head);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -11499,7 +11982,7 @@ macro_rules! dlist_head_node {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -11630,6 +12113,11 @@ macro_rules! __pgrx_c_args_dlist_init {
             @argument [__pgrx_c_args_dlist_init] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_init] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dlist_init!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11665,6 +12153,11 @@ macro_rules! __pgrx_c_args_dlist_init {
             @argument [__pgrx_c_args_dlist_init] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_init] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_init!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11681,7 +12174,7 @@ macro_rules! __pgrx_c_args_dlist_init {
         $crate::dlist_init!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dlist_init from ilist.h:313
@@ -11753,13 +12246,13 @@ macro_rules! dlist_init {
         $crate::__pgrx_c_args_dlist_init!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_init!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_init!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -11772,7 +12265,7 @@ macro_rules! dlist_init {
                         $crate::__pgrx_c_operand!(@check_safety; $head);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::dlist_init(
@@ -11804,7 +12297,7 @@ macro_rules! dlist_init {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -11919,6 +12412,13 @@ macro_rules! __pgrx_c_args_dlist_insert_after {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_insert_after] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_insert_after!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11980,6 +12480,11 @@ macro_rules! __pgrx_c_args_dlist_insert_after {
             @argument [__pgrx_c_args_dlist_insert_after] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_insert_after] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dlist_insert_after!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12017,6 +12522,13 @@ macro_rules! __pgrx_c_args_dlist_insert_after {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_insert_after] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_insert_after!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12033,7 +12545,7 @@ macro_rules! __pgrx_c_args_dlist_insert_after {
         $crate::dlist_insert_after!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dlist_insert_after from ilist.h:380
@@ -12131,13 +12643,13 @@ macro_rules! dlist_insert_after {
         $crate::__pgrx_c_args_dlist_insert_after!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $after:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_insert_after!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $after:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_insert_after!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -12151,7 +12663,7 @@ macro_rules! dlist_insert_after {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::dlist_insert_after(
@@ -12206,7 +12718,7 @@ macro_rules! dlist_insert_after {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -12343,6 +12855,13 @@ macro_rules! __pgrx_c_args_dlist_insert_before {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_insert_before] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_insert_before!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12404,6 +12923,11 @@ macro_rules! __pgrx_c_args_dlist_insert_before {
             @argument [__pgrx_c_args_dlist_insert_before] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_insert_before] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dlist_insert_before!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12441,6 +12965,13 @@ macro_rules! __pgrx_c_args_dlist_insert_before {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_insert_before] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_insert_before!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12457,7 +12988,7 @@ macro_rules! __pgrx_c_args_dlist_insert_before {
         $crate::dlist_insert_before!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dlist_insert_before from ilist.h:392
@@ -12555,13 +13086,13 @@ macro_rules! dlist_insert_before {
         $crate::__pgrx_c_args_dlist_insert_before!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $before:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_insert_before!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $before:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_insert_before!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -12575,7 +13106,7 @@ macro_rules! dlist_insert_before {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::dlist_insert_before(
@@ -12630,7 +13161,7 @@ macro_rules! dlist_insert_before {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -12774,6 +13305,11 @@ macro_rules! __pgrx_c_args_dlist_is_empty {
             @argument [__pgrx_c_args_dlist_is_empty] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_is_empty] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dlist_is_empty!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12811,6 +13347,11 @@ macro_rules! __pgrx_c_args_dlist_is_empty {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_is_empty] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_is_empty!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12827,7 +13368,7 @@ macro_rules! __pgrx_c_args_dlist_is_empty {
         $crate::dlist_is_empty!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dlist_is_empty from ilist.h:335
@@ -12903,13 +13444,13 @@ macro_rules! dlist_is_empty {
         $crate::__pgrx_c_args_dlist_is_empty!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_is_empty!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_is_empty!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -12922,7 +13463,7 @@ macro_rules! dlist_is_empty {
                         $crate::__pgrx_c_operand!(@check_safety; $head);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -12958,7 +13499,7 @@ macro_rules! dlist_is_empty {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -13075,6 +13616,13 @@ macro_rules! __pgrx_c_args_dlist_member_check {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_member_check] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_member_check!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13108,13 +13656,13 @@ macro_rules! __pgrx_c_args_dlist_member_check {
         )
     };
     (@ignore1 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::dlist_member_check!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro dlist_member_check from ilist.h:302
@@ -13161,13 +13709,13 @@ macro_rules! dlist_member_check {
         $crate::__pgrx_c_args_dlist_member_check!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_member_check!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_member_check!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -13180,7 +13728,7 @@ macro_rules! dlist_member_check {
                         $crate::__pgrx_c_operand!(@check_safety; $head);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -13190,7 +13738,7 @@ macro_rules! dlist_member_check {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -13284,6 +13832,13 @@ macro_rules! __pgrx_c_args_dlist_move_head {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_move_head] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_move_head!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13345,6 +13900,11 @@ macro_rules! __pgrx_c_args_dlist_move_head {
             @argument [__pgrx_c_args_dlist_move_head] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_move_head] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dlist_move_head!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13382,6 +13942,13 @@ macro_rules! __pgrx_c_args_dlist_move_head {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_move_head] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_move_head!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13398,7 +13965,7 @@ macro_rules! __pgrx_c_args_dlist_move_head {
         $crate::dlist_move_head!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dlist_move_head from ilist.h:466
@@ -13500,13 +14067,13 @@ macro_rules! dlist_move_head {
         $crate::__pgrx_c_args_dlist_move_head!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_move_head!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_move_head!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -13520,7 +14087,7 @@ macro_rules! dlist_move_head {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::dlist_move_head(
@@ -13575,7 +14142,7 @@ macro_rules! dlist_move_head {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -13712,6 +14279,13 @@ macro_rules! __pgrx_c_args_dlist_move_tail {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_move_tail] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_move_tail!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13773,6 +14347,11 @@ macro_rules! __pgrx_c_args_dlist_move_tail {
             @argument [__pgrx_c_args_dlist_move_tail] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_move_tail] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dlist_move_tail!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13810,6 +14389,13 @@ macro_rules! __pgrx_c_args_dlist_move_tail {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_move_tail] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_move_tail!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13826,7 +14412,7 @@ macro_rules! __pgrx_c_args_dlist_move_tail {
         $crate::dlist_move_tail!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dlist_move_tail from ilist.h:485
@@ -13928,13 +14514,13 @@ macro_rules! dlist_move_tail {
         $crate::__pgrx_c_args_dlist_move_tail!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_move_tail!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_move_tail!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -13948,7 +14534,7 @@ macro_rules! dlist_move_tail {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::dlist_move_tail(
@@ -14003,7 +14589,7 @@ macro_rules! dlist_move_tail {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -14140,6 +14726,13 @@ macro_rules! __pgrx_c_args_dlist_next_node {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_next_node] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_next_node!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14201,6 +14794,11 @@ macro_rules! __pgrx_c_args_dlist_next_node {
             @argument [__pgrx_c_args_dlist_next_node] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_next_node] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dlist_next_node!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14238,6 +14836,13 @@ macro_rules! __pgrx_c_args_dlist_next_node {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_next_node] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_next_node!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14254,7 +14859,7 @@ macro_rules! __pgrx_c_args_dlist_next_node {
         $crate::dlist_next_node!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dlist_next_node from ilist.h:536
@@ -14359,13 +14964,13 @@ macro_rules! dlist_next_node {
         $crate::__pgrx_c_args_dlist_next_node!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_next_node!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_next_node!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -14379,7 +14984,7 @@ macro_rules! dlist_next_node {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -14443,7 +15048,7 @@ macro_rules! dlist_next_node {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -14596,6 +15201,11 @@ macro_rules! __pgrx_c_args_dlist_node_init {
             @argument [__pgrx_c_args_dlist_node_init] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_node_init] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dlist_node_init!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14633,6 +15243,13 @@ macro_rules! __pgrx_c_args_dlist_node_init {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_node_init] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_node_init!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14649,7 +15266,7 @@ macro_rules! __pgrx_c_args_dlist_node_init {
         $crate::dlist_node_init!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dlist_node_init from ilist.h:324
@@ -14721,13 +15338,13 @@ macro_rules! dlist_node_init {
         $crate::__pgrx_c_args_dlist_node_init!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_node_init!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_node_init!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -14740,7 +15357,7 @@ macro_rules! dlist_node_init {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::dlist_node_init(
@@ -14772,7 +15389,7 @@ macro_rules! dlist_node_init {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -14899,6 +15516,11 @@ macro_rules! __pgrx_c_args_dlist_node_is_detached {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_node_is_detached] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dlist_node_is_detached!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14936,6 +15558,13 @@ macro_rules! __pgrx_c_args_dlist_node_is_detached {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_node_is_detached] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_node_is_detached!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14952,7 +15581,7 @@ macro_rules! __pgrx_c_args_dlist_node_is_detached {
         $crate::dlist_node_is_detached!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dlist_node_is_detached from ilist.h:524
@@ -15032,13 +15661,13 @@ macro_rules! dlist_node_is_detached {
         $crate::__pgrx_c_args_dlist_node_is_detached!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_node_is_detached!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_node_is_detached!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -15051,7 +15680,7 @@ macro_rules! dlist_node_is_detached {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -15087,7 +15716,7 @@ macro_rules! dlist_node_is_detached {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -15211,6 +15840,11 @@ macro_rules! __pgrx_c_args_dlist_pop_head_node {
             @argument [__pgrx_c_args_dlist_pop_head_node] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_pop_head_node] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dlist_pop_head_node!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15248,6 +15882,13 @@ macro_rules! __pgrx_c_args_dlist_pop_head_node {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_pop_head_node] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_pop_head_node!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15264,7 +15905,7 @@ macro_rules! __pgrx_c_args_dlist_pop_head_node {
         $crate::dlist_pop_head_node!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dlist_pop_head_node from ilist.h:449
@@ -15350,13 +15991,13 @@ macro_rules! dlist_pop_head_node {
         $crate::__pgrx_c_args_dlist_pop_head_node!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_pop_head_node!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_pop_head_node!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -15369,7 +16010,7 @@ macro_rules! dlist_pop_head_node {
                         $crate::__pgrx_c_operand!(@check_safety; $head);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -15410,7 +16051,7 @@ macro_rules! dlist_pop_head_node {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -15534,6 +16175,13 @@ macro_rules! __pgrx_c_args_dlist_prev_node {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_prev_node] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_prev_node!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15595,6 +16243,11 @@ macro_rules! __pgrx_c_args_dlist_prev_node {
             @argument [__pgrx_c_args_dlist_prev_node] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_prev_node] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dlist_prev_node!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15632,6 +16285,13 @@ macro_rules! __pgrx_c_args_dlist_prev_node {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_prev_node] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_prev_node!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15648,7 +16308,7 @@ macro_rules! __pgrx_c_args_dlist_prev_node {
         $crate::dlist_prev_node!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dlist_prev_node from ilist.h:546
@@ -15753,13 +16413,13 @@ macro_rules! dlist_prev_node {
         $crate::__pgrx_c_args_dlist_prev_node!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_prev_node!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_prev_node!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -15773,7 +16433,7 @@ macro_rules! dlist_prev_node {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -15837,7 +16497,7 @@ macro_rules! dlist_prev_node {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -15983,6 +16643,13 @@ macro_rules! __pgrx_c_args_dlist_push_head {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_push_head] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_push_head!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16044,6 +16711,11 @@ macro_rules! __pgrx_c_args_dlist_push_head {
             @argument [__pgrx_c_args_dlist_push_head] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_push_head] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dlist_push_head!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16081,6 +16753,13 @@ macro_rules! __pgrx_c_args_dlist_push_head {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_push_head] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_push_head!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16097,7 +16776,7 @@ macro_rules! __pgrx_c_args_dlist_push_head {
         $crate::dlist_push_head!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dlist_push_head from ilist.h:346
@@ -16200,13 +16879,13 @@ macro_rules! dlist_push_head {
         $crate::__pgrx_c_args_dlist_push_head!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_push_head!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_push_head!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -16220,7 +16899,7 @@ macro_rules! dlist_push_head {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::dlist_push_head(
@@ -16275,7 +16954,7 @@ macro_rules! dlist_push_head {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -16412,6 +17091,13 @@ macro_rules! __pgrx_c_args_dlist_push_tail {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_push_tail] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_push_tail!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16473,6 +17159,11 @@ macro_rules! __pgrx_c_args_dlist_push_tail {
             @argument [__pgrx_c_args_dlist_push_tail] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_push_tail] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dlist_push_tail!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16510,6 +17201,13 @@ macro_rules! __pgrx_c_args_dlist_push_tail {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_push_tail] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_push_tail!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16526,7 +17224,7 @@ macro_rules! __pgrx_c_args_dlist_push_tail {
         $crate::dlist_push_tail!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dlist_push_tail from ilist.h:363
@@ -16629,13 +17327,13 @@ macro_rules! dlist_push_tail {
         $crate::__pgrx_c_args_dlist_push_tail!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_push_tail!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_push_tail!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -16649,7 +17347,7 @@ macro_rules! dlist_push_tail {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::dlist_push_tail(
@@ -16704,7 +17402,7 @@ macro_rules! dlist_push_tail {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -16844,6 +17542,13 @@ macro_rules! __pgrx_c_args_dlist_tail_element_off {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_tail_element_off] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_tail_element_off!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16907,6 +17612,11 @@ macro_rules! __pgrx_c_args_dlist_tail_element_off {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_tail_element_off] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dlist_tail_element_off!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16944,6 +17654,13 @@ macro_rules! __pgrx_c_args_dlist_tail_element_off {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_tail_element_off] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_tail_element_off!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16960,7 +17677,7 @@ macro_rules! __pgrx_c_args_dlist_tail_element_off {
         $crate::dlist_tail_element_off!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dlist_tail_element_off from ilist.h:571
@@ -17062,13 +17779,13 @@ macro_rules! dlist_tail_element_off {
         $crate::__pgrx_c_args_dlist_tail_element_off!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $off:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_tail_element_off!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $off:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_tail_element_off!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -17082,7 +17799,7 @@ macro_rules! dlist_tail_element_off {
                         $crate::__pgrx_c_operand!(@check_safety; $off);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -17140,7 +17857,7 @@ macro_rules! dlist_tail_element_off {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -17287,6 +18004,11 @@ macro_rules! __pgrx_c_args_dlist_tail_node {
             @argument [__pgrx_c_args_dlist_tail_node] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_tail_node] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dlist_tail_node!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17324,6 +18046,13 @@ macro_rules! __pgrx_c_args_dlist_tail_node {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dlist_tail_node] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dlist_tail_node!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17340,7 +18069,7 @@ macro_rules! __pgrx_c_args_dlist_tail_node {
         $crate::dlist_tail_node!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function dlist_tail_node from ilist.h:581
@@ -17421,13 +18150,13 @@ macro_rules! dlist_tail_node {
         $crate::__pgrx_c_args_dlist_tail_node!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_tail_node!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dlist_tail_node!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -17440,7 +18169,7 @@ macro_rules! dlist_tail_node {
                         $crate::__pgrx_c_operand!(@check_safety; $head);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -17481,7 +18210,7 @@ macro_rules! dlist_tail_node {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -17612,6 +18341,11 @@ macro_rules! __pgrx_c_args_slist_check {
             @argument [__pgrx_c_args_slist_check] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_check] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_slist_check!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17647,6 +18381,11 @@ macro_rules! __pgrx_c_args_slist_check {
             @argument [__pgrx_c_args_slist_check] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_check] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slist_check!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17663,7 +18402,7 @@ macro_rules! __pgrx_c_args_slist_check {
         $crate::slist_check!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro slist_check from ilist.h:304
@@ -17710,13 +18449,13 @@ macro_rules! slist_check {
         $crate::__pgrx_c_args_slist_check!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slist_check!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slist_check!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -17729,7 +18468,7 @@ macro_rules! slist_check {
                         $crate::__pgrx_c_operand!(@check_safety; $head);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -17739,7 +18478,7 @@ macro_rules! slist_check {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -17843,6 +18582,11 @@ macro_rules! __pgrx_c_args_slist_delete_current {
             @argument [__pgrx_c_args_slist_delete_current] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_delete_current] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_slist_delete_current!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17880,6 +18624,13 @@ macro_rules! __pgrx_c_args_slist_delete_current {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_delete_current] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slist_delete_current!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17896,7 +18647,7 @@ macro_rules! __pgrx_c_args_slist_delete_current {
         $crate::slist_delete_current!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function slist_delete_current from ilist.h:1083
@@ -17979,13 +18730,13 @@ macro_rules! slist_delete_current {
         $crate::__pgrx_c_args_slist_delete_current!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $iter:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slist_delete_current!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $iter:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slist_delete_current!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -17998,7 +18749,7 @@ macro_rules! slist_delete_current {
                         $crate::__pgrx_c_operand!(@check_safety; $iter);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::slist_delete_current(
@@ -18030,7 +18781,7 @@ macro_rules! slist_delete_current {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -18145,6 +18896,11 @@ macro_rules! __pgrx_c_args_slist_has_next {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_has_next] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slist_has_next!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18206,6 +18962,11 @@ macro_rules! __pgrx_c_args_slist_has_next {
             @argument [__pgrx_c_args_slist_has_next] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_has_next] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_slist_has_next!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18243,6 +19004,11 @@ macro_rules! __pgrx_c_args_slist_has_next {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_has_next] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slist_has_next!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18259,7 +19025,7 @@ macro_rules! __pgrx_c_args_slist_has_next {
         $crate::slist_has_next!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function slist_has_next from ilist.h:1042
@@ -18358,13 +19124,13 @@ macro_rules! slist_has_next {
         $crate::__pgrx_c_args_slist_has_next!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slist_has_next!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slist_has_next!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -18378,7 +19144,7 @@ macro_rules! slist_has_next {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -18437,7 +19203,7 @@ macro_rules! slist_has_next {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -18579,6 +19345,13 @@ macro_rules! __pgrx_c_args_slist_head_element_off {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_head_element_off] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slist_head_element_off!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18642,6 +19415,11 @@ macro_rules! __pgrx_c_args_slist_head_element_off {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_head_element_off] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_slist_head_element_off!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18679,6 +19457,13 @@ macro_rules! __pgrx_c_args_slist_head_element_off {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_head_element_off] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slist_head_element_off!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18695,7 +19480,7 @@ macro_rules! __pgrx_c_args_slist_head_element_off {
         $crate::slist_head_element_off!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function slist_head_element_off from ilist.h:1061
@@ -18797,13 +19582,13 @@ macro_rules! slist_head_element_off {
         $crate::__pgrx_c_args_slist_head_element_off!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $off:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slist_head_element_off!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $off:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slist_head_element_off!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -18817,7 +19602,7 @@ macro_rules! slist_head_element_off {
                         $crate::__pgrx_c_operand!(@check_safety; $off);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -18875,7 +19660,7 @@ macro_rules! slist_head_element_off {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -19022,6 +19807,11 @@ macro_rules! __pgrx_c_args_slist_head_node {
             @argument [__pgrx_c_args_slist_head_node] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_head_node] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_slist_head_node!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19059,6 +19849,13 @@ macro_rules! __pgrx_c_args_slist_head_node {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_head_node] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slist_head_node!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19075,7 +19872,7 @@ macro_rules! __pgrx_c_args_slist_head_node {
         $crate::slist_head_node!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function slist_head_node from ilist.h:1071
@@ -19156,13 +19953,13 @@ macro_rules! slist_head_node {
         $crate::__pgrx_c_args_slist_head_node!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slist_head_node!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slist_head_node!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -19175,7 +19972,7 @@ macro_rules! slist_head_node {
                         $crate::__pgrx_c_operand!(@check_safety; $head);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -19216,7 +20013,7 @@ macro_rules! slist_head_node {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -19347,6 +20144,11 @@ macro_rules! __pgrx_c_args_slist_init {
             @argument [__pgrx_c_args_slist_init] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_init] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_slist_init!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19382,6 +20184,11 @@ macro_rules! __pgrx_c_args_slist_init {
             @argument [__pgrx_c_args_slist_init] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_init] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slist_init!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19398,7 +20205,7 @@ macro_rules! __pgrx_c_args_slist_init {
         $crate::slist_init!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function slist_init from ilist.h:985
@@ -19470,13 +20277,13 @@ macro_rules! slist_init {
         $crate::__pgrx_c_args_slist_init!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slist_init!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slist_init!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -19489,7 +20296,7 @@ macro_rules! slist_init {
                         $crate::__pgrx_c_operand!(@check_safety; $head);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::slist_init(
@@ -19521,7 +20328,7 @@ macro_rules! slist_init {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -19636,6 +20443,13 @@ macro_rules! __pgrx_c_args_slist_insert_after {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_insert_after] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slist_insert_after!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19697,6 +20511,11 @@ macro_rules! __pgrx_c_args_slist_insert_after {
             @argument [__pgrx_c_args_slist_insert_after] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_insert_after] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_slist_insert_after!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19734,6 +20553,13 @@ macro_rules! __pgrx_c_args_slist_insert_after {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_insert_after] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slist_insert_after!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19750,7 +20576,7 @@ macro_rules! __pgrx_c_args_slist_insert_after {
         $crate::slist_insert_after!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function slist_insert_after from ilist.h:1017
@@ -19846,13 +20672,13 @@ macro_rules! slist_insert_after {
         $crate::__pgrx_c_args_slist_insert_after!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $after:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slist_insert_after!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $after:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slist_insert_after!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -19866,7 +20692,7 @@ macro_rules! slist_insert_after {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::slist_insert_after(
@@ -19921,7 +20747,7 @@ macro_rules! slist_insert_after {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -20065,6 +20891,11 @@ macro_rules! __pgrx_c_args_slist_is_empty {
             @argument [__pgrx_c_args_slist_is_empty] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_is_empty] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_slist_is_empty!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20102,6 +20933,11 @@ macro_rules! __pgrx_c_args_slist_is_empty {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_is_empty] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slist_is_empty!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20118,7 +20954,7 @@ macro_rules! __pgrx_c_args_slist_is_empty {
         $crate::slist_is_empty!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function slist_is_empty from ilist.h:994
@@ -20194,13 +21030,13 @@ macro_rules! slist_is_empty {
         $crate::__pgrx_c_args_slist_is_empty!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slist_is_empty!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slist_is_empty!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -20213,7 +21049,7 @@ macro_rules! slist_is_empty {
                         $crate::__pgrx_c_operand!(@check_safety; $head);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -20249,7 +21085,7 @@ macro_rules! slist_is_empty {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -20366,6 +21202,13 @@ macro_rules! __pgrx_c_args_slist_next_node {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_next_node] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slist_next_node!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20427,6 +21270,11 @@ macro_rules! __pgrx_c_args_slist_next_node {
             @argument [__pgrx_c_args_slist_next_node] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_next_node] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_slist_next_node!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20464,6 +21312,13 @@ macro_rules! __pgrx_c_args_slist_next_node {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_next_node] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slist_next_node!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20480,7 +21335,7 @@ macro_rules! __pgrx_c_args_slist_next_node {
         $crate::slist_next_node!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function slist_next_node from ilist.h:1053
@@ -20585,13 +21440,13 @@ macro_rules! slist_next_node {
         $crate::__pgrx_c_args_slist_next_node!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slist_next_node!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slist_next_node!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -20605,7 +21460,7 @@ macro_rules! slist_next_node {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -20669,7 +21524,7 @@ macro_rules! slist_next_node {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -20822,6 +21677,11 @@ macro_rules! __pgrx_c_args_slist_pop_head_node {
             @argument [__pgrx_c_args_slist_pop_head_node] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_pop_head_node] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_slist_pop_head_node!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20859,6 +21719,13 @@ macro_rules! __pgrx_c_args_slist_pop_head_node {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_pop_head_node] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slist_pop_head_node!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20875,7 +21742,7 @@ macro_rules! __pgrx_c_args_slist_pop_head_node {
         $crate::slist_pop_head_node!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function slist_pop_head_node from ilist.h:1027
@@ -20962,13 +21829,13 @@ macro_rules! slist_pop_head_node {
         $crate::__pgrx_c_args_slist_pop_head_node!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slist_pop_head_node!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slist_pop_head_node!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -20981,7 +21848,7 @@ macro_rules! slist_pop_head_node {
                         $crate::__pgrx_c_operand!(@check_safety; $head);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -21022,7 +21889,7 @@ macro_rules! slist_pop_head_node {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -21146,6 +22013,13 @@ macro_rules! __pgrx_c_args_slist_push_head {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_push_head] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slist_push_head!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -21207,6 +22081,11 @@ macro_rules! __pgrx_c_args_slist_push_head {
             @argument [__pgrx_c_args_slist_push_head] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_push_head] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_slist_push_head!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -21244,6 +22123,13 @@ macro_rules! __pgrx_c_args_slist_push_head {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slist_push_head] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slist_push_head!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -21260,7 +22146,7 @@ macro_rules! __pgrx_c_args_slist_push_head {
         $crate::slist_push_head!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function slist_push_head from ilist.h:1005
@@ -21358,13 +22244,13 @@ macro_rules! slist_push_head {
         $crate::__pgrx_c_args_slist_push_head!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slist_push_head!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $head:tt, $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slist_push_head!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -21378,7 +22264,7 @@ macro_rules! slist_push_head {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::slist_push_head(
@@ -21433,7 +22319,7 @@ macro_rules! slist_push_head {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

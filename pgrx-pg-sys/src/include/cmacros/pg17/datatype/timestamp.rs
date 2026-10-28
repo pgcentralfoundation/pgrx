@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_INTERVAL_IS_NOBEGIN {
             @argument [__pgrx_c_args_INTERVAL_IS_NOBEGIN] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INTERVAL_IS_NOBEGIN] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INTERVAL_IS_NOBEGIN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -118,6 +123,13 @@ macro_rules! __pgrx_c_args_INTERVAL_IS_NOBEGIN {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INTERVAL_IS_NOBEGIN] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INTERVAL_IS_NOBEGIN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -134,7 +146,7 @@ macro_rules! __pgrx_c_args_INTERVAL_IS_NOBEGIN {
         $crate::INTERVAL_IS_NOBEGIN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro INTERVAL_IS_NOBEGIN from timestamp.h:182
@@ -302,13 +314,13 @@ macro_rules! INTERVAL_IS_NOBEGIN {
         $crate::__pgrx_c_args_INTERVAL_IS_NOBEGIN!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INTERVAL_IS_NOBEGIN!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INTERVAL_IS_NOBEGIN!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -322,7 +334,7 @@ macro_rules! INTERVAL_IS_NOBEGIN {
                         $crate::__pgrx_c_operand!(@check_safety; $i);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -477,7 +489,7 @@ macro_rules! INTERVAL_IS_NOBEGIN {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -703,6 +715,11 @@ macro_rules! __pgrx_c_args_INTERVAL_IS_NOEND {
             @argument [__pgrx_c_args_INTERVAL_IS_NOEND] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INTERVAL_IS_NOEND] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INTERVAL_IS_NOEND!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -740,6 +757,13 @@ macro_rules! __pgrx_c_args_INTERVAL_IS_NOEND {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INTERVAL_IS_NOEND] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INTERVAL_IS_NOEND!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -756,7 +780,7 @@ macro_rules! __pgrx_c_args_INTERVAL_IS_NOEND {
         $crate::INTERVAL_IS_NOEND!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro INTERVAL_IS_NOEND from timestamp.h:192
@@ -924,13 +948,13 @@ macro_rules! INTERVAL_IS_NOEND {
         $crate::__pgrx_c_args_INTERVAL_IS_NOEND!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INTERVAL_IS_NOEND!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INTERVAL_IS_NOEND!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -944,7 +968,7 @@ macro_rules! INTERVAL_IS_NOEND {
                         $crate::__pgrx_c_operand!(@check_safety; $i);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -1099,7 +1123,7 @@ macro_rules! INTERVAL_IS_NOEND {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1325,6 +1349,11 @@ macro_rules! __pgrx_c_args_INTERVAL_NOBEGIN {
             @argument [__pgrx_c_args_INTERVAL_NOBEGIN] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INTERVAL_NOBEGIN] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INTERVAL_NOBEGIN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1362,6 +1391,13 @@ macro_rules! __pgrx_c_args_INTERVAL_NOBEGIN {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INTERVAL_NOBEGIN] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INTERVAL_NOBEGIN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1378,7 +1414,7 @@ macro_rules! __pgrx_c_args_INTERVAL_NOBEGIN {
         $crate::INTERVAL_NOBEGIN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro INTERVAL_NOBEGIN from timestamp.h:175
@@ -1489,7 +1525,7 @@ macro_rules! INTERVAL_NOBEGIN {
         $crate::__pgrx_c_args_INTERVAL_NOBEGIN!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_INTERVAL_NOBEGIN!(@collect __pgrx_emit_public []; $($raw)*)
@@ -1573,6 +1609,11 @@ macro_rules! __pgrx_c_args_INTERVAL_NOEND {
             @argument [__pgrx_c_args_INTERVAL_NOEND] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INTERVAL_NOEND] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INTERVAL_NOEND!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1610,6 +1651,11 @@ macro_rules! __pgrx_c_args_INTERVAL_NOEND {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INTERVAL_NOEND] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INTERVAL_NOEND!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1626,7 +1672,7 @@ macro_rules! __pgrx_c_args_INTERVAL_NOEND {
         $crate::INTERVAL_NOEND!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro INTERVAL_NOEND from timestamp.h:185
@@ -1737,7 +1783,7 @@ macro_rules! INTERVAL_NOEND {
         $crate::__pgrx_c_args_INTERVAL_NOEND!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_INTERVAL_NOEND!(@collect __pgrx_emit_public []; $($raw)*)
@@ -1821,6 +1867,11 @@ macro_rules! __pgrx_c_args_INTERVAL_NOT_FINITE {
             @argument [__pgrx_c_args_INTERVAL_NOT_FINITE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INTERVAL_NOT_FINITE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INTERVAL_NOT_FINITE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1858,6 +1909,13 @@ macro_rules! __pgrx_c_args_INTERVAL_NOT_FINITE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INTERVAL_NOT_FINITE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INTERVAL_NOT_FINITE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1874,7 +1932,7 @@ macro_rules! __pgrx_c_args_INTERVAL_NOT_FINITE {
         $crate::INTERVAL_NOT_FINITE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro INTERVAL_NOT_FINITE from timestamp.h:195
@@ -2248,13 +2306,13 @@ macro_rules! INTERVAL_NOT_FINITE {
         $crate::__pgrx_c_args_INTERVAL_NOT_FINITE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INTERVAL_NOT_FINITE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INTERVAL_NOT_FINITE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2268,7 +2326,7 @@ macro_rules! INTERVAL_NOT_FINITE {
                         $crate::__pgrx_c_operand!(@check_safety; $i);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -2622,7 +2680,7 @@ macro_rules! INTERVAL_NOT_FINITE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3054,6 +3112,11 @@ macro_rules! __pgrx_c_args_IS_VALID_DATE {
             @argument [__pgrx_c_args_IS_VALID_DATE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_VALID_DATE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IS_VALID_DATE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3091,6 +3154,11 @@ macro_rules! __pgrx_c_args_IS_VALID_DATE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_VALID_DATE] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_DATE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3107,7 +3175,7 @@ macro_rules! __pgrx_c_args_IS_VALID_DATE {
         $crate::IS_VALID_DATE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IS_VALID_DATE from timestamp.h:262
@@ -3240,13 +3308,13 @@ macro_rules! IS_VALID_DATE {
         $crate::__pgrx_c_args_IS_VALID_DATE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $d:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_DATE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $d:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_DATE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3259,7 +3327,7 @@ macro_rules! IS_VALID_DATE {
                         $crate::__pgrx_c_operand!(@check_safety; $d);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -3363,7 +3431,7 @@ macro_rules! IS_VALID_DATE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3543,6 +3611,13 @@ macro_rules! __pgrx_c_args_IS_VALID_JULIAN {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_VALID_JULIAN] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_JULIAN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3597,6 +3672,13 @@ macro_rules! __pgrx_c_args_IS_VALID_JULIAN {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_VALID_JULIAN] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_JULIAN!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3627,13 +3709,13 @@ macro_rules! __pgrx_c_args_IS_VALID_JULIAN {
         $crate::__pgrx_c_args_IS_VALID_JULIAN!(@ignore2 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore2 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p3 $mode:ident [$($done:tt)*];) => {
         $crate::IS_VALID_JULIAN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IS_VALID_JULIAN from timestamp.h:227
@@ -3907,13 +3989,13 @@ macro_rules! IS_VALID_JULIAN {
         $crate::__pgrx_c_args_IS_VALID_JULIAN!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $y:tt, $m:tt, $d:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_JULIAN!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $y:tt, $m:tt, $d:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_JULIAN!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3927,7 +4009,7 @@ macro_rules! IS_VALID_JULIAN {
                         $crate::__pgrx_c_operand!(@check_safety; $m);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -4195,7 +4277,7 @@ macro_rules! IS_VALID_JULIAN {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4526,6 +4608,11 @@ macro_rules! __pgrx_c_args_IS_VALID_TIMESTAMP {
             @argument [__pgrx_c_args_IS_VALID_TIMESTAMP] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_VALID_TIMESTAMP] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IS_VALID_TIMESTAMP!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4563,6 +4650,13 @@ macro_rules! __pgrx_c_args_IS_VALID_TIMESTAMP {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_VALID_TIMESTAMP] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_TIMESTAMP!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4579,7 +4673,7 @@ macro_rules! __pgrx_c_args_IS_VALID_TIMESTAMP {
         $crate::IS_VALID_TIMESTAMP!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IS_VALID_TIMESTAMP from timestamp.h:267
@@ -4657,13 +4751,13 @@ macro_rules! IS_VALID_TIMESTAMP {
         $crate::__pgrx_c_args_IS_VALID_TIMESTAMP!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $t:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_TIMESTAMP!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $t:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_TIMESTAMP!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4677,7 +4771,7 @@ macro_rules! IS_VALID_TIMESTAMP {
                         $crate::__pgrx_c_operand!(@check_safety; $t);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -4733,7 +4827,7 @@ macro_rules! IS_VALID_TIMESTAMP {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4872,6 +4966,11 @@ macro_rules! __pgrx_c_args_TIMESTAMP_IS_NOBEGIN {
             @argument [__pgrx_c_args_TIMESTAMP_IS_NOBEGIN] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TIMESTAMP_IS_NOBEGIN] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TIMESTAMP_IS_NOBEGIN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4909,6 +5008,13 @@ macro_rules! __pgrx_c_args_TIMESTAMP_IS_NOBEGIN {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TIMESTAMP_IS_NOBEGIN] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_IS_NOBEGIN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4925,7 +5031,7 @@ macro_rules! __pgrx_c_args_TIMESTAMP_IS_NOBEGIN {
         $crate::TIMESTAMP_IS_NOBEGIN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TIMESTAMP_IS_NOBEGIN from timestamp.h:162
@@ -4978,13 +5084,13 @@ macro_rules! TIMESTAMP_IS_NOBEGIN {
         $crate::__pgrx_c_args_TIMESTAMP_IS_NOBEGIN!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $j:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_IS_NOBEGIN!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $j:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_IS_NOBEGIN!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4998,7 +5104,7 @@ macro_rules! TIMESTAMP_IS_NOBEGIN {
                         $crate::__pgrx_c_operand!(@check_safety; $j);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -5017,7 +5123,7 @@ macro_rules! TIMESTAMP_IS_NOBEGIN {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5128,6 +5234,11 @@ macro_rules! __pgrx_c_args_TIMESTAMP_IS_NOEND {
             @argument [__pgrx_c_args_TIMESTAMP_IS_NOEND] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TIMESTAMP_IS_NOEND] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TIMESTAMP_IS_NOEND!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5165,6 +5276,13 @@ macro_rules! __pgrx_c_args_TIMESTAMP_IS_NOEND {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TIMESTAMP_IS_NOEND] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_IS_NOEND!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5181,7 +5299,7 @@ macro_rules! __pgrx_c_args_TIMESTAMP_IS_NOEND {
         $crate::TIMESTAMP_IS_NOEND!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TIMESTAMP_IS_NOEND from timestamp.h:167
@@ -5234,13 +5352,13 @@ macro_rules! TIMESTAMP_IS_NOEND {
         $crate::__pgrx_c_args_TIMESTAMP_IS_NOEND!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $j:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_IS_NOEND!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $j:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_IS_NOEND!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5254,7 +5372,7 @@ macro_rules! TIMESTAMP_IS_NOEND {
                         $crate::__pgrx_c_operand!(@check_safety; $j);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -5273,7 +5391,7 @@ macro_rules! TIMESTAMP_IS_NOEND {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5384,6 +5502,11 @@ macro_rules! __pgrx_c_args_TIMESTAMP_NOBEGIN {
             @argument [__pgrx_c_args_TIMESTAMP_NOBEGIN] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TIMESTAMP_NOBEGIN] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOBEGIN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5421,6 +5544,13 @@ macro_rules! __pgrx_c_args_TIMESTAMP_NOBEGIN {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TIMESTAMP_NOBEGIN] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOBEGIN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5437,7 +5567,7 @@ macro_rules! __pgrx_c_args_TIMESTAMP_NOBEGIN {
         $crate::TIMESTAMP_NOBEGIN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TIMESTAMP_NOBEGIN from timestamp.h:159
@@ -5488,7 +5618,7 @@ macro_rules! TIMESTAMP_NOBEGIN {
         $crate::__pgrx_c_args_TIMESTAMP_NOBEGIN!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOBEGIN!(@collect __pgrx_emit_public []; $($raw)*)
@@ -5572,6 +5702,11 @@ macro_rules! __pgrx_c_args_TIMESTAMP_NOEND {
             @argument [__pgrx_c_args_TIMESTAMP_NOEND] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TIMESTAMP_NOEND] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOEND!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5609,6 +5744,13 @@ macro_rules! __pgrx_c_args_TIMESTAMP_NOEND {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TIMESTAMP_NOEND] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOEND!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5625,7 +5767,7 @@ macro_rules! __pgrx_c_args_TIMESTAMP_NOEND {
         $crate::TIMESTAMP_NOEND!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TIMESTAMP_NOEND from timestamp.h:164
@@ -5676,7 +5818,7 @@ macro_rules! TIMESTAMP_NOEND {
         $crate::__pgrx_c_args_TIMESTAMP_NOEND!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOEND!(@collect __pgrx_emit_public []; $($raw)*)
@@ -5763,6 +5905,11 @@ macro_rules! __pgrx_c_args_TIMESTAMP_NOT_FINITE {
             @argument [__pgrx_c_args_TIMESTAMP_NOT_FINITE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TIMESTAMP_NOT_FINITE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOT_FINITE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5800,6 +5947,13 @@ macro_rules! __pgrx_c_args_TIMESTAMP_NOT_FINITE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TIMESTAMP_NOT_FINITE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOT_FINITE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5816,7 +5970,7 @@ macro_rules! __pgrx_c_args_TIMESTAMP_NOT_FINITE {
         $crate::TIMESTAMP_NOT_FINITE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TIMESTAMP_NOT_FINITE from timestamp.h:169
@@ -5900,13 +6054,13 @@ macro_rules! TIMESTAMP_NOT_FINITE {
         $crate::__pgrx_c_args_TIMESTAMP_NOT_FINITE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $j:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOT_FINITE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $j:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOT_FINITE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5920,7 +6074,7 @@ macro_rules! TIMESTAMP_NOT_FINITE {
                         $crate::__pgrx_c_operand!(@check_safety; $j);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -5986,7 +6140,7 @@ macro_rules! TIMESTAMP_NOT_FINITE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

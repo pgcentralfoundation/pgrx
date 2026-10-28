@@ -899,6 +899,10 @@ pub mod __pgrx_c_callbacks {
     pub type get_relation_stats_hook_type = crate::__pgrx_c_macros::expression::FunctionValue<
         crate::__pgrx_c_generated::Signature_e4b183e2914e42c6d1805e7c72252596,
     >;
+    #[doc = "Explicit C callback typedef `grouping_eqop_callback` with its exact native binding storage."]
+    pub type grouping_eqop_callback = crate::__pgrx_c_macros::expression::FunctionValue<
+        crate::__pgrx_c_generated::Signature_e9fa658f13e946cc5ca9b60ed90ef986,
+    >;
     #[doc = "Explicit C callback typedef `join_search_hook_type` with its exact native binding storage."]
     pub type join_search_hook_type = crate::__pgrx_c_macros::expression::FunctionValue<
         crate::__pgrx_c_generated::Signature_40de2fc40fb66fefb6dbbd2863ac3d7b,
@@ -4653,7 +4657,3 @@ unsafe impl c::expression::OrdinaryField<Field_dbId>
     type Declared = FieldReadWrite;
     const OFFSET: usize = 4;
 }
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<crate::__pgrx_c_bindings::SharedInvalCatalogMsg, <<c::expression::CRecord<crate::__pgrx_c_bindings::SharedInvalCatalogMsg> as c::expression::OrdinaryField<Field_dbId>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).dbId) };
-#[doc(hidden)]
-pub struct Field_catId;

@@ -84,6 +84,11 @@ macro_rules! __pgrx_c_args_MemoryContextSwitchTo {
             @argument [__pgrx_c_args_MemoryContextSwitchTo] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MemoryContextSwitchTo] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_MemoryContextSwitchTo!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -121,6 +126,13 @@ macro_rules! __pgrx_c_args_MemoryContextSwitchTo {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MemoryContextSwitchTo] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MemoryContextSwitchTo!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -137,7 +149,7 @@ macro_rules! __pgrx_c_args_MemoryContextSwitchTo {
         $crate::MemoryContextSwitchTo!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function MemoryContextSwitchTo from palloc.h:146
@@ -221,13 +233,13 @@ macro_rules! MemoryContextSwitchTo {
         $crate::__pgrx_c_args_MemoryContextSwitchTo!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $context:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MemoryContextSwitchTo!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $context:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MemoryContextSwitchTo!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -240,7 +252,7 @@ macro_rules! MemoryContextSwitchTo {
                         $crate::__pgrx_c_operand!(@check_safety; $context);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -281,7 +293,7 @@ macro_rules! MemoryContextSwitchTo {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -415,6 +427,11 @@ macro_rules! __pgrx_c_args_palloc0_array {
             @argument [__pgrx_c_args_palloc0_array] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_palloc0_array] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_palloc0_array!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -452,6 +469,11 @@ macro_rules! __pgrx_c_args_palloc0_array {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_palloc0_array] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_palloc0_array!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -468,7 +490,7 @@ macro_rules! __pgrx_c_args_palloc0_array {
         $crate::palloc0_array!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro palloc0_array from palloc.h:111
@@ -569,13 +591,13 @@ macro_rules! palloc0_array {
         $crate::__pgrx_c_args_palloc0_array!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $type:ty, $count:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_palloc0_array!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $type:ty, $count:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_palloc0_array!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -588,7 +610,7 @@ macro_rules! palloc0_array {
                         $crate::__pgrx_c_operand!(@check_safety; $count);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -657,7 +679,7 @@ macro_rules! palloc0_array {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -773,7 +795,7 @@ macro_rules! __pgrx_c_args_palloc0_object {
         $crate::palloc0_object!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro palloc0_object from palloc.h:105
@@ -853,13 +875,13 @@ macro_rules! palloc0_object {
         $crate::__pgrx_c_args_palloc0_object!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $type:ty $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_palloc0_object!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $type:ty $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_palloc0_object!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -870,7 +892,7 @@ macro_rules! palloc0_object {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -915,7 +937,7 @@ macro_rules! palloc0_object {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1051,6 +1073,11 @@ macro_rules! __pgrx_c_args_palloc0fast {
             @argument [__pgrx_c_args_palloc0fast] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_palloc0fast] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_palloc0fast!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1086,6 +1113,11 @@ macro_rules! __pgrx_c_args_palloc0fast {
             @argument [__pgrx_c_args_palloc0fast] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_palloc0fast] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_palloc0fast!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1102,7 +1134,7 @@ macro_rules! __pgrx_c_args_palloc0fast {
         $crate::palloc0fast!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro palloc0fast from palloc.h:129
@@ -1490,13 +1522,13 @@ macro_rules! palloc0fast {
         $crate::__pgrx_c_args_palloc0fast!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $sz:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_palloc0fast!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $sz:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_palloc0fast!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1510,7 +1542,7 @@ macro_rules! palloc0fast {
                         $crate::__pgrx_c_operand!(@check_safety; $sz);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -1885,7 +1917,7 @@ macro_rules! palloc0fast {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2330,6 +2362,11 @@ macro_rules! __pgrx_c_args_palloc_array {
             @argument [__pgrx_c_args_palloc_array] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_palloc_array] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_palloc_array!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2365,6 +2402,11 @@ macro_rules! __pgrx_c_args_palloc_array {
             @argument [__pgrx_c_args_palloc_array] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_palloc_array] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_palloc_array!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2381,7 +2423,7 @@ macro_rules! __pgrx_c_args_palloc_array {
         $crate::palloc_array!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro palloc_array from palloc.h:110
@@ -2482,13 +2524,13 @@ macro_rules! palloc_array {
         $crate::__pgrx_c_args_palloc_array!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $type:ty, $count:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_palloc_array!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $type:ty, $count:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_palloc_array!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2501,7 +2543,7 @@ macro_rules! palloc_array {
                         $crate::__pgrx_c_operand!(@check_safety; $count);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -2570,7 +2612,7 @@ macro_rules! palloc_array {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2724,6 +2766,13 @@ macro_rules! __pgrx_c_args_palloc_array_extended {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_palloc_array_extended] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_palloc_array_extended!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2785,6 +2834,11 @@ macro_rules! __pgrx_c_args_palloc_array_extended {
             @argument [__pgrx_c_args_palloc_array_extended] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_palloc_array_extended] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_palloc_array_extended!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2822,6 +2876,13 @@ macro_rules! __pgrx_c_args_palloc_array_extended {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_palloc_array_extended] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_palloc_array_extended!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2838,7 +2899,7 @@ macro_rules! __pgrx_c_args_palloc_array_extended {
         $crate::palloc_array_extended!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro palloc_array_extended from palloc.h:112
@@ -2953,13 +3014,13 @@ macro_rules! palloc_array_extended {
         $crate::__pgrx_c_args_palloc_array_extended!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $type:ty, $count:tt, $flags:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_palloc_array_extended!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $type:ty, $count:tt, $flags:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_palloc_array_extended!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2973,7 +3034,7 @@ macro_rules! palloc_array_extended {
                         $crate::__pgrx_c_operand!(@check_safety; $flags);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -3060,7 +3121,7 @@ macro_rules! palloc_array_extended {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3189,7 +3250,7 @@ macro_rules! __pgrx_c_args_palloc_object {
         $crate::palloc_object!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro palloc_object from palloc.h:104
@@ -3269,13 +3330,13 @@ macro_rules! palloc_object {
         $crate::__pgrx_c_args_palloc_object!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $type:ty $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_palloc_object!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $type:ty $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_palloc_object!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3286,7 +3347,7 @@ macro_rules! palloc_object {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -3331,7 +3392,7 @@ macro_rules! palloc_object {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3460,6 +3521,11 @@ macro_rules! __pgrx_c_args_repalloc_array {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_repalloc_array] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_repalloc_array!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3524,6 +3590,11 @@ macro_rules! __pgrx_c_args_repalloc_array {
             @argument [__pgrx_c_args_repalloc_array] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_repalloc_array] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_repalloc_array!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3561,6 +3632,11 @@ macro_rules! __pgrx_c_args_repalloc_array {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_repalloc_array] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_repalloc_array!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3577,7 +3653,7 @@ macro_rules! __pgrx_c_args_repalloc_array {
         $crate::repalloc_array!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro repalloc_array from palloc.h:118
@@ -3698,13 +3774,13 @@ macro_rules! repalloc_array {
         $crate::__pgrx_c_args_repalloc_array!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $pointer:tt, $type:ty, $count:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_repalloc_array!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $pointer:tt, $type:ty, $count:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_repalloc_array!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3718,7 +3794,7 @@ macro_rules! repalloc_array {
                         $crate::__pgrx_c_operand!(@check_safety; $count);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -3811,7 +3887,7 @@ macro_rules! repalloc_array {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3981,6 +4057,13 @@ macro_rules! __pgrx_c_args_repalloc_array_extended {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_repalloc_array_extended] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_repalloc_array_extended!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4035,6 +4118,13 @@ macro_rules! __pgrx_c_args_repalloc_array_extended {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_repalloc_array_extended] [p3 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_repalloc_array_extended] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -4101,6 +4191,11 @@ macro_rules! __pgrx_c_args_repalloc_array_extended {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_repalloc_array_extended] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_repalloc_array_extended!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4138,6 +4233,13 @@ macro_rules! __pgrx_c_args_repalloc_array_extended {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_repalloc_array_extended] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_repalloc_array_extended!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4154,7 +4256,7 @@ macro_rules! __pgrx_c_args_repalloc_array_extended {
         $crate::repalloc_array_extended!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro repalloc_array_extended from palloc.h:119
@@ -4292,13 +4394,13 @@ macro_rules! repalloc_array_extended {
         $crate::__pgrx_c_args_repalloc_array_extended!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $pointer:tt, $type:ty, $count:tt, $flags:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_repalloc_array_extended!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $pointer:tt, $type:ty, $count:tt, $flags:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_repalloc_array_extended!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4313,7 +4415,7 @@ macro_rules! repalloc_array_extended {
                         $crate::__pgrx_c_operand!(@check_safety; $flags);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -4424,7 +4526,7 @@ macro_rules! repalloc_array_extended {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

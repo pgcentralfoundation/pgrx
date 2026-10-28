@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_get_leftop {
             @argument [__pgrx_c_args_get_leftop] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_get_leftop] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_get_leftop!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -116,6 +121,11 @@ macro_rules! __pgrx_c_args_get_leftop {
             @argument [__pgrx_c_args_get_leftop] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_get_leftop] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_get_leftop!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -132,7 +142,7 @@ macro_rules! __pgrx_c_args_get_leftop {
         $crate::get_leftop!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function get_leftop from nodeFuncs.h:72
@@ -212,13 +222,13 @@ macro_rules! get_leftop {
         $crate::__pgrx_c_args_get_leftop!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $clause:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_get_leftop!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $clause:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_get_leftop!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -231,7 +241,7 @@ macro_rules! get_leftop {
                         $crate::__pgrx_c_operand!(@check_safety; $clause);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -268,7 +278,7 @@ macro_rules! get_leftop {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -395,6 +405,11 @@ macro_rules! __pgrx_c_args_get_notclausearg {
             @argument [__pgrx_c_args_get_notclausearg] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_get_notclausearg] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_get_notclausearg!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -432,6 +447,13 @@ macro_rules! __pgrx_c_args_get_notclausearg {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_get_notclausearg] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_get_notclausearg!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -448,7 +470,7 @@ macro_rules! __pgrx_c_args_get_notclausearg {
         $crate::get_notclausearg!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function get_notclausearg from nodeFuncs.h:123
@@ -523,13 +545,13 @@ macro_rules! get_notclausearg {
         $crate::__pgrx_c_args_get_notclausearg!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $notclause:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_get_notclausearg!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $notclause:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_get_notclausearg!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -542,7 +564,7 @@ macro_rules! get_notclausearg {
                         $crate::__pgrx_c_operand!(@check_safety; $notclause);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -579,7 +601,7 @@ macro_rules! get_notclausearg {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -706,6 +728,11 @@ macro_rules! __pgrx_c_args_get_rightop {
             @argument [__pgrx_c_args_get_rightop] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_get_rightop] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_get_rightop!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -741,6 +768,11 @@ macro_rules! __pgrx_c_args_get_rightop {
             @argument [__pgrx_c_args_get_rightop] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_get_rightop] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_get_rightop!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -757,7 +789,7 @@ macro_rules! __pgrx_c_args_get_rightop {
         $crate::get_rightop!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function get_rightop from nodeFuncs.h:84
@@ -837,13 +869,13 @@ macro_rules! get_rightop {
         $crate::__pgrx_c_args_get_rightop!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $clause:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_get_rightop!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $clause:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_get_rightop!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -856,7 +888,7 @@ macro_rules! get_rightop {
                         $crate::__pgrx_c_operand!(@check_safety; $clause);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -893,7 +925,7 @@ macro_rules! get_rightop {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1020,6 +1052,11 @@ macro_rules! __pgrx_c_args_is_andclause {
             @argument [__pgrx_c_args_is_andclause] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_is_andclause] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_is_andclause!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1055,6 +1092,11 @@ macro_rules! __pgrx_c_args_is_andclause {
             @argument [__pgrx_c_args_is_andclause] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_is_andclause] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_is_andclause!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1071,7 +1113,7 @@ macro_rules! __pgrx_c_args_is_andclause {
         $crate::is_andclause!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function is_andclause from nodeFuncs.h:96
@@ -1143,13 +1185,13 @@ macro_rules! is_andclause {
         $crate::__pgrx_c_args_is_andclause!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $clause:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_is_andclause!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $clause:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_is_andclause!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1162,7 +1204,7 @@ macro_rules! is_andclause {
                         $crate::__pgrx_c_operand!(@check_safety; $clause);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1194,7 +1236,7 @@ macro_rules! is_andclause {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1314,6 +1356,11 @@ macro_rules! __pgrx_c_args_is_funcclause {
             @argument [__pgrx_c_args_is_funcclause] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_is_funcclause] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_is_funcclause!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1351,6 +1398,11 @@ macro_rules! __pgrx_c_args_is_funcclause {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_is_funcclause] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_is_funcclause!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1367,7 +1419,7 @@ macro_rules! __pgrx_c_args_is_funcclause {
         $crate::is_funcclause!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function is_funcclause from nodeFuncs.h:58
@@ -1437,13 +1489,13 @@ macro_rules! is_funcclause {
         $crate::__pgrx_c_args_is_funcclause!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $clause:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_is_funcclause!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $clause:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_is_funcclause!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1456,7 +1508,7 @@ macro_rules! is_funcclause {
                         $crate::__pgrx_c_operand!(@check_safety; $clause);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1488,7 +1540,7 @@ macro_rules! is_funcclause {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1608,6 +1660,11 @@ macro_rules! __pgrx_c_args_is_notclause {
             @argument [__pgrx_c_args_is_notclause] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_is_notclause] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_is_notclause!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1643,6 +1700,11 @@ macro_rules! __pgrx_c_args_is_notclause {
             @argument [__pgrx_c_args_is_notclause] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_is_notclause] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_is_notclause!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1659,7 +1721,7 @@ macro_rules! __pgrx_c_args_is_notclause {
         $crate::is_notclause!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function is_notclause from nodeFuncs.h:114
@@ -1731,13 +1793,13 @@ macro_rules! is_notclause {
         $crate::__pgrx_c_args_is_notclause!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $clause:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_is_notclause!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $clause:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_is_notclause!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1750,7 +1812,7 @@ macro_rules! is_notclause {
                         $crate::__pgrx_c_operand!(@check_safety; $clause);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1782,7 +1844,7 @@ macro_rules! is_notclause {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1902,6 +1964,11 @@ macro_rules! __pgrx_c_args_is_opclause {
             @argument [__pgrx_c_args_is_opclause] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_is_opclause] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_is_opclause!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1937,6 +2004,11 @@ macro_rules! __pgrx_c_args_is_opclause {
             @argument [__pgrx_c_args_is_opclause] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_is_opclause] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_is_opclause!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1953,7 +2025,7 @@ macro_rules! __pgrx_c_args_is_opclause {
         $crate::is_opclause!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function is_opclause from nodeFuncs.h:65
@@ -2023,13 +2095,13 @@ macro_rules! is_opclause {
         $crate::__pgrx_c_args_is_opclause!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $clause:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_is_opclause!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $clause:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_is_opclause!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2042,7 +2114,7 @@ macro_rules! is_opclause {
                         $crate::__pgrx_c_operand!(@check_safety; $clause);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2074,7 +2146,7 @@ macro_rules! is_opclause {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2194,6 +2266,11 @@ macro_rules! __pgrx_c_args_is_orclause {
             @argument [__pgrx_c_args_is_orclause] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_is_orclause] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_is_orclause!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2229,6 +2306,11 @@ macro_rules! __pgrx_c_args_is_orclause {
             @argument [__pgrx_c_args_is_orclause] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_is_orclause] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_is_orclause!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2245,7 +2327,7 @@ macro_rules! __pgrx_c_args_is_orclause {
         $crate::is_orclause!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function is_orclause from nodeFuncs.h:105
@@ -2317,13 +2399,13 @@ macro_rules! is_orclause {
         $crate::__pgrx_c_args_is_orclause!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $clause:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_is_orclause!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $clause:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_is_orclause!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2336,7 +2418,7 @@ macro_rules! is_orclause {
                         $crate::__pgrx_c_operand!(@check_safety; $clause);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2368,7 +2450,7 @@ macro_rules! is_orclause {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

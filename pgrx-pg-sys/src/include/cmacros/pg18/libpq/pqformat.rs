@@ -72,6 +72,11 @@ macro_rules! __pgrx_c_args_pq_sendbyte {
             @argument [__pgrx_c_args_pq_sendbyte] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_sendbyte] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pq_sendbyte!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -133,6 +138,11 @@ macro_rules! __pgrx_c_args_pq_sendbyte {
             @argument [__pgrx_c_args_pq_sendbyte] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_sendbyte] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pq_sendbyte!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -168,6 +178,11 @@ macro_rules! __pgrx_c_args_pq_sendbyte {
             @argument [__pgrx_c_args_pq_sendbyte] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_sendbyte] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pq_sendbyte!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -184,7 +199,7 @@ macro_rules! __pgrx_c_args_pq_sendbyte {
         $crate::pq_sendbyte!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pq_sendbyte from pqformat.h:159
@@ -269,13 +284,13 @@ macro_rules! pq_sendbyte {
         $crate::__pgrx_c_args_pq_sendbyte!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $buf:tt, $byt:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pq_sendbyte!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $buf:tt, $byt:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pq_sendbyte!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -289,7 +304,7 @@ macro_rules! pq_sendbyte {
                         $crate::__pgrx_c_operand!(@check_safety; $byt);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::pq_sendbyte(
@@ -334,7 +349,7 @@ macro_rules! pq_sendbyte {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -459,6 +474,11 @@ macro_rules! __pgrx_c_args_pq_sendint {
             @argument [__pgrx_c_args_pq_sendint] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_sendint] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pq_sendint!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -509,6 +529,11 @@ macro_rules! __pgrx_c_args_pq_sendint {
     (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_pq_sendint] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_sendint] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -572,6 +597,11 @@ macro_rules! __pgrx_c_args_pq_sendint {
             @argument [__pgrx_c_args_pq_sendint] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_sendint] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pq_sendint!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -607,6 +637,11 @@ macro_rules! __pgrx_c_args_pq_sendint {
             @argument [__pgrx_c_args_pq_sendint] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_sendint] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pq_sendint!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -623,7 +658,7 @@ macro_rules! __pgrx_c_args_pq_sendint {
         $crate::pq_sendint!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pq_sendint from pqformat.h:170
@@ -733,13 +768,13 @@ macro_rules! pq_sendint {
         $crate::__pgrx_c_args_pq_sendint!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $buf:tt, $i:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pq_sendint!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $buf:tt, $i:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pq_sendint!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -754,7 +789,7 @@ macro_rules! pq_sendint {
                         $crate::__pgrx_c_operand!(@check_safety; $b);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::pq_sendint(
@@ -812,7 +847,7 @@ macro_rules! pq_sendint {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -947,6 +982,11 @@ macro_rules! __pgrx_c_args_pq_sendint16 {
             @argument [__pgrx_c_args_pq_sendint16] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_sendint16] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pq_sendint16!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1008,6 +1048,11 @@ macro_rules! __pgrx_c_args_pq_sendint16 {
             @argument [__pgrx_c_args_pq_sendint16] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_sendint16] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pq_sendint16!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1043,6 +1088,11 @@ macro_rules! __pgrx_c_args_pq_sendint16 {
             @argument [__pgrx_c_args_pq_sendint16] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_sendint16] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pq_sendint16!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1059,7 +1109,7 @@ macro_rules! __pgrx_c_args_pq_sendint16 {
         $crate::pq_sendint16!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pq_sendint16 from pqformat.h:135
@@ -1145,13 +1195,13 @@ macro_rules! pq_sendint16 {
         $crate::__pgrx_c_args_pq_sendint16!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $buf:tt, $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pq_sendint16!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $buf:tt, $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pq_sendint16!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1165,7 +1215,7 @@ macro_rules! pq_sendint16 {
                         $crate::__pgrx_c_operand!(@check_safety; $i);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::pq_sendint16(
@@ -1210,7 +1260,7 @@ macro_rules! pq_sendint16 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1335,6 +1385,11 @@ macro_rules! __pgrx_c_args_pq_sendint32 {
             @argument [__pgrx_c_args_pq_sendint32] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_sendint32] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pq_sendint32!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1396,6 +1451,11 @@ macro_rules! __pgrx_c_args_pq_sendint32 {
             @argument [__pgrx_c_args_pq_sendint32] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_sendint32] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pq_sendint32!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1431,6 +1491,11 @@ macro_rules! __pgrx_c_args_pq_sendint32 {
             @argument [__pgrx_c_args_pq_sendint32] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_sendint32] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pq_sendint32!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1447,7 +1512,7 @@ macro_rules! __pgrx_c_args_pq_sendint32 {
         $crate::pq_sendint32!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pq_sendint32 from pqformat.h:143
@@ -1533,13 +1598,13 @@ macro_rules! pq_sendint32 {
         $crate::__pgrx_c_args_pq_sendint32!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $buf:tt, $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pq_sendint32!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $buf:tt, $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pq_sendint32!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1553,7 +1618,7 @@ macro_rules! pq_sendint32 {
                         $crate::__pgrx_c_operand!(@check_safety; $i);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::pq_sendint32(
@@ -1598,7 +1663,7 @@ macro_rules! pq_sendint32 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1723,6 +1788,11 @@ macro_rules! __pgrx_c_args_pq_sendint64 {
             @argument [__pgrx_c_args_pq_sendint64] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_sendint64] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pq_sendint64!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1784,6 +1854,11 @@ macro_rules! __pgrx_c_args_pq_sendint64 {
             @argument [__pgrx_c_args_pq_sendint64] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_sendint64] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pq_sendint64!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1819,6 +1894,11 @@ macro_rules! __pgrx_c_args_pq_sendint64 {
             @argument [__pgrx_c_args_pq_sendint64] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_sendint64] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pq_sendint64!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1835,7 +1915,7 @@ macro_rules! __pgrx_c_args_pq_sendint64 {
         $crate::pq_sendint64!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pq_sendint64 from pqformat.h:151
@@ -1921,13 +2001,13 @@ macro_rules! pq_sendint64 {
         $crate::__pgrx_c_args_pq_sendint64!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $buf:tt, $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pq_sendint64!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $buf:tt, $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pq_sendint64!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1941,7 +2021,7 @@ macro_rules! pq_sendint64 {
                         $crate::__pgrx_c_operand!(@check_safety; $i);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::pq_sendint64(
@@ -1986,7 +2066,7 @@ macro_rules! pq_sendint64 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2111,6 +2191,11 @@ macro_rules! __pgrx_c_args_pq_sendint8 {
             @argument [__pgrx_c_args_pq_sendint8] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_sendint8] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pq_sendint8!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2172,6 +2257,11 @@ macro_rules! __pgrx_c_args_pq_sendint8 {
             @argument [__pgrx_c_args_pq_sendint8] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_sendint8] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pq_sendint8!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2207,6 +2297,11 @@ macro_rules! __pgrx_c_args_pq_sendint8 {
             @argument [__pgrx_c_args_pq_sendint8] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_sendint8] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pq_sendint8!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2223,7 +2318,7 @@ macro_rules! __pgrx_c_args_pq_sendint8 {
         $crate::pq_sendint8!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pq_sendint8 from pqformat.h:127
@@ -2309,13 +2404,13 @@ macro_rules! pq_sendint8 {
         $crate::__pgrx_c_args_pq_sendint8!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $buf:tt, $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pq_sendint8!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $buf:tt, $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pq_sendint8!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2329,7 +2424,7 @@ macro_rules! pq_sendint8 {
                         $crate::__pgrx_c_operand!(@check_safety; $i);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::pq_sendint8(
@@ -2374,7 +2469,7 @@ macro_rules! pq_sendint8 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2501,6 +2596,11 @@ macro_rules! __pgrx_c_args_pq_writeint16 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_writeint16] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pq_writeint16!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2562,6 +2662,11 @@ macro_rules! __pgrx_c_args_pq_writeint16 {
             @argument [__pgrx_c_args_pq_writeint16] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_writeint16] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pq_writeint16!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2599,6 +2704,11 @@ macro_rules! __pgrx_c_args_pq_writeint16 {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_writeint16] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pq_writeint16!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2615,7 +2725,7 @@ macro_rules! __pgrx_c_args_pq_writeint16 {
         $crate::pq_writeint16!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pq_writeint16 from pqformat.h:59
@@ -2704,13 +2814,13 @@ macro_rules! pq_writeint16 {
         $crate::__pgrx_c_args_pq_writeint16!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $buf:tt, $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pq_writeint16!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $buf:tt, $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pq_writeint16!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2724,7 +2834,7 @@ macro_rules! pq_writeint16 {
                         $crate::__pgrx_c_operand!(@check_safety; $i);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::pq_writeint16(
@@ -2769,7 +2879,7 @@ macro_rules! pq_writeint16 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2896,6 +3006,11 @@ macro_rules! __pgrx_c_args_pq_writeint32 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_writeint32] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pq_writeint32!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2957,6 +3072,11 @@ macro_rules! __pgrx_c_args_pq_writeint32 {
             @argument [__pgrx_c_args_pq_writeint32] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_writeint32] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pq_writeint32!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2994,6 +3114,11 @@ macro_rules! __pgrx_c_args_pq_writeint32 {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_writeint32] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pq_writeint32!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3010,7 +3135,7 @@ macro_rules! __pgrx_c_args_pq_writeint32 {
         $crate::pq_writeint32!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pq_writeint32 from pqformat.h:73
@@ -3099,13 +3224,13 @@ macro_rules! pq_writeint32 {
         $crate::__pgrx_c_args_pq_writeint32!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $buf:tt, $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pq_writeint32!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $buf:tt, $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pq_writeint32!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3119,7 +3244,7 @@ macro_rules! pq_writeint32 {
                         $crate::__pgrx_c_operand!(@check_safety; $i);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::pq_writeint32(
@@ -3164,7 +3289,7 @@ macro_rules! pq_writeint32 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3291,6 +3416,11 @@ macro_rules! __pgrx_c_args_pq_writeint64 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_writeint64] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pq_writeint64!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3352,6 +3482,11 @@ macro_rules! __pgrx_c_args_pq_writeint64 {
             @argument [__pgrx_c_args_pq_writeint64] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_writeint64] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pq_writeint64!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3389,6 +3524,11 @@ macro_rules! __pgrx_c_args_pq_writeint64 {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_writeint64] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pq_writeint64!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3405,7 +3545,7 @@ macro_rules! __pgrx_c_args_pq_writeint64 {
         $crate::pq_writeint64!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pq_writeint64 from pqformat.h:87
@@ -3494,13 +3634,13 @@ macro_rules! pq_writeint64 {
         $crate::__pgrx_c_args_pq_writeint64!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $buf:tt, $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pq_writeint64!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $buf:tt, $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pq_writeint64!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3514,7 +3654,7 @@ macro_rules! pq_writeint64 {
                         $crate::__pgrx_c_operand!(@check_safety; $i);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::pq_writeint64(
@@ -3559,7 +3699,7 @@ macro_rules! pq_writeint64 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3684,6 +3824,11 @@ macro_rules! __pgrx_c_args_pq_writeint8 {
             @argument [__pgrx_c_args_pq_writeint8] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_writeint8] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pq_writeint8!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3745,6 +3890,11 @@ macro_rules! __pgrx_c_args_pq_writeint8 {
             @argument [__pgrx_c_args_pq_writeint8] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_writeint8] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pq_writeint8!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3780,6 +3930,11 @@ macro_rules! __pgrx_c_args_pq_writeint8 {
             @argument [__pgrx_c_args_pq_writeint8] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_writeint8] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pq_writeint8!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3796,7 +3951,7 @@ macro_rules! __pgrx_c_args_pq_writeint8 {
         $crate::pq_writeint8!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pq_writeint8 from pqformat.h:45
@@ -3885,13 +4040,13 @@ macro_rules! pq_writeint8 {
         $crate::__pgrx_c_args_pq_writeint8!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $buf:tt, $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pq_writeint8!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $buf:tt, $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pq_writeint8!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3905,7 +4060,7 @@ macro_rules! pq_writeint8 {
                         $crate::__pgrx_c_operand!(@check_safety; $i);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::pq_writeint8(
@@ -3950,7 +4105,7 @@ macro_rules! pq_writeint8 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4077,6 +4232,11 @@ macro_rules! __pgrx_c_args_pq_writestring {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_writestring] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pq_writestring!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4138,6 +4298,11 @@ macro_rules! __pgrx_c_args_pq_writestring {
             @argument [__pgrx_c_args_pq_writestring] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_writestring] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pq_writestring!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4175,6 +4340,11 @@ macro_rules! __pgrx_c_args_pq_writestring {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pq_writestring] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pq_writestring!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4191,7 +4361,7 @@ macro_rules! __pgrx_c_args_pq_writestring {
         $crate::pq_writestring!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pq_writestring from pqformat.h:107
@@ -4301,13 +4471,13 @@ macro_rules! pq_writestring {
         $crate::__pgrx_c_args_pq_writestring!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $buf:tt, $str:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pq_writestring!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $buf:tt, $str:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pq_writestring!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4321,7 +4491,7 @@ macro_rules! pq_writestring {
                         $crate::__pgrx_c_operand!(@check_safety; $str);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::pq_writestring(
@@ -4378,7 +4548,7 @@ macro_rules! pq_writestring {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

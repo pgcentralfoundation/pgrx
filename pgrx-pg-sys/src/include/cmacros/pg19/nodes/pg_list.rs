@@ -74,6 +74,13 @@ macro_rules! __pgrx_c_args_for_both_cell_setup {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_for_both_cell_setup] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_for_both_cell_setup!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -128,6 +135,13 @@ macro_rules! __pgrx_c_args_for_both_cell_setup {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_for_both_cell_setup] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_for_both_cell_setup!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -179,6 +193,13 @@ macro_rules! __pgrx_c_args_for_both_cell_setup {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_for_both_cell_setup] [p3 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_for_both_cell_setup] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -243,6 +264,11 @@ macro_rules! __pgrx_c_args_for_both_cell_setup {
             @argument [__pgrx_c_args_for_both_cell_setup] [p4 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_for_both_cell_setup] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_for_both_cell_setup!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -280,6 +306,13 @@ macro_rules! __pgrx_c_args_for_both_cell_setup {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_for_both_cell_setup] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_for_both_cell_setup!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -296,7 +329,7 @@ macro_rules! __pgrx_c_args_for_both_cell_setup {
         $crate::for_both_cell_setup!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function for_both_cell_setup from pg_list.h:580
@@ -351,7 +384,7 @@ macro_rules! for_both_cell_setup {
                     $crate::__pgrx_c_bindings::ForBothCellState
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_8f4e2a38e99711307080259d905c3251(
+                $crate::__pgrx_c_generated::Inline_556b287aef6e2636bcaeefd0b61dde67(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -448,13 +481,13 @@ macro_rules! for_both_cell_setup {
         $crate::__pgrx_c_args_for_both_cell_setup!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $list1:tt, $initcell1:tt, $list2:tt, $initcell2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_for_both_cell_setup!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $list1:tt, $initcell1:tt, $list2:tt, $initcell2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_for_both_cell_setup!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -470,7 +503,7 @@ macro_rules! for_both_cell_setup {
                         $crate::__pgrx_c_operand!(@check_safety; $initcell2);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -478,7 +511,7 @@ macro_rules! for_both_cell_setup {
                                     $crate::__pgrx_c_bindings::ForBothCellState
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_8f4e2a38e99711307080259d905c3251(
+                                $crate::__pgrx_c_generated::Inline_556b287aef6e2636bcaeefd0b61dde67(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -577,7 +610,7 @@ macro_rules! for_both_cell_setup {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -592,7 +625,7 @@ macro_rules! for_both_cell_setup {
                         $crate::__pgrx_c_bindings::ForBothCellState
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_8f4e2a38e99711307080259d905c3251(
+                    $crate::__pgrx_c_generated::Inline_556b287aef6e2636bcaeefd0b61dde67(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
@@ -764,6 +797,13 @@ macro_rules! __pgrx_c_args_for_each_cell_setup {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_for_each_cell_setup] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_for_each_cell_setup!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -825,6 +865,11 @@ macro_rules! __pgrx_c_args_for_each_cell_setup {
             @argument [__pgrx_c_args_for_each_cell_setup] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_for_each_cell_setup] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_for_each_cell_setup!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -862,6 +907,13 @@ macro_rules! __pgrx_c_args_for_each_cell_setup {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_for_each_cell_setup] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_for_each_cell_setup!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -878,7 +930,7 @@ macro_rules! __pgrx_c_args_for_each_cell_setup {
         $crate::for_each_cell_setup!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function for_each_cell_setup from pg_list.h:478
@@ -929,7 +981,7 @@ macro_rules! for_each_cell_setup {
                     $crate::__pgrx_c_bindings::ForEachState
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_2ff67e4d59bbc2dae22cd60d5936a776(
+                $crate::__pgrx_c_generated::Inline_e6d78c39b379dd896425196c66a034c6(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -982,13 +1034,13 @@ macro_rules! for_each_cell_setup {
         $crate::__pgrx_c_args_for_each_cell_setup!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $lst:tt, $initcell:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_for_each_cell_setup!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $lst:tt, $initcell:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_for_each_cell_setup!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1002,7 +1054,7 @@ macro_rules! for_each_cell_setup {
                         $crate::__pgrx_c_operand!(@check_safety; $initcell);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1010,7 +1062,7 @@ macro_rules! for_each_cell_setup {
                                     $crate::__pgrx_c_bindings::ForEachState
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_2ff67e4d59bbc2dae22cd60d5936a776(
+                                $crate::__pgrx_c_generated::Inline_e6d78c39b379dd896425196c66a034c6(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -1063,7 +1115,7 @@ macro_rules! for_each_cell_setup {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1078,7 +1130,7 @@ macro_rules! for_each_cell_setup {
                         $crate::__pgrx_c_bindings::ForEachState
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_2ff67e4d59bbc2dae22cd60d5936a776(
+                    $crate::__pgrx_c_generated::Inline_e6d78c39b379dd896425196c66a034c6(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
@@ -1206,6 +1258,13 @@ macro_rules! __pgrx_c_args_for_each_from_setup {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_for_each_from_setup] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_for_each_from_setup!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1267,6 +1326,11 @@ macro_rules! __pgrx_c_args_for_each_from_setup {
             @argument [__pgrx_c_args_for_each_from_setup] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_for_each_from_setup] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_for_each_from_setup!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1304,6 +1368,13 @@ macro_rules! __pgrx_c_args_for_each_from_setup {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_for_each_from_setup] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_for_each_from_setup!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1320,7 +1391,7 @@ macro_rules! __pgrx_c_args_for_each_from_setup {
         $crate::for_each_from_setup!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function for_each_from_setup from pg_list.h:454
@@ -1371,7 +1442,7 @@ macro_rules! for_each_from_setup {
                     $crate::__pgrx_c_bindings::ForEachState
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_6dba8c288d488c2f6a648bbb14fb8ec2(
+                $crate::__pgrx_c_generated::Inline_f1a4ec56b217ee2c7c89d818ee32d7ae(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -1412,13 +1483,13 @@ macro_rules! for_each_from_setup {
         $crate::__pgrx_c_args_for_each_from_setup!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $lst:tt, $N:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_for_each_from_setup!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $lst:tt, $N:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_for_each_from_setup!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1432,7 +1503,7 @@ macro_rules! for_each_from_setup {
                         $crate::__pgrx_c_operand!(@check_safety; $N);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1440,7 +1511,7 @@ macro_rules! for_each_from_setup {
                                     $crate::__pgrx_c_bindings::ForEachState
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_6dba8c288d488c2f6a648bbb14fb8ec2(
+                                $crate::__pgrx_c_generated::Inline_f1a4ec56b217ee2c7c89d818ee32d7ae(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -1483,7 +1554,7 @@ macro_rules! for_each_from_setup {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1498,7 +1569,7 @@ macro_rules! for_each_from_setup {
                         $crate::__pgrx_c_bindings::ForEachState
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_6dba8c288d488c2f6a648bbb14fb8ec2(
+                    $crate::__pgrx_c_generated::Inline_f1a4ec56b217ee2c7c89d818ee32d7ae(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
@@ -1621,6 +1692,11 @@ macro_rules! __pgrx_c_args_lfirst {
             @argument [__pgrx_c_args_lfirst] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lfirst] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_lfirst!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1656,6 +1732,11 @@ macro_rules! __pgrx_c_args_lfirst {
             @argument [__pgrx_c_args_lfirst] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lfirst] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_lfirst!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1672,7 +1753,7 @@ macro_rules! __pgrx_c_args_lfirst {
         $crate::lfirst!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro lfirst from pg_list.h:172
@@ -1772,7 +1853,7 @@ macro_rules! lfirst {
                         $crate::__pgrx_c_operand!(@check_safety; $lc);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_ptr_value,
@@ -1790,7 +1871,7 @@ macro_rules! lfirst {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1903,6 +1984,11 @@ macro_rules! __pgrx_c_args_lfirst_int {
             @argument [__pgrx_c_args_lfirst_int] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lfirst_int] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_lfirst_int!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1938,6 +2024,11 @@ macro_rules! __pgrx_c_args_lfirst_int {
             @argument [__pgrx_c_args_lfirst_int] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lfirst_int] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_lfirst_int!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1954,7 +2045,7 @@ macro_rules! __pgrx_c_args_lfirst_int {
         $crate::lfirst_int!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro lfirst_int from pg_list.h:173
@@ -2056,7 +2147,7 @@ macro_rules! lfirst_int {
                         $crate::__pgrx_c_operand!(@check_safety; $lc);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_int_value,
@@ -2074,7 +2165,7 @@ macro_rules! lfirst_int {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2190,6 +2281,11 @@ macro_rules! __pgrx_c_args_lfirst_node {
             @argument [__pgrx_c_args_lfirst_node] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lfirst_node] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_lfirst_node!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2225,6 +2321,11 @@ macro_rules! __pgrx_c_args_lfirst_node {
             @argument [__pgrx_c_args_lfirst_node] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lfirst_node] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_lfirst_node!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2241,7 +2342,7 @@ macro_rules! __pgrx_c_args_lfirst_node {
         $crate::lfirst_node!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro lfirst_node from pg_list.h:176
@@ -2314,13 +2415,13 @@ macro_rules! lfirst_node {
         $crate::__pgrx_c_args_lfirst_node!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $type:ty, $lc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_lfirst_node!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $type:ty, $lc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_lfirst_node!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2334,7 +2435,7 @@ macro_rules! lfirst_node {
                         $crate::__pgrx_c_operand!(@check_safety; $lc);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -2377,7 +2478,7 @@ macro_rules! lfirst_node {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2504,6 +2605,11 @@ macro_rules! __pgrx_c_args_lfirst_oid {
             @argument [__pgrx_c_args_lfirst_oid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lfirst_oid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_lfirst_oid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2539,6 +2645,11 @@ macro_rules! __pgrx_c_args_lfirst_oid {
             @argument [__pgrx_c_args_lfirst_oid] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lfirst_oid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_lfirst_oid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2555,7 +2666,7 @@ macro_rules! __pgrx_c_args_lfirst_oid {
         $crate::lfirst_oid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro lfirst_oid from pg_list.h:174
@@ -2657,7 +2768,7 @@ macro_rules! lfirst_oid {
                         $crate::__pgrx_c_operand!(@check_safety; $lc);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_oid_value,
@@ -2675,7 +2786,7 @@ macro_rules! lfirst_oid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2788,6 +2899,11 @@ macro_rules! __pgrx_c_args_lfirst_xid {
             @argument [__pgrx_c_args_lfirst_xid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lfirst_xid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_lfirst_xid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2823,6 +2939,11 @@ macro_rules! __pgrx_c_args_lfirst_xid {
             @argument [__pgrx_c_args_lfirst_xid] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lfirst_xid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_lfirst_xid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2839,7 +2960,7 @@ macro_rules! __pgrx_c_args_lfirst_xid {
         $crate::lfirst_xid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro lfirst_xid from pg_list.h:175
@@ -2941,7 +3062,7 @@ macro_rules! lfirst_xid {
                         $crate::__pgrx_c_operand!(@check_safety; $lc);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_xid_value,
@@ -2959,7 +3080,7 @@ macro_rules! lfirst_xid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3070,6 +3191,11 @@ macro_rules! __pgrx_c_args_lfourth {
             @argument [__pgrx_c_args_lfourth] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lfourth] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_lfourth!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3105,6 +3231,11 @@ macro_rules! __pgrx_c_args_lfourth {
             @argument [__pgrx_c_args_lfourth] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lfourth] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_lfourth!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3121,7 +3252,7 @@ macro_rules! __pgrx_c_args_lfourth {
         $crate::lfourth!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro lfourth from pg_list.h:193
@@ -3379,7 +3510,7 @@ macro_rules! lfourth {
                         $crate::__pgrx_c_operand!(@check_safety; $l);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_ptr_value,
@@ -3452,7 +3583,7 @@ macro_rules! lfourth {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3616,6 +3747,11 @@ macro_rules! __pgrx_c_args_lfourth_int {
             @argument [__pgrx_c_args_lfourth_int] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lfourth_int] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_lfourth_int!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3651,6 +3787,11 @@ macro_rules! __pgrx_c_args_lfourth_int {
             @argument [__pgrx_c_args_lfourth_int] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lfourth_int] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_lfourth_int!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3667,7 +3808,7 @@ macro_rules! __pgrx_c_args_lfourth_int {
         $crate::lfourth_int!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro lfourth_int from pg_list.h:194
@@ -3927,7 +4068,7 @@ macro_rules! lfourth_int {
                         $crate::__pgrx_c_operand!(@check_safety; $l);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_int_value,
@@ -4000,7 +4141,7 @@ macro_rules! lfourth_int {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4167,6 +4308,11 @@ macro_rules! __pgrx_c_args_lfourth_node {
             @argument [__pgrx_c_args_lfourth_node] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lfourth_node] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_lfourth_node!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4202,6 +4348,11 @@ macro_rules! __pgrx_c_args_lfourth_node {
             @argument [__pgrx_c_args_lfourth_node] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lfourth_node] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_lfourth_node!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4218,7 +4369,7 @@ macro_rules! __pgrx_c_args_lfourth_node {
         $crate::lfourth_node!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro lfourth_node from pg_list.h:196
@@ -4348,13 +4499,13 @@ macro_rules! lfourth_node {
         $crate::__pgrx_c_args_lfourth_node!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $type:ty, $l:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_lfourth_node!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $type:ty, $l:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_lfourth_node!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4368,7 +4519,7 @@ macro_rules! lfourth_node {
                         $crate::__pgrx_c_operand!(@check_safety; $l);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -4465,7 +4616,7 @@ macro_rules! lfourth_node {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4649,6 +4800,11 @@ macro_rules! __pgrx_c_args_lfourth_oid {
             @argument [__pgrx_c_args_lfourth_oid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lfourth_oid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_lfourth_oid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4684,6 +4840,11 @@ macro_rules! __pgrx_c_args_lfourth_oid {
             @argument [__pgrx_c_args_lfourth_oid] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lfourth_oid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_lfourth_oid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4700,7 +4861,7 @@ macro_rules! __pgrx_c_args_lfourth_oid {
         $crate::lfourth_oid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro lfourth_oid from pg_list.h:195
@@ -4960,7 +5121,7 @@ macro_rules! lfourth_oid {
                         $crate::__pgrx_c_operand!(@check_safety; $l);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_oid_value,
@@ -5033,7 +5194,7 @@ macro_rules! lfourth_oid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5197,6 +5358,11 @@ macro_rules! __pgrx_c_args_linitial {
             @argument [__pgrx_c_args_linitial] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_linitial] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_linitial!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5232,6 +5398,11 @@ macro_rules! __pgrx_c_args_linitial {
             @argument [__pgrx_c_args_linitial] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_linitial] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_linitial!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5248,7 +5419,7 @@ macro_rules! __pgrx_c_args_linitial {
         $crate::linitial!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro linitial from pg_list.h:178
@@ -5514,7 +5685,7 @@ macro_rules! linitial {
                         $crate::__pgrx_c_operand!(@check_safety; $l);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_ptr_value,
@@ -5589,7 +5760,7 @@ macro_rules! linitial {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5755,6 +5926,11 @@ macro_rules! __pgrx_c_args_linitial_int {
             @argument [__pgrx_c_args_linitial_int] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_linitial_int] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_linitial_int!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5790,6 +5966,11 @@ macro_rules! __pgrx_c_args_linitial_int {
             @argument [__pgrx_c_args_linitial_int] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_linitial_int] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_linitial_int!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5806,7 +5987,7 @@ macro_rules! __pgrx_c_args_linitial_int {
         $crate::linitial_int!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro linitial_int from pg_list.h:179
@@ -6072,7 +6253,7 @@ macro_rules! linitial_int {
                         $crate::__pgrx_c_operand!(@check_safety; $l);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_int_value,
@@ -6147,7 +6328,7 @@ macro_rules! linitial_int {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6316,6 +6497,11 @@ macro_rules! __pgrx_c_args_linitial_node {
             @argument [__pgrx_c_args_linitial_node] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_linitial_node] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_linitial_node!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6353,6 +6539,11 @@ macro_rules! __pgrx_c_args_linitial_node {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_linitial_node] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_linitial_node!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6369,7 +6560,7 @@ macro_rules! __pgrx_c_args_linitial_node {
         $crate::linitial_node!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro linitial_node from pg_list.h:181
@@ -6501,13 +6692,13 @@ macro_rules! linitial_node {
         $crate::__pgrx_c_args_linitial_node!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $type:ty, $l:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_linitial_node!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $type:ty, $l:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_linitial_node!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6521,7 +6712,7 @@ macro_rules! linitial_node {
                         $crate::__pgrx_c_operand!(@check_safety; $l);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -6620,7 +6811,7 @@ macro_rules! linitial_node {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6806,6 +6997,11 @@ macro_rules! __pgrx_c_args_linitial_oid {
             @argument [__pgrx_c_args_linitial_oid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_linitial_oid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_linitial_oid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6841,6 +7037,11 @@ macro_rules! __pgrx_c_args_linitial_oid {
             @argument [__pgrx_c_args_linitial_oid] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_linitial_oid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_linitial_oid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6857,7 +7058,7 @@ macro_rules! __pgrx_c_args_linitial_oid {
         $crate::linitial_oid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro linitial_oid from pg_list.h:180
@@ -7123,7 +7324,7 @@ macro_rules! linitial_oid {
                         $crate::__pgrx_c_operand!(@check_safety; $l);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_oid_value,
@@ -7198,7 +7399,7 @@ macro_rules! linitial_oid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7357,6 +7558,13 @@ macro_rules! __pgrx_c_args_list_cell_number {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_cell_number] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_cell_number!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7418,6 +7626,11 @@ macro_rules! __pgrx_c_args_list_cell_number {
             @argument [__pgrx_c_args_list_cell_number] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_cell_number] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_cell_number!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7455,6 +7668,13 @@ macro_rules! __pgrx_c_args_list_cell_number {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_cell_number] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_cell_number!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7471,7 +7691,7 @@ macro_rules! __pgrx_c_args_list_cell_number {
         $crate::list_cell_number!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function list_cell_number from pg_list.h:364
@@ -7569,13 +7789,13 @@ macro_rules! list_cell_number {
         $crate::__pgrx_c_args_list_cell_number!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $l:tt, $c:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_cell_number!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $l:tt, $c:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_cell_number!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7589,7 +7809,7 @@ macro_rules! list_cell_number {
                         $crate::__pgrx_c_operand!(@check_safety; $c);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -7648,7 +7868,7 @@ macro_rules! list_cell_number {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7794,6 +8014,11 @@ macro_rules! __pgrx_c_args_list_head {
             @argument [__pgrx_c_args_list_head] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_head] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_head!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7829,6 +8054,11 @@ macro_rules! __pgrx_c_args_list_head {
             @argument [__pgrx_c_args_list_head] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_head] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_head!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7845,7 +8075,7 @@ macro_rules! __pgrx_c_args_list_head {
         $crate::list_head!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function list_head from pg_list.h:127
@@ -7926,13 +8156,13 @@ macro_rules! list_head {
         $crate::__pgrx_c_args_list_head!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $l:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_head!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $l:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_head!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7945,7 +8175,7 @@ macro_rules! list_head {
                         $crate::__pgrx_c_operand!(@check_safety; $l);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -7986,7 +8216,7 @@ macro_rules! list_head {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8117,6 +8347,11 @@ macro_rules! __pgrx_c_args_list_last_cell {
             @argument [__pgrx_c_args_list_last_cell] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_last_cell] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_last_cell!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8154,6 +8389,11 @@ macro_rules! __pgrx_c_args_list_last_cell {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_last_cell] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_last_cell!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8170,7 +8410,7 @@ macro_rules! __pgrx_c_args_list_last_cell {
         $crate::list_last_cell!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function list_last_cell from pg_list.h:319
@@ -8252,13 +8492,13 @@ macro_rules! list_last_cell {
         $crate::__pgrx_c_args_list_last_cell!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $list:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_last_cell!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $list:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_last_cell!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8271,7 +8511,7 @@ macro_rules! list_last_cell {
                         $crate::__pgrx_c_operand!(@check_safety; $list);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -8312,7 +8552,7 @@ macro_rules! list_last_cell {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8443,6 +8683,11 @@ macro_rules! __pgrx_c_args_list_length {
             @argument [__pgrx_c_args_list_length] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_length] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_length!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8478,6 +8723,11 @@ macro_rules! __pgrx_c_args_list_length {
             @argument [__pgrx_c_args_list_length] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_length] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_length!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8494,7 +8744,7 @@ macro_rules! __pgrx_c_args_list_length {
         $crate::list_length!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function list_length from pg_list.h:151
@@ -8568,13 +8818,13 @@ macro_rules! list_length {
         $crate::__pgrx_c_args_list_length!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $l:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_length!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $l:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_length!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8587,7 +8837,7 @@ macro_rules! list_length {
                         $crate::__pgrx_c_operand!(@check_safety; $l);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -8623,7 +8873,7 @@ macro_rules! list_length {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8747,6 +8997,11 @@ macro_rules! __pgrx_c_args_list_make1 {
             @argument [__pgrx_c_args_list_make1] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make1] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_make1!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8782,6 +9037,11 @@ macro_rules! __pgrx_c_args_list_make1 {
             @argument [__pgrx_c_args_list_make1] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make1] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make1!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8798,7 +9058,7 @@ macro_rules! __pgrx_c_args_list_make1 {
         $crate::list_make1!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro list_make1 from pg_list.h:244
@@ -8841,7 +9101,7 @@ macro_rules! list_make1 {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_05531ecc0cff85b35f1d9429ca804950(
+                $crate::__pgrx_c_generated::Inline_2a45601f1d7f9d6363a841e3cb1d4907(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -8881,7 +9141,7 @@ macro_rules! list_make1 {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -8914,13 +9174,13 @@ macro_rules! list_make1 {
         $crate::__pgrx_c_args_list_make1!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x1:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make1!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x1:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make1!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8934,7 +9194,7 @@ macro_rules! list_make1 {
                         $crate::__pgrx_c_operand!(@check_safety; $x1);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -8945,7 +9205,7 @@ macro_rules! list_make1 {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_05531ecc0cff85b35f1d9429ca804950(
+                                $crate::__pgrx_c_generated::Inline_2a45601f1d7f9d6363a841e3cb1d4907(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -8993,7 +9253,7 @@ macro_rules! list_make1 {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -9029,7 +9289,7 @@ macro_rules! list_make1 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9048,7 +9308,7 @@ macro_rules! list_make1 {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_05531ecc0cff85b35f1d9429ca804950(
+                    $crate::__pgrx_c_generated::Inline_2a45601f1d7f9d6363a841e3cb1d4907(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -9088,7 +9348,7 @@ macro_rules! list_make1 {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                        $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -9203,6 +9463,11 @@ macro_rules! __pgrx_c_args_list_make1_int {
             @argument [__pgrx_c_args_list_make1_int] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make1_int] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_make1_int!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9240,6 +9505,11 @@ macro_rules! __pgrx_c_args_list_make1_int {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make1_int] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make1_int!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9256,7 +9526,7 @@ macro_rules! __pgrx_c_args_list_make1_int {
         $crate::list_make1_int!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro list_make1_int from pg_list.h:259
@@ -9299,7 +9569,7 @@ macro_rules! list_make1_int {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_05531ecc0cff85b35f1d9429ca804950(
+                $crate::__pgrx_c_generated::Inline_2a45601f1d7f9d6363a841e3cb1d4907(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -9339,7 +9609,7 @@ macro_rules! list_make1_int {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -9366,13 +9636,13 @@ macro_rules! list_make1_int {
         $crate::__pgrx_c_args_list_make1_int!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x1:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make1_int!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x1:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make1_int!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -9386,7 +9656,7 @@ macro_rules! list_make1_int {
                         $crate::__pgrx_c_operand!(@check_safety; $x1);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -9397,7 +9667,7 @@ macro_rules! list_make1_int {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_05531ecc0cff85b35f1d9429ca804950(
+                                $crate::__pgrx_c_generated::Inline_2a45601f1d7f9d6363a841e3cb1d4907(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -9445,7 +9715,7 @@ macro_rules! list_make1_int {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -9475,7 +9745,7 @@ macro_rules! list_make1_int {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9494,7 +9764,7 @@ macro_rules! list_make1_int {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_05531ecc0cff85b35f1d9429ca804950(
+                    $crate::__pgrx_c_generated::Inline_2a45601f1d7f9d6363a841e3cb1d4907(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -9534,7 +9804,7 @@ macro_rules! list_make1_int {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                        $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -9643,6 +9913,11 @@ macro_rules! __pgrx_c_args_list_make1_oid {
             @argument [__pgrx_c_args_list_make1_oid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make1_oid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_make1_oid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9680,6 +9955,11 @@ macro_rules! __pgrx_c_args_list_make1_oid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make1_oid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make1_oid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9696,7 +9976,7 @@ macro_rules! __pgrx_c_args_list_make1_oid {
         $crate::list_make1_oid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro list_make1_oid from pg_list.h:274
@@ -9739,7 +10019,7 @@ macro_rules! list_make1_oid {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_05531ecc0cff85b35f1d9429ca804950(
+                $crate::__pgrx_c_generated::Inline_2a45601f1d7f9d6363a841e3cb1d4907(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -9779,7 +10059,7 @@ macro_rules! list_make1_oid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -9812,13 +10092,13 @@ macro_rules! list_make1_oid {
         $crate::__pgrx_c_args_list_make1_oid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x1:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make1_oid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x1:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make1_oid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -9832,7 +10112,7 @@ macro_rules! list_make1_oid {
                         $crate::__pgrx_c_operand!(@check_safety; $x1);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -9843,7 +10123,7 @@ macro_rules! list_make1_oid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_05531ecc0cff85b35f1d9429ca804950(
+                                $crate::__pgrx_c_generated::Inline_2a45601f1d7f9d6363a841e3cb1d4907(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -9891,7 +10171,7 @@ macro_rules! list_make1_oid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -9927,7 +10207,7 @@ macro_rules! list_make1_oid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9946,7 +10226,7 @@ macro_rules! list_make1_oid {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_05531ecc0cff85b35f1d9429ca804950(
+                    $crate::__pgrx_c_generated::Inline_2a45601f1d7f9d6363a841e3cb1d4907(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -9986,7 +10266,7 @@ macro_rules! list_make1_oid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                        $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -10101,6 +10381,11 @@ macro_rules! __pgrx_c_args_list_make1_xid {
             @argument [__pgrx_c_args_list_make1_xid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make1_xid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_make1_xid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10138,6 +10423,11 @@ macro_rules! __pgrx_c_args_list_make1_xid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make1_xid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make1_xid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10154,7 +10444,7 @@ macro_rules! __pgrx_c_args_list_make1_xid {
         $crate::list_make1_xid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro list_make1_xid from pg_list.h:289
@@ -10197,7 +10487,7 @@ macro_rules! list_make1_xid {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_05531ecc0cff85b35f1d9429ca804950(
+                $crate::__pgrx_c_generated::Inline_2a45601f1d7f9d6363a841e3cb1d4907(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -10237,7 +10527,7 @@ macro_rules! list_make1_xid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -10270,13 +10560,13 @@ macro_rules! list_make1_xid {
         $crate::__pgrx_c_args_list_make1_xid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x1:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make1_xid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x1:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make1_xid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -10290,7 +10580,7 @@ macro_rules! list_make1_xid {
                         $crate::__pgrx_c_operand!(@check_safety; $x1);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -10301,7 +10591,7 @@ macro_rules! list_make1_xid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_05531ecc0cff85b35f1d9429ca804950(
+                                $crate::__pgrx_c_generated::Inline_2a45601f1d7f9d6363a841e3cb1d4907(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -10349,7 +10639,7 @@ macro_rules! list_make1_xid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -10385,7 +10675,7 @@ macro_rules! list_make1_xid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10404,7 +10694,7 @@ macro_rules! list_make1_xid {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_05531ecc0cff85b35f1d9429ca804950(
+                    $crate::__pgrx_c_generated::Inline_2a45601f1d7f9d6363a841e3cb1d4907(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -10444,7 +10734,7 @@ macro_rules! list_make1_xid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                        $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -10550,6 +10840,11 @@ macro_rules! __pgrx_c_args_list_make2 {
             @argument [__pgrx_c_args_list_make2] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make2] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make2!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10611,6 +10906,11 @@ macro_rules! __pgrx_c_args_list_make2 {
             @argument [__pgrx_c_args_list_make2] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make2] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_make2!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10646,6 +10946,11 @@ macro_rules! __pgrx_c_args_list_make2 {
             @argument [__pgrx_c_args_list_make2] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make2] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make2!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10662,7 +10967,7 @@ macro_rules! __pgrx_c_args_list_make2 {
         $crate::list_make2!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro list_make2 from pg_list.h:246
@@ -10706,7 +11011,7 @@ macro_rules! list_make2 {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_e1dc2f4a740a2ddebdf4862dc5f5b8a1(
+                $crate::__pgrx_c_generated::Inline_da28b763dd1fb625038dec4b74fa73e0(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -10746,7 +11051,7 @@ macro_rules! list_make2 {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -10788,7 +11093,7 @@ macro_rules! list_make2 {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -10821,13 +11126,13 @@ macro_rules! list_make2 {
         $crate::__pgrx_c_args_list_make2!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x1:tt, $x2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make2!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x1:tt, $x2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make2!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -10842,7 +11147,7 @@ macro_rules! list_make2 {
                         $crate::__pgrx_c_operand!(@check_safety; $x2);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -10853,7 +11158,7 @@ macro_rules! list_make2 {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_e1dc2f4a740a2ddebdf4862dc5f5b8a1(
+                                $crate::__pgrx_c_generated::Inline_da28b763dd1fb625038dec4b74fa73e0(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -10901,7 +11206,7 @@ macro_rules! list_make2 {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -10951,7 +11256,7 @@ macro_rules! list_make2 {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -10987,7 +11292,7 @@ macro_rules! list_make2 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -11006,7 +11311,7 @@ macro_rules! list_make2 {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_e1dc2f4a740a2ddebdf4862dc5f5b8a1(
+                    $crate::__pgrx_c_generated::Inline_da28b763dd1fb625038dec4b74fa73e0(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -11046,7 +11351,7 @@ macro_rules! list_make2 {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                        $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -11088,7 +11393,7 @@ macro_rules! list_make2 {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                        $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -11196,6 +11501,11 @@ macro_rules! __pgrx_c_args_list_make2_int {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make2_int] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make2_int!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11257,6 +11567,11 @@ macro_rules! __pgrx_c_args_list_make2_int {
             @argument [__pgrx_c_args_list_make2_int] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make2_int] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_make2_int!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11294,6 +11609,11 @@ macro_rules! __pgrx_c_args_list_make2_int {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make2_int] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make2_int!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11310,7 +11630,7 @@ macro_rules! __pgrx_c_args_list_make2_int {
         $crate::list_make2_int!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro list_make2_int from pg_list.h:261
@@ -11354,7 +11674,7 @@ macro_rules! list_make2_int {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_e1dc2f4a740a2ddebdf4862dc5f5b8a1(
+                $crate::__pgrx_c_generated::Inline_da28b763dd1fb625038dec4b74fa73e0(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -11394,7 +11714,7 @@ macro_rules! list_make2_int {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -11430,7 +11750,7 @@ macro_rules! list_make2_int {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -11457,13 +11777,13 @@ macro_rules! list_make2_int {
         $crate::__pgrx_c_args_list_make2_int!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x1:tt, $x2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make2_int!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x1:tt, $x2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make2_int!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -11478,7 +11798,7 @@ macro_rules! list_make2_int {
                         $crate::__pgrx_c_operand!(@check_safety; $x2);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -11489,7 +11809,7 @@ macro_rules! list_make2_int {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_e1dc2f4a740a2ddebdf4862dc5f5b8a1(
+                                $crate::__pgrx_c_generated::Inline_da28b763dd1fb625038dec4b74fa73e0(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -11537,7 +11857,7 @@ macro_rules! list_make2_int {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -11581,7 +11901,7 @@ macro_rules! list_make2_int {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -11611,7 +11931,7 @@ macro_rules! list_make2_int {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -11630,7 +11950,7 @@ macro_rules! list_make2_int {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_e1dc2f4a740a2ddebdf4862dc5f5b8a1(
+                    $crate::__pgrx_c_generated::Inline_da28b763dd1fb625038dec4b74fa73e0(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -11670,7 +11990,7 @@ macro_rules! list_make2_int {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                        $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -11706,7 +12026,7 @@ macro_rules! list_make2_int {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                        $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -11808,6 +12128,11 @@ macro_rules! __pgrx_c_args_list_make2_oid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make2_oid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make2_oid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11869,6 +12194,11 @@ macro_rules! __pgrx_c_args_list_make2_oid {
             @argument [__pgrx_c_args_list_make2_oid] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make2_oid] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_make2_oid!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11906,6 +12236,11 @@ macro_rules! __pgrx_c_args_list_make2_oid {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make2_oid] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make2_oid!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11922,7 +12257,7 @@ macro_rules! __pgrx_c_args_list_make2_oid {
         $crate::list_make2_oid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro list_make2_oid from pg_list.h:276
@@ -11966,7 +12301,7 @@ macro_rules! list_make2_oid {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_e1dc2f4a740a2ddebdf4862dc5f5b8a1(
+                $crate::__pgrx_c_generated::Inline_da28b763dd1fb625038dec4b74fa73e0(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -12006,7 +12341,7 @@ macro_rules! list_make2_oid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -12048,7 +12383,7 @@ macro_rules! list_make2_oid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -12081,13 +12416,13 @@ macro_rules! list_make2_oid {
         $crate::__pgrx_c_args_list_make2_oid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x1:tt, $x2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make2_oid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x1:tt, $x2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make2_oid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -12102,7 +12437,7 @@ macro_rules! list_make2_oid {
                         $crate::__pgrx_c_operand!(@check_safety; $x2);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -12113,7 +12448,7 @@ macro_rules! list_make2_oid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_e1dc2f4a740a2ddebdf4862dc5f5b8a1(
+                                $crate::__pgrx_c_generated::Inline_da28b763dd1fb625038dec4b74fa73e0(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -12161,7 +12496,7 @@ macro_rules! list_make2_oid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -12211,7 +12546,7 @@ macro_rules! list_make2_oid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -12247,7 +12582,7 @@ macro_rules! list_make2_oid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -12266,7 +12601,7 @@ macro_rules! list_make2_oid {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_e1dc2f4a740a2ddebdf4862dc5f5b8a1(
+                    $crate::__pgrx_c_generated::Inline_da28b763dd1fb625038dec4b74fa73e0(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -12306,7 +12641,7 @@ macro_rules! list_make2_oid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                        $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -12348,7 +12683,7 @@ macro_rules! list_make2_oid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                        $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -12456,6 +12791,11 @@ macro_rules! __pgrx_c_args_list_make2_xid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make2_xid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make2_xid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12517,6 +12857,11 @@ macro_rules! __pgrx_c_args_list_make2_xid {
             @argument [__pgrx_c_args_list_make2_xid] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make2_xid] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_make2_xid!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12554,6 +12899,11 @@ macro_rules! __pgrx_c_args_list_make2_xid {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make2_xid] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make2_xid!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12570,7 +12920,7 @@ macro_rules! __pgrx_c_args_list_make2_xid {
         $crate::list_make2_xid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro list_make2_xid from pg_list.h:291
@@ -12614,7 +12964,7 @@ macro_rules! list_make2_xid {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_e1dc2f4a740a2ddebdf4862dc5f5b8a1(
+                $crate::__pgrx_c_generated::Inline_da28b763dd1fb625038dec4b74fa73e0(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -12654,7 +13004,7 @@ macro_rules! list_make2_xid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -12696,7 +13046,7 @@ macro_rules! list_make2_xid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -12729,13 +13079,13 @@ macro_rules! list_make2_xid {
         $crate::__pgrx_c_args_list_make2_xid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x1:tt, $x2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make2_xid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x1:tt, $x2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make2_xid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -12750,7 +13100,7 @@ macro_rules! list_make2_xid {
                         $crate::__pgrx_c_operand!(@check_safety; $x2);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -12761,7 +13111,7 @@ macro_rules! list_make2_xid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_e1dc2f4a740a2ddebdf4862dc5f5b8a1(
+                                $crate::__pgrx_c_generated::Inline_da28b763dd1fb625038dec4b74fa73e0(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -12809,7 +13159,7 @@ macro_rules! list_make2_xid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -12859,7 +13209,7 @@ macro_rules! list_make2_xid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -12895,7 +13245,7 @@ macro_rules! list_make2_xid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -12914,7 +13264,7 @@ macro_rules! list_make2_xid {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_e1dc2f4a740a2ddebdf4862dc5f5b8a1(
+                    $crate::__pgrx_c_generated::Inline_da28b763dd1fb625038dec4b74fa73e0(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -12954,7 +13304,7 @@ macro_rules! list_make2_xid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                        $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -12996,7 +13346,7 @@ macro_rules! list_make2_xid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                        $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -13102,6 +13452,11 @@ macro_rules! __pgrx_c_args_list_make3 {
             @argument [__pgrx_c_args_list_make3] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make3] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make3!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13152,6 +13507,11 @@ macro_rules! __pgrx_c_args_list_make3 {
     (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_list_make3] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make3] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -13215,6 +13575,11 @@ macro_rules! __pgrx_c_args_list_make3 {
             @argument [__pgrx_c_args_list_make3] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make3] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_make3!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13250,6 +13615,11 @@ macro_rules! __pgrx_c_args_list_make3 {
             @argument [__pgrx_c_args_list_make3] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make3] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make3!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13266,7 +13636,7 @@ macro_rules! __pgrx_c_args_list_make3 {
         $crate::list_make3!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro list_make3 from pg_list.h:248
@@ -13311,7 +13681,7 @@ macro_rules! list_make3 {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_ded8cefce7ced741223b79e3b9273eae(
+                $crate::__pgrx_c_generated::Inline_54a847d5a47f039494251a444944de3a(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -13351,7 +13721,7 @@ macro_rules! list_make3 {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -13393,7 +13763,7 @@ macro_rules! list_make3 {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -13435,7 +13805,7 @@ macro_rules! list_make3 {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -13468,13 +13838,13 @@ macro_rules! list_make3 {
         $crate::__pgrx_c_args_list_make3!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x1:tt, $x2:tt, $x3:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make3!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x1:tt, $x2:tt, $x3:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make3!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -13490,7 +13860,7 @@ macro_rules! list_make3 {
                         $crate::__pgrx_c_operand!(@check_safety; $x3);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -13501,7 +13871,7 @@ macro_rules! list_make3 {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_ded8cefce7ced741223b79e3b9273eae(
+                                $crate::__pgrx_c_generated::Inline_54a847d5a47f039494251a444944de3a(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -13549,7 +13919,7 @@ macro_rules! list_make3 {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -13599,7 +13969,7 @@ macro_rules! list_make3 {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -13649,7 +14019,7 @@ macro_rules! list_make3 {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -13685,7 +14055,7 @@ macro_rules! list_make3 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -13704,7 +14074,7 @@ macro_rules! list_make3 {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_ded8cefce7ced741223b79e3b9273eae(
+                    $crate::__pgrx_c_generated::Inline_54a847d5a47f039494251a444944de3a(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -13744,7 +14114,7 @@ macro_rules! list_make3 {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                        $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -13786,7 +14156,7 @@ macro_rules! list_make3 {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                        $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -13828,7 +14198,7 @@ macro_rules! list_make3 {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                        $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -13936,6 +14306,11 @@ macro_rules! __pgrx_c_args_list_make3_int {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make3_int] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make3_int!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13988,6 +14363,11 @@ macro_rules! __pgrx_c_args_list_make3_int {
             @argument [__pgrx_c_args_list_make3_int] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
             ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make3_int] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -14051,6 +14431,11 @@ macro_rules! __pgrx_c_args_list_make3_int {
             @argument [__pgrx_c_args_list_make3_int] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make3_int] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_make3_int!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14088,6 +14473,11 @@ macro_rules! __pgrx_c_args_list_make3_int {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make3_int] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make3_int!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14104,7 +14494,7 @@ macro_rules! __pgrx_c_args_list_make3_int {
         $crate::list_make3_int!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro list_make3_int from pg_list.h:263
@@ -14149,7 +14539,7 @@ macro_rules! list_make3_int {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_ded8cefce7ced741223b79e3b9273eae(
+                $crate::__pgrx_c_generated::Inline_54a847d5a47f039494251a444944de3a(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -14189,7 +14579,7 @@ macro_rules! list_make3_int {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -14225,7 +14615,7 @@ macro_rules! list_make3_int {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -14261,7 +14651,7 @@ macro_rules! list_make3_int {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -14288,13 +14678,13 @@ macro_rules! list_make3_int {
         $crate::__pgrx_c_args_list_make3_int!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x1:tt, $x2:tt, $x3:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make3_int!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x1:tt, $x2:tt, $x3:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make3_int!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -14310,7 +14700,7 @@ macro_rules! list_make3_int {
                         $crate::__pgrx_c_operand!(@check_safety; $x3);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -14321,7 +14711,7 @@ macro_rules! list_make3_int {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_ded8cefce7ced741223b79e3b9273eae(
+                                $crate::__pgrx_c_generated::Inline_54a847d5a47f039494251a444944de3a(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -14369,7 +14759,7 @@ macro_rules! list_make3_int {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -14413,7 +14803,7 @@ macro_rules! list_make3_int {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -14457,7 +14847,7 @@ macro_rules! list_make3_int {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -14487,7 +14877,7 @@ macro_rules! list_make3_int {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -14506,7 +14896,7 @@ macro_rules! list_make3_int {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_ded8cefce7ced741223b79e3b9273eae(
+                    $crate::__pgrx_c_generated::Inline_54a847d5a47f039494251a444944de3a(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -14546,7 +14936,7 @@ macro_rules! list_make3_int {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                        $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -14582,7 +14972,7 @@ macro_rules! list_make3_int {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                        $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -14618,7 +15008,7 @@ macro_rules! list_make3_int {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                        $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -14720,6 +15110,11 @@ macro_rules! __pgrx_c_args_list_make3_oid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make3_oid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make3_oid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14772,6 +15167,11 @@ macro_rules! __pgrx_c_args_list_make3_oid {
             @argument [__pgrx_c_args_list_make3_oid] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
             ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make3_oid] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -14835,6 +15235,11 @@ macro_rules! __pgrx_c_args_list_make3_oid {
             @argument [__pgrx_c_args_list_make3_oid] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make3_oid] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_make3_oid!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14872,6 +15277,11 @@ macro_rules! __pgrx_c_args_list_make3_oid {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make3_oid] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make3_oid!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14888,7 +15298,7 @@ macro_rules! __pgrx_c_args_list_make3_oid {
         $crate::list_make3_oid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro list_make3_oid from pg_list.h:278
@@ -14933,7 +15343,7 @@ macro_rules! list_make3_oid {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_ded8cefce7ced741223b79e3b9273eae(
+                $crate::__pgrx_c_generated::Inline_54a847d5a47f039494251a444944de3a(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -14973,7 +15383,7 @@ macro_rules! list_make3_oid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -15015,7 +15425,7 @@ macro_rules! list_make3_oid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -15057,7 +15467,7 @@ macro_rules! list_make3_oid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -15090,13 +15500,13 @@ macro_rules! list_make3_oid {
         $crate::__pgrx_c_args_list_make3_oid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x1:tt, $x2:tt, $x3:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make3_oid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x1:tt, $x2:tt, $x3:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make3_oid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -15112,7 +15522,7 @@ macro_rules! list_make3_oid {
                         $crate::__pgrx_c_operand!(@check_safety; $x3);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -15123,7 +15533,7 @@ macro_rules! list_make3_oid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_ded8cefce7ced741223b79e3b9273eae(
+                                $crate::__pgrx_c_generated::Inline_54a847d5a47f039494251a444944de3a(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -15171,7 +15581,7 @@ macro_rules! list_make3_oid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -15221,7 +15631,7 @@ macro_rules! list_make3_oid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -15271,7 +15681,7 @@ macro_rules! list_make3_oid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -15307,7 +15717,7 @@ macro_rules! list_make3_oid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -15326,7 +15736,7 @@ macro_rules! list_make3_oid {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_ded8cefce7ced741223b79e3b9273eae(
+                    $crate::__pgrx_c_generated::Inline_54a847d5a47f039494251a444944de3a(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -15366,7 +15776,7 @@ macro_rules! list_make3_oid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                        $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -15408,7 +15818,7 @@ macro_rules! list_make3_oid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                        $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -15450,7 +15860,7 @@ macro_rules! list_make3_oid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                        $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -15558,6 +15968,11 @@ macro_rules! __pgrx_c_args_list_make3_xid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make3_xid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make3_xid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15610,6 +16025,11 @@ macro_rules! __pgrx_c_args_list_make3_xid {
             @argument [__pgrx_c_args_list_make3_xid] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
             ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make3_xid] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -15673,6 +16093,11 @@ macro_rules! __pgrx_c_args_list_make3_xid {
             @argument [__pgrx_c_args_list_make3_xid] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make3_xid] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_make3_xid!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15710,6 +16135,11 @@ macro_rules! __pgrx_c_args_list_make3_xid {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make3_xid] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make3_xid!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15726,7 +16156,7 @@ macro_rules! __pgrx_c_args_list_make3_xid {
         $crate::list_make3_xid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro list_make3_xid from pg_list.h:293
@@ -15771,7 +16201,7 @@ macro_rules! list_make3_xid {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_ded8cefce7ced741223b79e3b9273eae(
+                $crate::__pgrx_c_generated::Inline_54a847d5a47f039494251a444944de3a(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -15811,7 +16241,7 @@ macro_rules! list_make3_xid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -15853,7 +16283,7 @@ macro_rules! list_make3_xid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -15895,7 +16325,7 @@ macro_rules! list_make3_xid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -15928,13 +16358,13 @@ macro_rules! list_make3_xid {
         $crate::__pgrx_c_args_list_make3_xid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x1:tt, $x2:tt, $x3:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make3_xid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x1:tt, $x2:tt, $x3:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make3_xid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -15950,7 +16380,7 @@ macro_rules! list_make3_xid {
                         $crate::__pgrx_c_operand!(@check_safety; $x3);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -15961,7 +16391,7 @@ macro_rules! list_make3_xid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_ded8cefce7ced741223b79e3b9273eae(
+                                $crate::__pgrx_c_generated::Inline_54a847d5a47f039494251a444944de3a(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -16009,7 +16439,7 @@ macro_rules! list_make3_xid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -16059,7 +16489,7 @@ macro_rules! list_make3_xid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -16109,7 +16539,7 @@ macro_rules! list_make3_xid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -16145,7 +16575,7 @@ macro_rules! list_make3_xid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -16164,7 +16594,7 @@ macro_rules! list_make3_xid {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_ded8cefce7ced741223b79e3b9273eae(
+                    $crate::__pgrx_c_generated::Inline_54a847d5a47f039494251a444944de3a(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -16204,7 +16634,7 @@ macro_rules! list_make3_xid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                        $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -16246,7 +16676,7 @@ macro_rules! list_make3_xid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                        $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -16288,7 +16718,7 @@ macro_rules! list_make3_xid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                        $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -16394,6 +16824,11 @@ macro_rules! __pgrx_c_args_list_make4 {
             @argument [__pgrx_c_args_list_make4] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make4] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make4!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16446,6 +16881,11 @@ macro_rules! __pgrx_c_args_list_make4 {
             @argument [__pgrx_c_args_list_make4] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make4] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make4!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16496,6 +16936,11 @@ macro_rules! __pgrx_c_args_list_make4 {
     (@p2 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_list_make4] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make4] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -16559,6 +17004,11 @@ macro_rules! __pgrx_c_args_list_make4 {
             @argument [__pgrx_c_args_list_make4] [p4 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make4] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_make4!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16594,6 +17044,11 @@ macro_rules! __pgrx_c_args_list_make4 {
             @argument [__pgrx_c_args_list_make4] [p4 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make4] [p4 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make4!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16610,7 +17065,7 @@ macro_rules! __pgrx_c_args_list_make4 {
         $crate::list_make4!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro list_make4 from pg_list.h:251
@@ -16656,7 +17111,7 @@ macro_rules! list_make4 {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_bbdc98adccdd145a9c538666f85bbc30(
+                $crate::__pgrx_c_generated::Inline_564114a3c2cbff5bdc90d29e6d180220(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -16696,7 +17151,7 @@ macro_rules! list_make4 {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -16738,7 +17193,7 @@ macro_rules! list_make4 {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -16780,7 +17235,7 @@ macro_rules! list_make4 {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -16822,7 +17277,7 @@ macro_rules! list_make4 {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -16855,13 +17310,13 @@ macro_rules! list_make4 {
         $crate::__pgrx_c_args_list_make4!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x1:tt, $x2:tt, $x3:tt, $x4:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make4!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x1:tt, $x2:tt, $x3:tt, $x4:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make4!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -16878,7 +17333,7 @@ macro_rules! list_make4 {
                         $crate::__pgrx_c_operand!(@check_safety; $x4);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -16889,7 +17344,7 @@ macro_rules! list_make4 {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_bbdc98adccdd145a9c538666f85bbc30(
+                                $crate::__pgrx_c_generated::Inline_564114a3c2cbff5bdc90d29e6d180220(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -16937,7 +17392,7 @@ macro_rules! list_make4 {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -16987,7 +17442,7 @@ macro_rules! list_make4 {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -17037,7 +17492,7 @@ macro_rules! list_make4 {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -17087,7 +17542,7 @@ macro_rules! list_make4 {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -17123,7 +17578,7 @@ macro_rules! list_make4 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -17142,7 +17597,7 @@ macro_rules! list_make4 {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_bbdc98adccdd145a9c538666f85bbc30(
+                    $crate::__pgrx_c_generated::Inline_564114a3c2cbff5bdc90d29e6d180220(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -17182,7 +17637,7 @@ macro_rules! list_make4 {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                        $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -17224,7 +17679,7 @@ macro_rules! list_make4 {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                        $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -17266,7 +17721,7 @@ macro_rules! list_make4 {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                        $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -17308,7 +17763,7 @@ macro_rules! list_make4 {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                        $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -17416,6 +17871,11 @@ macro_rules! __pgrx_c_args_list_make4_int {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make4_int] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make4_int!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17470,6 +17930,11 @@ macro_rules! __pgrx_c_args_list_make4_int {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make4_int] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make4_int!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17522,6 +17987,11 @@ macro_rules! __pgrx_c_args_list_make4_int {
             @argument [__pgrx_c_args_list_make4_int] [p3 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
             ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make4_int] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -17585,6 +18055,11 @@ macro_rules! __pgrx_c_args_list_make4_int {
             @argument [__pgrx_c_args_list_make4_int] [p4 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make4_int] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_make4_int!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17622,6 +18097,11 @@ macro_rules! __pgrx_c_args_list_make4_int {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make4_int] [p4 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make4_int!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17638,7 +18118,7 @@ macro_rules! __pgrx_c_args_list_make4_int {
         $crate::list_make4_int!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro list_make4_int from pg_list.h:266
@@ -17684,7 +18164,7 @@ macro_rules! list_make4_int {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_bbdc98adccdd145a9c538666f85bbc30(
+                $crate::__pgrx_c_generated::Inline_564114a3c2cbff5bdc90d29e6d180220(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -17724,7 +18204,7 @@ macro_rules! list_make4_int {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -17760,7 +18240,7 @@ macro_rules! list_make4_int {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -17796,7 +18276,7 @@ macro_rules! list_make4_int {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -17832,7 +18312,7 @@ macro_rules! list_make4_int {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -17859,13 +18339,13 @@ macro_rules! list_make4_int {
         $crate::__pgrx_c_args_list_make4_int!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x1:tt, $x2:tt, $x3:tt, $x4:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make4_int!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x1:tt, $x2:tt, $x3:tt, $x4:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make4_int!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -17882,7 +18362,7 @@ macro_rules! list_make4_int {
                         $crate::__pgrx_c_operand!(@check_safety; $x4);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -17893,7 +18373,7 @@ macro_rules! list_make4_int {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_bbdc98adccdd145a9c538666f85bbc30(
+                                $crate::__pgrx_c_generated::Inline_564114a3c2cbff5bdc90d29e6d180220(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -17941,7 +18421,7 @@ macro_rules! list_make4_int {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -17985,7 +18465,7 @@ macro_rules! list_make4_int {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -18029,7 +18509,7 @@ macro_rules! list_make4_int {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -18073,7 +18553,7 @@ macro_rules! list_make4_int {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -18103,7 +18583,7 @@ macro_rules! list_make4_int {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -18122,7 +18602,7 @@ macro_rules! list_make4_int {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_bbdc98adccdd145a9c538666f85bbc30(
+                    $crate::__pgrx_c_generated::Inline_564114a3c2cbff5bdc90d29e6d180220(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -18162,7 +18642,7 @@ macro_rules! list_make4_int {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                        $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -18198,7 +18678,7 @@ macro_rules! list_make4_int {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                        $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -18234,7 +18714,7 @@ macro_rules! list_make4_int {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                        $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -18270,7 +18750,7 @@ macro_rules! list_make4_int {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                        $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -18372,6 +18852,11 @@ macro_rules! __pgrx_c_args_list_make4_oid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make4_oid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make4_oid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18426,6 +18911,11 @@ macro_rules! __pgrx_c_args_list_make4_oid {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make4_oid] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make4_oid!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18478,6 +18968,11 @@ macro_rules! __pgrx_c_args_list_make4_oid {
             @argument [__pgrx_c_args_list_make4_oid] [p3 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
             ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make4_oid] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -18541,6 +19036,11 @@ macro_rules! __pgrx_c_args_list_make4_oid {
             @argument [__pgrx_c_args_list_make4_oid] [p4 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make4_oid] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_make4_oid!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18578,6 +19078,11 @@ macro_rules! __pgrx_c_args_list_make4_oid {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make4_oid] [p4 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make4_oid!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18594,7 +19099,7 @@ macro_rules! __pgrx_c_args_list_make4_oid {
         $crate::list_make4_oid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro list_make4_oid from pg_list.h:281
@@ -18640,7 +19145,7 @@ macro_rules! list_make4_oid {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_bbdc98adccdd145a9c538666f85bbc30(
+                $crate::__pgrx_c_generated::Inline_564114a3c2cbff5bdc90d29e6d180220(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -18680,7 +19185,7 @@ macro_rules! list_make4_oid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -18722,7 +19227,7 @@ macro_rules! list_make4_oid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -18764,7 +19269,7 @@ macro_rules! list_make4_oid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -18806,7 +19311,7 @@ macro_rules! list_make4_oid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -18839,13 +19344,13 @@ macro_rules! list_make4_oid {
         $crate::__pgrx_c_args_list_make4_oid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x1:tt, $x2:tt, $x3:tt, $x4:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make4_oid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x1:tt, $x2:tt, $x3:tt, $x4:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make4_oid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -18862,7 +19367,7 @@ macro_rules! list_make4_oid {
                         $crate::__pgrx_c_operand!(@check_safety; $x4);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -18873,7 +19378,7 @@ macro_rules! list_make4_oid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_bbdc98adccdd145a9c538666f85bbc30(
+                                $crate::__pgrx_c_generated::Inline_564114a3c2cbff5bdc90d29e6d180220(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -18921,7 +19426,7 @@ macro_rules! list_make4_oid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -18971,7 +19476,7 @@ macro_rules! list_make4_oid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -19021,7 +19526,7 @@ macro_rules! list_make4_oid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -19071,7 +19576,7 @@ macro_rules! list_make4_oid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -19107,7 +19612,7 @@ macro_rules! list_make4_oid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -19126,7 +19631,7 @@ macro_rules! list_make4_oid {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_bbdc98adccdd145a9c538666f85bbc30(
+                    $crate::__pgrx_c_generated::Inline_564114a3c2cbff5bdc90d29e6d180220(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -19166,7 +19671,7 @@ macro_rules! list_make4_oid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                        $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -19208,7 +19713,7 @@ macro_rules! list_make4_oid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                        $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -19250,7 +19755,7 @@ macro_rules! list_make4_oid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                        $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -19292,7 +19797,7 @@ macro_rules! list_make4_oid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                        $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -19400,6 +19905,11 @@ macro_rules! __pgrx_c_args_list_make4_xid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make4_xid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make4_xid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19454,6 +19964,11 @@ macro_rules! __pgrx_c_args_list_make4_xid {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make4_xid] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make4_xid!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19506,6 +20021,11 @@ macro_rules! __pgrx_c_args_list_make4_xid {
             @argument [__pgrx_c_args_list_make4_xid] [p3 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
             ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make4_xid] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -19569,6 +20089,11 @@ macro_rules! __pgrx_c_args_list_make4_xid {
             @argument [__pgrx_c_args_list_make4_xid] [p4 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make4_xid] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_make4_xid!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19606,6 +20131,11 @@ macro_rules! __pgrx_c_args_list_make4_xid {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make4_xid] [p4 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make4_xid!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19622,7 +20152,7 @@ macro_rules! __pgrx_c_args_list_make4_xid {
         $crate::list_make4_xid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro list_make4_xid from pg_list.h:296
@@ -19668,7 +20198,7 @@ macro_rules! list_make4_xid {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_bbdc98adccdd145a9c538666f85bbc30(
+                $crate::__pgrx_c_generated::Inline_564114a3c2cbff5bdc90d29e6d180220(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -19708,7 +20238,7 @@ macro_rules! list_make4_xid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -19750,7 +20280,7 @@ macro_rules! list_make4_xid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -19792,7 +20322,7 @@ macro_rules! list_make4_xid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -19834,7 +20364,7 @@ macro_rules! list_make4_xid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -19867,13 +20397,13 @@ macro_rules! list_make4_xid {
         $crate::__pgrx_c_args_list_make4_xid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x1:tt, $x2:tt, $x3:tt, $x4:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make4_xid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x1:tt, $x2:tt, $x3:tt, $x4:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make4_xid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -19890,7 +20420,7 @@ macro_rules! list_make4_xid {
                         $crate::__pgrx_c_operand!(@check_safety; $x4);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -19901,7 +20431,7 @@ macro_rules! list_make4_xid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_bbdc98adccdd145a9c538666f85bbc30(
+                                $crate::__pgrx_c_generated::Inline_564114a3c2cbff5bdc90d29e6d180220(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -19949,7 +20479,7 @@ macro_rules! list_make4_xid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -19999,7 +20529,7 @@ macro_rules! list_make4_xid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -20049,7 +20579,7 @@ macro_rules! list_make4_xid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -20099,7 +20629,7 @@ macro_rules! list_make4_xid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -20135,7 +20665,7 @@ macro_rules! list_make4_xid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -20154,7 +20684,7 @@ macro_rules! list_make4_xid {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_bbdc98adccdd145a9c538666f85bbc30(
+                    $crate::__pgrx_c_generated::Inline_564114a3c2cbff5bdc90d29e6d180220(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -20194,7 +20724,7 @@ macro_rules! list_make4_xid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                        $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -20236,7 +20766,7 @@ macro_rules! list_make4_xid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                        $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -20278,7 +20808,7 @@ macro_rules! list_make4_xid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                        $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -20320,7 +20850,7 @@ macro_rules! list_make4_xid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                        $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -20426,6 +20956,11 @@ macro_rules! __pgrx_c_args_list_make5 {
             @argument [__pgrx_c_args_list_make5] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make5] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make5!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20476,6 +21011,11 @@ macro_rules! __pgrx_c_args_list_make5 {
     (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_list_make5] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make5] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -20530,6 +21070,11 @@ macro_rules! __pgrx_c_args_list_make5 {
             @argument [__pgrx_c_args_list_make5] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make5] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make5!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20580,6 +21125,11 @@ macro_rules! __pgrx_c_args_list_make5 {
     (@p3 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_list_make5] [p4 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make5] [p4 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -20643,6 +21193,11 @@ macro_rules! __pgrx_c_args_list_make5 {
             @argument [__pgrx_c_args_list_make5] [p5 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make5] [p5 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_make5!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20678,6 +21233,11 @@ macro_rules! __pgrx_c_args_list_make5 {
             @argument [__pgrx_c_args_list_make5] [p5 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make5] [p5 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make5!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20694,7 +21254,7 @@ macro_rules! __pgrx_c_args_list_make5 {
         $crate::list_make5!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro list_make5 from pg_list.h:254
@@ -20741,7 +21301,7 @@ macro_rules! list_make5 {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_b424bda9c9843c9855167d03a096c730(
+                $crate::__pgrx_c_generated::Inline_466321d9692df52c90ce7a4c533a8c6c(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -20781,7 +21341,7 @@ macro_rules! list_make5 {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -20823,7 +21383,7 @@ macro_rules! list_make5 {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -20865,7 +21425,7 @@ macro_rules! list_make5 {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -20907,7 +21467,7 @@ macro_rules! list_make5 {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -20949,7 +21509,7 @@ macro_rules! list_make5 {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -20982,13 +21542,13 @@ macro_rules! list_make5 {
         $crate::__pgrx_c_args_list_make5!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x1:tt, $x2:tt, $x3:tt, $x4:tt, $x5:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make5!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x1:tt, $x2:tt, $x3:tt, $x4:tt, $x5:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make5!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -21006,7 +21566,7 @@ macro_rules! list_make5 {
                         $crate::__pgrx_c_operand!(@check_safety; $x5);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -21017,7 +21577,7 @@ macro_rules! list_make5 {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_b424bda9c9843c9855167d03a096c730(
+                                $crate::__pgrx_c_generated::Inline_466321d9692df52c90ce7a4c533a8c6c(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -21065,7 +21625,7 @@ macro_rules! list_make5 {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -21115,7 +21675,7 @@ macro_rules! list_make5 {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -21165,7 +21725,7 @@ macro_rules! list_make5 {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -21215,7 +21775,7 @@ macro_rules! list_make5 {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -21265,7 +21825,7 @@ macro_rules! list_make5 {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -21301,7 +21861,7 @@ macro_rules! list_make5 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -21320,7 +21880,7 @@ macro_rules! list_make5 {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_b424bda9c9843c9855167d03a096c730(
+                    $crate::__pgrx_c_generated::Inline_466321d9692df52c90ce7a4c533a8c6c(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -21360,7 +21920,7 @@ macro_rules! list_make5 {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                        $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -21402,7 +21962,7 @@ macro_rules! list_make5 {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                        $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -21444,7 +22004,7 @@ macro_rules! list_make5 {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                        $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -21486,7 +22046,7 @@ macro_rules! list_make5 {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                        $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -21528,7 +22088,7 @@ macro_rules! list_make5 {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                        $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -21636,6 +22196,11 @@ macro_rules! __pgrx_c_args_list_make5_int {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make5_int] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make5_int!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -21688,6 +22253,11 @@ macro_rules! __pgrx_c_args_list_make5_int {
             @argument [__pgrx_c_args_list_make5_int] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
             ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make5_int] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -21744,6 +22314,11 @@ macro_rules! __pgrx_c_args_list_make5_int {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make5_int] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make5_int!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -21796,6 +22371,11 @@ macro_rules! __pgrx_c_args_list_make5_int {
             @argument [__pgrx_c_args_list_make5_int] [p4 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
             ]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make5_int] [p4 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -21859,6 +22439,11 @@ macro_rules! __pgrx_c_args_list_make5_int {
             @argument [__pgrx_c_args_list_make5_int] [p5 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make5_int] [p5 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_make5_int!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -21896,6 +22481,11 @@ macro_rules! __pgrx_c_args_list_make5_int {
             ]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make5_int] [p5 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make5_int!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -21912,7 +22502,7 @@ macro_rules! __pgrx_c_args_list_make5_int {
         $crate::list_make5_int!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro list_make5_int from pg_list.h:269
@@ -21959,7 +22549,7 @@ macro_rules! list_make5_int {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_b424bda9c9843c9855167d03a096c730(
+                $crate::__pgrx_c_generated::Inline_466321d9692df52c90ce7a4c533a8c6c(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -21999,7 +22589,7 @@ macro_rules! list_make5_int {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -22035,7 +22625,7 @@ macro_rules! list_make5_int {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -22071,7 +22661,7 @@ macro_rules! list_make5_int {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -22107,7 +22697,7 @@ macro_rules! list_make5_int {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -22143,7 +22733,7 @@ macro_rules! list_make5_int {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -22170,13 +22760,13 @@ macro_rules! list_make5_int {
         $crate::__pgrx_c_args_list_make5_int!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x1:tt, $x2:tt, $x3:tt, $x4:tt, $x5:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make5_int!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x1:tt, $x2:tt, $x3:tt, $x4:tt, $x5:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make5_int!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -22194,7 +22784,7 @@ macro_rules! list_make5_int {
                         $crate::__pgrx_c_operand!(@check_safety; $x5);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -22205,7 +22795,7 @@ macro_rules! list_make5_int {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_b424bda9c9843c9855167d03a096c730(
+                                $crate::__pgrx_c_generated::Inline_466321d9692df52c90ce7a4c533a8c6c(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -22253,7 +22843,7 @@ macro_rules! list_make5_int {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -22297,7 +22887,7 @@ macro_rules! list_make5_int {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -22341,7 +22931,7 @@ macro_rules! list_make5_int {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -22385,7 +22975,7 @@ macro_rules! list_make5_int {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -22429,7 +23019,7 @@ macro_rules! list_make5_int {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -22459,7 +23049,7 @@ macro_rules! list_make5_int {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -22478,7 +23068,7 @@ macro_rules! list_make5_int {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_b424bda9c9843c9855167d03a096c730(
+                    $crate::__pgrx_c_generated::Inline_466321d9692df52c90ce7a4c533a8c6c(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -22518,7 +23108,7 @@ macro_rules! list_make5_int {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                        $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -22554,7 +23144,7 @@ macro_rules! list_make5_int {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                        $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -22590,7 +23180,7 @@ macro_rules! list_make5_int {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                        $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -22626,7 +23216,7 @@ macro_rules! list_make5_int {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                        $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -22662,7 +23252,7 @@ macro_rules! list_make5_int {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                        $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                             <
                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -22764,6 +23354,11 @@ macro_rules! __pgrx_c_args_list_make5_oid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make5_oid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make5_oid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -22816,6 +23411,11 @@ macro_rules! __pgrx_c_args_list_make5_oid {
             @argument [__pgrx_c_args_list_make5_oid] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
             ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make5_oid] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -22872,6 +23472,11 @@ macro_rules! __pgrx_c_args_list_make5_oid {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make5_oid] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make5_oid!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -22924,6 +23529,11 @@ macro_rules! __pgrx_c_args_list_make5_oid {
             @argument [__pgrx_c_args_list_make5_oid] [p4 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
             ]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make5_oid] [p4 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -22987,6 +23597,11 @@ macro_rules! __pgrx_c_args_list_make5_oid {
             @argument [__pgrx_c_args_list_make5_oid] [p5 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make5_oid] [p5 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_make5_oid!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -23024,6 +23639,11 @@ macro_rules! __pgrx_c_args_list_make5_oid {
             ]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make5_oid] [p5 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make5_oid!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -23040,7 +23660,7 @@ macro_rules! __pgrx_c_args_list_make5_oid {
         $crate::list_make5_oid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro list_make5_oid from pg_list.h:284
@@ -23087,7 +23707,7 @@ macro_rules! list_make5_oid {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_b424bda9c9843c9855167d03a096c730(
+                $crate::__pgrx_c_generated::Inline_466321d9692df52c90ce7a4c533a8c6c(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -23127,7 +23747,7 @@ macro_rules! list_make5_oid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -23169,7 +23789,7 @@ macro_rules! list_make5_oid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -23211,7 +23831,7 @@ macro_rules! list_make5_oid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -23253,7 +23873,7 @@ macro_rules! list_make5_oid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -23295,7 +23915,7 @@ macro_rules! list_make5_oid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -23328,13 +23948,13 @@ macro_rules! list_make5_oid {
         $crate::__pgrx_c_args_list_make5_oid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x1:tt, $x2:tt, $x3:tt, $x4:tt, $x5:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make5_oid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x1:tt, $x2:tt, $x3:tt, $x4:tt, $x5:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make5_oid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -23352,7 +23972,7 @@ macro_rules! list_make5_oid {
                         $crate::__pgrx_c_operand!(@check_safety; $x5);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -23363,7 +23983,7 @@ macro_rules! list_make5_oid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_b424bda9c9843c9855167d03a096c730(
+                                $crate::__pgrx_c_generated::Inline_466321d9692df52c90ce7a4c533a8c6c(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -23411,7 +24031,7 @@ macro_rules! list_make5_oid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -23461,7 +24081,7 @@ macro_rules! list_make5_oid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -23511,7 +24131,7 @@ macro_rules! list_make5_oid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -23561,7 +24181,7 @@ macro_rules! list_make5_oid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -23611,7 +24231,7 @@ macro_rules! list_make5_oid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -23647,7 +24267,7 @@ macro_rules! list_make5_oid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -23666,7 +24286,7 @@ macro_rules! list_make5_oid {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_b424bda9c9843c9855167d03a096c730(
+                    $crate::__pgrx_c_generated::Inline_466321d9692df52c90ce7a4c533a8c6c(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -23706,7 +24326,7 @@ macro_rules! list_make5_oid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                        $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -23748,7 +24368,7 @@ macro_rules! list_make5_oid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                        $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -23790,7 +24410,7 @@ macro_rules! list_make5_oid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                        $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -23832,7 +24452,7 @@ macro_rules! list_make5_oid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                        $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -23874,7 +24494,7 @@ macro_rules! list_make5_oid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                        $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -23982,6 +24602,11 @@ macro_rules! __pgrx_c_args_list_make5_xid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make5_xid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make5_xid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -24034,6 +24659,11 @@ macro_rules! __pgrx_c_args_list_make5_xid {
             @argument [__pgrx_c_args_list_make5_xid] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
             ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make5_xid] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -24090,6 +24720,11 @@ macro_rules! __pgrx_c_args_list_make5_xid {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make5_xid] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make5_xid!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -24142,6 +24777,11 @@ macro_rules! __pgrx_c_args_list_make5_xid {
             @argument [__pgrx_c_args_list_make5_xid] [p4 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
             ]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make5_xid] [p4 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -24205,6 +24845,11 @@ macro_rules! __pgrx_c_args_list_make5_xid {
             @argument [__pgrx_c_args_list_make5_xid] [p5 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make5_xid] [p5 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_make5_xid!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -24242,6 +24887,11 @@ macro_rules! __pgrx_c_args_list_make5_xid {
             ]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make5_xid] [p5 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make5_xid!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -24258,7 +24908,7 @@ macro_rules! __pgrx_c_args_list_make5_xid {
         $crate::list_make5_xid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro list_make5_xid from pg_list.h:299
@@ -24305,7 +24955,7 @@ macro_rules! list_make5_xid {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_b424bda9c9843c9855167d03a096c730(
+                $crate::__pgrx_c_generated::Inline_466321d9692df52c90ce7a4c533a8c6c(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -24345,7 +24995,7 @@ macro_rules! list_make5_xid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -24387,7 +25037,7 @@ macro_rules! list_make5_xid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -24429,7 +25079,7 @@ macro_rules! list_make5_xid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -24471,7 +25121,7 @@ macro_rules! list_make5_xid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -24513,7 +25163,7 @@ macro_rules! list_make5_xid {
                                         $crate::__pgrx_c_bindings::ListCell
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -24546,13 +25196,13 @@ macro_rules! list_make5_xid {
         $crate::__pgrx_c_args_list_make5_xid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x1:tt, $x2:tt, $x3:tt, $x4:tt, $x5:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make5_xid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x1:tt, $x2:tt, $x3:tt, $x4:tt, $x5:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make5_xid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -24570,7 +25220,7 @@ macro_rules! list_make5_xid {
                         $crate::__pgrx_c_operand!(@check_safety; $x5);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -24581,7 +25231,7 @@ macro_rules! list_make5_xid {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_b424bda9c9843c9855167d03a096c730(
+                                $crate::__pgrx_c_generated::Inline_466321d9692df52c90ce7a4c533a8c6c(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -24629,7 +25279,7 @@ macro_rules! list_make5_xid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -24679,7 +25329,7 @@ macro_rules! list_make5_xid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -24729,7 +25379,7 @@ macro_rules! list_make5_xid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -24779,7 +25429,7 @@ macro_rules! list_make5_xid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -24829,7 +25479,7 @@ macro_rules! list_make5_xid {
                                                         $crate::__pgrx_c_bindings::ListCell
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -24865,7 +25515,7 @@ macro_rules! list_make5_xid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -24884,7 +25534,7 @@ macro_rules! list_make5_xid {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_b424bda9c9843c9855167d03a096c730(
+                    $crate::__pgrx_c_generated::Inline_466321d9692df52c90ce7a4c533a8c6c(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_1b360947b45797cc037dee7a26a631d0c3ae3a6313b40617a2afc9597c121bde,
@@ -24924,7 +25574,7 @@ macro_rules! list_make5_xid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                        $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -24966,7 +25616,7 @@ macro_rules! list_make5_xid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                        $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -25008,7 +25658,7 @@ macro_rules! list_make5_xid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                        $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -25050,7 +25700,7 @@ macro_rules! list_make5_xid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                        $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -25092,7 +25742,7 @@ macro_rules! list_make5_xid {
                                             $crate::__pgrx_c_bindings::ListCell
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                        $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -25207,6 +25857,11 @@ macro_rules! __pgrx_c_args_list_make_int_cell {
             @argument [__pgrx_c_args_list_make_int_cell] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make_int_cell] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_make_int_cell!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -25244,6 +25899,13 @@ macro_rules! __pgrx_c_args_list_make_int_cell {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make_int_cell] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make_int_cell!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -25260,7 +25922,7 @@ macro_rules! __pgrx_c_args_list_make_int_cell {
         $crate::list_make_int_cell!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function list_make_int_cell from pg_list.h:217
@@ -25308,7 +25970,7 @@ macro_rules! list_make_int_cell {
             <
                 $crate::__pgrx_c_macros::expression::CRawRecord<$crate::__pgrx_c_bindings::ListCell> as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                     <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::CInt,
@@ -25327,13 +25989,13 @@ macro_rules! list_make_int_cell {
         $crate::__pgrx_c_args_list_make_int_cell!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $v:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make_int_cell!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $v:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make_int_cell!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -25346,7 +26008,7 @@ macro_rules! list_make_int_cell {
                         $crate::__pgrx_c_operand!(@check_safety; $v);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -25354,7 +26016,7 @@ macro_rules! list_make_int_cell {
                                     $crate::__pgrx_c_bindings::ListCell
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                                $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                                     <
                                         $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
@@ -25374,7 +26036,7 @@ macro_rules! list_make_int_cell {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -25389,7 +26051,7 @@ macro_rules! list_make_int_cell {
                         $crate::__pgrx_c_bindings::ListCell
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_3cd8295bc8f24ade2d38eefaa01f9945(
+                    $crate::__pgrx_c_generated::Inline_1e369460b49c1c8936fffcd9233e98c9(
                         <
                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
@@ -25492,6 +26154,11 @@ macro_rules! __pgrx_c_args_list_make_oid_cell {
             @argument [__pgrx_c_args_list_make_oid_cell] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make_oid_cell] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_make_oid_cell!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -25529,6 +26196,13 @@ macro_rules! __pgrx_c_args_list_make_oid_cell {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make_oid_cell] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make_oid_cell!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -25545,7 +26219,7 @@ macro_rules! __pgrx_c_args_list_make_oid_cell {
         $crate::list_make_oid_cell!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function list_make_oid_cell from pg_list.h:226
@@ -25593,7 +26267,7 @@ macro_rules! list_make_oid_cell {
             <
                 $crate::__pgrx_c_macros::expression::CRawRecord<$crate::__pgrx_c_bindings::ListCell> as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedInt,
@@ -25620,13 +26294,13 @@ macro_rules! list_make_oid_cell {
         $crate::__pgrx_c_args_list_make_oid_cell!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $v:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make_oid_cell!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $v:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make_oid_cell!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -25639,7 +26313,7 @@ macro_rules! list_make_oid_cell {
                         $crate::__pgrx_c_operand!(@check_safety; $v);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -25647,7 +26321,7 @@ macro_rules! list_make_oid_cell {
                                     $crate::__pgrx_c_bindings::ListCell
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                                $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedInt,
@@ -25673,7 +26347,7 @@ macro_rules! list_make_oid_cell {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -25688,7 +26362,7 @@ macro_rules! list_make_oid_cell {
                         $crate::__pgrx_c_bindings::ListCell
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_f2afe070cd9995e0d18fa7a898ac4415(
+                    $crate::__pgrx_c_generated::Inline_80401b729599195cc66d49f5e411e5b0(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -25797,6 +26471,11 @@ macro_rules! __pgrx_c_args_list_make_ptr_cell {
             @argument [__pgrx_c_args_list_make_ptr_cell] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make_ptr_cell] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_make_ptr_cell!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -25834,6 +26513,13 @@ macro_rules! __pgrx_c_args_list_make_ptr_cell {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make_ptr_cell] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make_ptr_cell!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -25850,7 +26536,7 @@ macro_rules! __pgrx_c_args_list_make_ptr_cell {
         $crate::list_make_ptr_cell!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function list_make_ptr_cell from pg_list.h:208
@@ -25898,7 +26584,7 @@ macro_rules! list_make_ptr_cell {
             <
                 $crate::__pgrx_c_macros::expression::CRawRecord<$crate::__pgrx_c_bindings::ListCell> as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CVoid,
@@ -25925,13 +26611,13 @@ macro_rules! list_make_ptr_cell {
         $crate::__pgrx_c_args_list_make_ptr_cell!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $v:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make_ptr_cell!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $v:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make_ptr_cell!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -25944,7 +26630,7 @@ macro_rules! list_make_ptr_cell {
                         $crate::__pgrx_c_operand!(@check_safety; $v);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -25952,7 +26638,7 @@ macro_rules! list_make_ptr_cell {
                                     $crate::__pgrx_c_bindings::ListCell
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                                $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CVoid,
@@ -25978,7 +26664,7 @@ macro_rules! list_make_ptr_cell {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -25993,7 +26679,7 @@ macro_rules! list_make_ptr_cell {
                         $crate::__pgrx_c_bindings::ListCell
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_314e680ada09c4be3243bfb5cd64b6a8(
+                    $crate::__pgrx_c_generated::Inline_a52320d00769c77d00087aaf5c051f4e(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -26102,6 +26788,11 @@ macro_rules! __pgrx_c_args_list_make_xid_cell {
             @argument [__pgrx_c_args_list_make_xid_cell] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make_xid_cell] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_make_xid_cell!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -26139,6 +26830,13 @@ macro_rules! __pgrx_c_args_list_make_xid_cell {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_make_xid_cell] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_make_xid_cell!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -26155,7 +26853,7 @@ macro_rules! __pgrx_c_args_list_make_xid_cell {
         $crate::list_make_xid_cell!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function list_make_xid_cell from pg_list.h:235
@@ -26203,7 +26901,7 @@ macro_rules! list_make_xid_cell {
             <
                 $crate::__pgrx_c_macros::expression::CRawRecord<$crate::__pgrx_c_bindings::ListCell> as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedInt,
@@ -26230,13 +26928,13 @@ macro_rules! list_make_xid_cell {
         $crate::__pgrx_c_args_list_make_xid_cell!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $v:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make_xid_cell!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $v:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_make_xid_cell!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -26249,7 +26947,7 @@ macro_rules! list_make_xid_cell {
                         $crate::__pgrx_c_operand!(@check_safety; $v);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -26257,7 +26955,7 @@ macro_rules! list_make_xid_cell {
                                     $crate::__pgrx_c_bindings::ListCell
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                                $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedInt,
@@ -26283,7 +26981,7 @@ macro_rules! list_make_xid_cell {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -26298,7 +26996,7 @@ macro_rules! list_make_xid_cell {
                         $crate::__pgrx_c_bindings::ListCell
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_515079c6a2f2c7d68a5f726b7276552d(
+                    $crate::__pgrx_c_generated::Inline_207aacf30a54d03a679ebc6cdd7afe07(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -26398,6 +27096,11 @@ macro_rules! __pgrx_c_args_list_nth {
             @argument [__pgrx_c_args_list_nth] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_nth] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_nth!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -26459,6 +27162,11 @@ macro_rules! __pgrx_c_args_list_nth {
             @argument [__pgrx_c_args_list_nth] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_nth] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_nth!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -26494,6 +27202,11 @@ macro_rules! __pgrx_c_args_list_nth {
             @argument [__pgrx_c_args_list_nth] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_nth] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_nth!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -26510,7 +27223,7 @@ macro_rules! __pgrx_c_args_list_nth {
         $crate::list_nth!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function list_nth from pg_list.h:330
@@ -26601,13 +27314,13 @@ macro_rules! list_nth {
         $crate::__pgrx_c_args_list_nth!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $list:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_nth!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $list:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_nth!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -26621,7 +27334,7 @@ macro_rules! list_nth {
                         $crate::__pgrx_c_operand!(@check_safety; $n);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -26673,7 +27386,7 @@ macro_rules! list_nth {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -26807,6 +27520,11 @@ macro_rules! __pgrx_c_args_list_nth_cell {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_nth_cell] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_nth_cell!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -26868,6 +27586,11 @@ macro_rules! __pgrx_c_args_list_nth_cell {
             @argument [__pgrx_c_args_list_nth_cell] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_nth_cell] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_nth_cell!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -26905,6 +27628,11 @@ macro_rules! __pgrx_c_args_list_nth_cell {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_nth_cell] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_nth_cell!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -26921,7 +27649,7 @@ macro_rules! __pgrx_c_args_list_nth_cell {
         $crate::list_nth_cell!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function list_nth_cell from pg_list.h:308
@@ -27015,13 +27743,13 @@ macro_rules! list_nth_cell {
         $crate::__pgrx_c_args_list_nth_cell!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $list:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_nth_cell!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $list:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_nth_cell!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -27035,7 +27763,7 @@ macro_rules! list_nth_cell {
                         $crate::__pgrx_c_operand!(@check_safety; $n);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -27089,7 +27817,7 @@ macro_rules! list_nth_cell {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -27223,6 +27951,11 @@ macro_rules! __pgrx_c_args_list_nth_int {
             @argument [__pgrx_c_args_list_nth_int] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_nth_int] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_nth_int!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -27284,6 +28017,11 @@ macro_rules! __pgrx_c_args_list_nth_int {
             @argument [__pgrx_c_args_list_nth_int] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_nth_int] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_nth_int!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -27319,6 +28057,11 @@ macro_rules! __pgrx_c_args_list_nth_int {
             @argument [__pgrx_c_args_list_nth_int] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_nth_int] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_nth_int!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -27335,7 +28078,7 @@ macro_rules! __pgrx_c_args_list_nth_int {
         $crate::list_nth_int!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function list_nth_int from pg_list.h:341
@@ -27421,13 +28164,13 @@ macro_rules! list_nth_int {
         $crate::__pgrx_c_args_list_nth_int!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $list:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_nth_int!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $list:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_nth_int!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -27441,7 +28184,7 @@ macro_rules! list_nth_int {
                         $crate::__pgrx_c_operand!(@check_safety; $n);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -27490,7 +28233,7 @@ macro_rules! list_nth_int {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -27622,6 +28365,11 @@ macro_rules! __pgrx_c_args_list_nth_node {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_nth_node] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_nth_node!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -27683,6 +28431,11 @@ macro_rules! __pgrx_c_args_list_nth_node {
             @argument [__pgrx_c_args_list_nth_node] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_nth_node] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_nth_node!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -27720,6 +28473,11 @@ macro_rules! __pgrx_c_args_list_nth_node {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_nth_node] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_nth_node!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -27736,7 +28494,7 @@ macro_rules! __pgrx_c_args_list_nth_node {
         $crate::list_nth_node!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro list_nth_node from pg_list.h:359
@@ -27837,13 +28595,13 @@ macro_rules! list_nth_node {
         $crate::__pgrx_c_args_list_nth_node!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $type:ty, $list:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_nth_node!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $type:ty, $list:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_nth_node!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -27858,7 +28616,7 @@ macro_rules! list_nth_node {
                         $crate::__pgrx_c_operand!(@check_safety; $n);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -27930,7 +28688,7 @@ macro_rules! list_nth_node {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -28075,6 +28833,11 @@ macro_rules! __pgrx_c_args_list_nth_oid {
             @argument [__pgrx_c_args_list_nth_oid] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_nth_oid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_nth_oid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -28136,6 +28899,11 @@ macro_rules! __pgrx_c_args_list_nth_oid {
             @argument [__pgrx_c_args_list_nth_oid] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_nth_oid] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_nth_oid!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -28171,6 +28939,11 @@ macro_rules! __pgrx_c_args_list_nth_oid {
             @argument [__pgrx_c_args_list_nth_oid] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_nth_oid] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_nth_oid!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -28187,7 +28960,7 @@ macro_rules! __pgrx_c_args_list_nth_oid {
         $crate::list_nth_oid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function list_nth_oid from pg_list.h:352
@@ -28278,13 +29051,13 @@ macro_rules! list_nth_oid {
         $crate::__pgrx_c_args_list_nth_oid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $list:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_nth_oid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $list:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_nth_oid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -28298,7 +29071,7 @@ macro_rules! list_nth_oid {
                         $crate::__pgrx_c_operand!(@check_safety; $n);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -28350,7 +29123,7 @@ macro_rules! list_nth_oid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -28491,6 +29264,11 @@ macro_rules! __pgrx_c_args_list_second_cell {
             @argument [__pgrx_c_args_list_second_cell] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_second_cell] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_second_cell!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -28528,6 +29306,13 @@ macro_rules! __pgrx_c_args_list_second_cell {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_second_cell] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_second_cell!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -28544,7 +29329,7 @@ macro_rules! __pgrx_c_args_list_second_cell {
         $crate::list_second_cell!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function list_second_cell from pg_list.h:141
@@ -28628,13 +29413,13 @@ macro_rules! list_second_cell {
         $crate::__pgrx_c_args_list_second_cell!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $l:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_second_cell!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $l:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_second_cell!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -28647,7 +29432,7 @@ macro_rules! list_second_cell {
                         $crate::__pgrx_c_operand!(@check_safety; $l);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -28688,7 +29473,7 @@ macro_rules! list_second_cell {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -28819,6 +29604,11 @@ macro_rules! __pgrx_c_args_list_tail {
             @argument [__pgrx_c_args_list_tail] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_tail] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_list_tail!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -28854,6 +29644,11 @@ macro_rules! __pgrx_c_args_list_tail {
             @argument [__pgrx_c_args_list_tail] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_list_tail] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_list_tail!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -28870,7 +29665,7 @@ macro_rules! __pgrx_c_args_list_tail {
         $crate::list_tail!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function list_tail from pg_list.h:134
@@ -28951,13 +29746,13 @@ macro_rules! list_tail {
         $crate::__pgrx_c_args_list_tail!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $l:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_tail!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $l:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_list_tail!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -28970,7 +29765,7 @@ macro_rules! list_tail {
                         $crate::__pgrx_c_operand!(@check_safety; $l);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -29011,7 +29806,7 @@ macro_rules! list_tail {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -29138,6 +29933,11 @@ macro_rules! __pgrx_c_args_llast {
             @argument [__pgrx_c_args_llast] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_llast] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_llast!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -29173,6 +29973,11 @@ macro_rules! __pgrx_c_args_llast {
             @argument [__pgrx_c_args_llast] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_llast] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_llast!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -29189,7 +29994,7 @@ macro_rules! __pgrx_c_args_llast {
         $crate::llast!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro llast from pg_list.h:198
@@ -29396,7 +30201,7 @@ macro_rules! llast {
                         $crate::__pgrx_c_operand!(@check_safety; $l);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_ptr_value,
@@ -29452,7 +30257,7 @@ macro_rules! llast {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -29599,6 +30404,11 @@ macro_rules! __pgrx_c_args_llast_int {
             @argument [__pgrx_c_args_llast_int] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_llast_int] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_llast_int!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -29634,6 +30444,11 @@ macro_rules! __pgrx_c_args_llast_int {
             @argument [__pgrx_c_args_llast_int] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_llast_int] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_llast_int!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -29650,7 +30465,7 @@ macro_rules! __pgrx_c_args_llast_int {
         $crate::llast_int!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro llast_int from pg_list.h:199
@@ -29859,7 +30674,7 @@ macro_rules! llast_int {
                         $crate::__pgrx_c_operand!(@check_safety; $l);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_int_value,
@@ -29915,7 +30730,7 @@ macro_rules! llast_int {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -30065,6 +30880,11 @@ macro_rules! __pgrx_c_args_llast_node {
             @argument [__pgrx_c_args_llast_node] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_llast_node] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_llast_node!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -30100,6 +30920,11 @@ macro_rules! __pgrx_c_args_llast_node {
             @argument [__pgrx_c_args_llast_node] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_llast_node] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_llast_node!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -30116,7 +30941,7 @@ macro_rules! __pgrx_c_args_llast_node {
         $crate::llast_node!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro llast_node from pg_list.h:202
@@ -30229,13 +31054,13 @@ macro_rules! llast_node {
         $crate::__pgrx_c_args_llast_node!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $type:ty, $l:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_llast_node!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $type:ty, $l:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_llast_node!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -30249,7 +31074,7 @@ macro_rules! llast_node {
                         $crate::__pgrx_c_operand!(@check_safety; $l);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -30329,7 +31154,7 @@ macro_rules! llast_node {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -30496,6 +31321,11 @@ macro_rules! __pgrx_c_args_llast_oid {
             @argument [__pgrx_c_args_llast_oid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_llast_oid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_llast_oid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -30531,6 +31361,11 @@ macro_rules! __pgrx_c_args_llast_oid {
             @argument [__pgrx_c_args_llast_oid] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_llast_oid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_llast_oid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -30547,7 +31382,7 @@ macro_rules! __pgrx_c_args_llast_oid {
         $crate::llast_oid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro llast_oid from pg_list.h:200
@@ -30756,7 +31591,7 @@ macro_rules! llast_oid {
                         $crate::__pgrx_c_operand!(@check_safety; $l);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_oid_value,
@@ -30812,7 +31647,7 @@ macro_rules! llast_oid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -30959,6 +31794,11 @@ macro_rules! __pgrx_c_args_llast_xid {
             @argument [__pgrx_c_args_llast_xid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_llast_xid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_llast_xid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -30994,6 +31834,11 @@ macro_rules! __pgrx_c_args_llast_xid {
             @argument [__pgrx_c_args_llast_xid] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_llast_xid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_llast_xid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -31010,7 +31855,7 @@ macro_rules! __pgrx_c_args_llast_xid {
         $crate::llast_xid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro llast_xid from pg_list.h:201
@@ -31219,7 +32064,7 @@ macro_rules! llast_xid {
                         $crate::__pgrx_c_operand!(@check_safety; $l);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_xid_value,
@@ -31275,7 +32120,7 @@ macro_rules! llast_xid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -31413,6 +32258,11 @@ macro_rules! __pgrx_c_args_lnext {
             @argument [__pgrx_c_args_lnext] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lnext] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_lnext!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -31470,6 +32320,11 @@ macro_rules! __pgrx_c_args_lnext {
             @argument [__pgrx_c_args_lnext] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lnext] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_lnext!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -31505,6 +32360,11 @@ macro_rules! __pgrx_c_args_lnext {
             @argument [__pgrx_c_args_lnext] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lnext] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_lnext!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -31521,7 +32381,7 @@ macro_rules! __pgrx_c_args_lnext {
         $crate::lnext!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function lnext from pg_list.h:374
@@ -31630,13 +32490,13 @@ macro_rules! lnext {
         $crate::__pgrx_c_args_lnext!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $l:tt, $c:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_lnext!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $l:tt, $c:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_lnext!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -31650,7 +32510,7 @@ macro_rules! lnext {
                         $crate::__pgrx_c_operand!(@check_safety; $c);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -31714,7 +32574,7 @@ macro_rules! lnext {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -31865,6 +32725,11 @@ macro_rules! __pgrx_c_args_lsecond {
             @argument [__pgrx_c_args_lsecond] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lsecond] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_lsecond!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -31900,6 +32765,11 @@ macro_rules! __pgrx_c_args_lsecond {
             @argument [__pgrx_c_args_lsecond] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lsecond] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_lsecond!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -31916,7 +32786,7 @@ macro_rules! __pgrx_c_args_lsecond {
         $crate::lsecond!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro lsecond from pg_list.h:183
@@ -32174,7 +33044,7 @@ macro_rules! lsecond {
                         $crate::__pgrx_c_operand!(@check_safety; $l);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_ptr_value,
@@ -32247,7 +33117,7 @@ macro_rules! lsecond {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -32411,6 +33281,11 @@ macro_rules! __pgrx_c_args_lsecond_int {
             @argument [__pgrx_c_args_lsecond_int] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lsecond_int] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_lsecond_int!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -32446,6 +33321,11 @@ macro_rules! __pgrx_c_args_lsecond_int {
             @argument [__pgrx_c_args_lsecond_int] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lsecond_int] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_lsecond_int!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -32462,7 +33342,7 @@ macro_rules! __pgrx_c_args_lsecond_int {
         $crate::lsecond_int!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro lsecond_int from pg_list.h:184
@@ -32722,7 +33602,7 @@ macro_rules! lsecond_int {
                         $crate::__pgrx_c_operand!(@check_safety; $l);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_int_value,
@@ -32795,7 +33675,7 @@ macro_rules! lsecond_int {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -32962,6 +33842,11 @@ macro_rules! __pgrx_c_args_lsecond_node {
             @argument [__pgrx_c_args_lsecond_node] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lsecond_node] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_lsecond_node!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -32997,6 +33882,11 @@ macro_rules! __pgrx_c_args_lsecond_node {
             @argument [__pgrx_c_args_lsecond_node] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lsecond_node] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_lsecond_node!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -33013,7 +33903,7 @@ macro_rules! __pgrx_c_args_lsecond_node {
         $crate::lsecond_node!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro lsecond_node from pg_list.h:186
@@ -33143,13 +34033,13 @@ macro_rules! lsecond_node {
         $crate::__pgrx_c_args_lsecond_node!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $type:ty, $l:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_lsecond_node!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $type:ty, $l:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_lsecond_node!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -33163,7 +34053,7 @@ macro_rules! lsecond_node {
                         $crate::__pgrx_c_operand!(@check_safety; $l);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -33260,7 +34150,7 @@ macro_rules! lsecond_node {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -33444,6 +34334,11 @@ macro_rules! __pgrx_c_args_lsecond_oid {
             @argument [__pgrx_c_args_lsecond_oid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lsecond_oid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_lsecond_oid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -33479,6 +34374,11 @@ macro_rules! __pgrx_c_args_lsecond_oid {
             @argument [__pgrx_c_args_lsecond_oid] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lsecond_oid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_lsecond_oid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -33495,7 +34395,7 @@ macro_rules! __pgrx_c_args_lsecond_oid {
         $crate::lsecond_oid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro lsecond_oid from pg_list.h:185
@@ -33755,7 +34655,7 @@ macro_rules! lsecond_oid {
                         $crate::__pgrx_c_operand!(@check_safety; $l);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_oid_value,
@@ -33828,7 +34728,7 @@ macro_rules! lsecond_oid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -33990,6 +34890,11 @@ macro_rules! __pgrx_c_args_lthird {
             @argument [__pgrx_c_args_lthird] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lthird] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_lthird!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -34025,6 +34930,11 @@ macro_rules! __pgrx_c_args_lthird {
             @argument [__pgrx_c_args_lthird] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lthird] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_lthird!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -34041,7 +34951,7 @@ macro_rules! __pgrx_c_args_lthird {
         $crate::lthird!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro lthird from pg_list.h:188
@@ -34299,7 +35209,7 @@ macro_rules! lthird {
                         $crate::__pgrx_c_operand!(@check_safety; $l);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_ptr_value,
@@ -34372,7 +35282,7 @@ macro_rules! lthird {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -34536,6 +35446,11 @@ macro_rules! __pgrx_c_args_lthird_int {
             @argument [__pgrx_c_args_lthird_int] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lthird_int] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_lthird_int!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -34571,6 +35486,11 @@ macro_rules! __pgrx_c_args_lthird_int {
             @argument [__pgrx_c_args_lthird_int] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lthird_int] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_lthird_int!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -34587,7 +35507,7 @@ macro_rules! __pgrx_c_args_lthird_int {
         $crate::lthird_int!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro lthird_int from pg_list.h:189
@@ -34847,7 +35767,7 @@ macro_rules! lthird_int {
                         $crate::__pgrx_c_operand!(@check_safety; $l);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_int_value,
@@ -34920,7 +35840,7 @@ macro_rules! lthird_int {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -35087,6 +36007,11 @@ macro_rules! __pgrx_c_args_lthird_node {
             @argument [__pgrx_c_args_lthird_node] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lthird_node] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_lthird_node!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -35122,6 +36047,11 @@ macro_rules! __pgrx_c_args_lthird_node {
             @argument [__pgrx_c_args_lthird_node] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lthird_node] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_lthird_node!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -35138,7 +36068,7 @@ macro_rules! __pgrx_c_args_lthird_node {
         $crate::lthird_node!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro lthird_node from pg_list.h:191
@@ -35268,13 +36198,13 @@ macro_rules! lthird_node {
         $crate::__pgrx_c_args_lthird_node!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $type:ty, $l:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_lthird_node!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $type:ty, $l:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_lthird_node!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -35288,7 +36218,7 @@ macro_rules! lthird_node {
                         $crate::__pgrx_c_operand!(@check_safety; $l);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -35385,7 +36315,7 @@ macro_rules! lthird_node {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -35569,6 +36499,11 @@ macro_rules! __pgrx_c_args_lthird_oid {
             @argument [__pgrx_c_args_lthird_oid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lthird_oid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_lthird_oid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -35604,6 +36539,11 @@ macro_rules! __pgrx_c_args_lthird_oid {
             @argument [__pgrx_c_args_lthird_oid] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lthird_oid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_lthird_oid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -35620,7 +36560,7 @@ macro_rules! __pgrx_c_args_lthird_oid {
         $crate::lthird_oid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro lthird_oid from pg_list.h:190
@@ -35880,7 +36820,7 @@ macro_rules! lthird_oid {
                         $crate::__pgrx_c_operand!(@check_safety; $l);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_oid_value,
@@ -35953,7 +36893,7 @@ macro_rules! lthird_oid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -36072,7 +37012,7 @@ macro_rules! __pgrx_c_args_multi_for_advance_cell {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_multi_for_advance_cell!(
@@ -36081,7 +37021,7 @@ macro_rules! __pgrx_c_args_multi_for_advance_cell {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_multi_for_advance_cell!(
@@ -36123,7 +37063,7 @@ macro_rules! __pgrx_c_args_multi_for_advance_cell {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_multi_for_advance_cell!(
@@ -36132,7 +37072,7 @@ macro_rules! __pgrx_c_args_multi_for_advance_cell {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_multi_for_advance_cell!(
@@ -36186,7 +37126,7 @@ macro_rules! __pgrx_c_args_multi_for_advance_cell {
         $crate::multi_for_advance_cell!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro multi_for_advance_cell from pg_list.h:557
@@ -36482,13 +37422,13 @@ macro_rules! multi_for_advance_cell {
         $crate::__pgrx_c_args_multi_for_advance_cell!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cell:tt, $state:tt, $l:ident, $i:ident $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_multi_for_advance_cell!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cell:tt, $state:tt, $l:ident, $i:ident $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_multi_for_advance_cell!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -36503,7 +37443,7 @@ macro_rules! multi_for_advance_cell {
                         $crate::__pgrx_c_operand!(@check_safety; $state);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -36765,7 +37705,7 @@ macro_rules! multi_for_advance_cell {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

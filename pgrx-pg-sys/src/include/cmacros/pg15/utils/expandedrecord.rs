@@ -86,6 +86,11 @@ macro_rules! __pgrx_c_args_ExpandedRecordGetDatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExpandedRecordGetDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ExpandedRecordGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -123,6 +128,13 @@ macro_rules! __pgrx_c_args_ExpandedRecordGetDatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExpandedRecordGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExpandedRecordGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -139,7 +151,7 @@ macro_rules! __pgrx_c_args_ExpandedRecordGetDatum {
         $crate::ExpandedRecordGetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ExpandedRecordGetDatum from expandedrecord.h:143
@@ -238,13 +250,13 @@ macro_rules! ExpandedRecordGetDatum {
         $crate::__pgrx_c_args_ExpandedRecordGetDatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $erh:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExpandedRecordGetDatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $erh:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExpandedRecordGetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -258,7 +270,7 @@ macro_rules! ExpandedRecordGetDatum {
                         $crate::__pgrx_c_operand!(@check_safety; $erh);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -316,7 +328,7 @@ macro_rules! ExpandedRecordGetDatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -471,6 +483,13 @@ macro_rules! __pgrx_c_args_ExpandedRecordGetRODatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExpandedRecordGetRODatum] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ExpandedRecordGetRODatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -508,6 +527,13 @@ macro_rules! __pgrx_c_args_ExpandedRecordGetRODatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExpandedRecordGetRODatum] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExpandedRecordGetRODatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -524,7 +550,7 @@ macro_rules! __pgrx_c_args_ExpandedRecordGetRODatum {
         $crate::ExpandedRecordGetRODatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ExpandedRecordGetRODatum from expandedrecord.h:144
@@ -623,13 +649,13 @@ macro_rules! ExpandedRecordGetRODatum {
         $crate::__pgrx_c_args_ExpandedRecordGetRODatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $erh:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExpandedRecordGetRODatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $erh:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExpandedRecordGetRODatum!(
@@ -646,7 +672,7 @@ macro_rules! ExpandedRecordGetRODatum {
                         $crate::__pgrx_c_operand!(@check_safety; $erh);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -704,7 +730,7 @@ macro_rules! ExpandedRecordGetRODatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -859,6 +885,11 @@ macro_rules! __pgrx_c_args_ExpandedRecordIsDomain {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExpandedRecordIsDomain] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ExpandedRecordIsDomain!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -896,6 +927,13 @@ macro_rules! __pgrx_c_args_ExpandedRecordIsDomain {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExpandedRecordIsDomain] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExpandedRecordIsDomain!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -912,7 +950,7 @@ macro_rules! __pgrx_c_args_ExpandedRecordIsDomain {
         $crate::ExpandedRecordIsDomain!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ExpandedRecordIsDomain from expandedrecord.h:150
@@ -998,13 +1036,13 @@ macro_rules! ExpandedRecordIsDomain {
         $crate::__pgrx_c_args_ExpandedRecordIsDomain!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $erh:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExpandedRecordIsDomain!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $erh:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExpandedRecordIsDomain!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1017,7 +1055,7 @@ macro_rules! ExpandedRecordIsDomain {
                         $crate::__pgrx_c_operand!(@check_safety; $erh);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -1075,7 +1113,7 @@ macro_rules! ExpandedRecordIsDomain {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1219,6 +1257,11 @@ macro_rules! __pgrx_c_args_ExpandedRecordIsEmpty {
             @argument [__pgrx_c_args_ExpandedRecordIsEmpty] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExpandedRecordIsEmpty] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ExpandedRecordIsEmpty!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1256,6 +1299,13 @@ macro_rules! __pgrx_c_args_ExpandedRecordIsEmpty {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExpandedRecordIsEmpty] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExpandedRecordIsEmpty!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1272,7 +1322,7 @@ macro_rules! __pgrx_c_args_ExpandedRecordIsEmpty {
         $crate::ExpandedRecordIsEmpty!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ExpandedRecordIsEmpty from expandedrecord.h:148
@@ -1376,13 +1426,13 @@ macro_rules! ExpandedRecordIsEmpty {
         $crate::__pgrx_c_args_ExpandedRecordIsEmpty!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $erh:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExpandedRecordIsEmpty!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $erh:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExpandedRecordIsEmpty!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1395,7 +1445,7 @@ macro_rules! ExpandedRecordIsEmpty {
                         $crate::__pgrx_c_operand!(@check_safety; $erh);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -1472,7 +1522,7 @@ macro_rules! ExpandedRecordIsEmpty {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1589,7 +1639,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_EXPANDED_RECORD {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_EXPANDED_RECORD!(
@@ -1598,7 +1648,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_EXPANDED_RECORD {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_EXPANDED_RECORD!(
@@ -1690,6 +1740,13 @@ macro_rules! __pgrx_c_args_PG_GETARG_EXPANDED_RECORD {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_GETARG_EXPANDED_RECORD] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PG_GETARG_EXPANDED_RECORD!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1727,6 +1784,13 @@ macro_rules! __pgrx_c_args_PG_GETARG_EXPANDED_RECORD {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_GETARG_EXPANDED_RECORD] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_EXPANDED_RECORD!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1743,7 +1807,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_EXPANDED_RECORD {
         $crate::PG_GETARG_EXPANDED_RECORD!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PG_GETARG_EXPANDED_RECORD from expandedrecord.h:142
@@ -1860,13 +1924,13 @@ macro_rules! PG_GETARG_EXPANDED_RECORD {
         $crate::__pgrx_c_args_PG_GETARG_EXPANDED_RECORD!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $n:tt, $fcinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_EXPANDED_RECORD!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $n:tt, $fcinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_EXPANDED_RECORD!(
@@ -1884,7 +1948,7 @@ macro_rules! PG_GETARG_EXPANDED_RECORD {
                         $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1969,7 +2033,7 @@ macro_rules! PG_GETARG_EXPANDED_RECORD {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2141,6 +2205,13 @@ macro_rules! __pgrx_c_args_PG_RETURN_EXPANDED_RECORD {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_RETURN_EXPANDED_RECORD] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PG_RETURN_EXPANDED_RECORD!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2178,6 +2249,13 @@ macro_rules! __pgrx_c_args_PG_RETURN_EXPANDED_RECORD {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_RETURN_EXPANDED_RECORD] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_EXPANDED_RECORD!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2194,7 +2272,7 @@ macro_rules! __pgrx_c_args_PG_RETURN_EXPANDED_RECORD {
         $crate::PG_RETURN_EXPANDED_RECORD!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PG_RETURN_EXPANDED_RECORD from expandedrecord.h:145
@@ -2287,8 +2365,8 @@ macro_rules! PG_RETURN_EXPANDED_RECORD {
                                 )
                             )
                         )
-                    ] [compile_error!("C expression is not a place in this operation")] [
-                        compile_error!("C expression is not a place in this operation")
+                    ] [::core::compile_error!("C expression is not a place in this operation")] [
+                        ::core::compile_error!("C expression is not a place in this operation")
                     ] [
                         $crate::__pgrx_c_macros::expression::size_of_value_type(
                             if false {
@@ -2297,7 +2375,7 @@ macro_rules! PG_RETURN_EXPANDED_RECORD {
                                         $crate::__pgrx_c_operand!(@check_safety; $x);
                                     }
                                 }
-                                Some(
+                                ::core::option::Option::Some(
                                     unsafe {
                                         $crate::__pgrx_c_macros::expression::profile_value::<
                                             true,
@@ -2363,7 +2441,7 @@ macro_rules! PG_RETURN_EXPANDED_RECORD {
                                     }
                                 )
                             } else {
-                                None
+                                ::core::option::Option::None
                             }
                         )
                     ]
@@ -2431,8 +2509,8 @@ macro_rules! PG_RETURN_EXPANDED_RECORD {
                                 )
                             )
                         )
-                    ] [compile_error!("C expression is not a place in this operation")] [
-                        compile_error!("C expression is not a place in this operation")
+                    ] [::core::compile_error!("C expression is not a place in this operation")] [
+                        ::core::compile_error!("C expression is not a place in this operation")
                     ] [
                         $crate::__pgrx_c_macros::expression::size_of_value_type(
                             if false {
@@ -2441,7 +2519,7 @@ macro_rules! PG_RETURN_EXPANDED_RECORD {
                                         $crate::__pgrx_c_operand!(@check_safety; $x);
                                     }
                                 }
-                                Some(
+                                ::core::option::Option::Some(
                                     unsafe {
                                         $crate::__pgrx_c_macros::expression::profile_value::<
                                             true,
@@ -2507,7 +2585,7 @@ macro_rules! PG_RETURN_EXPANDED_RECORD {
                                     }
                                 )
                             } else {
-                                None
+                                ::core::option::Option::None
                             }
                         )
                     ]
@@ -2522,7 +2600,7 @@ macro_rules! PG_RETURN_EXPANDED_RECORD {
         )
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_EXPANDED_RECORD!(@collect __pgrx_emit_public []; $($raw)*)
@@ -2602,6 +2680,13 @@ macro_rules! __pgrx_c_args_TransferExpandedRecord {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TransferExpandedRecord] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TransferExpandedRecord!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2665,6 +2750,11 @@ macro_rules! __pgrx_c_args_TransferExpandedRecord {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TransferExpandedRecord] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TransferExpandedRecord!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2702,6 +2792,13 @@ macro_rules! __pgrx_c_args_TransferExpandedRecord {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TransferExpandedRecord] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TransferExpandedRecord!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2718,7 +2815,7 @@ macro_rules! __pgrx_c_args_TransferExpandedRecord {
         $crate::TransferExpandedRecord!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TransferExpandedRecord from expandedrecord.h:154
@@ -2832,13 +2929,13 @@ macro_rules! TransferExpandedRecord {
         $crate::__pgrx_c_args_TransferExpandedRecord!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $erh:tt, $cxt:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TransferExpandedRecord!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $erh:tt, $cxt:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TransferExpandedRecord!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2853,7 +2950,7 @@ macro_rules! TransferExpandedRecord {
                         $crate::__pgrx_c_operand!(@check_safety; $cxt);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::MemoryContextSetParent(
@@ -2936,7 +3033,7 @@ macro_rules! TransferExpandedRecord {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3103,6 +3200,13 @@ macro_rules! __pgrx_c_args_expanded_record_get_field {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_expanded_record_get_field] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_expanded_record_get_field!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3154,6 +3258,13 @@ macro_rules! __pgrx_c_args_expanded_record_get_field {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_expanded_record_get_field] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_expanded_record_get_field] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -3220,6 +3331,13 @@ macro_rules! __pgrx_c_args_expanded_record_get_field {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_expanded_record_get_field] [p3 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_expanded_record_get_field!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3257,6 +3375,13 @@ macro_rules! __pgrx_c_args_expanded_record_get_field {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_expanded_record_get_field] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_expanded_record_get_field!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3273,7 +3398,7 @@ macro_rules! __pgrx_c_args_expanded_record_get_field {
         $crate::expanded_record_get_field!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function expanded_record_get_field from expandedrecord.h:217
@@ -3393,13 +3518,13 @@ macro_rules! expanded_record_get_field {
         $crate::__pgrx_c_args_expanded_record_get_field!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $erh:tt, $fnumber:tt, $isnull:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_expanded_record_get_field!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $erh:tt, $fnumber:tt, $isnull:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_expanded_record_get_field!(
@@ -3417,7 +3542,7 @@ macro_rules! expanded_record_get_field {
                         $crate::__pgrx_c_operand!(@check_safety; $isnull);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -3488,7 +3613,7 @@ macro_rules! expanded_record_get_field {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3652,6 +3777,13 @@ macro_rules! __pgrx_c_args_expanded_record_get_tupdesc {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_expanded_record_get_tupdesc] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_expanded_record_get_tupdesc!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3689,6 +3821,13 @@ macro_rules! __pgrx_c_args_expanded_record_get_tupdesc {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_expanded_record_get_tupdesc] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_expanded_record_get_tupdesc!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3705,7 +3844,7 @@ macro_rules! __pgrx_c_args_expanded_record_get_tupdesc {
         $crate::expanded_record_get_tupdesc!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function expanded_record_get_tupdesc from expandedrecord.h:207
@@ -3792,13 +3931,13 @@ macro_rules! expanded_record_get_tupdesc {
         $crate::__pgrx_c_args_expanded_record_get_tupdesc!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $erh:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_expanded_record_get_tupdesc!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $erh:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_expanded_record_get_tupdesc!(
@@ -3814,7 +3953,7 @@ macro_rules! expanded_record_get_tupdesc {
                         $crate::__pgrx_c_operand!(@check_safety; $erh);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -3855,7 +3994,7 @@ macro_rules! expanded_record_get_tupdesc {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3985,6 +4124,13 @@ macro_rules! __pgrx_c_args_expanded_record_set_field {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_expanded_record_set_field] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_expanded_record_set_field!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4036,6 +4182,13 @@ macro_rules! __pgrx_c_args_expanded_record_set_field {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_expanded_record_set_field] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_expanded_record_set_field] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -4093,6 +4246,13 @@ macro_rules! __pgrx_c_args_expanded_record_set_field {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_expanded_record_set_field] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_expanded_record_set_field!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4144,6 +4304,13 @@ macro_rules! __pgrx_c_args_expanded_record_set_field {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_expanded_record_set_field] [p4 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_expanded_record_set_field] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -4210,6 +4377,13 @@ macro_rules! __pgrx_c_args_expanded_record_set_field {
             ]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_expanded_record_set_field] [p5 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_expanded_record_set_field!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4247,6 +4421,13 @@ macro_rules! __pgrx_c_args_expanded_record_set_field {
             ]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_expanded_record_set_field] [p5 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_expanded_record_set_field!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4263,7 +4444,7 @@ macro_rules! __pgrx_c_args_expanded_record_set_field {
         $crate::expanded_record_set_field!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro expanded_record_set_field from expandedrecord.h:198
@@ -4412,7 +4593,7 @@ macro_rules! expanded_record_set_field {
         $crate::__pgrx_c_args_expanded_record_set_field!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $erh:tt, $fnumber:tt, $newValue:tt, $isnull:tt, $expand_external:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_expanded_record_set_field!(@collect __pgrx_emit_place []; $($raw)*)
@@ -4425,7 +4606,7 @@ macro_rules! expanded_record_set_field {
         $isnull:tt,
         $expand_external:tt $(,)?
     ) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_expanded_record_set_field!(
@@ -4446,7 +4627,7 @@ macro_rules! expanded_record_set_field {
                         $crate::__pgrx_c_operand!(@check_safety; $expand_external);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::expanded_record_set_field_internal(
@@ -4559,7 +4740,7 @@ macro_rules! expanded_record_set_field {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

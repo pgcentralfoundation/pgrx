@@ -86,6 +86,11 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_hit {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_count_buffer_hit] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_hit!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -123,6 +128,13 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_hit {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_count_buffer_hit] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_hit!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -139,7 +151,7 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_hit {
         $crate::pgstat_count_buffer_hit!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro pgstat_count_buffer_hit from pgstat.h:640
@@ -482,7 +494,7 @@ macro_rules! pgstat_count_buffer_hit {
         $crate::__pgrx_c_args_pgstat_count_buffer_hit!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_hit!(@collect __pgrx_emit_public []; $($raw)*)
@@ -571,6 +583,13 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_read {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_count_buffer_read] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -608,6 +627,13 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_read {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_count_buffer_read] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -624,7 +650,7 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_read {
         $crate::pgstat_count_buffer_read!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro pgstat_count_buffer_read from pgstat.h:635
@@ -967,7 +993,7 @@ macro_rules! pgstat_count_buffer_read {
         $crate::__pgrx_c_args_pgstat_count_buffer_read!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read!(@collect __pgrx_emit_public []; $($raw)*)
@@ -1059,6 +1085,13 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_read_time {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_count_buffer_read_time] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read_time!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1096,6 +1129,13 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_read_time {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_count_buffer_read_time] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read_time!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1112,7 +1152,7 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_read_time {
         $crate::pgstat_count_buffer_read_time!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro pgstat_count_buffer_read_time from pgstat.h:552
@@ -1178,7 +1218,7 @@ macro_rules! pgstat_count_buffer_read_time {
         )
     };
     (@__pgrx_emit_place; $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read_time!(
@@ -1187,7 +1227,7 @@ macro_rules! pgstat_count_buffer_read_time {
         )
     };
     (@__pgrx_emit_read_place; $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read_time!(
@@ -1203,7 +1243,7 @@ macro_rules! pgstat_count_buffer_read_time {
                         $crate::__pgrx_c_operand!(@check_safety; $n);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::modify(
@@ -1230,7 +1270,7 @@ macro_rules! pgstat_count_buffer_read_time {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1358,6 +1398,13 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_write_time {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_count_buffer_write_time] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_write_time!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1395,6 +1442,13 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_write_time {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_count_buffer_write_time] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_write_time!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1411,7 +1465,7 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_write_time {
         $crate::pgstat_count_buffer_write_time!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro pgstat_count_buffer_write_time from pgstat.h:554
@@ -1477,7 +1531,7 @@ macro_rules! pgstat_count_buffer_write_time {
         )
     };
     (@__pgrx_emit_place; $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_write_time!(
@@ -1486,7 +1540,7 @@ macro_rules! pgstat_count_buffer_write_time {
         )
     };
     (@__pgrx_emit_read_place; $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_write_time!(
@@ -1502,7 +1556,7 @@ macro_rules! pgstat_count_buffer_write_time {
                         $crate::__pgrx_c_operand!(@check_safety; $n);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::modify(
@@ -1529,7 +1583,7 @@ macro_rules! pgstat_count_buffer_write_time {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1660,6 +1714,13 @@ macro_rules! __pgrx_c_args_pgstat_count_conn_active_time {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_count_conn_active_time] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_conn_active_time!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1697,6 +1758,13 @@ macro_rules! __pgrx_c_args_pgstat_count_conn_active_time {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_count_conn_active_time] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_conn_active_time!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1713,7 +1781,7 @@ macro_rules! __pgrx_c_args_pgstat_count_conn_active_time {
         $crate::pgstat_count_conn_active_time!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro pgstat_count_conn_active_time from pgstat.h:556
@@ -1779,7 +1847,7 @@ macro_rules! pgstat_count_conn_active_time {
         )
     };
     (@__pgrx_emit_place; $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_conn_active_time!(
@@ -1788,7 +1856,7 @@ macro_rules! pgstat_count_conn_active_time {
         )
     };
     (@__pgrx_emit_read_place; $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_conn_active_time!(
@@ -1804,7 +1872,7 @@ macro_rules! pgstat_count_conn_active_time {
                         $crate::__pgrx_c_operand!(@check_safety; $n);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::modify(
@@ -1831,7 +1899,7 @@ macro_rules! pgstat_count_conn_active_time {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1959,6 +2027,13 @@ macro_rules! __pgrx_c_args_pgstat_count_conn_txn_idle_time {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_count_conn_txn_idle_time] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_conn_txn_idle_time!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1996,6 +2071,13 @@ macro_rules! __pgrx_c_args_pgstat_count_conn_txn_idle_time {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_count_conn_txn_idle_time] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_conn_txn_idle_time!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2012,7 +2094,7 @@ macro_rules! __pgrx_c_args_pgstat_count_conn_txn_idle_time {
         $crate::pgstat_count_conn_txn_idle_time!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro pgstat_count_conn_txn_idle_time from pgstat.h:558
@@ -2080,7 +2162,7 @@ macro_rules! pgstat_count_conn_txn_idle_time {
         )
     };
     (@__pgrx_emit_place; $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_conn_txn_idle_time!(
@@ -2089,7 +2171,7 @@ macro_rules! pgstat_count_conn_txn_idle_time {
         )
     };
     (@__pgrx_emit_read_place; $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_conn_txn_idle_time!(
@@ -2105,7 +2187,7 @@ macro_rules! pgstat_count_conn_txn_idle_time {
                         $crate::__pgrx_c_operand!(@check_safety; $n);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::modify(
@@ -2132,7 +2214,7 @@ macro_rules! pgstat_count_conn_txn_idle_time {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2262,6 +2344,11 @@ macro_rules! __pgrx_c_args_pgstat_count_heap_fetch {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_count_heap_fetch] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_heap_fetch!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2299,6 +2386,13 @@ macro_rules! __pgrx_c_args_pgstat_count_heap_fetch {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_count_heap_fetch] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_heap_fetch!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2315,7 +2409,7 @@ macro_rules! __pgrx_c_args_pgstat_count_heap_fetch {
         $crate::pgstat_count_heap_fetch!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro pgstat_count_heap_fetch from pgstat.h:620
@@ -2658,7 +2752,7 @@ macro_rules! pgstat_count_heap_fetch {
         $crate::__pgrx_c_args_pgstat_count_heap_fetch!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_heap_fetch!(@collect __pgrx_emit_public []; $($raw)*)
@@ -2747,6 +2841,13 @@ macro_rules! __pgrx_c_args_pgstat_count_heap_getnext {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_count_heap_getnext] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_heap_getnext!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2784,6 +2885,13 @@ macro_rules! __pgrx_c_args_pgstat_count_heap_getnext {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_count_heap_getnext] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_heap_getnext!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2800,7 +2908,7 @@ macro_rules! __pgrx_c_args_pgstat_count_heap_getnext {
         $crate::pgstat_count_heap_getnext!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro pgstat_count_heap_getnext from pgstat.h:615
@@ -3143,7 +3251,7 @@ macro_rules! pgstat_count_heap_getnext {
         $crate::__pgrx_c_args_pgstat_count_heap_getnext!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_heap_getnext!(@collect __pgrx_emit_public []; $($raw)*)
@@ -3232,6 +3340,11 @@ macro_rules! __pgrx_c_args_pgstat_count_heap_scan {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_count_heap_scan] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_heap_scan!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3269,6 +3382,13 @@ macro_rules! __pgrx_c_args_pgstat_count_heap_scan {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_count_heap_scan] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_heap_scan!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3285,7 +3405,7 @@ macro_rules! __pgrx_c_args_pgstat_count_heap_scan {
         $crate::pgstat_count_heap_scan!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro pgstat_count_heap_scan from pgstat.h:610
@@ -3628,7 +3748,7 @@ macro_rules! pgstat_count_heap_scan {
         $crate::__pgrx_c_args_pgstat_count_heap_scan!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_heap_scan!(@collect __pgrx_emit_public []; $($raw)*)
@@ -3717,6 +3837,11 @@ macro_rules! __pgrx_c_args_pgstat_count_index_scan {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_count_index_scan] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_index_scan!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3754,6 +3879,13 @@ macro_rules! __pgrx_c_args_pgstat_count_index_scan {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_count_index_scan] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_index_scan!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3770,7 +3902,7 @@ macro_rules! __pgrx_c_args_pgstat_count_index_scan {
         $crate::pgstat_count_index_scan!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro pgstat_count_index_scan from pgstat.h:625
@@ -4113,7 +4245,7 @@ macro_rules! pgstat_count_index_scan {
         $crate::__pgrx_c_args_pgstat_count_index_scan!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_index_scan!(@collect __pgrx_emit_public []; $($raw)*)
@@ -4193,6 +4325,13 @@ macro_rules! __pgrx_c_args_pgstat_count_index_tuples {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_count_index_tuples] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_index_tuples!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4256,6 +4395,13 @@ macro_rules! __pgrx_c_args_pgstat_count_index_tuples {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_count_index_tuples] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_index_tuples!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4293,6 +4439,13 @@ macro_rules! __pgrx_c_args_pgstat_count_index_tuples {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_count_index_tuples] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_index_tuples!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4309,7 +4462,7 @@ macro_rules! __pgrx_c_args_pgstat_count_index_tuples {
         $crate::pgstat_count_index_tuples!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro pgstat_count_index_tuples from pgstat.h:630
@@ -4655,7 +4808,7 @@ macro_rules! pgstat_count_index_tuples {
         $crate::__pgrx_c_args_pgstat_count_index_tuples!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_index_tuples!(@collect __pgrx_emit_public []; $($raw)*)
@@ -4747,6 +4900,13 @@ macro_rules! __pgrx_c_args_pgstat_should_count_relation {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_should_count_relation] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_should_count_relation!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4784,6 +4944,13 @@ macro_rules! __pgrx_c_args_pgstat_should_count_relation {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_should_count_relation] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_should_count_relation!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4800,7 +4967,7 @@ macro_rules! __pgrx_c_args_pgstat_should_count_relation {
         $crate::pgstat_should_count_relation!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro pgstat_should_count_relation from pgstat.h:604
@@ -5063,13 +5230,13 @@ macro_rules! pgstat_should_count_relation {
         $crate::__pgrx_c_args_pgstat_should_count_relation!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rel:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pgstat_should_count_relation!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rel:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pgstat_should_count_relation!(
@@ -5086,7 +5253,7 @@ macro_rules! pgstat_should_count_relation {
                         $crate::__pgrx_c_operand!(@check_safety; $rel);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -5326,7 +5493,7 @@ macro_rules! pgstat_should_count_relation {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

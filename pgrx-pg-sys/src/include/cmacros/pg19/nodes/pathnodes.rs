@@ -84,6 +84,11 @@ macro_rules! __pgrx_c_args_EC_MUST_BE_REDUNDANT {
             @argument [__pgrx_c_args_EC_MUST_BE_REDUNDANT] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_EC_MUST_BE_REDUNDANT] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_EC_MUST_BE_REDUNDANT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -121,6 +126,13 @@ macro_rules! __pgrx_c_args_EC_MUST_BE_REDUNDANT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_EC_MUST_BE_REDUNDANT] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_EC_MUST_BE_REDUNDANT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -137,7 +149,7 @@ macro_rules! __pgrx_c_args_EC_MUST_BE_REDUNDANT {
         $crate::EC_MUST_BE_REDUNDANT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro EC_MUST_BE_REDUNDANT from pathnodes.h:1684
@@ -239,7 +251,7 @@ macro_rules! EC_MUST_BE_REDUNDANT {
                         $crate::__pgrx_c_operand!(@check_safety; $eclass);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_ec_has_const,
@@ -257,7 +269,7 @@ macro_rules! EC_MUST_BE_REDUNDANT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -370,6 +382,11 @@ macro_rules! __pgrx_c_args_IS_DUMMY_APPEND {
             @argument [__pgrx_c_args_IS_DUMMY_APPEND] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_DUMMY_APPEND] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IS_DUMMY_APPEND!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -407,6 +424,13 @@ macro_rules! __pgrx_c_args_IS_DUMMY_APPEND {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_DUMMY_APPEND] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_DUMMY_APPEND!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -423,7 +447,7 @@ macro_rules! __pgrx_c_args_IS_DUMMY_APPEND {
         $crate::IS_DUMMY_APPEND!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IS_DUMMY_APPEND from pathnodes.h:2291
@@ -625,13 +649,13 @@ macro_rules! IS_DUMMY_APPEND {
         $crate::__pgrx_c_args_IS_DUMMY_APPEND!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $p:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_DUMMY_APPEND!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $p:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_DUMMY_APPEND!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -645,7 +669,7 @@ macro_rules! IS_DUMMY_APPEND {
                         $crate::__pgrx_c_operand!(@check_safety; $p);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -823,7 +847,7 @@ macro_rules! IS_DUMMY_APPEND {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1079,6 +1103,11 @@ macro_rules! __pgrx_c_args_IS_DUMMY_REL {
             @argument [__pgrx_c_args_IS_DUMMY_REL] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_DUMMY_REL] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IS_DUMMY_REL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1114,6 +1143,11 @@ macro_rules! __pgrx_c_args_IS_DUMMY_REL {
             @argument [__pgrx_c_args_IS_DUMMY_REL] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_DUMMY_REL] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_DUMMY_REL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1130,7 +1164,7 @@ macro_rules! __pgrx_c_args_IS_DUMMY_REL {
         $crate::IS_DUMMY_REL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IS_DUMMY_REL from pathnodes.h:2299
@@ -1199,13 +1233,13 @@ macro_rules! IS_DUMMY_REL {
         $crate::__pgrx_c_args_IS_DUMMY_REL!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $r:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_DUMMY_REL!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $r:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_DUMMY_REL!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1219,7 +1253,7 @@ macro_rules! IS_DUMMY_REL {
                         $crate::__pgrx_c_operand!(@check_safety; $r);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1255,7 +1289,7 @@ macro_rules! IS_DUMMY_REL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1380,6 +1414,11 @@ macro_rules! __pgrx_c_args_IS_GROUPED_REL {
             @argument [__pgrx_c_args_IS_GROUPED_REL] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_GROUPED_REL] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IS_GROUPED_REL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1417,6 +1456,11 @@ macro_rules! __pgrx_c_args_IS_GROUPED_REL {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_GROUPED_REL] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_GROUPED_REL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1433,7 +1477,7 @@ macro_rules! __pgrx_c_args_IS_GROUPED_REL {
         $crate::IS_GROUPED_REL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IS_GROUPED_REL from pathnodes.h:1257
@@ -1519,13 +1563,13 @@ macro_rules! IS_GROUPED_REL {
         $crate::__pgrx_c_args_IS_GROUPED_REL!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rel:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_GROUPED_REL!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rel:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_GROUPED_REL!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1539,7 +1583,7 @@ macro_rules! IS_GROUPED_REL {
                         $crate::__pgrx_c_operand!(@check_safety; $rel);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -1595,7 +1639,7 @@ macro_rules! IS_GROUPED_REL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1735,6 +1779,11 @@ macro_rules! __pgrx_c_args_IS_JOIN_REL {
             @argument [__pgrx_c_args_IS_JOIN_REL] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_JOIN_REL] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IS_JOIN_REL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1770,6 +1819,11 @@ macro_rules! __pgrx_c_args_IS_JOIN_REL {
             @argument [__pgrx_c_args_IS_JOIN_REL] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_JOIN_REL] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_JOIN_REL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1786,7 +1840,7 @@ macro_rules! __pgrx_c_args_IS_JOIN_REL {
         $crate::IS_JOIN_REL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IS_JOIN_REL from pathnodes.h:994
@@ -1899,13 +1953,13 @@ macro_rules! IS_JOIN_REL {
         $crate::__pgrx_c_args_IS_JOIN_REL!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rel:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_JOIN_REL!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rel:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_JOIN_REL!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1918,7 +1972,7 @@ macro_rules! IS_JOIN_REL {
                         $crate::__pgrx_c_operand!(@check_safety; $rel);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -2014,7 +2068,7 @@ macro_rules! IS_JOIN_REL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2185,6 +2239,11 @@ macro_rules! __pgrx_c_args_IS_OTHER_REL {
             @argument [__pgrx_c_args_IS_OTHER_REL] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_OTHER_REL] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IS_OTHER_REL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2220,6 +2279,11 @@ macro_rules! __pgrx_c_args_IS_OTHER_REL {
             @argument [__pgrx_c_args_IS_OTHER_REL] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_OTHER_REL] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_OTHER_REL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2236,7 +2300,7 @@ macro_rules! __pgrx_c_args_IS_OTHER_REL {
         $crate::IS_OTHER_REL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IS_OTHER_REL from pathnodes.h:1004
@@ -2408,13 +2472,13 @@ macro_rules! IS_OTHER_REL {
         $crate::__pgrx_c_args_IS_OTHER_REL!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rel:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_OTHER_REL!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rel:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_OTHER_REL!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2427,7 +2491,7 @@ macro_rules! IS_OTHER_REL {
                         $crate::__pgrx_c_operand!(@check_safety; $rel);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -2582,7 +2646,7 @@ macro_rules! IS_OTHER_REL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2812,6 +2876,11 @@ macro_rules! __pgrx_c_args_IS_PARTITIONED_REL {
             @argument [__pgrx_c_args_IS_PARTITIONED_REL] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_PARTITIONED_REL] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IS_PARTITIONED_REL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2849,6 +2918,13 @@ macro_rules! __pgrx_c_args_IS_PARTITIONED_REL {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_PARTITIONED_REL] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_PARTITIONED_REL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2865,7 +2941,7 @@ macro_rules! __pgrx_c_args_IS_PARTITIONED_REL {
         $crate::IS_PARTITIONED_REL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IS_PARTITIONED_REL from pathnodes.h:1231
@@ -3121,13 +3197,13 @@ macro_rules! IS_PARTITIONED_REL {
         $crate::__pgrx_c_args_IS_PARTITIONED_REL!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rel:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_PARTITIONED_REL!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rel:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_PARTITIONED_REL!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3141,7 +3217,7 @@ macro_rules! IS_PARTITIONED_REL {
                         $crate::__pgrx_c_operand!(@check_safety; $rel);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -3372,7 +3448,7 @@ macro_rules! IS_PARTITIONED_REL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3682,6 +3758,11 @@ macro_rules! __pgrx_c_args_IS_SIMPLE_REL {
             @argument [__pgrx_c_args_IS_SIMPLE_REL] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_SIMPLE_REL] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IS_SIMPLE_REL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3719,6 +3800,11 @@ macro_rules! __pgrx_c_args_IS_SIMPLE_REL {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_SIMPLE_REL] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_SIMPLE_REL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3735,7 +3821,7 @@ macro_rules! __pgrx_c_args_IS_SIMPLE_REL {
         $crate::IS_SIMPLE_REL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IS_SIMPLE_REL from pathnodes.h:989
@@ -3852,13 +3938,13 @@ macro_rules! IS_SIMPLE_REL {
         $crate::__pgrx_c_args_IS_SIMPLE_REL!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rel:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_SIMPLE_REL!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rel:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_SIMPLE_REL!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3871,7 +3957,7 @@ macro_rules! IS_SIMPLE_REL {
                         $crate::__pgrx_c_operand!(@check_safety; $rel);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -3969,7 +4055,7 @@ macro_rules! IS_SIMPLE_REL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4144,6 +4230,11 @@ macro_rules! __pgrx_c_args_IS_UPPER_REL {
             @argument [__pgrx_c_args_IS_UPPER_REL] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_UPPER_REL] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IS_UPPER_REL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4179,6 +4270,11 @@ macro_rules! __pgrx_c_args_IS_UPPER_REL {
             @argument [__pgrx_c_args_IS_UPPER_REL] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_UPPER_REL] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_UPPER_REL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4195,7 +4291,7 @@ macro_rules! __pgrx_c_args_IS_UPPER_REL {
         $crate::IS_UPPER_REL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IS_UPPER_REL from pathnodes.h:999
@@ -4308,13 +4404,13 @@ macro_rules! IS_UPPER_REL {
         $crate::__pgrx_c_args_IS_UPPER_REL!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rel:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_UPPER_REL!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rel:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_UPPER_REL!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4327,7 +4423,7 @@ macro_rules! IS_UPPER_REL {
                         $crate::__pgrx_c_operand!(@check_safety; $rel);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -4423,7 +4519,7 @@ macro_rules! IS_UPPER_REL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4594,6 +4690,11 @@ macro_rules! __pgrx_c_args_PATH_REQ_OUTER {
             @argument [__pgrx_c_args_PATH_REQ_OUTER] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PATH_REQ_OUTER] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PATH_REQ_OUTER!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4631,6 +4732,11 @@ macro_rules! __pgrx_c_args_PATH_REQ_OUTER {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PATH_REQ_OUTER] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PATH_REQ_OUTER!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4647,7 +4753,7 @@ macro_rules! __pgrx_c_args_PATH_REQ_OUTER {
         $crate::PATH_REQ_OUTER!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PATH_REQ_OUTER from pathnodes.h:2015
@@ -4798,13 +4904,13 @@ macro_rules! PATH_REQ_OUTER {
         $crate::__pgrx_c_args_PATH_REQ_OUTER!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $path:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PATH_REQ_OUTER!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $path:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PATH_REQ_OUTER!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4818,7 +4924,7 @@ macro_rules! PATH_REQ_OUTER {
                         $crate::__pgrx_c_operand!(@check_safety; $path);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -4942,7 +5048,7 @@ macro_rules! PATH_REQ_OUTER {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5143,6 +5249,13 @@ macro_rules! __pgrx_c_args_RELATION_WAS_MADE_UNIQUE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RELATION_WAS_MADE_UNIQUE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RELATION_WAS_MADE_UNIQUE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5194,6 +5307,13 @@ macro_rules! __pgrx_c_args_RELATION_WAS_MADE_UNIQUE {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_RELATION_WAS_MADE_UNIQUE] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RELATION_WAS_MADE_UNIQUE] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -5260,6 +5380,13 @@ macro_rules! __pgrx_c_args_RELATION_WAS_MADE_UNIQUE {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RELATION_WAS_MADE_UNIQUE] [p3 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RELATION_WAS_MADE_UNIQUE!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5297,6 +5424,13 @@ macro_rules! __pgrx_c_args_RELATION_WAS_MADE_UNIQUE {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RELATION_WAS_MADE_UNIQUE] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RELATION_WAS_MADE_UNIQUE!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5313,7 +5447,7 @@ macro_rules! __pgrx_c_args_RELATION_WAS_MADE_UNIQUE {
         $crate::RELATION_WAS_MADE_UNIQUE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RELATION_WAS_MADE_UNIQUE from pathnodes.h:1250
@@ -5547,13 +5681,13 @@ macro_rules! RELATION_WAS_MADE_UNIQUE {
         $crate::__pgrx_c_args_RELATION_WAS_MADE_UNIQUE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rel:tt, $sjinfo:tt, $nominal_jointype:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RELATION_WAS_MADE_UNIQUE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rel:tt, $sjinfo:tt, $nominal_jointype:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RELATION_WAS_MADE_UNIQUE!(
@@ -5571,7 +5705,7 @@ macro_rules! RELATION_WAS_MADE_UNIQUE {
                         $crate::__pgrx_c_operand!(@check_safety; $nominal_jointype);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -5771,7 +5905,7 @@ macro_rules! RELATION_WAS_MADE_UNIQUE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6059,6 +6193,11 @@ macro_rules! __pgrx_c_args_REL_HAS_ALL_PART_PROPS {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_REL_HAS_ALL_PART_PROPS] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_REL_HAS_ALL_PART_PROPS!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6096,6 +6235,13 @@ macro_rules! __pgrx_c_args_REL_HAS_ALL_PART_PROPS {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_REL_HAS_ALL_PART_PROPS] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_REL_HAS_ALL_PART_PROPS!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6112,7 +6258,7 @@ macro_rules! __pgrx_c_args_REL_HAS_ALL_PART_PROPS {
         $crate::REL_HAS_ALL_PART_PROPS!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro REL_HAS_ALL_PART_PROPS from pathnodes.h:1239
@@ -6388,13 +6534,13 @@ macro_rules! REL_HAS_ALL_PART_PROPS {
         $crate::__pgrx_c_args_REL_HAS_ALL_PART_PROPS!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rel:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_REL_HAS_ALL_PART_PROPS!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rel:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_REL_HAS_ALL_PART_PROPS!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6407,7 +6553,7 @@ macro_rules! REL_HAS_ALL_PART_PROPS {
                         $crate::__pgrx_c_operand!(@check_safety; $rel);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -6662,7 +6808,7 @@ macro_rules! REL_HAS_ALL_PART_PROPS {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6989,6 +7135,13 @@ macro_rules! __pgrx_c_args_RINFO_IS_PUSHED_DOWN {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RINFO_IS_PUSHED_DOWN] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7050,6 +7203,11 @@ macro_rules! __pgrx_c_args_RINFO_IS_PUSHED_DOWN {
             @argument [__pgrx_c_args_RINFO_IS_PUSHED_DOWN] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RINFO_IS_PUSHED_DOWN] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7087,6 +7245,13 @@ macro_rules! __pgrx_c_args_RINFO_IS_PUSHED_DOWN {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RINFO_IS_PUSHED_DOWN] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7103,7 +7268,7 @@ macro_rules! __pgrx_c_args_RINFO_IS_PUSHED_DOWN {
         $crate::RINFO_IS_PUSHED_DOWN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RINFO_IS_PUSHED_DOWN from pathnodes.h:3057
@@ -7260,13 +7425,13 @@ macro_rules! RINFO_IS_PUSHED_DOWN {
         $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rinfo:tt, $joinrelids:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rinfo:tt, $joinrelids:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7280,7 +7445,7 @@ macro_rules! RINFO_IS_PUSHED_DOWN {
                         $crate::__pgrx_c_operand!(@check_safety; $joinrelids);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -7409,7 +7574,7 @@ macro_rules! RINFO_IS_PUSHED_DOWN {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7615,6 +7780,13 @@ macro_rules! __pgrx_c_args_get_pathtarget_sortgroupref {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_get_pathtarget_sortgroupref] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_get_pathtarget_sortgroupref!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7628,7 +7800,7 @@ macro_rules! __pgrx_c_args_get_pathtarget_sortgroupref {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_get_pathtarget_sortgroupref!(
@@ -7636,7 +7808,7 @@ macro_rules! __pgrx_c_args_get_pathtarget_sortgroupref {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_get_pathtarget_sortgroupref!(
@@ -7645,7 +7817,7 @@ macro_rules! __pgrx_c_args_get_pathtarget_sortgroupref {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_get_pathtarget_sortgroupref!(
@@ -7726,7 +7898,7 @@ macro_rules! __pgrx_c_args_get_pathtarget_sortgroupref {
         $crate::get_pathtarget_sortgroupref!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro get_pathtarget_sortgroupref from pathnodes.h:1894
@@ -7858,13 +8030,13 @@ macro_rules! get_pathtarget_sortgroupref {
         $crate::__pgrx_c_args_get_pathtarget_sortgroupref!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $target:tt, $colno:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_get_pathtarget_sortgroupref!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $target:tt, $colno:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_get_pathtarget_sortgroupref!(
@@ -7881,7 +8053,7 @@ macro_rules! get_pathtarget_sortgroupref {
                         $crate::__pgrx_c_operand!(@check_safety; $colno);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -7988,7 +8160,7 @@ macro_rules! get_pathtarget_sortgroupref {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8125,7 +8297,7 @@ macro_rules! __pgrx_c_args_planner_rt_fetch {
         $crate::__pgrx_c_args_planner_rt_fetch!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_planner_rt_fetch!(
@@ -8134,7 +8306,7 @@ macro_rules! __pgrx_c_args_planner_rt_fetch {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_planner_rt_fetch!(
@@ -8224,6 +8396,11 @@ macro_rules! __pgrx_c_args_planner_rt_fetch {
             @argument [__pgrx_c_args_planner_rt_fetch] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_planner_rt_fetch] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_planner_rt_fetch!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8261,6 +8438,13 @@ macro_rules! __pgrx_c_args_planner_rt_fetch {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_planner_rt_fetch] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_planner_rt_fetch!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8277,7 +8461,7 @@ macro_rules! __pgrx_c_args_planner_rt_fetch {
         $crate::planner_rt_fetch!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro planner_rt_fetch from pathnodes.h:704
@@ -8517,13 +8701,13 @@ macro_rules! planner_rt_fetch {
         $crate::__pgrx_c_args_planner_rt_fetch!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rti:tt, $root:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_planner_rt_fetch!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rti:tt, $root:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_planner_rt_fetch!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8538,7 +8722,7 @@ macro_rules! planner_rt_fetch {
                         $crate::__pgrx_c_operand!(@check_safety; $root);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -8757,7 +8941,7 @@ macro_rules! planner_rt_fetch {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9046,6 +9230,13 @@ macro_rules! __pgrx_c_args_planner_subplan_get_plan {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_planner_subplan_get_plan] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_planner_subplan_get_plan!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9109,6 +9300,13 @@ macro_rules! __pgrx_c_args_planner_subplan_get_plan {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_planner_subplan_get_plan] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_planner_subplan_get_plan!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9146,6 +9344,13 @@ macro_rules! __pgrx_c_args_planner_subplan_get_plan {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_planner_subplan_get_plan] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_planner_subplan_get_plan!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9162,7 +9367,7 @@ macro_rules! __pgrx_c_args_planner_subplan_get_plan {
         $crate::planner_subplan_get_plan!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro planner_subplan_get_plan from pathnodes.h:277
@@ -9346,13 +9551,13 @@ macro_rules! planner_subplan_get_plan {
         $crate::__pgrx_c_args_planner_subplan_get_plan!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $root:tt, $subplan:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_planner_subplan_get_plan!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $root:tt, $subplan:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_planner_subplan_get_plan!(
@@ -9369,7 +9574,7 @@ macro_rules! planner_subplan_get_plan {
                         $crate::__pgrx_c_operand!(@check_safety; $subplan);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -9516,7 +9721,7 @@ macro_rules! planner_subplan_get_plan {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

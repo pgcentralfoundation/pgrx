@@ -66,13 +66,13 @@ macro_rules! AssertCouldGetRelation {
         $crate::AssertCouldGetRelation!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::AssertCouldGetRelation!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::AssertCouldGetRelation!(@__pgrx_emit_read_place; $($raw)*)
@@ -83,7 +83,7 @@ macro_rules! AssertCouldGetRelation {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::AssertCouldGetRelation()
@@ -91,7 +91,7 @@ macro_rules! AssertCouldGetRelation {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -109,13 +109,13 @@ macro_rules! AssertCouldGetRelation {
         $crate::AssertCouldGetRelation!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::AssertCouldGetRelation!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 
@@ -170,19 +170,19 @@ macro_rules! AssertPendingSyncs_RelationCache {
         $crate::AssertPendingSyncs_RelationCache!(@__pgrx_emit_discard; $($raw)*)
     };
     (@__pgrx_emit_public; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     (@__pgrx_emit_discard; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     () => {
         $crate::AssertPendingSyncs_RelationCache!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 

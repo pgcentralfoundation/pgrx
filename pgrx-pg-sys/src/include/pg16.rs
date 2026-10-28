@@ -186,18 +186,18 @@ pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const OPENSSL_API_COMPAT: u32 = 268439552;
 pub const PACKAGE_BUGREPORT: &::core::ffi::CStr = c"pgsql-bugs@lists.postgresql.org";
 pub const PACKAGE_NAME: &::core::ffi::CStr = c"PostgreSQL";
-pub const PACKAGE_STRING: &::core::ffi::CStr = c"PostgreSQL 16.14";
+pub const PACKAGE_STRING: &::core::ffi::CStr = c"PostgreSQL 16.15";
 pub const PACKAGE_TARNAME: &::core::ffi::CStr = c"postgresql";
 pub const PACKAGE_URL: &::core::ffi::CStr = c"https://www.postgresql.org/";
-pub const PACKAGE_VERSION: &::core::ffi::CStr = c"16.14";
+pub const PACKAGE_VERSION: &::core::ffi::CStr = c"16.15";
 pub const PG_KRB_SRVNAM: &::core::ffi::CStr = c"postgres";
 pub const PG_MAJORVERSION: &::core::ffi::CStr = c"16";
 pub const PG_MAJORVERSION_NUM: u32 = 16;
-pub const PG_MINORVERSION_NUM: u32 = 14;
+pub const PG_MINORVERSION_NUM: u32 = 15;
 pub const PG_USE_STDBOOL: u32 = 1;
-pub const PG_VERSION: &::core::ffi::CStr = c"16.14 (Debian 16.14-1.pgdg13+1)";
-pub const PG_VERSION_NUM: u32 = 160014;
-pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 16.14 (Debian 16.14-1.pgdg13+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit" ;
+pub const PG_VERSION: &::core::ffi::CStr = c"16.15 (Ubuntu 16.15-1.pgdg24.04+2)";
+pub const PG_VERSION_NUM: u32 = 160015;
+pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 16.15 (Ubuntu 16.15-1.pgdg24.04+2) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, 64-bit" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -266,7 +266,7 @@ pub const PG_BINARY_R: &::core::ffi::CStr = c"r";
 pub const PG_BINARY_W: &::core::ffi::CStr = c"w";
 pub const PGINVALID_SOCKET: i32 = -1;
 pub const PG_BACKEND_VERSIONSTR: &::core::ffi::CStr =
-    c"postgres (PostgreSQL) 16.14 (Debian 16.14-1.pgdg13+1)\n";
+    c"postgres (PostgreSQL) 16.15 (Ubuntu 16.15-1.pgdg24.04+2)\n";
 pub const EXE: &::core::ffi::CStr = c"";
 pub const DEVNULL: &::core::ffi::CStr = c"/dev/null";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -1694,6 +1694,7 @@ pub const INDEX_CREATE_CONCURRENT: u32 = 8;
 pub const INDEX_CREATE_IF_NOT_EXISTS: u32 = 16;
 pub const INDEX_CREATE_PARTITIONED: u32 = 32;
 pub const INDEX_CREATE_INVALID: u32 = 64;
+pub const INDEX_CREATE_DEFERRABLE: u32 = 128;
 pub const INDEX_CONSTR_CREATE_MARK_AS_PRIMARY: u32 = 1;
 pub const INDEX_CONSTR_CREATE_DEFERRABLE: u32 = 2;
 pub const INDEX_CONSTR_CREATE_INIT_DEFERRED: u32 = 4;
@@ -2250,6 +2251,7 @@ pub const OID_ARRAY_CONTAINED_OP: u32 = 2752;
 pub const RECORD_EQ_OP: u32 = 2988;
 pub const RECORD_LT_OP: u32 = 2990;
 pub const RECORD_GT_OP: u32 = 2991;
+pub const RANGE_EQ_OP: u32 = 3882;
 pub const OID_RANGE_LESS_OP: u32 = 3884;
 pub const OID_RANGE_LESS_EQUAL_OP: u32 = 3885;
 pub const OID_RANGE_GREATER_EQUAL_OP: u32 = 3886;
@@ -2263,6 +2265,7 @@ pub const OID_RANGE_LEFT_OP: u32 = 3893;
 pub const OID_RANGE_RIGHT_OP: u32 = 3894;
 pub const OID_RANGE_OVERLAPS_LEFT_OP: u32 = 3895;
 pub const OID_RANGE_OVERLAPS_RIGHT_OP: u32 = 3896;
+pub const MULTIRANGE_EQ_OP: u32 = 2860;
 pub const OID_MULTIRANGE_LESS_OP: u32 = 2862;
 pub const OID_MULTIRANGE_LESS_EQUAL_OP: u32 = 2863;
 pub const OID_MULTIRANGE_GREATER_EQUAL_OP: u32 = 2864;
@@ -3241,8 +3244,8 @@ pub const U_SHOW_CPLUSPLUS_HEADER_API: u32 = 0;
 pub const LOCALE_NAME_BUFLEN: u32 = 128;
 pub const MAXSTRLEN: u32 = 2047;
 pub const MAXSTRPOS: u32 = 1048575;
-pub const MAXENTRYPOS: u32 = 16384;
 pub const MAXNUMPOS: u32 = 256;
+pub const MAXENTRYPOS: u32 = 16384;
 pub const QI_VAL: u32 = 1;
 pub const QI_OPR: u32 = 2;
 pub const QI_VALSTOP: u32 = 3;
@@ -6746,8 +6749,6 @@ pub const DEFAULT_NOT_UNK_SEL: f64 = 0.995;
 pub const SELFLAG_USED_DEFAULT: u32 = 1;
 pub type pg_int64 = ::core::ffi::c_long;
 pub type __gnuc_va_list = __builtin_va_list;
-pub type __uint16_t = ::core::ffi::c_ushort;
-pub type __uint_least16_t = __uint16_t;
 pub type __dev_t = ::core::ffi::c_ulong;
 pub type __uid_t = ::core::ffi::c_uint;
 pub type __gid_t = ::core::ffi::c_uint;
@@ -6793,9 +6794,7 @@ pub struct _IO_FILE {
     pub _markers: *mut _IO_marker,
     pub _chain: *mut _IO_FILE,
     pub _fileno: ::core::ffi::c_int,
-    pub _bitfield_align_1: [u32; 0],
-    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 3usize]>,
-    pub _short_backupbuf: [::core::ffi::c_char; 1usize],
+    pub _flags2: ::core::ffi::c_int,
     pub _old_offset: __off_t,
     pub _cur_column: ::core::ffi::c_ushort,
     pub _vtable_offset: ::core::ffi::c_schar,
@@ -6806,7 +6805,7 @@ pub struct _IO_FILE {
     pub _wide_data: *mut _IO_wide_data,
     pub _freeres_list: *mut _IO_FILE,
     pub _freeres_buf: *mut ::core::ffi::c_void,
-    pub _prevchain: *mut *mut _IO_FILE,
+    pub __pad5: usize,
     pub _mode: ::core::ffi::c_int,
     pub _unused2: [::core::ffi::c_char; 20usize],
 }
@@ -6817,50 +6816,6 @@ impl Default for _IO_FILE {
             ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
-    }
-}
-impl _IO_FILE {
-    #[inline]
-    pub fn _flags2(&self) -> ::core::ffi::c_int {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 24u8) as u32) }
-    }
-    #[inline]
-    pub fn set__flags2(&mut self, val: ::core::ffi::c_int) {
-        unsafe {
-            let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(0usize, 24u8, val as u64)
-        }
-    }
-    #[inline]
-    pub unsafe fn _flags2_raw(this: *const Self) -> ::core::ffi::c_int {
-        unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 3usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
-                0usize,
-                24u8,
-            ) as u32)
-        }
-    }
-    #[inline]
-    pub unsafe fn set__flags2_raw(this: *mut Self, val: ::core::ffi::c_int) {
-        unsafe {
-            let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 3usize]>>::raw_set(
-                ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                0usize,
-                24u8,
-                val as u64,
-            )
-        }
-    }
-    #[inline]
-    pub fn new_bitfield_1(_flags2: ::core::ffi::c_int) -> __BindgenBitfieldUnit<[u8; 3usize]> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 3usize]> = Default::default();
-        __bindgen_bitfield_unit.set(0usize, 24u8, {
-            let _flags2: u32 = unsafe { ::core::mem::transmute(_flags2) };
-            _flags2 as u64
-        });
-        __bindgen_bitfield_unit
     }
 }
 pub type va_list = __gnuc_va_list;
@@ -13823,6 +13778,7 @@ pub struct CreateStatsStmt {
     pub stxcomment: *mut ::core::ffi::c_char,
     pub transformed: bool,
     pub if_not_exists: bool,
+    pub owner: Oid,
 }
 impl Default for CreateStatsStmt {
     fn default() -> Self {
@@ -33425,6 +33381,7 @@ pub mod WaitEventIPC {
     pub const WAIT_EVENT_WAL_RECEIVER_EXIT: Type = 134217778;
     pub const WAIT_EVENT_WAL_RECEIVER_WAIT_START: Type = 134217779;
     pub const WAIT_EVENT_XACT_GROUP_UPDATE: Type = 134217780;
+    pub const WAIT_EVENT_WAL_RECEIVER_UPSTREAM_CATCHUP: Type = 134217781;
 }
 pub mod WaitEventTimeout {
     pub type Type = ::core::ffi::c_uint;
@@ -37530,8 +37487,7 @@ impl Default for TSConfigCacheEntry {
         }
     }
 }
-pub type char16_t = __uint_least16_t;
-pub type UChar = char16_t;
+pub type UChar = u16;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct UCollator {
@@ -42898,6 +42854,7 @@ unsafe extern "C-unwind" {
     pub fn GetInsertRecPtr() -> XLogRecPtr;
     pub fn GetFlushRecPtr(insertTLI: *mut TimeLineID) -> XLogRecPtr;
     pub fn GetWALInsertionTimeLine() -> TimeLineID;
+    pub fn GetWALInsertionTimeLineIfSet() -> TimeLineID;
     pub fn GetLastImportantRecPtr() -> XLogRecPtr;
     pub fn SetWalWriterSleeping(sleeping: bool);
     pub fn RemoveNonParentXlogFiles(switchpoint: XLogRecPtr, newTLI: TimeLineID);
@@ -46739,6 +46696,11 @@ unsafe extern "C-unwind" {
         buf: *mut Buffer,
     ) -> XLogRedoAction::Type;
     pub fn XLogInitBufferForRedo(record: *mut XLogReaderState, block_id: uint8) -> Buffer;
+    pub fn XLogFlushBufferForRedoIfInit(
+        record: *mut XLogReaderState,
+        block_id: uint8,
+        buffer: Buffer,
+    );
     pub fn XLogReadBufferForRedoExtended(
         record: *mut XLogReaderState,
         block_id: uint8,
@@ -46823,6 +46785,8 @@ unsafe extern "C-unwind" {
         reverse_self: bool,
     );
     pub fn getObjectClass(object: *const ObjectAddress) -> ObjectClass::Type;
+    pub fn CheckUsageOnTypesInExpr(expr: *mut Node, rtable: *mut List, roleid: Oid);
+    pub fn CheckUsageOnTypesInSingleRelExpr(expr: *mut Node, relId: Oid, roleid: Oid);
     pub fn new_object_addresses() -> *mut ObjectAddresses;
     pub fn add_exact_object_address(object: *const ObjectAddress, addrs: *mut ObjectAddresses);
     pub fn object_address_present(
@@ -48202,6 +48166,7 @@ unsafe extern "C-unwind" {
         grantorId: *mut Oid,
         grantOptions: *mut AclMode,
     );
+    pub static mut cached_db_hash: uint32;
     pub fn initialize_acl();
     pub fn ExecuteGrantStmt(stmt: *mut GrantStmt);
     pub fn ExecAlterDefaultPrivilegesStmt(
@@ -48907,7 +48872,11 @@ unsafe extern "C-unwind" {
     pub fn DefineOperator(names: *mut List, parameters: *mut List) -> ObjectAddress;
     pub fn RemoveOperatorById(operOid: Oid);
     pub fn AlterOperator(stmt: *mut AlterOperatorStmt) -> ObjectAddress;
-    pub fn CreateStatistics(stmt: *mut CreateStatsStmt, check_rights: bool) -> ObjectAddress;
+    pub fn CreateStatistics(
+        relids: *mut List,
+        stmt: *mut CreateStatsStmt,
+        check_rights: bool,
+    ) -> ObjectAddress;
     pub fn AlterStatistics(stmt: *mut AlterStatsStmt) -> ObjectAddress;
     pub fn RemoveStatisticsById(statsOid: Oid);
     pub fn RemoveStatisticsDataById(statsOid: Oid, inh: bool);
@@ -50078,6 +50047,7 @@ unsafe extern "C-unwind" {
         names: *mut List,
         newConstraint: *mut Node,
         constrAddr: *mut ObjectAddress,
+        is_readd: bool,
     ) -> ObjectAddress;
     pub fn AlterDomainValidateConstraint(
         names: *mut List,
@@ -55901,6 +55871,7 @@ unsafe extern "C-unwind" {
     pub static mut wal_receiver_timeout: ::core::ffi::c_int;
     pub static mut hot_standby_feedback: bool;
     pub static mut WalRcv: *mut WalRcvData;
+    pub static mut WalRcvIdentifySystemLsn: XLogRecPtr;
     pub static mut WalReceiverFunctions: *mut WalReceiverFunctionsType;
     #[link_name = "walrcv_clear_result__pgrx_cshim"]
     pub fn walrcv_clear_result(walres: *mut WalRcvExecResult);
@@ -56029,6 +56000,7 @@ unsafe extern "C-unwind" {
     ) -> bool;
     pub fn ResetLogicalStreamingState();
     pub fn UpdateDecodingStats(ctx: *mut LogicalDecodingContext);
+    pub static mut output_plugin_libraries_string: *mut ::core::ffi::c_char;
     pub fn xlog_decode(ctx: *mut LogicalDecodingContext, buf: *mut XLogRecordBuffer);
     pub fn heap_decode(ctx: *mut LogicalDecodingContext, buf: *mut XLogRecordBuffer);
     pub fn heap2_decode(ctx: *mut LogicalDecodingContext, buf: *mut XLogRecordBuffer);
@@ -61118,6 +61090,12 @@ unsafe extern "C-unwind" {
     -> bool;
     pub fn get_op_hash_functions(
         opno: Oid,
+        lhs_procno: *mut RegProcedure,
+        rhs_procno: *mut RegProcedure,
+    ) -> bool;
+    pub fn get_op_hash_functions_ext(
+        opno: Oid,
+        inputtype: Oid,
         lhs_procno: *mut RegProcedure,
         rhs_procno: *mut RegProcedure,
     ) -> bool;

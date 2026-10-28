@@ -71,13 +71,13 @@ macro_rules! SPI_pop {
         $crate::SPI_pop!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::SPI_pop!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::SPI_pop!(@__pgrx_emit_read_place; $($raw)*)
@@ -88,7 +88,7 @@ macro_rules! SPI_pop {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -109,7 +109,7 @@ macro_rules! SPI_pop {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -137,13 +137,13 @@ macro_rules! SPI_pop {
         $crate::SPI_pop!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::SPI_pop!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 
@@ -196,13 +196,13 @@ macro_rules! __pgrx_c_args_SPI_pop_conditional {
         )
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::SPI_pop_conditional!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SPI_pop_conditional from spi.h:107
@@ -255,13 +255,13 @@ macro_rules! SPI_pop_conditional {
         $crate::__pgrx_c_args_SPI_pop_conditional!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $pushed:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SPI_pop_conditional!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $pushed:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SPI_pop_conditional!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -272,7 +272,7 @@ macro_rules! SPI_pop_conditional {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -293,7 +293,7 @@ macro_rules! SPI_pop_conditional {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -392,13 +392,13 @@ macro_rules! SPI_push {
         $crate::SPI_push!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::SPI_push!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::SPI_push!(@__pgrx_emit_read_place; $($raw)*)
@@ -409,7 +409,7 @@ macro_rules! SPI_push {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -430,7 +430,7 @@ macro_rules! SPI_push {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -458,13 +458,13 @@ macro_rules! SPI_push {
         $crate::SPI_push!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::SPI_push!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 
@@ -524,13 +524,13 @@ macro_rules! SPI_push_conditional {
         $crate::SPI_push_conditional!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("a C literal or constant is not an object place")
+        ::core::compile_error!("a C literal or constant is not an object place")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::SPI_push_conditional!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("a C literal or constant is not an object place")
+        ::core::compile_error!("a C literal or constant is not an object place")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::SPI_push_conditional!(@__pgrx_emit_read_place; $($raw)*)
@@ -541,7 +541,7 @@ macro_rules! SPI_push_conditional {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::null_constant(
@@ -554,7 +554,7 @@ macro_rules! SPI_push_conditional {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -575,13 +575,13 @@ macro_rules! SPI_push_conditional {
         $crate::SPI_push_conditional!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::SPI_push_conditional!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 
@@ -654,13 +654,13 @@ macro_rules! SPI_restore_connection {
         $crate::SPI_restore_connection!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::SPI_restore_connection!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::SPI_restore_connection!(@__pgrx_emit_read_place; $($raw)*)
@@ -671,7 +671,7 @@ macro_rules! SPI_restore_connection {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -692,7 +692,7 @@ macro_rules! SPI_restore_connection {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -720,13 +720,13 @@ macro_rules! SPI_restore_connection {
         $crate::SPI_restore_connection!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::SPI_restore_connection!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 

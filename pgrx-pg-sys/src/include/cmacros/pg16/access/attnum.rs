@@ -86,6 +86,11 @@ macro_rules! __pgrx_c_args_AttrNumberGetAttrOffset {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_AttrNumberGetAttrOffset] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_AttrNumberGetAttrOffset!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -123,6 +128,13 @@ macro_rules! __pgrx_c_args_AttrNumberGetAttrOffset {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_AttrNumberGetAttrOffset] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_AttrNumberGetAttrOffset!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -139,7 +151,7 @@ macro_rules! __pgrx_c_args_AttrNumberGetAttrOffset {
         $crate::AttrNumberGetAttrOffset!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro AttrNumberGetAttrOffset from attnum.h:51
@@ -226,13 +238,13 @@ macro_rules! AttrNumberGetAttrOffset {
         $crate::__pgrx_c_args_AttrNumberGetAttrOffset!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $attNum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_AttrNumberGetAttrOffset!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $attNum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_AttrNumberGetAttrOffset!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -246,7 +258,7 @@ macro_rules! AttrNumberGetAttrOffset {
                         $crate::__pgrx_c_operand!(@check_safety; $attNum);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -299,7 +311,7 @@ macro_rules! AttrNumberGetAttrOffset {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -445,6 +457,13 @@ macro_rules! __pgrx_c_args_AttrNumberIsForUserDefinedAttr {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_AttrNumberIsForUserDefinedAttr] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_AttrNumberIsForUserDefinedAttr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -482,6 +501,13 @@ macro_rules! __pgrx_c_args_AttrNumberIsForUserDefinedAttr {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_AttrNumberIsForUserDefinedAttr] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_AttrNumberIsForUserDefinedAttr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -498,7 +524,7 @@ macro_rules! __pgrx_c_args_AttrNumberIsForUserDefinedAttr {
         $crate::AttrNumberIsForUserDefinedAttr!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro AttrNumberIsForUserDefinedAttr from attnum.h:41
@@ -569,7 +595,7 @@ macro_rules! AttrNumberIsForUserDefinedAttr {
         )
     };
     (@__pgrx_emit_place; $attributeNumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_AttrNumberIsForUserDefinedAttr!(
@@ -578,7 +604,7 @@ macro_rules! AttrNumberIsForUserDefinedAttr {
         )
     };
     (@__pgrx_emit_read_place; $attributeNumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_AttrNumberIsForUserDefinedAttr!(
@@ -595,7 +621,7 @@ macro_rules! AttrNumberIsForUserDefinedAttr {
                         $crate::__pgrx_c_operand!(@check_safety; $attributeNumber);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -634,7 +660,7 @@ macro_rules! AttrNumberIsForUserDefinedAttr {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -767,6 +793,11 @@ macro_rules! __pgrx_c_args_AttrOffsetGetAttrNumber {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_AttrOffsetGetAttrNumber] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_AttrOffsetGetAttrNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -804,6 +835,13 @@ macro_rules! __pgrx_c_args_AttrOffsetGetAttrNumber {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_AttrOffsetGetAttrNumber] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_AttrOffsetGetAttrNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -820,7 +858,7 @@ macro_rules! __pgrx_c_args_AttrOffsetGetAttrNumber {
         $crate::AttrOffsetGetAttrNumber!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro AttrOffsetGetAttrNumber from attnum.h:61
@@ -893,13 +931,13 @@ macro_rules! AttrOffsetGetAttrNumber {
         $crate::__pgrx_c_args_AttrOffsetGetAttrNumber!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $attributeOffset:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_AttrOffsetGetAttrNumber!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $attributeOffset:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_AttrOffsetGetAttrNumber!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -912,7 +950,7 @@ macro_rules! AttrOffsetGetAttrNumber {
                         $crate::__pgrx_c_operand!(@check_safety; $attributeOffset);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -954,7 +992,7 @@ macro_rules! AttrOffsetGetAttrNumber {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1083,6 +1121,11 @@ macro_rules! __pgrx_c_args_AttributeNumberIsValid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_AttributeNumberIsValid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_AttributeNumberIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1120,6 +1163,13 @@ macro_rules! __pgrx_c_args_AttributeNumberIsValid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_AttributeNumberIsValid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_AttributeNumberIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1136,7 +1186,7 @@ macro_rules! __pgrx_c_args_AttributeNumberIsValid {
         $crate::AttributeNumberIsValid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro AttributeNumberIsValid from attnum.h:34
@@ -1204,13 +1254,13 @@ macro_rules! AttributeNumberIsValid {
         $crate::__pgrx_c_args_AttributeNumberIsValid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $attributeNumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_AttributeNumberIsValid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $attributeNumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_AttributeNumberIsValid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1224,7 +1274,7 @@ macro_rules! AttributeNumberIsValid {
                         $crate::__pgrx_c_operand!(@check_safety; $attributeNumber);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -1265,7 +1315,7 @@ macro_rules! AttributeNumberIsValid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

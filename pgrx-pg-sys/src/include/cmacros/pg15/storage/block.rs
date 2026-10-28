@@ -72,6 +72,11 @@ macro_rules! __pgrx_c_args_BlockIdCopy {
             @argument [__pgrx_c_args_BlockIdCopy] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BlockIdCopy] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BlockIdCopy!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -133,6 +138,11 @@ macro_rules! __pgrx_c_args_BlockIdCopy {
             @argument [__pgrx_c_args_BlockIdCopy] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BlockIdCopy] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BlockIdCopy!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -168,6 +178,11 @@ macro_rules! __pgrx_c_args_BlockIdCopy {
             @argument [__pgrx_c_args_BlockIdCopy] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BlockIdCopy] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BlockIdCopy!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -184,7 +199,7 @@ macro_rules! __pgrx_c_args_BlockIdCopy {
         $crate::BlockIdCopy!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BlockIdCopy from block.h:94
@@ -311,13 +326,13 @@ macro_rules! BlockIdCopy {
         $crate::__pgrx_c_args_BlockIdCopy!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $toBlockId:tt, $fromBlockId:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BlockIdCopy!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $toBlockId:tt, $fromBlockId:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BlockIdCopy!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -331,7 +346,7 @@ macro_rules! BlockIdCopy {
                         $crate::__pgrx_c_operand!(@check_safety; $fromBlockId);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -443,7 +458,7 @@ macro_rules! BlockIdCopy {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -620,6 +635,11 @@ macro_rules! __pgrx_c_args_BlockIdEquals {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BlockIdEquals] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BlockIdEquals!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -681,6 +701,11 @@ macro_rules! __pgrx_c_args_BlockIdEquals {
             @argument [__pgrx_c_args_BlockIdEquals] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BlockIdEquals] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BlockIdEquals!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -718,6 +743,11 @@ macro_rules! __pgrx_c_args_BlockIdEquals {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BlockIdEquals] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BlockIdEquals!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -734,7 +764,7 @@ macro_rules! __pgrx_c_args_BlockIdEquals {
         $crate::BlockIdEquals!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BlockIdEquals from block.h:104
@@ -884,13 +914,13 @@ macro_rules! BlockIdEquals {
         $crate::__pgrx_c_args_BlockIdEquals!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $blockId1:tt, $blockId2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BlockIdEquals!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $blockId1:tt, $blockId2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BlockIdEquals!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -904,7 +934,7 @@ macro_rules! BlockIdEquals {
                         $crate::__pgrx_c_operand!(@check_safety; $blockId2);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -1032,7 +1062,7 @@ macro_rules! BlockIdEquals {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1242,6 +1272,11 @@ macro_rules! __pgrx_c_args_BlockIdGetBlockNumber {
             @argument [__pgrx_c_args_BlockIdGetBlockNumber] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BlockIdGetBlockNumber] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BlockIdGetBlockNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1279,6 +1314,13 @@ macro_rules! __pgrx_c_args_BlockIdGetBlockNumber {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BlockIdGetBlockNumber] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BlockIdGetBlockNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1295,7 +1337,7 @@ macro_rules! __pgrx_c_args_BlockIdGetBlockNumber {
         $crate::BlockIdGetBlockNumber!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BlockIdGetBlockNumber from block.h:112
@@ -1425,13 +1467,13 @@ macro_rules! BlockIdGetBlockNumber {
         $crate::__pgrx_c_args_BlockIdGetBlockNumber!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $blockId:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BlockIdGetBlockNumber!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $blockId:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BlockIdGetBlockNumber!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1444,7 +1486,7 @@ macro_rules! BlockIdGetBlockNumber {
                         $crate::__pgrx_c_operand!(@check_safety; $blockId);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitor(
@@ -1546,7 +1588,7 @@ macro_rules! BlockIdGetBlockNumber {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1730,6 +1772,11 @@ macro_rules! __pgrx_c_args_BlockIdIsValid {
             @argument [__pgrx_c_args_BlockIdIsValid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BlockIdIsValid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BlockIdIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1767,6 +1814,11 @@ macro_rules! __pgrx_c_args_BlockIdIsValid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BlockIdIsValid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BlockIdIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1783,7 +1835,7 @@ macro_rules! __pgrx_c_args_BlockIdIsValid {
         $crate::BlockIdIsValid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BlockIdIsValid from block.h:77
@@ -1866,13 +1918,13 @@ macro_rules! BlockIdIsValid {
         $crate::__pgrx_c_args_BlockIdIsValid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $blockId:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BlockIdIsValid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $blockId:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BlockIdIsValid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1886,7 +1938,7 @@ macro_rules! BlockIdIsValid {
                         $crate::__pgrx_c_operand!(@check_safety; $blockId);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -1935,7 +1987,7 @@ macro_rules! BlockIdIsValid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2063,6 +2115,11 @@ macro_rules! __pgrx_c_args_BlockIdSet {
             @argument [__pgrx_c_args_BlockIdSet] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BlockIdSet] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BlockIdSet!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2124,6 +2181,11 @@ macro_rules! __pgrx_c_args_BlockIdSet {
             @argument [__pgrx_c_args_BlockIdSet] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BlockIdSet] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BlockIdSet!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2159,6 +2221,11 @@ macro_rules! __pgrx_c_args_BlockIdSet {
             @argument [__pgrx_c_args_BlockIdSet] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BlockIdSet] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BlockIdSet!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2175,7 +2242,7 @@ macro_rules! __pgrx_c_args_BlockIdSet {
         $crate::BlockIdSet!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BlockIdSet from block.h:84
@@ -2298,13 +2365,13 @@ macro_rules! BlockIdSet {
         $crate::__pgrx_c_args_BlockIdSet!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $blockId:tt, $blockNumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BlockIdSet!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $blockId:tt, $blockNumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BlockIdSet!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2318,7 +2385,7 @@ macro_rules! BlockIdSet {
                         $crate::__pgrx_c_operand!(@check_safety; $blockNumber);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -2430,7 +2497,7 @@ macro_rules! BlockIdSet {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2606,6 +2673,11 @@ macro_rules! __pgrx_c_args_BlockNumberIsValid {
             @argument [__pgrx_c_args_BlockNumberIsValid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BlockNumberIsValid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BlockNumberIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2643,6 +2715,13 @@ macro_rules! __pgrx_c_args_BlockNumberIsValid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BlockNumberIsValid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BlockNumberIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2659,7 +2738,7 @@ macro_rules! __pgrx_c_args_BlockNumberIsValid {
         $crate::BlockNumberIsValid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BlockNumberIsValid from block.h:70
@@ -2723,13 +2802,13 @@ macro_rules! BlockNumberIsValid {
         $crate::__pgrx_c_args_BlockNumberIsValid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $blockNumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BlockNumberIsValid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $blockNumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BlockNumberIsValid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2742,7 +2821,7 @@ macro_rules! BlockNumberIsValid {
                         $crate::__pgrx_c_operand!(@check_safety; $blockNumber);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -2775,7 +2854,7 @@ macro_rules! BlockNumberIsValid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

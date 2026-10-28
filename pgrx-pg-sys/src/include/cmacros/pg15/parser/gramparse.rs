@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_pg_yyget_extra {
             @argument [__pgrx_c_args_pg_yyget_extra] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_yyget_extra] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_yyget_extra!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -118,6 +123,11 @@ macro_rules! __pgrx_c_args_pg_yyget_extra {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_yyget_extra] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_yyget_extra!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -134,7 +144,7 @@ macro_rules! __pgrx_c_args_pg_yyget_extra {
         $crate::pg_yyget_extra!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro pg_yyget_extra from gramparse.h:64
@@ -274,7 +284,7 @@ macro_rules! pg_yyget_extra {
                         $crate::__pgrx_c_operand!(@check_safety; $yyscanner);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::pointee(
                             (
@@ -305,7 +315,7 @@ macro_rules! pg_yyget_extra {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

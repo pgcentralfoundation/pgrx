@@ -4,6 +4,32 @@ This code is generated for documentation purposes, so that it is easy to referen
 */
 // Shared generated C macro support.
 
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::xl_btree_unlink_page, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_btree_unlink_page> as c::expression::OrdinaryField<Field_leaftopparent>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).leaftopparent) };
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::xl_btree_update>() == 2);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::xl_btree_update>() == 2);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::xl_btree_update {}
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_btree_update, ndeletedtids) == 0);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_ndeletedtids>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_btree_update>
+{
+    type Member = c::CUnsignedShort;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 0;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::xl_btree_update, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_btree_update> as c::expression::OrdinaryField<Field_ndeletedtids>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).ndeletedtids) };
+const _: () = {
+    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::xl_btree_vacuum>() == 4);
+    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::xl_btree_vacuum>() == 2);
+};
+impl c::expression::NativeRecord for crate::__pgrx_c_bindings::xl_btree_vacuum {}
+const _: () =
+    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_btree_vacuum, ndeleted) == 0);
 // SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
 unsafe impl c::expression::OrdinaryField<Field_ndeleted>
     for c::expression::CRecord<crate::__pgrx_c_bindings::xl_btree_vacuum>
@@ -4043,41 +4069,3 @@ impl c::sealed::Sealed for crate::__pgrx_c_bindings::_IO_marker {}
 impl c::expression::NativeType for crate::__pgrx_c_bindings::_IO_marker {
     type Marker = c::expression::COpaque<Self>;
 }
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::_IO_codecvt {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::_IO_codecvt {
-    type Marker = c::expression::COpaque<Self>;
-}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::XLogReaderRoutine>() == 24);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::XLogReaderRoutine>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::XLogReaderRoutine {}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::XLogPrefetcher {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::XLogPrefetcher {
-    type Marker = c::expression::COpaque<Self>;
-}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::WorkTableScanState>() == 232);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::WorkTableScanState>() == 8);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::WorkTableScanState {}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::WindowStatePerFuncData {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::WindowStatePerFuncData {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::WindowStatePerAggData {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::WindowStatePerAggData {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::WindowObjectData {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::WindowObjectData {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::WaitEventSet {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::WaitEventSet {
-    type Marker = c::expression::COpaque<Self>;
-}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::ValuesScan>() == 120);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::ValuesScan>() == 8);
-};

@@ -72,6 +72,11 @@ macro_rules! __pgrx_c_args_SET_VARSIZE {
             @argument [__pgrx_c_args_SET_VARSIZE] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -133,6 +138,11 @@ macro_rules! __pgrx_c_args_SET_VARSIZE {
             @argument [__pgrx_c_args_SET_VARSIZE] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_VARSIZE!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -168,6 +178,11 @@ macro_rules! __pgrx_c_args_SET_VARSIZE {
             @argument [__pgrx_c_args_SET_VARSIZE] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -184,7 +199,7 @@ macro_rules! __pgrx_c_args_SET_VARSIZE {
         $crate::SET_VARSIZE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_VARSIZE from varatt.h:305
@@ -298,13 +313,13 @@ macro_rules! SET_VARSIZE {
         $crate::__pgrx_c_args_SET_VARSIZE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -319,7 +334,7 @@ macro_rules! SET_VARSIZE {
                         $crate::__pgrx_c_operand!(@check_safety; $len);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -413,7 +428,7 @@ macro_rules! SET_VARSIZE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -573,6 +588,11 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_1B {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_1B] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_1B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -634,6 +654,11 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_1B {
             @argument [__pgrx_c_args_SET_VARSIZE_1B] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_1B] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_VARSIZE_1B!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -671,6 +696,11 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_1B {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_1B] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_1B!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -687,7 +717,7 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_1B {
         $crate::SET_VARSIZE_1B!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_VARSIZE_1B from varatt.h:236
@@ -814,13 +844,13 @@ macro_rules! SET_VARSIZE_1B {
         $crate::__pgrx_c_args_SET_VARSIZE_1B!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_1B!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_1B!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -834,7 +864,7 @@ macro_rules! SET_VARSIZE_1B {
                         $crate::__pgrx_c_operand!(@check_safety; $len);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -937,7 +967,7 @@ macro_rules! SET_VARSIZE_1B {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1110,6 +1140,11 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_4B] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1171,6 +1206,11 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B {
             @argument [__pgrx_c_args_SET_VARSIZE_4B] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_4B] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1208,6 +1248,11 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_4B] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1224,7 +1269,7 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B {
         $crate::SET_VARSIZE_4B!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_VARSIZE_4B from varatt.h:232
@@ -1337,13 +1382,13 @@ macro_rules! SET_VARSIZE_4B {
         $crate::__pgrx_c_args_SET_VARSIZE_4B!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1357,7 +1402,7 @@ macro_rules! SET_VARSIZE_4B {
                         $crate::__pgrx_c_operand!(@check_safety; $len);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -1451,7 +1496,7 @@ macro_rules! SET_VARSIZE_4B {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1610,6 +1655,13 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B_C {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_4B_C] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1671,6 +1723,11 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B_C {
             @argument [__pgrx_c_args_SET_VARSIZE_4B_C] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_4B_C] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1708,6 +1765,13 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B_C {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_4B_C] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1724,7 +1788,7 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B_C {
         $crate::SET_VARSIZE_4B_C!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_VARSIZE_4B_C from varatt.h:234
@@ -1857,13 +1921,13 @@ macro_rules! SET_VARSIZE_4B_C {
         $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1877,7 +1941,7 @@ macro_rules! SET_VARSIZE_4B_C {
                         $crate::__pgrx_c_operand!(@check_safety; $len);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -1986,7 +2050,7 @@ macro_rules! SET_VARSIZE_4B_C {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2168,6 +2232,13 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_COMPRESSED {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_COMPRESSED] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2231,6 +2302,11 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_COMPRESSED {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_COMPRESSED] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2268,6 +2344,13 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_COMPRESSED {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_COMPRESSED] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2284,7 +2367,7 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_COMPRESSED {
         $crate::SET_VARSIZE_COMPRESSED!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_VARSIZE_COMPRESSED from varatt.h:307
@@ -2421,13 +2504,13 @@ macro_rules! SET_VARSIZE_COMPRESSED {
         $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2442,7 +2525,7 @@ macro_rules! SET_VARSIZE_COMPRESSED {
                         $crate::__pgrx_c_operand!(@check_safety; $len);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -2551,7 +2634,7 @@ macro_rules! SET_VARSIZE_COMPRESSED {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2731,6 +2814,13 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_SHORT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_SHORT] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2792,6 +2882,11 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_SHORT {
             @argument [__pgrx_c_args_SET_VARSIZE_SHORT] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_SHORT] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2829,6 +2924,13 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_SHORT {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARSIZE_SHORT] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2845,7 +2947,7 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_SHORT {
         $crate::SET_VARSIZE_SHORT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_VARSIZE_SHORT from varatt.h:306
@@ -2973,13 +3075,13 @@ macro_rules! SET_VARSIZE_SHORT {
         $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2994,7 +3096,7 @@ macro_rules! SET_VARSIZE_SHORT {
                         $crate::__pgrx_c_operand!(@check_safety; $len);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -3097,7 +3199,7 @@ macro_rules! SET_VARSIZE_SHORT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3271,6 +3373,13 @@ macro_rules! __pgrx_c_args_SET_VARTAG_1B_E {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARTAG_1B_E] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_1B_E!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3332,6 +3441,11 @@ macro_rules! __pgrx_c_args_SET_VARTAG_1B_E {
             @argument [__pgrx_c_args_SET_VARTAG_1B_E] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARTAG_1B_E] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_VARTAG_1B_E!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3369,6 +3483,13 @@ macro_rules! __pgrx_c_args_SET_VARTAG_1B_E {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARTAG_1B_E] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_1B_E!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3385,7 +3506,7 @@ macro_rules! __pgrx_c_args_SET_VARTAG_1B_E {
         $crate::SET_VARTAG_1B_E!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_VARTAG_1B_E from varatt.h:238
@@ -3526,13 +3647,13 @@ macro_rules! SET_VARTAG_1B_E {
         $crate::__pgrx_c_args_SET_VARTAG_1B_E!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt, $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_1B_E!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt, $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_1B_E!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3546,7 +3667,7 @@ macro_rules! SET_VARTAG_1B_E {
                         $crate::__pgrx_c_operand!(@check_safety; $tag);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -3656,7 +3777,7 @@ macro_rules! SET_VARTAG_1B_E {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3843,6 +3964,13 @@ macro_rules! __pgrx_c_args_SET_VARTAG_EXTERNAL {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARTAG_EXTERNAL] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3904,6 +4032,11 @@ macro_rules! __pgrx_c_args_SET_VARTAG_EXTERNAL {
             @argument [__pgrx_c_args_SET_VARTAG_EXTERNAL] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARTAG_EXTERNAL] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3941,6 +4074,13 @@ macro_rules! __pgrx_c_args_SET_VARTAG_EXTERNAL {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_VARTAG_EXTERNAL] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3957,7 +4097,7 @@ macro_rules! __pgrx_c_args_SET_VARTAG_EXTERNAL {
         $crate::SET_VARTAG_EXTERNAL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_VARTAG_EXTERNAL from varatt.h:309
@@ -4099,13 +4239,13 @@ macro_rules! SET_VARTAG_EXTERNAL {
         $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt, $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt, $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4120,7 +4260,7 @@ macro_rules! SET_VARTAG_EXTERNAL {
                         $crate::__pgrx_c_operand!(@check_safety; $tag);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -4230,7 +4370,7 @@ macro_rules! SET_VARTAG_EXTERNAL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4428,6 +4568,11 @@ macro_rules! __pgrx_c_args_VARATT_CAN_MAKE_SHORT {
             @argument [__pgrx_c_args_VARATT_CAN_MAKE_SHORT] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_CAN_MAKE_SHORT] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4465,6 +4610,13 @@ macro_rules! __pgrx_c_args_VARATT_CAN_MAKE_SHORT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_CAN_MAKE_SHORT] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4481,7 +4633,7 @@ macro_rules! __pgrx_c_args_VARATT_CAN_MAKE_SHORT {
         $crate::VARATT_CAN_MAKE_SHORT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_CAN_MAKE_SHORT from varatt.h:258
@@ -4759,13 +4911,13 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
         $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4779,7 +4931,7 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -5040,7 +5192,7 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5377,6 +5529,13 @@ macro_rules! __pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5414,6 +5573,13 @@ macro_rules! __pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5430,7 +5596,7 @@ macro_rules! __pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE {
         $crate::VARATT_CONVERTED_SHORT_SIZE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_CONVERTED_SHORT_SIZE from varatt.h:261
@@ -5597,13 +5763,13 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
         $crate::__pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE!(
@@ -5620,7 +5786,7 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::add::<
@@ -5756,7 +5922,7 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5985,6 +6151,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6022,6 +6195,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6038,7 +6218,7 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD {
         $crate::VARATT_EXTERNAL_GET_COMPRESS_METHOD!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_EXTERNAL_GET_COMPRESS_METHOD from varatt.h:336
@@ -6104,7 +6284,7 @@ macro_rules! VARATT_EXTERNAL_GET_COMPRESS_METHOD {
         )
     };
     (@__pgrx_emit_place; $toast_pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD!(
@@ -6113,7 +6293,7 @@ macro_rules! VARATT_EXTERNAL_GET_COMPRESS_METHOD {
         )
     };
     (@__pgrx_emit_read_place; $toast_pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD!(
@@ -6129,7 +6309,7 @@ macro_rules! VARATT_EXTERNAL_GET_COMPRESS_METHOD {
                         $crate::__pgrx_c_operand!(@check_safety; $toast_pointer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::shr(
@@ -6152,7 +6332,7 @@ macro_rules! VARATT_EXTERNAL_GET_COMPRESS_METHOD {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6280,6 +6460,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6317,6 +6504,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6333,7 +6527,7 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE {
         $crate::VARATT_EXTERNAL_GET_EXTSIZE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_EXTERNAL_GET_EXTSIZE from varatt.h:334
@@ -6392,13 +6586,13 @@ macro_rules! VARATT_EXTERNAL_GET_EXTSIZE {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $toast_pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $toast_pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE!(
@@ -6414,7 +6608,7 @@ macro_rules! VARATT_EXTERNAL_GET_EXTSIZE {
                         $crate::__pgrx_c_operand!(@check_safety; $toast_pointer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -6437,7 +6631,7 @@ macro_rules! VARATT_EXTERNAL_GET_EXTSIZE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6562,6 +6756,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6599,6 +6800,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6615,7 +6823,7 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED {
         $crate::VARATT_EXTERNAL_IS_COMPRESSED!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_EXTERNAL_IS_COMPRESSED from varatt.h:354
@@ -6723,7 +6931,7 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
         )
     };
     (@__pgrx_emit_place; $toast_pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED!(
@@ -6732,7 +6940,7 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
         )
     };
     (@__pgrx_emit_read_place; $toast_pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED!(
@@ -6749,7 +6957,7 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
                         $crate::__pgrx_c_operand!(@check_safety; $toast_pointer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::lt(
@@ -6841,7 +7049,7 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7005,6 +7213,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7060,6 +7275,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
             @argument [__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD] [
                 p2 $mode [$($done)*] [$($rest)*]
             ] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -7128,6 +7350,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
             ] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD] [
+                p3 $mode [$($done)*] []
+            ] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7165,6 +7394,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
             ] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD] [
+                p3 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7181,7 +7417,7 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
         $crate::VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD from varatt.h:339
@@ -7313,7 +7549,7 @@ macro_rules! VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
         )
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
@@ -7400,6 +7636,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_1B {
             @argument [__pgrx_c_args_VARATT_IS_1B] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_1B] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_1B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7435,6 +7676,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_1B {
             @argument [__pgrx_c_args_VARATT_IS_1B] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_1B] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_1B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7451,7 +7697,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_1B {
         $crate::VARATT_IS_1B!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_1B from varatt.h:217
@@ -7554,13 +7800,13 @@ macro_rules! VARATT_IS_1B {
         $crate::__pgrx_c_args_VARATT_IS_1B!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_1B!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_1B!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7573,7 +7819,7 @@ macro_rules! VARATT_IS_1B {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -7645,7 +7891,7 @@ macro_rules! VARATT_IS_1B {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7802,6 +8048,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_1B_E {
             @argument [__pgrx_c_args_VARATT_IS_1B_E] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_1B_E] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_1B_E!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7839,6 +8090,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_1B_E {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_1B_E] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_1B_E!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7855,7 +8111,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_1B_E {
         $crate::VARATT_IS_1B_E!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_1B_E from varatt.h:219
@@ -7949,13 +8205,13 @@ macro_rules! VARATT_IS_1B_E {
         $crate::__pgrx_c_args_VARATT_IS_1B_E!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_1B_E!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_1B_E!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7968,7 +8224,7 @@ macro_rules! VARATT_IS_1B_E {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -8025,7 +8281,7 @@ macro_rules! VARATT_IS_1B_E {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8173,6 +8429,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B {
             @argument [__pgrx_c_args_VARATT_IS_4B] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_4B] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_4B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8208,6 +8469,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B {
             @argument [__pgrx_c_args_VARATT_IS_4B] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_4B] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8224,7 +8490,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B {
         $crate::VARATT_IS_4B!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_4B from varatt.h:211
@@ -8329,13 +8595,13 @@ macro_rules! VARATT_IS_4B {
         $crate::__pgrx_c_args_VARATT_IS_4B!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8348,7 +8614,7 @@ macro_rules! VARATT_IS_4B {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -8422,7 +8688,7 @@ macro_rules! VARATT_IS_4B {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8581,6 +8847,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B_C {
             @argument [__pgrx_c_args_VARATT_IS_4B_C] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_4B_C] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_C!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8618,6 +8889,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B_C {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_4B_C] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_C!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8634,7 +8910,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B_C {
         $crate::VARATT_IS_4B_C!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_4B_C from varatt.h:215
@@ -8737,13 +9013,13 @@ macro_rules! VARATT_IS_4B_C {
         $crate::__pgrx_c_args_VARATT_IS_4B_C!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_C!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_C!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8756,7 +9032,7 @@ macro_rules! VARATT_IS_4B_C {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -8828,7 +9104,7 @@ macro_rules! VARATT_IS_4B_C {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8985,6 +9261,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B_U {
             @argument [__pgrx_c_args_VARATT_IS_4B_U] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_4B_U] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_U!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9022,6 +9303,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B_U {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_4B_U] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_U!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9038,7 +9324,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B_U {
         $crate::VARATT_IS_4B_U!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_4B_U from varatt.h:213
@@ -9143,13 +9429,13 @@ macro_rules! VARATT_IS_4B_U {
         $crate::__pgrx_c_args_VARATT_IS_4B_U!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_U!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_U!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -9162,7 +9448,7 @@ macro_rules! VARATT_IS_4B_U {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -9236,7 +9522,7 @@ macro_rules! VARATT_IS_4B_U {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9398,6 +9684,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_COMPRESSED {
             @argument [__pgrx_c_args_VARATT_IS_COMPRESSED] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_COMPRESSED] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9435,6 +9726,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_COMPRESSED {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_COMPRESSED] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9451,7 +9749,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_COMPRESSED {
         $crate::VARATT_IS_COMPRESSED!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_COMPRESSED from varatt.h:288
@@ -9555,13 +9853,13 @@ macro_rules! VARATT_IS_COMPRESSED {
         $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -9575,7 +9873,7 @@ macro_rules! VARATT_IS_COMPRESSED {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -9647,7 +9945,7 @@ macro_rules! VARATT_IS_COMPRESSED {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9805,6 +10103,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTENDED {
             @argument [__pgrx_c_args_VARATT_IS_EXTENDED] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTENDED] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9842,6 +10145,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTENDED {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTENDED] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9858,7 +10168,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTENDED {
         $crate::VARATT_IS_EXTENDED!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_EXTENDED from varatt.h:303
@@ -9976,13 +10286,13 @@ macro_rules! VARATT_IS_EXTENDED {
         $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -9996,7 +10306,7 @@ macro_rules! VARATT_IS_EXTENDED {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::logical_not(
@@ -10084,7 +10394,7 @@ macro_rules! VARATT_IS_EXTENDED {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10256,6 +10566,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL {
             @argument [__pgrx_c_args_VARATT_IS_EXTERNAL] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10293,6 +10608,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10309,7 +10631,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL {
         $crate::VARATT_IS_EXTERNAL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_EXTERNAL from varatt.h:289
@@ -10404,13 +10726,13 @@ macro_rules! VARATT_IS_EXTERNAL {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -10424,7 +10746,7 @@ macro_rules! VARATT_IS_EXTERNAL {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -10481,7 +10803,7 @@ macro_rules! VARATT_IS_EXTERNAL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10635,6 +10957,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10672,6 +11001,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10688,7 +11024,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED {
         $crate::VARATT_IS_EXTERNAL_EXPANDED!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_EXTERNAL_EXPANDED from varatt.h:298
@@ -10889,13 +11225,13 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED!(
@@ -10912,7 +11248,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -11086,7 +11422,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -11349,6 +11685,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11386,6 +11729,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11402,7 +11752,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO {
         $crate::VARATT_IS_EXTERNAL_EXPANDED_RO!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_EXTERNAL_EXPANDED_RO from varatt.h:294
@@ -11571,7 +11921,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
         )
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO!(
@@ -11580,7 +11930,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
         )
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO!(
@@ -11597,7 +11947,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -11740,7 +12090,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -11974,6 +12324,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12011,6 +12368,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12027,7 +12391,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW {
         $crate::VARATT_IS_EXTERNAL_EXPANDED_RW!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_EXTERNAL_EXPANDED_RW from varatt.h:296
@@ -12196,7 +12560,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
         )
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW!(
@@ -12205,7 +12569,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
         )
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW!(
@@ -12222,7 +12586,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -12365,7 +12729,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -12596,6 +12960,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12633,6 +13004,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12649,7 +13027,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT {
         $crate::VARATT_IS_EXTERNAL_INDIRECT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_EXTERNAL_INDIRECT from varatt.h:292
@@ -12815,13 +13193,13 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT!(
@@ -12838,7 +13216,7 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -12981,7 +13359,7 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -13209,6 +13587,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13246,6 +13631,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13262,7 +13654,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED {
         $crate::VARATT_IS_EXTERNAL_NON_EXPANDED!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_EXTERNAL_NON_EXPANDED from varatt.h:300
@@ -13473,7 +13865,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
         )
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED!(
@@ -13482,7 +13874,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
         )
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED!(
@@ -13499,7 +13891,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -13677,7 +14069,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -13950,6 +14342,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13987,6 +14386,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14003,7 +14409,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK {
         $crate::VARATT_IS_EXTERNAL_ONDISK!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_EXTERNAL_ONDISK from varatt.h:290
@@ -14169,13 +14575,13 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK!(
@@ -14192,7 +14598,7 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -14335,7 +14741,7 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -14552,6 +14958,11 @@ macro_rules! __pgrx_c_args_VARATT_IS_SHORT {
             @argument [__pgrx_c_args_VARATT_IS_SHORT] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_SHORT] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_SHORT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14589,6 +15000,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_SHORT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_SHORT] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_SHORT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14605,7 +15023,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_SHORT {
         $crate::VARATT_IS_SHORT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_SHORT from varatt.h:302
@@ -14709,13 +15127,13 @@ macro_rules! VARATT_IS_SHORT {
         $crate::__pgrx_c_args_VARATT_IS_SHORT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_SHORT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_SHORT!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -14729,7 +15147,7 @@ macro_rules! VARATT_IS_SHORT {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -14801,7 +15219,7 @@ macro_rules! VARATT_IS_SHORT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -14959,6 +15377,11 @@ macro_rules! __pgrx_c_args_VARATT_NOT_PAD_BYTE {
             @argument [__pgrx_c_args_VARATT_NOT_PAD_BYTE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_NOT_PAD_BYTE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14996,6 +15419,13 @@ macro_rules! __pgrx_c_args_VARATT_NOT_PAD_BYTE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_NOT_PAD_BYTE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15012,7 +15442,7 @@ macro_rules! __pgrx_c_args_VARATT_NOT_PAD_BYTE {
         $crate::VARATT_NOT_PAD_BYTE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_NOT_PAD_BYTE from varatt.h:221
@@ -15088,13 +15518,13 @@ macro_rules! VARATT_NOT_PAD_BYTE {
         $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -15107,7 +15537,7 @@ macro_rules! VARATT_NOT_PAD_BYTE {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -15154,7 +15584,7 @@ macro_rules! VARATT_NOT_PAD_BYTE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -15282,6 +15712,11 @@ macro_rules! __pgrx_c_args_VARDATA {
             @argument [__pgrx_c_args_VARDATA] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARDATA!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15317,6 +15752,11 @@ macro_rules! __pgrx_c_args_VARDATA {
             @argument [__pgrx_c_args_VARDATA] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15333,7 +15773,7 @@ macro_rules! __pgrx_c_args_VARDATA {
         $crate::VARDATA!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARDATA from varatt.h:278
@@ -15509,7 +15949,7 @@ macro_rules! VARDATA {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_va_data,
@@ -15557,7 +15997,7 @@ macro_rules! VARDATA {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -15693,6 +16133,11 @@ macro_rules! __pgrx_c_args_VARDATA_1B {
             @argument [__pgrx_c_args_VARDATA_1B] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_1B] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARDATA_1B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15728,6 +16173,11 @@ macro_rules! __pgrx_c_args_VARDATA_1B {
             @argument [__pgrx_c_args_VARDATA_1B] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_1B] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_1B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15744,7 +16194,7 @@ macro_rules! __pgrx_c_args_VARDATA_1B {
         $crate::VARDATA_1B!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARDATA_1B from varatt.h:246
@@ -15896,7 +16346,7 @@ macro_rules! VARDATA_1B {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_va_data,
@@ -15930,7 +16380,7 @@ macro_rules! VARDATA_1B {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -16059,6 +16509,11 @@ macro_rules! __pgrx_c_args_VARDATA_1B_E {
             @argument [__pgrx_c_args_VARDATA_1B_E] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_1B_E] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARDATA_1B_E!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16094,6 +16549,11 @@ macro_rules! __pgrx_c_args_VARDATA_1B_E {
             @argument [__pgrx_c_args_VARDATA_1B_E] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_1B_E] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_1B_E!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16110,7 +16570,7 @@ macro_rules! __pgrx_c_args_VARDATA_1B_E {
         $crate::VARDATA_1B_E!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARDATA_1B_E from varatt.h:247
@@ -16262,7 +16722,7 @@ macro_rules! VARDATA_1B_E {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_va_data,
@@ -16296,7 +16756,7 @@ macro_rules! VARDATA_1B_E {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -16425,6 +16885,11 @@ macro_rules! __pgrx_c_args_VARDATA_4B {
             @argument [__pgrx_c_args_VARDATA_4B] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_4B] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARDATA_4B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16460,6 +16925,11 @@ macro_rules! __pgrx_c_args_VARDATA_4B {
             @argument [__pgrx_c_args_VARDATA_4B] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_4B] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_4B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16476,7 +16946,7 @@ macro_rules! __pgrx_c_args_VARDATA_4B {
         $crate::VARDATA_4B!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARDATA_4B from varatt.h:244
@@ -16648,7 +17118,7 @@ macro_rules! VARDATA_4B {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_va_data,
@@ -16696,7 +17166,7 @@ macro_rules! VARDATA_4B {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -16831,6 +17301,11 @@ macro_rules! __pgrx_c_args_VARDATA_4B_C {
             @argument [__pgrx_c_args_VARDATA_4B_C] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_4B_C] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARDATA_4B_C!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16866,6 +17341,11 @@ macro_rules! __pgrx_c_args_VARDATA_4B_C {
             @argument [__pgrx_c_args_VARDATA_4B_C] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_4B_C] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_4B_C!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16882,7 +17362,7 @@ macro_rules! __pgrx_c_args_VARDATA_4B_C {
         $crate::VARDATA_4B_C!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARDATA_4B_C from varatt.h:245
@@ -17054,7 +17534,7 @@ macro_rules! VARDATA_4B_C {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_va_data,
@@ -17102,7 +17582,7 @@ macro_rules! VARDATA_4B_C {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -17237,6 +17717,11 @@ macro_rules! __pgrx_c_args_VARDATA_ANY {
             @argument [__pgrx_c_args_VARDATA_ANY] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_ANY] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARDATA_ANY!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17272,6 +17757,11 @@ macro_rules! __pgrx_c_args_VARDATA_ANY {
             @argument [__pgrx_c_args_VARDATA_ANY] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_ANY] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_ANY!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17288,7 +17778,7 @@ macro_rules! __pgrx_c_args_VARDATA_ANY {
         $crate::VARDATA_ANY!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARDATA_ANY from varatt.h:324
@@ -17509,13 +17999,13 @@ macro_rules! VARDATA_ANY {
         $crate::__pgrx_c_args_VARDATA_ANY!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_ANY!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_ANY!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -17529,7 +18019,7 @@ macro_rules! VARDATA_ANY {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -17726,7 +18216,7 @@ macro_rules! VARDATA_ANY {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -18012,6 +18502,13 @@ macro_rules! __pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD] [
+                p1 $mode [$($done)*] []
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18049,6 +18546,13 @@ macro_rules! __pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18065,7 +18569,7 @@ macro_rules! __pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
         $crate::VARDATA_COMPRESSED_GET_COMPRESS_METHOD!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARDATA_COMPRESSED_GET_COMPRESS_METHOD from varatt.h:330
@@ -18169,7 +18673,7 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
         )
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD!(
@@ -18178,7 +18682,7 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
         )
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD!(
@@ -18194,7 +18698,7 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::shr(
@@ -18255,7 +18759,7 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -18424,6 +18928,13 @@ macro_rules! __pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18461,6 +18972,13 @@ macro_rules! __pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18477,7 +18995,7 @@ macro_rules! __pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE {
         $crate::VARDATA_COMPRESSED_GET_EXTSIZE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARDATA_COMPRESSED_GET_EXTSIZE from varatt.h:328
@@ -18581,7 +19099,7 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
         )
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE!(
@@ -18590,7 +19108,7 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
         )
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE!(
@@ -18606,7 +19124,7 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -18667,7 +19185,7 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -18828,6 +19346,11 @@ macro_rules! __pgrx_c_args_VARDATA_EXTERNAL {
             @argument [__pgrx_c_args_VARDATA_EXTERNAL] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_EXTERNAL] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARDATA_EXTERNAL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18865,6 +19388,13 @@ macro_rules! __pgrx_c_args_VARDATA_EXTERNAL {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_EXTERNAL] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_EXTERNAL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18881,7 +19411,7 @@ macro_rules! __pgrx_c_args_VARDATA_EXTERNAL {
         $crate::VARDATA_EXTERNAL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARDATA_EXTERNAL from varatt.h:286
@@ -19037,7 +19567,7 @@ macro_rules! VARDATA_EXTERNAL {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_va_data,
@@ -19071,7 +19601,7 @@ macro_rules! VARDATA_EXTERNAL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -19201,6 +19731,11 @@ macro_rules! __pgrx_c_args_VARDATA_SHORT {
             @argument [__pgrx_c_args_VARDATA_SHORT] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_SHORT] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARDATA_SHORT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19238,6 +19773,11 @@ macro_rules! __pgrx_c_args_VARDATA_SHORT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARDATA_SHORT] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_SHORT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19254,7 +19794,7 @@ macro_rules! __pgrx_c_args_VARDATA_SHORT {
         $crate::VARDATA_SHORT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARDATA_SHORT from varatt.h:282
@@ -19410,7 +19950,7 @@ macro_rules! VARDATA_SHORT {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_va_data,
@@ -19444,7 +19984,7 @@ macro_rules! VARDATA_SHORT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -19572,6 +20112,11 @@ macro_rules! __pgrx_c_args_VARSIZE {
             @argument [__pgrx_c_args_VARSIZE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARSIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19607,6 +20152,11 @@ macro_rules! __pgrx_c_args_VARSIZE {
             @argument [__pgrx_c_args_VARSIZE] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19623,7 +20173,7 @@ macro_rules! __pgrx_c_args_VARSIZE {
         $crate::VARSIZE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARSIZE from varatt.h:279
@@ -19733,13 +20283,13 @@ macro_rules! VARSIZE {
         $crate::__pgrx_c_args_VARSIZE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -19753,7 +20303,7 @@ macro_rules! VARSIZE {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -19833,7 +20383,7 @@ macro_rules! VARSIZE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -19997,6 +20547,11 @@ macro_rules! __pgrx_c_args_VARSIZE_1B {
             @argument [__pgrx_c_args_VARSIZE_1B] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE_1B] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARSIZE_1B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20032,6 +20587,11 @@ macro_rules! __pgrx_c_args_VARSIZE_1B {
             @argument [__pgrx_c_args_VARSIZE_1B] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE_1B] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_1B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20048,7 +20608,7 @@ macro_rules! __pgrx_c_args_VARSIZE_1B {
         $crate::VARSIZE_1B!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARSIZE_1B from varatt.h:227
@@ -20151,13 +20711,13 @@ macro_rules! VARSIZE_1B {
         $crate::__pgrx_c_args_VARSIZE_1B!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_1B!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_1B!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -20170,7 +20730,7 @@ macro_rules! VARSIZE_1B {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -20242,7 +20802,7 @@ macro_rules! VARSIZE_1B {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -20399,6 +20959,11 @@ macro_rules! __pgrx_c_args_VARSIZE_4B {
             @argument [__pgrx_c_args_VARSIZE_4B] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE_4B] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARSIZE_4B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20434,6 +20999,11 @@ macro_rules! __pgrx_c_args_VARSIZE_4B {
             @argument [__pgrx_c_args_VARSIZE_4B] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE_4B] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_4B!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20450,7 +21020,7 @@ macro_rules! __pgrx_c_args_VARSIZE_4B {
         $crate::VARSIZE_4B!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARSIZE_4B from varatt.h:225
@@ -20559,13 +21129,13 @@ macro_rules! VARSIZE_4B {
         $crate::__pgrx_c_args_VARSIZE_4B!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_4B!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_4B!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -20578,7 +21148,7 @@ macro_rules! VARSIZE_4B {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -20658,7 +21228,7 @@ macro_rules! VARSIZE_4B {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -20821,6 +21391,11 @@ macro_rules! __pgrx_c_args_VARSIZE_ANY {
             @argument [__pgrx_c_args_VARSIZE_ANY] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE_ANY] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARSIZE_ANY!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20856,6 +21431,11 @@ macro_rules! __pgrx_c_args_VARSIZE_ANY {
             @argument [__pgrx_c_args_VARSIZE_ANY] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE_ANY] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_ANY!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20872,7 +21452,7 @@ macro_rules! __pgrx_c_args_VARSIZE_ANY {
         $crate::VARSIZE_ANY!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARSIZE_ANY from varatt.h:311
@@ -21611,13 +22191,13 @@ macro_rules! VARSIZE_ANY {
         $crate::__pgrx_c_args_VARSIZE_ANY!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_ANY!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_ANY!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -21631,7 +22211,7 @@ macro_rules! VARSIZE_ANY {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -22349,7 +22929,7 @@ macro_rules! VARSIZE_ANY {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -23142,6 +23722,11 @@ macro_rules! __pgrx_c_args_VARSIZE_ANY_EXHDR {
             @argument [__pgrx_c_args_VARSIZE_ANY_EXHDR] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE_ANY_EXHDR] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -23179,6 +23764,13 @@ macro_rules! __pgrx_c_args_VARSIZE_ANY_EXHDR {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE_ANY_EXHDR] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -23195,7 +23787,7 @@ macro_rules! __pgrx_c_args_VARSIZE_ANY_EXHDR {
         $crate::VARSIZE_ANY_EXHDR!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARSIZE_ANY_EXHDR from varatt.h:317
@@ -24013,13 +24605,13 @@ macro_rules! VARSIZE_ANY_EXHDR {
         $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -24033,7 +24625,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -24839,7 +25431,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -25711,6 +26303,11 @@ macro_rules! __pgrx_c_args_VARSIZE_EXTERNAL {
             @argument [__pgrx_c_args_VARSIZE_EXTERNAL] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE_EXTERNAL] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -25748,6 +26345,13 @@ macro_rules! __pgrx_c_args_VARSIZE_EXTERNAL {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE_EXTERNAL] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -25764,7 +26368,7 @@ macro_rules! __pgrx_c_args_VARSIZE_EXTERNAL {
         $crate::VARSIZE_EXTERNAL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARSIZE_EXTERNAL from varatt.h:285
@@ -26157,13 +26761,13 @@ macro_rules! VARSIZE_EXTERNAL {
         $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -26177,7 +26781,7 @@ macro_rules! VARSIZE_EXTERNAL {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::add::<
@@ -26541,7 +27145,7 @@ macro_rules! VARSIZE_EXTERNAL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -26988,6 +27592,11 @@ macro_rules! __pgrx_c_args_VARSIZE_SHORT {
             @argument [__pgrx_c_args_VARSIZE_SHORT] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE_SHORT] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARSIZE_SHORT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -27025,6 +27634,11 @@ macro_rules! __pgrx_c_args_VARSIZE_SHORT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARSIZE_SHORT] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_SHORT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -27041,7 +27655,7 @@ macro_rules! __pgrx_c_args_VARSIZE_SHORT {
         $crate::VARSIZE_SHORT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARSIZE_SHORT from varatt.h:281
@@ -27145,13 +27759,13 @@ macro_rules! VARSIZE_SHORT {
         $crate::__pgrx_c_args_VARSIZE_SHORT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_SHORT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_SHORT!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -27165,7 +27779,7 @@ macro_rules! VARSIZE_SHORT {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -27237,7 +27851,7 @@ macro_rules! VARSIZE_SHORT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -27395,6 +28009,11 @@ macro_rules! __pgrx_c_args_VARTAG_1B_E {
             @argument [__pgrx_c_args_VARTAG_1B_E] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARTAG_1B_E] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARTAG_1B_E!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -27430,6 +28049,11 @@ macro_rules! __pgrx_c_args_VARTAG_1B_E {
             @argument [__pgrx_c_args_VARTAG_1B_E] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARTAG_1B_E] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_1B_E!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -27446,7 +28070,7 @@ macro_rules! __pgrx_c_args_VARTAG_1B_E {
         $crate::VARTAG_1B_E!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARTAG_1B_E from varatt.h:229
@@ -27598,7 +28222,7 @@ macro_rules! VARTAG_1B_E {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_va_tag,
@@ -27632,7 +28256,7 @@ macro_rules! VARTAG_1B_E {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -27761,6 +28385,11 @@ macro_rules! __pgrx_c_args_VARTAG_EXTERNAL {
             @argument [__pgrx_c_args_VARTAG_EXTERNAL] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARTAG_EXTERNAL] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARTAG_EXTERNAL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -27798,6 +28427,13 @@ macro_rules! __pgrx_c_args_VARTAG_EXTERNAL {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARTAG_EXTERNAL] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_EXTERNAL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -27814,7 +28450,7 @@ macro_rules! __pgrx_c_args_VARTAG_EXTERNAL {
         $crate::VARTAG_EXTERNAL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARTAG_EXTERNAL from varatt.h:284
@@ -27970,7 +28606,7 @@ macro_rules! VARTAG_EXTERNAL {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_va_tag,
@@ -28004,7 +28640,7 @@ macro_rules! VARTAG_EXTERNAL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -28134,6 +28770,11 @@ macro_rules! __pgrx_c_args_VARTAG_IS_EXPANDED {
             @argument [__pgrx_c_args_VARTAG_IS_EXPANDED] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARTAG_IS_EXPANDED] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -28171,6 +28812,13 @@ macro_rules! __pgrx_c_args_VARTAG_IS_EXPANDED {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARTAG_IS_EXPANDED] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -28187,7 +28835,7 @@ macro_rules! __pgrx_c_args_VARTAG_IS_EXPANDED {
         $crate::VARTAG_IS_EXPANDED!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARTAG_IS_EXPANDED from varatt.h:93
@@ -28257,13 +28905,13 @@ macro_rules! VARTAG_IS_EXPANDED {
         $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -28276,7 +28924,7 @@ macro_rules! VARTAG_IS_EXPANDED {
                         $crate::__pgrx_c_operand!(@check_safety; $tag);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -28317,7 +28965,7 @@ macro_rules! VARTAG_IS_EXPANDED {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -28445,6 +29093,11 @@ macro_rules! __pgrx_c_args_VARTAG_SIZE {
             @argument [__pgrx_c_args_VARTAG_SIZE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARTAG_SIZE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARTAG_SIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -28480,6 +29133,11 @@ macro_rules! __pgrx_c_args_VARTAG_SIZE {
             @argument [__pgrx_c_args_VARTAG_SIZE] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARTAG_SIZE] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_SIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -28496,7 +29154,7 @@ macro_rules! __pgrx_c_args_VARTAG_SIZE {
         $crate::VARTAG_SIZE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARTAG_SIZE from varatt.h:96
@@ -28739,13 +29397,13 @@ macro_rules! VARTAG_SIZE {
         $crate::__pgrx_c_args_VARTAG_SIZE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_SIZE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_SIZE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -28759,7 +29417,7 @@ macro_rules! VARTAG_SIZE {
                         $crate::__pgrx_c_operand!(@check_safety; $tag);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -28982,7 +29640,7 @@ macro_rules! VARTAG_SIZE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

@@ -77,6 +77,13 @@ macro_rules! __pgrx_c_args_ScanDirectionCombine {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ScanDirectionCombine] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ScanDirectionCombine!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -138,6 +145,11 @@ macro_rules! __pgrx_c_args_ScanDirectionCombine {
             @argument [__pgrx_c_args_ScanDirectionCombine] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ScanDirectionCombine] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ScanDirectionCombine!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -175,6 +187,13 @@ macro_rules! __pgrx_c_args_ScanDirectionCombine {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ScanDirectionCombine] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ScanDirectionCombine!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -191,7 +210,7 @@ macro_rules! __pgrx_c_args_ScanDirectionCombine {
         $crate::ScanDirectionCombine!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ScanDirectionCombine from sdir.h:36
@@ -248,13 +267,13 @@ macro_rules! ScanDirectionCombine {
         $crate::__pgrx_c_args_ScanDirectionCombine!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ScanDirectionCombine!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ScanDirectionCombine!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -268,7 +287,7 @@ macro_rules! ScanDirectionCombine {
                         $crate::__pgrx_c_operand!(@check_safety; $b);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::mul::<
@@ -291,7 +310,7 @@ macro_rules! ScanDirectionCombine {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -406,6 +425,11 @@ macro_rules! __pgrx_c_args_ScanDirectionIsBackward {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ScanDirectionIsBackward] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ScanDirectionIsBackward!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -443,6 +467,13 @@ macro_rules! __pgrx_c_args_ScanDirectionIsBackward {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ScanDirectionIsBackward] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ScanDirectionIsBackward!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -459,7 +490,7 @@ macro_rules! __pgrx_c_args_ScanDirectionIsBackward {
         $crate::ScanDirectionIsBackward!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ScanDirectionIsBackward from sdir.h:50
@@ -525,13 +556,13 @@ macro_rules! ScanDirectionIsBackward {
         $crate::__pgrx_c_args_ScanDirectionIsBackward!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $direction:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ScanDirectionIsBackward!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $direction:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ScanDirectionIsBackward!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -545,7 +576,7 @@ macro_rules! ScanDirectionIsBackward {
                         $crate::__pgrx_c_operand!(@check_safety; $direction);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -584,7 +615,7 @@ macro_rules! ScanDirectionIsBackward {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -706,6 +737,11 @@ macro_rules! __pgrx_c_args_ScanDirectionIsForward {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ScanDirectionIsForward] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ScanDirectionIsForward!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -743,6 +779,13 @@ macro_rules! __pgrx_c_args_ScanDirectionIsForward {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ScanDirectionIsForward] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ScanDirectionIsForward!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -759,7 +802,7 @@ macro_rules! __pgrx_c_args_ScanDirectionIsForward {
         $crate::ScanDirectionIsForward!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ScanDirectionIsForward from sdir.h:64
@@ -825,13 +868,13 @@ macro_rules! ScanDirectionIsForward {
         $crate::__pgrx_c_args_ScanDirectionIsForward!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $direction:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ScanDirectionIsForward!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $direction:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ScanDirectionIsForward!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -845,7 +888,7 @@ macro_rules! ScanDirectionIsForward {
                         $crate::__pgrx_c_operand!(@check_safety; $direction);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -884,7 +927,7 @@ macro_rules! ScanDirectionIsForward {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1006,6 +1049,13 @@ macro_rules! __pgrx_c_args_ScanDirectionIsNoMovement {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ScanDirectionIsNoMovement] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ScanDirectionIsNoMovement!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1043,6 +1093,13 @@ macro_rules! __pgrx_c_args_ScanDirectionIsNoMovement {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ScanDirectionIsNoMovement] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ScanDirectionIsNoMovement!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1059,7 +1116,7 @@ macro_rules! __pgrx_c_args_ScanDirectionIsNoMovement {
         $crate::ScanDirectionIsNoMovement!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ScanDirectionIsNoMovement from sdir.h:57
@@ -1129,13 +1186,13 @@ macro_rules! ScanDirectionIsNoMovement {
         $crate::__pgrx_c_args_ScanDirectionIsNoMovement!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $direction:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ScanDirectionIsNoMovement!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $direction:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ScanDirectionIsNoMovement!(
@@ -1152,7 +1209,7 @@ macro_rules! ScanDirectionIsNoMovement {
                         $crate::__pgrx_c_operand!(@check_safety; $direction);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -1193,7 +1250,7 @@ macro_rules! ScanDirectionIsNoMovement {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1317,6 +1374,11 @@ macro_rules! __pgrx_c_args_ScanDirectionIsValid {
             @argument [__pgrx_c_args_ScanDirectionIsValid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ScanDirectionIsValid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ScanDirectionIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1354,6 +1416,13 @@ macro_rules! __pgrx_c_args_ScanDirectionIsValid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ScanDirectionIsValid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ScanDirectionIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1370,7 +1439,7 @@ macro_rules! __pgrx_c_args_ScanDirectionIsValid {
         $crate::ScanDirectionIsValid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ScanDirectionIsValid from sdir.h:42
@@ -1480,13 +1549,13 @@ macro_rules! ScanDirectionIsValid {
         $crate::__pgrx_c_args_ScanDirectionIsValid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $direction:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ScanDirectionIsValid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $direction:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ScanDirectionIsValid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1500,7 +1569,7 @@ macro_rules! ScanDirectionIsValid {
                         $crate::__pgrx_c_operand!(@check_safety; $direction);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -1583,7 +1652,7 @@ macro_rules! ScanDirectionIsValid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

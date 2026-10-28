@@ -86,6 +86,13 @@ macro_rules! __pgrx_c_args_pg_atomic_clear_flag_impl {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_atomic_clear_flag_impl] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_atomic_clear_flag_impl!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -123,6 +130,13 @@ macro_rules! __pgrx_c_args_pg_atomic_clear_flag_impl {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_atomic_clear_flag_impl] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_atomic_clear_flag_impl!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -139,7 +153,7 @@ macro_rules! __pgrx_c_args_pg_atomic_clear_flag_impl {
         $crate::pg_atomic_clear_flag_impl!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_atomic_clear_flag_impl from arch-x86.h:155
@@ -221,13 +235,13 @@ macro_rules! pg_atomic_clear_flag_impl {
         $crate::__pgrx_c_args_pg_atomic_clear_flag_impl!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ptr:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_atomic_clear_flag_impl!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $ptr:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_atomic_clear_flag_impl!(
@@ -243,7 +257,7 @@ macro_rules! pg_atomic_clear_flag_impl {
                         $crate::__pgrx_c_operand!(@check_safety; $ptr);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::pg_atomic_clear_flag_impl(
@@ -277,7 +291,7 @@ macro_rules! pg_atomic_clear_flag_impl {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -400,6 +414,13 @@ macro_rules! __pgrx_c_args_pg_atomic_compare_exchange_u32_impl {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_atomic_compare_exchange_u32_impl] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_atomic_compare_exchange_u32_impl!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -455,6 +476,13 @@ macro_rules! __pgrx_c_args_pg_atomic_compare_exchange_u32_impl {
             @argument [__pgrx_c_args_pg_atomic_compare_exchange_u32_impl] [
                 p2 $mode [$($done)*] [$($rest)*]
             ] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_atomic_compare_exchange_u32_impl] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -523,6 +551,13 @@ macro_rules! __pgrx_c_args_pg_atomic_compare_exchange_u32_impl {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_atomic_compare_exchange_u32_impl] [p3 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_atomic_compare_exchange_u32_impl!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -560,6 +595,13 @@ macro_rules! __pgrx_c_args_pg_atomic_compare_exchange_u32_impl {
             ] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_atomic_compare_exchange_u32_impl] [
+                p3 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_atomic_compare_exchange_u32_impl!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -576,7 +618,7 @@ macro_rules! __pgrx_c_args_pg_atomic_compare_exchange_u32_impl {
         $crate::pg_atomic_compare_exchange_u32_impl!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_atomic_compare_exchange_u32_impl from arch-x86.h:167
@@ -709,7 +751,7 @@ macro_rules! pg_atomic_compare_exchange_u32_impl {
         )
     };
     (@__pgrx_emit_place; $ptr:tt, $expected:tt, $newval:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_atomic_compare_exchange_u32_impl!(
@@ -718,7 +760,7 @@ macro_rules! pg_atomic_compare_exchange_u32_impl {
         )
     };
     (@__pgrx_emit_read_place; $ptr:tt, $expected:tt, $newval:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_atomic_compare_exchange_u32_impl!(
@@ -736,7 +778,7 @@ macro_rules! pg_atomic_compare_exchange_u32_impl {
                         $crate::__pgrx_c_operand!(@check_safety; $newval);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -806,7 +848,7 @@ macro_rules! pg_atomic_compare_exchange_u32_impl {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -970,6 +1012,13 @@ macro_rules! __pgrx_c_args_pg_atomic_compare_exchange_u64_impl {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_atomic_compare_exchange_u64_impl] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_atomic_compare_exchange_u64_impl!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1025,6 +1074,13 @@ macro_rules! __pgrx_c_args_pg_atomic_compare_exchange_u64_impl {
             @argument [__pgrx_c_args_pg_atomic_compare_exchange_u64_impl] [
                 p2 $mode [$($done)*] [$($rest)*]
             ] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_atomic_compare_exchange_u64_impl] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -1093,6 +1149,13 @@ macro_rules! __pgrx_c_args_pg_atomic_compare_exchange_u64_impl {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_atomic_compare_exchange_u64_impl] [p3 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_atomic_compare_exchange_u64_impl!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1130,6 +1193,13 @@ macro_rules! __pgrx_c_args_pg_atomic_compare_exchange_u64_impl {
             ] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_atomic_compare_exchange_u64_impl] [
+                p3 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_atomic_compare_exchange_u64_impl!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1146,7 +1216,7 @@ macro_rules! __pgrx_c_args_pg_atomic_compare_exchange_u64_impl {
         $crate::pg_atomic_compare_exchange_u64_impl!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_atomic_compare_exchange_u64_impl from arch-x86.h:204
@@ -1279,7 +1349,7 @@ macro_rules! pg_atomic_compare_exchange_u64_impl {
         )
     };
     (@__pgrx_emit_place; $ptr:tt, $expected:tt, $newval:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_atomic_compare_exchange_u64_impl!(
@@ -1288,7 +1358,7 @@ macro_rules! pg_atomic_compare_exchange_u64_impl {
         )
     };
     (@__pgrx_emit_read_place; $ptr:tt, $expected:tt, $newval:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_atomic_compare_exchange_u64_impl!(
@@ -1306,7 +1376,7 @@ macro_rules! pg_atomic_compare_exchange_u64_impl {
                         $crate::__pgrx_c_operand!(@check_safety; $newval);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1376,7 +1446,7 @@ macro_rules! pg_atomic_compare_exchange_u64_impl {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1540,6 +1610,13 @@ macro_rules! __pgrx_c_args_pg_atomic_fetch_add_u32_impl {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_atomic_fetch_add_u32_impl] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_atomic_fetch_add_u32_impl!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1606,6 +1683,13 @@ macro_rules! __pgrx_c_args_pg_atomic_fetch_add_u32_impl {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_atomic_fetch_add_u32_impl] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_atomic_fetch_add_u32_impl!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1643,6 +1727,13 @@ macro_rules! __pgrx_c_args_pg_atomic_fetch_add_u32_impl {
             ] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_atomic_fetch_add_u32_impl] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_atomic_fetch_add_u32_impl!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1659,7 +1750,7 @@ macro_rules! __pgrx_c_args_pg_atomic_fetch_add_u32_impl {
         $crate::pg_atomic_fetch_add_u32_impl!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_atomic_fetch_add_u32_impl from arch-x86.h:188
@@ -1756,13 +1847,13 @@ macro_rules! pg_atomic_fetch_add_u32_impl {
         $crate::__pgrx_c_args_pg_atomic_fetch_add_u32_impl!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ptr:tt, $add_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_atomic_fetch_add_u32_impl!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $ptr:tt, $add_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_atomic_fetch_add_u32_impl!(
@@ -1779,7 +1870,7 @@ macro_rules! pg_atomic_fetch_add_u32_impl {
                         $crate::__pgrx_c_operand!(@check_safety; $add_);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1830,7 +1921,7 @@ macro_rules! pg_atomic_fetch_add_u32_impl {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1975,6 +2066,13 @@ macro_rules! __pgrx_c_args_pg_atomic_fetch_add_u64_impl {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_atomic_fetch_add_u64_impl] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_atomic_fetch_add_u64_impl!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2041,6 +2139,13 @@ macro_rules! __pgrx_c_args_pg_atomic_fetch_add_u64_impl {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_atomic_fetch_add_u64_impl] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_atomic_fetch_add_u64_impl!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2078,6 +2183,13 @@ macro_rules! __pgrx_c_args_pg_atomic_fetch_add_u64_impl {
             ] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_atomic_fetch_add_u64_impl] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_atomic_fetch_add_u64_impl!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2094,7 +2206,7 @@ macro_rules! __pgrx_c_args_pg_atomic_fetch_add_u64_impl {
         $crate::pg_atomic_fetch_add_u64_impl!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_atomic_fetch_add_u64_impl from arch-x86.h:225
@@ -2191,13 +2303,13 @@ macro_rules! pg_atomic_fetch_add_u64_impl {
         $crate::__pgrx_c_args_pg_atomic_fetch_add_u64_impl!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ptr:tt, $add_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_atomic_fetch_add_u64_impl!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $ptr:tt, $add_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_atomic_fetch_add_u64_impl!(
@@ -2214,7 +2326,7 @@ macro_rules! pg_atomic_fetch_add_u64_impl {
                         $crate::__pgrx_c_operand!(@check_safety; $add_);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2265,7 +2377,7 @@ macro_rules! pg_atomic_fetch_add_u64_impl {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2419,6 +2531,13 @@ macro_rules! __pgrx_c_args_pg_atomic_test_set_flag_impl {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_atomic_test_set_flag_impl] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_atomic_test_set_flag_impl!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2456,6 +2575,13 @@ macro_rules! __pgrx_c_args_pg_atomic_test_set_flag_impl {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_atomic_test_set_flag_impl] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_atomic_test_set_flag_impl!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2472,7 +2598,7 @@ macro_rules! __pgrx_c_args_pg_atomic_test_set_flag_impl {
         $crate::pg_atomic_test_set_flag_impl!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_atomic_test_set_flag_impl from arch-x86.h:140
@@ -2559,13 +2685,13 @@ macro_rules! pg_atomic_test_set_flag_impl {
         $crate::__pgrx_c_args_pg_atomic_test_set_flag_impl!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ptr:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_atomic_test_set_flag_impl!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $ptr:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_atomic_test_set_flag_impl!(
@@ -2581,7 +2707,7 @@ macro_rules! pg_atomic_test_set_flag_impl {
                         $crate::__pgrx_c_operand!(@check_safety; $ptr);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2619,7 +2745,7 @@ macro_rules! pg_atomic_test_set_flag_impl {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2737,13 +2863,13 @@ macro_rules! pg_spin_delay_impl {
         $crate::pg_spin_delay_impl!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::pg_spin_delay_impl!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::pg_spin_delay_impl!(@__pgrx_emit_read_place; $($raw)*)
@@ -2754,7 +2880,7 @@ macro_rules! pg_spin_delay_impl {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::pg_spin_delay_impl()
@@ -2762,7 +2888,7 @@ macro_rules! pg_spin_delay_impl {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2780,13 +2906,13 @@ macro_rules! pg_spin_delay_impl {
         $crate::pg_spin_delay_impl!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::pg_spin_delay_impl!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 

@@ -59,9 +59,11 @@ macro_rules! __pgrx_c_operand {
     (@size; (@native [$expression:expr])) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
-                Some($crate::__pgrx_c_macros::expression::input($expression))
+                ::core::option::Option::Some(
+                    $crate::__pgrx_c_macros::expression::input($expression)
+                )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -100,15 +102,15 @@ macro_rules! __pgrx_c_operand {
         )
     };
     (@place; (@literal [$argument:expr])) => {
-        compile_error!("a C literal is not an object place")
+        ::core::compile_error!("a C literal is not an object place")
     };
     (@read_place; (@literal [$argument:expr])) => {
-        compile_error!("a C literal is not an object place")
+        ::core::compile_error!("a C literal is not an object place")
     };
     (@size; (@literal [$argument:expr])) => {
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
-                Some(
+                ::core::option::Option::Some(
                     $crate::__pgrx_c_macros::expression::literal::value::<
                         {
                             let __pgrx_c_literal = $argument;
@@ -118,7 +120,7 @@ macro_rules! __pgrx_c_operand {
                     >($argument)
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -160,6 +162,6 @@ macro_rules! __pgrx_c_operand {
         }
     };
     ($($invalid:tt)*) => {
-        compile_error!("invalid C macro operand context")
+        ::core::compile_error!("invalid C macro operand context")
     };
 }

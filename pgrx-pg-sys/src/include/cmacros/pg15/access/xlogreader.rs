@@ -89,6 +89,13 @@ macro_rules! __pgrx_c_args_XLogReaderHasQueuedRecordOrError {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogReaderHasQueuedRecordOrError] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XLogReaderHasQueuedRecordOrError!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -126,6 +133,13 @@ macro_rules! __pgrx_c_args_XLogReaderHasQueuedRecordOrError {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogReaderHasQueuedRecordOrError] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogReaderHasQueuedRecordOrError!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -142,7 +156,7 @@ macro_rules! __pgrx_c_args_XLogReaderHasQueuedRecordOrError {
         $crate::XLogReaderHasQueuedRecordOrError!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function XLogReaderHasQueuedRecordOrError from xlogreader.h:324
@@ -222,7 +236,7 @@ macro_rules! XLogReaderHasQueuedRecordOrError {
         )
     };
     (@__pgrx_emit_place; $state:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLogReaderHasQueuedRecordOrError!(
@@ -231,7 +245,7 @@ macro_rules! XLogReaderHasQueuedRecordOrError {
         )
     };
     (@__pgrx_emit_read_place; $state:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLogReaderHasQueuedRecordOrError!(
@@ -247,7 +261,7 @@ macro_rules! XLogReaderHasQueuedRecordOrError {
                         $crate::__pgrx_c_operand!(@check_safety; $state);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -283,7 +297,7 @@ macro_rules! XLogReaderHasQueuedRecordOrError {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -412,6 +426,13 @@ macro_rules! __pgrx_c_args_XLogRecBlockImageApply {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecBlockImageApply] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogRecBlockImageApply!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -425,7 +446,7 @@ macro_rules! __pgrx_c_args_XLogRecBlockImageApply {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_XLogRecBlockImageApply!(
@@ -433,7 +454,7 @@ macro_rules! __pgrx_c_args_XLogRecBlockImageApply {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogRecBlockImageApply!(
@@ -442,7 +463,7 @@ macro_rules! __pgrx_c_args_XLogRecBlockImageApply {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_XLogRecBlockImageApply!(
@@ -523,7 +544,7 @@ macro_rules! __pgrx_c_args_XLogRecBlockImageApply {
         $crate::XLogRecBlockImageApply!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XLogRecBlockImageApply from xlogreader.h:426
@@ -732,7 +753,7 @@ macro_rules! XLogRecBlockImageApply {
                         $crate::__pgrx_c_operand!(@check_safety; $block_id);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_apply_image,
@@ -786,7 +807,7 @@ macro_rules! XLogRecBlockImageApply {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -928,6 +949,13 @@ macro_rules! __pgrx_c_args_XLogRecGetBlock {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecGetBlock] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogRecGetBlock!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -989,6 +1017,11 @@ macro_rules! __pgrx_c_args_XLogRecGetBlock {
             @argument [__pgrx_c_args_XLogRecGetBlock] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecGetBlock] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XLogRecGetBlock!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1026,6 +1059,13 @@ macro_rules! __pgrx_c_args_XLogRecGetBlock {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecGetBlock] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogRecGetBlock!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1042,7 +1082,7 @@ macro_rules! __pgrx_c_args_XLogRecGetBlock {
         $crate::XLogRecGetBlock!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XLogRecGetBlock from xlogreader.h:420
@@ -1130,13 +1170,13 @@ macro_rules! XLogRecGetBlock {
         $crate::__pgrx_c_args_XLogRecGetBlock!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $decoder:tt, $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLogRecGetBlock!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $decoder:tt, $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLogRecGetBlock!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1150,7 +1190,7 @@ macro_rules! XLogRecGetBlock {
                         $crate::__pgrx_c_operand!(@check_safety; $i);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::address(
@@ -1205,7 +1245,7 @@ macro_rules! XLogRecGetBlock {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1350,6 +1390,11 @@ macro_rules! __pgrx_c_args_XLogRecGetData {
             @argument [__pgrx_c_args_XLogRecGetData] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecGetData] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XLogRecGetData!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1387,6 +1432,11 @@ macro_rules! __pgrx_c_args_XLogRecGetData {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecGetData] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogRecGetData!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1403,7 +1453,7 @@ macro_rules! __pgrx_c_args_XLogRecGetData {
         $crate::XLogRecGetData!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XLogRecGetData from xlogreader.h:416
@@ -1549,7 +1599,7 @@ macro_rules! XLogRecGetData {
                         $crate::__pgrx_c_operand!(@check_safety; $decoder);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_main_data,
@@ -1585,7 +1635,7 @@ macro_rules! XLogRecGetData {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1716,6 +1766,11 @@ macro_rules! __pgrx_c_args_XLogRecGetDataLen {
             @argument [__pgrx_c_args_XLogRecGetDataLen] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecGetDataLen] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XLogRecGetDataLen!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1753,6 +1808,13 @@ macro_rules! __pgrx_c_args_XLogRecGetDataLen {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecGetDataLen] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogRecGetDataLen!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1769,7 +1831,7 @@ macro_rules! __pgrx_c_args_XLogRecGetDataLen {
         $crate::XLogRecGetDataLen!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XLogRecGetDataLen from xlogreader.h:417
@@ -1915,7 +1977,7 @@ macro_rules! XLogRecGetDataLen {
                         $crate::__pgrx_c_operand!(@check_safety; $decoder);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_main_data_len,
@@ -1951,7 +2013,7 @@ macro_rules! XLogRecGetDataLen {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2082,6 +2144,11 @@ macro_rules! __pgrx_c_args_XLogRecGetInfo {
             @argument [__pgrx_c_args_XLogRecGetInfo] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecGetInfo] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XLogRecGetInfo!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2119,6 +2186,11 @@ macro_rules! __pgrx_c_args_XLogRecGetInfo {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecGetInfo] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogRecGetInfo!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2135,7 +2207,7 @@ macro_rules! __pgrx_c_args_XLogRecGetInfo {
         $crate::XLogRecGetInfo!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XLogRecGetInfo from xlogreader.h:411
@@ -2299,7 +2371,7 @@ macro_rules! XLogRecGetInfo {
                         $crate::__pgrx_c_operand!(@check_safety; $decoder);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_xl_info,
@@ -2341,7 +2413,7 @@ macro_rules! XLogRecGetInfo {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2478,6 +2550,11 @@ macro_rules! __pgrx_c_args_XLogRecGetOrigin {
             @argument [__pgrx_c_args_XLogRecGetOrigin] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecGetOrigin] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XLogRecGetOrigin!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2515,6 +2592,13 @@ macro_rules! __pgrx_c_args_XLogRecGetOrigin {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecGetOrigin] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogRecGetOrigin!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2531,7 +2615,7 @@ macro_rules! __pgrx_c_args_XLogRecGetOrigin {
         $crate::XLogRecGetOrigin!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XLogRecGetOrigin from xlogreader.h:414
@@ -2677,7 +2761,7 @@ macro_rules! XLogRecGetOrigin {
                         $crate::__pgrx_c_operand!(@check_safety; $decoder);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_record_origin,
@@ -2713,7 +2797,7 @@ macro_rules! XLogRecGetOrigin {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2844,6 +2928,11 @@ macro_rules! __pgrx_c_args_XLogRecGetPrev {
             @argument [__pgrx_c_args_XLogRecGetPrev] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecGetPrev] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XLogRecGetPrev!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2881,6 +2970,11 @@ macro_rules! __pgrx_c_args_XLogRecGetPrev {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecGetPrev] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogRecGetPrev!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2897,7 +2991,7 @@ macro_rules! __pgrx_c_args_XLogRecGetPrev {
         $crate::XLogRecGetPrev!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XLogRecGetPrev from xlogreader.h:410
@@ -3061,7 +3155,7 @@ macro_rules! XLogRecGetPrev {
                         $crate::__pgrx_c_operand!(@check_safety; $decoder);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_xl_prev,
@@ -3103,7 +3197,7 @@ macro_rules! XLogRecGetPrev {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3240,6 +3334,11 @@ macro_rules! __pgrx_c_args_XLogRecGetRmid {
             @argument [__pgrx_c_args_XLogRecGetRmid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecGetRmid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XLogRecGetRmid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3277,6 +3376,11 @@ macro_rules! __pgrx_c_args_XLogRecGetRmid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecGetRmid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogRecGetRmid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3293,7 +3397,7 @@ macro_rules! __pgrx_c_args_XLogRecGetRmid {
         $crate::XLogRecGetRmid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XLogRecGetRmid from xlogreader.h:412
@@ -3457,7 +3561,7 @@ macro_rules! XLogRecGetRmid {
                         $crate::__pgrx_c_operand!(@check_safety; $decoder);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_xl_rmid,
@@ -3499,7 +3603,7 @@ macro_rules! XLogRecGetRmid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3636,6 +3740,11 @@ macro_rules! __pgrx_c_args_XLogRecGetTopXid {
             @argument [__pgrx_c_args_XLogRecGetTopXid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecGetTopXid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XLogRecGetTopXid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3673,6 +3782,13 @@ macro_rules! __pgrx_c_args_XLogRecGetTopXid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecGetTopXid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogRecGetTopXid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3689,7 +3805,7 @@ macro_rules! __pgrx_c_args_XLogRecGetTopXid {
         $crate::XLogRecGetTopXid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XLogRecGetTopXid from xlogreader.h:415
@@ -3835,7 +3951,7 @@ macro_rules! XLogRecGetTopXid {
                         $crate::__pgrx_c_operand!(@check_safety; $decoder);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_toplevel_xid,
@@ -3871,7 +3987,7 @@ macro_rules! XLogRecGetTopXid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4002,6 +4118,11 @@ macro_rules! __pgrx_c_args_XLogRecGetTotalLen {
             @argument [__pgrx_c_args_XLogRecGetTotalLen] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecGetTotalLen] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XLogRecGetTotalLen!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4039,6 +4160,13 @@ macro_rules! __pgrx_c_args_XLogRecGetTotalLen {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecGetTotalLen] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogRecGetTotalLen!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4055,7 +4183,7 @@ macro_rules! __pgrx_c_args_XLogRecGetTotalLen {
         $crate::XLogRecGetTotalLen!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XLogRecGetTotalLen from xlogreader.h:409
@@ -4219,7 +4347,7 @@ macro_rules! XLogRecGetTotalLen {
                         $crate::__pgrx_c_operand!(@check_safety; $decoder);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_xl_tot_len,
@@ -4261,7 +4389,7 @@ macro_rules! XLogRecGetTotalLen {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4398,6 +4526,11 @@ macro_rules! __pgrx_c_args_XLogRecGetXid {
             @argument [__pgrx_c_args_XLogRecGetXid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecGetXid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XLogRecGetXid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4435,6 +4568,11 @@ macro_rules! __pgrx_c_args_XLogRecGetXid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecGetXid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogRecGetXid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4451,7 +4589,7 @@ macro_rules! __pgrx_c_args_XLogRecGetXid {
         $crate::XLogRecGetXid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XLogRecGetXid from xlogreader.h:413
@@ -4615,7 +4753,7 @@ macro_rules! XLogRecGetXid {
                         $crate::__pgrx_c_operand!(@check_safety; $decoder);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_xl_xid,
@@ -4657,7 +4795,7 @@ macro_rules! XLogRecGetXid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4799,6 +4937,11 @@ macro_rules! __pgrx_c_args_XLogRecHasAnyBlockRefs {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecHasAnyBlockRefs] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XLogRecHasAnyBlockRefs!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4836,6 +4979,13 @@ macro_rules! __pgrx_c_args_XLogRecHasAnyBlockRefs {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecHasAnyBlockRefs] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogRecHasAnyBlockRefs!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4852,7 +5002,7 @@ macro_rules! __pgrx_c_args_XLogRecHasAnyBlockRefs {
         $crate::XLogRecHasAnyBlockRefs!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XLogRecHasAnyBlockRefs from xlogreader.h:418
@@ -4939,13 +5089,13 @@ macro_rules! XLogRecHasAnyBlockRefs {
         $crate::__pgrx_c_args_XLogRecHasAnyBlockRefs!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $decoder:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLogRecHasAnyBlockRefs!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $decoder:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLogRecHasAnyBlockRefs!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4958,7 +5108,7 @@ macro_rules! XLogRecHasAnyBlockRefs {
                         $crate::__pgrx_c_operand!(@check_safety; $decoder);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ge(
@@ -5012,7 +5162,7 @@ macro_rules! XLogRecHasAnyBlockRefs {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5150,6 +5300,13 @@ macro_rules! __pgrx_c_args_XLogRecHasBlockImage {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecHasBlockImage] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogRecHasBlockImage!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5163,7 +5320,7 @@ macro_rules! __pgrx_c_args_XLogRecHasBlockImage {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_XLogRecHasBlockImage!(
@@ -5171,7 +5328,7 @@ macro_rules! __pgrx_c_args_XLogRecHasBlockImage {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogRecHasBlockImage!(
@@ -5180,7 +5337,7 @@ macro_rules! __pgrx_c_args_XLogRecHasBlockImage {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_XLogRecHasBlockImage!(
@@ -5259,7 +5416,7 @@ macro_rules! __pgrx_c_args_XLogRecHasBlockImage {
         $crate::XLogRecHasBlockImage!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XLogRecHasBlockImage from xlogreader.h:424
@@ -5465,7 +5622,7 @@ macro_rules! XLogRecHasBlockImage {
                         $crate::__pgrx_c_operand!(@check_safety; $block_id);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_has_image,
@@ -5519,7 +5676,7 @@ macro_rules! XLogRecHasBlockImage {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5661,6 +5818,13 @@ macro_rules! __pgrx_c_args_XLogRecHasBlockRef {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecHasBlockRef] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogRecHasBlockRef!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5674,7 +5838,7 @@ macro_rules! __pgrx_c_args_XLogRecHasBlockRef {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_XLogRecHasBlockRef!(
@@ -5682,7 +5846,7 @@ macro_rules! __pgrx_c_args_XLogRecHasBlockRef {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogRecHasBlockRef!(
@@ -5691,7 +5855,7 @@ macro_rules! __pgrx_c_args_XLogRecHasBlockRef {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_XLogRecHasBlockRef!(
@@ -5770,7 +5934,7 @@ macro_rules! __pgrx_c_args_XLogRecHasBlockRef {
         $crate::XLogRecHasBlockRef!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XLogRecHasBlockRef from xlogreader.h:421
@@ -5931,13 +6095,13 @@ macro_rules! XLogRecHasBlockRef {
         $crate::__pgrx_c_args_XLogRecHasBlockRef!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $decoder:tt, $block_id:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLogRecHasBlockRef!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $decoder:tt, $block_id:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLogRecHasBlockRef!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5951,7 +6115,7 @@ macro_rules! XLogRecHasBlockRef {
                         $crate::__pgrx_c_operand!(@check_safety; $block_id);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -6099,7 +6263,7 @@ macro_rules! XLogRecHasBlockRef {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6317,6 +6481,11 @@ macro_rules! __pgrx_c_args_XLogRecMaxBlockId {
             @argument [__pgrx_c_args_XLogRecMaxBlockId] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecMaxBlockId] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XLogRecMaxBlockId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6354,6 +6523,13 @@ macro_rules! __pgrx_c_args_XLogRecMaxBlockId {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogRecMaxBlockId] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogRecMaxBlockId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6370,7 +6546,7 @@ macro_rules! __pgrx_c_args_XLogRecMaxBlockId {
         $crate::XLogRecMaxBlockId!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XLogRecMaxBlockId from xlogreader.h:419
@@ -6516,7 +6692,7 @@ macro_rules! XLogRecMaxBlockId {
                         $crate::__pgrx_c_operand!(@check_safety; $decoder);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_max_block_id,
@@ -6552,7 +6728,7 @@ macro_rules! XLogRecMaxBlockId {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

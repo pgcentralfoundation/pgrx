@@ -80,6 +80,13 @@ macro_rules! __pgrx_c_args_GetPlannerGlobalExtensionState {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetPlannerGlobalExtensionState] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetPlannerGlobalExtensionState!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -146,6 +153,13 @@ macro_rules! __pgrx_c_args_GetPlannerGlobalExtensionState {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetPlannerGlobalExtensionState] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GetPlannerGlobalExtensionState!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -183,6 +197,13 @@ macro_rules! __pgrx_c_args_GetPlannerGlobalExtensionState {
             ] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetPlannerGlobalExtensionState] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetPlannerGlobalExtensionState!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -199,7 +220,7 @@ macro_rules! __pgrx_c_args_GetPlannerGlobalExtensionState {
         $crate::GetPlannerGlobalExtensionState!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function GetPlannerGlobalExtensionState from extendplan.h:24
@@ -300,7 +321,7 @@ macro_rules! GetPlannerGlobalExtensionState {
         )
     };
     (@__pgrx_emit_place; $glob:tt, $extension_id:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetPlannerGlobalExtensionState!(
@@ -309,7 +330,7 @@ macro_rules! GetPlannerGlobalExtensionState {
         )
     };
     (@__pgrx_emit_read_place; $glob:tt, $extension_id:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetPlannerGlobalExtensionState!(
@@ -326,7 +347,7 @@ macro_rules! GetPlannerGlobalExtensionState {
                         $crate::__pgrx_c_operand!(@check_safety; $extension_id);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -383,7 +404,7 @@ macro_rules! GetPlannerGlobalExtensionState {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -532,6 +553,13 @@ macro_rules! __pgrx_c_args_GetPlannerInfoExtensionState {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetPlannerInfoExtensionState] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetPlannerInfoExtensionState!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -598,6 +626,13 @@ macro_rules! __pgrx_c_args_GetPlannerInfoExtensionState {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetPlannerInfoExtensionState] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GetPlannerInfoExtensionState!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -635,6 +670,13 @@ macro_rules! __pgrx_c_args_GetPlannerInfoExtensionState {
             ] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetPlannerInfoExtensionState] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetPlannerInfoExtensionState!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -651,7 +693,7 @@ macro_rules! __pgrx_c_args_GetPlannerInfoExtensionState {
         $crate::GetPlannerInfoExtensionState!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function GetPlannerInfoExtensionState from extendplan.h:38
@@ -749,13 +791,13 @@ macro_rules! GetPlannerInfoExtensionState {
         $crate::__pgrx_c_args_GetPlannerInfoExtensionState!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $root:tt, $extension_id:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetPlannerInfoExtensionState!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $root:tt, $extension_id:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetPlannerInfoExtensionState!(
@@ -772,7 +814,7 @@ macro_rules! GetPlannerInfoExtensionState {
                         $crate::__pgrx_c_operand!(@check_safety; $extension_id);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -829,7 +871,7 @@ macro_rules! GetPlannerInfoExtensionState {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -972,6 +1014,13 @@ macro_rules! __pgrx_c_args_GetRelOptInfoExtensionState {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetRelOptInfoExtensionState] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetRelOptInfoExtensionState!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1035,6 +1084,13 @@ macro_rules! __pgrx_c_args_GetRelOptInfoExtensionState {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetRelOptInfoExtensionState] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GetRelOptInfoExtensionState!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1072,6 +1128,13 @@ macro_rules! __pgrx_c_args_GetRelOptInfoExtensionState {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetRelOptInfoExtensionState] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetRelOptInfoExtensionState!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1088,7 +1151,7 @@ macro_rules! __pgrx_c_args_GetRelOptInfoExtensionState {
         $crate::GetRelOptInfoExtensionState!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function GetRelOptInfoExtensionState from extendplan.h:52
@@ -1186,13 +1249,13 @@ macro_rules! GetRelOptInfoExtensionState {
         $crate::__pgrx_c_args_GetRelOptInfoExtensionState!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rel:tt, $extension_id:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetRelOptInfoExtensionState!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rel:tt, $extension_id:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetRelOptInfoExtensionState!(
@@ -1209,7 +1272,7 @@ macro_rules! GetRelOptInfoExtensionState {
                         $crate::__pgrx_c_operand!(@check_safety; $extension_id);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1266,7 +1329,7 @@ macro_rules! GetRelOptInfoExtensionState {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

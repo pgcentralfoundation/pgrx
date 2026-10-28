@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_PinTupleDesc {
             @argument [__pgrx_c_args_PinTupleDesc] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PinTupleDesc] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PinTupleDesc!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -116,6 +121,11 @@ macro_rules! __pgrx_c_args_PinTupleDesc {
             @argument [__pgrx_c_args_PinTupleDesc] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PinTupleDesc] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PinTupleDesc!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -132,7 +142,7 @@ macro_rules! __pgrx_c_args_PinTupleDesc {
         $crate::PinTupleDesc!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PinTupleDesc from tupdesc.h:234
@@ -241,7 +251,7 @@ macro_rules! PinTupleDesc {
         $crate::__pgrx_c_args_PinTupleDesc!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_PinTupleDesc!(@collect __pgrx_emit_public []; $($raw)*)
@@ -325,6 +335,11 @@ macro_rules! __pgrx_c_args_ReleaseTupleDesc {
             @argument [__pgrx_c_args_ReleaseTupleDesc] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ReleaseTupleDesc] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ReleaseTupleDesc!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -362,6 +377,13 @@ macro_rules! __pgrx_c_args_ReleaseTupleDesc {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ReleaseTupleDesc] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ReleaseTupleDesc!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -378,7 +400,7 @@ macro_rules! __pgrx_c_args_ReleaseTupleDesc {
         $crate::ReleaseTupleDesc!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ReleaseTupleDesc from tupdesc.h:240
@@ -487,7 +509,7 @@ macro_rules! ReleaseTupleDesc {
         $crate::__pgrx_c_args_ReleaseTupleDesc!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_ReleaseTupleDesc!(@collect __pgrx_emit_public []; $($raw)*)
@@ -564,6 +586,11 @@ macro_rules! __pgrx_c_args_TupleDescAttr {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TupleDescAttr] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TupleDescAttr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -625,6 +652,11 @@ macro_rules! __pgrx_c_args_TupleDescAttr {
             @argument [__pgrx_c_args_TupleDescAttr] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TupleDescAttr] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TupleDescAttr!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -662,6 +694,11 @@ macro_rules! __pgrx_c_args_TupleDescAttr {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TupleDescAttr] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TupleDescAttr!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -678,7 +715,7 @@ macro_rules! __pgrx_c_args_TupleDescAttr {
         $crate::TupleDescAttr!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function TupleDescAttr from tupdesc.h:177
@@ -774,13 +811,13 @@ macro_rules! TupleDescAttr {
         $crate::__pgrx_c_args_TupleDescAttr!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tupdesc:tt, $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TupleDescAttr!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tupdesc:tt, $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TupleDescAttr!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -794,7 +831,7 @@ macro_rules! TupleDescAttr {
                         $crate::__pgrx_c_operand!(@check_safety; $i);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -848,7 +885,7 @@ macro_rules! TupleDescAttr {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -987,6 +1024,13 @@ macro_rules! __pgrx_c_args_TupleDescCompactAttr {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TupleDescCompactAttr] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TupleDescCompactAttr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1048,6 +1092,11 @@ macro_rules! __pgrx_c_args_TupleDescCompactAttr {
             @argument [__pgrx_c_args_TupleDescCompactAttr] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TupleDescCompactAttr] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TupleDescCompactAttr!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1085,6 +1134,13 @@ macro_rules! __pgrx_c_args_TupleDescCompactAttr {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TupleDescCompactAttr] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TupleDescCompactAttr!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1101,7 +1157,7 @@ macro_rules! __pgrx_c_args_TupleDescCompactAttr {
         $crate::TupleDescCompactAttr!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function TupleDescCompactAttr from tupdesc.h:194
@@ -1201,13 +1257,13 @@ macro_rules! TupleDescCompactAttr {
         $crate::__pgrx_c_args_TupleDescCompactAttr!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tupdesc:tt, $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TupleDescCompactAttr!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tupdesc:tt, $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TupleDescCompactAttr!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1221,7 +1277,7 @@ macro_rules! TupleDescCompactAttr {
                         $crate::__pgrx_c_operand!(@check_safety; $i);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1275,7 +1331,7 @@ macro_rules! TupleDescCompactAttr {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1418,6 +1474,11 @@ macro_rules! __pgrx_c_args_TupleDescSize {
             @argument [__pgrx_c_args_TupleDescSize] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TupleDescSize] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TupleDescSize!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1455,6 +1516,11 @@ macro_rules! __pgrx_c_args_TupleDescSize {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TupleDescSize] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TupleDescSize!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1471,7 +1537,7 @@ macro_rules! __pgrx_c_args_TupleDescSize {
         $crate::TupleDescSize!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TupleDescSize from tupdesc.h:218
@@ -1603,13 +1669,13 @@ macro_rules! TupleDescSize {
         $crate::__pgrx_c_args_TupleDescSize!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $src:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TupleDescSize!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $src:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TupleDescSize!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1623,7 +1689,7 @@ macro_rules! TupleDescSize {
                         $crate::__pgrx_c_operand!(@check_safety; $src);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                             $crate::__pgrx_c_macros::expression::add::<
@@ -1744,7 +1810,7 @@ macro_rules! TupleDescSize {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

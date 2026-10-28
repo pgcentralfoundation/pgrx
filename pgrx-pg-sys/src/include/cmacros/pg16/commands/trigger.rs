@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_CALLED_AS_TRIGGER {
             @argument [__pgrx_c_args_CALLED_AS_TRIGGER] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_CALLED_AS_TRIGGER] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_CALLED_AS_TRIGGER!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -118,6 +123,13 @@ macro_rules! __pgrx_c_args_CALLED_AS_TRIGGER {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_CALLED_AS_TRIGGER] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_CALLED_AS_TRIGGER!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -134,7 +146,7 @@ macro_rules! __pgrx_c_args_CALLED_AS_TRIGGER {
         $crate::CALLED_AS_TRIGGER!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro CALLED_AS_TRIGGER from trigger.h:26
@@ -317,13 +329,13 @@ macro_rules! CALLED_AS_TRIGGER {
         $crate::__pgrx_c_args_CALLED_AS_TRIGGER!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $fcinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_CALLED_AS_TRIGGER!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $fcinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_CALLED_AS_TRIGGER!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -337,7 +349,7 @@ macro_rules! CALLED_AS_TRIGGER {
                         $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -494,7 +506,7 @@ macro_rules! CALLED_AS_TRIGGER {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -731,6 +743,11 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_AFTER {
             @argument [__pgrx_c_args_TRIGGER_FIRED_AFTER] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TRIGGER_FIRED_AFTER] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_AFTER!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -768,6 +785,13 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_AFTER {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TRIGGER_FIRED_AFTER] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_AFTER!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -784,7 +808,7 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_AFTER {
         $crate::TRIGGER_FIRED_AFTER!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TRIGGER_FIRED_AFTER from trigger.h:133
@@ -849,13 +873,13 @@ macro_rules! TRIGGER_FIRED_AFTER {
         $crate::__pgrx_c_args_TRIGGER_FIRED_AFTER!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $event:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_AFTER!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $event:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_AFTER!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -868,7 +892,7 @@ macro_rules! TRIGGER_FIRED_AFTER {
                         $crate::__pgrx_c_operand!(@check_safety; $event);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -908,7 +932,7 @@ macro_rules! TRIGGER_FIRED_AFTER {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1034,6 +1058,11 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BEFORE {
             @argument [__pgrx_c_args_TRIGGER_FIRED_BEFORE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TRIGGER_FIRED_BEFORE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BEFORE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1071,6 +1100,13 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BEFORE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TRIGGER_FIRED_BEFORE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BEFORE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1087,7 +1123,7 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BEFORE {
         $crate::TRIGGER_FIRED_BEFORE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TRIGGER_FIRED_BEFORE from trigger.h:130
@@ -1150,13 +1186,13 @@ macro_rules! TRIGGER_FIRED_BEFORE {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BEFORE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $event:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BEFORE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $event:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BEFORE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1169,7 +1205,7 @@ macro_rules! TRIGGER_FIRED_BEFORE {
                         $crate::__pgrx_c_operand!(@check_safety; $event);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -1205,7 +1241,7 @@ macro_rules! TRIGGER_FIRED_BEFORE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1331,6 +1367,11 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_DELETE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TRIGGER_FIRED_BY_DELETE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_DELETE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1368,6 +1409,13 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_DELETE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TRIGGER_FIRED_BY_DELETE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_DELETE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1384,7 +1432,7 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_DELETE {
         $crate::TRIGGER_FIRED_BY_DELETE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TRIGGER_FIRED_BY_DELETE from trigger.h:115
@@ -1450,13 +1498,13 @@ macro_rules! TRIGGER_FIRED_BY_DELETE {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_DELETE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $event:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_DELETE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $event:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_DELETE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1469,7 +1517,7 @@ macro_rules! TRIGGER_FIRED_BY_DELETE {
                         $crate::__pgrx_c_operand!(@check_safety; $event);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -1505,7 +1553,7 @@ macro_rules! TRIGGER_FIRED_BY_DELETE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1631,6 +1679,11 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_INSERT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TRIGGER_FIRED_BY_INSERT] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_INSERT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1668,6 +1721,13 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_INSERT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TRIGGER_FIRED_BY_INSERT] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_INSERT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1684,7 +1744,7 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_INSERT {
         $crate::TRIGGER_FIRED_BY_INSERT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TRIGGER_FIRED_BY_INSERT from trigger.h:112
@@ -1752,13 +1812,13 @@ macro_rules! TRIGGER_FIRED_BY_INSERT {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_INSERT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $event:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_INSERT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $event:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_INSERT!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1771,7 +1831,7 @@ macro_rules! TRIGGER_FIRED_BY_INSERT {
                         $crate::__pgrx_c_operand!(@check_safety; $event);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -1811,7 +1871,7 @@ macro_rules! TRIGGER_FIRED_BY_INSERT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1939,6 +1999,13 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1976,6 +2043,13 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1992,7 +2066,7 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE {
         $crate::TRIGGER_FIRED_BY_TRUNCATE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TRIGGER_FIRED_BY_TRUNCATE from trigger.h:121
@@ -2058,13 +2132,13 @@ macro_rules! TRIGGER_FIRED_BY_TRUNCATE {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $event:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $event:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE!(
@@ -2080,7 +2154,7 @@ macro_rules! TRIGGER_FIRED_BY_TRUNCATE {
                         $crate::__pgrx_c_operand!(@check_safety; $event);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -2116,7 +2190,7 @@ macro_rules! TRIGGER_FIRED_BY_TRUNCATE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2242,6 +2316,11 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_UPDATE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TRIGGER_FIRED_BY_UPDATE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_UPDATE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2279,6 +2358,13 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_UPDATE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TRIGGER_FIRED_BY_UPDATE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_UPDATE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2295,7 +2381,7 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_UPDATE {
         $crate::TRIGGER_FIRED_BY_UPDATE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TRIGGER_FIRED_BY_UPDATE from trigger.h:118
@@ -2361,13 +2447,13 @@ macro_rules! TRIGGER_FIRED_BY_UPDATE {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_UPDATE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $event:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_UPDATE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $event:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_UPDATE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2380,7 +2466,7 @@ macro_rules! TRIGGER_FIRED_BY_UPDATE {
                         $crate::__pgrx_c_operand!(@check_safety; $event);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -2416,7 +2502,7 @@ macro_rules! TRIGGER_FIRED_BY_UPDATE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2540,6 +2626,11 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_FOR_ROW {
             @argument [__pgrx_c_args_TRIGGER_FIRED_FOR_ROW] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TRIGGER_FIRED_FOR_ROW] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_ROW!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2577,6 +2668,13 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_FOR_ROW {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TRIGGER_FIRED_FOR_ROW] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_ROW!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2593,7 +2691,7 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_FOR_ROW {
         $crate::TRIGGER_FIRED_FOR_ROW!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TRIGGER_FIRED_FOR_ROW from trigger.h:124
@@ -2645,13 +2743,13 @@ macro_rules! TRIGGER_FIRED_FOR_ROW {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_ROW!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $event:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_ROW!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $event:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_ROW!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2664,7 +2762,7 @@ macro_rules! TRIGGER_FIRED_FOR_ROW {
                         $crate::__pgrx_c_operand!(@check_safety; $event);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -2683,7 +2781,7 @@ macro_rules! TRIGGER_FIRED_FOR_ROW {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2798,6 +2896,13 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2835,6 +2940,13 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2851,7 +2963,7 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT {
         $crate::TRIGGER_FIRED_FOR_STATEMENT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TRIGGER_FIRED_FOR_STATEMENT from trigger.h:127
@@ -2913,13 +3025,13 @@ macro_rules! TRIGGER_FIRED_FOR_STATEMENT {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $event:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $event:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT!(
@@ -2936,7 +3048,7 @@ macro_rules! TRIGGER_FIRED_FOR_STATEMENT {
                         $crate::__pgrx_c_operand!(@check_safety; $event);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::logical_not(
@@ -2967,7 +3079,7 @@ macro_rules! TRIGGER_FIRED_FOR_STATEMENT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3090,6 +3202,11 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_INSTEAD {
             @argument [__pgrx_c_args_TRIGGER_FIRED_INSTEAD] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TRIGGER_FIRED_INSTEAD] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_INSTEAD!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3127,6 +3244,13 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_INSTEAD {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TRIGGER_FIRED_INSTEAD] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_INSTEAD!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3143,7 +3267,7 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_INSTEAD {
         $crate::TRIGGER_FIRED_INSTEAD!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TRIGGER_FIRED_INSTEAD from trigger.h:136
@@ -3206,13 +3330,13 @@ macro_rules! TRIGGER_FIRED_INSTEAD {
         $crate::__pgrx_c_args_TRIGGER_FIRED_INSTEAD!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $event:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_INSTEAD!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $event:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_INSTEAD!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3225,7 +3349,7 @@ macro_rules! TRIGGER_FIRED_INSTEAD {
                         $crate::__pgrx_c_operand!(@check_safety; $event);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -3261,7 +3385,7 @@ macro_rules! TRIGGER_FIRED_INSTEAD {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

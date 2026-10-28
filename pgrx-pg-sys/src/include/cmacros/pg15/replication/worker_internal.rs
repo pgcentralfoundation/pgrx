@@ -61,7 +61,7 @@ macro_rules! am_tablesync_worker {
     (@__pgrx_emit_value;) => {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_ad325caec4d8af663a2432c2c9cc198f()
+                $crate::__pgrx_c_generated::Inline_3eb8ae53d0e8d2e982ab06d9e4b4beb4()
             )
         )
     };
@@ -69,13 +69,13 @@ macro_rules! am_tablesync_worker {
         $crate::am_tablesync_worker!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::am_tablesync_worker!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::am_tablesync_worker!(@__pgrx_emit_read_place; $($raw)*)
@@ -86,19 +86,19 @@ macro_rules! am_tablesync_worker {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_ad325caec4d8af663a2432c2c9cc198f()
+                                $crate::__pgrx_c_generated::Inline_3eb8ae53d0e8d2e982ab06d9e4b4beb4()
                             )
                         )
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -109,7 +109,7 @@ macro_rules! am_tablesync_worker {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::__pgrx_c_generated::Inline_ad325caec4d8af663a2432c2c9cc198f()
+                    $crate::__pgrx_c_generated::Inline_3eb8ae53d0e8d2e982ab06d9e4b4beb4()
                 )
             );
         }
@@ -118,13 +118,13 @@ macro_rules! am_tablesync_worker {
         $crate::am_tablesync_worker!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::am_tablesync_worker!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 

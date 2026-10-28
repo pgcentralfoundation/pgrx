@@ -33,7 +33,7 @@ macro_rules! __pgrx_c_args_BKPIMAGE_COMPRESSED {
         $crate::__pgrx_c_args_BKPIMAGE_COMPRESSED!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_BKPIMAGE_COMPRESSED!(
@@ -41,7 +41,7 @@ macro_rules! __pgrx_c_args_BKPIMAGE_COMPRESSED {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BKPIMAGE_COMPRESSED!(
@@ -50,7 +50,7 @@ macro_rules! __pgrx_c_args_BKPIMAGE_COMPRESSED {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_BKPIMAGE_COMPRESSED!(
@@ -129,7 +129,7 @@ macro_rules! __pgrx_c_args_BKPIMAGE_COMPRESSED {
         $crate::BKPIMAGE_COMPRESSED!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BKPIMAGE_COMPRESSED from xlogrecord.h:165
@@ -230,13 +230,13 @@ macro_rules! BKPIMAGE_COMPRESSED {
         $crate::__pgrx_c_args_BKPIMAGE_COMPRESSED!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $info:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKPIMAGE_COMPRESSED!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $info:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKPIMAGE_COMPRESSED!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -249,7 +249,7 @@ macro_rules! BKPIMAGE_COMPRESSED {
                         $crate::__pgrx_c_operand!(@check_safety; $info);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -321,7 +321,7 @@ macro_rules! BKPIMAGE_COMPRESSED {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

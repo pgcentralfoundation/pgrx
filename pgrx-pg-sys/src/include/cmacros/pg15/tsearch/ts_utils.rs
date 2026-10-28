@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_DatumGetTSQuerySign {
             @argument [__pgrx_c_args_DatumGetTSQuerySign] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetTSQuerySign] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetTSQuerySign!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -118,6 +123,13 @@ macro_rules! __pgrx_c_args_DatumGetTSQuerySign {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetTSQuerySign] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSQuerySign!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -134,7 +146,7 @@ macro_rules! __pgrx_c_args_DatumGetTSQuerySign {
         $crate::DatumGetTSQuerySign!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DatumGetTSQuerySign from ts_utils.h:245
@@ -200,13 +212,13 @@ macro_rules! DatumGetTSQuerySign {
         $crate::__pgrx_c_args_DatumGetTSQuerySign!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSQuerySign!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSQuerySign!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -220,7 +232,7 @@ macro_rules! DatumGetTSQuerySign {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -249,7 +261,7 @@ macro_rules! DatumGetTSQuerySign {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -369,6 +381,11 @@ macro_rules! __pgrx_c_args_ISOPERATOR {
             @argument [__pgrx_c_args_ISOPERATOR] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ISOPERATOR] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ISOPERATOR!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -404,6 +421,11 @@ macro_rules! __pgrx_c_args_ISOPERATOR {
             @argument [__pgrx_c_args_ISOPERATOR] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ISOPERATOR] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ISOPERATOR!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -420,7 +442,7 @@ macro_rules! __pgrx_c_args_ISOPERATOR {
         $crate::ISOPERATOR!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ISOPERATOR from ts_utils.h:41
@@ -716,13 +738,13 @@ macro_rules! ISOPERATOR {
         $crate::__pgrx_c_args_ISOPERATOR!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ISOPERATOR!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ISOPERATOR!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -735,7 +757,7 @@ macro_rules! ISOPERATOR {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -1021,7 +1043,7 @@ macro_rules! ISOPERATOR {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1330,7 +1352,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSQUERYSIGN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERYSIGN!(
@@ -1339,7 +1361,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSQUERYSIGN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERYSIGN!(
@@ -1429,6 +1451,11 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSQUERYSIGN {
             @argument [__pgrx_c_args_PG_GETARG_TSQUERYSIGN] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_GETARG_TSQUERYSIGN] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERYSIGN!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1466,6 +1493,13 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSQUERYSIGN {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_GETARG_TSQUERYSIGN] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERYSIGN!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1482,7 +1516,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSQUERYSIGN {
         $crate::PG_GETARG_TSQUERYSIGN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PG_GETARG_TSQUERYSIGN from ts_utils.h:247
@@ -1635,7 +1669,7 @@ macro_rules! PG_GETARG_TSQUERYSIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::project::<
                                         $crate::__pgrx_c_generated::Field_value,
@@ -1676,7 +1710,7 @@ macro_rules! PG_GETARG_TSQUERYSIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -1802,7 +1836,7 @@ macro_rules! PG_GETARG_TSQUERYSIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::project::<
                                         $crate::__pgrx_c_generated::Field_value,
@@ -1843,7 +1877,7 @@ macro_rules! PG_GETARG_TSQUERYSIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -1969,7 +2003,7 @@ macro_rules! PG_GETARG_TSQUERYSIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::project::<
                                         $crate::__pgrx_c_generated::Field_value,
@@ -2010,7 +2044,7 @@ macro_rules! PG_GETARG_TSQUERYSIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -2136,7 +2170,7 @@ macro_rules! PG_GETARG_TSQUERYSIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::project::<
                                         $crate::__pgrx_c_generated::Field_value,
@@ -2177,7 +2211,7 @@ macro_rules! PG_GETARG_TSQUERYSIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -2303,7 +2337,7 @@ macro_rules! PG_GETARG_TSQUERYSIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::project::<
                                         $crate::__pgrx_c_generated::Field_value,
@@ -2344,7 +2378,7 @@ macro_rules! PG_GETARG_TSQUERYSIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -2439,6 +2473,11 @@ macro_rules! __pgrx_c_args_PG_RETURN_TSQUERYSIGN {
             @argument [__pgrx_c_args_PG_RETURN_TSQUERYSIGN] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_RETURN_TSQUERYSIGN] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PG_RETURN_TSQUERYSIGN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2476,6 +2515,13 @@ macro_rules! __pgrx_c_args_PG_RETURN_TSQUERYSIGN {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_RETURN_TSQUERYSIGN] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TSQUERYSIGN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2492,7 +2538,7 @@ macro_rules! __pgrx_c_args_PG_RETURN_TSQUERYSIGN {
         $crate::PG_RETURN_TSQUERYSIGN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PG_RETURN_TSQUERYSIGN from ts_utils.h:246
@@ -2605,7 +2651,7 @@ macro_rules! PG_RETURN_TSQUERYSIGN {
         )
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TSQUERYSIGN!(@collect __pgrx_emit_public []; $($raw)*)
@@ -2689,6 +2735,11 @@ macro_rules! __pgrx_c_args_TSQuerySignGetDatum {
             @argument [__pgrx_c_args_TSQuerySignGetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TSQuerySignGetDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TSQuerySignGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2726,6 +2777,13 @@ macro_rules! __pgrx_c_args_TSQuerySignGetDatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TSQuerySignGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSQuerySignGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2742,7 +2800,7 @@ macro_rules! __pgrx_c_args_TSQuerySignGetDatum {
         $crate::TSQuerySignGetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TSQuerySignGetDatum from ts_utils.h:244
@@ -2794,8 +2852,8 @@ macro_rules! TSQuerySignGetDatum {
                             )
                         )
                     )
-                ] [compile_error!("C expression is not a place in this operation")] [
-                    compile_error!("C expression is not a place in this operation")
+                ] [::core::compile_error!("C expression is not a place in this operation")] [
+                    ::core::compile_error!("C expression is not a place in this operation")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -2804,7 +2862,7 @@ macro_rules! TSQuerySignGetDatum {
                                     $crate::__pgrx_c_operand!(@check_safety; $X);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
@@ -2823,7 +2881,7 @@ macro_rules! TSQuerySignGetDatum {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -2851,8 +2909,8 @@ macro_rules! TSQuerySignGetDatum {
                             )
                         )
                     )
-                ] [compile_error!("C expression is not a place in this operation")] [
-                    compile_error!("C expression is not a place in this operation")
+                ] [::core::compile_error!("C expression is not a place in this operation")] [
+                    ::core::compile_error!("C expression is not a place in this operation")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -2861,7 +2919,7 @@ macro_rules! TSQuerySignGetDatum {
                                     $crate::__pgrx_c_operand!(@check_safety; $X);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
@@ -2880,7 +2938,7 @@ macro_rules! TSQuerySignGetDatum {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -2908,8 +2966,8 @@ macro_rules! TSQuerySignGetDatum {
                             )
                         )
                     )
-                ] [compile_error!("C expression is not a place in this operation")] [
-                    compile_error!("C expression is not a place in this operation")
+                ] [::core::compile_error!("C expression is not a place in this operation")] [
+                    ::core::compile_error!("C expression is not a place in this operation")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -2918,7 +2976,7 @@ macro_rules! TSQuerySignGetDatum {
                                     $crate::__pgrx_c_operand!(@check_safety; $X);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
@@ -2937,7 +2995,7 @@ macro_rules! TSQuerySignGetDatum {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -2965,8 +3023,8 @@ macro_rules! TSQuerySignGetDatum {
                             )
                         )
                     )
-                ] [compile_error!("C expression is not a place in this operation")] [
-                    compile_error!("C expression is not a place in this operation")
+                ] [::core::compile_error!("C expression is not a place in this operation")] [
+                    ::core::compile_error!("C expression is not a place in this operation")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -2975,7 +3033,7 @@ macro_rules! TSQuerySignGetDatum {
                                     $crate::__pgrx_c_operand!(@check_safety; $X);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
@@ -2994,7 +3052,7 @@ macro_rules! TSQuerySignGetDatum {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -3022,8 +3080,8 @@ macro_rules! TSQuerySignGetDatum {
                             )
                         )
                     )
-                ] [compile_error!("C expression is not a place in this operation")] [
-                    compile_error!("C expression is not a place in this operation")
+                ] [::core::compile_error!("C expression is not a place in this operation")] [
+                    ::core::compile_error!("C expression is not a place in this operation")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -3032,7 +3090,7 @@ macro_rules! TSQuerySignGetDatum {
                                     $crate::__pgrx_c_operand!(@check_safety; $X);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
@@ -3051,7 +3109,7 @@ macro_rules! TSQuerySignGetDatum {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]

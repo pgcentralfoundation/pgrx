@@ -77,6 +77,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ACCUM_DIFF {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_ACCUM_DIFF] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -128,6 +135,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ACCUM_DIFF {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_INSTR_TIME_ACCUM_DIFF] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_ACCUM_DIFF] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -192,6 +206,11 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ACCUM_DIFF {
             @argument [__pgrx_c_args_INSTR_TIME_ACCUM_DIFF] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_ACCUM_DIFF] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -229,6 +248,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ACCUM_DIFF {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_ACCUM_DIFF] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -245,7 +271,7 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ACCUM_DIFF {
         $crate::INSTR_TIME_ACCUM_DIFF!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro INSTR_TIME_ACCUM_DIFF from instr_time.h:447
@@ -330,13 +356,13 @@ macro_rules! INSTR_TIME_ACCUM_DIFF {
         $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt, $y:tt, $z:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt, $y:tt, $z:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -351,7 +377,7 @@ macro_rules! INSTR_TIME_ACCUM_DIFF {
                         $crate::__pgrx_c_operand!(@check_safety; $z);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::modify(
@@ -403,7 +429,7 @@ macro_rules! INSTR_TIME_ACCUM_DIFF {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -533,6 +559,11 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ADD {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_ADD] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ADD!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -594,6 +625,11 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ADD {
             @argument [__pgrx_c_args_INSTR_TIME_ADD] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_ADD] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_ADD!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -631,6 +667,11 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ADD {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_ADD] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ADD!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -647,7 +688,7 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ADD {
         $crate::INSTR_TIME_ADD!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro INSTR_TIME_ADD from instr_time.h:438
@@ -714,13 +755,13 @@ macro_rules! INSTR_TIME_ADD {
         $crate::__pgrx_c_args_INSTR_TIME_ADD!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt, $y:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ADD!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt, $y:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ADD!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -734,7 +775,7 @@ macro_rules! INSTR_TIME_ADD {
                         $crate::__pgrx_c_operand!(@check_safety; $y);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::modify(
@@ -763,7 +804,7 @@ macro_rules! INSTR_TIME_ADD {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -879,6 +920,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ADD_NANOSEC {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_ADD_NANOSEC] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ADD_NANOSEC!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -942,6 +990,11 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ADD_NANOSEC {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_ADD_NANOSEC] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_ADD_NANOSEC!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -979,6 +1032,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ADD_NANOSEC {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_ADD_NANOSEC] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ADD_NANOSEC!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -995,7 +1055,7 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ADD_NANOSEC {
         $crate::INSTR_TIME_ADD_NANOSEC!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro INSTR_TIME_ADD_NANOSEC from instr_time.h:441
@@ -1077,13 +1137,13 @@ macro_rules! INSTR_TIME_ADD_NANOSEC {
         $crate::__pgrx_c_args_INSTR_TIME_ADD_NANOSEC!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $t:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ADD_NANOSEC!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $t:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ADD_NANOSEC!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1097,7 +1157,7 @@ macro_rules! INSTR_TIME_ADD_NANOSEC {
                         $crate::__pgrx_c_operand!(@check_safety; $n);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::modify(
@@ -1138,7 +1198,7 @@ macro_rules! INSTR_TIME_ADD_NANOSEC {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1273,6 +1333,11 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_DOUBLE {
             @argument [__pgrx_c_args_INSTR_TIME_GET_DOUBLE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_GET_DOUBLE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_DOUBLE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1310,6 +1375,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_DOUBLE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_GET_DOUBLE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_DOUBLE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1326,7 +1398,7 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_DOUBLE {
         $crate::INSTR_TIME_GET_DOUBLE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro INSTR_TIME_GET_DOUBLE from instr_time.h:456
@@ -1423,13 +1495,13 @@ macro_rules! INSTR_TIME_GET_DOUBLE {
         $crate::__pgrx_c_args_INSTR_TIME_GET_DOUBLE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $t:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_DOUBLE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $t:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_DOUBLE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1443,7 +1515,7 @@ macro_rules! INSTR_TIME_GET_DOUBLE {
                         $crate::__pgrx_c_operand!(@check_safety; $t);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::div(
@@ -1505,7 +1577,7 @@ macro_rules! INSTR_TIME_GET_DOUBLE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1661,6 +1733,11 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_MICROSEC {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_GET_MICROSEC] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MICROSEC!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1698,6 +1775,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_MICROSEC {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_GET_MICROSEC] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MICROSEC!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1714,7 +1798,7 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_MICROSEC {
         $crate::INSTR_TIME_GET_MICROSEC!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro INSTR_TIME_GET_MICROSEC from instr_time.h:462
@@ -1800,13 +1884,13 @@ macro_rules! INSTR_TIME_GET_MICROSEC {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MICROSEC!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $t:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MICROSEC!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $t:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MICROSEC!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1820,7 +1904,7 @@ macro_rules! INSTR_TIME_GET_MICROSEC {
                         $crate::__pgrx_c_operand!(@check_safety; $t);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::div(
@@ -1872,7 +1956,7 @@ macro_rules! INSTR_TIME_GET_MICROSEC {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2014,6 +2098,11 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_MILLISEC {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_GET_MILLISEC] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MILLISEC!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2051,6 +2140,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_MILLISEC {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_GET_MILLISEC] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MILLISEC!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2067,7 +2163,7 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_MILLISEC {
         $crate::INSTR_TIME_GET_MILLISEC!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro INSTR_TIME_GET_MILLISEC from instr_time.h:459
@@ -2167,13 +2263,13 @@ macro_rules! INSTR_TIME_GET_MILLISEC {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MILLISEC!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $t:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MILLISEC!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $t:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MILLISEC!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2187,7 +2283,7 @@ macro_rules! INSTR_TIME_GET_MILLISEC {
                         $crate::__pgrx_c_operand!(@check_safety; $t);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::div(
@@ -2249,7 +2345,7 @@ macro_rules! INSTR_TIME_GET_MILLISEC {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2405,6 +2501,11 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_NANOSEC {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_GET_NANOSEC] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_NANOSEC!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2442,6 +2543,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_NANOSEC {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_GET_NANOSEC] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_NANOSEC!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2458,7 +2566,7 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_NANOSEC {
         $crate::INSTR_TIME_GET_NANOSEC!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro INSTR_TIME_GET_NANOSEC from instr_time.h:453
@@ -2528,13 +2636,13 @@ macro_rules! INSTR_TIME_GET_NANOSEC {
         $crate::__pgrx_c_args_INSTR_TIME_GET_NANOSEC!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $t:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_NANOSEC!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $t:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_NANOSEC!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2548,7 +2656,7 @@ macro_rules! INSTR_TIME_GET_NANOSEC {
                         $crate::__pgrx_c_operand!(@check_safety; $t);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2582,7 +2690,7 @@ macro_rules! INSTR_TIME_GET_NANOSEC {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2696,6 +2804,11 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_GT] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2757,6 +2870,11 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GT {
             @argument [__pgrx_c_args_INSTR_TIME_GT] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_GT] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_GT!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2794,6 +2912,11 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GT {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_GT] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GT!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2810,7 +2933,7 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GT {
         $crate::INSTR_TIME_GT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro INSTR_TIME_GT from instr_time.h:450
@@ -2871,13 +2994,13 @@ macro_rules! INSTR_TIME_GT {
         $crate::__pgrx_c_args_INSTR_TIME_GT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt, $y:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt, $y:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GT!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2891,7 +3014,7 @@ macro_rules! INSTR_TIME_GT {
                         $crate::__pgrx_c_operand!(@check_safety; $y);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::gt(
@@ -2918,7 +3041,7 @@ macro_rules! INSTR_TIME_GT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3036,6 +3159,11 @@ macro_rules! __pgrx_c_args_INSTR_TIME_IS_ZERO {
             @argument [__pgrx_c_args_INSTR_TIME_IS_ZERO] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_IS_ZERO] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3073,6 +3201,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_IS_ZERO {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_IS_ZERO] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3089,7 +3224,7 @@ macro_rules! __pgrx_c_args_INSTR_TIME_IS_ZERO {
         $crate::INSTR_TIME_IS_ZERO!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro INSTR_TIME_IS_ZERO from instr_time.h:427
@@ -3147,13 +3282,13 @@ macro_rules! INSTR_TIME_IS_ZERO {
         $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $t:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $t:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3166,7 +3301,7 @@ macro_rules! INSTR_TIME_IS_ZERO {
                         $crate::__pgrx_c_operand!(@check_safety; $t);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -3191,7 +3326,7 @@ macro_rules! INSTR_TIME_IS_ZERO {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3312,6 +3447,11 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_CURRENT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_SET_CURRENT] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3349,6 +3489,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_CURRENT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_SET_CURRENT] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3365,7 +3512,7 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_CURRENT {
         $crate::INSTR_TIME_SET_CURRENT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro INSTR_TIME_SET_CURRENT from instr_time.h:434
@@ -3413,7 +3560,7 @@ macro_rules! INSTR_TIME_SET_CURRENT {
                                 $crate::__pgrx_c_bindings::instr_time
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::__pgrx_c_generated::Inline_1a181b889cb8c3dcd3d4d62c467ac999()
+                            $crate::__pgrx_c_generated::Inline_036dbd2f3784e423a7c2d617570d6ce5()
                         )
                     )
                 )
@@ -3424,13 +3571,13 @@ macro_rules! INSTR_TIME_SET_CURRENT {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $t:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $t:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3443,7 +3590,7 @@ macro_rules! INSTR_TIME_SET_CURRENT {
                         $crate::__pgrx_c_operand!(@check_safety; $t);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -3454,7 +3601,7 @@ macro_rules! INSTR_TIME_SET_CURRENT {
                                             $crate::__pgrx_c_bindings::instr_time
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_1a181b889cb8c3dcd3d4d62c467ac999()
+                                        $crate::__pgrx_c_generated::Inline_036dbd2f3784e423a7c2d617570d6ce5()
                                     )
                                 )
                             )
@@ -3462,7 +3609,7 @@ macro_rules! INSTR_TIME_SET_CURRENT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3480,7 +3627,7 @@ macro_rules! INSTR_TIME_SET_CURRENT {
                                 $crate::__pgrx_c_bindings::instr_time
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::__pgrx_c_generated::Inline_1a181b889cb8c3dcd3d4d62c467ac999()
+                            $crate::__pgrx_c_generated::Inline_036dbd2f3784e423a7c2d617570d6ce5()
                         )
                     )
                 )
@@ -3577,6 +3724,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_CURRENT_FAST {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_SET_CURRENT_FAST] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT_FAST!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3614,6 +3768,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_CURRENT_FAST {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_SET_CURRENT_FAST] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT_FAST!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3630,7 +3791,7 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_CURRENT_FAST {
         $crate::INSTR_TIME_SET_CURRENT_FAST!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro INSTR_TIME_SET_CURRENT_FAST from instr_time.h:431
@@ -3678,7 +3839,7 @@ macro_rules! INSTR_TIME_SET_CURRENT_FAST {
                                 $crate::__pgrx_c_bindings::instr_time
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::__pgrx_c_generated::Inline_07f505ca20d4e2441c1e5ce8232eaf53()
+                            $crate::__pgrx_c_generated::Inline_c8848e70f8ec0c9060ca431866e343d5()
                         )
                     )
                 )
@@ -3689,13 +3850,13 @@ macro_rules! INSTR_TIME_SET_CURRENT_FAST {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT_FAST!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $t:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT_FAST!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $t:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT_FAST!(
@@ -3711,7 +3872,7 @@ macro_rules! INSTR_TIME_SET_CURRENT_FAST {
                         $crate::__pgrx_c_operand!(@check_safety; $t);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -3722,7 +3883,7 @@ macro_rules! INSTR_TIME_SET_CURRENT_FAST {
                                             $crate::__pgrx_c_bindings::instr_time
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_07f505ca20d4e2441c1e5ce8232eaf53()
+                                        $crate::__pgrx_c_generated::Inline_c8848e70f8ec0c9060ca431866e343d5()
                                     )
                                 )
                             )
@@ -3730,7 +3891,7 @@ macro_rules! INSTR_TIME_SET_CURRENT_FAST {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3748,7 +3909,7 @@ macro_rules! INSTR_TIME_SET_CURRENT_FAST {
                                 $crate::__pgrx_c_bindings::instr_time
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::__pgrx_c_generated::Inline_07f505ca20d4e2441c1e5ce8232eaf53()
+                            $crate::__pgrx_c_generated::Inline_c8848e70f8ec0c9060ca431866e343d5()
                         )
                     )
                 )
@@ -3843,6 +4004,11 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_ZERO {
             @argument [__pgrx_c_args_INSTR_TIME_SET_ZERO] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_SET_ZERO] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3880,6 +4046,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_ZERO {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_SET_ZERO] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3896,7 +4069,7 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_ZERO {
         $crate::INSTR_TIME_SET_ZERO!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro INSTR_TIME_SET_ZERO from instr_time.h:429
@@ -3950,13 +4123,13 @@ macro_rules! INSTR_TIME_SET_ZERO {
         $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $t:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $t:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3969,7 +4142,7 @@ macro_rules! INSTR_TIME_SET_ZERO {
                         $crate::__pgrx_c_operand!(@check_safety; $t);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -3990,7 +4163,7 @@ macro_rules! INSTR_TIME_SET_ZERO {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4095,6 +4268,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SUBTRACT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_SUBTRACT] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4156,6 +4336,11 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SUBTRACT {
             @argument [__pgrx_c_args_INSTR_TIME_SUBTRACT] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_SUBTRACT] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4193,6 +4378,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SUBTRACT {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INSTR_TIME_SUBTRACT] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4209,7 +4401,7 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SUBTRACT {
         $crate::INSTR_TIME_SUBTRACT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro INSTR_TIME_SUBTRACT from instr_time.h:444
@@ -4276,13 +4468,13 @@ macro_rules! INSTR_TIME_SUBTRACT {
         $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt, $y:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt, $y:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4296,7 +4488,7 @@ macro_rules! INSTR_TIME_SUBTRACT {
                         $crate::__pgrx_c_operand!(@check_safety; $y);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::modify(
@@ -4325,7 +4517,7 @@ macro_rules! INSTR_TIME_SUBTRACT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4434,20 +4626,20 @@ macro_rules! pg_current_timing_clock_source {
                     $crate::__pgrx_c_macros::CUnsignedInt,
                     u32
                 > as $crate::__pgrx_c_macros::expression::CType
-            >::from_storage($crate::__pgrx_c_generated::Inline_1ffeda9f59d1b12c1b5cad0823f331a5())
+            >::from_storage($crate::__pgrx_c_generated::Inline_3c08d4af0bf0d6491f654cc90b7644de())
         )
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::pg_current_timing_clock_source!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::pg_current_timing_clock_source!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::pg_current_timing_clock_source!(@__pgrx_emit_read_place; $($raw)*)
@@ -4458,7 +4650,7 @@ macro_rules! pg_current_timing_clock_source {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -4468,13 +4660,13 @@ macro_rules! pg_current_timing_clock_source {
                                     u32
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_1ffeda9f59d1b12c1b5cad0823f331a5()
+                                $crate::__pgrx_c_generated::Inline_3c08d4af0bf0d6491f654cc90b7644de()
                             )
                         )
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4491,7 +4683,7 @@ macro_rules! pg_current_timing_clock_source {
                         u32
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_1ffeda9f59d1b12c1b5cad0823f331a5()
+                    $crate::__pgrx_c_generated::Inline_3c08d4af0bf0d6491f654cc90b7644de()
                 )
             );
         }
@@ -4500,13 +4692,13 @@ macro_rules! pg_current_timing_clock_source {
         $crate::pg_current_timing_clock_source!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::pg_current_timing_clock_source!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 
@@ -4578,20 +4770,20 @@ macro_rules! pg_get_ticks {
                 $crate::__pgrx_c_macros::expression::CRawRecord<
                     $crate::__pgrx_c_bindings::instr_time
                 > as $crate::__pgrx_c_macros::expression::CType
-            >::from_storage($crate::__pgrx_c_generated::Inline_1a181b889cb8c3dcd3d4d62c467ac999())
+            >::from_storage($crate::__pgrx_c_generated::Inline_036dbd2f3784e423a7c2d617570d6ce5())
         )
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::pg_get_ticks!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::pg_get_ticks!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::pg_get_ticks!(@__pgrx_emit_read_place; $($raw)*)
@@ -4602,7 +4794,7 @@ macro_rules! pg_get_ticks {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -4610,13 +4802,13 @@ macro_rules! pg_get_ticks {
                                     $crate::__pgrx_c_bindings::instr_time
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_1a181b889cb8c3dcd3d4d62c467ac999()
+                                $crate::__pgrx_c_generated::Inline_036dbd2f3784e423a7c2d617570d6ce5()
                             )
                         )
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4631,7 +4823,7 @@ macro_rules! pg_get_ticks {
                         $crate::__pgrx_c_bindings::instr_time
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_1a181b889cb8c3dcd3d4d62c467ac999()
+                    $crate::__pgrx_c_generated::Inline_036dbd2f3784e423a7c2d617570d6ce5()
                 )
             );
         }
@@ -4640,13 +4832,13 @@ macro_rules! pg_get_ticks {
         $crate::pg_get_ticks!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::pg_get_ticks!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 
@@ -4718,20 +4910,20 @@ macro_rules! pg_get_ticks_fast {
                 $crate::__pgrx_c_macros::expression::CRawRecord<
                     $crate::__pgrx_c_bindings::instr_time
                 > as $crate::__pgrx_c_macros::expression::CType
-            >::from_storage($crate::__pgrx_c_generated::Inline_07f505ca20d4e2441c1e5ce8232eaf53())
+            >::from_storage($crate::__pgrx_c_generated::Inline_c8848e70f8ec0c9060ca431866e343d5())
         )
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::pg_get_ticks_fast!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::pg_get_ticks_fast!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::pg_get_ticks_fast!(@__pgrx_emit_read_place; $($raw)*)
@@ -4742,7 +4934,7 @@ macro_rules! pg_get_ticks_fast {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -4750,13 +4942,13 @@ macro_rules! pg_get_ticks_fast {
                                     $crate::__pgrx_c_bindings::instr_time
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_07f505ca20d4e2441c1e5ce8232eaf53()
+                                $crate::__pgrx_c_generated::Inline_c8848e70f8ec0c9060ca431866e343d5()
                             )
                         )
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4771,7 +4963,7 @@ macro_rules! pg_get_ticks_fast {
                         $crate::__pgrx_c_bindings::instr_time
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_07f505ca20d4e2441c1e5ce8232eaf53()
+                    $crate::__pgrx_c_generated::Inline_c8848e70f8ec0c9060ca431866e343d5()
                 )
             );
         }
@@ -4780,13 +4972,13 @@ macro_rules! pg_get_ticks_fast {
         $crate::pg_get_ticks_fast!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::pg_get_ticks_fast!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 
@@ -4858,20 +5050,20 @@ macro_rules! pg_get_ticks_system {
                 $crate::__pgrx_c_macros::expression::CRawRecord<
                     $crate::__pgrx_c_bindings::instr_time
                 > as $crate::__pgrx_c_macros::expression::CType
-            >::from_storage($crate::__pgrx_c_generated::Inline_f8d4fea9cd2841a3c7a19118a51df1a9())
+            >::from_storage($crate::__pgrx_c_generated::Inline_c9228155ad81b167f91e0f1c66183550())
         )
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::pg_get_ticks_system!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::pg_get_ticks_system!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::pg_get_ticks_system!(@__pgrx_emit_read_place; $($raw)*)
@@ -4882,7 +5074,7 @@ macro_rules! pg_get_ticks_system {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -4890,13 +5082,13 @@ macro_rules! pg_get_ticks_system {
                                     $crate::__pgrx_c_bindings::instr_time
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_f8d4fea9cd2841a3c7a19118a51df1a9()
+                                $crate::__pgrx_c_generated::Inline_c9228155ad81b167f91e0f1c66183550()
                             )
                         )
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4911,7 +5103,7 @@ macro_rules! pg_get_ticks_system {
                         $crate::__pgrx_c_bindings::instr_time
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_f8d4fea9cd2841a3c7a19118a51df1a9()
+                    $crate::__pgrx_c_generated::Inline_c9228155ad81b167f91e0f1c66183550()
                 )
             );
         }
@@ -4920,13 +5112,13 @@ macro_rules! pg_get_ticks_system {
         $crate::pg_get_ticks_system!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::pg_get_ticks_system!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 
@@ -5007,6 +5199,11 @@ macro_rules! __pgrx_c_args_pg_ns_to_ticks {
             @argument [__pgrx_c_args_pg_ns_to_ticks] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_ns_to_ticks] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_ns_to_ticks!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5044,6 +5241,11 @@ macro_rules! __pgrx_c_args_pg_ns_to_ticks {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_ns_to_ticks] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_ns_to_ticks!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5060,7 +5262,7 @@ macro_rules! __pgrx_c_args_pg_ns_to_ticks {
         $crate::pg_ns_to_ticks!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_ns_to_ticks from instr_time.h:306
@@ -5152,13 +5354,13 @@ macro_rules! pg_ns_to_ticks {
         $crate::__pgrx_c_args_pg_ns_to_ticks!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ns:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_ns_to_ticks!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $ns:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_ns_to_ticks!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5171,7 +5373,7 @@ macro_rules! pg_ns_to_ticks {
                         $crate::__pgrx_c_operand!(@check_safety; $ns);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -5197,7 +5399,7 @@ macro_rules! pg_ns_to_ticks {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5301,13 +5503,13 @@ macro_rules! pg_rdtsc {
         $crate::pg_rdtsc!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::pg_rdtsc!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::pg_rdtsc!(@__pgrx_emit_read_place; $($raw)*)
@@ -5318,7 +5520,7 @@ macro_rules! pg_rdtsc {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -5328,7 +5530,7 @@ macro_rules! pg_rdtsc {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5348,13 +5550,13 @@ macro_rules! pg_rdtsc {
         $crate::pg_rdtsc!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::pg_rdtsc!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 
@@ -5427,13 +5629,13 @@ macro_rules! pg_rdtscp {
         $crate::pg_rdtscp!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::pg_rdtscp!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::pg_rdtscp!(@__pgrx_emit_read_place; $($raw)*)
@@ -5444,7 +5646,7 @@ macro_rules! pg_rdtscp {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -5454,7 +5656,7 @@ macro_rules! pg_rdtscp {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5474,13 +5676,13 @@ macro_rules! pg_rdtscp {
         $crate::pg_rdtscp!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::pg_rdtscp!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 
@@ -5561,6 +5763,11 @@ macro_rules! __pgrx_c_args_pg_ticks_to_ns {
             @argument [__pgrx_c_args_pg_ticks_to_ns] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_ticks_to_ns] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_ticks_to_ns!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5598,6 +5805,11 @@ macro_rules! __pgrx_c_args_pg_ticks_to_ns {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_ticks_to_ns] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_ticks_to_ns!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5614,7 +5826,7 @@ macro_rules! __pgrx_c_args_pg_ticks_to_ns {
         $crate::pg_ticks_to_ns!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_ticks_to_ns from instr_time.h:262
@@ -5714,13 +5926,13 @@ macro_rules! pg_ticks_to_ns {
         $crate::__pgrx_c_args_pg_ticks_to_ns!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ticks:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_ticks_to_ns!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $ticks:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_ticks_to_ns!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5733,7 +5945,7 @@ macro_rules! pg_ticks_to_ns {
                         $crate::__pgrx_c_operand!(@check_safety; $ticks);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -5759,7 +5971,7 @@ macro_rules! pg_ticks_to_ns {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

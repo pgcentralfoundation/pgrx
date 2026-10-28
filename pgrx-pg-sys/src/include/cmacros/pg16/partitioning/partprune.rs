@@ -74,6 +74,13 @@ macro_rules! __pgrx_c_args_PruneCxtStateIdx {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PruneCxtStateIdx] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PruneCxtStateIdx!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -125,6 +132,13 @@ macro_rules! __pgrx_c_args_PruneCxtStateIdx {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_PruneCxtStateIdx] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PruneCxtStateIdx] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -189,6 +203,11 @@ macro_rules! __pgrx_c_args_PruneCxtStateIdx {
             @argument [__pgrx_c_args_PruneCxtStateIdx] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PruneCxtStateIdx] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PruneCxtStateIdx!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -226,6 +245,13 @@ macro_rules! __pgrx_c_args_PruneCxtStateIdx {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PruneCxtStateIdx] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PruneCxtStateIdx!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -242,7 +268,7 @@ macro_rules! __pgrx_c_args_PruneCxtStateIdx {
         $crate::PruneCxtStateIdx!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PruneCxtStateIdx from partprune.h:70
@@ -313,13 +339,13 @@ macro_rules! PruneCxtStateIdx {
         $crate::__pgrx_c_args_PruneCxtStateIdx!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $partnatts:tt, $step_id:tt, $keyno:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PruneCxtStateIdx!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $partnatts:tt, $step_id:tt, $keyno:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PruneCxtStateIdx!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -334,7 +360,7 @@ macro_rules! PruneCxtStateIdx {
                         $crate::__pgrx_c_operand!(@check_safety; $keyno);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                             $crate::__pgrx_c_macros::expression::add::<
@@ -372,7 +398,7 @@ macro_rules! PruneCxtStateIdx {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

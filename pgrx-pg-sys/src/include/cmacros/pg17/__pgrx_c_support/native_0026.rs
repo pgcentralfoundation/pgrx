@@ -4,54 +4,86 @@ This code is generated for documentation purposes, so that it is easy to referen
 */
 // Shared generated C macro support.
 
-#[doc = "Call the original C function `__ctype_b_loc`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline_2fb358639fa041b0952d93be51e9f393"]
+    fn raw_inline_2fb358639fa041b0952d93be51e9f393(
+        arg0: *mut crate::__pgrx_c_bindings::QueryCompletion,
+        arg1: u32,
+        arg2: u64,
+    ) -> ();
+}
+#[doc = "Call the original C function `SetQueryCompletion`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_d01ea46cbc449475d9bacf75d871024c() -> *mut *const u16 {
+pub unsafe fn Inline_2fb358639fa041b0952d93be51e9f393(
+    arg0: *mut crate::__pgrx_c_bindings::QueryCompletion,
+    arg1: u32,
+    arg2: u64,
+) -> () {
+    const _: () =
+        assert!(!::core::mem::needs_drop::<*mut crate::__pgrx_c_bindings::QueryCompletion>());
+    const _: () = assert!(!::core::mem::needs_drop::<u32>());
+    const _: () = assert!(!::core::mem::needs_drop::<u64>());
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
-        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_d01ea46cbc449475d9bacf75d871024c())
+        crate::ffi::pg_guard_ffi_boundary(move || {
+            raw_inline_2fb358639fa041b0952d93be51e9f393(arg0, arg1, arg2)
+        })
+    }
+}
+const _: () = assert!(::core::mem::size_of::<*mut *const u16>() == 8);
+const _: () = assert!(::core::mem::align_of::<*mut *const u16>() == 8);
+unsafe extern "C-unwind" {
+    #[link_name = "__pgrx_inline_955d728372ed13032c75306f5005a4b8"]
+    fn raw_inline_955d728372ed13032c75306f5005a4b8() -> *mut *const u16;
+}
+#[doc = "Call the original C function `__ctype_b_loc`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
+#[inline]
+pub unsafe fn Inline_955d728372ed13032c75306f5005a4b8() -> *mut *const u16 {
+    // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
+    unsafe {
+        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_955d728372ed13032c75306f5005a4b8())
     }
 }
 const _: () = assert!(::core::mem::size_of::<bool>() == 1);
 const _: () = assert!(::core::mem::align_of::<bool>() == 1);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_f1aeb73fc0fdd357b81a1cedd12bd561"]
-    fn raw_inline_f1aeb73fc0fdd357b81a1cedd12bd561() -> bool;
+    #[link_name = "__pgrx_inline_18b63667741973a323e259094f2a6973"]
+    fn raw_inline_18b63667741973a323e259094f2a6973() -> bool;
 }
 #[doc = "Call the original C function `am_leader_apply_worker`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_f1aeb73fc0fdd357b81a1cedd12bd561() -> bool {
+pub unsafe fn Inline_18b63667741973a323e259094f2a6973() -> bool {
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
-        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_f1aeb73fc0fdd357b81a1cedd12bd561())
+        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_18b63667741973a323e259094f2a6973())
     }
 }
 const _: () = assert!(::core::mem::size_of::<bool>() == 1);
 const _: () = assert!(::core::mem::align_of::<bool>() == 1);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_169d2255a45177fcf03a95ab0e468ec3"]
-    fn raw_inline_169d2255a45177fcf03a95ab0e468ec3() -> bool;
+    #[link_name = "__pgrx_inline_7a92e91521b122b8da008a3d0c63264e"]
+    fn raw_inline_7a92e91521b122b8da008a3d0c63264e() -> bool;
 }
 #[doc = "Call the original C function `am_parallel_apply_worker`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_169d2255a45177fcf03a95ab0e468ec3() -> bool {
+pub unsafe fn Inline_7a92e91521b122b8da008a3d0c63264e() -> bool {
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
-        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_169d2255a45177fcf03a95ab0e468ec3())
+        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_7a92e91521b122b8da008a3d0c63264e())
     }
 }
 const _: () = assert!(::core::mem::size_of::<bool>() == 1);
 const _: () = assert!(::core::mem::align_of::<bool>() == 1);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_511f6ed4fc5f3e5ed9cbc7681251f8fc"]
-    fn raw_inline_511f6ed4fc5f3e5ed9cbc7681251f8fc() -> bool;
+    #[link_name = "__pgrx_inline_f36b7721c52f906ada08fc3f2b195b93"]
+    fn raw_inline_f36b7721c52f906ada08fc3f2b195b93() -> bool;
 }
 #[doc = "Call the original C function `am_tablesync_worker`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_511f6ed4fc5f3e5ed9cbc7681251f8fc() -> bool {
+pub unsafe fn Inline_f36b7721c52f906ada08fc3f2b195b93() -> bool {
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
-        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_511f6ed4fc5f3e5ed9cbc7681251f8fc())
+        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_f36b7721c52f906ada08fc3f2b195b93())
     }
 }
 const _: () = assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::StringInfoData>() == 8);
@@ -60,15 +92,15 @@ const _: () =
 const _: () = assert!(::core::mem::size_of::<i8>() == 1);
 const _: () = assert!(::core::mem::align_of::<i8>() == 1);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_f41ab4a6e6c0050dedaec355995c7de3"]
-    fn raw_inline_f41ab4a6e6c0050dedaec355995c7de3(
+    #[link_name = "__pgrx_inline_5f4cb997fe80cf56c2dbfd8dc9b40ef6"]
+    fn raw_inline_5f4cb997fe80cf56c2dbfd8dc9b40ef6(
         arg0: *mut crate::__pgrx_c_bindings::StringInfoData,
         arg1: i8,
     ) -> ();
 }
 #[doc = "Call the original C function `appendStringInfoChar`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_f41ab4a6e6c0050dedaec355995c7de3(
+pub unsafe fn Inline_5f4cb997fe80cf56c2dbfd8dc9b40ef6(
     arg0: *mut crate::__pgrx_c_bindings::StringInfoData,
     arg1: i8,
 ) -> () {
@@ -78,7 +110,7 @@ pub unsafe fn Inline_f41ab4a6e6c0050dedaec355995c7de3(
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
         crate::ffi::pg_guard_ffi_boundary(move || {
-            raw_inline_f41ab4a6e6c0050dedaec355995c7de3(arg0, arg1)
+            raw_inline_5f4cb997fe80cf56c2dbfd8dc9b40ef6(arg0, arg1)
         })
     }
 }
@@ -87,16 +119,16 @@ const _: () = assert!(::core::mem::align_of::<*const i8>() == 8);
 const _: () = assert!(::core::mem::size_of::<f64>() == 8);
 const _: () = assert!(::core::mem::align_of::<f64>() == 8);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_f64910be7b1bfb3f5b496b463ef8e763"]
-    fn raw_inline_f64910be7b1bfb3f5b496b463ef8e763(arg0: *const i8) -> f64;
+    #[link_name = "__pgrx_inline_60e3fec337300bc062f88047102f8027"]
+    fn raw_inline_60e3fec337300bc062f88047102f8027(arg0: *const i8) -> f64;
 }
 #[doc = "Call the original C function `atof`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_f64910be7b1bfb3f5b496b463ef8e763(arg0: *const i8) -> f64 {
+pub unsafe fn Inline_60e3fec337300bc062f88047102f8027(arg0: *const i8) -> f64 {
     const _: () = assert!(!::core::mem::needs_drop::<*const i8>());
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
-        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_f64910be7b1bfb3f5b496b463ef8e763(arg0))
+        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_60e3fec337300bc062f88047102f8027(arg0))
     }
 }
 const _: () = assert!(::core::mem::size_of::<f64>() == 8);
@@ -104,16 +136,16 @@ const _: () = assert!(::core::mem::align_of::<f64>() == 8);
 const _: () = assert!(::core::mem::size_of::<f64>() == 8);
 const _: () = assert!(::core::mem::align_of::<f64>() == 8);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_11b341ec73004535a9946666bef7abc3"]
-    fn raw_inline_11b341ec73004535a9946666bef7abc3(arg0: f64) -> f64;
+    #[link_name = "__pgrx_inline_76504638ef2a398b596062bd9220ca14"]
+    fn raw_inline_76504638ef2a398b596062bd9220ca14(arg0: f64) -> f64;
 }
 #[doc = "Call the original C function `ceil`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_11b341ec73004535a9946666bef7abc3(arg0: f64) -> f64 {
+pub unsafe fn Inline_76504638ef2a398b596062bd9220ca14(arg0: f64) -> f64 {
     const _: () = assert!(!::core::mem::needs_drop::<f64>());
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
-        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_11b341ec73004535a9946666bef7abc3(arg0))
+        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_76504638ef2a398b596062bd9220ca14(arg0))
     }
 }
 const _: () = assert!(::core::mem::size_of::<i8>() == 1);
@@ -121,16 +153,16 @@ const _: () = assert!(::core::mem::align_of::<i8>() == 1);
 const _: () = assert!(::core::mem::size_of::<*const ::core::ffi::c_char>() == 8);
 const _: () = assert!(::core::mem::align_of::<*const ::core::ffi::c_char>() == 8);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_8aecadcd23299b9e21e522a1434030ea"]
-    fn raw_inline_8aecadcd23299b9e21e522a1434030ea(arg0: i8) -> *const ::core::ffi::c_char;
+    #[link_name = "__pgrx_inline_baa3f841de54dcb96f2f81edb31469cd"]
+    fn raw_inline_baa3f841de54dcb96f2f81edb31469cd(arg0: i8) -> *const ::core::ffi::c_char;
 }
 #[doc = "Call the original C function `collprovider_name`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_8aecadcd23299b9e21e522a1434030ea(arg0: i8) -> *const ::core::ffi::c_char {
+pub unsafe fn Inline_baa3f841de54dcb96f2f81edb31469cd(arg0: i8) -> *const ::core::ffi::c_char {
     const _: () = assert!(!::core::mem::needs_drop::<i8>());
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
-        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_8aecadcd23299b9e21e522a1434030ea(arg0))
+        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_baa3f841de54dcb96f2f81edb31469cd(arg0))
     }
 }
 const _: () = assert!(::core::mem::size_of::<*const i8>() == 8);
@@ -142,8 +174,8 @@ const _: () = assert!(::core::mem::align_of::<i32>() == 4);
 const _: () = assert!(::core::mem::size_of::<*mut i8>() == 8);
 const _: () = assert!(::core::mem::align_of::<*mut i8>() == 8);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_5b187ec9cc0450261bdc48d696dba725"]
-    fn raw_inline_5b187ec9cc0450261bdc48d696dba725(
+    #[link_name = "__pgrx_inline_c43097d7e92e417361d375be54723225"]
+    fn raw_inline_c43097d7e92e417361d375be54723225(
         arg0: *const i8,
         arg1: *const i8,
         arg2: i32,
@@ -151,7 +183,7 @@ unsafe extern "C-unwind" {
 }
 #[doc = "Call the original C function `dcgettext`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_5b187ec9cc0450261bdc48d696dba725(
+pub unsafe fn Inline_c43097d7e92e417361d375be54723225(
     arg0: *const i8,
     arg1: *const i8,
     arg2: i32,
@@ -162,7 +194,7 @@ pub unsafe fn Inline_5b187ec9cc0450261bdc48d696dba725(
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
         crate::ffi::pg_guard_ffi_boundary(move || {
-            raw_inline_5b187ec9cc0450261bdc48d696dba725(arg0, arg1, arg2)
+            raw_inline_c43097d7e92e417361d375be54723225(arg0, arg1, arg2)
         })
     }
 }
@@ -171,16 +203,16 @@ const _: () = assert!(::core::mem::align_of::<f64>() == 8);
 const _: () = assert!(::core::mem::size_of::<f64>() == 8);
 const _: () = assert!(::core::mem::align_of::<f64>() == 8);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_31457d87c737e1c39e12330deaf39521"]
-    fn raw_inline_31457d87c737e1c39e12330deaf39521(arg0: f64) -> f64;
+    #[link_name = "__pgrx_inline_9fbe7e23538c0c9112281a795e2f8a8d"]
+    fn raw_inline_9fbe7e23538c0c9112281a795e2f8a8d(arg0: f64) -> f64;
 }
 #[doc = "Call the original C function `floor`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_31457d87c737e1c39e12330deaf39521(arg0: f64) -> f64 {
+pub unsafe fn Inline_9fbe7e23538c0c9112281a795e2f8a8d(arg0: f64) -> f64 {
     const _: () = assert!(!::core::mem::needs_drop::<f64>());
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
-        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_31457d87c737e1c39e12330deaf39521(arg0))
+        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_9fbe7e23538c0c9112281a795e2f8a8d(arg0))
     }
 }
 const _: () = assert!(::core::mem::size_of::<*const crate::__pgrx_c_bindings::List>() == 8);
@@ -200,8 +232,8 @@ const _: () = assert!(
         == 8
 );
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_8b99014d9780aa9c398d32282581edec"]
-    fn raw_inline_8b99014d9780aa9c398d32282581edec(
+    #[link_name = "__pgrx_inline_e1d185823fc6fcc6c0f1c80176ae9f94"]
+    fn raw_inline_e1d185823fc6fcc6c0f1c80176ae9f94(
         arg0: *const crate::__pgrx_c_bindings::List,
         arg1: *const crate::__pgrx_c_bindings::ListCell,
         arg2: *const crate::__pgrx_c_bindings::List,
@@ -210,7 +242,7 @@ unsafe extern "C-unwind" {
 }
 #[doc = "Call the original C function `for_both_cell_setup`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_8b99014d9780aa9c398d32282581edec(
+pub unsafe fn Inline_e1d185823fc6fcc6c0f1c80176ae9f94(
     arg0: *const crate::__pgrx_c_bindings::List,
     arg1: *const crate::__pgrx_c_bindings::ListCell,
     arg2: *const crate::__pgrx_c_bindings::List,
@@ -223,7 +255,7 @@ pub unsafe fn Inline_8b99014d9780aa9c398d32282581edec(
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
         crate::ffi::pg_guard_ffi_boundary(move || {
-            raw_inline_8b99014d9780aa9c398d32282581edec(arg0, arg1, arg2, arg3)
+            raw_inline_e1d185823fc6fcc6c0f1c80176ae9f94(arg0, arg1, arg2, arg3)
         })
     }
 }
@@ -240,15 +272,15 @@ const _: () = assert!(
         == 8
 );
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_24c7b0bc1b09aa6db0d980feb9f348f8"]
-    fn raw_inline_24c7b0bc1b09aa6db0d980feb9f348f8(
+    #[link_name = "__pgrx_inline_d94d294313cf43b5223a364ec02aa5f8"]
+    fn raw_inline_d94d294313cf43b5223a364ec02aa5f8(
         arg0: *const crate::__pgrx_c_bindings::List,
         arg1: *const crate::__pgrx_c_bindings::ListCell,
     ) -> ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ForEachState>;
 }
 #[doc = "Call the original C function `for_each_cell_setup`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_24c7b0bc1b09aa6db0d980feb9f348f8(
+pub unsafe fn Inline_d94d294313cf43b5223a364ec02aa5f8(
     arg0: *const crate::__pgrx_c_bindings::List,
     arg1: *const crate::__pgrx_c_bindings::ListCell,
 ) -> ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ForEachState> {
@@ -257,7 +289,7 @@ pub unsafe fn Inline_24c7b0bc1b09aa6db0d980feb9f348f8(
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
         crate::ffi::pg_guard_ffi_boundary(move || {
-            raw_inline_24c7b0bc1b09aa6db0d980feb9f348f8(arg0, arg1)
+            raw_inline_d94d294313cf43b5223a364ec02aa5f8(arg0, arg1)
         })
     }
 }
@@ -274,15 +306,15 @@ const _: () = assert!(
         == 8
 );
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_2733cc5dc64ac7fce15f71762a29e6d8"]
-    fn raw_inline_2733cc5dc64ac7fce15f71762a29e6d8(
+    #[link_name = "__pgrx_inline_547d96c7580d4587c3d089c9d7c33470"]
+    fn raw_inline_547d96c7580d4587c3d089c9d7c33470(
         arg0: *const crate::__pgrx_c_bindings::List,
         arg1: i32,
     ) -> ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ForEachState>;
 }
 #[doc = "Call the original C function `for_each_from_setup`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_2733cc5dc64ac7fce15f71762a29e6d8(
+pub unsafe fn Inline_547d96c7580d4587c3d089c9d7c33470(
     arg0: *const crate::__pgrx_c_bindings::List,
     arg1: i32,
 ) -> ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::ForEachState> {
@@ -291,7 +323,7 @@ pub unsafe fn Inline_2733cc5dc64ac7fce15f71762a29e6d8(
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
         crate::ffi::pg_guard_ffi_boundary(move || {
-            raw_inline_2733cc5dc64ac7fce15f71762a29e6d8(arg0, arg1)
+            raw_inline_547d96c7580d4587c3d089c9d7c33470(arg0, arg1)
         })
     }
 }
@@ -300,16 +332,16 @@ const _: () = assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::Oid>() =
 const _: () = assert!(::core::mem::size_of::<i8>() == 1);
 const _: () = assert!(::core::mem::align_of::<i8>() == 1);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_b425e214373a923ebe3732264bc869d8"]
-    fn raw_inline_b425e214373a923ebe3732264bc869d8(arg0: crate::__pgrx_c_bindings::Oid) -> i8;
+    #[link_name = "__pgrx_inline_1feb2085237ed9fa2d01f981656e6c8c"]
+    fn raw_inline_1feb2085237ed9fa2d01f981656e6c8c(arg0: crate::__pgrx_c_bindings::Oid) -> i8;
 }
 #[doc = "Call the original C function `get_typstorage`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_b425e214373a923ebe3732264bc869d8(arg0: crate::__pgrx_c_bindings::Oid) -> i8 {
+pub unsafe fn Inline_1feb2085237ed9fa2d01f981656e6c8c(arg0: crate::__pgrx_c_bindings::Oid) -> i8 {
     const _: () = assert!(!::core::mem::needs_drop::<crate::__pgrx_c_bindings::Oid>());
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
-        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_b425e214373a923ebe3732264bc869d8(arg0))
+        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_1feb2085237ed9fa2d01f981656e6c8c(arg0))
     }
 }
 const _: () = assert!(::core::mem::size_of::<i64>() == 8);
@@ -317,16 +349,16 @@ const _: () = assert!(::core::mem::align_of::<i64>() == 8);
 const _: () = assert!(::core::mem::size_of::<i64>() == 8);
 const _: () = assert!(::core::mem::align_of::<i64>() == 8);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_9e366d4c2dd87044402df3a845461be3"]
-    fn raw_inline_9e366d4c2dd87044402df3a845461be3(arg0: i64) -> i64;
+    #[link_name = "__pgrx_inline_8aadcb8b74d1f2f3ce9375077ca1af13"]
+    fn raw_inline_8aadcb8b74d1f2f3ce9375077ca1af13(arg0: i64) -> i64;
 }
 #[doc = "Call the original C function `labs`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_9e366d4c2dd87044402df3a845461be3(arg0: i64) -> i64 {
+pub unsafe fn Inline_8aadcb8b74d1f2f3ce9375077ca1af13(arg0: i64) -> i64 {
     const _: () = assert!(!::core::mem::needs_drop::<i64>());
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
-        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_9e366d4c2dd87044402df3a845461be3(arg0))
+        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_8aadcb8b74d1f2f3ce9375077ca1af13(arg0))
     }
 }
 const _: () = assert!(::core::mem::size_of::<*mut ::core::ffi::c_void>() == 8);
@@ -338,8 +370,8 @@ const _: () = assert!(::core::mem::align_of::<u64>() == 8);
 const _: () = assert!(::core::mem::size_of::<*mut ::core::ffi::c_void>() == 8);
 const _: () = assert!(::core::mem::align_of::<*mut ::core::ffi::c_void>() == 8);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_3b2d6a4cf5b0bd0e8ade91b877f2bbda"]
-    fn raw_inline_3b2d6a4cf5b0bd0e8ade91b877f2bbda(
+    #[link_name = "__pgrx_inline_68aa97b4a9b83970dabc5a5f33abb3c8"]
+    fn raw_inline_68aa97b4a9b83970dabc5a5f33abb3c8(
         arg0: *mut ::core::ffi::c_void,
         arg1: *const ::core::ffi::c_void,
         arg2: u64,
@@ -347,7 +379,7 @@ unsafe extern "C-unwind" {
 }
 #[doc = "Call the original C function `memcpy`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_3b2d6a4cf5b0bd0e8ade91b877f2bbda(
+pub unsafe fn Inline_68aa97b4a9b83970dabc5a5f33abb3c8(
     arg0: *mut ::core::ffi::c_void,
     arg1: *const ::core::ffi::c_void,
     arg2: u64,
@@ -358,7 +390,7 @@ pub unsafe fn Inline_3b2d6a4cf5b0bd0e8ade91b877f2bbda(
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
         crate::ffi::pg_guard_ffi_boundary(move || {
-            raw_inline_3b2d6a4cf5b0bd0e8ade91b877f2bbda(arg0, arg1, arg2)
+            raw_inline_68aa97b4a9b83970dabc5a5f33abb3c8(arg0, arg1, arg2)
         })
     }
 }
@@ -369,15 +401,15 @@ const _: () = assert!(::core::mem::align_of::<u32>() == 4);
 const _: () = assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::Node>() == 8);
 const _: () = assert!(::core::mem::align_of::<*mut crate::__pgrx_c_bindings::Node>() == 8);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_e8d4b0d7e7d630489be38b543e7c5b14"]
-    fn raw_inline_e8d4b0d7e7d630489be38b543e7c5b14(
+    #[link_name = "__pgrx_inline_903baaa3a44cca53f859144765942ce8"]
+    fn raw_inline_903baaa3a44cca53f859144765942ce8(
         arg0: usize,
         arg1: u32,
     ) -> *mut crate::__pgrx_c_bindings::Node;
 }
 #[doc = "Call the original C function `newNode`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_e8d4b0d7e7d630489be38b543e7c5b14(
+pub unsafe fn Inline_903baaa3a44cca53f859144765942ce8(
     arg0: usize,
     arg1: u32,
 ) -> *mut crate::__pgrx_c_bindings::Node {
@@ -386,7 +418,7 @@ pub unsafe fn Inline_e8d4b0d7e7d630489be38b543e7c5b14(
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
         crate::ffi::pg_guard_ffi_boundary(move || {
-            raw_inline_e8d4b0d7e7d630489be38b543e7c5b14(arg0, arg1)
+            raw_inline_903baaa3a44cca53f859144765942ce8(arg0, arg1)
         })
     }
 }
@@ -397,29 +429,29 @@ const _: () = assert!(
     ::core::mem::align_of::<::core::mem::MaybeUninit<crate::__pgrx_c_bindings::instr_time>>() == 8
 );
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_5478280976dd3a47c6c919744a51baed"]
-    fn raw_inline_5478280976dd3a47c6c919744a51baed()
+    #[link_name = "__pgrx_inline_2cf55c5193ef5067844a0cb7a5260acd"]
+    fn raw_inline_2cf55c5193ef5067844a0cb7a5260acd()
     -> ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::instr_time>;
 }
 #[doc = "Call the original C function `pg_clock_gettime_ns`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_5478280976dd3a47c6c919744a51baed()
+pub unsafe fn Inline_2cf55c5193ef5067844a0cb7a5260acd()
 -> ::core::mem::MaybeUninit<crate::__pgrx_c_bindings::instr_time> {
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
-        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_5478280976dd3a47c6c919744a51baed())
+        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_2cf55c5193ef5067844a0cb7a5260acd())
     }
 }
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_2179c51183e7296f60e32255e28910f5"]
-    fn raw_inline_2179c51183e7296f60e32255e28910f5() -> ();
+    #[link_name = "__pgrx_inline_b607952939781649fc383b925a67d1c6"]
+    fn raw_inline_b607952939781649fc383b925a67d1c6() -> ();
 }
 #[doc = "Call the original C function `pg_re_throw`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_2179c51183e7296f60e32255e28910f5() -> () {
+pub unsafe fn Inline_b607952939781649fc383b925a67d1c6() -> () {
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
-        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_2179c51183e7296f60e32255e28910f5())
+        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_b607952939781649fc383b925a67d1c6())
     }
 }
 const _: () = assert!(::core::mem::size_of::<*const crate::__pgrx_c_bindings::RangeType>() == 8);
@@ -427,20 +459,20 @@ const _: () = assert!(::core::mem::align_of::<*const crate::__pgrx_c_bindings::R
 const _: () = assert!(::core::mem::size_of::<i8>() == 1);
 const _: () = assert!(::core::mem::align_of::<i8>() == 1);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_fb3b445d7fb2f74c00ba2ec82088785f"]
-    fn raw_inline_fb3b445d7fb2f74c00ba2ec82088785f(
+    #[link_name = "__pgrx_inline_25205898a6cdd31148d26f00020c7129"]
+    fn raw_inline_25205898a6cdd31148d26f00020c7129(
         arg0: *const crate::__pgrx_c_bindings::RangeType,
     ) -> i8;
 }
 #[doc = "Call the original C function `range_get_flags`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_fb3b445d7fb2f74c00ba2ec82088785f(
+pub unsafe fn Inline_25205898a6cdd31148d26f00020c7129(
     arg0: *const crate::__pgrx_c_bindings::RangeType,
 ) -> i8 {
     const _: () = assert!(!::core::mem::needs_drop::<*const crate::__pgrx_c_bindings::RangeType>());
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
-        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_fb3b445d7fb2f74c00ba2ec82088785f(arg0))
+        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_25205898a6cdd31148d26f00020c7129(arg0))
     }
 }
 const _: () = assert!(::core::mem::size_of::<f64>() == 8);
@@ -448,16 +480,16 @@ const _: () = assert!(::core::mem::align_of::<f64>() == 8);
 const _: () = assert!(::core::mem::size_of::<f64>() == 8);
 const _: () = assert!(::core::mem::align_of::<f64>() == 8);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_91437e2c2f5de8b5214366860d11b162"]
-    fn raw_inline_91437e2c2f5de8b5214366860d11b162(arg0: f64) -> f64;
+    #[link_name = "__pgrx_inline_6e8f0f29aad56aa47dd33fdd0fe1af5b"]
+    fn raw_inline_6e8f0f29aad56aa47dd33fdd0fe1af5b(arg0: f64) -> f64;
 }
 #[doc = "Call the original C function `rint`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_91437e2c2f5de8b5214366860d11b162(arg0: f64) -> f64 {
+pub unsafe fn Inline_6e8f0f29aad56aa47dd33fdd0fe1af5b(arg0: f64) -> f64 {
     const _: () = assert!(!::core::mem::needs_drop::<f64>());
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
-        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_91437e2c2f5de8b5214366860d11b162(arg0))
+        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_6e8f0f29aad56aa47dd33fdd0fe1af5b(arg0))
     }
 }
 const _: () =
@@ -471,8 +503,8 @@ const _: () = assert!(::core::mem::align_of::<u32>() == 4);
 const _: () = assert!(::core::mem::size_of::<*mut ::core::ffi::c_void>() == 8);
 const _: () = assert!(::core::mem::align_of::<*mut ::core::ffi::c_void>() == 8);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_db52b838aad9d3c7d38d42ba2ee11842"]
-    fn raw_inline_db52b838aad9d3c7d38d42ba2ee11842(
+    #[link_name = "__pgrx_inline_67d4ecf87bd66a879407984c1d78794c"]
+    fn raw_inline_67d4ecf87bd66a879407984c1d78794c(
         arg0: *mut crate::__pgrx_c_bindings::SMgrRelationData,
         arg1: i32,
         arg2: u32,
@@ -481,7 +513,7 @@ unsafe extern "C-unwind" {
 }
 #[doc = "Call the original C function `smgrread`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_db52b838aad9d3c7d38d42ba2ee11842(
+pub unsafe fn Inline_67d4ecf87bd66a879407984c1d78794c(
     arg0: *mut crate::__pgrx_c_bindings::SMgrRelationData,
     arg1: i32,
     arg2: u32,
@@ -495,7 +527,7 @@ pub unsafe fn Inline_db52b838aad9d3c7d38d42ba2ee11842(
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
         crate::ffi::pg_guard_ffi_boundary(move || {
-            raw_inline_db52b838aad9d3c7d38d42ba2ee11842(arg0, arg1, arg2, arg3)
+            raw_inline_67d4ecf87bd66a879407984c1d78794c(arg0, arg1, arg2, arg3)
         })
     }
 }
@@ -512,8 +544,8 @@ const _: () = assert!(::core::mem::align_of::<*const ::core::ffi::c_void>() == 8
 const _: () = assert!(::core::mem::size_of::<bool>() == 1);
 const _: () = assert!(::core::mem::align_of::<bool>() == 1);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_ddbe7e91e12d85d256c6b34d84136671"]
-    fn raw_inline_ddbe7e91e12d85d256c6b34d84136671(
+    #[link_name = "__pgrx_inline_50efb1dba230657eb987762e605adf6b"]
+    fn raw_inline_50efb1dba230657eb987762e605adf6b(
         arg0: *mut crate::__pgrx_c_bindings::SMgrRelationData,
         arg1: i32,
         arg2: u32,
@@ -523,7 +555,7 @@ unsafe extern "C-unwind" {
 }
 #[doc = "Call the original C function `smgrwrite`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_ddbe7e91e12d85d256c6b34d84136671(
+pub unsafe fn Inline_50efb1dba230657eb987762e605adf6b(
     arg0: *mut crate::__pgrx_c_bindings::SMgrRelationData,
     arg1: i32,
     arg2: u32,
@@ -539,7 +571,7 @@ pub unsafe fn Inline_ddbe7e91e12d85d256c6b34d84136671(
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
         crate::ffi::pg_guard_ffi_boundary(move || {
-            raw_inline_ddbe7e91e12d85d256c6b34d84136671(arg0, arg1, arg2, arg3, arg4)
+            raw_inline_50efb1dba230657eb987762e605adf6b(arg0, arg1, arg2, arg3, arg4)
         })
     }
 }
@@ -548,16 +580,16 @@ const _: () = assert!(::core::mem::align_of::<*const i8>() == 8);
 const _: () = assert!(::core::mem::size_of::<u64>() == 8);
 const _: () = assert!(::core::mem::align_of::<u64>() == 8);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_d149f5a3121a4dd1850f6472cc624c30"]
-    fn raw_inline_d149f5a3121a4dd1850f6472cc624c30(arg0: *const i8) -> u64;
+    #[link_name = "__pgrx_inline_e5a17c0f96276e5c9a132f335239bd20"]
+    fn raw_inline_e5a17c0f96276e5c9a132f335239bd20(arg0: *const i8) -> u64;
 }
 #[doc = "Call the original C function `strlen`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_d149f5a3121a4dd1850f6472cc624c30(arg0: *const i8) -> u64 {
+pub unsafe fn Inline_e5a17c0f96276e5c9a132f335239bd20(arg0: *const i8) -> u64 {
     const _: () = assert!(!::core::mem::needs_drop::<*const i8>());
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
-        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_d149f5a3121a4dd1850f6472cc624c30(arg0))
+        crate::ffi::pg_guard_ffi_boundary(move || raw_inline_e5a17c0f96276e5c9a132f335239bd20(arg0))
     }
 }
 const _: () = assert!(::core::mem::size_of::<*const i8>() == 8);
@@ -569,8 +601,8 @@ const _: () = assert!(::core::mem::align_of::<i32>() == 4);
 const _: () = assert!(::core::mem::size_of::<i64>() == 8);
 const _: () = assert!(::core::mem::align_of::<i64>() == 8);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_5a5aba47a62ed3600f0dbd734135aff6"]
-    fn raw_inline_5a5aba47a62ed3600f0dbd734135aff6(
+    #[link_name = "__pgrx_inline_28c5ebea20cbf23edda77265aecef3ae"]
+    fn raw_inline_28c5ebea20cbf23edda77265aecef3ae(
         arg0: *const i8,
         arg1: *mut *mut i8,
         arg2: i32,
@@ -578,7 +610,7 @@ unsafe extern "C-unwind" {
 }
 #[doc = "Call the original C function `strtol`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_5a5aba47a62ed3600f0dbd734135aff6(
+pub unsafe fn Inline_28c5ebea20cbf23edda77265aecef3ae(
     arg0: *const i8,
     arg1: *mut *mut i8,
     arg2: i32,
@@ -589,7 +621,7 @@ pub unsafe fn Inline_5a5aba47a62ed3600f0dbd734135aff6(
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
         crate::ffi::pg_guard_ffi_boundary(move || {
-            raw_inline_5a5aba47a62ed3600f0dbd734135aff6(arg0, arg1, arg2)
+            raw_inline_28c5ebea20cbf23edda77265aecef3ae(arg0, arg1, arg2)
         })
     }
 }
@@ -602,8 +634,8 @@ const _: () = assert!(::core::mem::align_of::<i32>() == 4);
 const _: () = assert!(::core::mem::size_of::<u64>() == 8);
 const _: () = assert!(::core::mem::align_of::<u64>() == 8);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_c706cb132e20027f707d66074f3aff37"]
-    fn raw_inline_c706cb132e20027f707d66074f3aff37(
+    #[link_name = "__pgrx_inline_101dd51dd2ef8a860d744d1182cb2904"]
+    fn raw_inline_101dd51dd2ef8a860d744d1182cb2904(
         arg0: *const i8,
         arg1: *mut *mut i8,
         arg2: i32,
@@ -611,7 +643,7 @@ unsafe extern "C-unwind" {
 }
 #[doc = "Call the original C function `strtoul`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_c706cb132e20027f707d66074f3aff37(
+pub unsafe fn Inline_101dd51dd2ef8a860d744d1182cb2904(
     arg0: *const i8,
     arg1: *mut *mut i8,
     arg2: i32,
@@ -622,7 +654,7 @@ pub unsafe fn Inline_c706cb132e20027f707d66074f3aff37(
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
         crate::ffi::pg_guard_ffi_boundary(move || {
-            raw_inline_c706cb132e20027f707d66074f3aff37(arg0, arg1, arg2)
+            raw_inline_101dd51dd2ef8a860d744d1182cb2904(arg0, arg1, arg2)
         })
     }
 }
@@ -639,8 +671,8 @@ const _: () = assert!(::core::mem::align_of::<*mut crate::__pgrx_c_bindings::Tra
 const _: () = assert!(::core::mem::size_of::<*mut crate::__pgrx_c_bindings::MultiXactId>() == 8);
 const _: () = assert!(::core::mem::align_of::<*mut crate::__pgrx_c_bindings::MultiXactId>() == 8);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_bcee00834cef7f709890173af9aaf417"]
-    fn raw_inline_bcee00834cef7f709890173af9aaf417(
+    #[link_name = "__pgrx_inline_d9963295b7a4cdb090ed2a5c04759144"]
+    fn raw_inline_d9963295b7a4cdb090ed2a5c04759144(
         arg0: *mut crate::__pgrx_c_bindings::RelationData,
         arg1: *const crate::__pgrx_c_bindings::RelFileLocator,
         arg2: i8,
@@ -650,7 +682,7 @@ unsafe extern "C-unwind" {
 }
 #[doc = "Call the original C function `table_relation_set_new_filelocator`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_bcee00834cef7f709890173af9aaf417(
+pub unsafe fn Inline_d9963295b7a4cdb090ed2a5c04759144(
     arg0: *mut crate::__pgrx_c_bindings::RelationData,
     arg1: *const crate::__pgrx_c_bindings::RelFileLocator,
     arg2: i8,
@@ -668,7 +700,7 @@ pub unsafe fn Inline_bcee00834cef7f709890173af9aaf417(
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
         crate::ffi::pg_guard_ffi_boundary(move || {
-            raw_inline_bcee00834cef7f709890173af9aaf417(arg0, arg1, arg2, arg3, arg4)
+            raw_inline_d9963295b7a4cdb090ed2a5c04759144(arg0, arg1, arg2, arg3, arg4)
         })
     }
 }
@@ -679,15 +711,15 @@ const _: () = assert!(::core::mem::align_of::<i32>() == 4);
 const _: () = assert!(::core::mem::size_of::<u64>() == 8);
 const _: () = assert!(::core::mem::align_of::<u64>() == 8);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_a56192ae792c90c28420b44b09b25cbc"]
-    fn raw_inline_a56192ae792c90c28420b44b09b25cbc(
+    #[link_name = "__pgrx_inline_ad7b27f2cf5de1efdf7383bca0ce5f7a"]
+    fn raw_inline_ad7b27f2cf5de1efdf7383bca0ce5f7a(
         arg0: *mut crate::__pgrx_c_bindings::RelationData,
         arg1: i32,
     ) -> u64;
 }
 #[doc = "Call the original C function `table_relation_size`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_a56192ae792c90c28420b44b09b25cbc(
+pub unsafe fn Inline_ad7b27f2cf5de1efdf7383bca0ce5f7a(
     arg0: *mut crate::__pgrx_c_bindings::RelationData,
     arg1: i32,
 ) -> u64 {
@@ -697,7 +729,7 @@ pub unsafe fn Inline_a56192ae792c90c28420b44b09b25cbc(
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
         crate::ffi::pg_guard_ffi_boundary(move || {
-            raw_inline_a56192ae792c90c28420b44b09b25cbc(arg0, arg1)
+            raw_inline_ad7b27f2cf5de1efdf7383bca0ce5f7a(arg0, arg1)
         })
     }
 }
@@ -713,8 +745,8 @@ const _: () =
 const _: () = assert!(::core::mem::size_of::<bool>() == 1);
 const _: () = assert!(::core::mem::align_of::<bool>() == 1);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_d4592184a2e3da94d00c265abd89034c"]
-    fn raw_inline_d4592184a2e3da94d00c265abd89034c(
+    #[link_name = "__pgrx_inline_fc75bb25042f4a148ae4097cbae082a0"]
+    fn raw_inline_fc75bb25042f4a148ae4097cbae082a0(
         arg0: *mut crate::__pgrx_c_bindings::TableScanDescData,
         arg1: i32,
         arg2: *mut crate::__pgrx_c_bindings::TupleTableSlot,
@@ -722,7 +754,7 @@ unsafe extern "C-unwind" {
 }
 #[doc = "Call the original C function `table_scan_getnextslot`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_d4592184a2e3da94d00c265abd89034c(
+pub unsafe fn Inline_fc75bb25042f4a148ae4097cbae082a0(
     arg0: *mut crate::__pgrx_c_bindings::TableScanDescData,
     arg1: i32,
     arg2: *mut crate::__pgrx_c_bindings::TupleTableSlot,
@@ -735,7 +767,7 @@ pub unsafe fn Inline_d4592184a2e3da94d00c265abd89034c(
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
         crate::ffi::pg_guard_ffi_boundary(move || {
-            raw_inline_d4592184a2e3da94d00c265abd89034c(arg0, arg1, arg2)
+            raw_inline_fc75bb25042f4a148ae4097cbae082a0(arg0, arg1, arg2)
         })
     }
 }
@@ -751,8 +783,8 @@ const _: () =
 const _: () = assert!(::core::mem::size_of::<bool>() == 1);
 const _: () = assert!(::core::mem::align_of::<bool>() == 1);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_9042c4cdf19826a894e3f55f8f08cee9"]
-    fn raw_inline_9042c4cdf19826a894e3f55f8f08cee9(
+    #[link_name = "__pgrx_inline_839c4b610393339e3e65ce2f1e17575f"]
+    fn raw_inline_839c4b610393339e3e65ce2f1e17575f(
         arg0: *mut crate::__pgrx_c_bindings::TableScanDescData,
         arg1: i32,
         arg2: *mut crate::__pgrx_c_bindings::TupleTableSlot,
@@ -760,7 +792,7 @@ unsafe extern "C-unwind" {
 }
 #[doc = "Call the original C function `table_scan_getnextslot_tidrange`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_9042c4cdf19826a894e3f55f8f08cee9(
+pub unsafe fn Inline_839c4b610393339e3e65ce2f1e17575f(
     arg0: *mut crate::__pgrx_c_bindings::TableScanDescData,
     arg1: i32,
     arg2: *mut crate::__pgrx_c_bindings::TupleTableSlot,
@@ -773,7 +805,7 @@ pub unsafe fn Inline_9042c4cdf19826a894e3f55f8f08cee9(
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
         crate::ffi::pg_guard_ffi_boundary(move || {
-            raw_inline_9042c4cdf19826a894e3f55f8f08cee9(arg0, arg1, arg2)
+            raw_inline_839c4b610393339e3e65ce2f1e17575f(arg0, arg1, arg2)
         })
     }
 }
@@ -799,8 +831,8 @@ const _: () = assert!(::core::mem::align_of::<bool>() == 1);
 const _: () = assert!(::core::mem::size_of::<u32>() == 4);
 const _: () = assert!(::core::mem::align_of::<u32>() == 4);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_9e98ccca188c543b4a3dbcae1da2b9a2"]
-    fn raw_inline_9e98ccca188c543b4a3dbcae1da2b9a2(
+    #[link_name = "__pgrx_inline_8c4807e26e534cf06d2090d4586ab6df"]
+    fn raw_inline_8c4807e26e534cf06d2090d4586ab6df(
         arg0: *mut crate::__pgrx_c_bindings::RelationData,
         arg1: *mut crate::__pgrx_c_bindings::ItemPointerData,
         arg2: u32,
@@ -813,7 +845,7 @@ unsafe extern "C-unwind" {
 }
 #[doc = "Call the original C function `table_tuple_delete`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_9e98ccca188c543b4a3dbcae1da2b9a2(
+pub unsafe fn Inline_8c4807e26e534cf06d2090d4586ab6df(
     arg0: *mut crate::__pgrx_c_bindings::RelationData,
     arg1: *mut crate::__pgrx_c_bindings::ItemPointerData,
     arg2: u32,
@@ -839,7 +871,7 @@ pub unsafe fn Inline_9e98ccca188c543b4a3dbcae1da2b9a2(
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
         crate::ffi::pg_guard_ffi_boundary(move || {
-            raw_inline_9e98ccca188c543b4a3dbcae1da2b9a2(
+            raw_inline_8c4807e26e534cf06d2090d4586ab6df(
                 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7,
             )
         })
@@ -870,8 +902,8 @@ const _: () =
 const _: () = assert!(::core::mem::size_of::<u32>() == 4);
 const _: () = assert!(::core::mem::align_of::<u32>() == 4);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_d31887db58f62802bcaafc622c312476"]
-    fn raw_inline_d31887db58f62802bcaafc622c312476(
+    #[link_name = "__pgrx_inline_28f63e7327d2127ea6798c086c144b8c"]
+    fn raw_inline_28f63e7327d2127ea6798c086c144b8c(
         arg0: *mut crate::__pgrx_c_bindings::RelationData,
         arg1: *mut crate::__pgrx_c_bindings::ItemPointerData,
         arg2: *mut crate::__pgrx_c_bindings::SnapshotData,
@@ -885,7 +917,7 @@ unsafe extern "C-unwind" {
 }
 #[doc = "Call the original C function `table_tuple_lock`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_d31887db58f62802bcaafc622c312476(
+pub unsafe fn Inline_28f63e7327d2127ea6798c086c144b8c(
     arg0: *mut crate::__pgrx_c_bindings::RelationData,
     arg1: *mut crate::__pgrx_c_bindings::ItemPointerData,
     arg2: *mut crate::__pgrx_c_bindings::SnapshotData,
@@ -913,7 +945,7 @@ pub unsafe fn Inline_d31887db58f62802bcaafc622c312476(
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
         crate::ffi::pg_guard_ffi_boundary(move || {
-            raw_inline_d31887db58f62802bcaafc622c312476(
+            raw_inline_28f63e7327d2127ea6798c086c144b8c(
                 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8,
             )
         })
@@ -946,8 +978,8 @@ const _: () = assert!(::core::mem::align_of::<*mut u32>() == 8);
 const _: () = assert!(::core::mem::size_of::<u32>() == 4);
 const _: () = assert!(::core::mem::align_of::<u32>() == 4);
 unsafe extern "C-unwind" {
-    #[link_name = "__pgrx_inline_e12794786ad08bdde5b17be315e9049c"]
-    fn raw_inline_e12794786ad08bdde5b17be315e9049c(
+    #[link_name = "__pgrx_inline_d260c999ac27c71c000d5078d95cf1ea"]
+    fn raw_inline_d260c999ac27c71c000d5078d95cf1ea(
         arg0: *mut crate::__pgrx_c_bindings::RelationData,
         arg1: *mut crate::__pgrx_c_bindings::ItemPointerData,
         arg2: *mut crate::__pgrx_c_bindings::TupleTableSlot,
@@ -962,7 +994,7 @@ unsafe extern "C-unwind" {
 }
 #[doc = "Call the original C function `table_tuple_update`.\n\n# Safety\nPointer arguments must remain live and valid for every access the original function performs, with its required alignment, initialization, bounds, and aliasing. By-value records must have every field the original function reads initialized, and preserve their C object representation. The caller must uphold the original function's resource and thread requirements. Calls must run on the backend thread. Rust callbacks must use the appropriate pgrx callback guard and cannot unwind through the native call. Invariants must already hold when PostgreSQL can raise ERROR."]
 #[inline]
-pub unsafe fn Inline_e12794786ad08bdde5b17be315e9049c(
+pub unsafe fn Inline_d260c999ac27c71c000d5078d95cf1ea(
     arg0: *mut crate::__pgrx_c_bindings::RelationData,
     arg1: *mut crate::__pgrx_c_bindings::ItemPointerData,
     arg2: *mut crate::__pgrx_c_bindings::TupleTableSlot,
@@ -993,7 +1025,7 @@ pub unsafe fn Inline_e12794786ad08bdde5b17be315e9049c(
     // SAFETY: The caller establishes the native function's contract, backend thread, and guarded callback obligations. Captured ABI arguments are scalars, raw pointers, or MaybeUninit aggregates; the assertions above exclude destructors. The closure only makes the native call and cannot run Rust conversion code.
     unsafe {
         crate::ffi::pg_guard_ffi_boundary(move || {
-            raw_inline_e12794786ad08bdde5b17be315e9049c(
+            raw_inline_d260c999ac27c71c000d5078d95cf1ea(
                 arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9,
             )
         })

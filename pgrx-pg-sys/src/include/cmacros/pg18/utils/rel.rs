@@ -89,6 +89,13 @@ macro_rules! __pgrx_c_args_IndexRelationGetNumberOfAttributes {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IndexRelationGetNumberOfAttributes] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IndexRelationGetNumberOfAttributes!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -126,6 +133,13 @@ macro_rules! __pgrx_c_args_IndexRelationGetNumberOfAttributes {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IndexRelationGetNumberOfAttributes] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexRelationGetNumberOfAttributes!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -142,7 +156,7 @@ macro_rules! __pgrx_c_args_IndexRelationGetNumberOfAttributes {
         $crate::IndexRelationGetNumberOfAttributes!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IndexRelationGetNumberOfAttributes from rel.h:528
@@ -300,7 +314,7 @@ macro_rules! IndexRelationGetNumberOfAttributes {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_indnatts,
@@ -336,7 +350,7 @@ macro_rules! IndexRelationGetNumberOfAttributes {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -487,6 +501,13 @@ macro_rules! __pgrx_c_args_IndexRelationGetNumberOfKeyAttributes {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IndexRelationGetNumberOfKeyAttributes] [
+                p1 $mode [$($done)*] []
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IndexRelationGetNumberOfKeyAttributes!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -524,6 +545,13 @@ macro_rules! __pgrx_c_args_IndexRelationGetNumberOfKeyAttributes {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IndexRelationGetNumberOfKeyAttributes] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexRelationGetNumberOfKeyAttributes!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -540,7 +568,7 @@ macro_rules! __pgrx_c_args_IndexRelationGetNumberOfKeyAttributes {
         $crate::IndexRelationGetNumberOfKeyAttributes!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IndexRelationGetNumberOfKeyAttributes from rel.h:535
@@ -698,7 +726,7 @@ macro_rules! IndexRelationGetNumberOfKeyAttributes {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_indnkeyatts,
@@ -734,7 +762,7 @@ macro_rules! IndexRelationGetNumberOfKeyAttributes {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -874,6 +902,11 @@ macro_rules! __pgrx_c_args_RELATION_IS_LOCAL {
             @argument [__pgrx_c_args_RELATION_IS_LOCAL] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RELATION_IS_LOCAL] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RELATION_IS_LOCAL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -911,6 +944,13 @@ macro_rules! __pgrx_c_args_RELATION_IS_LOCAL {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RELATION_IS_LOCAL] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RELATION_IS_LOCAL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -927,7 +967,7 @@ macro_rules! __pgrx_c_args_RELATION_IS_LOCAL {
         $crate::RELATION_IS_LOCAL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RELATION_IS_LOCAL from rel.h:659
@@ -1030,13 +1070,13 @@ macro_rules! RELATION_IS_LOCAL {
         $crate::__pgrx_c_args_RELATION_IS_LOCAL!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RELATION_IS_LOCAL!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RELATION_IS_LOCAL!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1049,7 +1089,7 @@ macro_rules! RELATION_IS_LOCAL {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -1130,7 +1170,7 @@ macro_rules! RELATION_IS_LOCAL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1296,6 +1336,11 @@ macro_rules! __pgrx_c_args_RELATION_IS_OTHER_TEMP {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RELATION_IS_OTHER_TEMP] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RELATION_IS_OTHER_TEMP!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1333,6 +1378,13 @@ macro_rules! __pgrx_c_args_RELATION_IS_OTHER_TEMP {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RELATION_IS_OTHER_TEMP] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RELATION_IS_OTHER_TEMP!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1349,10 +1401,10 @@ macro_rules! __pgrx_c_args_RELATION_IS_OTHER_TEMP {
         $crate::RELATION_IS_OTHER_TEMP!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro RELATION_IS_OTHER_TEMP from rel.h:669
+/// C macro RELATION_IS_OTHER_TEMP from rel.h:678
 ///
 /// ```text
 /// #define RELATION_IS_OTHER_TEMP( relation ) ( ( relation ) -> rd_rel -> relpersistence == RELPERSISTENCE_TEMP && ! ( relation ) -> rd_islocaltemp )
@@ -1475,13 +1527,13 @@ macro_rules! RELATION_IS_OTHER_TEMP {
         $crate::__pgrx_c_args_RELATION_IS_OTHER_TEMP!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RELATION_IS_OTHER_TEMP!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RELATION_IS_OTHER_TEMP!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1494,7 +1546,7 @@ macro_rules! RELATION_IS_OTHER_TEMP {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -1597,7 +1649,7 @@ macro_rules! RELATION_IS_OTHER_TEMP {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1778,6 +1830,11 @@ macro_rules! __pgrx_c_args_RelationCloseSmgr {
             @argument [__pgrx_c_args_RelationCloseSmgr] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationCloseSmgr] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationCloseSmgr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1815,6 +1872,13 @@ macro_rules! __pgrx_c_args_RelationCloseSmgr {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationCloseSmgr] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationCloseSmgr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1831,7 +1895,7 @@ macro_rules! __pgrx_c_args_RelationCloseSmgr {
         $crate::RelationCloseSmgr!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function RelationCloseSmgr from rel.h:592
@@ -1908,13 +1972,13 @@ macro_rules! RelationCloseSmgr {
         $crate::__pgrx_c_args_RelationCloseSmgr!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationCloseSmgr!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationCloseSmgr!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1927,7 +1991,7 @@ macro_rules! RelationCloseSmgr {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::RelationCloseSmgr(
@@ -1959,7 +2023,7 @@ macro_rules! RelationCloseSmgr {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2081,6 +2145,11 @@ macro_rules! __pgrx_c_args_RelationGetDescr {
             @argument [__pgrx_c_args_RelationGetDescr] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetDescr] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetDescr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2118,6 +2187,13 @@ macro_rules! __pgrx_c_args_RelationGetDescr {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetDescr] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetDescr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2134,7 +2210,7 @@ macro_rules! __pgrx_c_args_RelationGetDescr {
         $crate::RelationGetDescr!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelationGetDescr from rel.h:542
@@ -2236,7 +2312,7 @@ macro_rules! RelationGetDescr {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_rd_att,
@@ -2254,7 +2330,7 @@ macro_rules! RelationGetDescr {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2363,6 +2439,13 @@ macro_rules! __pgrx_c_args_RelationGetFillFactor {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetFillFactor] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetFillFactor!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2424,6 +2507,11 @@ macro_rules! __pgrx_c_args_RelationGetFillFactor {
             @argument [__pgrx_c_args_RelationGetFillFactor] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetFillFactor] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetFillFactor!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2461,6 +2549,13 @@ macro_rules! __pgrx_c_args_RelationGetFillFactor {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetFillFactor] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetFillFactor!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2477,7 +2572,7 @@ macro_rules! __pgrx_c_args_RelationGetFillFactor {
         $crate::RelationGetFillFactor!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelationGetFillFactor from rel.h:374
@@ -2611,13 +2706,13 @@ macro_rules! RelationGetFillFactor {
         $crate::__pgrx_c_args_RelationGetFillFactor!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt, $defaultff:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationGetFillFactor!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt, $defaultff:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationGetFillFactor!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2631,7 +2726,7 @@ macro_rules! RelationGetFillFactor {
                         $crate::__pgrx_c_operand!(@check_safety; $defaultff);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -2738,7 +2833,7 @@ macro_rules! RelationGetFillFactor {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2925,6 +3020,11 @@ macro_rules! __pgrx_c_args_RelationGetForm {
             @argument [__pgrx_c_args_RelationGetForm] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetForm] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetForm!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2962,6 +3062,13 @@ macro_rules! __pgrx_c_args_RelationGetForm {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetForm] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetForm!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2978,7 +3085,7 @@ macro_rules! __pgrx_c_args_RelationGetForm {
         $crate::RelationGetForm!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelationGetForm from rel.h:510
@@ -3080,7 +3187,7 @@ macro_rules! RelationGetForm {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_rd_rel,
@@ -3098,7 +3205,7 @@ macro_rules! RelationGetForm {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3214,6 +3321,11 @@ macro_rules! __pgrx_c_args_RelationGetNamespace {
             @argument [__pgrx_c_args_RelationGetNamespace] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetNamespace] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetNamespace!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3251,6 +3363,13 @@ macro_rules! __pgrx_c_args_RelationGetNamespace {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetNamespace] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetNamespace!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3267,7 +3386,7 @@ macro_rules! __pgrx_c_args_RelationGetNamespace {
         $crate::RelationGetNamespace!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelationGetNamespace from rel.h:557
@@ -3413,7 +3532,7 @@ macro_rules! RelationGetNamespace {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_relnamespace,
@@ -3449,7 +3568,7 @@ macro_rules! RelationGetNamespace {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3588,6 +3707,13 @@ macro_rules! __pgrx_c_args_RelationGetNumberOfAttributes {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetNumberOfAttributes] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetNumberOfAttributes!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3625,6 +3751,13 @@ macro_rules! __pgrx_c_args_RelationGetNumberOfAttributes {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetNumberOfAttributes] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetNumberOfAttributes!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3641,7 +3774,7 @@ macro_rules! __pgrx_c_args_RelationGetNumberOfAttributes {
         $crate::RelationGetNumberOfAttributes!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelationGetNumberOfAttributes from rel.h:522
@@ -3799,7 +3932,7 @@ macro_rules! RelationGetNumberOfAttributes {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_relnatts,
@@ -3835,7 +3968,7 @@ macro_rules! RelationGetNumberOfAttributes {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3968,6 +4101,13 @@ macro_rules! __pgrx_c_args_RelationGetParallelWorkers {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetParallelWorkers] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetParallelWorkers!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4031,6 +4171,13 @@ macro_rules! __pgrx_c_args_RelationGetParallelWorkers {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetParallelWorkers] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetParallelWorkers!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4068,6 +4215,13 @@ macro_rules! __pgrx_c_args_RelationGetParallelWorkers {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetParallelWorkers] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetParallelWorkers!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4084,7 +4238,7 @@ macro_rules! __pgrx_c_args_RelationGetParallelWorkers {
         $crate::RelationGetParallelWorkers!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelationGetParallelWorkers from rel.h:408
@@ -4221,13 +4375,13 @@ macro_rules! RelationGetParallelWorkers {
         $crate::__pgrx_c_args_RelationGetParallelWorkers!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt, $defaultpw:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationGetParallelWorkers!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt, $defaultpw:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationGetParallelWorkers!(
@@ -4244,7 +4398,7 @@ macro_rules! RelationGetParallelWorkers {
                         $crate::__pgrx_c_operand!(@check_safety; $defaultpw);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -4351,7 +4505,7 @@ macro_rules! RelationGetParallelWorkers {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4543,6 +4697,11 @@ macro_rules! __pgrx_c_args_RelationGetRelationName {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetRelationName] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetRelationName!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4580,6 +4739,13 @@ macro_rules! __pgrx_c_args_RelationGetRelationName {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetRelationName] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetRelationName!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4596,7 +4762,7 @@ macro_rules! __pgrx_c_args_RelationGetRelationName {
         $crate::RelationGetRelationName!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelationGetRelationName from rel.h:550
@@ -4792,7 +4958,7 @@ macro_rules! RelationGetRelationName {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_data,
@@ -4839,7 +5005,7 @@ macro_rules! RelationGetRelationName {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4979,6 +5145,11 @@ macro_rules! __pgrx_c_args_RelationGetRelid {
             @argument [__pgrx_c_args_RelationGetRelid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetRelid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetRelid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5016,6 +5187,13 @@ macro_rules! __pgrx_c_args_RelationGetRelid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetRelid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetRelid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5032,7 +5210,7 @@ macro_rules! __pgrx_c_args_RelationGetRelid {
         $crate::RelationGetRelid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelationGetRelid from rel.h:516
@@ -5134,7 +5312,7 @@ macro_rules! RelationGetRelid {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_rd_id,
@@ -5152,7 +5330,7 @@ macro_rules! RelationGetRelid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5265,6 +5443,11 @@ macro_rules! __pgrx_c_args_RelationGetSmgr {
             @argument [__pgrx_c_args_RelationGetSmgr] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetSmgr] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetSmgr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5302,6 +5485,13 @@ macro_rules! __pgrx_c_args_RelationGetSmgr {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetSmgr] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetSmgr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5318,7 +5508,7 @@ macro_rules! __pgrx_c_args_RelationGetSmgr {
         $crate::RelationGetSmgr!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function RelationGetSmgr from rel.h:577
@@ -5404,13 +5594,13 @@ macro_rules! RelationGetSmgr {
         $crate::__pgrx_c_args_RelationGetSmgr!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rel:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationGetSmgr!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rel:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationGetSmgr!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5423,7 +5613,7 @@ macro_rules! RelationGetSmgr {
                         $crate::__pgrx_c_operand!(@check_safety; $rel);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -5464,7 +5654,7 @@ macro_rules! RelationGetSmgr {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5600,6 +5790,11 @@ macro_rules! __pgrx_c_args_RelationGetTargetBlock {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetTargetBlock] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetTargetBlock!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5637,6 +5832,13 @@ macro_rules! __pgrx_c_args_RelationGetTargetBlock {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetTargetBlock] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetBlock!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5653,7 +5855,7 @@ macro_rules! __pgrx_c_args_RelationGetTargetBlock {
         $crate::RelationGetTargetBlock!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelationGetTargetBlock from rel.h:612
@@ -5805,13 +6007,13 @@ macro_rules! RelationGetTargetBlock {
         $crate::__pgrx_c_args_RelationGetTargetBlock!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetBlock!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetBlock!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5825,7 +6027,7 @@ macro_rules! RelationGetTargetBlock {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -5950,7 +6152,7 @@ macro_rules! RelationGetTargetBlock {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6152,6 +6354,13 @@ macro_rules! __pgrx_c_args_RelationGetTargetPageFreeSpace {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetTargetPageFreeSpace] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageFreeSpace!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6218,6 +6427,13 @@ macro_rules! __pgrx_c_args_RelationGetTargetPageFreeSpace {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetTargetPageFreeSpace] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetTargetPageFreeSpace!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6255,6 +6471,13 @@ macro_rules! __pgrx_c_args_RelationGetTargetPageFreeSpace {
             ] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetTargetPageFreeSpace] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageFreeSpace!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6271,7 +6494,7 @@ macro_rules! __pgrx_c_args_RelationGetTargetPageFreeSpace {
         $crate::RelationGetTargetPageFreeSpace!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelationGetTargetPageFreeSpace from rel.h:389
@@ -6476,7 +6699,7 @@ macro_rules! RelationGetTargetPageFreeSpace {
         )
     };
     (@__pgrx_emit_place; $relation:tt, $defaultff:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageFreeSpace!(
@@ -6485,7 +6708,7 @@ macro_rules! RelationGetTargetPageFreeSpace {
         )
     };
     (@__pgrx_emit_read_place; $relation:tt, $defaultff:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageFreeSpace!(
@@ -6503,7 +6726,7 @@ macro_rules! RelationGetTargetPageFreeSpace {
                         $crate::__pgrx_c_operand!(@check_safety; $defaultff);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                             $crate::__pgrx_c_macros::expression::div(
@@ -6671,7 +6894,7 @@ macro_rules! RelationGetTargetPageFreeSpace {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6928,6 +7151,13 @@ macro_rules! __pgrx_c_args_RelationGetTargetPageUsage {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetTargetPageUsage] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageUsage!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6991,6 +7221,13 @@ macro_rules! __pgrx_c_args_RelationGetTargetPageUsage {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetTargetPageUsage] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetTargetPageUsage!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7028,6 +7265,13 @@ macro_rules! __pgrx_c_args_RelationGetTargetPageUsage {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetTargetPageUsage] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageUsage!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7044,7 +7288,7 @@ macro_rules! __pgrx_c_args_RelationGetTargetPageUsage {
         $crate::RelationGetTargetPageUsage!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelationGetTargetPageUsage from rel.h:382
@@ -7225,13 +7469,13 @@ macro_rules! RelationGetTargetPageUsage {
         $crate::__pgrx_c_args_RelationGetTargetPageUsage!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt, $defaultff:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageUsage!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt, $defaultff:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageUsage!(
@@ -7249,7 +7493,7 @@ macro_rules! RelationGetTargetPageUsage {
                         $crate::__pgrx_c_operand!(@check_safety; $defaultff);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::div(
@@ -7394,7 +7638,7 @@ macro_rules! RelationGetTargetPageUsage {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7621,6 +7865,13 @@ macro_rules! __pgrx_c_args_RelationGetToastTupleTarget {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetToastTupleTarget] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetToastTupleTarget!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7684,6 +7935,13 @@ macro_rules! __pgrx_c_args_RelationGetToastTupleTarget {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetToastTupleTarget] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetToastTupleTarget!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7721,6 +7979,13 @@ macro_rules! __pgrx_c_args_RelationGetToastTupleTarget {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetToastTupleTarget] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetToastTupleTarget!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7737,7 +8002,7 @@ macro_rules! __pgrx_c_args_RelationGetToastTupleTarget {
         $crate::RelationGetToastTupleTarget!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelationGetToastTupleTarget from rel.h:366
@@ -7874,13 +8139,13 @@ macro_rules! RelationGetToastTupleTarget {
         $crate::__pgrx_c_args_RelationGetToastTupleTarget!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt, $defaulttarg:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationGetToastTupleTarget!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt, $defaulttarg:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationGetToastTupleTarget!(
@@ -7897,7 +8162,7 @@ macro_rules! RelationGetToastTupleTarget {
                         $crate::__pgrx_c_operand!(@check_safety; $defaulttarg);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -8009,7 +8274,7 @@ macro_rules! RelationGetToastTupleTarget {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8207,6 +8472,13 @@ macro_rules! __pgrx_c_args_RelationHasCascadedCheckOption {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasCascadedCheckOption] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationHasCascadedCheckOption!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8244,6 +8516,13 @@ macro_rules! __pgrx_c_args_RelationHasCascadedCheckOption {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasCascadedCheckOption] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationHasCascadedCheckOption!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8260,7 +8539,7 @@ macro_rules! __pgrx_c_args_RelationHasCascadedCheckOption {
         $crate::RelationHasCascadedCheckOption!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelationHasCascadedCheckOption from rel.h:479
@@ -8439,7 +8718,7 @@ macro_rules! RelationHasCascadedCheckOption {
         )
     };
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationHasCascadedCheckOption!(
@@ -8448,7 +8727,7 @@ macro_rules! RelationHasCascadedCheckOption {
         )
     };
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationHasCascadedCheckOption!(
@@ -8465,7 +8744,7 @@ macro_rules! RelationHasCascadedCheckOption {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -8609,7 +8888,7 @@ macro_rules! RelationHasCascadedCheckOption {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8850,6 +9129,11 @@ macro_rules! __pgrx_c_args_RelationHasCheckOption {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasCheckOption] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationHasCheckOption!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8887,6 +9171,13 @@ macro_rules! __pgrx_c_args_RelationHasCheckOption {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasCheckOption] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationHasCheckOption!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8903,7 +9194,7 @@ macro_rules! __pgrx_c_args_RelationHasCheckOption {
         $crate::RelationHasCheckOption!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelationHasCheckOption from rel.h:457
@@ -9081,13 +9372,13 @@ macro_rules! RelationHasCheckOption {
         $crate::__pgrx_c_args_RelationHasCheckOption!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationHasCheckOption!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationHasCheckOption!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -9101,7 +9392,7 @@ macro_rules! RelationHasCheckOption {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -9247,7 +9538,7 @@ macro_rules! RelationHasCheckOption {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9481,6 +9772,13 @@ macro_rules! __pgrx_c_args_RelationHasLocalCheckOption {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasLocalCheckOption] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationHasLocalCheckOption!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9518,6 +9816,13 @@ macro_rules! __pgrx_c_args_RelationHasLocalCheckOption {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasLocalCheckOption] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationHasLocalCheckOption!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9534,7 +9839,7 @@ macro_rules! __pgrx_c_args_RelationHasLocalCheckOption {
         $crate::RelationHasLocalCheckOption!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelationHasLocalCheckOption from rel.h:468
@@ -9710,13 +10015,13 @@ macro_rules! RelationHasLocalCheckOption {
         $crate::__pgrx_c_args_RelationHasLocalCheckOption!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationHasLocalCheckOption!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationHasLocalCheckOption!(
@@ -9733,7 +10038,7 @@ macro_rules! RelationHasLocalCheckOption {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -9877,7 +10182,7 @@ macro_rules! RelationHasLocalCheckOption {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10115,6 +10420,13 @@ macro_rules! __pgrx_c_args_RelationHasReferenceCountZero {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasReferenceCountZero] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationHasReferenceCountZero!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10152,6 +10464,13 @@ macro_rules! __pgrx_c_args_RelationHasReferenceCountZero {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasReferenceCountZero] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationHasReferenceCountZero!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10168,7 +10487,7 @@ macro_rules! __pgrx_c_args_RelationHasReferenceCountZero {
         $crate::RelationHasReferenceCountZero!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelationHasReferenceCountZero from rel.h:500
@@ -10257,7 +10576,7 @@ macro_rules! RelationHasReferenceCountZero {
         )
     };
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationHasReferenceCountZero!(
@@ -10266,7 +10585,7 @@ macro_rules! RelationHasReferenceCountZero {
         )
     };
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationHasReferenceCountZero!(
@@ -10283,7 +10602,7 @@ macro_rules! RelationHasReferenceCountZero {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -10337,7 +10656,7 @@ macro_rules! RelationHasReferenceCountZero {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10485,6 +10804,13 @@ macro_rules! __pgrx_c_args_RelationHasSecurityInvoker {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasSecurityInvoker] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationHasSecurityInvoker!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10522,6 +10848,13 @@ macro_rules! __pgrx_c_args_RelationHasSecurityInvoker {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasSecurityInvoker] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationHasSecurityInvoker!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10538,7 +10871,7 @@ macro_rules! __pgrx_c_args_RelationHasSecurityInvoker {
         $crate::RelationHasSecurityInvoker!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelationHasSecurityInvoker from rel.h:447
@@ -10706,13 +11039,13 @@ macro_rules! RelationHasSecurityInvoker {
         $crate::__pgrx_c_args_RelationHasSecurityInvoker!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationHasSecurityInvoker!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationHasSecurityInvoker!(
@@ -10729,7 +11062,7 @@ macro_rules! RelationHasSecurityInvoker {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -10868,7 +11201,7 @@ macro_rules! RelationHasSecurityInvoker {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -11045,7 +11378,7 @@ macro_rules! __pgrx_c_args_RelationIsAccessibleInLogicalDecoding {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_RelationIsAccessibleInLogicalDecoding!(
@@ -11053,7 +11386,7 @@ macro_rules! __pgrx_c_args_RelationIsAccessibleInLogicalDecoding {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsAccessibleInLogicalDecoding!(
@@ -11062,7 +11395,7 @@ macro_rules! __pgrx_c_args_RelationIsAccessibleInLogicalDecoding {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_RelationIsAccessibleInLogicalDecoding!(
@@ -11143,10 +11476,10 @@ macro_rules! __pgrx_c_args_RelationIsAccessibleInLogicalDecoding {
         $crate::RelationIsAccessibleInLogicalDecoding!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro RelationIsAccessibleInLogicalDecoding from rel.h:695
+/// C macro RelationIsAccessibleInLogicalDecoding from rel.h:704
 ///
 /// ```text
 /// #define RelationIsAccessibleInLogicalDecoding( relation ) ( XLogLogicalInfoActive ( ) && RelationNeedsWAL ( relation ) && ( IsCatalogRelation ( relation ) || RelationIsUsedAsCatalogTable ( relation ) ) )
@@ -11809,7 +12142,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
         )
     };
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationIsAccessibleInLogicalDecoding!(
@@ -11818,7 +12151,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
         )
     };
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationIsAccessibleInLogicalDecoding!(
@@ -11835,7 +12168,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -12464,7 +12797,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -13142,7 +13475,7 @@ macro_rules! __pgrx_c_args_RelationIsLogicallyLogged {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_RelationIsLogicallyLogged!(
@@ -13150,7 +13483,7 @@ macro_rules! __pgrx_c_args_RelationIsLogicallyLogged {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsLogicallyLogged!(
@@ -13159,7 +13492,7 @@ macro_rules! __pgrx_c_args_RelationIsLogicallyLogged {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_RelationIsLogicallyLogged!(
@@ -13240,10 +13573,10 @@ macro_rules! __pgrx_c_args_RelationIsLogicallyLogged {
         $crate::RelationIsLogicallyLogged!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro RelationIsLogicallyLogged from rel.h:712
+/// C macro RelationIsLogicallyLogged from rel.h:721
 ///
 /// ```text
 /// #define RelationIsLogicallyLogged( relation ) ( XLogLogicalInfoActive ( ) && RelationNeedsWAL ( relation ) && ( relation ) -> rd_rel -> relkind != RELKIND_FOREIGN_TABLE && ! IsCatalogRelation ( relation ) )
@@ -13690,13 +14023,13 @@ macro_rules! RelationIsLogicallyLogged {
         $crate::__pgrx_c_args_RelationIsLogicallyLogged!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationIsLogicallyLogged!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationIsLogicallyLogged!(
@@ -13713,7 +14046,7 @@ macro_rules! RelationIsLogicallyLogged {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -14133,7 +14466,7 @@ macro_rules! RelationIsLogicallyLogged {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -14634,6 +14967,11 @@ macro_rules! __pgrx_c_args_RelationIsMapped {
             @argument [__pgrx_c_args_RelationIsMapped] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationIsMapped] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationIsMapped!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14671,6 +15009,13 @@ macro_rules! __pgrx_c_args_RelationIsMapped {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationIsMapped] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsMapped!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14687,7 +15032,7 @@ macro_rules! __pgrx_c_args_RelationIsMapped {
         $crate::RelationIsMapped!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelationIsMapped from rel.h:565
@@ -15161,13 +15506,13 @@ macro_rules! RelationIsMapped {
         $crate::__pgrx_c_args_RelationIsMapped!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationIsMapped!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationIsMapped!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -15181,7 +15526,7 @@ macro_rules! RelationIsMapped {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -15637,7 +15982,7 @@ macro_rules! RelationIsMapped {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -16169,6 +16514,11 @@ macro_rules! __pgrx_c_args_RelationIsPermanent {
             @argument [__pgrx_c_args_RelationIsPermanent] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationIsPermanent] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationIsPermanent!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16206,6 +16556,13 @@ macro_rules! __pgrx_c_args_RelationIsPermanent {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationIsPermanent] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsPermanent!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16222,7 +16579,7 @@ macro_rules! __pgrx_c_args_RelationIsPermanent {
         $crate::RelationIsPermanent!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelationIsPermanent from rel.h:628
@@ -16304,13 +16661,13 @@ macro_rules! RelationIsPermanent {
         $crate::__pgrx_c_args_RelationIsPermanent!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationIsPermanent!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationIsPermanent!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -16323,7 +16680,7 @@ macro_rules! RelationIsPermanent {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -16375,7 +16732,7 @@ macro_rules! RelationIsPermanent {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -16515,6 +16872,11 @@ macro_rules! __pgrx_c_args_RelationIsPopulated {
             @argument [__pgrx_c_args_RelationIsPopulated] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationIsPopulated] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationIsPopulated!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16552,6 +16914,13 @@ macro_rules! __pgrx_c_args_RelationIsPopulated {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationIsPopulated] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsPopulated!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16568,10 +16937,10 @@ macro_rules! __pgrx_c_args_RelationIsPopulated {
         $crate::RelationIsPopulated!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro RelationIsPopulated from rel.h:688
+/// C macro RelationIsPopulated from rel.h:697
 ///
 /// ```text
 /// #define RelationIsPopulated( relation ) ( ( relation ) -> rd_rel -> relispopulated )
@@ -16714,7 +17083,7 @@ macro_rules! RelationIsPopulated {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_relispopulated,
@@ -16750,7 +17119,7 @@ macro_rules! RelationIsPopulated {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -16881,6 +17250,11 @@ macro_rules! __pgrx_c_args_RelationIsScannable {
             @argument [__pgrx_c_args_RelationIsScannable] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationIsScannable] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationIsScannable!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16918,6 +17292,13 @@ macro_rules! __pgrx_c_args_RelationIsScannable {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationIsScannable] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsScannable!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16934,10 +17315,10 @@ macro_rules! __pgrx_c_args_RelationIsScannable {
         $crate::RelationIsScannable!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro RelationIsScannable from rel.h:680
+/// C macro RelationIsScannable from rel.h:689
 ///
 /// ```text
 /// #define RelationIsScannable( relation ) ( ( relation ) -> rd_rel -> relispopulated )
@@ -17080,7 +17461,7 @@ macro_rules! RelationIsScannable {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_relispopulated,
@@ -17116,7 +17497,7 @@ macro_rules! RelationIsScannable {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -17252,6 +17633,11 @@ macro_rules! __pgrx_c_args_RelationIsSecurityView {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationIsSecurityView] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationIsSecurityView!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17289,6 +17675,13 @@ macro_rules! __pgrx_c_args_RelationIsSecurityView {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationIsSecurityView] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsSecurityView!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17305,7 +17698,7 @@ macro_rules! __pgrx_c_args_RelationIsSecurityView {
         $crate::RelationIsSecurityView!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelationIsSecurityView from rel.h:437
@@ -17473,13 +17866,13 @@ macro_rules! RelationIsSecurityView {
         $crate::__pgrx_c_args_RelationIsSecurityView!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationIsSecurityView!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationIsSecurityView!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -17493,7 +17886,7 @@ macro_rules! RelationIsSecurityView {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -17632,7 +18025,7 @@ macro_rules! RelationIsSecurityView {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -17859,6 +18252,13 @@ macro_rules! __pgrx_c_args_RelationIsUsedAsCatalogTable {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationIsUsedAsCatalogTable] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationIsUsedAsCatalogTable!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17896,6 +18296,13 @@ macro_rules! __pgrx_c_args_RelationIsUsedAsCatalogTable {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationIsUsedAsCatalogTable] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsUsedAsCatalogTable!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17912,7 +18319,7 @@ macro_rules! __pgrx_c_args_RelationIsUsedAsCatalogTable {
         $crate::RelationIsUsedAsCatalogTable!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelationIsUsedAsCatalogTable from rel.h:397
@@ -18205,13 +18612,13 @@ macro_rules! RelationIsUsedAsCatalogTable {
         $crate::__pgrx_c_args_RelationIsUsedAsCatalogTable!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationIsUsedAsCatalogTable!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationIsUsedAsCatalogTable!(
@@ -18227,7 +18634,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -18493,7 +18900,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -18843,6 +19250,11 @@ macro_rules! __pgrx_c_args_RelationIsValid {
             @argument [__pgrx_c_args_RelationIsValid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationIsValid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18880,6 +19292,13 @@ macro_rules! __pgrx_c_args_RelationIsValid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationIsValid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18896,7 +19315,7 @@ macro_rules! __pgrx_c_args_RelationIsValid {
         $crate::RelationIsValid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelationIsValid from rel.h:489
@@ -18979,13 +19398,13 @@ macro_rules! RelationIsValid {
         $crate::__pgrx_c_args_RelationIsValid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationIsValid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationIsValid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -18999,7 +19418,7 @@ macro_rules! RelationIsValid {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -19048,7 +19467,7 @@ macro_rules! RelationIsValid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -19137,7 +19556,7 @@ macro_rules! __pgrx_c_args_RelationNeedsWAL {
         $crate::__pgrx_c_args_RelationNeedsWAL!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_RelationNeedsWAL!(
@@ -19145,7 +19564,7 @@ macro_rules! __pgrx_c_args_RelationNeedsWAL {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationNeedsWAL!(
@@ -19154,7 +19573,7 @@ macro_rules! __pgrx_c_args_RelationNeedsWAL {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_RelationNeedsWAL!(
@@ -19233,7 +19652,7 @@ macro_rules! __pgrx_c_args_RelationNeedsWAL {
         $crate::RelationNeedsWAL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelationNeedsWAL from rel.h:639
@@ -19488,13 +19907,13 @@ macro_rules! RelationNeedsWAL {
         $crate::__pgrx_c_args_RelationNeedsWAL!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationNeedsWAL!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationNeedsWAL!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -19508,7 +19927,7 @@ macro_rules! RelationNeedsWAL {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -19745,7 +20164,7 @@ macro_rules! RelationNeedsWAL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -20054,6 +20473,13 @@ macro_rules! __pgrx_c_args_RelationSetTargetBlock {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationSetTargetBlock] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationSetTargetBlock!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20117,6 +20543,11 @@ macro_rules! __pgrx_c_args_RelationSetTargetBlock {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationSetTargetBlock] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationSetTargetBlock!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20154,6 +20585,13 @@ macro_rules! __pgrx_c_args_RelationSetTargetBlock {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationSetTargetBlock] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationSetTargetBlock!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20170,7 +20608,7 @@ macro_rules! __pgrx_c_args_RelationSetTargetBlock {
         $crate::RelationSetTargetBlock!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelationSetTargetBlock from rel.h:619
@@ -20276,7 +20714,7 @@ macro_rules! RelationSetTargetBlock {
         $crate::__pgrx_c_args_RelationSetTargetBlock!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationSetTargetBlock!(@collect __pgrx_emit_public []; $($raw)*)
@@ -20365,6 +20803,13 @@ macro_rules! __pgrx_c_args_RelationUsesLocalBuffers {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationUsesLocalBuffers] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationUsesLocalBuffers!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20402,6 +20847,13 @@ macro_rules! __pgrx_c_args_RelationUsesLocalBuffers {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationUsesLocalBuffers] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationUsesLocalBuffers!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20418,7 +20870,7 @@ macro_rules! __pgrx_c_args_RelationUsesLocalBuffers {
         $crate::RelationUsesLocalBuffers!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelationUsesLocalBuffers from rel.h:648
@@ -20503,13 +20955,13 @@ macro_rules! RelationUsesLocalBuffers {
         $crate::__pgrx_c_args_RelationUsesLocalBuffers!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationUsesLocalBuffers!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelationUsesLocalBuffers!(
@@ -20525,7 +20977,7 @@ macro_rules! RelationUsesLocalBuffers {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -20577,7 +21029,7 @@ macro_rules! RelationUsesLocalBuffers {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

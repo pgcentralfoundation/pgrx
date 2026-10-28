@@ -36,7 +36,7 @@ macro_rules! __pgrx_c_args_InitTupleHashIterator {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitTupleHashIterator!(
@@ -45,7 +45,7 @@ macro_rules! __pgrx_c_args_InitTupleHashIterator {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitTupleHashIterator!(
@@ -135,6 +135,11 @@ macro_rules! __pgrx_c_args_InitTupleHashIterator {
             @argument [__pgrx_c_args_InitTupleHashIterator] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InitTupleHashIterator] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InitTupleHashIterator!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -172,6 +177,13 @@ macro_rules! __pgrx_c_args_InitTupleHashIterator {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InitTupleHashIterator] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitTupleHashIterator!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -188,7 +200,7 @@ macro_rules! __pgrx_c_args_InitTupleHashIterator {
         $crate::InitTupleHashIterator!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro InitTupleHashIterator from execnodes.h:836
@@ -291,13 +303,13 @@ macro_rules! InitTupleHashIterator {
         $crate::__pgrx_c_args_InitTupleHashIterator!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $htable:tt, $iter:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_InitTupleHashIterator!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $htable:tt, $iter:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_InitTupleHashIterator!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -312,7 +324,7 @@ macro_rules! InitTupleHashIterator {
                         $crate::__pgrx_c_operand!(@check_safety; $iter);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::tuplehash_start_iterate(
@@ -387,7 +399,7 @@ macro_rules! InitTupleHashIterator {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -538,6 +550,13 @@ macro_rules! __pgrx_c_args_InstrCountFiltered1 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InstrCountFiltered1] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InstrCountFiltered1!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -599,6 +618,11 @@ macro_rules! __pgrx_c_args_InstrCountFiltered1 {
             @argument [__pgrx_c_args_InstrCountFiltered1] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InstrCountFiltered1] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InstrCountFiltered1!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -636,6 +660,13 @@ macro_rules! __pgrx_c_args_InstrCountFiltered1 {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InstrCountFiltered1] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InstrCountFiltered1!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -652,7 +683,7 @@ macro_rules! __pgrx_c_args_InstrCountFiltered1 {
         $crate::InstrCountFiltered1!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro InstrCountFiltered1 from execnodes.h:1143
@@ -807,7 +838,7 @@ macro_rules! InstrCountFiltered1 {
         $crate::__pgrx_c_args_InstrCountFiltered1!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_InstrCountFiltered1!(@collect __pgrx_emit_public []; $($raw)*)
@@ -884,6 +915,13 @@ macro_rules! __pgrx_c_args_InstrCountFiltered2 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InstrCountFiltered2] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InstrCountFiltered2!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -945,6 +983,11 @@ macro_rules! __pgrx_c_args_InstrCountFiltered2 {
             @argument [__pgrx_c_args_InstrCountFiltered2] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InstrCountFiltered2] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InstrCountFiltered2!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -982,6 +1025,13 @@ macro_rules! __pgrx_c_args_InstrCountFiltered2 {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InstrCountFiltered2] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InstrCountFiltered2!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -998,7 +1048,7 @@ macro_rules! __pgrx_c_args_InstrCountFiltered2 {
         $crate::InstrCountFiltered2!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro InstrCountFiltered2 from execnodes.h:1148
@@ -1153,7 +1203,7 @@ macro_rules! InstrCountFiltered2 {
         $crate::__pgrx_c_args_InstrCountFiltered2!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_InstrCountFiltered2!(@collect __pgrx_emit_public []; $($raw)*)
@@ -1230,6 +1280,13 @@ macro_rules! __pgrx_c_args_InstrCountTuples2 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InstrCountTuples2] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InstrCountTuples2!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1291,6 +1348,11 @@ macro_rules! __pgrx_c_args_InstrCountTuples2 {
             @argument [__pgrx_c_args_InstrCountTuples2] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InstrCountTuples2] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InstrCountTuples2!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1328,6 +1390,13 @@ macro_rules! __pgrx_c_args_InstrCountTuples2 {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InstrCountTuples2] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InstrCountTuples2!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1344,7 +1413,7 @@ macro_rules! __pgrx_c_args_InstrCountTuples2 {
         $crate::InstrCountTuples2!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro InstrCountTuples2 from execnodes.h:1138
@@ -1499,7 +1568,7 @@ macro_rules! InstrCountTuples2 {
         $crate::__pgrx_c_args_InstrCountTuples2!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_InstrCountTuples2!(@collect __pgrx_emit_public []; $($raw)*)
@@ -1538,7 +1607,7 @@ macro_rules! __pgrx_c_args_ResetTupleHashIterator {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ResetTupleHashIterator!(
@@ -1547,7 +1616,7 @@ macro_rules! __pgrx_c_args_ResetTupleHashIterator {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_ResetTupleHashIterator!(
@@ -1639,6 +1708,11 @@ macro_rules! __pgrx_c_args_ResetTupleHashIterator {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ResetTupleHashIterator] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ResetTupleHashIterator!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1676,6 +1750,13 @@ macro_rules! __pgrx_c_args_ResetTupleHashIterator {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ResetTupleHashIterator] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ResetTupleHashIterator!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1692,7 +1773,7 @@ macro_rules! __pgrx_c_args_ResetTupleHashIterator {
         $crate::ResetTupleHashIterator!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ResetTupleHashIterator from execnodes.h:840
@@ -1798,13 +1879,13 @@ macro_rules! ResetTupleHashIterator {
         $crate::__pgrx_c_args_ResetTupleHashIterator!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $htable:tt, $iter:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ResetTupleHashIterator!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $htable:tt, $iter:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ResetTupleHashIterator!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1819,7 +1900,7 @@ macro_rules! ResetTupleHashIterator {
                         $crate::__pgrx_c_operand!(@check_safety; $iter);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::tuplehash_start_iterate(
@@ -1894,7 +1975,7 @@ macro_rules! ResetTupleHashIterator {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2004,7 +2085,7 @@ macro_rules! __pgrx_c_args_ScanTupleHashTable {
         $crate::__pgrx_c_args_ScanTupleHashTable!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ScanTupleHashTable!(
@@ -2013,7 +2094,7 @@ macro_rules! __pgrx_c_args_ScanTupleHashTable {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_ScanTupleHashTable!(
@@ -2103,6 +2184,11 @@ macro_rules! __pgrx_c_args_ScanTupleHashTable {
             @argument [__pgrx_c_args_ScanTupleHashTable] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ScanTupleHashTable] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ScanTupleHashTable!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2140,6 +2226,13 @@ macro_rules! __pgrx_c_args_ScanTupleHashTable {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ScanTupleHashTable] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ScanTupleHashTable!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2156,7 +2249,7 @@ macro_rules! __pgrx_c_args_ScanTupleHashTable {
         $crate::ScanTupleHashTable!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ScanTupleHashTable from execnodes.h:842
@@ -2268,13 +2361,13 @@ macro_rules! ScanTupleHashTable {
         $crate::__pgrx_c_args_ScanTupleHashTable!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $htable:tt, $iter:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ScanTupleHashTable!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $htable:tt, $iter:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ScanTupleHashTable!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2289,7 +2382,7 @@ macro_rules! ScanTupleHashTable {
                         $crate::__pgrx_c_operand!(@check_safety; $iter);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2373,7 +2466,7 @@ macro_rules! ScanTupleHashTable {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2515,13 +2608,13 @@ macro_rules! __pgrx_c_args_TermTupleHashIterator {
         )
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::TermTupleHashIterator!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TermTupleHashIterator from execnodes.h:838
@@ -2574,13 +2667,13 @@ macro_rules! TermTupleHashIterator {
         $crate::__pgrx_c_args_TermTupleHashIterator!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $iter:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TermTupleHashIterator!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $iter:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TermTupleHashIterator!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2591,7 +2684,7 @@ macro_rules! TermTupleHashIterator {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -2612,7 +2705,7 @@ macro_rules! TermTupleHashIterator {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2721,6 +2814,11 @@ macro_rules! __pgrx_c_args_innerPlanState {
             @argument [__pgrx_c_args_innerPlanState] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_innerPlanState] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_innerPlanState!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2758,6 +2856,11 @@ macro_rules! __pgrx_c_args_innerPlanState {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_innerPlanState] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_innerPlanState!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2774,7 +2877,7 @@ macro_rules! __pgrx_c_args_innerPlanState {
         $crate::innerPlanState!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro innerPlanState from execnodes.h:1134
@@ -2926,7 +3029,7 @@ macro_rules! innerPlanState {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_righttree,
@@ -2960,7 +3063,7 @@ macro_rules! innerPlanState {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3089,6 +3192,11 @@ macro_rules! __pgrx_c_args_outerPlanState {
             @argument [__pgrx_c_args_outerPlanState] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_outerPlanState] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_outerPlanState!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3126,6 +3234,11 @@ macro_rules! __pgrx_c_args_outerPlanState {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_outerPlanState] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_outerPlanState!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3142,7 +3255,7 @@ macro_rules! __pgrx_c_args_outerPlanState {
         $crate::outerPlanState!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro outerPlanState from execnodes.h:1135
@@ -3294,7 +3407,7 @@ macro_rules! outerPlanState {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_lefttree,
@@ -3328,7 +3441,7 @@ macro_rules! outerPlanState {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

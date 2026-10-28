@@ -86,6 +86,11 @@ macro_rules! __pgrx_c_args_pgstat_is_kind_builtin {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_is_kind_builtin] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_is_kind_builtin!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -123,6 +128,13 @@ macro_rules! __pgrx_c_args_pgstat_is_kind_builtin {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_is_kind_builtin] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_is_kind_builtin!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -139,7 +151,7 @@ macro_rules! __pgrx_c_args_pgstat_is_kind_builtin {
         $crate::pgstat_is_kind_builtin!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pgstat_is_kind_builtin from pgstat_kind.h:60
@@ -206,13 +218,13 @@ macro_rules! pgstat_is_kind_builtin {
         $crate::__pgrx_c_args_pgstat_is_kind_builtin!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $kind:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pgstat_is_kind_builtin!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $kind:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pgstat_is_kind_builtin!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -225,7 +237,7 @@ macro_rules! pgstat_is_kind_builtin {
                         $crate::__pgrx_c_operand!(@check_safety; $kind);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -251,7 +263,7 @@ macro_rules! pgstat_is_kind_builtin {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -368,6 +380,11 @@ macro_rules! __pgrx_c_args_pgstat_is_kind_custom {
             @argument [__pgrx_c_args_pgstat_is_kind_custom] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_is_kind_custom] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_is_kind_custom!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -405,6 +422,13 @@ macro_rules! __pgrx_c_args_pgstat_is_kind_custom {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_is_kind_custom] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_is_kind_custom!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -421,7 +445,7 @@ macro_rules! __pgrx_c_args_pgstat_is_kind_custom {
         $crate::pgstat_is_kind_custom!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pgstat_is_kind_custom from pgstat_kind.h:66
@@ -485,13 +509,13 @@ macro_rules! pgstat_is_kind_custom {
         $crate::__pgrx_c_args_pgstat_is_kind_custom!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $kind:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pgstat_is_kind_custom!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $kind:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pgstat_is_kind_custom!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -504,7 +528,7 @@ macro_rules! pgstat_is_kind_custom {
                         $crate::__pgrx_c_operand!(@check_safety; $kind);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -530,7 +554,7 @@ macro_rules! pgstat_is_kind_custom {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

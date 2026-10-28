@@ -50,13 +50,13 @@ macro_rules! __pgrx_c_args_BRIN_elog {
         $crate::__pgrx_c_args_BRIN_elog!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::BRIN_elog!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BRIN_elog from brin_internal.h:85
@@ -109,13 +109,13 @@ macro_rules! BRIN_elog {
         $crate::__pgrx_c_args_BRIN_elog!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $args:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BRIN_elog!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $args:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BRIN_elog!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -126,7 +126,7 @@ macro_rules! BRIN_elog {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -147,7 +147,7 @@ macro_rules! BRIN_elog {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -208,7 +208,7 @@ macro_rules! __pgrx_c_args_SizeofBrinOpcInfo {
         $crate::__pgrx_c_args_SizeofBrinOpcInfo!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_SizeofBrinOpcInfo!(
@@ -216,7 +216,7 @@ macro_rules! __pgrx_c_args_SizeofBrinOpcInfo {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SizeofBrinOpcInfo!(
@@ -225,7 +225,7 @@ macro_rules! __pgrx_c_args_SizeofBrinOpcInfo {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_SizeofBrinOpcInfo!(
@@ -304,7 +304,7 @@ macro_rules! __pgrx_c_args_SizeofBrinOpcInfo {
         $crate::SizeofBrinOpcInfo!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SizeofBrinOpcInfo from brin_internal.h:41
@@ -379,13 +379,13 @@ macro_rules! SizeofBrinOpcInfo {
         $crate::__pgrx_c_args_SizeofBrinOpcInfo!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ncols:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SizeofBrinOpcInfo!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $ncols:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SizeofBrinOpcInfo!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -399,7 +399,7 @@ macro_rules! SizeofBrinOpcInfo {
                         $crate::__pgrx_c_operand!(@check_safety; $ncols);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                             $crate::__pgrx_c_macros::expression::add::<
@@ -444,7 +444,7 @@ macro_rules! SizeofBrinOpcInfo {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

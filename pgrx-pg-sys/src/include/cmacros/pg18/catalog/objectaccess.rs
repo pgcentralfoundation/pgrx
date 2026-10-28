@@ -86,6 +86,13 @@ macro_rules! __pgrx_c_args_InvokeFunctionExecuteHook {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeFunctionExecuteHook] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHook!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -123,6 +130,13 @@ macro_rules! __pgrx_c_args_InvokeFunctionExecuteHook {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeFunctionExecuteHook] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHook!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -139,7 +153,7 @@ macro_rules! __pgrx_c_args_InvokeFunctionExecuteHook {
         $crate::InvokeFunctionExecuteHook!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro InvokeFunctionExecuteHook from objectaccess.h:213
@@ -225,7 +239,7 @@ macro_rules! InvokeFunctionExecuteHook {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHook!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHook!(@collect __pgrx_emit_public []; $($raw)*)
@@ -317,6 +331,13 @@ macro_rules! __pgrx_c_args_InvokeFunctionExecuteHookStr {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeFunctionExecuteHookStr] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHookStr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -354,6 +375,13 @@ macro_rules! __pgrx_c_args_InvokeFunctionExecuteHookStr {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeFunctionExecuteHookStr] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHookStr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -370,7 +398,7 @@ macro_rules! __pgrx_c_args_InvokeFunctionExecuteHookStr {
         $crate::InvokeFunctionExecuteHookStr!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro InvokeFunctionExecuteHookStr from objectaccess.h:260
@@ -465,7 +493,7 @@ macro_rules! InvokeFunctionExecuteHookStr {
         )
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHookStr!(
@@ -548,6 +576,13 @@ macro_rules! __pgrx_c_args_InvokeNamespaceSearchHook {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeNamespaceSearchHook] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHook!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -611,6 +646,13 @@ macro_rules! __pgrx_c_args_InvokeNamespaceSearchHook {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeNamespaceSearchHook] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHook!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -648,6 +690,13 @@ macro_rules! __pgrx_c_args_InvokeNamespaceSearchHook {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeNamespaceSearchHook] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHook!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -664,7 +713,7 @@ macro_rules! __pgrx_c_args_InvokeNamespaceSearchHook {
         $crate::InvokeNamespaceSearchHook!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro InvokeNamespaceSearchHook from objectaccess.h:208
@@ -798,13 +847,13 @@ macro_rules! InvokeNamespaceSearchHook {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHook!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $objectId:tt, $ereport_on_violation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHook!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $objectId:tt, $ereport_on_violation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHook!(
@@ -821,7 +870,7 @@ macro_rules! InvokeNamespaceSearchHook {
                         $crate::__pgrx_c_operand!(@check_safety; $ereport_on_violation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -923,7 +972,7 @@ macro_rules! InvokeNamespaceSearchHook {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1106,6 +1155,13 @@ macro_rules! __pgrx_c_args_InvokeNamespaceSearchHookStr {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeNamespaceSearchHookStr] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHookStr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1172,6 +1228,13 @@ macro_rules! __pgrx_c_args_InvokeNamespaceSearchHookStr {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeNamespaceSearchHookStr] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHookStr!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1209,6 +1272,13 @@ macro_rules! __pgrx_c_args_InvokeNamespaceSearchHookStr {
             ] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeNamespaceSearchHookStr] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHookStr!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1225,7 +1295,7 @@ macro_rules! __pgrx_c_args_InvokeNamespaceSearchHookStr {
         $crate::InvokeNamespaceSearchHookStr!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro InvokeNamespaceSearchHookStr from objectaccess.h:255
@@ -1369,13 +1439,13 @@ macro_rules! InvokeNamespaceSearchHookStr {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHookStr!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $objectName:tt, $ereport_on_violation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHookStr!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $objectName:tt, $ereport_on_violation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHookStr!(
@@ -1392,7 +1462,7 @@ macro_rules! InvokeNamespaceSearchHookStr {
                         $crate::__pgrx_c_operand!(@check_safety; $ereport_on_violation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -1500,7 +1570,7 @@ macro_rules! InvokeNamespaceSearchHookStr {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1692,6 +1762,13 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHook {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectDropHook] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHook!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1743,6 +1820,13 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHook {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_InvokeObjectDropHook] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectDropHook] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -1807,6 +1891,11 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHook {
             @argument [__pgrx_c_args_InvokeObjectDropHook] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectDropHook] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectDropHook!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1844,6 +1933,13 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHook {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectDropHook] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHook!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1860,7 +1956,7 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHook {
         $crate::InvokeObjectDropHook!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro InvokeObjectDropHook from objectaccess.h:182
@@ -2012,7 +2108,7 @@ macro_rules! InvokeObjectDropHook {
         $crate::__pgrx_c_args_InvokeObjectDropHook!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHook!(@collect __pgrx_emit_public []; $($raw)*)
@@ -2092,6 +2188,13 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArg {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectDropHookArg] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2146,6 +2249,13 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArg {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectDropHookArg] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2197,6 +2307,13 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArg {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_InvokeObjectDropHookArg] [p3 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectDropHookArg] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -2263,6 +2380,11 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArg {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectDropHookArg] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2300,6 +2422,13 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArg {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectDropHookArg] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2316,7 +2445,7 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArg {
         $crate::InvokeObjectDropHookArg!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro InvokeObjectDropHookArg from objectaccess.h:184
@@ -2465,7 +2594,7 @@ macro_rules! InvokeObjectDropHookArg {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(@collect __pgrx_emit_public []; $($raw)*)
@@ -2545,6 +2674,13 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArgStr {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectDropHookArgStr] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2599,6 +2735,13 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArgStr {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectDropHookArgStr] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2650,6 +2793,13 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArgStr {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_InvokeObjectDropHookArgStr] [p3 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectDropHookArgStr] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -2716,6 +2866,13 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArgStr {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectDropHookArgStr] [p4 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2753,6 +2910,13 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArgStr {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectDropHookArgStr] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2769,7 +2933,7 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArgStr {
         $crate::InvokeObjectDropHookArgStr!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro InvokeObjectDropHookArgStr from objectaccess.h:231
@@ -2924,7 +3088,7 @@ macro_rules! InvokeObjectDropHookArgStr {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(@collect __pgrx_emit_public []; $($raw)*)
@@ -3004,6 +3168,13 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookStr {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectDropHookStr] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookStr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3055,6 +3226,13 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookStr {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_InvokeObjectDropHookStr] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectDropHookStr] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -3121,6 +3299,11 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookStr {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectDropHookStr] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookStr!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3158,6 +3341,13 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookStr {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectDropHookStr] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookStr!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3174,7 +3364,7 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookStr {
         $crate::InvokeObjectDropHookStr!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro InvokeObjectDropHookStr from objectaccess.h:229
@@ -3335,7 +3525,7 @@ macro_rules! InvokeObjectDropHookStr {
         $crate::__pgrx_c_args_InvokeObjectDropHookStr!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookStr!(@collect __pgrx_emit_public []; $($raw)*)
@@ -3415,6 +3605,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHook {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostAlterHook] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3466,6 +3663,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHook {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_InvokeObjectPostAlterHook] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostAlterHook] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -3532,6 +3736,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHook {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostAlterHook] [p3 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3569,6 +3780,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHook {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostAlterHook] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3585,7 +3803,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHook {
         $crate::InvokeObjectPostAlterHook!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro InvokeObjectPostAlterHook from objectaccess.h:197
@@ -3768,7 +3986,7 @@ macro_rules! InvokeObjectPostAlterHook {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(@collect __pgrx_emit_public []; $($raw)*)
@@ -3851,6 +4069,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArg {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostAlterHookArg] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3906,6 +4131,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArg {
             @argument [__pgrx_c_args_InvokeObjectPostAlterHookArg] [
                 p2 $mode [$($done)*] [$($rest)*]
             ] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostAlterHookArg] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -3965,6 +4197,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArg {
             ] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostAlterHookArg] [
+                p3 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4020,6 +4259,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArg {
             @argument [__pgrx_c_args_InvokeObjectPostAlterHookArg] [
                 p4 $mode [$($done)*] [$($rest)*]
             ] [($($inner)*)]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostAlterHookArg] [
+                p4 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -4088,6 +4334,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArg {
             ]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostAlterHookArg] [p5 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4125,6 +4378,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArg {
             ] [($($inner)*)]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostAlterHookArg] [
+                p5 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4141,7 +4401,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArg {
         $crate::InvokeObjectPostAlterHookArg!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro InvokeObjectPostAlterHookArg from objectaccess.h:200
@@ -4337,7 +4597,7 @@ macro_rules! InvokeObjectPostAlterHookArg {
         )
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
@@ -4423,6 +4683,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArgStr {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostAlterHookArgStr] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4478,6 +4745,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArgStr {
             @argument [__pgrx_c_args_InvokeObjectPostAlterHookArgStr] [
                 p2 $mode [$($done)*] [$($rest)*]
             ] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostAlterHookArgStr] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -4537,6 +4811,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArgStr {
             ] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostAlterHookArgStr] [
+                p3 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4592,6 +4873,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArgStr {
             @argument [__pgrx_c_args_InvokeObjectPostAlterHookArgStr] [
                 p4 $mode [$($done)*] [$($rest)*]
             ] [($($inner)*)]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostAlterHookArgStr] [
+                p4 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -4660,6 +4948,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArgStr {
             ]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostAlterHookArgStr] [p5 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4697,6 +4992,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArgStr {
             ] [($($inner)*)]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostAlterHookArgStr] [
+                p5 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4713,7 +5015,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArgStr {
         $crate::InvokeObjectPostAlterHookArgStr!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro InvokeObjectPostAlterHookArgStr from objectaccess.h:247
@@ -4915,7 +5217,7 @@ macro_rules! InvokeObjectPostAlterHookArgStr {
         )
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
@@ -5001,6 +5303,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookStr {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostAlterHookStr] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookStr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5056,6 +5365,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookStr {
             @argument [__pgrx_c_args_InvokeObjectPostAlterHookStr] [
                 p2 $mode [$($done)*] [$($rest)*]
             ] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostAlterHookStr] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -5124,6 +5440,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookStr {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostAlterHookStr] [p3 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookStr!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5161,6 +5484,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookStr {
             ] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostAlterHookStr] [
+                p3 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookStr!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5177,7 +5507,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookStr {
         $crate::InvokeObjectPostAlterHookStr!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro InvokeObjectPostAlterHookStr from objectaccess.h:244
@@ -5369,7 +5699,7 @@ macro_rules! InvokeObjectPostAlterHookStr {
         )
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookStr!(
@@ -5452,6 +5782,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHook {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostCreateHook] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5503,6 +5840,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHook {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_InvokeObjectPostCreateHook] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostCreateHook] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -5569,6 +5913,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHook {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostCreateHook] [p3 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5606,6 +5957,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHook {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostCreateHook] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5622,7 +5980,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHook {
         $crate::InvokeObjectPostCreateHook!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro InvokeObjectPostCreateHook from objectaccess.h:173
@@ -5778,7 +6136,7 @@ macro_rules! InvokeObjectPostCreateHook {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(@collect __pgrx_emit_public []; $($raw)*)
@@ -5861,6 +6219,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArg {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostCreateHookArg] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5918,6 +6283,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArg {
             ] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostCreateHookArg] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5973,6 +6345,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArg {
             @argument [__pgrx_c_args_InvokeObjectPostCreateHookArg] [
                 p3 $mode [$($done)*] [$($rest)*]
             ] [($($inner)*)]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostCreateHookArg] [
+                p3 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -6041,6 +6420,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArg {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostCreateHookArg] [p4 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6078,6 +6464,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArg {
             ] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostCreateHookArg] [
+                p4 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6094,7 +6487,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArg {
         $crate::InvokeObjectPostCreateHookArg!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro InvokeObjectPostCreateHookArg from objectaccess.h:175
@@ -6246,7 +6639,7 @@ macro_rules! InvokeObjectPostCreateHookArg {
         )
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
@@ -6332,6 +6725,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArgStr {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostCreateHookArgStr] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6389,6 +6789,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArgStr {
             ] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostCreateHookArgStr] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6444,6 +6851,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArgStr {
             @argument [__pgrx_c_args_InvokeObjectPostCreateHookArgStr] [
                 p3 $mode [$($done)*] [$($rest)*]
             ] [($($inner)*)]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostCreateHookArgStr] [
+                p3 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -6512,6 +6926,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArgStr {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostCreateHookArgStr] [p4 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6549,6 +6970,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArgStr {
             ] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostCreateHookArgStr] [
+                p4 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6565,7 +6993,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArgStr {
         $crate::InvokeObjectPostCreateHookArgStr!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro InvokeObjectPostCreateHookArgStr from objectaccess.h:222
@@ -6723,7 +7151,7 @@ macro_rules! InvokeObjectPostCreateHookArgStr {
         )
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
@@ -6809,6 +7237,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookStr {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostCreateHookStr] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookStr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6864,6 +7299,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookStr {
             @argument [__pgrx_c_args_InvokeObjectPostCreateHookStr] [
                 p2 $mode [$($done)*] [$($rest)*]
             ] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostCreateHookStr] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -6932,6 +7374,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookStr {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostCreateHookStr] [p3 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookStr!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6969,6 +7418,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookStr {
             ] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectPostCreateHookStr] [
+                p3 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookStr!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6985,7 +7441,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookStr {
         $crate::InvokeObjectPostCreateHookStr!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro InvokeObjectPostCreateHookStr from objectaccess.h:220
@@ -7150,7 +7606,7 @@ macro_rules! InvokeObjectPostCreateHookStr {
         )
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookStr!(
@@ -7242,6 +7698,13 @@ macro_rules! __pgrx_c_args_InvokeObjectTruncateHook {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectTruncateHook] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHook!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7279,6 +7742,13 @@ macro_rules! __pgrx_c_args_InvokeObjectTruncateHook {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectTruncateHook] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHook!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7295,7 +7765,7 @@ macro_rules! __pgrx_c_args_InvokeObjectTruncateHook {
         $crate::InvokeObjectTruncateHook!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro InvokeObjectTruncateHook from objectaccess.h:191
@@ -7381,7 +7851,7 @@ macro_rules! InvokeObjectTruncateHook {
         $crate::__pgrx_c_args_InvokeObjectTruncateHook!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHook!(@collect __pgrx_emit_public []; $($raw)*)
@@ -7470,6 +7940,13 @@ macro_rules! __pgrx_c_args_InvokeObjectTruncateHookStr {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectTruncateHookStr] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHookStr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7507,6 +7984,13 @@ macro_rules! __pgrx_c_args_InvokeObjectTruncateHookStr {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InvokeObjectTruncateHookStr] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHookStr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7523,7 +8007,7 @@ macro_rules! __pgrx_c_args_InvokeObjectTruncateHookStr {
         $crate::InvokeObjectTruncateHookStr!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro InvokeObjectTruncateHookStr from objectaccess.h:238
@@ -7618,7 +8102,7 @@ macro_rules! InvokeObjectTruncateHookStr {
         )
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHookStr!(@collect __pgrx_emit_public []; $($raw)*)

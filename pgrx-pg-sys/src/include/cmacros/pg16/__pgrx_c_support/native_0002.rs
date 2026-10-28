@@ -4,6 +4,60 @@ This code is generated for documentation purposes, so that it is easy to referen
 */
 // Shared generated C macro support.
 
+const _: () = assert!(
+    ::core::mem::size_of::<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(
+                *mut crate::__pgrx_c_bindings::ReorderBuffer,
+                *mut crate::__pgrx_c_bindings::ReorderBufferTXN,
+                u64,
+                i64,
+            ) -> (),
+        >,
+    >() == 8
+);
+const _: () = assert!(
+    ::core::mem::align_of::<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(
+                *mut crate::__pgrx_c_bindings::ReorderBuffer,
+                *mut crate::__pgrx_c_bindings::ReorderBufferTXN,
+                u64,
+                i64,
+            ) -> (),
+        >,
+    >() == 8
+);
+#[doc(hidden)]
+#[derive(Clone, Copy)]
+pub struct Signature_7d8be69134e976cd08f3d85e5cb3daf4;
+impl c::sealed::Sealed for Signature_7d8be69134e976cd08f3d85e5cb3daf4 {}
+impl c::expression::NativeFunctionSignature for Signature_7d8be69134e976cd08f3d85e5cb3daf4 {
+    type Physical = PhysicalFunction_C_unwind_4<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(
+                *mut crate::__pgrx_c_bindings::ReorderBuffer,
+                *mut crate::__pgrx_c_bindings::ReorderBufferTXN,
+                u64,
+                i64,
+            ) -> (),
+        >,
+    >;
+}
+const _: () = assert!(
+    ::core::mem::size_of::<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::SampleScanState) -> (),
+        >,
+    >() == 8
+);
+const _: () = assert!(
+    ::core::mem::align_of::<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::SampleScanState) -> (),
+        >,
+    >() == 8
+);
 #[doc(hidden)]
 #[derive(Clone, Copy)]
 pub struct Signature_2460f002f4f04d00272075edaed42c35;
@@ -6801,43 +6855,3 @@ unsafe impl<Q: c::expression::Qualifier> c::expression::ReadPlace
         <Self::Type as c::expression::CType>::from_storage(storage)
     }
 }
-// SAFETY: Write capability retains ReadWrite qualification. Original C performs declared-base conversion and width narrowing without Rust byte reads.
-unsafe impl c::expression::WritePlace
-    for Bitfield_a652f61f7fd27574846c18953015e6a9<c::expression::ReadWrite>
-{
-    type Assignment = c::CUnsignedInt;
-    unsafe fn store(
-        self,
-        value: <Self::Assignment as c::expression::CType>::Value,
-    ) -> <Self::Type as c::expression::CType>::Value {
-        let value = <Self::Assignment as c::expression::CType>::into_storage(value); // SAFETY: The caller establishes writable field storage; this helper evaluates one original-C assignment and returns its narrowed result.
-        let stored = unsafe {
-            if self.access.unaligned {
-                if self.access.volatile {
-                    __pgrx_bitfield_a652f61f7fd27574846c18953015e6a9_set_unaligned_volatile(
-                        self.address,
-                        value,
-                    )
-                } else {
-                    __pgrx_bitfield_a652f61f7fd27574846c18953015e6a9_set_unaligned(
-                        self.address,
-                        value,
-                    )
-                }
-            } else if self.access.volatile {
-                __pgrx_bitfield_a652f61f7fd27574846c18953015e6a9_set_volatile(self.address, value)
-            } else {
-                __pgrx_bitfield_a652f61f7fd27574846c18953015e6a9_set(self.address, value)
-            }
-        };
-        <Self::Type as c::expression::CType>::from_storage(stored)
-    }
-}
-#[doc(hidden)]
-pub struct Field_replace;
-const _: () = {
-    assert!(
-        ::core::mem::offset_of!(crate::__pgrx_c_bindings::HeadlineWordEntry, _bitfield_1) * 8 + 2
-            == 2
-    );
-};

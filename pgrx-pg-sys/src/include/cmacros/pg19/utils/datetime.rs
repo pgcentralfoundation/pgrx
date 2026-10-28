@@ -77,6 +77,11 @@ macro_rules! __pgrx_c_args_DTK_M {
             @argument [__pgrx_c_args_DTK_M] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DTK_M] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DTK_M!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -112,6 +117,11 @@ macro_rules! __pgrx_c_args_DTK_M {
             @argument [__pgrx_c_args_DTK_M] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DTK_M] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DTK_M!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -128,7 +138,7 @@ macro_rules! __pgrx_c_args_DTK_M {
         $crate::DTK_M!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DTK_M from datetime.h:187
@@ -182,13 +192,13 @@ macro_rules! DTK_M {
         $crate::__pgrx_c_args_DTK_M!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $t:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DTK_M!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $t:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DTK_M!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -201,7 +211,7 @@ macro_rules! DTK_M {
                         $crate::__pgrx_c_operand!(@check_safety; $t);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::shl::<
@@ -224,7 +234,7 @@ macro_rules! DTK_M {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -325,6 +335,11 @@ macro_rules! __pgrx_c_args_FMODULO {
             @argument [__pgrx_c_args_FMODULO] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FMODULO] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FMODULO!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -375,6 +390,11 @@ macro_rules! __pgrx_c_args_FMODULO {
     (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_FMODULO] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FMODULO] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -436,6 +456,11 @@ macro_rules! __pgrx_c_args_FMODULO {
             @argument [__pgrx_c_args_FMODULO] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FMODULO] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_FMODULO!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -471,6 +496,11 @@ macro_rules! __pgrx_c_args_FMODULO {
             @argument [__pgrx_c_args_FMODULO] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FMODULO] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FMODULO!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -487,7 +517,7 @@ macro_rules! __pgrx_c_args_FMODULO {
         $crate::FMODULO!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro FMODULO from datetime.h:238
@@ -569,7 +599,7 @@ macro_rules! FMODULO {
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CDouble as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_661bc6714da1686b7deed8cbd4475115(
+                                                    $crate::__pgrx_c_generated::Inline_9052e6b31a6af0378ff478a27311a08e(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CDouble as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -621,7 +651,7 @@ macro_rules! FMODULO {
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CDouble as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_2f911a08bee0a0a1c64bbe9a470d8a98(
+                                                    $crate::__pgrx_c_generated::Inline_770774f29aef9830c38c85b065c5f788(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CDouble as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
@@ -699,7 +729,7 @@ macro_rules! FMODULO {
                                 <
                                     $crate::__pgrx_c_macros::expression::CDouble as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::__pgrx_c_generated::Inline_ef26ddf2423db3a697d5131e479c494c(
+                                    $crate::__pgrx_c_generated::Inline_34bd5762fe5dbe5885ea353cb4b1605b(
                                         <
                                             $crate::__pgrx_c_macros::expression::CDouble as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
@@ -764,7 +794,7 @@ macro_rules! FMODULO {
         $crate::__pgrx_c_args_FMODULO!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_FMODULO!(@collect __pgrx_emit_public []; $($raw)*)
@@ -839,6 +869,11 @@ macro_rules! __pgrx_c_args_TMODULO {
             @argument [__pgrx_c_args_TMODULO] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TMODULO] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TMODULO!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -889,6 +924,11 @@ macro_rules! __pgrx_c_args_TMODULO {
     (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_TMODULO] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TMODULO] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -950,6 +990,11 @@ macro_rules! __pgrx_c_args_TMODULO {
             @argument [__pgrx_c_args_TMODULO] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TMODULO] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TMODULO!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -985,6 +1030,11 @@ macro_rules! __pgrx_c_args_TMODULO {
             @argument [__pgrx_c_args_TMODULO] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TMODULO] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TMODULO!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1001,7 +1051,7 @@ macro_rules! __pgrx_c_args_TMODULO {
         $crate::TMODULO!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TMODULO from datetime.h:250
@@ -1126,7 +1176,7 @@ macro_rules! TMODULO {
         $crate::__pgrx_c_args_TMODULO!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_TMODULO!(@collect __pgrx_emit_public []; $($raw)*)
@@ -1208,6 +1258,11 @@ macro_rules! __pgrx_c_args_isleap {
             @argument [__pgrx_c_args_isleap] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_isleap] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_isleap!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1243,6 +1298,11 @@ macro_rules! __pgrx_c_args_isleap {
             @argument [__pgrx_c_args_isleap] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_isleap] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_isleap!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1259,7 +1319,7 @@ macro_rules! __pgrx_c_args_isleap {
         $crate::isleap!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro isleap from datetime.h:273
@@ -1444,13 +1504,13 @@ macro_rules! isleap {
         $crate::__pgrx_c_args_isleap!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $y:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_isleap!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $y:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_isleap!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1463,7 +1523,7 @@ macro_rules! isleap {
                         $crate::__pgrx_c_operand!(@check_safety; $y);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -1629,7 +1689,7 @@ macro_rules! isleap {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

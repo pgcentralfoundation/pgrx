@@ -76,13 +76,13 @@ macro_rules! FIRST_PREPARED_XACT_PROC_NUMBER {
         $crate::FIRST_PREPARED_XACT_PROC_NUMBER!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::FIRST_PREPARED_XACT_PROC_NUMBER!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::FIRST_PREPARED_XACT_PROC_NUMBER!(@__pgrx_emit_read_place; $($raw)*)
@@ -93,7 +93,7 @@ macro_rules! FIRST_PREPARED_XACT_PROC_NUMBER {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::add::<
@@ -122,7 +122,7 @@ macro_rules! FIRST_PREPARED_XACT_PROC_NUMBER {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -153,13 +153,13 @@ macro_rules! FIRST_PREPARED_XACT_PROC_NUMBER {
         $crate::FIRST_PREPARED_XACT_PROC_NUMBER!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::FIRST_PREPARED_XACT_PROC_NUMBER!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 
@@ -239,13 +239,13 @@ macro_rules! FastPathLockSlotsPerBackend {
         $crate::FastPathLockSlotsPerBackend!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::FastPathLockSlotsPerBackend!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::FastPathLockSlotsPerBackend!(@__pgrx_emit_read_place; $($raw)*)
@@ -256,7 +256,7 @@ macro_rules! FastPathLockSlotsPerBackend {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::mul::<
@@ -285,7 +285,7 @@ macro_rules! FastPathLockSlotsPerBackend {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -320,13 +320,13 @@ macro_rules! FastPathLockSlotsPerBackend {
         $crate::FastPathLockSlotsPerBackend!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::FastPathLockSlotsPerBackend!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 
@@ -407,6 +407,11 @@ macro_rules! __pgrx_c_args_GetNumberFromPGProc {
             @argument [__pgrx_c_args_GetNumberFromPGProc] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetNumberFromPGProc] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GetNumberFromPGProc!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -444,6 +449,13 @@ macro_rules! __pgrx_c_args_GetNumberFromPGProc {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetNumberFromPGProc] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetNumberFromPGProc!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -460,7 +472,7 @@ macro_rules! __pgrx_c_args_GetNumberFromPGProc {
         $crate::GetNumberFromPGProc!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GetNumberFromPGProc from proc.h:439
@@ -554,13 +566,13 @@ macro_rules! GetNumberFromPGProc {
         $crate::__pgrx_c_args_GetNumberFromPGProc!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $proc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetNumberFromPGProc!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $proc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetNumberFromPGProc!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -573,7 +585,7 @@ macro_rules! GetNumberFromPGProc {
                         $crate::__pgrx_c_operand!(@check_safety; $proc);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::sub::<
@@ -640,7 +652,7 @@ macro_rules! GetNumberFromPGProc {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -788,6 +800,11 @@ macro_rules! __pgrx_c_args_GetPGProcByNumber {
             @argument [__pgrx_c_args_GetPGProcByNumber] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetPGProcByNumber] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GetPGProcByNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -825,6 +842,13 @@ macro_rules! __pgrx_c_args_GetPGProcByNumber {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetPGProcByNumber] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetPGProcByNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -841,7 +865,7 @@ macro_rules! __pgrx_c_args_GetPGProcByNumber {
         $crate::GetPGProcByNumber!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GetPGProcByNumber from proc.h:438
@@ -920,13 +944,13 @@ macro_rules! GetPGProcByNumber {
         $crate::__pgrx_c_args_GetPGProcByNumber!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetPGProcByNumber!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetPGProcByNumber!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -939,7 +963,7 @@ macro_rules! GetPGProcByNumber {
                         $crate::__pgrx_c_operand!(@check_safety; $n);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::address(
@@ -986,7 +1010,7 @@ macro_rules! GetPGProcByNumber {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

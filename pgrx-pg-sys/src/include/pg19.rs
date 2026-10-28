@@ -166,17 +166,17 @@ pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const OPENSSL_API_COMPAT: u32 = 269488128;
 pub const PACKAGE_BUGREPORT: &::core::ffi::CStr = c"pgsql-bugs@lists.postgresql.org";
 pub const PACKAGE_NAME: &::core::ffi::CStr = c"PostgreSQL";
-pub const PACKAGE_STRING: &::core::ffi::CStr = c"PostgreSQL 19beta4";
+pub const PACKAGE_STRING: &::core::ffi::CStr = c"PostgreSQL 19rc1";
 pub const PACKAGE_TARNAME: &::core::ffi::CStr = c"postgresql";
 pub const PACKAGE_URL: &::core::ffi::CStr = c"https://www.postgresql.org/";
-pub const PACKAGE_VERSION: &::core::ffi::CStr = c"19beta4";
+pub const PACKAGE_VERSION: &::core::ffi::CStr = c"19rc1";
 pub const PG_KRB_SRVNAM: &::core::ffi::CStr = c"postgres";
 pub const PG_MAJORVERSION: &::core::ffi::CStr = c"19";
 pub const PG_MAJORVERSION_NUM: u32 = 19;
 pub const PG_MINORVERSION_NUM: u32 = 0;
-pub const PG_VERSION: &::core::ffi::CStr = c"19beta4 (Debian 19~beta4-1.pgdg13+1)";
+pub const PG_VERSION: &::core::ffi::CStr = c"19rc1 (Ubuntu 19~rc1-1.pgdg24.04+1)";
 pub const PG_VERSION_NUM: u32 = 190000;
-pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 19beta4 (Debian 19~beta4-1.pgdg13+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit" ;
+pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 19rc1 (Ubuntu 19~rc1-1.pgdg24.04+1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, 64-bit" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_INTMAX_T: u32 = 8;
 pub const SIZEOF_LONG: u32 = 8;
@@ -247,7 +247,6 @@ pub const PG_DIAG_SOURCE_LINE: u8 = 76u8;
 pub const PG_DIAG_SOURCE_FUNCTION: u8 = 82u8;
 pub const INT64_FORMAT: &::core::ffi::CStr = c"%ld";
 pub const UINT64_FORMAT: &::core::ffi::CStr = c"%lu";
-pub const OID8_FORMAT: &::core::ffi::CStr = c"%lu";
 pub const PG_INT8_MIN: i32 = -128;
 pub const PG_INT8_MAX: u32 = 127;
 pub const PG_UINT8_MAX: u32 = 255;
@@ -269,7 +268,7 @@ pub const PG_BINARY_R: &::core::ffi::CStr = c"r";
 pub const PG_BINARY_W: &::core::ffi::CStr = c"w";
 pub const PGINVALID_SOCKET: i32 = -1;
 pub const PG_BACKEND_VERSIONSTR: &::core::ffi::CStr =
-    c"postgres (PostgreSQL) 19beta4 (Debian 19~beta4-1.pgdg13+1)\n";
+    c"postgres (PostgreSQL) 19rc1 (Ubuntu 19~rc1-1.pgdg24.04+1)\n";
 pub const EXE: &::core::ffi::CStr = c"";
 pub const DEVNULL: &::core::ffi::CStr = c"/dev/null";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -467,7 +466,7 @@ pub const ATTNULLABLE_UNRESTRICTED: u8 = 102u8;
 pub const ATTNULLABLE_UNKNOWN: u8 = 117u8;
 pub const ATTNULLABLE_VALID: u8 = 118u8;
 pub const ATTNULLABLE_INVALID: u8 = 105u8;
-pub const CATALOG_VERSION_NO: u32 = 202609165;
+pub const CATALOG_VERSION_NO: u32 = 202610061;
 pub const PG_TBLSPC_DIR: &::core::ffi::CStr = c"pg_tblspc";
 pub const PG_TBLSPC_DIR_SLASH: &::core::ffi::CStr = c"pg_tblspc/";
 pub const OIDCHARS: u32 = 10;
@@ -7172,9 +7171,7 @@ pub struct _IO_FILE {
     pub _markers: *mut _IO_marker,
     pub _chain: *mut _IO_FILE,
     pub _fileno: ::core::ffi::c_int,
-    pub _bitfield_align_1: [u32; 0],
-    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 3usize]>,
-    pub _short_backupbuf: [::core::ffi::c_char; 1usize],
+    pub _flags2: ::core::ffi::c_int,
     pub _old_offset: __off_t,
     pub _cur_column: ::core::ffi::c_ushort,
     pub _vtable_offset: ::core::ffi::c_schar,
@@ -7185,7 +7182,7 @@ pub struct _IO_FILE {
     pub _wide_data: *mut _IO_wide_data,
     pub _freeres_list: *mut _IO_FILE,
     pub _freeres_buf: *mut ::core::ffi::c_void,
-    pub _prevchain: *mut *mut _IO_FILE,
+    pub __pad5: usize,
     pub _mode: ::core::ffi::c_int,
     pub _unused2: [::core::ffi::c_char; 20usize],
 }
@@ -7196,50 +7193,6 @@ impl Default for _IO_FILE {
             ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
-    }
-}
-impl _IO_FILE {
-    #[inline]
-    pub fn _flags2(&self) -> ::core::ffi::c_int {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 24u8) as u32) }
-    }
-    #[inline]
-    pub fn set__flags2(&mut self, val: ::core::ffi::c_int) {
-        unsafe {
-            let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(0usize, 24u8, val as u64)
-        }
-    }
-    #[inline]
-    pub unsafe fn _flags2_raw(this: *const Self) -> ::core::ffi::c_int {
-        unsafe {
-            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 3usize]>>::raw_get(
-                ::core::ptr::addr_of!((*this)._bitfield_1),
-                0usize,
-                24u8,
-            ) as u32)
-        }
-    }
-    #[inline]
-    pub unsafe fn set__flags2_raw(this: *mut Self, val: ::core::ffi::c_int) {
-        unsafe {
-            let val: u32 = ::core::mem::transmute(val);
-            <__BindgenBitfieldUnit<[u8; 3usize]>>::raw_set(
-                ::core::ptr::addr_of_mut!((*this)._bitfield_1),
-                0usize,
-                24u8,
-                val as u64,
-            )
-        }
-    }
-    #[inline]
-    pub fn new_bitfield_1(_flags2: ::core::ffi::c_int) -> __BindgenBitfieldUnit<[u8; 3usize]> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 3usize]> = Default::default();
-        __bindgen_bitfield_unit.set(0usize, 24u8, {
-            let _flags2: u32 = unsafe { ::core::mem::transmute(_flags2) };
-            _flags2 as u64
-        });
-        __bindgen_bitfield_unit
     }
 }
 pub type va_list = __gnuc_va_list;
@@ -8256,6 +8209,7 @@ pub struct IndexVacuumInfo {
     pub index: Relation,
     pub heaprel: Relation,
     pub analyze_only: bool,
+    pub is_autovacuum: bool,
     pub report_progress: bool,
     pub estimated_count: bool,
     pub message_level: ::core::ffi::c_int,
@@ -22922,6 +22876,7 @@ pub struct ElidedNode {
     pub plan_node_id: ::core::ffi::c_int,
     pub elided_type: NodeTag,
     pub relids: *mut Bitmapset,
+    pub child_append_relid_sets: *mut List,
 }
 impl Default for ElidedNode {
     fn default() -> Self {
@@ -34761,6 +34716,7 @@ pub struct PartitionPruneState {
     pub prune_context: MemoryContext,
     pub do_initial_prune: bool,
     pub do_exec_prune: bool,
+    pub initialized: bool,
     pub num_partprunedata: ::core::ffi::c_int,
     pub partprunedata: __IncompleteArrayField<*mut PartitionPruningData>,
 }
@@ -38805,6 +38761,7 @@ pub struct LogicalRepRelMapEntry {
     pub attrmap: *mut AttrMap,
     pub updatable: bool,
     pub localindexoid: Oid,
+    pub idxisreplident: bool,
     pub state: ::core::ffi::c_char,
     pub statelsn: XLogRecPtr,
 }
@@ -45806,10 +45763,11 @@ unsafe extern "C-unwind" {
     pub fn InitializeProcessXLogLogicalInfo();
     pub fn ProcessBarrierUpdateXLogLogicalInfo() -> bool;
     pub fn IsLogicalDecodingEnabled() -> bool;
+    pub fn StandbyLogicalDecodingEnabledSince(lsn: XLogRecPtr) -> bool;
     pub fn IsXLogLogicalInfoEnabled() -> bool;
     pub fn AtEOXact_LogicalCtl();
     pub fn EnsureLogicalDecodingEnabled();
-    pub fn EnableLogicalDecoding();
+    pub fn EnableLogicalDecoding(lsn: XLogRecPtr);
     pub fn RequestDisableLogicalDecoding();
     pub fn DisableLogicalDecodingIfNecessary();
     pub fn DisableLogicalDecoding();
@@ -53924,6 +53882,7 @@ unsafe extern "C-unwind" {
     pub fn RelationFindReplTupleByIndex(
         rel: Relation,
         idxoid: Oid,
+        skipduplicates: bool,
         lockmode: LockTupleMode::Type,
         searchslot: *mut TupleTableSlot,
         outslot: *mut TupleTableSlot,
@@ -53936,6 +53895,7 @@ unsafe extern "C-unwind" {
     ) -> bool;
     pub fn RelationFindDeletedTupleInfoSeq(
         rel: Relation,
+        identidxoid: Oid,
         searchslot: *mut TupleTableSlot,
         oldestxmin: TransactionId,
         delete_xid: *mut TransactionId,
@@ -53945,6 +53905,7 @@ unsafe extern "C-unwind" {
     pub fn RelationFindDeletedTupleInfoByIndex(
         rel: Relation,
         idxoid: Oid,
+        skipduplicates: bool,
         searchslot: *mut TupleTableSlot,
         oldestxmin: TransactionId,
         delete_xid: *mut TransactionId,
@@ -55424,6 +55385,7 @@ unsafe extern "C-unwind" {
     );
     pub fn parallel_vacuum_update_shared_delay_params();
     pub fn parallel_vacuum_propagate_shared_delay_params();
+    pub fn parallel_vacuum_refresh_cost_params();
     pub fn parallel_vacuum_main(seg: *mut dsm_segment, toc: *mut shm_toc);
     pub fn analyze_rel(
         relid: Oid,
@@ -59032,6 +58994,11 @@ unsafe extern "C-unwind" {
         parent_joinrel: *mut RelOptInfo,
         child_joinrel: *mut RelOptInfo,
     );
+    pub fn add_child_rel_pathkey_equivalences(
+        root: *mut PlannerInfo,
+        child_rel: *mut RelOptInfo,
+        pathkeys: *mut List,
+    );
     pub fn add_setop_child_rel_equivalences(
         root: *mut PlannerInfo,
         child_rel: *mut RelOptInfo,
@@ -61913,7 +61880,7 @@ unsafe extern "C-unwind" {
         attnum: AttrNumber,
         atttypid: *mut Oid,
         atttypmod: *mut int32,
-        atttyptype: *mut ::core::ffi::c_char,
+        basetypcache: *mut *mut TypeCacheEntry,
         atttypcoll: *mut Oid,
         eq_opr: *mut Oid,
         lt_opr: *mut Oid,
@@ -61947,11 +61914,11 @@ unsafe extern "C-unwind" {
         ok: *mut bool,
     ) -> Datum;
     pub fn statatt_get_elem_type(
-        atttypid: Oid,
-        atttyptype: ::core::ffi::c_char,
+        basetypcache: *mut TypeCacheEntry,
         elemtypid: *mut Oid,
         elem_eq_opr: *mut Oid,
     ) -> bool;
+    pub fn statatt_get_range_type(basetypcache: *mut TypeCacheEntry, rangetypid: *mut Oid) -> bool;
     pub fn pgaio_io_acquire(
         resowner: *mut ResourceOwnerData,
         ret: *mut PgAioReturn,
@@ -62096,7 +62063,6 @@ unsafe extern "C-unwind" {
     pub fn BufMappingPartitionLockByIndex(index: uint32) -> *mut LWLock;
     pub static mut BufferDescriptors: *mut BufferDescPadded;
     pub static mut BufferIOCVArray: *mut ConditionVariableMinimallyPadded;
-    pub static mut BackendWritebackContext: WritebackContext;
     pub static mut LocalBufferDescriptors: *mut BufferDesc;
     #[link_name = "GetBufferDescriptor__pgrx_cshim"]
     pub fn GetBufferDescriptor(id: uint32) -> *mut BufferDesc;
@@ -69043,8 +69009,6 @@ pub const HAVE_TERMIOS_H: i32 = 1;
 pub const HAVE_THREADSAFE_CURL_GLOBAL_INIT: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_TYPEOF`, omitted by bindgen."]
 pub const HAVE_TYPEOF: i32 = 1;
-#[doc = " Compiler-verified C object macro `HAVE_TYPEOF_UNQUAL`, omitted by bindgen."]
-pub const HAVE_TYPEOF_UNQUAL: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_UCHAR_H`, omitted by bindgen."]
 pub const HAVE_UCHAR_H: i32 = 1;
 #[doc = " Compiler-verified C object macro `HAVE_UNISTD_H`, omitted by bindgen."]

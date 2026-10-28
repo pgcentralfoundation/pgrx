@@ -34,7 +34,7 @@ macro_rules! __pgrx_c_field_marker {
         >
     };
     (@walk []; $($rest:tt)+) => {
-        compile_error!("offsetof member path exceeds the 64-component bound")
+        ::core::compile_error!("offsetof member path exceeds the 64-component bound")
     };
     (CanPartialClearThrough) => {
         $crate::__pgrx_c_generated::Field_CanPartialClearThrough
@@ -119,6 +119,12 @@ macro_rules! __pgrx_c_field_marker {
     };
     (__mask_was_saved) => {
         $crate::__pgrx_c_generated::Field___mask_was_saved
+    };
+    (__pad5) => {
+        $crate::__pgrx_c_generated::Field___pad5
+    };
+    (__ss_align) => {
+        $crate::__pgrx_c_generated::Field___ss_align
     };
     (_cur_column) => {
         $crate::__pgrx_c_generated::Field__cur_column
@@ -1400,6 +1406,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (casecollid) => {
         $crate::__pgrx_c_generated::Field_casecollid
+    };
+    (casemap_full) => {
+        $crate::__pgrx_c_generated::Field_casemap_full
     };
     (casetype) => {
         $crate::__pgrx_c_generated::Field_casetype
@@ -4215,6 +4224,9 @@ macro_rules! __pgrx_c_field_marker {
     (idle_in_transaction_time) => {
         $crate::__pgrx_c_generated::Field_idle_in_transaction_time
     };
+    (idxisreplident) => {
+        $crate::__pgrx_c_generated::Field_idxisreplident
+    };
     (idxoffnum) => {
         $crate::__pgrx_c_generated::Field_idxoffnum
     };
@@ -4817,6 +4829,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (is_array) => {
         $crate::__pgrx_c_generated::Field_is_array
+    };
+    (is_autovacuum) => {
+        $crate::__pgrx_c_generated::Field_is_autovacuum
     };
     (is_build) => {
         $crate::__pgrx_c_generated::Field_is_build
@@ -5585,6 +5600,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (log_verbosity) => {
         $crate::__pgrx_c_generated::Field_log_verbosity
+    };
+    (logical) => {
+        $crate::__pgrx_c_generated::Field_logical
     };
     (logicalDecodingEnabled) => {
         $crate::__pgrx_c_generated::Field_logicalDecodingEnabled
@@ -10068,6 +10086,9 @@ macro_rules! __pgrx_c_field_marker {
     (srvowner) => {
         $crate::__pgrx_c_generated::Field_srvowner
     };
+    (ss_family) => {
+        $crate::__pgrx_c_generated::Field_ss_family
+    };
     (ssl_bits) => {
         $crate::__pgrx_c_generated::Field_ssl_bits
     };
@@ -11953,6 +11974,6 @@ macro_rules! __pgrx_c_field_marker {
         $crate::__pgrx_c_generated::Field_zone
     };
     ($($unknown:tt)*) => {
-        compile_error!("field has no compiler-verified PostgreSQL binding capability")
+        ::core::compile_error!("field has no compiler-verified PostgreSQL binding capability")
     };
 }

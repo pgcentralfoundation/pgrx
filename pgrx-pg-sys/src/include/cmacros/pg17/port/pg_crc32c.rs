@@ -72,6 +72,11 @@ macro_rules! __pgrx_c_args_COMP_CRC32C {
             @argument [__pgrx_c_args_COMP_CRC32C] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_COMP_CRC32C] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_COMP_CRC32C!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -122,6 +127,11 @@ macro_rules! __pgrx_c_args_COMP_CRC32C {
     (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_COMP_CRC32C] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_COMP_CRC32C] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -185,6 +195,11 @@ macro_rules! __pgrx_c_args_COMP_CRC32C {
             @argument [__pgrx_c_args_COMP_CRC32C] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_COMP_CRC32C] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_COMP_CRC32C!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -220,6 +235,11 @@ macro_rules! __pgrx_c_args_COMP_CRC32C {
             @argument [__pgrx_c_args_COMP_CRC32C] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_COMP_CRC32C] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_COMP_CRC32C!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -236,7 +256,7 @@ macro_rules! __pgrx_c_args_COMP_CRC32C {
         $crate::COMP_CRC32C!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro COMP_CRC32C from pg_crc32c.h:76
@@ -318,13 +338,13 @@ macro_rules! COMP_CRC32C {
         $crate::__pgrx_c_args_COMP_CRC32C!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $crc:tt, $data:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_COMP_CRC32C!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $crc:tt, $data:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_COMP_CRC32C!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -339,7 +359,7 @@ macro_rules! COMP_CRC32C {
                         $crate::__pgrx_c_operand!(@check_safety; $len);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -388,7 +408,7 @@ macro_rules! COMP_CRC32C {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -513,6 +533,11 @@ macro_rules! __pgrx_c_args_EQ_CRC32C {
             @argument [__pgrx_c_args_EQ_CRC32C] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_EQ_CRC32C] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_EQ_CRC32C!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -574,6 +599,11 @@ macro_rules! __pgrx_c_args_EQ_CRC32C {
             @argument [__pgrx_c_args_EQ_CRC32C] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_EQ_CRC32C] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_EQ_CRC32C!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -609,6 +639,11 @@ macro_rules! __pgrx_c_args_EQ_CRC32C {
             @argument [__pgrx_c_args_EQ_CRC32C] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_EQ_CRC32C] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_EQ_CRC32C!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -625,7 +660,7 @@ macro_rules! __pgrx_c_args_EQ_CRC32C {
         $crate::EQ_CRC32C!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro EQ_CRC32C from pg_crc32c.h:42
@@ -678,13 +713,13 @@ macro_rules! EQ_CRC32C {
         $crate::__pgrx_c_args_EQ_CRC32C!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $c1:tt, $c2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_EQ_CRC32C!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $c1:tt, $c2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_EQ_CRC32C!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -698,7 +733,7 @@ macro_rules! EQ_CRC32C {
                         $crate::__pgrx_c_operand!(@check_safety; $c2);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -717,7 +752,7 @@ macro_rules! EQ_CRC32C {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -827,6 +862,11 @@ macro_rules! __pgrx_c_args_FIN_CRC32C {
             @argument [__pgrx_c_args_FIN_CRC32C] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FIN_CRC32C] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_FIN_CRC32C!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -862,6 +902,11 @@ macro_rules! __pgrx_c_args_FIN_CRC32C {
             @argument [__pgrx_c_args_FIN_CRC32C] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FIN_CRC32C] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FIN_CRC32C!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -878,7 +923,7 @@ macro_rules! __pgrx_c_args_FIN_CRC32C {
         $crate::FIN_CRC32C!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro FIN_CRC32C from pg_crc32c.h:78
@@ -928,13 +973,13 @@ macro_rules! FIN_CRC32C {
         $crate::__pgrx_c_args_FIN_CRC32C!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $crc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FIN_CRC32C!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $crc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FIN_CRC32C!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -947,7 +992,7 @@ macro_rules! FIN_CRC32C {
                         $crate::__pgrx_c_operand!(@check_safety; $crc);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::modify(
@@ -967,7 +1012,7 @@ macro_rules! FIN_CRC32C {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1075,6 +1120,11 @@ macro_rules! __pgrx_c_args_INIT_CRC32C {
             @argument [__pgrx_c_args_INIT_CRC32C] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INIT_CRC32C] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INIT_CRC32C!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1110,6 +1160,11 @@ macro_rules! __pgrx_c_args_INIT_CRC32C {
             @argument [__pgrx_c_args_INIT_CRC32C] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INIT_CRC32C] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INIT_CRC32C!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1126,7 +1181,7 @@ macro_rules! __pgrx_c_args_INIT_CRC32C {
         $crate::INIT_CRC32C!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro INIT_CRC32C from pg_crc32c.h:41
@@ -1174,13 +1229,13 @@ macro_rules! INIT_CRC32C {
         $crate::__pgrx_c_args_INIT_CRC32C!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $crc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INIT_CRC32C!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $crc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INIT_CRC32C!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1193,7 +1248,7 @@ macro_rules! INIT_CRC32C {
                         $crate::__pgrx_c_operand!(@check_safety; $crc);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -1208,7 +1263,7 @@ macro_rules! INIT_CRC32C {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

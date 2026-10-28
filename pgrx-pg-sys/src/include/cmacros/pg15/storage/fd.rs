@@ -84,6 +84,11 @@ macro_rules! __pgrx_c_args_FILE_POSSIBLY_DELETED {
             @argument [__pgrx_c_args_FILE_POSSIBLY_DELETED] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FILE_POSSIBLY_DELETED] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_FILE_POSSIBLY_DELETED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -121,6 +126,13 @@ macro_rules! __pgrx_c_args_FILE_POSSIBLY_DELETED {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FILE_POSSIBLY_DELETED] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FILE_POSSIBLY_DELETED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -137,7 +149,7 @@ macro_rules! __pgrx_c_args_FILE_POSSIBLY_DELETED {
         $crate::FILE_POSSIBLY_DELETED!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro FILE_POSSIBLY_DELETED from fd.h:77
@@ -188,13 +200,13 @@ macro_rules! FILE_POSSIBLY_DELETED {
         $crate::__pgrx_c_args_FILE_POSSIBLY_DELETED!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $err:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FILE_POSSIBLY_DELETED!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $err:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FILE_POSSIBLY_DELETED!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -207,7 +219,7 @@ macro_rules! FILE_POSSIBLY_DELETED {
                         $crate::__pgrx_c_operand!(@check_safety; $err);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -227,7 +239,7 @@ macro_rules! FILE_POSSIBLY_DELETED {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

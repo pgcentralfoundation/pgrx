@@ -74,6 +74,13 @@ macro_rules! __pgrx_c_args_CopyQueryCompletion {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_CopyQueryCompletion] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_CopyQueryCompletion!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -135,6 +142,11 @@ macro_rules! __pgrx_c_args_CopyQueryCompletion {
             @argument [__pgrx_c_args_CopyQueryCompletion] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_CopyQueryCompletion] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_CopyQueryCompletion!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -172,6 +184,13 @@ macro_rules! __pgrx_c_args_CopyQueryCompletion {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_CopyQueryCompletion] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_CopyQueryCompletion!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -188,7 +207,7 @@ macro_rules! __pgrx_c_args_CopyQueryCompletion {
         $crate::CopyQueryCompletion!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function CopyQueryCompletion from cmdtag.h:45
@@ -284,13 +303,13 @@ macro_rules! CopyQueryCompletion {
         $crate::__pgrx_c_args_CopyQueryCompletion!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $dst:tt, $src:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_CopyQueryCompletion!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $dst:tt, $src:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_CopyQueryCompletion!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -304,7 +323,7 @@ macro_rules! CopyQueryCompletion {
                         $crate::__pgrx_c_operand!(@check_safety; $src);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::CopyQueryCompletion(
@@ -359,7 +378,7 @@ macro_rules! CopyQueryCompletion {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -496,6 +515,13 @@ macro_rules! __pgrx_c_args_SetQueryCompletion {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SetQueryCompletion] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SetQueryCompletion!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -547,6 +573,13 @@ macro_rules! __pgrx_c_args_SetQueryCompletion {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_SetQueryCompletion] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SetQueryCompletion] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -611,6 +644,11 @@ macro_rules! __pgrx_c_args_SetQueryCompletion {
             @argument [__pgrx_c_args_SetQueryCompletion] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SetQueryCompletion] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SetQueryCompletion!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -648,6 +686,13 @@ macro_rules! __pgrx_c_args_SetQueryCompletion {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SetQueryCompletion] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SetQueryCompletion!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -664,7 +709,7 @@ macro_rules! __pgrx_c_args_SetQueryCompletion {
         $crate::SetQueryCompletion!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function SetQueryCompletion from cmdtag.h:37
@@ -710,7 +755,7 @@ macro_rules! SetQueryCompletion {
     };
     (@__pgrx_emit_value; $qc:tt, $commandTag:tt, $nprocessed:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            $crate::__pgrx_c_generated::Inline_d44094b51b395f7ddec2bb82399641c2(
+            $crate::__pgrx_c_generated::Inline_a009088be9379ebafbc7f85e285ce784(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -772,13 +817,13 @@ macro_rules! SetQueryCompletion {
         $crate::__pgrx_c_args_SetQueryCompletion!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $qc:tt, $commandTag:tt, $nprocessed:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SetQueryCompletion!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $qc:tt, $commandTag:tt, $nprocessed:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SetQueryCompletion!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -793,10 +838,10 @@ macro_rules! SetQueryCompletion {
                         $crate::__pgrx_c_operand!(@check_safety; $nprocessed);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::__pgrx_c_generated::Inline_d44094b51b395f7ddec2bb82399641c2(
+                            $crate::__pgrx_c_generated::Inline_a009088be9379ebafbc7f85e285ce784(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -859,7 +904,7 @@ macro_rules! SetQueryCompletion {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -869,7 +914,7 @@ macro_rules! SetQueryCompletion {
     (@__pgrx_emit_discard; $qc:tt, $commandTag:tt, $nprocessed:tt $(,)?) => {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::__pgrx_c_generated::Inline_d44094b51b395f7ddec2bb82399641c2(
+                $crate::__pgrx_c_generated::Inline_a009088be9379ebafbc7f85e285ce784(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CRecord<

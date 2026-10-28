@@ -84,6 +84,11 @@ macro_rules! __pgrx_c_args_ReleaseVariableStats {
             @argument [__pgrx_c_args_ReleaseVariableStats] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ReleaseVariableStats] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ReleaseVariableStats!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -121,6 +126,13 @@ macro_rules! __pgrx_c_args_ReleaseVariableStats {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ReleaseVariableStats] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ReleaseVariableStats!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -137,7 +149,7 @@ macro_rules! __pgrx_c_args_ReleaseVariableStats {
         $crate::ReleaseVariableStats!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ReleaseVariableStats from selfuncs.h:103
@@ -272,7 +284,7 @@ macro_rules! ReleaseVariableStats {
         $crate::__pgrx_c_args_ReleaseVariableStats!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_ReleaseVariableStats!(@collect __pgrx_emit_public []; $($raw)*)

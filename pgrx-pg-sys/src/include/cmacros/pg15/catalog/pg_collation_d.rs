@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_collprovider_name {
             @argument [__pgrx_c_args_collprovider_name] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_collprovider_name] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_collprovider_name!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -118,6 +123,13 @@ macro_rules! __pgrx_c_args_collprovider_name {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_collprovider_name] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_collprovider_name!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -134,7 +146,7 @@ macro_rules! __pgrx_c_args_collprovider_name {
         $crate::collprovider_name!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function collprovider_name from pg_collation_d.h:44
@@ -193,7 +205,7 @@ macro_rules! collprovider_name {
                     $crate::__pgrx_c_macros::expression::ReadOnly
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_b29f685f9985bcf4daba925afadc0d10(
+                $crate::__pgrx_c_generated::Inline_2af5363fea5175be18194e0562db82c9(
                     <$crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType>::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::CChar,
@@ -212,13 +224,13 @@ macro_rules! collprovider_name {
         $crate::__pgrx_c_args_collprovider_name!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $c:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_collprovider_name!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $c:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_collprovider_name!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -231,7 +243,7 @@ macro_rules! collprovider_name {
                         $crate::__pgrx_c_operand!(@check_safety; $c);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -243,7 +255,7 @@ macro_rules! collprovider_name {
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_b29f685f9985bcf4daba925afadc0d10(
+                                $crate::__pgrx_c_generated::Inline_2af5363fea5175be18194e0562db82c9(
                                     <
                                         $crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
@@ -263,7 +275,7 @@ macro_rules! collprovider_name {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -282,7 +294,7 @@ macro_rules! collprovider_name {
                         $crate::__pgrx_c_macros::expression::ReadOnly
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_b29f685f9985bcf4daba925afadc0d10(
+                    $crate::__pgrx_c_generated::Inline_2af5363fea5175be18194e0562db82c9(
                         <
                             $crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(

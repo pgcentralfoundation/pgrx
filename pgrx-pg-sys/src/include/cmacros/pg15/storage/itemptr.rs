@@ -74,6 +74,13 @@ macro_rules! __pgrx_c_args_ItemPointerCopy {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerCopy] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerCopy!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -135,6 +142,11 @@ macro_rules! __pgrx_c_args_ItemPointerCopy {
             @argument [__pgrx_c_args_ItemPointerCopy] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerCopy] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ItemPointerCopy!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -172,6 +184,13 @@ macro_rules! __pgrx_c_args_ItemPointerCopy {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerCopy] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerCopy!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -188,7 +207,7 @@ macro_rules! __pgrx_c_args_ItemPointerCopy {
         $crate::ItemPointerCopy!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ItemPointerCopy from itemptr.h:161
@@ -300,13 +319,13 @@ macro_rules! ItemPointerCopy {
         $crate::__pgrx_c_args_ItemPointerCopy!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $fromPointer:tt, $toPointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerCopy!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $fromPointer:tt, $toPointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerCopy!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -321,7 +340,7 @@ macro_rules! ItemPointerCopy {
                         $crate::__pgrx_c_operand!(@check_safety; $toPointer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -414,7 +433,7 @@ macro_rules! ItemPointerCopy {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -584,6 +603,13 @@ macro_rules! __pgrx_c_args_ItemPointerGetBlockNumber {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerGetBlockNumber] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ItemPointerGetBlockNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -621,6 +647,13 @@ macro_rules! __pgrx_c_args_ItemPointerGetBlockNumber {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerGetBlockNumber] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerGetBlockNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -637,7 +670,7 @@ macro_rules! __pgrx_c_args_ItemPointerGetBlockNumber {
         $crate::ItemPointerGetBlockNumber!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ItemPointerGetBlockNumber from itemptr.h:98
@@ -849,13 +882,13 @@ macro_rules! ItemPointerGetBlockNumber {
         $crate::__pgrx_c_args_ItemPointerGetBlockNumber!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerGetBlockNumber!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerGetBlockNumber!(
@@ -872,7 +905,7 @@ macro_rules! ItemPointerGetBlockNumber {
                         $crate::__pgrx_c_operand!(@check_safety; $pointer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -1049,7 +1082,7 @@ macro_rules! ItemPointerGetBlockNumber {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1320,6 +1353,13 @@ macro_rules! __pgrx_c_args_ItemPointerGetBlockNumberNoCheck {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerGetBlockNumberNoCheck] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ItemPointerGetBlockNumberNoCheck!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1357,6 +1397,13 @@ macro_rules! __pgrx_c_args_ItemPointerGetBlockNumberNoCheck {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerGetBlockNumberNoCheck] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerGetBlockNumberNoCheck!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1373,7 +1420,7 @@ macro_rules! __pgrx_c_args_ItemPointerGetBlockNumberNoCheck {
         $crate::ItemPointerGetBlockNumberNoCheck!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ItemPointerGetBlockNumberNoCheck from itemptr.h:89
@@ -1551,7 +1598,7 @@ macro_rules! ItemPointerGetBlockNumberNoCheck {
         )
     };
     (@__pgrx_emit_place; $pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerGetBlockNumberNoCheck!(
@@ -1560,7 +1607,7 @@ macro_rules! ItemPointerGetBlockNumberNoCheck {
         )
     };
     (@__pgrx_emit_read_place; $pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerGetBlockNumberNoCheck!(
@@ -1577,7 +1624,7 @@ macro_rules! ItemPointerGetBlockNumberNoCheck {
                         $crate::__pgrx_c_operand!(@check_safety; $pointer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitor(
@@ -1717,7 +1764,7 @@ macro_rules! ItemPointerGetBlockNumberNoCheck {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1952,6 +1999,13 @@ macro_rules! __pgrx_c_args_ItemPointerGetOffsetNumber {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerGetOffsetNumber] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ItemPointerGetOffsetNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1989,6 +2043,13 @@ macro_rules! __pgrx_c_args_ItemPointerGetOffsetNumber {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerGetOffsetNumber] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerGetOffsetNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2005,7 +2066,7 @@ macro_rules! __pgrx_c_args_ItemPointerGetOffsetNumber {
         $crate::ItemPointerGetOffsetNumber!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ItemPointerGetOffsetNumber from itemptr.h:117
@@ -2092,13 +2153,13 @@ macro_rules! ItemPointerGetOffsetNumber {
         $crate::__pgrx_c_args_ItemPointerGetOffsetNumber!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerGetOffsetNumber!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerGetOffsetNumber!(
@@ -2115,7 +2176,7 @@ macro_rules! ItemPointerGetOffsetNumber {
                         $crate::__pgrx_c_operand!(@check_safety; $pointer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -2169,7 +2230,7 @@ macro_rules! ItemPointerGetOffsetNumber {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2315,6 +2376,13 @@ macro_rules! __pgrx_c_args_ItemPointerGetOffsetNumberNoCheck {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerGetOffsetNumberNoCheck] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ItemPointerGetOffsetNumberNoCheck!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2352,6 +2420,13 @@ macro_rules! __pgrx_c_args_ItemPointerGetOffsetNumberNoCheck {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerGetOffsetNumberNoCheck] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerGetOffsetNumberNoCheck!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2368,7 +2443,7 @@ macro_rules! __pgrx_c_args_ItemPointerGetOffsetNumberNoCheck {
         $crate::ItemPointerGetOffsetNumberNoCheck!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ItemPointerGetOffsetNumberNoCheck from itemptr.h:108
@@ -2482,7 +2557,7 @@ macro_rules! ItemPointerGetOffsetNumberNoCheck {
                         $crate::__pgrx_c_operand!(@check_safety; $pointer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_ip_posid,
@@ -2500,7 +2575,7 @@ macro_rules! ItemPointerGetOffsetNumberNoCheck {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2630,6 +2705,13 @@ macro_rules! __pgrx_c_args_ItemPointerIndicatesMovedPartitions {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerIndicatesMovedPartitions] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ItemPointerIndicatesMovedPartitions!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2667,6 +2749,13 @@ macro_rules! __pgrx_c_args_ItemPointerIndicatesMovedPartitions {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerIndicatesMovedPartitions] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerIndicatesMovedPartitions!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2683,7 +2772,7 @@ macro_rules! __pgrx_c_args_ItemPointerIndicatesMovedPartitions {
         $crate::ItemPointerIndicatesMovedPartitions!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ItemPointerIndicatesMovedPartitions from itemptr.h:184
@@ -2965,7 +3054,7 @@ macro_rules! ItemPointerIndicatesMovedPartitions {
         )
     };
     (@__pgrx_emit_place; $pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerIndicatesMovedPartitions!(
@@ -2974,7 +3063,7 @@ macro_rules! ItemPointerIndicatesMovedPartitions {
         )
     };
     (@__pgrx_emit_read_place; $pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerIndicatesMovedPartitions!(
@@ -2991,7 +3080,7 @@ macro_rules! ItemPointerIndicatesMovedPartitions {
                         $crate::__pgrx_c_operand!(@check_safety; $pointer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -3242,7 +3331,7 @@ macro_rules! ItemPointerIndicatesMovedPartitions {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3581,6 +3670,11 @@ macro_rules! __pgrx_c_args_ItemPointerIsValid {
             @argument [__pgrx_c_args_ItemPointerIsValid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerIsValid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ItemPointerIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3618,6 +3712,13 @@ macro_rules! __pgrx_c_args_ItemPointerIsValid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerIsValid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3634,7 +3735,7 @@ macro_rules! __pgrx_c_args_ItemPointerIsValid {
         $crate::ItemPointerIsValid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ItemPointerIsValid from itemptr.h:82
@@ -3799,13 +3900,13 @@ macro_rules! ItemPointerIsValid {
         $crate::__pgrx_c_args_ItemPointerIsValid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerIsValid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerIsValid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3819,7 +3920,7 @@ macro_rules! ItemPointerIsValid {
                         $crate::__pgrx_c_operand!(@check_safety; $pointer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -3953,7 +4054,7 @@ macro_rules! ItemPointerIsValid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4165,6 +4266,11 @@ macro_rules! __pgrx_c_args_ItemPointerSet {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerSet] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSet!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4219,6 +4325,11 @@ macro_rules! __pgrx_c_args_ItemPointerSet {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerSet] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSet!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4232,7 +4343,7 @@ macro_rules! __pgrx_c_args_ItemPointerSet {
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_ItemPointerSet!(
@@ -4240,7 +4351,7 @@ macro_rules! __pgrx_c_args_ItemPointerSet {
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSet!(
@@ -4249,7 +4360,7 @@ macro_rules! __pgrx_c_args_ItemPointerSet {
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_ItemPointerSet!(
@@ -4328,7 +4439,7 @@ macro_rules! __pgrx_c_args_ItemPointerSet {
         $crate::ItemPointerSet!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ItemPointerSet from itemptr.h:127
@@ -4578,13 +4689,13 @@ macro_rules! ItemPointerSet {
         $crate::__pgrx_c_args_ItemPointerSet!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $pointer:tt, $blockNumber:tt, $offNum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSet!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $pointer:tt, $blockNumber:tt, $offNum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSet!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4600,7 +4711,7 @@ macro_rules! ItemPointerSet {
                         $crate::__pgrx_c_operand!(@check_safety; $offNum);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -4824,7 +4935,7 @@ macro_rules! ItemPointerSet {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5122,6 +5233,13 @@ macro_rules! __pgrx_c_args_ItemPointerSetBlockNumber {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerSetBlockNumber] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetBlockNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5185,6 +5303,13 @@ macro_rules! __pgrx_c_args_ItemPointerSetBlockNumber {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerSetBlockNumber] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ItemPointerSetBlockNumber!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5222,6 +5347,13 @@ macro_rules! __pgrx_c_args_ItemPointerSetBlockNumber {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerSetBlockNumber] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetBlockNumber!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5238,7 +5370,7 @@ macro_rules! __pgrx_c_args_ItemPointerSetBlockNumber {
         $crate::ItemPointerSetBlockNumber!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ItemPointerSetBlockNumber from itemptr.h:138
@@ -5455,13 +5587,13 @@ macro_rules! ItemPointerSetBlockNumber {
         $crate::__pgrx_c_args_ItemPointerSetBlockNumber!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $pointer:tt, $blockNumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetBlockNumber!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $pointer:tt, $blockNumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetBlockNumber!(
@@ -5479,7 +5611,7 @@ macro_rules! ItemPointerSetBlockNumber {
                         $crate::__pgrx_c_operand!(@check_safety; $blockNumber);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -5662,7 +5794,7 @@ macro_rules! ItemPointerSetBlockNumber {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5932,6 +6064,11 @@ macro_rules! __pgrx_c_args_ItemPointerSetInvalid {
             @argument [__pgrx_c_args_ItemPointerSetInvalid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerSetInvalid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ItemPointerSetInvalid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5969,6 +6106,13 @@ macro_rules! __pgrx_c_args_ItemPointerSetInvalid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerSetInvalid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetInvalid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5985,7 +6129,7 @@ macro_rules! __pgrx_c_args_ItemPointerSetInvalid {
         $crate::ItemPointerSetInvalid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ItemPointerSetInvalid from itemptr.h:172
@@ -6239,13 +6383,13 @@ macro_rules! ItemPointerSetInvalid {
         $crate::__pgrx_c_args_ItemPointerSetInvalid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetInvalid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetInvalid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6259,7 +6403,7 @@ macro_rules! ItemPointerSetInvalid {
                         $crate::__pgrx_c_operand!(@check_safety; $pointer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -6491,7 +6635,7 @@ macro_rules! ItemPointerSetInvalid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6807,6 +6951,13 @@ macro_rules! __pgrx_c_args_ItemPointerSetMovedPartitions {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerSetMovedPartitions] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ItemPointerSetMovedPartitions!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6844,6 +6995,13 @@ macro_rules! __pgrx_c_args_ItemPointerSetMovedPartitions {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerSetMovedPartitions] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetMovedPartitions!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6860,7 +7018,7 @@ macro_rules! __pgrx_c_args_ItemPointerSetMovedPartitions {
         $crate::ItemPointerSetMovedPartitions!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ItemPointerSetMovedPartitions from itemptr.h:195
@@ -7124,7 +7282,7 @@ macro_rules! ItemPointerSetMovedPartitions {
         )
     };
     (@__pgrx_emit_place; $pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetMovedPartitions!(
@@ -7133,7 +7291,7 @@ macro_rules! ItemPointerSetMovedPartitions {
         )
     };
     (@__pgrx_emit_read_place; $pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetMovedPartitions!(
@@ -7150,7 +7308,7 @@ macro_rules! ItemPointerSetMovedPartitions {
                         $crate::__pgrx_c_operand!(@check_safety; $pointer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -7386,7 +7544,7 @@ macro_rules! ItemPointerSetMovedPartitions {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7700,6 +7858,13 @@ macro_rules! __pgrx_c_args_ItemPointerSetOffsetNumber {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerSetOffsetNumber] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetOffsetNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7763,6 +7928,13 @@ macro_rules! __pgrx_c_args_ItemPointerSetOffsetNumber {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerSetOffsetNumber] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ItemPointerSetOffsetNumber!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7800,6 +7972,13 @@ macro_rules! __pgrx_c_args_ItemPointerSetOffsetNumber {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerSetOffsetNumber] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetOffsetNumber!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7816,7 +7995,7 @@ macro_rules! __pgrx_c_args_ItemPointerSetOffsetNumber {
         $crate::ItemPointerSetOffsetNumber!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ItemPointerSetOffsetNumber from itemptr.h:148
@@ -7907,13 +8086,13 @@ macro_rules! ItemPointerSetOffsetNumber {
         $crate::__pgrx_c_args_ItemPointerSetOffsetNumber!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $pointer:tt, $offsetNumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetOffsetNumber!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $pointer:tt, $offsetNumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetOffsetNumber!(
@@ -7931,7 +8110,7 @@ macro_rules! ItemPointerSetOffsetNumber {
                         $crate::__pgrx_c_operand!(@check_safety; $offsetNumber);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -7994,7 +8173,7 @@ macro_rules! ItemPointerSetOffsetNumber {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

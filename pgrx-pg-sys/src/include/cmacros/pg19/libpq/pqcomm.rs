@@ -72,6 +72,11 @@ macro_rules! __pgrx_c_args_PG_PROTOCOL {
             @argument [__pgrx_c_args_PG_PROTOCOL] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_PROTOCOL] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_PROTOCOL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -133,6 +138,11 @@ macro_rules! __pgrx_c_args_PG_PROTOCOL {
             @argument [__pgrx_c_args_PG_PROTOCOL] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_PROTOCOL] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PG_PROTOCOL!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -168,6 +178,11 @@ macro_rules! __pgrx_c_args_PG_PROTOCOL {
             @argument [__pgrx_c_args_PG_PROTOCOL] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_PROTOCOL] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_PROTOCOL!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -184,7 +199,7 @@ macro_rules! __pgrx_c_args_PG_PROTOCOL {
         $crate::PG_PROTOCOL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PG_PROTOCOL from pqcomm.h:89
@@ -256,13 +271,13 @@ macro_rules! PG_PROTOCOL {
         $crate::__pgrx_c_args_PG_PROTOCOL!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $m:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_PROTOCOL!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $m:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_PROTOCOL!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -276,7 +291,7 @@ macro_rules! PG_PROTOCOL {
                         $crate::__pgrx_c_operand!(@check_safety; $n);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitor(
@@ -314,7 +329,7 @@ macro_rules! PG_PROTOCOL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -439,6 +454,11 @@ macro_rules! __pgrx_c_args_PG_PROTOCOL_FULL {
             @argument [__pgrx_c_args_PG_PROTOCOL_FULL] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_PROTOCOL_FULL] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PG_PROTOCOL_FULL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -476,6 +496,13 @@ macro_rules! __pgrx_c_args_PG_PROTOCOL_FULL {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_PROTOCOL_FULL] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_PROTOCOL_FULL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -492,7 +519,7 @@ macro_rules! __pgrx_c_args_PG_PROTOCOL_FULL {
         $crate::PG_PROTOCOL_FULL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PG_PROTOCOL_FULL from pqcomm.h:88
@@ -588,13 +615,13 @@ macro_rules! PG_PROTOCOL_FULL {
         $crate::__pgrx_c_args_PG_PROTOCOL_FULL!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $v:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_PROTOCOL_FULL!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $v:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_PROTOCOL_FULL!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -608,7 +635,7 @@ macro_rules! PG_PROTOCOL_FULL {
                         $crate::__pgrx_c_operand!(@check_safety; $v);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                             $crate::__pgrx_c_macros::expression::add::<
@@ -685,7 +712,7 @@ macro_rules! PG_PROTOCOL_FULL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -835,6 +862,11 @@ macro_rules! __pgrx_c_args_PG_PROTOCOL_MAJOR {
             @argument [__pgrx_c_args_PG_PROTOCOL_MAJOR] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_PROTOCOL_MAJOR] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PG_PROTOCOL_MAJOR!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -872,6 +904,13 @@ macro_rules! __pgrx_c_args_PG_PROTOCOL_MAJOR {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_PROTOCOL_MAJOR] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_PROTOCOL_MAJOR!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -888,7 +927,7 @@ macro_rules! __pgrx_c_args_PG_PROTOCOL_MAJOR {
         $crate::PG_PROTOCOL_MAJOR!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PG_PROTOCOL_MAJOR from pqcomm.h:86
@@ -942,13 +981,13 @@ macro_rules! PG_PROTOCOL_MAJOR {
         $crate::__pgrx_c_args_PG_PROTOCOL_MAJOR!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $v:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_PROTOCOL_MAJOR!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $v:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_PROTOCOL_MAJOR!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -961,7 +1000,7 @@ macro_rules! PG_PROTOCOL_MAJOR {
                         $crate::__pgrx_c_operand!(@check_safety; $v);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::shr(
@@ -980,7 +1019,7 @@ macro_rules! PG_PROTOCOL_MAJOR {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1088,6 +1127,11 @@ macro_rules! __pgrx_c_args_PG_PROTOCOL_MINOR {
             @argument [__pgrx_c_args_PG_PROTOCOL_MINOR] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_PROTOCOL_MINOR] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PG_PROTOCOL_MINOR!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1125,6 +1169,13 @@ macro_rules! __pgrx_c_args_PG_PROTOCOL_MINOR {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_PROTOCOL_MINOR] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_PROTOCOL_MINOR!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1141,7 +1192,7 @@ macro_rules! __pgrx_c_args_PG_PROTOCOL_MINOR {
         $crate::PG_PROTOCOL_MINOR!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PG_PROTOCOL_MINOR from pqcomm.h:87
@@ -1193,13 +1244,13 @@ macro_rules! PG_PROTOCOL_MINOR {
         $crate::__pgrx_c_args_PG_PROTOCOL_MINOR!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $v:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_PROTOCOL_MINOR!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $v:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_PROTOCOL_MINOR!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1212,7 +1263,7 @@ macro_rules! PG_PROTOCOL_MINOR {
                         $crate::__pgrx_c_operand!(@check_safety; $v);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -1231,7 +1282,7 @@ macro_rules! PG_PROTOCOL_MINOR {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1341,6 +1392,11 @@ macro_rules! __pgrx_c_args_is_unixsock_path {
             @argument [__pgrx_c_args_is_unixsock_path] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_is_unixsock_path] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_is_unixsock_path!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1378,6 +1434,13 @@ macro_rules! __pgrx_c_args_is_unixsock_path {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_is_unixsock_path] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_is_unixsock_path!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1394,7 +1457,7 @@ macro_rules! __pgrx_c_args_is_unixsock_path {
         $crate::is_unixsock_path!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function is_unixsock_path from pqcomm.h:65
@@ -1470,13 +1533,13 @@ macro_rules! is_unixsock_path {
         $crate::__pgrx_c_args_is_unixsock_path!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $path:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_is_unixsock_path!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $path:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_is_unixsock_path!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1489,7 +1552,7 @@ macro_rules! is_unixsock_path {
                         $crate::__pgrx_c_operand!(@check_safety; $path);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1527,7 +1590,7 @@ macro_rules! is_unixsock_path {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

@@ -58,7 +58,7 @@ macro_rules! __pgrx_c_classify {
         )
     };
     (@walk [$callback:ident] $state:tt [$($original:tt)*] []; [$($raw:tt)*]) => {
-        compile_error!("C macro argument exceeds the 64-group normalization bound")
+        ::core::compile_error!("C macro argument exceeds the 64-group normalization bound")
     };
     (@walk [$callback:ident] $state:tt [$($original:tt)*] $budget:tt; [$($raw:tt)*]) => {
         $crate::$callback!(@classified $state (@native [$($original)*]))
@@ -15633,6 +15633,198 @@ macro_rules! __pgrx_c_classify {
     }) => {
         $($items)*
     };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; float4_div) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available float4_div {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; float4_eq) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available float4_eq {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; float4_ge) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available float4_ge {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; float4_gt) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available float4_gt {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; float4_le) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available float4_le {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; float4_lt) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available float4_lt {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; float4_max) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available float4_max {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; float4_mi) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available float4_mi {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; float4_min) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available float4_min {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; float4_mul) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available float4_mul {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; float4_ne) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available float4_ne {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; float4_pl) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available float4_pl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; float8_div) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available float8_div {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; float8_eq) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available float8_eq {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; float8_ge) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available float8_ge {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; float8_gt) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available float8_gt {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; float8_le) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available float8_le {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; float8_lt) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available float8_lt {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; float8_max) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available float8_max {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; float8_mi) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available float8_mi {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; float8_min) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available float8_min {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; float8_mul) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available float8_mul {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; float8_ne) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available float8_ne {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; float8_pl) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available float8_pl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
     (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; floatVal) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
@@ -19890,7 +20082,7 @@ macro_rules! __pgrx_c_classify {
         $crate::$callback!(@classified $state (@native [$($original)*]))
     };
     (@path [$callback:ident] $state:tt $original:tt $path:tt $group:tt []; $($raw:tt)+) => {
-        compile_error!("C macro path exceeds the 64-component normalization bound")
+        ::core::compile_error!("C macro path exceeds the 64-component normalization bound")
     };
     (@known [$callback:ident] $state:tt [$($path:tt)*]; ($($inner:tt)*)) => {
         $crate::$callback!(@classified $state (@macro [$($path)*] [$($inner)*]))
@@ -19904,6 +20096,6 @@ macro_rules! __pgrx_c_classify {
         $crate::$callback!(@classified $state (@macro [$($path)*] [$($inner)*]))
     };
     ($($invalid:tt)*) => {
-        compile_error!("invalid generated C macro argument descriptor")
+        ::core::compile_error!("invalid generated C macro argument descriptor")
     };
 }

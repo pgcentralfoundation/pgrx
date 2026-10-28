@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args___pgrx_c_macro_5f {
             @argument [__pgrx_c_args___pgrx_c_macro_5f] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args___pgrx_c_macro_5f] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args___pgrx_c_macro_5f!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -118,6 +123,13 @@ macro_rules! __pgrx_c_args___pgrx_c_macro_5f {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args___pgrx_c_macro_5f] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args___pgrx_c_macro_5f!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -134,7 +146,7 @@ macro_rules! __pgrx_c_args___pgrx_c_macro_5f {
         $crate::__pgrx_c_macro_5f!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro _ from plpgsql.h:37
@@ -178,7 +190,7 @@ macro_rules! __pgrx_c_macro_5f {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_2d3bb95fdd90f23ef55d370b1db3ebfc(
+                $crate::__pgrx_c_generated::Inline_ded82bd4d8f982109da5f67108c6b889(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::CChar,
@@ -257,13 +269,13 @@ macro_rules! __pgrx_c_macro_5f {
         $crate::__pgrx_c_args___pgrx_c_macro_5f!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args___pgrx_c_macro_5f!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args___pgrx_c_macro_5f!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -277,7 +289,7 @@ macro_rules! __pgrx_c_macro_5f {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -286,7 +298,7 @@ macro_rules! __pgrx_c_macro_5f {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_2d3bb95fdd90f23ef55d370b1db3ebfc(
+                                $crate::__pgrx_c_generated::Inline_ded82bd4d8f982109da5f67108c6b889(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::CChar,
@@ -372,7 +384,7 @@ macro_rules! __pgrx_c_macro_5f {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -389,7 +401,7 @@ macro_rules! __pgrx_c_macro_5f {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_2d3bb95fdd90f23ef55d370b1db3ebfc(
+                    $crate::__pgrx_c_generated::Inline_ded82bd4d8f982109da5f67108c6b889(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::CChar,

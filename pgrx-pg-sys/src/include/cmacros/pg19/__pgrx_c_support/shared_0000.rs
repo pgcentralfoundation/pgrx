@@ -824,13 +824,13 @@ mod __pgrx_metadata_native {
         ///
         /// # Safety
         /// The matching native archive must remain loaded. Its returned static must not be mutated.
-        #[link_name = "pgrx_metadata_6e929bdbb96d36f4_magic_get"]
+        #[link_name = "pgrx_metadata_5b0b95606e67f4a1_magic_get"]
         pub(super) fn pgrx_metadata_magic_get() -> *const crate::__pgrx_c_bindings::Pg_magic_struct;
         /// Return the native static declared by PG_FUNCTION_INFO_V1.
         ///
         /// # Safety
         /// The matching native archive must remain loaded. Its returned static must not be mutated.
-        #[link_name = "pg_finfo_pgrx_metadata_6e929bdbb96d36f4_function_v1"]
+        #[link_name = "pg_finfo_pgrx_metadata_5b0b95606e67f4a1_function_v1"]
         pub(super) fn pg_finfo_pgrx_metadata_function_v1()
         -> *const crate::__pgrx_c_bindings::Pg_finfo_record;
     }

@@ -74,6 +74,13 @@ macro_rules! __pgrx_c_args_pg_add_s16_overflow {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_s16_overflow] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_add_s16_overflow!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -125,6 +132,13 @@ macro_rules! __pgrx_c_args_pg_add_s16_overflow {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_pg_add_s16_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_s16_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -189,6 +203,11 @@ macro_rules! __pgrx_c_args_pg_add_s16_overflow {
             @argument [__pgrx_c_args_pg_add_s16_overflow] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_s16_overflow] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_add_s16_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -226,6 +245,13 @@ macro_rules! __pgrx_c_args_pg_add_s16_overflow {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_s16_overflow] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_add_s16_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -242,7 +268,7 @@ macro_rules! __pgrx_c_args_pg_add_s16_overflow {
         $crate::pg_add_s16_overflow!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_add_s16_overflow from int.h:46
@@ -346,13 +372,13 @@ macro_rules! pg_add_s16_overflow {
         $crate::__pgrx_c_args_pg_add_s16_overflow!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_add_s16_overflow!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_add_s16_overflow!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -367,7 +393,7 @@ macro_rules! pg_add_s16_overflow {
                         $crate::__pgrx_c_operand!(@check_safety; $result);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -425,7 +451,7 @@ macro_rules! pg_add_s16_overflow {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -562,6 +588,13 @@ macro_rules! __pgrx_c_args_pg_add_s32_overflow {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_s32_overflow] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_add_s32_overflow!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -613,6 +646,13 @@ macro_rules! __pgrx_c_args_pg_add_s32_overflow {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_pg_add_s32_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_s32_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -677,6 +717,11 @@ macro_rules! __pgrx_c_args_pg_add_s32_overflow {
             @argument [__pgrx_c_args_pg_add_s32_overflow] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_s32_overflow] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_add_s32_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -714,6 +759,13 @@ macro_rules! __pgrx_c_args_pg_add_s32_overflow {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_s32_overflow] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_add_s32_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -730,7 +782,7 @@ macro_rules! __pgrx_c_args_pg_add_s32_overflow {
         $crate::pg_add_s32_overflow!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_add_s32_overflow from int.h:103
@@ -834,13 +886,13 @@ macro_rules! pg_add_s32_overflow {
         $crate::__pgrx_c_args_pg_add_s32_overflow!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_add_s32_overflow!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_add_s32_overflow!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -855,7 +907,7 @@ macro_rules! pg_add_s32_overflow {
                         $crate::__pgrx_c_operand!(@check_safety; $result);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -913,7 +965,7 @@ macro_rules! pg_add_s32_overflow {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1050,6 +1102,13 @@ macro_rules! __pgrx_c_args_pg_add_s64_overflow {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_s64_overflow] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_add_s64_overflow!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1101,6 +1160,13 @@ macro_rules! __pgrx_c_args_pg_add_s64_overflow {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_pg_add_s64_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_s64_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -1165,6 +1231,11 @@ macro_rules! __pgrx_c_args_pg_add_s64_overflow {
             @argument [__pgrx_c_args_pg_add_s64_overflow] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_s64_overflow] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_add_s64_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1202,6 +1273,13 @@ macro_rules! __pgrx_c_args_pg_add_s64_overflow {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_s64_overflow] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_add_s64_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1218,7 +1296,7 @@ macro_rules! __pgrx_c_args_pg_add_s64_overflow {
         $crate::pg_add_s64_overflow!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_add_s64_overflow from int.h:160
@@ -1331,13 +1409,13 @@ macro_rules! pg_add_s64_overflow {
         $crate::__pgrx_c_args_pg_add_s64_overflow!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_add_s64_overflow!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_add_s64_overflow!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1352,7 +1430,7 @@ macro_rules! pg_add_s64_overflow {
                         $crate::__pgrx_c_operand!(@check_safety; $result);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1410,7 +1488,7 @@ macro_rules! pg_add_s64_overflow {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1550,6 +1628,13 @@ macro_rules! __pgrx_c_args_pg_add_size_overflow {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_size_overflow] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_add_size_overflow!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1601,6 +1686,13 @@ macro_rules! __pgrx_c_args_pg_add_size_overflow {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_pg_add_size_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_size_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -1665,6 +1757,11 @@ macro_rules! __pgrx_c_args_pg_add_size_overflow {
             @argument [__pgrx_c_args_pg_add_size_overflow] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_size_overflow] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_add_size_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1702,6 +1799,13 @@ macro_rules! __pgrx_c_args_pg_add_size_overflow {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_size_overflow] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_add_size_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1718,7 +1822,7 @@ macro_rules! __pgrx_c_args_pg_add_size_overflow {
         $crate::pg_add_size_overflow!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_add_size_overflow from int.h:444
@@ -1844,13 +1948,13 @@ macro_rules! pg_add_size_overflow {
         $crate::__pgrx_c_args_pg_add_size_overflow!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_add_size_overflow!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_add_size_overflow!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1865,7 +1969,7 @@ macro_rules! pg_add_size_overflow {
                         $crate::__pgrx_c_operand!(@check_safety; $result);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1941,7 +2045,7 @@ macro_rules! pg_add_size_overflow {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2096,6 +2200,13 @@ macro_rules! __pgrx_c_args_pg_add_u16_overflow {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_u16_overflow] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_add_u16_overflow!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2147,6 +2258,13 @@ macro_rules! __pgrx_c_args_pg_add_u16_overflow {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_pg_add_u16_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_u16_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -2211,6 +2329,11 @@ macro_rules! __pgrx_c_args_pg_add_u16_overflow {
             @argument [__pgrx_c_args_pg_add_u16_overflow] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_u16_overflow] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_add_u16_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2248,6 +2371,13 @@ macro_rules! __pgrx_c_args_pg_add_u16_overflow {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_u16_overflow] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_add_u16_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2264,7 +2394,7 @@ macro_rules! __pgrx_c_args_pg_add_u16_overflow {
         $crate::pg_add_u16_overflow!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_add_u16_overflow from int.h:269
@@ -2372,13 +2502,13 @@ macro_rules! pg_add_u16_overflow {
         $crate::__pgrx_c_args_pg_add_u16_overflow!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_add_u16_overflow!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_add_u16_overflow!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2393,7 +2523,7 @@ macro_rules! pg_add_u16_overflow {
                         $crate::__pgrx_c_operand!(@check_safety; $result);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2451,7 +2581,7 @@ macro_rules! pg_add_u16_overflow {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2588,6 +2718,13 @@ macro_rules! __pgrx_c_args_pg_add_u32_overflow {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_u32_overflow] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_add_u32_overflow!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2639,6 +2776,13 @@ macro_rules! __pgrx_c_args_pg_add_u32_overflow {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_pg_add_u32_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_u32_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -2703,6 +2847,11 @@ macro_rules! __pgrx_c_args_pg_add_u32_overflow {
             @argument [__pgrx_c_args_pg_add_u32_overflow] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_u32_overflow] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_add_u32_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2740,6 +2889,13 @@ macro_rules! __pgrx_c_args_pg_add_u32_overflow {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_u32_overflow] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_add_u32_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2756,7 +2912,7 @@ macro_rules! __pgrx_c_args_pg_add_u32_overflow {
         $crate::pg_add_u32_overflow!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_add_u32_overflow from int.h:324
@@ -2864,13 +3020,13 @@ macro_rules! pg_add_u32_overflow {
         $crate::__pgrx_c_args_pg_add_u32_overflow!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_add_u32_overflow!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_add_u32_overflow!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2885,7 +3041,7 @@ macro_rules! pg_add_u32_overflow {
                         $crate::__pgrx_c_operand!(@check_safety; $result);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2943,7 +3099,7 @@ macro_rules! pg_add_u32_overflow {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3080,6 +3236,13 @@ macro_rules! __pgrx_c_args_pg_add_u64_overflow {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_u64_overflow] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_add_u64_overflow!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3131,6 +3294,13 @@ macro_rules! __pgrx_c_args_pg_add_u64_overflow {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_pg_add_u64_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_u64_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -3195,6 +3365,11 @@ macro_rules! __pgrx_c_args_pg_add_u64_overflow {
             @argument [__pgrx_c_args_pg_add_u64_overflow] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_u64_overflow] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_add_u64_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3232,6 +3407,13 @@ macro_rules! __pgrx_c_args_pg_add_u64_overflow {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_add_u64_overflow] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_add_u64_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3248,7 +3430,7 @@ macro_rules! __pgrx_c_args_pg_add_u64_overflow {
         $crate::pg_add_u64_overflow!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_add_u64_overflow from int.h:379
@@ -3356,13 +3538,13 @@ macro_rules! pg_add_u64_overflow {
         $crate::__pgrx_c_args_pg_add_u64_overflow!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_add_u64_overflow!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_add_u64_overflow!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3377,7 +3559,7 @@ macro_rules! pg_add_u64_overflow {
                         $crate::__pgrx_c_operand!(@check_safety; $result);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -3435,7 +3617,7 @@ macro_rules! pg_add_u64_overflow {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3570,6 +3752,11 @@ macro_rules! __pgrx_c_args_pg_cmp_s16 {
             @argument [__pgrx_c_args_pg_cmp_s16] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_cmp_s16] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_s16!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3631,6 +3818,11 @@ macro_rules! __pgrx_c_args_pg_cmp_s16 {
             @argument [__pgrx_c_args_pg_cmp_s16] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_cmp_s16] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_cmp_s16!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3666,6 +3858,11 @@ macro_rules! __pgrx_c_args_pg_cmp_s16 {
             @argument [__pgrx_c_args_pg_cmp_s16] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_cmp_s16] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_s16!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3682,7 +3879,7 @@ macro_rules! __pgrx_c_args_pg_cmp_s16 {
         $crate::pg_cmp_s16!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_cmp_s16 from int.h:537
@@ -3755,13 +3952,13 @@ macro_rules! pg_cmp_s16 {
         $crate::__pgrx_c_args_pg_cmp_s16!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_s16!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_s16!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3775,7 +3972,7 @@ macro_rules! pg_cmp_s16 {
                         $crate::__pgrx_c_operand!(@check_safety; $b);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -3814,7 +4011,7 @@ macro_rules! pg_cmp_s16 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3931,6 +4128,11 @@ macro_rules! __pgrx_c_args_pg_cmp_s32 {
             @argument [__pgrx_c_args_pg_cmp_s32] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_cmp_s32] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_s32!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3992,6 +4194,11 @@ macro_rules! __pgrx_c_args_pg_cmp_s32 {
             @argument [__pgrx_c_args_pg_cmp_s32] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_cmp_s32] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_cmp_s32!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4027,6 +4234,11 @@ macro_rules! __pgrx_c_args_pg_cmp_s32 {
             @argument [__pgrx_c_args_pg_cmp_s32] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_cmp_s32] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_s32!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4043,7 +4255,7 @@ macro_rules! __pgrx_c_args_pg_cmp_s32 {
         $crate::pg_cmp_s32!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_cmp_s32 from int.h:549
@@ -4116,13 +4328,13 @@ macro_rules! pg_cmp_s32 {
         $crate::__pgrx_c_args_pg_cmp_s32!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_s32!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_s32!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4136,7 +4348,7 @@ macro_rules! pg_cmp_s32 {
                         $crate::__pgrx_c_operand!(@check_safety; $b);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -4175,7 +4387,7 @@ macro_rules! pg_cmp_s32 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4292,6 +4504,11 @@ macro_rules! __pgrx_c_args_pg_cmp_s64 {
             @argument [__pgrx_c_args_pg_cmp_s64] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_cmp_s64] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_s64!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4353,6 +4570,11 @@ macro_rules! __pgrx_c_args_pg_cmp_s64 {
             @argument [__pgrx_c_args_pg_cmp_s64] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_cmp_s64] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_cmp_s64!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4388,6 +4610,11 @@ macro_rules! __pgrx_c_args_pg_cmp_s64 {
             @argument [__pgrx_c_args_pg_cmp_s64] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_cmp_s64] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_s64!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4404,7 +4631,7 @@ macro_rules! __pgrx_c_args_pg_cmp_s64 {
         $crate::pg_cmp_s64!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_cmp_s64 from int.h:561
@@ -4477,13 +4704,13 @@ macro_rules! pg_cmp_s64 {
         $crate::__pgrx_c_args_pg_cmp_s64!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_s64!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_s64!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4497,7 +4724,7 @@ macro_rules! pg_cmp_s64 {
                         $crate::__pgrx_c_operand!(@check_safety; $b);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -4536,7 +4763,7 @@ macro_rules! pg_cmp_s64 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4653,6 +4880,11 @@ macro_rules! __pgrx_c_args_pg_cmp_size {
             @argument [__pgrx_c_args_pg_cmp_size] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_cmp_size] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_size!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4714,6 +4946,11 @@ macro_rules! __pgrx_c_args_pg_cmp_size {
             @argument [__pgrx_c_args_pg_cmp_size] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_cmp_size] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_cmp_size!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4749,6 +4986,11 @@ macro_rules! __pgrx_c_args_pg_cmp_size {
             @argument [__pgrx_c_args_pg_cmp_size] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_cmp_size] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_size!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4765,7 +5007,7 @@ macro_rules! __pgrx_c_args_pg_cmp_size {
         $crate::pg_cmp_size!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_cmp_size from int.h:573
@@ -4854,13 +5096,13 @@ macro_rules! pg_cmp_size {
         $crate::__pgrx_c_args_pg_cmp_size!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_size!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_size!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4874,7 +5116,7 @@ macro_rules! pg_cmp_size {
                         $crate::__pgrx_c_operand!(@check_safety; $b);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -4925,7 +5167,7 @@ macro_rules! pg_cmp_size {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5054,6 +5296,11 @@ macro_rules! __pgrx_c_args_pg_cmp_u16 {
             @argument [__pgrx_c_args_pg_cmp_u16] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_cmp_u16] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_u16!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5115,6 +5362,11 @@ macro_rules! __pgrx_c_args_pg_cmp_u16 {
             @argument [__pgrx_c_args_pg_cmp_u16] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_cmp_u16] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_cmp_u16!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5150,6 +5402,11 @@ macro_rules! __pgrx_c_args_pg_cmp_u16 {
             @argument [__pgrx_c_args_pg_cmp_u16] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_cmp_u16] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_u16!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5166,7 +5423,7 @@ macro_rules! __pgrx_c_args_pg_cmp_u16 {
         $crate::pg_cmp_u16!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_cmp_u16 from int.h:543
@@ -5243,13 +5500,13 @@ macro_rules! pg_cmp_u16 {
         $crate::__pgrx_c_args_pg_cmp_u16!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_u16!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_u16!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5263,7 +5520,7 @@ macro_rules! pg_cmp_u16 {
                         $crate::__pgrx_c_operand!(@check_safety; $b);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -5302,7 +5559,7 @@ macro_rules! pg_cmp_u16 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5419,6 +5676,11 @@ macro_rules! __pgrx_c_args_pg_cmp_u32 {
             @argument [__pgrx_c_args_pg_cmp_u32] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_cmp_u32] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_u32!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5480,6 +5742,11 @@ macro_rules! __pgrx_c_args_pg_cmp_u32 {
             @argument [__pgrx_c_args_pg_cmp_u32] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_cmp_u32] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_cmp_u32!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5515,6 +5782,11 @@ macro_rules! __pgrx_c_args_pg_cmp_u32 {
             @argument [__pgrx_c_args_pg_cmp_u32] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_cmp_u32] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_u32!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5531,7 +5803,7 @@ macro_rules! __pgrx_c_args_pg_cmp_u32 {
         $crate::pg_cmp_u32!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_cmp_u32 from int.h:555
@@ -5608,13 +5880,13 @@ macro_rules! pg_cmp_u32 {
         $crate::__pgrx_c_args_pg_cmp_u32!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_u32!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_u32!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5628,7 +5900,7 @@ macro_rules! pg_cmp_u32 {
                         $crate::__pgrx_c_operand!(@check_safety; $b);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -5667,7 +5939,7 @@ macro_rules! pg_cmp_u32 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5784,6 +6056,11 @@ macro_rules! __pgrx_c_args_pg_cmp_u64 {
             @argument [__pgrx_c_args_pg_cmp_u64] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_cmp_u64] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_u64!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5845,6 +6122,11 @@ macro_rules! __pgrx_c_args_pg_cmp_u64 {
             @argument [__pgrx_c_args_pg_cmp_u64] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_cmp_u64] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_cmp_u64!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5880,6 +6162,11 @@ macro_rules! __pgrx_c_args_pg_cmp_u64 {
             @argument [__pgrx_c_args_pg_cmp_u64] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_cmp_u64] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_u64!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5896,7 +6183,7 @@ macro_rules! __pgrx_c_args_pg_cmp_u64 {
         $crate::pg_cmp_u64!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_cmp_u64 from int.h:567
@@ -5973,13 +6260,13 @@ macro_rules! pg_cmp_u64 {
         $crate::__pgrx_c_args_pg_cmp_u64!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_u64!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_cmp_u64!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5993,7 +6280,7 @@ macro_rules! pg_cmp_u64 {
                         $crate::__pgrx_c_operand!(@check_safety; $b);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -6032,7 +6319,7 @@ macro_rules! pg_cmp_u64 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6151,6 +6438,13 @@ macro_rules! __pgrx_c_args_pg_mul_s16_overflow {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_s16_overflow] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_s16_overflow!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6202,6 +6496,13 @@ macro_rules! __pgrx_c_args_pg_mul_s16_overflow {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_pg_mul_s16_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_s16_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -6266,6 +6567,11 @@ macro_rules! __pgrx_c_args_pg_mul_s16_overflow {
             @argument [__pgrx_c_args_pg_mul_s16_overflow] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_s16_overflow] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_mul_s16_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6303,6 +6609,13 @@ macro_rules! __pgrx_c_args_pg_mul_s16_overflow {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_s16_overflow] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_s16_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6319,7 +6632,7 @@ macro_rules! __pgrx_c_args_pg_mul_s16_overflow {
         $crate::pg_mul_s16_overflow!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_mul_s16_overflow from int.h:82
@@ -6423,13 +6736,13 @@ macro_rules! pg_mul_s16_overflow {
         $crate::__pgrx_c_args_pg_mul_s16_overflow!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_s16_overflow!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_s16_overflow!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6444,7 +6757,7 @@ macro_rules! pg_mul_s16_overflow {
                         $crate::__pgrx_c_operand!(@check_safety; $result);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -6502,7 +6815,7 @@ macro_rules! pg_mul_s16_overflow {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6639,6 +6952,13 @@ macro_rules! __pgrx_c_args_pg_mul_s32_overflow {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_s32_overflow] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_s32_overflow!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6690,6 +7010,13 @@ macro_rules! __pgrx_c_args_pg_mul_s32_overflow {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_pg_mul_s32_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_s32_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -6754,6 +7081,11 @@ macro_rules! __pgrx_c_args_pg_mul_s32_overflow {
             @argument [__pgrx_c_args_pg_mul_s32_overflow] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_s32_overflow] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_mul_s32_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6791,6 +7123,13 @@ macro_rules! __pgrx_c_args_pg_mul_s32_overflow {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_s32_overflow] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_s32_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6807,7 +7146,7 @@ macro_rules! __pgrx_c_args_pg_mul_s32_overflow {
         $crate::pg_mul_s32_overflow!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_mul_s32_overflow from int.h:139
@@ -6911,13 +7250,13 @@ macro_rules! pg_mul_s32_overflow {
         $crate::__pgrx_c_args_pg_mul_s32_overflow!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_s32_overflow!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_s32_overflow!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6932,7 +7271,7 @@ macro_rules! pg_mul_s32_overflow {
                         $crate::__pgrx_c_operand!(@check_safety; $result);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -6990,7 +7329,7 @@ macro_rules! pg_mul_s32_overflow {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7127,6 +7466,13 @@ macro_rules! __pgrx_c_args_pg_mul_s64_overflow {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_s64_overflow] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_s64_overflow!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7178,6 +7524,13 @@ macro_rules! __pgrx_c_args_pg_mul_s64_overflow {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_pg_mul_s64_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_s64_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -7242,6 +7595,11 @@ macro_rules! __pgrx_c_args_pg_mul_s64_overflow {
             @argument [__pgrx_c_args_pg_mul_s64_overflow] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_s64_overflow] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_mul_s64_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7279,6 +7637,13 @@ macro_rules! __pgrx_c_args_pg_mul_s64_overflow {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_s64_overflow] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_s64_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7295,7 +7660,7 @@ macro_rules! __pgrx_c_args_pg_mul_s64_overflow {
         $crate::pg_mul_s64_overflow!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_mul_s64_overflow from int.h:218
@@ -7424,13 +7789,13 @@ macro_rules! pg_mul_s64_overflow {
         $crate::__pgrx_c_args_pg_mul_s64_overflow!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_s64_overflow!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_s64_overflow!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7445,7 +7810,7 @@ macro_rules! pg_mul_s64_overflow {
                         $crate::__pgrx_c_operand!(@check_safety; $result);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -7503,7 +7868,7 @@ macro_rules! pg_mul_s64_overflow {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7643,6 +8008,13 @@ macro_rules! __pgrx_c_args_pg_mul_size_overflow {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_size_overflow] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_size_overflow!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7694,6 +8066,13 @@ macro_rules! __pgrx_c_args_pg_mul_size_overflow {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_pg_mul_size_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_size_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -7758,6 +8137,11 @@ macro_rules! __pgrx_c_args_pg_mul_size_overflow {
             @argument [__pgrx_c_args_pg_mul_size_overflow] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_size_overflow] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_mul_size_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7795,6 +8179,13 @@ macro_rules! __pgrx_c_args_pg_mul_size_overflow {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_size_overflow] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_size_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7811,7 +8202,7 @@ macro_rules! __pgrx_c_args_pg_mul_size_overflow {
         $crate::pg_mul_size_overflow!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_mul_size_overflow from int.h:478
@@ -7937,13 +8328,13 @@ macro_rules! pg_mul_size_overflow {
         $crate::__pgrx_c_args_pg_mul_size_overflow!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_size_overflow!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_size_overflow!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7958,7 +8349,7 @@ macro_rules! pg_mul_size_overflow {
                         $crate::__pgrx_c_operand!(@check_safety; $result);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -8034,7 +8425,7 @@ macro_rules! pg_mul_size_overflow {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8189,6 +8580,13 @@ macro_rules! __pgrx_c_args_pg_mul_u16_overflow {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_u16_overflow] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_u16_overflow!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8240,6 +8638,13 @@ macro_rules! __pgrx_c_args_pg_mul_u16_overflow {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_pg_mul_u16_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_u16_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -8304,6 +8709,11 @@ macro_rules! __pgrx_c_args_pg_mul_u16_overflow {
             @argument [__pgrx_c_args_pg_mul_u16_overflow] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_u16_overflow] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_mul_u16_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8341,6 +8751,13 @@ macro_rules! __pgrx_c_args_pg_mul_u16_overflow {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_u16_overflow] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_u16_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8357,7 +8774,7 @@ macro_rules! __pgrx_c_args_pg_mul_u16_overflow {
         $crate::pg_mul_u16_overflow!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_mul_u16_overflow from int.h:303
@@ -8465,13 +8882,13 @@ macro_rules! pg_mul_u16_overflow {
         $crate::__pgrx_c_args_pg_mul_u16_overflow!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_u16_overflow!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_u16_overflow!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8486,7 +8903,7 @@ macro_rules! pg_mul_u16_overflow {
                         $crate::__pgrx_c_operand!(@check_safety; $result);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -8544,7 +8961,7 @@ macro_rules! pg_mul_u16_overflow {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8681,6 +9098,13 @@ macro_rules! __pgrx_c_args_pg_mul_u32_overflow {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_u32_overflow] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_u32_overflow!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8732,6 +9156,13 @@ macro_rules! __pgrx_c_args_pg_mul_u32_overflow {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_pg_mul_u32_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_u32_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -8796,6 +9227,11 @@ macro_rules! __pgrx_c_args_pg_mul_u32_overflow {
             @argument [__pgrx_c_args_pg_mul_u32_overflow] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_u32_overflow] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_mul_u32_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8833,6 +9269,13 @@ macro_rules! __pgrx_c_args_pg_mul_u32_overflow {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_u32_overflow] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_u32_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8849,7 +9292,7 @@ macro_rules! __pgrx_c_args_pg_mul_u32_overflow {
         $crate::pg_mul_u32_overflow!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_mul_u32_overflow from int.h:358
@@ -8957,13 +9400,13 @@ macro_rules! pg_mul_u32_overflow {
         $crate::__pgrx_c_args_pg_mul_u32_overflow!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_u32_overflow!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_u32_overflow!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8978,7 +9421,7 @@ macro_rules! pg_mul_u32_overflow {
                         $crate::__pgrx_c_operand!(@check_safety; $result);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -9036,7 +9479,7 @@ macro_rules! pg_mul_u32_overflow {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9173,6 +9616,13 @@ macro_rules! __pgrx_c_args_pg_mul_u64_overflow {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_u64_overflow] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_u64_overflow!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9224,6 +9674,13 @@ macro_rules! __pgrx_c_args_pg_mul_u64_overflow {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_pg_mul_u64_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_u64_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -9288,6 +9745,11 @@ macro_rules! __pgrx_c_args_pg_mul_u64_overflow {
             @argument [__pgrx_c_args_pg_mul_u64_overflow] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_u64_overflow] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_mul_u64_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9325,6 +9787,13 @@ macro_rules! __pgrx_c_args_pg_mul_u64_overflow {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_mul_u64_overflow] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_u64_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9341,7 +9810,7 @@ macro_rules! __pgrx_c_args_pg_mul_u64_overflow {
         $crate::pg_mul_u64_overflow!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_mul_u64_overflow from int.h:413
@@ -9459,13 +9928,13 @@ macro_rules! pg_mul_u64_overflow {
         $crate::__pgrx_c_args_pg_mul_u64_overflow!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_u64_overflow!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_mul_u64_overflow!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -9480,7 +9949,7 @@ macro_rules! pg_mul_u64_overflow {
                         $crate::__pgrx_c_operand!(@check_safety; $result);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -9538,7 +10007,7 @@ macro_rules! pg_mul_u64_overflow {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9675,6 +10144,13 @@ macro_rules! __pgrx_c_args_pg_sub_s16_overflow {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_s16_overflow] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_s16_overflow!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9726,6 +10202,13 @@ macro_rules! __pgrx_c_args_pg_sub_s16_overflow {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_pg_sub_s16_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_s16_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -9790,6 +10273,11 @@ macro_rules! __pgrx_c_args_pg_sub_s16_overflow {
             @argument [__pgrx_c_args_pg_sub_s16_overflow] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_s16_overflow] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_sub_s16_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9827,6 +10315,13 @@ macro_rules! __pgrx_c_args_pg_sub_s16_overflow {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_s16_overflow] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_s16_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9843,7 +10338,7 @@ macro_rules! __pgrx_c_args_pg_sub_s16_overflow {
         $crate::pg_sub_s16_overflow!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_sub_s16_overflow from int.h:64
@@ -9947,13 +10442,13 @@ macro_rules! pg_sub_s16_overflow {
         $crate::__pgrx_c_args_pg_sub_s16_overflow!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_s16_overflow!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_s16_overflow!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -9968,7 +10463,7 @@ macro_rules! pg_sub_s16_overflow {
                         $crate::__pgrx_c_operand!(@check_safety; $result);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -10026,7 +10521,7 @@ macro_rules! pg_sub_s16_overflow {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10163,6 +10658,13 @@ macro_rules! __pgrx_c_args_pg_sub_s32_overflow {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_s32_overflow] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_s32_overflow!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10214,6 +10716,13 @@ macro_rules! __pgrx_c_args_pg_sub_s32_overflow {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_pg_sub_s32_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_s32_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -10278,6 +10787,11 @@ macro_rules! __pgrx_c_args_pg_sub_s32_overflow {
             @argument [__pgrx_c_args_pg_sub_s32_overflow] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_s32_overflow] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_sub_s32_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10315,6 +10829,13 @@ macro_rules! __pgrx_c_args_pg_sub_s32_overflow {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_s32_overflow] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_s32_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10331,7 +10852,7 @@ macro_rules! __pgrx_c_args_pg_sub_s32_overflow {
         $crate::pg_sub_s32_overflow!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_sub_s32_overflow from int.h:121
@@ -10435,13 +10956,13 @@ macro_rules! pg_sub_s32_overflow {
         $crate::__pgrx_c_args_pg_sub_s32_overflow!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_s32_overflow!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_s32_overflow!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -10456,7 +10977,7 @@ macro_rules! pg_sub_s32_overflow {
                         $crate::__pgrx_c_operand!(@check_safety; $result);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -10514,7 +11035,7 @@ macro_rules! pg_sub_s32_overflow {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10651,6 +11172,13 @@ macro_rules! __pgrx_c_args_pg_sub_s64_overflow {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_s64_overflow] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_s64_overflow!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10702,6 +11230,13 @@ macro_rules! __pgrx_c_args_pg_sub_s64_overflow {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_pg_sub_s64_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_s64_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -10766,6 +11301,11 @@ macro_rules! __pgrx_c_args_pg_sub_s64_overflow {
             @argument [__pgrx_c_args_pg_sub_s64_overflow] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_s64_overflow] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_sub_s64_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10803,6 +11343,13 @@ macro_rules! __pgrx_c_args_pg_sub_s64_overflow {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_s64_overflow] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_s64_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10819,7 +11366,7 @@ macro_rules! __pgrx_c_args_pg_sub_s64_overflow {
         $crate::pg_sub_s64_overflow!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_sub_s64_overflow from int.h:187
@@ -10936,13 +11483,13 @@ macro_rules! pg_sub_s64_overflow {
         $crate::__pgrx_c_args_pg_sub_s64_overflow!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_s64_overflow!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_s64_overflow!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -10957,7 +11504,7 @@ macro_rules! pg_sub_s64_overflow {
                         $crate::__pgrx_c_operand!(@check_safety; $result);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -11015,7 +11562,7 @@ macro_rules! pg_sub_s64_overflow {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -11155,6 +11702,13 @@ macro_rules! __pgrx_c_args_pg_sub_size_overflow {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_size_overflow] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_size_overflow!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11206,6 +11760,13 @@ macro_rules! __pgrx_c_args_pg_sub_size_overflow {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_pg_sub_size_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_size_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -11270,6 +11831,11 @@ macro_rules! __pgrx_c_args_pg_sub_size_overflow {
             @argument [__pgrx_c_args_pg_sub_size_overflow] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_size_overflow] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_sub_size_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11307,6 +11873,13 @@ macro_rules! __pgrx_c_args_pg_sub_size_overflow {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_size_overflow] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_size_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11323,7 +11896,7 @@ macro_rules! __pgrx_c_args_pg_sub_size_overflow {
         $crate::pg_sub_size_overflow!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_sub_size_overflow from int.h:462
@@ -11447,13 +12020,13 @@ macro_rules! pg_sub_size_overflow {
         $crate::__pgrx_c_args_pg_sub_size_overflow!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_size_overflow!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_size_overflow!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -11468,7 +12041,7 @@ macro_rules! pg_sub_size_overflow {
                         $crate::__pgrx_c_operand!(@check_safety; $result);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -11544,7 +12117,7 @@ macro_rules! pg_sub_size_overflow {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -11699,6 +12272,13 @@ macro_rules! __pgrx_c_args_pg_sub_u16_overflow {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_u16_overflow] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_u16_overflow!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11750,6 +12330,13 @@ macro_rules! __pgrx_c_args_pg_sub_u16_overflow {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_pg_sub_u16_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_u16_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -11814,6 +12401,11 @@ macro_rules! __pgrx_c_args_pg_sub_u16_overflow {
             @argument [__pgrx_c_args_pg_sub_u16_overflow] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_u16_overflow] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_sub_u16_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11851,6 +12443,13 @@ macro_rules! __pgrx_c_args_pg_sub_u16_overflow {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_u16_overflow] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_u16_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11867,7 +12466,7 @@ macro_rules! __pgrx_c_args_pg_sub_u16_overflow {
         $crate::pg_sub_u16_overflow!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_sub_u16_overflow from int.h:287
@@ -11973,13 +12572,13 @@ macro_rules! pg_sub_u16_overflow {
         $crate::__pgrx_c_args_pg_sub_u16_overflow!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_u16_overflow!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_u16_overflow!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -11994,7 +12593,7 @@ macro_rules! pg_sub_u16_overflow {
                         $crate::__pgrx_c_operand!(@check_safety; $result);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -12052,7 +12651,7 @@ macro_rules! pg_sub_u16_overflow {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -12189,6 +12788,13 @@ macro_rules! __pgrx_c_args_pg_sub_u32_overflow {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_u32_overflow] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_u32_overflow!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12240,6 +12846,13 @@ macro_rules! __pgrx_c_args_pg_sub_u32_overflow {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_pg_sub_u32_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_u32_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -12304,6 +12917,11 @@ macro_rules! __pgrx_c_args_pg_sub_u32_overflow {
             @argument [__pgrx_c_args_pg_sub_u32_overflow] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_u32_overflow] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_sub_u32_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12341,6 +12959,13 @@ macro_rules! __pgrx_c_args_pg_sub_u32_overflow {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_u32_overflow] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_u32_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12357,7 +12982,7 @@ macro_rules! __pgrx_c_args_pg_sub_u32_overflow {
         $crate::pg_sub_u32_overflow!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_sub_u32_overflow from int.h:342
@@ -12463,13 +13088,13 @@ macro_rules! pg_sub_u32_overflow {
         $crate::__pgrx_c_args_pg_sub_u32_overflow!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_u32_overflow!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_u32_overflow!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -12484,7 +13109,7 @@ macro_rules! pg_sub_u32_overflow {
                         $crate::__pgrx_c_operand!(@check_safety; $result);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -12542,7 +13167,7 @@ macro_rules! pg_sub_u32_overflow {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -12679,6 +13304,13 @@ macro_rules! __pgrx_c_args_pg_sub_u64_overflow {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_u64_overflow] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_u64_overflow!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12730,6 +13362,13 @@ macro_rules! __pgrx_c_args_pg_sub_u64_overflow {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_pg_sub_u64_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_u64_overflow] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -12794,6 +13433,11 @@ macro_rules! __pgrx_c_args_pg_sub_u64_overflow {
             @argument [__pgrx_c_args_pg_sub_u64_overflow] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_u64_overflow] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_sub_u64_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12831,6 +13475,13 @@ macro_rules! __pgrx_c_args_pg_sub_u64_overflow {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_sub_u64_overflow] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_u64_overflow!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12847,7 +13498,7 @@ macro_rules! __pgrx_c_args_pg_sub_u64_overflow {
         $crate::pg_sub_u64_overflow!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_sub_u64_overflow from int.h:397
@@ -12953,13 +13604,13 @@ macro_rules! pg_sub_u64_overflow {
         $crate::__pgrx_c_args_pg_sub_u64_overflow!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_u64_overflow!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt, $result:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_sub_u64_overflow!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -12974,7 +13625,7 @@ macro_rules! pg_sub_u64_overflow {
                         $crate::__pgrx_c_operand!(@check_safety; $result);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -13032,7 +13683,7 @@ macro_rules! pg_sub_u64_overflow {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

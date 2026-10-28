@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_DatumGetRangeTypeP {
             @argument [__pgrx_c_args_DatumGetRangeTypeP] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetRangeTypeP] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetRangeTypeP!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -118,6 +123,13 @@ macro_rules! __pgrx_c_args_DatumGetRangeTypeP {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetRangeTypeP] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetRangeTypeP!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -134,7 +146,7 @@ macro_rules! __pgrx_c_args_DatumGetRangeTypeP {
         $crate::DatumGetRangeTypeP!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function DatumGetRangeTypeP from rangetypes.h:73
@@ -211,13 +223,13 @@ macro_rules! DatumGetRangeTypeP {
         $crate::__pgrx_c_args_DatumGetRangeTypeP!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetRangeTypeP!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetRangeTypeP!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -230,7 +242,7 @@ macro_rules! DatumGetRangeTypeP {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -267,7 +279,7 @@ macro_rules! DatumGetRangeTypeP {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -399,6 +411,11 @@ macro_rules! __pgrx_c_args_DatumGetRangeTypePCopy {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetRangeTypePCopy] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetRangeTypePCopy!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -436,6 +453,13 @@ macro_rules! __pgrx_c_args_DatumGetRangeTypePCopy {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetRangeTypePCopy] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetRangeTypePCopy!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -452,7 +476,7 @@ macro_rules! __pgrx_c_args_DatumGetRangeTypePCopy {
         $crate::DatumGetRangeTypePCopy!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function DatumGetRangeTypePCopy from rangetypes.h:79
@@ -532,13 +556,13 @@ macro_rules! DatumGetRangeTypePCopy {
         $crate::__pgrx_c_args_DatumGetRangeTypePCopy!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetRangeTypePCopy!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetRangeTypePCopy!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -551,7 +575,7 @@ macro_rules! DatumGetRangeTypePCopy {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -588,7 +612,7 @@ macro_rules! DatumGetRangeTypePCopy {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -667,7 +691,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_RANGE_P {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(
@@ -676,7 +700,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_RANGE_P {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(
@@ -766,6 +790,11 @@ macro_rules! __pgrx_c_args_PG_GETARG_RANGE_P {
             @argument [__pgrx_c_args_PG_GETARG_RANGE_P] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_GETARG_RANGE_P] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -803,6 +832,13 @@ macro_rules! __pgrx_c_args_PG_GETARG_RANGE_P {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_GETARG_RANGE_P] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -819,7 +855,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_RANGE_P {
         $crate::PG_GETARG_RANGE_P!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PG_GETARG_RANGE_P from rangetypes.h:91
@@ -933,13 +969,13 @@ macro_rules! PG_GETARG_RANGE_P {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $n:tt, $fcinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $n:tt, $fcinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -954,7 +990,7 @@ macro_rules! PG_GETARG_RANGE_P {
                         $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1039,7 +1075,7 @@ macro_rules! PG_GETARG_RANGE_P {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1161,7 +1197,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_RANGE_P_COPY {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P_COPY!(
@@ -1170,7 +1206,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_RANGE_P_COPY {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P_COPY!(
@@ -1262,6 +1298,11 @@ macro_rules! __pgrx_c_args_PG_GETARG_RANGE_P_COPY {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_GETARG_RANGE_P_COPY] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P_COPY!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1299,6 +1340,13 @@ macro_rules! __pgrx_c_args_PG_GETARG_RANGE_P_COPY {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_GETARG_RANGE_P_COPY] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P_COPY!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1315,7 +1363,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_RANGE_P_COPY {
         $crate::PG_GETARG_RANGE_P_COPY!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PG_GETARG_RANGE_P_COPY from rangetypes.h:92
@@ -1432,13 +1480,13 @@ macro_rules! PG_GETARG_RANGE_P_COPY {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P_COPY!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $n:tt, $fcinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P_COPY!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $n:tt, $fcinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P_COPY!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1453,7 +1501,7 @@ macro_rules! PG_GETARG_RANGE_P_COPY {
                         $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1538,7 +1586,7 @@ macro_rules! PG_GETARG_RANGE_P_COPY {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1705,6 +1753,11 @@ macro_rules! __pgrx_c_args_PG_RETURN_RANGE_P {
             @argument [__pgrx_c_args_PG_RETURN_RANGE_P] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_RETURN_RANGE_P] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PG_RETURN_RANGE_P!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1742,6 +1795,13 @@ macro_rules! __pgrx_c_args_PG_RETURN_RANGE_P {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_RETURN_RANGE_P] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_RANGE_P!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1758,7 +1818,7 @@ macro_rules! __pgrx_c_args_PG_RETURN_RANGE_P {
         $crate::PG_RETURN_RANGE_P!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PG_RETURN_RANGE_P from rangetypes.h:93
@@ -1877,7 +1937,7 @@ macro_rules! PG_RETURN_RANGE_P {
         )
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_RANGE_P!(@collect __pgrx_emit_public []; $($raw)*)
@@ -1961,6 +2021,11 @@ macro_rules! __pgrx_c_args_RANGE_HAS_LBOUND {
             @argument [__pgrx_c_args_RANGE_HAS_LBOUND] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RANGE_HAS_LBOUND] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RANGE_HAS_LBOUND!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1998,6 +2063,13 @@ macro_rules! __pgrx_c_args_RANGE_HAS_LBOUND {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RANGE_HAS_LBOUND] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RANGE_HAS_LBOUND!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2014,7 +2086,7 @@ macro_rules! __pgrx_c_args_RANGE_HAS_LBOUND {
         $crate::RANGE_HAS_LBOUND!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RANGE_HAS_LBOUND from rangetypes.h:48
@@ -2110,13 +2182,13 @@ macro_rules! RANGE_HAS_LBOUND {
         $crate::__pgrx_c_args_RANGE_HAS_LBOUND!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $flags:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RANGE_HAS_LBOUND!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $flags:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RANGE_HAS_LBOUND!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2129,7 +2201,7 @@ macro_rules! RANGE_HAS_LBOUND {
                         $crate::__pgrx_c_operand!(@check_safety; $flags);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::logical_not(
@@ -2196,7 +2268,7 @@ macro_rules! RANGE_HAS_LBOUND {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2350,6 +2422,11 @@ macro_rules! __pgrx_c_args_RANGE_HAS_UBOUND {
             @argument [__pgrx_c_args_RANGE_HAS_UBOUND] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RANGE_HAS_UBOUND] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RANGE_HAS_UBOUND!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2387,6 +2464,13 @@ macro_rules! __pgrx_c_args_RANGE_HAS_UBOUND {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RANGE_HAS_UBOUND] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RANGE_HAS_UBOUND!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2403,7 +2487,7 @@ macro_rules! __pgrx_c_args_RANGE_HAS_UBOUND {
         $crate::RANGE_HAS_UBOUND!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RANGE_HAS_UBOUND from rangetypes.h:52
@@ -2499,13 +2583,13 @@ macro_rules! RANGE_HAS_UBOUND {
         $crate::__pgrx_c_args_RANGE_HAS_UBOUND!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $flags:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RANGE_HAS_UBOUND!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $flags:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RANGE_HAS_UBOUND!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2518,7 +2602,7 @@ macro_rules! RANGE_HAS_UBOUND {
                         $crate::__pgrx_c_operand!(@check_safety; $flags);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::logical_not(
@@ -2585,7 +2669,7 @@ macro_rules! RANGE_HAS_UBOUND {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2739,6 +2823,11 @@ macro_rules! __pgrx_c_args_RangeIsEmpty {
             @argument [__pgrx_c_args_RangeIsEmpty] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RangeIsEmpty] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RangeIsEmpty!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2774,6 +2863,11 @@ macro_rules! __pgrx_c_args_RangeIsEmpty {
             @argument [__pgrx_c_args_RangeIsEmpty] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RangeIsEmpty] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RangeIsEmpty!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2790,7 +2884,7 @@ macro_rules! __pgrx_c_args_RangeIsEmpty {
         $crate::RangeIsEmpty!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RangeIsEmpty from rangetypes.h:56
@@ -2835,7 +2929,7 @@ macro_rules! RangeIsEmpty {
                                     <
                                         $crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_37d48936dd199184ee4842c0ace8ef92(
+                                        $crate::__pgrx_c_generated::Inline_609c6160e8d17deb76c34519a91f329f(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -2885,13 +2979,13 @@ macro_rules! RangeIsEmpty {
         $crate::__pgrx_c_args_RangeIsEmpty!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $r:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RangeIsEmpty!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $r:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RangeIsEmpty!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2904,7 +2998,7 @@ macro_rules! RangeIsEmpty {
                         $crate::__pgrx_c_operand!(@check_safety; $r);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -2918,7 +3012,7 @@ macro_rules! RangeIsEmpty {
                                                 <
                                                     $crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_37d48936dd199184ee4842c0ace8ef92(
+                                                    $crate::__pgrx_c_generated::Inline_609c6160e8d17deb76c34519a91f329f(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
@@ -2975,7 +3069,7 @@ macro_rules! RangeIsEmpty {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2993,7 +3087,7 @@ macro_rules! RangeIsEmpty {
                                     <
                                         $crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_37d48936dd199184ee4842c0ace8ef92(
+                                        $crate::__pgrx_c_generated::Inline_609c6160e8d17deb76c34519a91f329f(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -3129,6 +3223,11 @@ macro_rules! __pgrx_c_args_RangeIsOrContainsEmpty {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RangeIsOrContainsEmpty] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RangeIsOrContainsEmpty!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3166,6 +3265,13 @@ macro_rules! __pgrx_c_args_RangeIsOrContainsEmpty {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RangeIsOrContainsEmpty] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RangeIsOrContainsEmpty!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3182,7 +3288,7 @@ macro_rules! __pgrx_c_args_RangeIsOrContainsEmpty {
         $crate::RangeIsOrContainsEmpty!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RangeIsOrContainsEmpty from rangetypes.h:57
@@ -3230,7 +3336,7 @@ macro_rules! RangeIsOrContainsEmpty {
                                     <
                                         $crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_37d48936dd199184ee4842c0ace8ef92(
+                                        $crate::__pgrx_c_generated::Inline_609c6160e8d17deb76c34519a91f329f(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -3301,13 +3407,13 @@ macro_rules! RangeIsOrContainsEmpty {
         $crate::__pgrx_c_args_RangeIsOrContainsEmpty!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $r:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RangeIsOrContainsEmpty!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $r:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RangeIsOrContainsEmpty!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3320,7 +3426,7 @@ macro_rules! RangeIsOrContainsEmpty {
                         $crate::__pgrx_c_operand!(@check_safety; $r);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -3334,7 +3440,7 @@ macro_rules! RangeIsOrContainsEmpty {
                                                 <
                                                     $crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_37d48936dd199184ee4842c0ace8ef92(
+                                                    $crate::__pgrx_c_generated::Inline_609c6160e8d17deb76c34519a91f329f(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
@@ -3410,7 +3516,7 @@ macro_rules! RangeIsOrContainsEmpty {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3428,7 +3534,7 @@ macro_rules! RangeIsOrContainsEmpty {
                                     <
                                         $crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_37d48936dd199184ee4842c0ace8ef92(
+                                        $crate::__pgrx_c_generated::Inline_609c6160e8d17deb76c34519a91f329f(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
@@ -3580,6 +3686,11 @@ macro_rules! __pgrx_c_args_RangeTypeGetOid {
             @argument [__pgrx_c_args_RangeTypeGetOid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RangeTypeGetOid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RangeTypeGetOid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3617,6 +3728,13 @@ macro_rules! __pgrx_c_args_RangeTypeGetOid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RangeTypeGetOid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RangeTypeGetOid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3633,7 +3751,7 @@ macro_rules! __pgrx_c_args_RangeTypeGetOid {
         $crate::RangeTypeGetOid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RangeTypeGetOid from rangetypes.h:35
@@ -3735,7 +3853,7 @@ macro_rules! RangeTypeGetOid {
                         $crate::__pgrx_c_operand!(@check_safety; $r);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_rangetypid,
@@ -3753,7 +3871,7 @@ macro_rules! RangeTypeGetOid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3866,6 +3984,11 @@ macro_rules! __pgrx_c_args_RangeTypePGetDatum {
             @argument [__pgrx_c_args_RangeTypePGetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RangeTypePGetDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RangeTypePGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3903,6 +4026,13 @@ macro_rules! __pgrx_c_args_RangeTypePGetDatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RangeTypePGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RangeTypePGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3919,7 +4049,7 @@ macro_rules! __pgrx_c_args_RangeTypePGetDatum {
         $crate::RangeTypePGetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function RangeTypePGetDatum from rangetypes.h:85
@@ -3998,13 +4128,13 @@ macro_rules! RangeTypePGetDatum {
         $crate::__pgrx_c_args_RangeTypePGetDatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RangeTypePGetDatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RangeTypePGetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4017,7 +4147,7 @@ macro_rules! RangeTypePGetDatum {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -4056,7 +4186,7 @@ macro_rules! RangeTypePGetDatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

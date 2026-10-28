@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_DatumGetJsonbP {
             @argument [__pgrx_c_args_DatumGetJsonbP] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetJsonbP] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetJsonbP!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -118,6 +123,11 @@ macro_rules! __pgrx_c_args_DatumGetJsonbP {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetJsonbP] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetJsonbP!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -134,7 +144,7 @@ macro_rules! __pgrx_c_args_DatumGetJsonbP {
         $crate::DatumGetJsonbP!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function DatumGetJsonbP from jsonb.h:373
@@ -209,13 +219,13 @@ macro_rules! DatumGetJsonbP {
         $crate::__pgrx_c_args_DatumGetJsonbP!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $d:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetJsonbP!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $d:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetJsonbP!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -228,7 +238,7 @@ macro_rules! DatumGetJsonbP {
                         $crate::__pgrx_c_operand!(@check_safety; $d);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -265,7 +275,7 @@ macro_rules! DatumGetJsonbP {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -392,6 +402,11 @@ macro_rules! __pgrx_c_args_DatumGetJsonbPCopy {
             @argument [__pgrx_c_args_DatumGetJsonbPCopy] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetJsonbPCopy] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetJsonbPCopy!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -429,6 +444,13 @@ macro_rules! __pgrx_c_args_DatumGetJsonbPCopy {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetJsonbPCopy] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetJsonbPCopy!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -445,7 +467,7 @@ macro_rules! __pgrx_c_args_DatumGetJsonbPCopy {
         $crate::DatumGetJsonbPCopy!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function DatumGetJsonbPCopy from jsonb.h:379
@@ -520,13 +542,13 @@ macro_rules! DatumGetJsonbPCopy {
         $crate::__pgrx_c_args_DatumGetJsonbPCopy!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $d:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetJsonbPCopy!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $d:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetJsonbPCopy!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -539,7 +561,7 @@ macro_rules! DatumGetJsonbPCopy {
                         $crate::__pgrx_c_operand!(@check_safety; $d);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -576,7 +598,7 @@ macro_rules! DatumGetJsonbPCopy {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -703,6 +725,11 @@ macro_rules! __pgrx_c_args_IsAJsonbScalar {
             @argument [__pgrx_c_args_IsAJsonbScalar] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IsAJsonbScalar] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IsAJsonbScalar!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -740,6 +767,11 @@ macro_rules! __pgrx_c_args_IsAJsonbScalar {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IsAJsonbScalar] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsAJsonbScalar!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -756,7 +788,7 @@ macro_rules! __pgrx_c_args_IsAJsonbScalar {
         $crate::IsAJsonbScalar!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IsAJsonbScalar from jsonb.h:297
@@ -938,13 +970,13 @@ macro_rules! IsAJsonbScalar {
         $crate::__pgrx_c_args_IsAJsonbScalar!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $jsonbval:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IsAJsonbScalar!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $jsonbval:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IsAJsonbScalar!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -957,7 +989,7 @@ macro_rules! IsAJsonbScalar {
                         $crate::__pgrx_c_operand!(@check_safety; $jsonbval);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -1123,7 +1155,7 @@ macro_rules! IsAJsonbScalar {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1356,6 +1388,13 @@ macro_rules! __pgrx_c_args_JBE_ADVANCE_OFFSET {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JBE_ADVANCE_OFFSET] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ADVANCE_OFFSET!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1417,6 +1456,11 @@ macro_rules! __pgrx_c_args_JBE_ADVANCE_OFFSET {
             @argument [__pgrx_c_args_JBE_ADVANCE_OFFSET] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JBE_ADVANCE_OFFSET] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_JBE_ADVANCE_OFFSET!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1454,6 +1498,13 @@ macro_rules! __pgrx_c_args_JBE_ADVANCE_OFFSET {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JBE_ADVANCE_OFFSET] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ADVANCE_OFFSET!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1470,7 +1521,7 @@ macro_rules! __pgrx_c_args_JBE_ADVANCE_OFFSET {
         $crate::JBE_ADVANCE_OFFSET!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro JBE_ADVANCE_OFFSET from jsonb.h:162
@@ -1685,7 +1736,7 @@ macro_rules! JBE_ADVANCE_OFFSET {
         }
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::JBE_ADVANCE_OFFSET!(@__pgrx_c_guard_locals __pgrx_emit_public []; $($raw)*)
@@ -1769,6 +1820,11 @@ macro_rules! __pgrx_c_args_JBE_HAS_OFF {
             @argument [__pgrx_c_args_JBE_HAS_OFF] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JBE_HAS_OFF] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_JBE_HAS_OFF!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1804,6 +1860,11 @@ macro_rules! __pgrx_c_args_JBE_HAS_OFF {
             @argument [__pgrx_c_args_JBE_HAS_OFF] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JBE_HAS_OFF] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_HAS_OFF!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1820,7 +1881,7 @@ macro_rules! __pgrx_c_args_JBE_HAS_OFF {
         $crate::JBE_HAS_OFF!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro JBE_HAS_OFF from jsonb.h:152
@@ -1885,13 +1946,13 @@ macro_rules! JBE_HAS_OFF {
         $crate::__pgrx_c_args_JBE_HAS_OFF!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $je_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JBE_HAS_OFF!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $je_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JBE_HAS_OFF!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1904,7 +1965,7 @@ macro_rules! JBE_HAS_OFF {
                         $crate::__pgrx_c_operand!(@check_safety; $je_);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -1942,7 +2003,7 @@ macro_rules! JBE_HAS_OFF {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2065,6 +2126,11 @@ macro_rules! __pgrx_c_args_JBE_ISBOOL {
             @argument [__pgrx_c_args_JBE_ISBOOL] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JBE_ISBOOL] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_JBE_ISBOOL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2100,6 +2166,11 @@ macro_rules! __pgrx_c_args_JBE_ISBOOL {
             @argument [__pgrx_c_args_JBE_ISBOOL] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JBE_ISBOOL] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISBOOL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2116,7 +2187,7 @@ macro_rules! __pgrx_c_args_JBE_ISBOOL {
         $crate::JBE_ISBOOL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro JBE_ISBOOL from jsonb.h:159
@@ -2250,13 +2321,13 @@ macro_rules! JBE_ISBOOL {
         $crate::__pgrx_c_args_JBE_ISBOOL!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $je_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISBOOL!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $je_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISBOOL!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2270,7 +2341,7 @@ macro_rules! JBE_ISBOOL {
                         $crate::__pgrx_c_operand!(@check_safety; $je_);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -2384,7 +2455,7 @@ macro_rules! JBE_ISBOOL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2576,6 +2647,11 @@ macro_rules! __pgrx_c_args_JBE_ISBOOL_FALSE {
             @argument [__pgrx_c_args_JBE_ISBOOL_FALSE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JBE_ISBOOL_FALSE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_JBE_ISBOOL_FALSE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2613,6 +2689,13 @@ macro_rules! __pgrx_c_args_JBE_ISBOOL_FALSE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JBE_ISBOOL_FALSE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISBOOL_FALSE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2629,7 +2712,7 @@ macro_rules! __pgrx_c_args_JBE_ISBOOL_FALSE {
         $crate::JBE_ISBOOL_FALSE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro JBE_ISBOOL_FALSE from jsonb.h:158
@@ -2692,13 +2775,13 @@ macro_rules! JBE_ISBOOL_FALSE {
         $crate::__pgrx_c_args_JBE_ISBOOL_FALSE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $je_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISBOOL_FALSE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $je_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISBOOL_FALSE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2711,7 +2794,7 @@ macro_rules! JBE_ISBOOL_FALSE {
                         $crate::__pgrx_c_operand!(@check_safety; $je_);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -2747,7 +2830,7 @@ macro_rules! JBE_ISBOOL_FALSE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2868,6 +2951,11 @@ macro_rules! __pgrx_c_args_JBE_ISBOOL_TRUE {
             @argument [__pgrx_c_args_JBE_ISBOOL_TRUE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JBE_ISBOOL_TRUE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_JBE_ISBOOL_TRUE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2905,6 +2993,13 @@ macro_rules! __pgrx_c_args_JBE_ISBOOL_TRUE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JBE_ISBOOL_TRUE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISBOOL_TRUE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2921,7 +3016,7 @@ macro_rules! __pgrx_c_args_JBE_ISBOOL_TRUE {
         $crate::JBE_ISBOOL_TRUE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro JBE_ISBOOL_TRUE from jsonb.h:157
@@ -2984,13 +3079,13 @@ macro_rules! JBE_ISBOOL_TRUE {
         $crate::__pgrx_c_args_JBE_ISBOOL_TRUE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $je_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISBOOL_TRUE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $je_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISBOOL_TRUE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3003,7 +3098,7 @@ macro_rules! JBE_ISBOOL_TRUE {
                         $crate::__pgrx_c_operand!(@check_safety; $je_);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -3039,7 +3134,7 @@ macro_rules! JBE_ISBOOL_TRUE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3160,6 +3255,11 @@ macro_rules! __pgrx_c_args_JBE_ISCONTAINER {
             @argument [__pgrx_c_args_JBE_ISCONTAINER] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JBE_ISCONTAINER] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_JBE_ISCONTAINER!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3197,6 +3297,13 @@ macro_rules! __pgrx_c_args_JBE_ISCONTAINER {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JBE_ISCONTAINER] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISCONTAINER!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3213,7 +3320,7 @@ macro_rules! __pgrx_c_args_JBE_ISCONTAINER {
         $crate::JBE_ISCONTAINER!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro JBE_ISCONTAINER from jsonb.h:155
@@ -3276,13 +3383,13 @@ macro_rules! JBE_ISCONTAINER {
         $crate::__pgrx_c_args_JBE_ISCONTAINER!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $je_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISCONTAINER!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $je_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISCONTAINER!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3295,7 +3402,7 @@ macro_rules! JBE_ISCONTAINER {
                         $crate::__pgrx_c_operand!(@check_safety; $je_);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -3331,7 +3438,7 @@ macro_rules! JBE_ISCONTAINER {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3452,6 +3559,11 @@ macro_rules! __pgrx_c_args_JBE_ISNULL {
             @argument [__pgrx_c_args_JBE_ISNULL] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JBE_ISNULL] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_JBE_ISNULL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3487,6 +3599,11 @@ macro_rules! __pgrx_c_args_JBE_ISNULL {
             @argument [__pgrx_c_args_JBE_ISNULL] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JBE_ISNULL] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISNULL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3503,7 +3620,7 @@ macro_rules! __pgrx_c_args_JBE_ISNULL {
         $crate::JBE_ISNULL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro JBE_ISNULL from jsonb.h:156
@@ -3566,13 +3683,13 @@ macro_rules! JBE_ISNULL {
         $crate::__pgrx_c_args_JBE_ISNULL!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $je_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISNULL!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $je_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISNULL!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3585,7 +3702,7 @@ macro_rules! JBE_ISNULL {
                         $crate::__pgrx_c_operand!(@check_safety; $je_);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -3621,7 +3738,7 @@ macro_rules! JBE_ISNULL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3742,6 +3859,11 @@ macro_rules! __pgrx_c_args_JBE_ISNUMERIC {
             @argument [__pgrx_c_args_JBE_ISNUMERIC] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JBE_ISNUMERIC] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_JBE_ISNUMERIC!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3779,6 +3901,11 @@ macro_rules! __pgrx_c_args_JBE_ISNUMERIC {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JBE_ISNUMERIC] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISNUMERIC!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3795,7 +3922,7 @@ macro_rules! __pgrx_c_args_JBE_ISNUMERIC {
         $crate::JBE_ISNUMERIC!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro JBE_ISNUMERIC from jsonb.h:154
@@ -3858,13 +3985,13 @@ macro_rules! JBE_ISNUMERIC {
         $crate::__pgrx_c_args_JBE_ISNUMERIC!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $je_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISNUMERIC!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $je_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISNUMERIC!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3877,7 +4004,7 @@ macro_rules! JBE_ISNUMERIC {
                         $crate::__pgrx_c_operand!(@check_safety; $je_);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -3913,7 +4040,7 @@ macro_rules! JBE_ISNUMERIC {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4034,6 +4161,11 @@ macro_rules! __pgrx_c_args_JBE_ISSTRING {
             @argument [__pgrx_c_args_JBE_ISSTRING] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JBE_ISSTRING] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_JBE_ISSTRING!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4069,6 +4201,11 @@ macro_rules! __pgrx_c_args_JBE_ISSTRING {
             @argument [__pgrx_c_args_JBE_ISSTRING] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JBE_ISSTRING] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISSTRING!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4085,7 +4222,7 @@ macro_rules! __pgrx_c_args_JBE_ISSTRING {
         $crate::JBE_ISSTRING!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro JBE_ISSTRING from jsonb.h:153
@@ -4150,13 +4287,13 @@ macro_rules! JBE_ISSTRING {
         $crate::__pgrx_c_args_JBE_ISSTRING!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $je_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISSTRING!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $je_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISSTRING!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4169,7 +4306,7 @@ macro_rules! JBE_ISSTRING {
                         $crate::__pgrx_c_operand!(@check_safety; $je_);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -4207,7 +4344,7 @@ macro_rules! JBE_ISSTRING {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4330,6 +4467,11 @@ macro_rules! __pgrx_c_args_JBE_OFFLENFLD {
             @argument [__pgrx_c_args_JBE_OFFLENFLD] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JBE_OFFLENFLD] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_JBE_OFFLENFLD!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4367,6 +4509,11 @@ macro_rules! __pgrx_c_args_JBE_OFFLENFLD {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JBE_OFFLENFLD] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_OFFLENFLD!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4383,7 +4530,7 @@ macro_rules! __pgrx_c_args_JBE_OFFLENFLD {
         $crate::JBE_OFFLENFLD!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro JBE_OFFLENFLD from jsonb.h:151
@@ -4435,13 +4582,13 @@ macro_rules! JBE_OFFLENFLD {
         $crate::__pgrx_c_args_JBE_OFFLENFLD!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $je_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JBE_OFFLENFLD!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $je_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JBE_OFFLENFLD!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4454,7 +4601,7 @@ macro_rules! JBE_OFFLENFLD {
                         $crate::__pgrx_c_operand!(@check_safety; $je_);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -4473,7 +4620,7 @@ macro_rules! JBE_OFFLENFLD {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4583,6 +4730,11 @@ macro_rules! __pgrx_c_args_JB_ROOT_COUNT {
             @argument [__pgrx_c_args_JB_ROOT_COUNT] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JB_ROOT_COUNT] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_JB_ROOT_COUNT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4620,6 +4772,11 @@ macro_rules! __pgrx_c_args_JB_ROOT_COUNT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JB_ROOT_COUNT] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_COUNT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4636,7 +4793,7 @@ macro_rules! __pgrx_c_args_JB_ROOT_COUNT {
         $crate::JB_ROOT_COUNT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro JB_ROOT_COUNT from jsonb.h:219
@@ -4755,13 +4912,13 @@ macro_rules! JB_ROOT_COUNT {
         $crate::__pgrx_c_args_JB_ROOT_COUNT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $jbp_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_COUNT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $jbp_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_COUNT!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4775,7 +4932,7 @@ macro_rules! JB_ROOT_COUNT {
                         $crate::__pgrx_c_operand!(@check_safety; $jbp_);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -4861,7 +5018,7 @@ macro_rules! JB_ROOT_COUNT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5034,6 +5191,11 @@ macro_rules! __pgrx_c_args_JB_ROOT_IS_ARRAY {
             @argument [__pgrx_c_args_JB_ROOT_IS_ARRAY] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JB_ROOT_IS_ARRAY] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_ARRAY!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5071,6 +5233,13 @@ macro_rules! __pgrx_c_args_JB_ROOT_IS_ARRAY {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JB_ROOT_IS_ARRAY] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_ARRAY!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5087,7 +5256,7 @@ macro_rules! __pgrx_c_args_JB_ROOT_IS_ARRAY {
         $crate::JB_ROOT_IS_ARRAY!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro JB_ROOT_IS_ARRAY from jsonb.h:222
@@ -5224,13 +5393,13 @@ macro_rules! JB_ROOT_IS_ARRAY {
         $crate::__pgrx_c_args_JB_ROOT_IS_ARRAY!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $jbp_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_ARRAY!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $jbp_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_ARRAY!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5244,7 +5413,7 @@ macro_rules! JB_ROOT_IS_ARRAY {
                         $crate::__pgrx_c_operand!(@check_safety; $jbp_);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -5349,7 +5518,7 @@ macro_rules! JB_ROOT_IS_ARRAY {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5540,6 +5709,11 @@ macro_rules! __pgrx_c_args_JB_ROOT_IS_OBJECT {
             @argument [__pgrx_c_args_JB_ROOT_IS_OBJECT] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JB_ROOT_IS_OBJECT] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_OBJECT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5577,6 +5751,13 @@ macro_rules! __pgrx_c_args_JB_ROOT_IS_OBJECT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JB_ROOT_IS_OBJECT] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_OBJECT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5593,7 +5774,7 @@ macro_rules! __pgrx_c_args_JB_ROOT_IS_OBJECT {
         $crate::JB_ROOT_IS_OBJECT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro JB_ROOT_IS_OBJECT from jsonb.h:221
@@ -5730,13 +5911,13 @@ macro_rules! JB_ROOT_IS_OBJECT {
         $crate::__pgrx_c_args_JB_ROOT_IS_OBJECT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $jbp_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_OBJECT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $jbp_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_OBJECT!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5750,7 +5931,7 @@ macro_rules! JB_ROOT_IS_OBJECT {
                         $crate::__pgrx_c_operand!(@check_safety; $jbp_);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -5855,7 +6036,7 @@ macro_rules! JB_ROOT_IS_OBJECT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6046,6 +6227,11 @@ macro_rules! __pgrx_c_args_JB_ROOT_IS_SCALAR {
             @argument [__pgrx_c_args_JB_ROOT_IS_SCALAR] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JB_ROOT_IS_SCALAR] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_SCALAR!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6083,6 +6269,13 @@ macro_rules! __pgrx_c_args_JB_ROOT_IS_SCALAR {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JB_ROOT_IS_SCALAR] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_SCALAR!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6099,7 +6292,7 @@ macro_rules! __pgrx_c_args_JB_ROOT_IS_SCALAR {
         $crate::JB_ROOT_IS_SCALAR!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro JB_ROOT_IS_SCALAR from jsonb.h:220
@@ -6236,13 +6429,13 @@ macro_rules! JB_ROOT_IS_SCALAR {
         $crate::__pgrx_c_args_JB_ROOT_IS_SCALAR!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $jbp_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_SCALAR!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $jbp_:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_SCALAR!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6256,7 +6449,7 @@ macro_rules! JB_ROOT_IS_SCALAR {
                         $crate::__pgrx_c_operand!(@check_safety; $jbp_);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -6361,7 +6554,7 @@ macro_rules! JB_ROOT_IS_SCALAR {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6555,6 +6748,11 @@ macro_rules! __pgrx_c_args_JsonContainerIsArray {
             @argument [__pgrx_c_args_JsonContainerIsArray] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JsonContainerIsArray] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_JsonContainerIsArray!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6592,6 +6790,13 @@ macro_rules! __pgrx_c_args_JsonContainerIsArray {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JsonContainerIsArray] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerIsArray!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6608,7 +6813,7 @@ macro_rules! __pgrx_c_args_JsonContainerIsArray {
         $crate::JsonContainerIsArray!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro JsonContainerIsArray from jsonb.h:209
@@ -6686,13 +6891,13 @@ macro_rules! JsonContainerIsArray {
         $crate::__pgrx_c_args_JsonContainerIsArray!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $jc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerIsArray!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $jc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerIsArray!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6705,7 +6910,7 @@ macro_rules! JsonContainerIsArray {
                         $crate::__pgrx_c_operand!(@check_safety; $jc);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -6761,7 +6966,7 @@ macro_rules! JsonContainerIsArray {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6900,6 +7105,11 @@ macro_rules! __pgrx_c_args_JsonContainerIsObject {
             @argument [__pgrx_c_args_JsonContainerIsObject] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JsonContainerIsObject] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_JsonContainerIsObject!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6937,6 +7147,13 @@ macro_rules! __pgrx_c_args_JsonContainerIsObject {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JsonContainerIsObject] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerIsObject!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6953,7 +7170,7 @@ macro_rules! __pgrx_c_args_JsonContainerIsObject {
         $crate::JsonContainerIsObject!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro JsonContainerIsObject from jsonb.h:208
@@ -7031,13 +7248,13 @@ macro_rules! JsonContainerIsObject {
         $crate::__pgrx_c_args_JsonContainerIsObject!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $jc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerIsObject!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $jc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerIsObject!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7050,7 +7267,7 @@ macro_rules! JsonContainerIsObject {
                         $crate::__pgrx_c_operand!(@check_safety; $jc);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -7106,7 +7323,7 @@ macro_rules! JsonContainerIsObject {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7245,6 +7462,11 @@ macro_rules! __pgrx_c_args_JsonContainerIsScalar {
             @argument [__pgrx_c_args_JsonContainerIsScalar] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JsonContainerIsScalar] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_JsonContainerIsScalar!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7282,6 +7504,13 @@ macro_rules! __pgrx_c_args_JsonContainerIsScalar {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JsonContainerIsScalar] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerIsScalar!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7298,7 +7527,7 @@ macro_rules! __pgrx_c_args_JsonContainerIsScalar {
         $crate::JsonContainerIsScalar!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro JsonContainerIsScalar from jsonb.h:207
@@ -7376,13 +7605,13 @@ macro_rules! JsonContainerIsScalar {
         $crate::__pgrx_c_args_JsonContainerIsScalar!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $jc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerIsScalar!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $jc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerIsScalar!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7395,7 +7624,7 @@ macro_rules! JsonContainerIsScalar {
                         $crate::__pgrx_c_operand!(@check_safety; $jc);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -7451,7 +7680,7 @@ macro_rules! JsonContainerIsScalar {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7587,6 +7816,11 @@ macro_rules! __pgrx_c_args_JsonContainerSize {
             @argument [__pgrx_c_args_JsonContainerSize] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JsonContainerSize] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_JsonContainerSize!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7624,6 +7858,13 @@ macro_rules! __pgrx_c_args_JsonContainerSize {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JsonContainerSize] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerSize!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7640,7 +7881,7 @@ macro_rules! __pgrx_c_args_JsonContainerSize {
         $crate::JsonContainerSize!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro JsonContainerSize from jsonb.h:206
@@ -7705,13 +7946,13 @@ macro_rules! JsonContainerSize {
         $crate::__pgrx_c_args_JsonContainerSize!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $jc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerSize!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $jc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerSize!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7724,7 +7965,7 @@ macro_rules! JsonContainerSize {
                         $crate::__pgrx_c_operand!(@check_safety; $jc);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -7756,7 +7997,7 @@ macro_rules! JsonContainerSize {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7879,6 +8120,11 @@ macro_rules! __pgrx_c_args_JsonbPGetDatum {
             @argument [__pgrx_c_args_JsonbPGetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JsonbPGetDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_JsonbPGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7916,6 +8162,11 @@ macro_rules! __pgrx_c_args_JsonbPGetDatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_JsonbPGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonbPGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7932,7 +8183,7 @@ macro_rules! __pgrx_c_args_JsonbPGetDatum {
         $crate::JsonbPGetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function JsonbPGetDatum from jsonb.h:385
@@ -8011,13 +8262,13 @@ macro_rules! JsonbPGetDatum {
         $crate::__pgrx_c_args_JsonbPGetDatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $p:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JsonbPGetDatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $p:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_JsonbPGetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8030,7 +8281,7 @@ macro_rules! JsonbPGetDatum {
                         $crate::__pgrx_c_operand!(@check_safety; $p);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -8069,7 +8320,7 @@ macro_rules! JsonbPGetDatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8150,7 +8401,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_JSONB_P {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(
@@ -8159,7 +8410,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_JSONB_P {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(
@@ -8249,6 +8500,11 @@ macro_rules! __pgrx_c_args_PG_GETARG_JSONB_P {
             @argument [__pgrx_c_args_PG_GETARG_JSONB_P] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_GETARG_JSONB_P] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8286,6 +8542,13 @@ macro_rules! __pgrx_c_args_PG_GETARG_JSONB_P {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_GETARG_JSONB_P] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8302,7 +8565,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_JSONB_P {
         $crate::PG_GETARG_JSONB_P!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PG_GETARG_JSONB_P from jsonb.h:391
@@ -8414,13 +8677,13 @@ macro_rules! PG_GETARG_JSONB_P {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt, $fcinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt, $fcinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8435,7 +8698,7 @@ macro_rules! PG_GETARG_JSONB_P {
                         $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -8520,7 +8783,7 @@ macro_rules! PG_GETARG_JSONB_P {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8642,7 +8905,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_JSONB_P_COPY {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P_COPY!(
@@ -8651,7 +8914,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_JSONB_P_COPY {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P_COPY!(
@@ -8743,6 +9006,11 @@ macro_rules! __pgrx_c_args_PG_GETARG_JSONB_P_COPY {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_GETARG_JSONB_P_COPY] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P_COPY!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8780,6 +9048,13 @@ macro_rules! __pgrx_c_args_PG_GETARG_JSONB_P_COPY {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_GETARG_JSONB_P_COPY] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P_COPY!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8796,7 +9071,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_JSONB_P_COPY {
         $crate::PG_GETARG_JSONB_P_COPY!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PG_GETARG_JSONB_P_COPY from jsonb.h:392
@@ -8911,13 +9186,13 @@ macro_rules! PG_GETARG_JSONB_P_COPY {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P_COPY!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt, $fcinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P_COPY!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt, $fcinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P_COPY!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8932,7 +9207,7 @@ macro_rules! PG_GETARG_JSONB_P_COPY {
                         $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -9017,7 +9292,7 @@ macro_rules! PG_GETARG_JSONB_P_COPY {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9184,6 +9459,11 @@ macro_rules! __pgrx_c_args_PG_RETURN_JSONB_P {
             @argument [__pgrx_c_args_PG_RETURN_JSONB_P] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_RETURN_JSONB_P] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PG_RETURN_JSONB_P!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9221,6 +9501,13 @@ macro_rules! __pgrx_c_args_PG_RETURN_JSONB_P {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_RETURN_JSONB_P] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_JSONB_P!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9237,7 +9524,7 @@ macro_rules! __pgrx_c_args_PG_RETURN_JSONB_P {
         $crate::PG_RETURN_JSONB_P!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PG_RETURN_JSONB_P from jsonb.h:393
@@ -9350,7 +9637,7 @@ macro_rules! PG_RETURN_JSONB_P {
         )
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_JSONB_P!(@collect __pgrx_emit_public []; $($raw)*)

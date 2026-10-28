@@ -84,6 +84,11 @@ macro_rules! __pgrx_c_args_ACLITEM_GET_GOPTIONS {
             @argument [__pgrx_c_args_ACLITEM_GET_GOPTIONS] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACLITEM_GET_GOPTIONS] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ACLITEM_GET_GOPTIONS!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -121,6 +126,13 @@ macro_rules! __pgrx_c_args_ACLITEM_GET_GOPTIONS {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACLITEM_GET_GOPTIONS] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ACLITEM_GET_GOPTIONS!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -137,7 +149,7 @@ macro_rules! __pgrx_c_args_ACLITEM_GET_GOPTIONS {
         $crate::ACLITEM_GET_GOPTIONS!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ACLITEM_GET_GOPTIONS from acl.h:67
@@ -208,13 +220,13 @@ macro_rules! ACLITEM_GET_GOPTIONS {
         $crate::__pgrx_c_args_ACLITEM_GET_GOPTIONS!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $item:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ACLITEM_GET_GOPTIONS!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $item:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ACLITEM_GET_GOPTIONS!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -227,7 +239,7 @@ macro_rules! ACLITEM_GET_GOPTIONS {
                         $crate::__pgrx_c_operand!(@check_safety; $item);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -274,7 +286,7 @@ macro_rules! ACLITEM_GET_GOPTIONS {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -399,6 +411,11 @@ macro_rules! __pgrx_c_args_ACLITEM_GET_PRIVS {
             @argument [__pgrx_c_args_ACLITEM_GET_PRIVS] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACLITEM_GET_PRIVS] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ACLITEM_GET_PRIVS!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -436,6 +453,13 @@ macro_rules! __pgrx_c_args_ACLITEM_GET_PRIVS {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACLITEM_GET_PRIVS] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ACLITEM_GET_PRIVS!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -452,7 +476,7 @@ macro_rules! __pgrx_c_args_ACLITEM_GET_PRIVS {
         $crate::ACLITEM_GET_PRIVS!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ACLITEM_GET_PRIVS from acl.h:66
@@ -508,13 +532,13 @@ macro_rules! ACLITEM_GET_PRIVS {
         $crate::__pgrx_c_args_ACLITEM_GET_PRIVS!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $item:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ACLITEM_GET_PRIVS!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $item:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ACLITEM_GET_PRIVS!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -527,7 +551,7 @@ macro_rules! ACLITEM_GET_PRIVS {
                         $crate::__pgrx_c_operand!(@check_safety; $item);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -550,7 +574,7 @@ macro_rules! ACLITEM_GET_PRIVS {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -664,6 +688,11 @@ macro_rules! __pgrx_c_args_ACLITEM_GET_RIGHTS {
             @argument [__pgrx_c_args_ACLITEM_GET_RIGHTS] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACLITEM_GET_RIGHTS] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ACLITEM_GET_RIGHTS!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -701,6 +730,13 @@ macro_rules! __pgrx_c_args_ACLITEM_GET_RIGHTS {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACLITEM_GET_RIGHTS] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ACLITEM_GET_RIGHTS!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -717,7 +753,7 @@ macro_rules! __pgrx_c_args_ACLITEM_GET_RIGHTS {
         $crate::ACLITEM_GET_RIGHTS!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ACLITEM_GET_RIGHTS from acl.h:68
@@ -795,7 +831,7 @@ macro_rules! ACLITEM_GET_RIGHTS {
                         $crate::__pgrx_c_operand!(@check_safety; $item);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_ai_privs,
@@ -805,7 +841,7 @@ macro_rules! ACLITEM_GET_RIGHTS {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -906,6 +942,13 @@ macro_rules! __pgrx_c_args_ACLITEM_SET_GOPTIONS {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACLITEM_SET_GOPTIONS] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ACLITEM_SET_GOPTIONS!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -967,6 +1010,11 @@ macro_rules! __pgrx_c_args_ACLITEM_SET_GOPTIONS {
             @argument [__pgrx_c_args_ACLITEM_SET_GOPTIONS] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACLITEM_SET_GOPTIONS] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ACLITEM_SET_GOPTIONS!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1004,6 +1052,13 @@ macro_rules! __pgrx_c_args_ACLITEM_SET_GOPTIONS {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACLITEM_SET_GOPTIONS] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ACLITEM_SET_GOPTIONS!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1020,7 +1075,7 @@ macro_rules! __pgrx_c_args_ACLITEM_SET_GOPTIONS {
         $crate::ACLITEM_SET_GOPTIONS!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ACLITEM_SET_GOPTIONS from acl.h:76
@@ -1200,13 +1255,13 @@ macro_rules! ACLITEM_SET_GOPTIONS {
         $crate::__pgrx_c_args_ACLITEM_SET_GOPTIONS!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $item:tt, $goptions:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ACLITEM_SET_GOPTIONS!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $item:tt, $goptions:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ACLITEM_SET_GOPTIONS!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1220,7 +1275,7 @@ macro_rules! ACLITEM_SET_GOPTIONS {
                         $crate::__pgrx_c_operand!(@check_safety; $goptions);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -1377,7 +1432,7 @@ macro_rules! ACLITEM_SET_GOPTIONS {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1603,6 +1658,13 @@ macro_rules! __pgrx_c_args_ACLITEM_SET_PRIVS {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACLITEM_SET_PRIVS] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ACLITEM_SET_PRIVS!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1664,6 +1726,11 @@ macro_rules! __pgrx_c_args_ACLITEM_SET_PRIVS {
             @argument [__pgrx_c_args_ACLITEM_SET_PRIVS] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACLITEM_SET_PRIVS] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ACLITEM_SET_PRIVS!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1701,6 +1768,13 @@ macro_rules! __pgrx_c_args_ACLITEM_SET_PRIVS {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACLITEM_SET_PRIVS] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ACLITEM_SET_PRIVS!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1717,7 +1791,7 @@ macro_rules! __pgrx_c_args_ACLITEM_SET_PRIVS {
         $crate::ACLITEM_SET_PRIVS!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ACLITEM_SET_PRIVS from acl.h:73
@@ -1855,13 +1929,13 @@ macro_rules! ACLITEM_SET_PRIVS {
         $crate::__pgrx_c_args_ACLITEM_SET_PRIVS!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $item:tt, $privs:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ACLITEM_SET_PRIVS!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $item:tt, $privs:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ACLITEM_SET_PRIVS!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1875,7 +1949,7 @@ macro_rules! ACLITEM_SET_PRIVS {
                         $crate::__pgrx_c_operand!(@check_safety; $privs);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -1988,7 +2062,7 @@ macro_rules! ACLITEM_SET_PRIVS {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2175,6 +2249,13 @@ macro_rules! __pgrx_c_args_ACLITEM_SET_PRIVS_GOPTIONS {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACLITEM_SET_PRIVS_GOPTIONS] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ACLITEM_SET_PRIVS_GOPTIONS!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2226,6 +2307,13 @@ macro_rules! __pgrx_c_args_ACLITEM_SET_PRIVS_GOPTIONS {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_ACLITEM_SET_PRIVS_GOPTIONS] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACLITEM_SET_PRIVS_GOPTIONS] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -2292,6 +2380,13 @@ macro_rules! __pgrx_c_args_ACLITEM_SET_PRIVS_GOPTIONS {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACLITEM_SET_PRIVS_GOPTIONS] [p3 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ACLITEM_SET_PRIVS_GOPTIONS!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2329,6 +2424,13 @@ macro_rules! __pgrx_c_args_ACLITEM_SET_PRIVS_GOPTIONS {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACLITEM_SET_PRIVS_GOPTIONS] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ACLITEM_SET_PRIVS_GOPTIONS!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2345,7 +2447,7 @@ macro_rules! __pgrx_c_args_ACLITEM_SET_PRIVS_GOPTIONS {
         $crate::ACLITEM_SET_PRIVS_GOPTIONS!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ACLITEM_SET_PRIVS_GOPTIONS from acl.h:82
@@ -2498,13 +2600,13 @@ macro_rules! ACLITEM_SET_PRIVS_GOPTIONS {
         $crate::__pgrx_c_args_ACLITEM_SET_PRIVS_GOPTIONS!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $item:tt, $privs:tt, $goptions:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ACLITEM_SET_PRIVS_GOPTIONS!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $item:tt, $privs:tt, $goptions:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ACLITEM_SET_PRIVS_GOPTIONS!(
@@ -2522,7 +2624,7 @@ macro_rules! ACLITEM_SET_PRIVS_GOPTIONS {
                         $crate::__pgrx_c_operand!(@check_safety; $goptions);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -2639,7 +2741,7 @@ macro_rules! ACLITEM_SET_PRIVS_GOPTIONS {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2834,6 +2936,13 @@ macro_rules! __pgrx_c_args_ACLITEM_SET_RIGHTS {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACLITEM_SET_RIGHTS] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ACLITEM_SET_RIGHTS!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2895,6 +3004,11 @@ macro_rules! __pgrx_c_args_ACLITEM_SET_RIGHTS {
             @argument [__pgrx_c_args_ACLITEM_SET_RIGHTS] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACLITEM_SET_RIGHTS] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ACLITEM_SET_RIGHTS!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2932,6 +3046,13 @@ macro_rules! __pgrx_c_args_ACLITEM_SET_RIGHTS {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACLITEM_SET_RIGHTS] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ACLITEM_SET_RIGHTS!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2948,7 +3069,7 @@ macro_rules! __pgrx_c_args_ACLITEM_SET_RIGHTS {
         $crate::ACLITEM_SET_RIGHTS!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ACLITEM_SET_RIGHTS from acl.h:79
@@ -3013,13 +3134,13 @@ macro_rules! ACLITEM_SET_RIGHTS {
         $crate::__pgrx_c_args_ACLITEM_SET_RIGHTS!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $item:tt, $rights:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ACLITEM_SET_RIGHTS!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $item:tt, $rights:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ACLITEM_SET_RIGHTS!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3033,7 +3154,7 @@ macro_rules! ACLITEM_SET_RIGHTS {
                         $crate::__pgrx_c_operand!(@check_safety; $rights);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -3061,7 +3182,7 @@ macro_rules! ACLITEM_SET_RIGHTS {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3177,6 +3298,11 @@ macro_rules! __pgrx_c_args_ACL_DAT {
             @argument [__pgrx_c_args_ACL_DAT] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACL_DAT] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ACL_DAT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3212,6 +3338,11 @@ macro_rules! __pgrx_c_args_ACL_DAT {
             @argument [__pgrx_c_args_ACL_DAT] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACL_DAT] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ACL_DAT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3228,7 +3359,7 @@ macro_rules! __pgrx_c_args_ACL_DAT {
         $crate::ACL_DAT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ACL_DAT from acl.h:109
@@ -3618,13 +3749,13 @@ macro_rules! ACL_DAT {
         $crate::__pgrx_c_args_ACL_DAT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ACL:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ACL_DAT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $ACL:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ACL_DAT!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3638,7 +3769,7 @@ macro_rules! ACL_DAT {
                         $crate::__pgrx_c_operand!(@check_safety; $ACL);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -4003,7 +4134,7 @@ macro_rules! ACL_DAT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4450,6 +4581,11 @@ macro_rules! __pgrx_c_args_ACL_GRANT_OPTION_FOR {
             @argument [__pgrx_c_args_ACL_GRANT_OPTION_FOR] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACL_GRANT_OPTION_FOR] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ACL_GRANT_OPTION_FOR!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4487,6 +4623,13 @@ macro_rules! __pgrx_c_args_ACL_GRANT_OPTION_FOR {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACL_GRANT_OPTION_FOR] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ACL_GRANT_OPTION_FOR!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4503,7 +4646,7 @@ macro_rules! __pgrx_c_args_ACL_GRANT_OPTION_FOR {
         $crate::ACL_GRANT_OPTION_FOR!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ACL_GRANT_OPTION_FOR from acl.h:70
@@ -4577,13 +4720,13 @@ macro_rules! ACL_GRANT_OPTION_FOR {
         $crate::__pgrx_c_args_ACL_GRANT_OPTION_FOR!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $privs:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ACL_GRANT_OPTION_FOR!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $privs:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ACL_GRANT_OPTION_FOR!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4596,7 +4739,7 @@ macro_rules! ACL_GRANT_OPTION_FOR {
                         $crate::__pgrx_c_operand!(@check_safety; $privs);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::shl::<
@@ -4650,7 +4793,7 @@ macro_rules! ACL_GRANT_OPTION_FOR {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4776,6 +4919,11 @@ macro_rules! __pgrx_c_args_ACL_NUM {
             @argument [__pgrx_c_args_ACL_NUM] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACL_NUM] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ACL_NUM!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4811,6 +4959,11 @@ macro_rules! __pgrx_c_args_ACL_NUM {
             @argument [__pgrx_c_args_ACL_NUM] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACL_NUM] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ACL_NUM!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4827,7 +4980,7 @@ macro_rules! __pgrx_c_args_ACL_NUM {
         $crate::ACL_NUM!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ACL_NUM from acl.h:108
@@ -5095,7 +5248,7 @@ macro_rules! ACL_NUM {
                         $crate::__pgrx_c_operand!(@check_safety; $ACL);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::index(
                             (
@@ -5169,7 +5322,7 @@ macro_rules! ACL_NUM {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5339,6 +5492,11 @@ macro_rules! __pgrx_c_args_ACL_N_SIZE {
             @argument [__pgrx_c_args_ACL_N_SIZE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACL_N_SIZE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ACL_N_SIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5374,6 +5532,11 @@ macro_rules! __pgrx_c_args_ACL_N_SIZE {
             @argument [__pgrx_c_args_ACL_N_SIZE] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACL_N_SIZE] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ACL_N_SIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5390,7 +5553,7 @@ macro_rules! __pgrx_c_args_ACL_N_SIZE {
         $crate::ACL_N_SIZE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ACL_N_SIZE from acl.h:110
@@ -5640,13 +5803,13 @@ macro_rules! ACL_N_SIZE {
         $crate::__pgrx_c_args_ACL_N_SIZE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $N:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ACL_N_SIZE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $N:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ACL_N_SIZE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5660,7 +5823,7 @@ macro_rules! ACL_N_SIZE {
                         $crate::__pgrx_c_operand!(@check_safety; $N);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                             $crate::__pgrx_c_macros::expression::add::<
@@ -5890,7 +6053,7 @@ macro_rules! ACL_N_SIZE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6194,6 +6357,11 @@ macro_rules! __pgrx_c_args_ACL_OPTION_TO_PRIVS {
             @argument [__pgrx_c_args_ACL_OPTION_TO_PRIVS] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACL_OPTION_TO_PRIVS] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ACL_OPTION_TO_PRIVS!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6231,6 +6399,13 @@ macro_rules! __pgrx_c_args_ACL_OPTION_TO_PRIVS {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACL_OPTION_TO_PRIVS] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ACL_OPTION_TO_PRIVS!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6247,7 +6422,7 @@ macro_rules! __pgrx_c_args_ACL_OPTION_TO_PRIVS {
         $crate::ACL_OPTION_TO_PRIVS!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ACL_OPTION_TO_PRIVS from acl.h:71
@@ -6323,13 +6498,13 @@ macro_rules! ACL_OPTION_TO_PRIVS {
         $crate::__pgrx_c_args_ACL_OPTION_TO_PRIVS!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $privs:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ACL_OPTION_TO_PRIVS!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $privs:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ACL_OPTION_TO_PRIVS!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6342,7 +6517,7 @@ macro_rules! ACL_OPTION_TO_PRIVS {
                         $crate::__pgrx_c_operand!(@check_safety; $privs);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -6392,7 +6567,7 @@ macro_rules! ACL_OPTION_TO_PRIVS {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6522,6 +6697,11 @@ macro_rules! __pgrx_c_args_ACL_SIZE {
             @argument [__pgrx_c_args_ACL_SIZE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACL_SIZE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ACL_SIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6557,6 +6737,11 @@ macro_rules! __pgrx_c_args_ACL_SIZE {
             @argument [__pgrx_c_args_ACL_SIZE] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ACL_SIZE] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ACL_SIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6573,7 +6758,7 @@ macro_rules! __pgrx_c_args_ACL_SIZE {
         $crate::ACL_SIZE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ACL_SIZE from acl.h:111
@@ -6643,13 +6828,13 @@ macro_rules! ACL_SIZE {
         $crate::__pgrx_c_args_ACL_SIZE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ACL:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ACL_SIZE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $ACL:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ACL_SIZE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6663,7 +6848,7 @@ macro_rules! ACL_SIZE {
                         $crate::__pgrx_c_operand!(@check_safety; $ACL);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -6698,7 +6883,7 @@ macro_rules! ACL_SIZE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6824,6 +7009,11 @@ macro_rules! __pgrx_c_args_DatumGetAclItemP {
             @argument [__pgrx_c_args_DatumGetAclItemP] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetAclItemP] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetAclItemP!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6861,6 +7051,13 @@ macro_rules! __pgrx_c_args_DatumGetAclItemP {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetAclItemP] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetAclItemP!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6877,7 +7074,7 @@ macro_rules! __pgrx_c_args_DatumGetAclItemP {
         $crate::DatumGetAclItemP!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DatumGetAclItemP from acl.h:116
@@ -6962,13 +7159,13 @@ macro_rules! DatumGetAclItemP {
         $crate::__pgrx_c_args_DatumGetAclItemP!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetAclItemP!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetAclItemP!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6981,7 +7178,7 @@ macro_rules! DatumGetAclItemP {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -7029,7 +7226,7 @@ macro_rules! DatumGetAclItemP {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7168,6 +7365,11 @@ macro_rules! __pgrx_c_args_DatumGetAclP {
             @argument [__pgrx_c_args_DatumGetAclP] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetAclP] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetAclP!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7203,6 +7405,11 @@ macro_rules! __pgrx_c_args_DatumGetAclP {
             @argument [__pgrx_c_args_DatumGetAclP] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetAclP] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetAclP!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7219,7 +7426,7 @@ macro_rules! __pgrx_c_args_DatumGetAclP {
         $crate::DatumGetAclP!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DatumGetAclP from acl.h:120
@@ -7361,13 +7568,13 @@ macro_rules! DatumGetAclP {
         $crate::__pgrx_c_args_DatumGetAclP!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetAclP!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetAclP!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7381,7 +7588,7 @@ macro_rules! DatumGetAclP {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -7487,7 +7694,7 @@ macro_rules! DatumGetAclP {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7683,6 +7890,11 @@ macro_rules! __pgrx_c_args_DatumGetAclPCopy {
             @argument [__pgrx_c_args_DatumGetAclPCopy] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetAclPCopy] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetAclPCopy!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7720,6 +7932,13 @@ macro_rules! __pgrx_c_args_DatumGetAclPCopy {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetAclPCopy] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetAclPCopy!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7736,7 +7955,7 @@ macro_rules! __pgrx_c_args_DatumGetAclPCopy {
         $crate::DatumGetAclPCopy!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DatumGetAclPCopy from acl.h:121
@@ -7878,13 +8097,13 @@ macro_rules! DatumGetAclPCopy {
         $crate::__pgrx_c_args_DatumGetAclPCopy!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetAclPCopy!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetAclPCopy!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7898,7 +8117,7 @@ macro_rules! DatumGetAclPCopy {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -8004,7 +8223,7 @@ macro_rules! DatumGetAclPCopy {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8152,7 +8371,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_ACLITEM_P {
         $crate::__pgrx_c_args_PG_GETARG_ACLITEM_P!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_ACLITEM_P!(
@@ -8161,7 +8380,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_ACLITEM_P {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_ACLITEM_P!(
@@ -8251,6 +8470,11 @@ macro_rules! __pgrx_c_args_PG_GETARG_ACLITEM_P {
             @argument [__pgrx_c_args_PG_GETARG_ACLITEM_P] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_GETARG_ACLITEM_P] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PG_GETARG_ACLITEM_P!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8288,6 +8512,13 @@ macro_rules! __pgrx_c_args_PG_GETARG_ACLITEM_P {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_GETARG_ACLITEM_P] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_ACLITEM_P!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8304,7 +8535,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_ACLITEM_P {
         $crate::PG_GETARG_ACLITEM_P!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PG_GETARG_ACLITEM_P from acl.h:117
@@ -8439,13 +8670,13 @@ macro_rules! PG_GETARG_ACLITEM_P {
         $crate::__pgrx_c_args_PG_GETARG_ACLITEM_P!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $n:tt, $fcinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_ACLITEM_P!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $n:tt, $fcinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_ACLITEM_P!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8460,7 +8691,7 @@ macro_rules! PG_GETARG_ACLITEM_P {
                         $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -8556,7 +8787,7 @@ macro_rules! PG_GETARG_ACLITEM_P {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8694,7 +8925,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_ACL_P {
         $crate::__pgrx_c_args_PG_GETARG_ACL_P!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_ACL_P!(
@@ -8703,7 +8934,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_ACL_P {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_ACL_P!(
@@ -8793,6 +9024,11 @@ macro_rules! __pgrx_c_args_PG_GETARG_ACL_P {
             @argument [__pgrx_c_args_PG_GETARG_ACL_P] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_GETARG_ACL_P] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PG_GETARG_ACL_P!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8830,6 +9066,13 @@ macro_rules! __pgrx_c_args_PG_GETARG_ACL_P {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_GETARG_ACL_P] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_ACL_P!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8846,7 +9089,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_ACL_P {
         $crate::PG_GETARG_ACL_P!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PG_GETARG_ACL_P from acl.h:122
@@ -9036,13 +9279,13 @@ macro_rules! PG_GETARG_ACL_P {
         $crate::__pgrx_c_args_PG_GETARG_ACL_P!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $n:tt, $fcinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_ACL_P!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $n:tt, $fcinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_ACL_P!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -9057,7 +9300,7 @@ macro_rules! PG_GETARG_ACL_P {
                         $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -9206,7 +9449,7 @@ macro_rules! PG_GETARG_ACL_P {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9402,7 +9645,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_ACL_P_COPY {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_ACL_P_COPY!(
@@ -9411,7 +9654,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_ACL_P_COPY {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_ACL_P_COPY!(
@@ -9501,6 +9744,11 @@ macro_rules! __pgrx_c_args_PG_GETARG_ACL_P_COPY {
             @argument [__pgrx_c_args_PG_GETARG_ACL_P_COPY] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_GETARG_ACL_P_COPY] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PG_GETARG_ACL_P_COPY!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9538,6 +9786,13 @@ macro_rules! __pgrx_c_args_PG_GETARG_ACL_P_COPY {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_GETARG_ACL_P_COPY] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_ACL_P_COPY!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9554,7 +9809,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_ACL_P_COPY {
         $crate::PG_GETARG_ACL_P_COPY!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PG_GETARG_ACL_P_COPY from acl.h:123
@@ -9744,13 +9999,13 @@ macro_rules! PG_GETARG_ACL_P_COPY {
         $crate::__pgrx_c_args_PG_GETARG_ACL_P_COPY!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $n:tt, $fcinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_ACL_P_COPY!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $n:tt, $fcinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_ACL_P_COPY!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -9765,7 +10020,7 @@ macro_rules! PG_GETARG_ACL_P_COPY {
                         $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -9914,7 +10169,7 @@ macro_rules! PG_GETARG_ACL_P_COPY {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10155,6 +10410,11 @@ macro_rules! __pgrx_c_args_PG_RETURN_ACLITEM_P {
             @argument [__pgrx_c_args_PG_RETURN_ACLITEM_P] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_RETURN_ACLITEM_P] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PG_RETURN_ACLITEM_P!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10192,6 +10452,13 @@ macro_rules! __pgrx_c_args_PG_RETURN_ACLITEM_P {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_RETURN_ACLITEM_P] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_ACLITEM_P!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10208,7 +10475,7 @@ macro_rules! __pgrx_c_args_PG_RETURN_ACLITEM_P {
         $crate::PG_RETURN_ACLITEM_P!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PG_RETURN_ACLITEM_P from acl.h:118
@@ -10433,7 +10700,7 @@ macro_rules! PG_RETURN_ACLITEM_P {
         )
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_ACLITEM_P!(@collect __pgrx_emit_public []; $($raw)*)
@@ -10517,6 +10784,11 @@ macro_rules! __pgrx_c_args_PG_RETURN_ACL_P {
             @argument [__pgrx_c_args_PG_RETURN_ACL_P] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_RETURN_ACL_P] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PG_RETURN_ACL_P!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10554,6 +10826,13 @@ macro_rules! __pgrx_c_args_PG_RETURN_ACL_P {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_RETURN_ACL_P] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_ACL_P!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10570,7 +10849,7 @@ macro_rules! __pgrx_c_args_PG_RETURN_ACL_P {
         $crate::PG_RETURN_ACL_P!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PG_RETURN_ACL_P from acl.h:124
@@ -10795,7 +11074,7 @@ macro_rules! PG_RETURN_ACL_P {
         )
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_ACL_P!(@collect __pgrx_emit_public []; $($raw)*)

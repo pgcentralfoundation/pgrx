@@ -74,6 +74,13 @@ macro_rules! __pgrx_c_args_ObjectAddressSet {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ObjectAddressSet] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ObjectAddressSet!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -125,6 +132,13 @@ macro_rules! __pgrx_c_args_ObjectAddressSet {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_ObjectAddressSet] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ObjectAddressSet] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -189,6 +203,11 @@ macro_rules! __pgrx_c_args_ObjectAddressSet {
             @argument [__pgrx_c_args_ObjectAddressSet] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ObjectAddressSet] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ObjectAddressSet!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -226,6 +245,13 @@ macro_rules! __pgrx_c_args_ObjectAddressSet {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ObjectAddressSet] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ObjectAddressSet!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -242,7 +268,7 @@ macro_rules! __pgrx_c_args_ObjectAddressSet {
         $crate::ObjectAddressSet!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ObjectAddressSet from objectaddress.h:41
@@ -335,7 +361,7 @@ macro_rules! ObjectAddressSet {
         $crate::__pgrx_c_args_ObjectAddressSet!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_ObjectAddressSet!(@collect __pgrx_emit_public []; $($raw)*)
@@ -412,6 +438,13 @@ macro_rules! __pgrx_c_args_ObjectAddressSubSet {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ObjectAddressSubSet] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ObjectAddressSubSet!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -466,6 +499,13 @@ macro_rules! __pgrx_c_args_ObjectAddressSubSet {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ObjectAddressSubSet] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ObjectAddressSubSet!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -517,6 +557,13 @@ macro_rules! __pgrx_c_args_ObjectAddressSubSet {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_ObjectAddressSubSet] [p3 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ObjectAddressSubSet] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -581,6 +628,11 @@ macro_rules! __pgrx_c_args_ObjectAddressSubSet {
             @argument [__pgrx_c_args_ObjectAddressSubSet] [p4 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ObjectAddressSubSet] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ObjectAddressSubSet!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -618,6 +670,13 @@ macro_rules! __pgrx_c_args_ObjectAddressSubSet {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ObjectAddressSubSet] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ObjectAddressSubSet!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -634,7 +693,7 @@ macro_rules! __pgrx_c_args_ObjectAddressSubSet {
         $crate::ObjectAddressSubSet!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ObjectAddressSubSet from objectaddress.h:34
@@ -729,7 +788,7 @@ macro_rules! ObjectAddressSubSet {
         $crate::__pgrx_c_args_ObjectAddressSubSet!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_ObjectAddressSubSet!(@collect __pgrx_emit_public []; $($raw)*)

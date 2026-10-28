@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_PGLZ_MAX_OUTPUT {
             @argument [__pgrx_c_args_PGLZ_MAX_OUTPUT] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PGLZ_MAX_OUTPUT] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PGLZ_MAX_OUTPUT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -118,6 +123,13 @@ macro_rules! __pgrx_c_args_PGLZ_MAX_OUTPUT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PGLZ_MAX_OUTPUT] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PGLZ_MAX_OUTPUT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -134,7 +146,7 @@ macro_rules! __pgrx_c_args_PGLZ_MAX_OUTPUT {
         $crate::PGLZ_MAX_OUTPUT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PGLZ_MAX_OUTPUT from pg_lzcompress.h:21
@@ -188,13 +200,13 @@ macro_rules! PGLZ_MAX_OUTPUT {
         $crate::__pgrx_c_args_PGLZ_MAX_OUTPUT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $_dlen:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PGLZ_MAX_OUTPUT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $_dlen:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PGLZ_MAX_OUTPUT!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -207,7 +219,7 @@ macro_rules! PGLZ_MAX_OUTPUT {
                         $crate::__pgrx_c_operand!(@check_safety; $_dlen);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::add::<
@@ -230,7 +242,7 @@ macro_rules! PGLZ_MAX_OUTPUT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

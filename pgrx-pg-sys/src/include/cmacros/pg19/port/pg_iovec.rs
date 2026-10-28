@@ -72,6 +72,11 @@ macro_rules! __pgrx_c_args_pg_preadv {
             @argument [__pgrx_c_args_pg_preadv] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_preadv] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_preadv!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -124,6 +129,11 @@ macro_rules! __pgrx_c_args_pg_preadv {
             @argument [__pgrx_c_args_pg_preadv] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_preadv] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_preadv!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -174,6 +184,11 @@ macro_rules! __pgrx_c_args_pg_preadv {
     (@p2 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_pg_preadv] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_preadv] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -237,6 +252,11 @@ macro_rules! __pgrx_c_args_pg_preadv {
             @argument [__pgrx_c_args_pg_preadv] [p4 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_preadv] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_preadv!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -272,6 +292,11 @@ macro_rules! __pgrx_c_args_pg_preadv {
             @argument [__pgrx_c_args_pg_preadv] [p4 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_preadv] [p4 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_preadv!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -288,7 +313,7 @@ macro_rules! __pgrx_c_args_pg_preadv {
         $crate::pg_preadv!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_preadv from pg_iovec.h:53
@@ -429,13 +454,13 @@ macro_rules! pg_preadv {
         $crate::__pgrx_c_args_pg_preadv!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $fd:tt, $iov:tt, $iovcnt:tt, $offset:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_preadv!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $fd:tt, $iov:tt, $iovcnt:tt, $offset:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_preadv!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -451,7 +476,7 @@ macro_rules! pg_preadv {
                         $crate::__pgrx_c_operand!(@check_safety; $offset);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -529,7 +554,7 @@ macro_rules! pg_preadv {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -685,6 +710,11 @@ macro_rules! __pgrx_c_args_pg_pwritev {
             @argument [__pgrx_c_args_pg_pwritev] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_pwritev] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_pwritev!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -737,6 +767,11 @@ macro_rules! __pgrx_c_args_pg_pwritev {
             @argument [__pgrx_c_args_pg_pwritev] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_pwritev] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_pwritev!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -787,6 +822,11 @@ macro_rules! __pgrx_c_args_pg_pwritev {
     (@p2 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_pg_pwritev] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_pwritev] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -850,6 +890,11 @@ macro_rules! __pgrx_c_args_pg_pwritev {
             @argument [__pgrx_c_args_pg_pwritev] [p4 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_pwritev] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_pwritev!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -885,6 +930,11 @@ macro_rules! __pgrx_c_args_pg_pwritev {
             @argument [__pgrx_c_args_pg_pwritev] [p4 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_pwritev] [p4 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_pwritev!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -901,7 +951,7 @@ macro_rules! __pgrx_c_args_pg_pwritev {
         $crate::pg_pwritev!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_pwritev from pg_iovec.h:92
@@ -1042,13 +1092,13 @@ macro_rules! pg_pwritev {
         $crate::__pgrx_c_args_pg_pwritev!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $fd:tt, $iov:tt, $iovcnt:tt, $offset:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_pwritev!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $fd:tt, $iov:tt, $iovcnt:tt, $offset:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_pwritev!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1064,7 +1114,7 @@ macro_rules! pg_pwritev {
                         $crate::__pgrx_c_operand!(@check_safety; $offset);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1142,7 +1192,7 @@ macro_rules! pg_pwritev {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

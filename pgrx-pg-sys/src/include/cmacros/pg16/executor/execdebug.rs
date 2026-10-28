@@ -50,13 +50,13 @@ macro_rules! __pgrx_c_args_ENL1_printf {
         $crate::__pgrx_c_args_ENL1_printf!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::ENL1_printf!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ENL1_printf from execdebug.h:78
@@ -81,31 +81,31 @@ macro_rules! ENL1_printf {
     };
     (@__pgrx_emit_public; $message:tt $(,)?) => {};
     (@__pgrx_emit_value; $message:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ENL1_printf!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $message:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ENL1_printf!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $message:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ENL1_printf!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $message:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_size; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ENL1_printf!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $message:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_discard; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ENL1_printf!(@collect __pgrx_emit_discard []; $($raw)*)
@@ -158,7 +158,7 @@ macro_rules! __pgrx_c_args_MJ1_printf {
         $crate::__pgrx_c_args_MJ1_printf!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ1_printf!(
@@ -178,13 +178,13 @@ macro_rules! __pgrx_c_args_MJ1_printf {
         $crate::__pgrx_c_args_MJ1_printf!(@ignore1 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore1 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::MJ1_printf!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro MJ1_printf from execdebug.h:121
@@ -209,31 +209,31 @@ macro_rules! MJ1_printf {
     };
     (@__pgrx_emit_public; $s:tt, $p:tt $(,)?) => {};
     (@__pgrx_emit_value; $s:tt, $p:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ1_printf!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $s:tt, $p:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ1_printf!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $s:tt, $p:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ1_printf!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $s:tt, $p:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_size; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ1_printf!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $s:tt, $p:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_discard; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ1_printf!(@collect __pgrx_emit_discard []; $($raw)*)
@@ -286,7 +286,7 @@ macro_rules! __pgrx_c_args_MJ2_printf {
         $crate::__pgrx_c_args_MJ2_printf!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ2_printf!(
@@ -303,7 +303,7 @@ macro_rules! __pgrx_c_args_MJ2_printf {
         $crate::__pgrx_c_args_MJ2_printf!(@ignore1 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore1 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p2 $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ2_printf!(
@@ -323,13 +323,13 @@ macro_rules! __pgrx_c_args_MJ2_printf {
         $crate::__pgrx_c_args_MJ2_printf!(@ignore2 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore2 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p3 $mode:ident [$($done:tt)*];) => {
         $crate::MJ2_printf!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro MJ2_printf from execdebug.h:122
@@ -354,31 +354,31 @@ macro_rules! MJ2_printf {
     };
     (@__pgrx_emit_public; $s:tt, $p1:tt, $p2:tt $(,)?) => {};
     (@__pgrx_emit_value; $s:tt, $p1:tt, $p2:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ2_printf!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $s:tt, $p1:tt, $p2:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ2_printf!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $s:tt, $p1:tt, $p2:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ2_printf!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $s:tt, $p1:tt, $p2:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_size; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ2_printf!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $s:tt, $p1:tt, $p2:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_discard; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ2_printf!(@collect __pgrx_emit_discard []; $($raw)*)
@@ -434,13 +434,13 @@ macro_rules! __pgrx_c_args_MJ_DEBUG_COMPARE {
         $crate::__pgrx_c_args_MJ_DEBUG_COMPARE!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::MJ_DEBUG_COMPARE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro MJ_DEBUG_COMPARE from execdebug.h:125
@@ -465,31 +465,31 @@ macro_rules! MJ_DEBUG_COMPARE {
     };
     (@__pgrx_emit_public; $res:tt $(,)?) => {};
     (@__pgrx_emit_value; $res:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_DEBUG_COMPARE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $res:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_DEBUG_COMPARE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $res:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_DEBUG_COMPARE!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $res:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_size; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_DEBUG_COMPARE!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $res:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_discard; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_DEBUG_COMPARE!(@collect __pgrx_emit_discard []; $($raw)*)
@@ -548,13 +548,13 @@ macro_rules! __pgrx_c_args_MJ_DEBUG_PROC_NODE {
         )
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::MJ_DEBUG_PROC_NODE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro MJ_DEBUG_PROC_NODE from execdebug.h:127
@@ -579,31 +579,31 @@ macro_rules! MJ_DEBUG_PROC_NODE {
     };
     (@__pgrx_emit_public; $slot:tt $(,)?) => {};
     (@__pgrx_emit_value; $slot:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_DEBUG_PROC_NODE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $slot:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_DEBUG_PROC_NODE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $slot:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_DEBUG_PROC_NODE!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $slot:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_size; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_DEBUG_PROC_NODE!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $slot:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_discard; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_DEBUG_PROC_NODE!(@collect __pgrx_emit_discard []; $($raw)*)
@@ -656,7 +656,7 @@ macro_rules! __pgrx_c_args_MJ_DEBUG_QUAL {
         $crate::__pgrx_c_args_MJ_DEBUG_QUAL!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_DEBUG_QUAL!(
@@ -676,13 +676,13 @@ macro_rules! __pgrx_c_args_MJ_DEBUG_QUAL {
         $crate::__pgrx_c_args_MJ_DEBUG_QUAL!(@ignore1 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore1 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::MJ_DEBUG_QUAL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro MJ_DEBUG_QUAL from execdebug.h:126
@@ -707,31 +707,31 @@ macro_rules! MJ_DEBUG_QUAL {
     };
     (@__pgrx_emit_public; $clause:tt, $res:tt $(,)?) => {};
     (@__pgrx_emit_value; $clause:tt, $res:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_DEBUG_QUAL!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $clause:tt, $res:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_DEBUG_QUAL!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $clause:tt, $res:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_DEBUG_QUAL!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $clause:tt, $res:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_size; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_DEBUG_QUAL!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $clause:tt, $res:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_discard; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_DEBUG_QUAL!(@collect __pgrx_emit_discard []; $($raw)*)
@@ -787,13 +787,13 @@ macro_rules! __pgrx_c_args_MJ_debugtup {
         $crate::__pgrx_c_args_MJ_debugtup!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::MJ_debugtup!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro MJ_debugtup from execdebug.h:123
@@ -818,31 +818,31 @@ macro_rules! MJ_debugtup {
     };
     (@__pgrx_emit_public; $slot:tt $(,)?) => {};
     (@__pgrx_emit_value; $slot:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_debugtup!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $slot:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_debugtup!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $slot:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_debugtup!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $slot:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_size; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_debugtup!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $slot:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_discard; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_debugtup!(@collect __pgrx_emit_discard []; $($raw)*)
@@ -898,13 +898,13 @@ macro_rules! __pgrx_c_args_MJ_dump {
         $crate::__pgrx_c_args_MJ_dump!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::MJ_dump!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro MJ_dump from execdebug.h:124
@@ -929,31 +929,31 @@ macro_rules! MJ_dump {
     };
     (@__pgrx_emit_public; $state:tt $(,)?) => {};
     (@__pgrx_emit_value; $state:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_dump!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $state:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_dump!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $state:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_dump!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $state:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_size; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_dump!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $state:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_discard; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_dump!(@collect __pgrx_emit_discard []; $($raw)*)
@@ -1009,13 +1009,13 @@ macro_rules! __pgrx_c_args_MJ_nodeDisplay {
         $crate::__pgrx_c_args_MJ_nodeDisplay!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::MJ_nodeDisplay!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro MJ_nodeDisplay from execdebug.h:119
@@ -1040,31 +1040,31 @@ macro_rules! MJ_nodeDisplay {
     };
     (@__pgrx_emit_public; $l:tt $(,)?) => {};
     (@__pgrx_emit_value; $l:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_nodeDisplay!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $l:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_nodeDisplay!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $l:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_nodeDisplay!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $l:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_size; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_nodeDisplay!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $l:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_discard; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_nodeDisplay!(@collect __pgrx_emit_discard []; $($raw)*)
@@ -1120,13 +1120,13 @@ macro_rules! __pgrx_c_args_MJ_printf {
         $crate::__pgrx_c_args_MJ_printf!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::MJ_printf!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro MJ_printf from execdebug.h:120
@@ -1151,31 +1151,31 @@ macro_rules! MJ_printf {
     };
     (@__pgrx_emit_public; $s:tt $(,)?) => {};
     (@__pgrx_emit_value; $s:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_printf!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $s:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_printf!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $s:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_printf!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $s:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_size; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_printf!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $s:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_discard; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MJ_printf!(@collect __pgrx_emit_discard []; $($raw)*)
@@ -1228,7 +1228,7 @@ macro_rules! __pgrx_c_args_NL1_printf {
         $crate::__pgrx_c_args_NL1_printf!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NL1_printf!(
@@ -1248,13 +1248,13 @@ macro_rules! __pgrx_c_args_NL1_printf {
         $crate::__pgrx_c_args_NL1_printf!(@ignore1 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore1 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::NL1_printf!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro NL1_printf from execdebug.h:77
@@ -1279,31 +1279,31 @@ macro_rules! NL1_printf {
     };
     (@__pgrx_emit_public; $s:tt, $a:tt $(,)?) => {};
     (@__pgrx_emit_value; $s:tt, $a:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NL1_printf!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $s:tt, $a:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NL1_printf!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $s:tt, $a:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NL1_printf!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $s:tt, $a:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_size; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NL1_printf!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $s:tt, $a:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_discard; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NL1_printf!(@collect __pgrx_emit_discard []; $($raw)*)
@@ -1359,13 +1359,13 @@ macro_rules! __pgrx_c_args_NL_nodeDisplay {
         $crate::__pgrx_c_args_NL_nodeDisplay!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::NL_nodeDisplay!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro NL_nodeDisplay from execdebug.h:75
@@ -1390,31 +1390,31 @@ macro_rules! NL_nodeDisplay {
     };
     (@__pgrx_emit_public; $l:tt $(,)?) => {};
     (@__pgrx_emit_value; $l:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NL_nodeDisplay!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $l:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NL_nodeDisplay!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $l:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NL_nodeDisplay!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $l:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_size; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NL_nodeDisplay!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $l:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_discard; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NL_nodeDisplay!(@collect __pgrx_emit_discard []; $($raw)*)
@@ -1470,13 +1470,13 @@ macro_rules! __pgrx_c_args_NL_printf {
         $crate::__pgrx_c_args_NL_printf!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::NL_printf!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro NL_printf from execdebug.h:76
@@ -1501,31 +1501,31 @@ macro_rules! NL_printf {
     };
     (@__pgrx_emit_public; $s:tt $(,)?) => {};
     (@__pgrx_emit_value; $s:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NL_printf!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $s:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NL_printf!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $s:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NL_printf!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $s:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_size; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NL_printf!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $s:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_discard; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NL_printf!(@collect __pgrx_emit_discard []; $($raw)*)
@@ -1612,6 +1612,11 @@ macro_rules! __pgrx_c_args_NULL_OR_TUPLE {
             @argument [__pgrx_c_args_NULL_OR_TUPLE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_NULL_OR_TUPLE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_NULL_OR_TUPLE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1649,6 +1654,11 @@ macro_rules! __pgrx_c_args_NULL_OR_TUPLE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_NULL_OR_TUPLE] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_NULL_OR_TUPLE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1665,7 +1675,7 @@ macro_rules! __pgrx_c_args_NULL_OR_TUPLE {
         $crate::NULL_OR_TUPLE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro NULL_OR_TUPLE from execdebug.h:63
@@ -1873,13 +1883,13 @@ macro_rules! NULL_OR_TUPLE {
         $crate::__pgrx_c_args_NULL_OR_TUPLE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NULL_OR_TUPLE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NULL_OR_TUPLE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1893,7 +1903,7 @@ macro_rules! NULL_OR_TUPLE {
                         $crate::__pgrx_c_operand!(@check_safety; $slot);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -2080,7 +2090,7 @@ macro_rules! NULL_OR_TUPLE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2308,7 +2318,7 @@ macro_rules! __pgrx_c_args_SO1_printf {
         $crate::__pgrx_c_args_SO1_printf!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SO1_printf!(
@@ -2328,13 +2338,13 @@ macro_rules! __pgrx_c_args_SO1_printf {
         $crate::__pgrx_c_args_SO1_printf!(@ignore1 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore1 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::SO1_printf!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SO1_printf from execdebug.h:93
@@ -2359,31 +2369,31 @@ macro_rules! SO1_printf {
     };
     (@__pgrx_emit_public; $s:tt, $p:tt $(,)?) => {};
     (@__pgrx_emit_value; $s:tt, $p:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SO1_printf!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $s:tt, $p:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SO1_printf!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $s:tt, $p:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SO1_printf!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $s:tt, $p:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_size; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SO1_printf!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $s:tt, $p:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_discard; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SO1_printf!(@collect __pgrx_emit_discard []; $($raw)*)
@@ -2436,7 +2446,7 @@ macro_rules! __pgrx_c_args_SO2_printf {
         $crate::__pgrx_c_args_SO2_printf!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SO2_printf!(
@@ -2453,7 +2463,7 @@ macro_rules! __pgrx_c_args_SO2_printf {
         $crate::__pgrx_c_args_SO2_printf!(@ignore1 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore1 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p2 $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SO2_printf!(
@@ -2473,13 +2483,13 @@ macro_rules! __pgrx_c_args_SO2_printf {
         $crate::__pgrx_c_args_SO2_printf!(@ignore2 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore2 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p3 $mode:ident [$($done:tt)*];) => {
         $crate::SO2_printf!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SO2_printf from execdebug.h:94
@@ -2504,31 +2514,31 @@ macro_rules! SO2_printf {
     };
     (@__pgrx_emit_public; $s:tt, $p1:tt, $p2:tt $(,)?) => {};
     (@__pgrx_emit_value; $s:tt, $p1:tt, $p2:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SO2_printf!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $s:tt, $p1:tt, $p2:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SO2_printf!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $s:tt, $p1:tt, $p2:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SO2_printf!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $s:tt, $p1:tt, $p2:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_size; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SO2_printf!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $s:tt, $p1:tt, $p2:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_discard; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SO2_printf!(@collect __pgrx_emit_discard []; $($raw)*)
@@ -2584,13 +2594,13 @@ macro_rules! __pgrx_c_args_SO_nodeDisplay {
         $crate::__pgrx_c_args_SO_nodeDisplay!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::SO_nodeDisplay!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SO_nodeDisplay from execdebug.h:91
@@ -2615,31 +2625,31 @@ macro_rules! SO_nodeDisplay {
     };
     (@__pgrx_emit_public; $l:tt $(,)?) => {};
     (@__pgrx_emit_value; $l:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SO_nodeDisplay!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $l:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SO_nodeDisplay!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $l:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SO_nodeDisplay!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $l:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_size; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SO_nodeDisplay!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $l:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_discard; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SO_nodeDisplay!(@collect __pgrx_emit_discard []; $($raw)*)
@@ -2695,13 +2705,13 @@ macro_rules! __pgrx_c_args_SO_printf {
         $crate::__pgrx_c_args_SO_printf!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::SO_printf!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SO_printf from execdebug.h:92
@@ -2726,31 +2736,31 @@ macro_rules! SO_printf {
     };
     (@__pgrx_emit_public; $s:tt $(,)?) => {};
     (@__pgrx_emit_value; $s:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SO_printf!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $s:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SO_printf!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $s:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SO_printf!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $s:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_size; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SO_printf!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $s:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_discard; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SO_printf!(@collect __pgrx_emit_discard []; $($raw)*)
@@ -2835,6 +2845,11 @@ macro_rules! __pgrx_c_args_T_OR_F {
             @argument [__pgrx_c_args_T_OR_F] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_T_OR_F] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_T_OR_F!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2870,6 +2885,11 @@ macro_rules! __pgrx_c_args_T_OR_F {
             @argument [__pgrx_c_args_T_OR_F] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_T_OR_F] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_T_OR_F!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2886,7 +2906,7 @@ macro_rules! __pgrx_c_args_T_OR_F {
         $crate::T_OR_F!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro T_OR_F from execdebug.h:62
@@ -2966,13 +2986,13 @@ macro_rules! T_OR_F {
         $crate::__pgrx_c_args_T_OR_F!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_T_OR_F!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_T_OR_F!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2985,7 +3005,7 @@ macro_rules! T_OR_F {
                         $crate::__pgrx_c_operand!(@check_safety; $b);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -3047,7 +3067,7 @@ macro_rules! T_OR_F {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

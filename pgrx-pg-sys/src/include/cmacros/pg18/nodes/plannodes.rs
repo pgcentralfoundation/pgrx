@@ -86,6 +86,13 @@ macro_rules! __pgrx_c_args_RowMarkRequiresRowShareLock {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RowMarkRequiresRowShareLock] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RowMarkRequiresRowShareLock!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -123,6 +130,13 @@ macro_rules! __pgrx_c_args_RowMarkRequiresRowShareLock {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RowMarkRequiresRowShareLock] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RowMarkRequiresRowShareLock!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -139,7 +153,7 @@ macro_rules! __pgrx_c_args_RowMarkRequiresRowShareLock {
         $crate::RowMarkRequiresRowShareLock!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RowMarkRequiresRowShareLock from plannodes.h:1487
@@ -194,13 +208,13 @@ macro_rules! RowMarkRequiresRowShareLock {
         $crate::__pgrx_c_args_RowMarkRequiresRowShareLock!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $marktype:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RowMarkRequiresRowShareLock!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $marktype:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RowMarkRequiresRowShareLock!(
@@ -216,7 +230,7 @@ macro_rules! RowMarkRequiresRowShareLock {
                         $crate::__pgrx_c_operand!(@check_safety; $marktype);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::le(
@@ -235,7 +249,7 @@ macro_rules! RowMarkRequiresRowShareLock {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -344,6 +358,13 @@ macro_rules! __pgrx_c_args_exec_subplan_get_plan {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_exec_subplan_get_plan] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_exec_subplan_get_plan!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -405,6 +426,11 @@ macro_rules! __pgrx_c_args_exec_subplan_get_plan {
             @argument [__pgrx_c_args_exec_subplan_get_plan] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_exec_subplan_get_plan] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_exec_subplan_get_plan!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -442,6 +468,13 @@ macro_rules! __pgrx_c_args_exec_subplan_get_plan {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_exec_subplan_get_plan] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_exec_subplan_get_plan!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -458,7 +491,7 @@ macro_rules! __pgrx_c_args_exec_subplan_get_plan {
         $crate::exec_subplan_get_plan!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro exec_subplan_get_plan from plannodes.h:142
@@ -624,13 +657,13 @@ macro_rules! exec_subplan_get_plan {
         $crate::__pgrx_c_args_exec_subplan_get_plan!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $plannedstmt:tt, $subplan:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_exec_subplan_get_plan!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $plannedstmt:tt, $subplan:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_exec_subplan_get_plan!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -644,7 +677,7 @@ macro_rules! exec_subplan_get_plan {
                         $crate::__pgrx_c_operand!(@check_safety; $subplan);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -774,7 +807,7 @@ macro_rules! exec_subplan_get_plan {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -993,6 +1026,11 @@ macro_rules! __pgrx_c_args_innerPlan {
             @argument [__pgrx_c_args_innerPlan] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_innerPlan] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_innerPlan!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1028,6 +1066,11 @@ macro_rules! __pgrx_c_args_innerPlan {
             @argument [__pgrx_c_args_innerPlan] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_innerPlan] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_innerPlan!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1044,7 +1087,7 @@ macro_rules! __pgrx_c_args_innerPlan {
         $crate::innerPlan!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro innerPlan from plannodes.h:233
@@ -1196,7 +1239,7 @@ macro_rules! innerPlan {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_righttree,
@@ -1230,7 +1273,7 @@ macro_rules! innerPlan {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1359,6 +1402,11 @@ macro_rules! __pgrx_c_args_outerPlan {
             @argument [__pgrx_c_args_outerPlan] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_outerPlan] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_outerPlan!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1394,6 +1442,11 @@ macro_rules! __pgrx_c_args_outerPlan {
             @argument [__pgrx_c_args_outerPlan] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_outerPlan] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_outerPlan!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1410,7 +1463,7 @@ macro_rules! __pgrx_c_args_outerPlan {
         $crate::outerPlan!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro outerPlan from plannodes.h:234
@@ -1562,7 +1615,7 @@ macro_rules! outerPlan {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_lefttree,
@@ -1596,7 +1649,7 @@ macro_rules! outerPlan {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

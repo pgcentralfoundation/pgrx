@@ -74,6 +74,11 @@ macro_rules! __pgrx_c_args_VM_ALL_FROZEN {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VM_ALL_FROZEN] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VM_ALL_FROZEN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -126,6 +131,11 @@ macro_rules! __pgrx_c_args_VM_ALL_FROZEN {
             @argument [__pgrx_c_args_VM_ALL_FROZEN] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
             ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VM_ALL_FROZEN] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -189,6 +199,11 @@ macro_rules! __pgrx_c_args_VM_ALL_FROZEN {
             @argument [__pgrx_c_args_VM_ALL_FROZEN] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VM_ALL_FROZEN] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VM_ALL_FROZEN!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -226,6 +241,11 @@ macro_rules! __pgrx_c_args_VM_ALL_FROZEN {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VM_ALL_FROZEN] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VM_ALL_FROZEN!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -242,7 +262,7 @@ macro_rules! __pgrx_c_args_VM_ALL_FROZEN {
         $crate::VM_ALL_FROZEN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VM_ALL_FROZEN from visibilitymap.h:26
@@ -392,13 +412,13 @@ macro_rules! VM_ALL_FROZEN {
         $crate::__pgrx_c_args_VM_ALL_FROZEN!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $r:tt, $b:tt, $v:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VM_ALL_FROZEN!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $r:tt, $b:tt, $v:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VM_ALL_FROZEN!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -413,7 +433,7 @@ macro_rules! VM_ALL_FROZEN {
                         $crate::__pgrx_c_operand!(@check_safety; $v);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -532,7 +552,7 @@ macro_rules! VM_ALL_FROZEN {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -727,6 +747,11 @@ macro_rules! __pgrx_c_args_VM_ALL_VISIBLE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VM_ALL_VISIBLE] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VM_ALL_VISIBLE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -779,6 +804,11 @@ macro_rules! __pgrx_c_args_VM_ALL_VISIBLE {
             @argument [__pgrx_c_args_VM_ALL_VISIBLE] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
             ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VM_ALL_VISIBLE] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -842,6 +872,11 @@ macro_rules! __pgrx_c_args_VM_ALL_VISIBLE {
             @argument [__pgrx_c_args_VM_ALL_VISIBLE] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VM_ALL_VISIBLE] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VM_ALL_VISIBLE!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -879,6 +914,11 @@ macro_rules! __pgrx_c_args_VM_ALL_VISIBLE {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VM_ALL_VISIBLE] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VM_ALL_VISIBLE!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -895,7 +935,7 @@ macro_rules! __pgrx_c_args_VM_ALL_VISIBLE {
         $crate::VM_ALL_VISIBLE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VM_ALL_VISIBLE from visibilitymap.h:24
@@ -1045,13 +1085,13 @@ macro_rules! VM_ALL_VISIBLE {
         $crate::__pgrx_c_args_VM_ALL_VISIBLE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $r:tt, $b:tt, $v:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VM_ALL_VISIBLE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $r:tt, $b:tt, $v:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VM_ALL_VISIBLE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1066,7 +1106,7 @@ macro_rules! VM_ALL_VISIBLE {
                         $crate::__pgrx_c_operand!(@check_safety; $v);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -1185,7 +1225,7 @@ macro_rules! VM_ALL_VISIBLE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

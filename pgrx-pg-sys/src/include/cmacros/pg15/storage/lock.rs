@@ -77,6 +77,13 @@ macro_rules! __pgrx_c_args_GET_VXID_FROM_PGPROC {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GET_VXID_FROM_PGPROC] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_VXID_FROM_PGPROC!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -138,6 +145,11 @@ macro_rules! __pgrx_c_args_GET_VXID_FROM_PGPROC {
             @argument [__pgrx_c_args_GET_VXID_FROM_PGPROC] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GET_VXID_FROM_PGPROC] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GET_VXID_FROM_PGPROC!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -175,6 +187,13 @@ macro_rules! __pgrx_c_args_GET_VXID_FROM_PGPROC {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GET_VXID_FROM_PGPROC] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_VXID_FROM_PGPROC!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -191,7 +210,7 @@ macro_rules! __pgrx_c_args_GET_VXID_FROM_PGPROC {
         $crate::GET_VXID_FROM_PGPROC!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GET_VXID_FROM_PGPROC from lock.h:82
@@ -272,13 +291,13 @@ macro_rules! GET_VXID_FROM_PGPROC {
         $crate::__pgrx_c_args_GET_VXID_FROM_PGPROC!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $vxid:tt, $proc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GET_VXID_FROM_PGPROC!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $vxid:tt, $proc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GET_VXID_FROM_PGPROC!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -292,7 +311,7 @@ macro_rules! GET_VXID_FROM_PGPROC {
                         $crate::__pgrx_c_operand!(@check_safety; $proc);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -355,7 +374,7 @@ macro_rules! GET_VXID_FROM_PGPROC {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -496,6 +515,11 @@ macro_rules! __pgrx_c_args_LOCALLOCK_LOCKMETHOD {
             @argument [__pgrx_c_args_LOCALLOCK_LOCKMETHOD] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LOCALLOCK_LOCKMETHOD] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_LOCALLOCK_LOCKMETHOD!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -533,6 +557,13 @@ macro_rules! __pgrx_c_args_LOCALLOCK_LOCKMETHOD {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LOCALLOCK_LOCKMETHOD] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_LOCALLOCK_LOCKMETHOD!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -549,7 +580,7 @@ macro_rules! __pgrx_c_args_LOCALLOCK_LOCKMETHOD {
         $crate::LOCALLOCK_LOCKMETHOD!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro LOCALLOCK_LOCKMETHOD from lock.h:435
@@ -663,7 +694,7 @@ macro_rules! LOCALLOCK_LOCKMETHOD {
                         $crate::__pgrx_c_operand!(@check_safety; $llock);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
@@ -685,7 +716,7 @@ macro_rules! LOCALLOCK_LOCKMETHOD {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -802,6 +833,11 @@ macro_rules! __pgrx_c_args_LOCALLOCK_LOCKTAG {
             @argument [__pgrx_c_args_LOCALLOCK_LOCKTAG] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LOCALLOCK_LOCKTAG] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_LOCALLOCK_LOCKTAG!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -839,6 +875,13 @@ macro_rules! __pgrx_c_args_LOCALLOCK_LOCKTAG {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LOCALLOCK_LOCKTAG] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_LOCALLOCK_LOCKTAG!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -855,7 +898,7 @@ macro_rules! __pgrx_c_args_LOCALLOCK_LOCKTAG {
         $crate::LOCALLOCK_LOCKTAG!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro LOCALLOCK_LOCKTAG from lock.h:436
@@ -930,13 +973,13 @@ macro_rules! LOCALLOCK_LOCKTAG {
         $crate::__pgrx_c_args_LOCALLOCK_LOCKTAG!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $llock:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_LOCALLOCK_LOCKTAG!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $llock:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_LOCALLOCK_LOCKTAG!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -949,7 +992,7 @@ macro_rules! LOCALLOCK_LOCKTAG {
                         $crate::__pgrx_c_operand!(@check_safety; $llock);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             /* PGRX: LockTagType remains expanded because the C type has no corresponding named Rust binding. */
@@ -987,7 +1030,7 @@ macro_rules! LOCALLOCK_LOCKTAG {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1116,6 +1159,11 @@ macro_rules! __pgrx_c_args_LOCKBIT_OFF {
             @argument [__pgrx_c_args_LOCKBIT_OFF] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LOCKBIT_OFF] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_LOCKBIT_OFF!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1151,6 +1199,11 @@ macro_rules! __pgrx_c_args_LOCKBIT_OFF {
             @argument [__pgrx_c_args_LOCKBIT_OFF] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LOCKBIT_OFF] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_LOCKBIT_OFF!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1167,7 +1220,7 @@ macro_rules! __pgrx_c_args_LOCKBIT_OFF {
         $crate::LOCKBIT_OFF!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro LOCKBIT_OFF from lock.h:90
@@ -1233,13 +1286,13 @@ macro_rules! LOCKBIT_OFF {
         $crate::__pgrx_c_args_LOCKBIT_OFF!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $lockmode:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_LOCKBIT_OFF!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $lockmode:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_LOCKBIT_OFF!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1252,7 +1305,7 @@ macro_rules! LOCKBIT_OFF {
                         $crate::__pgrx_c_operand!(@check_safety; $lockmode);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitnot(
@@ -1290,7 +1343,7 @@ macro_rules! LOCKBIT_OFF {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1410,6 +1463,11 @@ macro_rules! __pgrx_c_args_LOCKBIT_ON {
             @argument [__pgrx_c_args_LOCKBIT_ON] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LOCKBIT_ON] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_LOCKBIT_ON!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1445,6 +1503,11 @@ macro_rules! __pgrx_c_args_LOCKBIT_ON {
             @argument [__pgrx_c_args_LOCKBIT_ON] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LOCKBIT_ON] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_LOCKBIT_ON!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1461,7 +1524,7 @@ macro_rules! __pgrx_c_args_LOCKBIT_ON {
         $crate::LOCKBIT_ON!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro LOCKBIT_ON from lock.h:89
@@ -1515,13 +1578,13 @@ macro_rules! LOCKBIT_ON {
         $crate::__pgrx_c_args_LOCKBIT_ON!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $lockmode:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_LOCKBIT_ON!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $lockmode:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_LOCKBIT_ON!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1534,7 +1597,7 @@ macro_rules! LOCKBIT_ON {
                         $crate::__pgrx_c_operand!(@check_safety; $lockmode);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::shl::<
@@ -1557,7 +1620,7 @@ macro_rules! LOCKBIT_ON {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1665,6 +1728,11 @@ macro_rules! __pgrx_c_args_LOCK_LOCKMETHOD {
             @argument [__pgrx_c_args_LOCK_LOCKMETHOD] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LOCK_LOCKMETHOD] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_LOCK_LOCKMETHOD!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1702,6 +1770,13 @@ macro_rules! __pgrx_c_args_LOCK_LOCKMETHOD {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LOCK_LOCKMETHOD] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_LOCK_LOCKMETHOD!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1718,7 +1793,7 @@ macro_rules! __pgrx_c_args_LOCK_LOCKMETHOD {
         $crate::LOCK_LOCKMETHOD!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro LOCK_LOCKMETHOD from lock.h:316
@@ -1783,13 +1858,13 @@ macro_rules! LOCK_LOCKMETHOD {
         $crate::__pgrx_c_args_LOCK_LOCKMETHOD!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $lock:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_LOCK_LOCKMETHOD!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $lock:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_LOCK_LOCKMETHOD!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1802,7 +1877,7 @@ macro_rules! LOCK_LOCKMETHOD {
                         $crate::__pgrx_c_operand!(@check_safety; $lock);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -1830,7 +1905,7 @@ macro_rules! LOCK_LOCKMETHOD {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1949,6 +2024,11 @@ macro_rules! __pgrx_c_args_LOCK_LOCKTAG {
             @argument [__pgrx_c_args_LOCK_LOCKTAG] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LOCK_LOCKTAG] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_LOCK_LOCKTAG!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1984,6 +2064,11 @@ macro_rules! __pgrx_c_args_LOCK_LOCKTAG {
             @argument [__pgrx_c_args_LOCK_LOCKTAG] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LOCK_LOCKTAG] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_LOCK_LOCKTAG!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2000,7 +2085,7 @@ macro_rules! __pgrx_c_args_LOCK_LOCKTAG {
         $crate::LOCK_LOCKTAG!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro LOCK_LOCKTAG from lock.h:317
@@ -2069,13 +2154,13 @@ macro_rules! LOCK_LOCKTAG {
         $crate::__pgrx_c_args_LOCK_LOCKTAG!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $lock:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_LOCK_LOCKTAG!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $lock:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_LOCK_LOCKTAG!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2088,7 +2173,7 @@ macro_rules! LOCK_LOCKTAG {
                         $crate::__pgrx_c_operand!(@check_safety; $lock);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             /* PGRX: LockTagType remains expanded because the C type has no corresponding named Rust binding. */
@@ -2120,7 +2205,7 @@ macro_rules! LOCK_LOCKTAG {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2248,6 +2333,13 @@ macro_rules! __pgrx_c_args_LocalTransactionIdIsValid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LocalTransactionIdIsValid] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_LocalTransactionIdIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2285,6 +2377,13 @@ macro_rules! __pgrx_c_args_LocalTransactionIdIsValid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LocalTransactionIdIsValid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_LocalTransactionIdIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2301,7 +2400,7 @@ macro_rules! __pgrx_c_args_LocalTransactionIdIsValid {
         $crate::LocalTransactionIdIsValid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro LocalTransactionIdIsValid from lock.h:71
@@ -2358,13 +2457,13 @@ macro_rules! LocalTransactionIdIsValid {
         $crate::__pgrx_c_args_LocalTransactionIdIsValid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $lxid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_LocalTransactionIdIsValid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $lxid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_LocalTransactionIdIsValid!(
@@ -2380,7 +2479,7 @@ macro_rules! LocalTransactionIdIsValid {
                         $crate::__pgrx_c_operand!(@check_safety; $lxid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -2403,7 +2502,7 @@ macro_rules! LocalTransactionIdIsValid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2515,6 +2614,11 @@ macro_rules! __pgrx_c_args_LockHashPartition {
             @argument [__pgrx_c_args_LockHashPartition] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LockHashPartition] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_LockHashPartition!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2552,6 +2656,13 @@ macro_rules! __pgrx_c_args_LockHashPartition {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LockHashPartition] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_LockHashPartition!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2568,7 +2679,7 @@ macro_rules! __pgrx_c_args_LockHashPartition {
         $crate::LockHashPartition!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro LockHashPartition from lock.h:517
@@ -2624,13 +2735,13 @@ macro_rules! LockHashPartition {
         $crate::__pgrx_c_args_LockHashPartition!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $hashcode:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_LockHashPartition!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $hashcode:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_LockHashPartition!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2643,7 +2754,7 @@ macro_rules! LockHashPartition {
                         $crate::__pgrx_c_operand!(@check_safety; $hashcode);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::rem(
@@ -2662,7 +2773,7 @@ macro_rules! LockHashPartition {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2775,6 +2886,11 @@ macro_rules! __pgrx_c_args_LockHashPartitionLock {
             @argument [__pgrx_c_args_LockHashPartitionLock] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LockHashPartitionLock] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_LockHashPartitionLock!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2812,6 +2928,13 @@ macro_rules! __pgrx_c_args_LockHashPartitionLock {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LockHashPartitionLock] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_LockHashPartitionLock!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2828,7 +2951,7 @@ macro_rules! __pgrx_c_args_LockHashPartitionLock {
         $crate::LockHashPartitionLock!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro LockHashPartitionLock from lock.h:519
@@ -2943,13 +3066,13 @@ macro_rules! LockHashPartitionLock {
         $crate::__pgrx_c_args_LockHashPartitionLock!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $hashcode:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_LockHashPartitionLock!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $hashcode:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_LockHashPartitionLock!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2963,7 +3086,7 @@ macro_rules! LockHashPartitionLock {
                         $crate::__pgrx_c_operand!(@check_safety; $hashcode);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::address(
@@ -3049,7 +3172,7 @@ macro_rules! LockHashPartitionLock {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3226,6 +3349,13 @@ macro_rules! __pgrx_c_args_LockHashPartitionLockByIndex {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LockHashPartitionLockByIndex] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_LockHashPartitionLockByIndex!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3263,6 +3393,13 @@ macro_rules! __pgrx_c_args_LockHashPartitionLockByIndex {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LockHashPartitionLockByIndex] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_LockHashPartitionLockByIndex!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3279,7 +3416,7 @@ macro_rules! __pgrx_c_args_LockHashPartitionLockByIndex {
         $crate::LockHashPartitionLockByIndex!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro LockHashPartitionLockByIndex from lock.h:522
@@ -3372,13 +3509,13 @@ macro_rules! LockHashPartitionLockByIndex {
         $crate::__pgrx_c_args_LockHashPartitionLockByIndex!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_LockHashPartitionLockByIndex!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_LockHashPartitionLockByIndex!(
@@ -3394,7 +3531,7 @@ macro_rules! LockHashPartitionLockByIndex {
                         $crate::__pgrx_c_operand!(@check_safety; $i);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::address(
@@ -3456,7 +3593,7 @@ macro_rules! LockHashPartitionLockByIndex {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3611,6 +3748,13 @@ macro_rules! __pgrx_c_args_LockHashPartitionLockByProc {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LockHashPartitionLockByProc] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_LockHashPartitionLockByProc!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3648,6 +3792,13 @@ macro_rules! __pgrx_c_args_LockHashPartitionLockByProc {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LockHashPartitionLockByProc] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_LockHashPartitionLockByProc!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3664,7 +3815,7 @@ macro_rules! __pgrx_c_args_LockHashPartitionLockByProc {
         $crate::LockHashPartitionLockByProc!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro LockHashPartitionLockByProc from lock.h:534
@@ -3799,13 +3950,13 @@ macro_rules! LockHashPartitionLockByProc {
         $crate::__pgrx_c_args_LockHashPartitionLockByProc!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $leader_pgproc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_LockHashPartitionLockByProc!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $leader_pgproc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_LockHashPartitionLockByProc!(
@@ -3822,7 +3973,7 @@ macro_rules! LockHashPartitionLockByProc {
                         $crate::__pgrx_c_operand!(@check_safety; $leader_pgproc);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::address(
@@ -3927,7 +4078,7 @@ macro_rules! LockHashPartitionLockByProc {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4116,6 +4267,11 @@ macro_rules! __pgrx_c_args_PROCLOCK_LOCKMETHOD {
             @argument [__pgrx_c_args_PROCLOCK_LOCKMETHOD] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PROCLOCK_LOCKMETHOD] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PROCLOCK_LOCKMETHOD!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4153,6 +4309,13 @@ macro_rules! __pgrx_c_args_PROCLOCK_LOCKMETHOD {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PROCLOCK_LOCKMETHOD] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PROCLOCK_LOCKMETHOD!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4169,7 +4332,7 @@ macro_rules! __pgrx_c_args_PROCLOCK_LOCKMETHOD {
         $crate::PROCLOCK_LOCKMETHOD!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PROCLOCK_LOCKMETHOD from lock.h:374
@@ -4267,13 +4430,13 @@ macro_rules! PROCLOCK_LOCKMETHOD {
         $crate::__pgrx_c_args_PROCLOCK_LOCKMETHOD!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $proclock:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PROCLOCK_LOCKMETHOD!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $proclock:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PROCLOCK_LOCKMETHOD!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4287,7 +4450,7 @@ macro_rules! PROCLOCK_LOCKMETHOD {
                         $crate::__pgrx_c_operand!(@check_safety; $proclock);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -4347,7 +4510,7 @@ macro_rules! PROCLOCK_LOCKMETHOD {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4495,6 +4658,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_ADVISORY {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_ADVISORY] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4546,6 +4716,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_ADVISORY {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_SET_LOCKTAG_ADVISORY] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_ADVISORY] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -4603,6 +4780,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_ADVISORY {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_ADVISORY] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4654,6 +4838,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_ADVISORY {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_SET_LOCKTAG_ADVISORY] [p4 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_ADVISORY] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -4718,6 +4909,11 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_ADVISORY {
             @argument [__pgrx_c_args_SET_LOCKTAG_ADVISORY] [p5 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_ADVISORY] [p5 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4755,6 +4951,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_ADVISORY {
             ]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_ADVISORY] [p5 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4771,7 +4974,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_ADVISORY {
         $crate::SET_LOCKTAG_ADVISORY!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_LOCKTAG_ADVISORY from lock.h:273
@@ -5002,13 +5205,13 @@ macro_rules! SET_LOCKTAG_ADVISORY {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $locktag:tt, $id1:tt, $id2:tt, $id3:tt, $id4:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $locktag:tt, $id1:tt, $id2:tt, $id3:tt, $id4:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5025,7 +5228,7 @@ macro_rules! SET_LOCKTAG_ADVISORY {
                         $crate::__pgrx_c_operand!(@check_safety; $id4);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -5239,7 +5442,7 @@ macro_rules! SET_LOCKTAG_ADVISORY {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5523,6 +5726,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5589,6 +5799,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5626,6 +5843,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS {
             ] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5642,7 +5866,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS {
         $crate::SET_LOCKTAG_DATABASE_FROZEN_IDS!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_LOCKTAG_DATABASE_FROZEN_IDS from lock.h:202
@@ -5871,7 +6095,7 @@ macro_rules! SET_LOCKTAG_DATABASE_FROZEN_IDS {
         )
     };
     (@__pgrx_emit_place; $locktag:tt, $dboid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS!(
@@ -5880,7 +6104,7 @@ macro_rules! SET_LOCKTAG_DATABASE_FROZEN_IDS {
         )
     };
     (@__pgrx_emit_read_place; $locktag:tt, $dboid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS!(
@@ -5897,7 +6121,7 @@ macro_rules! SET_LOCKTAG_DATABASE_FROZEN_IDS {
                         $crate::__pgrx_c_operand!(@check_safety; $dboid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -6106,7 +6330,7 @@ macro_rules! SET_LOCKTAG_DATABASE_FROZEN_IDS {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6388,6 +6612,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_OBJECT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_OBJECT] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6439,6 +6670,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_OBJECT {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_SET_LOCKTAG_OBJECT] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_OBJECT] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -6496,6 +6734,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_OBJECT {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_OBJECT] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6547,6 +6792,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_OBJECT {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_SET_LOCKTAG_OBJECT] [p4 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_OBJECT] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -6611,6 +6863,11 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_OBJECT {
             @argument [__pgrx_c_args_SET_LOCKTAG_OBJECT] [p5 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_OBJECT] [p5 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6648,6 +6905,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_OBJECT {
             ]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_OBJECT] [p5 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6664,7 +6928,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_OBJECT {
         $crate::SET_LOCKTAG_OBJECT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_LOCKTAG_OBJECT from lock.h:265
@@ -6909,13 +7173,13 @@ macro_rules! SET_LOCKTAG_OBJECT {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $locktag:tt, $dboid:tt, $classoid:tt, $objoid:tt, $objsubid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $locktag:tt, $dboid:tt, $classoid:tt, $objoid:tt, $objsubid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6932,7 +7196,7 @@ macro_rules! SET_LOCKTAG_OBJECT {
                         $crate::__pgrx_c_operand!(@check_safety; $objsubid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -7146,7 +7410,7 @@ macro_rules! SET_LOCKTAG_OBJECT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7424,6 +7688,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_PAGE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_PAGE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7478,6 +7749,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_PAGE {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_PAGE] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7529,6 +7807,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_PAGE {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_SET_LOCKTAG_PAGE] [p3 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_PAGE] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -7593,6 +7878,11 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_PAGE {
             @argument [__pgrx_c_args_SET_LOCKTAG_PAGE] [p4 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_PAGE] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7630,6 +7920,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_PAGE {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_PAGE] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7646,7 +7943,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_PAGE {
         $crate::SET_LOCKTAG_PAGE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_LOCKTAG_PAGE from lock.h:211
@@ -7875,13 +8172,13 @@ macro_rules! SET_LOCKTAG_PAGE {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $locktag:tt, $dboid:tt, $reloid:tt, $blocknum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $locktag:tt, $dboid:tt, $reloid:tt, $blocknum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7897,7 +8194,7 @@ macro_rules! SET_LOCKTAG_PAGE {
                         $crate::__pgrx_c_operand!(@check_safety; $blocknum);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -8110,7 +8407,7 @@ macro_rules! SET_LOCKTAG_PAGE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8390,6 +8687,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_RELATION] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8441,6 +8745,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_SET_LOCKTAG_RELATION] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_RELATION] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -8505,6 +8816,11 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION {
             @argument [__pgrx_c_args_SET_LOCKTAG_RELATION] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_RELATION] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8542,6 +8858,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_RELATION] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8558,7 +8881,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION {
         $crate::SET_LOCKTAG_RELATION!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_LOCKTAG_RELATION from lock.h:184
@@ -8787,13 +9110,13 @@ macro_rules! SET_LOCKTAG_RELATION {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $locktag:tt, $dboid:tt, $reloid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $locktag:tt, $dboid:tt, $reloid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8808,7 +9131,7 @@ macro_rules! SET_LOCKTAG_RELATION {
                         $crate::__pgrx_c_operand!(@check_safety; $reloid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -9020,7 +9343,7 @@ macro_rules! SET_LOCKTAG_RELATION {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9301,6 +9624,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9352,6 +9682,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -9418,6 +9755,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND] [p3 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9455,6 +9799,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9471,7 +9822,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND {
         $crate::SET_LOCKTAG_RELATION_EXTEND!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_LOCKTAG_RELATION_EXTEND from lock.h:193
@@ -9701,13 +10052,13 @@ macro_rules! SET_LOCKTAG_RELATION_EXTEND {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $locktag:tt, $dboid:tt, $reloid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $locktag:tt, $dboid:tt, $reloid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(
@@ -9725,7 +10076,7 @@ macro_rules! SET_LOCKTAG_RELATION_EXTEND {
                         $crate::__pgrx_c_operand!(@check_safety; $reloid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -9935,7 +10286,7 @@ macro_rules! SET_LOCKTAG_RELATION_EXTEND {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10220,6 +10571,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10275,6 +10633,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION {
             @argument [__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION] [
                 p2 $mode [$($done)*] [$($rest)*]
             ] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -10343,6 +10708,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION] [p3 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10380,6 +10752,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION {
             ] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION] [
+                p3 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10396,7 +10775,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION {
         $crate::SET_LOCKTAG_SPECULATIVE_INSERTION!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_LOCKTAG_SPECULATIVE_INSERTION from lock.h:250
@@ -10629,7 +11008,7 @@ macro_rules! SET_LOCKTAG_SPECULATIVE_INSERTION {
         )
     };
     (@__pgrx_emit_place; $locktag:tt, $xid:tt, $token:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION!(
@@ -10638,7 +11017,7 @@ macro_rules! SET_LOCKTAG_SPECULATIVE_INSERTION {
         )
     };
     (@__pgrx_emit_read_place; $locktag:tt, $xid:tt, $token:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION!(
@@ -10656,7 +11035,7 @@ macro_rules! SET_LOCKTAG_SPECULATIVE_INSERTION {
                         $crate::__pgrx_c_operand!(@check_safety; $token);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -10866,7 +11245,7 @@ macro_rules! SET_LOCKTAG_SPECULATIVE_INSERTION {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -11154,6 +11533,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TRANSACTION {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_TRANSACTION] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TRANSACTION!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11217,6 +11603,11 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TRANSACTION {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_TRANSACTION] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TRANSACTION!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11254,6 +11645,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TRANSACTION {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_TRANSACTION] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TRANSACTION!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11270,7 +11668,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TRANSACTION {
         $crate::SET_LOCKTAG_TRANSACTION!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_LOCKTAG_TRANSACTION from lock.h:229
@@ -11496,13 +11894,13 @@ macro_rules! SET_LOCKTAG_TRANSACTION {
         $crate::__pgrx_c_args_SET_LOCKTAG_TRANSACTION!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $locktag:tt, $xid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TRANSACTION!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $locktag:tt, $xid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TRANSACTION!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -11516,7 +11914,7 @@ macro_rules! SET_LOCKTAG_TRANSACTION {
                         $crate::__pgrx_c_operand!(@check_safety; $xid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -11725,7 +12123,7 @@ macro_rules! SET_LOCKTAG_TRANSACTION {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -11998,6 +12396,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TUPLE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_TUPLE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12049,6 +12454,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TUPLE {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_SET_LOCKTAG_TUPLE] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_TUPLE] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -12106,6 +12518,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TUPLE {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_TUPLE] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12157,6 +12576,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TUPLE {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_SET_LOCKTAG_TUPLE] [p4 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_TUPLE] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -12221,6 +12647,11 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TUPLE {
             @argument [__pgrx_c_args_SET_LOCKTAG_TUPLE] [p5 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_TUPLE] [p5 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12258,6 +12689,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TUPLE {
             ]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_TUPLE] [p5 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12274,7 +12712,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TUPLE {
         $crate::SET_LOCKTAG_TUPLE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_LOCKTAG_TUPLE from lock.h:220
@@ -12512,13 +12950,13 @@ macro_rules! SET_LOCKTAG_TUPLE {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $locktag:tt, $dboid:tt, $reloid:tt, $blocknum:tt, $offnum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $locktag:tt, $dboid:tt, $reloid:tt, $blocknum:tt, $offnum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -12535,7 +12973,7 @@ macro_rules! SET_LOCKTAG_TUPLE {
                         $crate::__pgrx_c_operand!(@check_safety; $offnum);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -12749,7 +13187,7 @@ macro_rules! SET_LOCKTAG_TUPLE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -13033,6 +13471,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13099,6 +13544,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13136,6 +13588,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION {
             ] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13152,7 +13611,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION {
         $crate::SET_LOCKTAG_VIRTUALTRANSACTION!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_LOCKTAG_VIRTUALTRANSACTION from lock.h:238
@@ -13396,7 +13855,7 @@ macro_rules! SET_LOCKTAG_VIRTUALTRANSACTION {
         )
     };
     (@__pgrx_emit_place; $locktag:tt, $vxid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION!(
@@ -13405,7 +13864,7 @@ macro_rules! SET_LOCKTAG_VIRTUALTRANSACTION {
         )
     };
     (@__pgrx_emit_read_place; $locktag:tt, $vxid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION!(
@@ -13422,7 +13881,7 @@ macro_rules! SET_LOCKTAG_VIRTUALTRANSACTION {
                         $crate::__pgrx_c_operand!(@check_safety; $vxid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -13644,7 +14103,7 @@ macro_rules! SET_LOCKTAG_VIRTUALTRANSACTION {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -13956,6 +14415,13 @@ macro_rules! __pgrx_c_args_SetInvalidVirtualTransactionId {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SetInvalidVirtualTransactionId] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SetInvalidVirtualTransactionId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13993,6 +14459,13 @@ macro_rules! __pgrx_c_args_SetInvalidVirtualTransactionId {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SetInvalidVirtualTransactionId] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SetInvalidVirtualTransactionId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14009,7 +14482,7 @@ macro_rules! __pgrx_c_args_SetInvalidVirtualTransactionId {
         $crate::SetInvalidVirtualTransactionId!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SetInvalidVirtualTransactionId from lock.h:79
@@ -14089,7 +14562,7 @@ macro_rules! SetInvalidVirtualTransactionId {
         )
     };
     (@__pgrx_emit_place; $vxid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SetInvalidVirtualTransactionId!(
@@ -14098,7 +14571,7 @@ macro_rules! SetInvalidVirtualTransactionId {
         )
     };
     (@__pgrx_emit_read_place; $vxid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SetInvalidVirtualTransactionId!(
@@ -14114,7 +14587,7 @@ macro_rules! SetInvalidVirtualTransactionId {
                         $crate::__pgrx_c_operand!(@check_safety; $vxid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -14168,7 +14641,7 @@ macro_rules! SetInvalidVirtualTransactionId {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -14305,6 +14778,13 @@ macro_rules! __pgrx_c_args_VirtualTransactionIdEquals {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VirtualTransactionIdEquals] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VirtualTransactionIdEquals!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14368,6 +14848,13 @@ macro_rules! __pgrx_c_args_VirtualTransactionIdEquals {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VirtualTransactionIdEquals] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VirtualTransactionIdEquals!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14405,6 +14892,13 @@ macro_rules! __pgrx_c_args_VirtualTransactionIdEquals {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VirtualTransactionIdEquals] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VirtualTransactionIdEquals!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14421,7 +14915,7 @@ macro_rules! __pgrx_c_args_VirtualTransactionIdEquals {
         $crate::VirtualTransactionIdEquals!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VirtualTransactionIdEquals from lock.h:76
@@ -14518,13 +15012,13 @@ macro_rules! VirtualTransactionIdEquals {
         $crate::__pgrx_c_args_VirtualTransactionIdEquals!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $vxid1:tt, $vxid2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VirtualTransactionIdEquals!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $vxid1:tt, $vxid2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VirtualTransactionIdEquals!(
@@ -14541,7 +15035,7 @@ macro_rules! VirtualTransactionIdEquals {
                         $crate::__pgrx_c_operand!(@check_safety; $vxid2);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -14641,7 +15135,7 @@ macro_rules! VirtualTransactionIdEquals {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -14803,6 +15297,13 @@ macro_rules! __pgrx_c_args_VirtualTransactionIdIsRecoveredPreparedXact {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VirtualTransactionIdIsRecoveredPreparedXact] [
+                p1 $mode [$($done)*] []
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VirtualTransactionIdIsRecoveredPreparedXact!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14840,6 +15341,13 @@ macro_rules! __pgrx_c_args_VirtualTransactionIdIsRecoveredPreparedXact {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VirtualTransactionIdIsRecoveredPreparedXact] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VirtualTransactionIdIsRecoveredPreparedXact!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14856,7 +15364,7 @@ macro_rules! __pgrx_c_args_VirtualTransactionIdIsRecoveredPreparedXact {
         $crate::VirtualTransactionIdIsRecoveredPreparedXact!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VirtualTransactionIdIsRecoveredPreparedXact from lock.h:74
@@ -14918,7 +15426,7 @@ macro_rules! VirtualTransactionIdIsRecoveredPreparedXact {
         )
     };
     (@__pgrx_emit_place; $vxid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VirtualTransactionIdIsRecoveredPreparedXact!(
@@ -14927,7 +15435,7 @@ macro_rules! VirtualTransactionIdIsRecoveredPreparedXact {
         )
     };
     (@__pgrx_emit_read_place; $vxid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VirtualTransactionIdIsRecoveredPreparedXact!(
@@ -14943,7 +15451,7 @@ macro_rules! VirtualTransactionIdIsRecoveredPreparedXact {
                         $crate::__pgrx_c_operand!(@check_safety; $vxid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -14966,7 +15474,7 @@ macro_rules! VirtualTransactionIdIsRecoveredPreparedXact {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -15094,6 +15602,13 @@ macro_rules! __pgrx_c_args_VirtualTransactionIdIsValid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VirtualTransactionIdIsValid] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VirtualTransactionIdIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15131,6 +15646,13 @@ macro_rules! __pgrx_c_args_VirtualTransactionIdIsValid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VirtualTransactionIdIsValid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VirtualTransactionIdIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15147,7 +15669,7 @@ macro_rules! __pgrx_c_args_VirtualTransactionIdIsValid {
         $crate::VirtualTransactionIdIsValid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VirtualTransactionIdIsValid from lock.h:72
@@ -15214,7 +15736,7 @@ macro_rules! VirtualTransactionIdIsValid {
                                     $crate::__pgrx_c_operand!(@check_safety; $vxid);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::project::<
                                         $crate::__pgrx_c_generated::Field_localTransactionId,
@@ -15224,7 +15746,7 @@ macro_rules! VirtualTransactionIdIsValid {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -15268,7 +15790,7 @@ macro_rules! VirtualTransactionIdIsValid {
                                     $crate::__pgrx_c_operand!(@check_safety; $vxid);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::project::<
                                         $crate::__pgrx_c_generated::Field_localTransactionId,
@@ -15278,7 +15800,7 @@ macro_rules! VirtualTransactionIdIsValid {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -15322,7 +15844,7 @@ macro_rules! VirtualTransactionIdIsValid {
                                     $crate::__pgrx_c_operand!(@check_safety; $vxid);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::project::<
                                         $crate::__pgrx_c_generated::Field_localTransactionId,
@@ -15332,7 +15854,7 @@ macro_rules! VirtualTransactionIdIsValid {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -15379,7 +15901,7 @@ macro_rules! VirtualTransactionIdIsValid {
                                     $crate::__pgrx_c_operand!(@check_safety; $vxid);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::project::<
                                         $crate::__pgrx_c_generated::Field_localTransactionId,
@@ -15389,7 +15911,7 @@ macro_rules! VirtualTransactionIdIsValid {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -15433,7 +15955,7 @@ macro_rules! VirtualTransactionIdIsValid {
                                     $crate::__pgrx_c_operand!(@check_safety; $vxid);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::project::<
                                         $crate::__pgrx_c_generated::Field_localTransactionId,
@@ -15443,7 +15965,7 @@ macro_rules! VirtualTransactionIdIsValid {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]

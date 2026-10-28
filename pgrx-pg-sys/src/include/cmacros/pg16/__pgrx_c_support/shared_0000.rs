@@ -384,12 +384,6 @@ pub mod __pgrx_c_types {
     pub type r#blkcnt_t = crate::__pgrx_c_macros::CLong;
     /// Preserve the compiler-established rank and width of C `blksize_t`.
     pub type r#blksize_t = crate::__pgrx_c_macros::CLong;
-    /// Preserve the compiler-established rank and width of C `char16_t`.
-    pub type r#char16_t = crate::__pgrx_c_macros::CUnsignedShort;
-    /// Preserve the compiler-established rank and width of C `char32_t`.
-    pub type r#char32_t = crate::__pgrx_c_macros::CUnsignedInt;
-    /// Preserve the compiler-established rank and width of C `char8_t`.
-    pub type r#char8_t = crate::__pgrx_c_macros::CUnsignedChar;
     /// Preserve the compiler-established rank and width of C `clock_t`.
     pub type r#clock_t = crate::__pgrx_c_macros::CLong;
     /// Preserve the compiler-established rank and width of C `clockid_t`.
@@ -793,13 +787,13 @@ mod __pgrx_metadata_native {
         ///
         /// # Safety
         /// The matching native archive must remain loaded. Its returned static must not be mutated.
-        #[link_name = "pgrx_metadata_c965d23aa8488fb4_magic_get"]
+        #[link_name = "pgrx_metadata_0d6f60988a48294f_magic_get"]
         pub(super) fn pgrx_metadata_magic_get() -> *const crate::__pgrx_c_bindings::Pg_magic_struct;
         /// Return the native static declared by PG_FUNCTION_INFO_V1.
         ///
         /// # Safety
         /// The matching native archive must remain loaded. Its returned static must not be mutated.
-        #[link_name = "pg_finfo_pgrx_metadata_c965d23aa8488fb4_function_v1"]
+        #[link_name = "pg_finfo_pgrx_metadata_0d6f60988a48294f_function_v1"]
         pub(super) fn pg_finfo_pgrx_metadata_function_v1()
         -> *const crate::__pgrx_c_bindings::Pg_finfo_record;
     }

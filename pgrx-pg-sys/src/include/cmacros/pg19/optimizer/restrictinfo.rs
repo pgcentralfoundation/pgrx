@@ -77,6 +77,13 @@ macro_rules! __pgrx_c_args_clause_sides_match_join {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_clause_sides_match_join] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_clause_sides_match_join!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -128,6 +135,13 @@ macro_rules! __pgrx_c_args_clause_sides_match_join {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_clause_sides_match_join] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_clause_sides_match_join] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -194,6 +208,11 @@ macro_rules! __pgrx_c_args_clause_sides_match_join {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_clause_sides_match_join] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_clause_sides_match_join!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -231,6 +250,13 @@ macro_rules! __pgrx_c_args_clause_sides_match_join {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_clause_sides_match_join] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_clause_sides_match_join!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -247,7 +273,7 @@ macro_rules! __pgrx_c_args_clause_sides_match_join {
         $crate::clause_sides_match_join!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function clause_sides_match_join from restrictinfo.h:72
@@ -385,13 +411,13 @@ macro_rules! clause_sides_match_join {
         $crate::__pgrx_c_args_clause_sides_match_join!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rinfo:tt, $outerrelids:tt, $innerrelids:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_clause_sides_match_join!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rinfo:tt, $outerrelids:tt, $innerrelids:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_clause_sides_match_join!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -406,7 +432,7 @@ macro_rules! clause_sides_match_join {
                         $crate::__pgrx_c_operand!(@check_safety; $innerrelids);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -498,7 +524,7 @@ macro_rules! clause_sides_match_join {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -662,6 +688,13 @@ macro_rules! __pgrx_c_args_make_simple_restrictinfo {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_make_simple_restrictinfo] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_make_simple_restrictinfo!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -725,6 +758,13 @@ macro_rules! __pgrx_c_args_make_simple_restrictinfo {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_make_simple_restrictinfo] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_make_simple_restrictinfo!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -762,6 +802,13 @@ macro_rules! __pgrx_c_args_make_simple_restrictinfo {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_make_simple_restrictinfo] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_make_simple_restrictinfo!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -778,7 +825,7 @@ macro_rules! __pgrx_c_args_make_simple_restrictinfo {
         $crate::make_simple_restrictinfo!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro make_simple_restrictinfo from restrictinfo.h:21
@@ -1083,13 +1130,13 @@ macro_rules! make_simple_restrictinfo {
         $crate::__pgrx_c_args_make_simple_restrictinfo!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $root:tt, $clause:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_make_simple_restrictinfo!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $root:tt, $clause:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_make_simple_restrictinfo!(
@@ -1107,7 +1154,7 @@ macro_rules! make_simple_restrictinfo {
                         $crate::__pgrx_c_operand!(@check_safety; $clause);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1406,7 +1453,7 @@ macro_rules! make_simple_restrictinfo {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

@@ -72,6 +72,11 @@ macro_rules! __pgrx_c_args_HeapKeyTest {
             @argument [__pgrx_c_args_HeapKeyTest] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapKeyTest] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapKeyTest!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -124,6 +129,11 @@ macro_rules! __pgrx_c_args_HeapKeyTest {
             @argument [__pgrx_c_args_HeapKeyTest] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapKeyTest] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapKeyTest!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -174,6 +184,11 @@ macro_rules! __pgrx_c_args_HeapKeyTest {
     (@p2 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_HeapKeyTest] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapKeyTest] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -237,6 +252,11 @@ macro_rules! __pgrx_c_args_HeapKeyTest {
             @argument [__pgrx_c_args_HeapKeyTest] [p4 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapKeyTest] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapKeyTest!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -272,6 +292,11 @@ macro_rules! __pgrx_c_args_HeapKeyTest {
             @argument [__pgrx_c_args_HeapKeyTest] [p4 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapKeyTest] [p4 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapKeyTest!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -288,7 +313,7 @@ macro_rules! __pgrx_c_args_HeapKeyTest {
         $crate::HeapKeyTest!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapKeyTest from valid.h:27
@@ -444,13 +469,13 @@ macro_rules! HeapKeyTest {
         $crate::__pgrx_c_args_HeapKeyTest!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tuple:tt, $tupdesc:tt, $nkeys:tt, $keys:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapKeyTest!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tuple:tt, $tupdesc:tt, $nkeys:tt, $keys:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapKeyTest!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -466,7 +491,7 @@ macro_rules! HeapKeyTest {
                         $crate::__pgrx_c_operand!(@check_safety; $keys);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -561,7 +586,7 @@ macro_rules! HeapKeyTest {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

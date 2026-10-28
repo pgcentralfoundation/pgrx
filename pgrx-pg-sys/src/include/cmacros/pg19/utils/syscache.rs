@@ -77,6 +77,13 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue1 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheHashValue1] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue1!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -138,6 +145,11 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue1 {
             @argument [__pgrx_c_args_GetSysCacheHashValue1] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheHashValue1] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue1!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -175,6 +187,13 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue1 {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheHashValue1] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue1!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -191,7 +210,7 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue1 {
         $crate::GetSysCacheHashValue1!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GetSysCacheHashValue1 from syscache.h:118
@@ -230,7 +249,7 @@ macro_rules! GetSysCacheHashValue1 {
         /* PGRX: GetSysCacheHashValue1 remains expanded because GetSysCacheHashValue is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_dc9150b43a9a706eed085de88ac34f88(
+                $crate::__pgrx_c_generated::Inline_0bbbd3f56fbcfd15168eafa466c13555(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -343,13 +362,13 @@ macro_rules! GetSysCacheHashValue1 {
         $crate::__pgrx_c_args_GetSysCacheHashValue1!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cacheId:tt, $key1:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue1!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cacheId:tt, $key1:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue1!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -364,13 +383,13 @@ macro_rules! GetSysCacheHashValue1 {
                         $crate::__pgrx_c_operand!(@check_safety; $key1);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_dc9150b43a9a706eed085de88ac34f88(
+                                $crate::__pgrx_c_generated::Inline_0bbbd3f56fbcfd15168eafa466c13555(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -492,7 +511,7 @@ macro_rules! GetSysCacheHashValue1 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -506,7 +525,7 @@ macro_rules! GetSysCacheHashValue1 {
                 <
                     $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_dc9150b43a9a706eed085de88ac34f88(
+                    $crate::__pgrx_c_generated::Inline_0bbbd3f56fbcfd15168eafa466c13555(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -697,6 +716,13 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue2 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheHashValue2] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue2!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -748,6 +774,13 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue2 {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_GetSysCacheHashValue2] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheHashValue2] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -812,6 +845,11 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue2 {
             @argument [__pgrx_c_args_GetSysCacheHashValue2] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheHashValue2] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue2!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -849,6 +887,13 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue2 {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheHashValue2] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue2!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -865,7 +910,7 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue2 {
         $crate::GetSysCacheHashValue2!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GetSysCacheHashValue2 from syscache.h:120
@@ -905,7 +950,7 @@ macro_rules! GetSysCacheHashValue2 {
         /* PGRX: GetSysCacheHashValue2 remains expanded because GetSysCacheHashValue is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_dc9150b43a9a706eed085de88ac34f88(
+                $crate::__pgrx_c_generated::Inline_0bbbd3f56fbcfd15168eafa466c13555(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -1014,13 +1059,13 @@ macro_rules! GetSysCacheHashValue2 {
         $crate::__pgrx_c_args_GetSysCacheHashValue2!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cacheId:tt, $key1:tt, $key2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue2!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cacheId:tt, $key1:tt, $key2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue2!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1036,13 +1081,13 @@ macro_rules! GetSysCacheHashValue2 {
                         $crate::__pgrx_c_operand!(@check_safety; $key2);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_dc9150b43a9a706eed085de88ac34f88(
+                                $crate::__pgrx_c_generated::Inline_0bbbd3f56fbcfd15168eafa466c13555(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -1158,7 +1203,7 @@ macro_rules! GetSysCacheHashValue2 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1172,7 +1217,7 @@ macro_rules! GetSysCacheHashValue2 {
                 <
                     $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_dc9150b43a9a706eed085de88ac34f88(
+                    $crate::__pgrx_c_generated::Inline_0bbbd3f56fbcfd15168eafa466c13555(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -1359,6 +1404,13 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue3 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheHashValue3] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1413,6 +1465,13 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue3 {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheHashValue3] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1464,6 +1523,13 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue3 {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_GetSysCacheHashValue3] [p3 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheHashValue3] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -1528,6 +1594,11 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue3 {
             @argument [__pgrx_c_args_GetSysCacheHashValue3] [p4 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheHashValue3] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1565,6 +1636,13 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue3 {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheHashValue3] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1581,7 +1659,7 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue3 {
         $crate::GetSysCacheHashValue3!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GetSysCacheHashValue3 from syscache.h:122
@@ -1622,7 +1700,7 @@ macro_rules! GetSysCacheHashValue3 {
         /* PGRX: GetSysCacheHashValue3 remains expanded because GetSysCacheHashValue is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_dc9150b43a9a706eed085de88ac34f88(
+                $crate::__pgrx_c_generated::Inline_0bbbd3f56fbcfd15168eafa466c13555(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -1727,13 +1805,13 @@ macro_rules! GetSysCacheHashValue3 {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1750,13 +1828,13 @@ macro_rules! GetSysCacheHashValue3 {
                         $crate::__pgrx_c_operand!(@check_safety; $key3);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_dc9150b43a9a706eed085de88ac34f88(
+                                $crate::__pgrx_c_generated::Inline_0bbbd3f56fbcfd15168eafa466c13555(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -1866,7 +1944,7 @@ macro_rules! GetSysCacheHashValue3 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1880,7 +1958,7 @@ macro_rules! GetSysCacheHashValue3 {
                 <
                     $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_dc9150b43a9a706eed085de88ac34f88(
+                    $crate::__pgrx_c_generated::Inline_0bbbd3f56fbcfd15168eafa466c13555(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -2063,6 +2141,13 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue4 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheHashValue4] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2114,6 +2199,13 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue4 {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_GetSysCacheHashValue4] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheHashValue4] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -2171,6 +2263,13 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue4 {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheHashValue4] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2222,6 +2321,13 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue4 {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_GetSysCacheHashValue4] [p4 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheHashValue4] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -2286,6 +2392,11 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue4 {
             @argument [__pgrx_c_args_GetSysCacheHashValue4] [p5 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheHashValue4] [p5 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2323,6 +2434,13 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue4 {
             ]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheHashValue4] [p5 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2339,7 +2457,7 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue4 {
         $crate::GetSysCacheHashValue4!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GetSysCacheHashValue4 from syscache.h:124
@@ -2381,7 +2499,7 @@ macro_rules! GetSysCacheHashValue4 {
         /* PGRX: GetSysCacheHashValue4 remains expanded because GetSysCacheHashValue is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_dc9150b43a9a706eed085de88ac34f88(
+                $crate::__pgrx_c_generated::Inline_0bbbd3f56fbcfd15168eafa466c13555(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -2482,13 +2600,13 @@ macro_rules! GetSysCacheHashValue4 {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt, $key4:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt, $key4:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2506,13 +2624,13 @@ macro_rules! GetSysCacheHashValue4 {
                         $crate::__pgrx_c_operand!(@check_safety; $key4);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_dc9150b43a9a706eed085de88ac34f88(
+                                $crate::__pgrx_c_generated::Inline_0bbbd3f56fbcfd15168eafa466c13555(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -2616,7 +2734,7 @@ macro_rules! GetSysCacheHashValue4 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2630,7 +2748,7 @@ macro_rules! GetSysCacheHashValue4 {
                 <
                     $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_dc9150b43a9a706eed085de88ac34f88(
+                    $crate::__pgrx_c_generated::Inline_0bbbd3f56fbcfd15168eafa466c13555(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -2806,6 +2924,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid1 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheOid1] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid1!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2857,6 +2982,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid1 {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_GetSysCacheOid1] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheOid1] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -2921,6 +3053,11 @@ macro_rules! __pgrx_c_args_GetSysCacheOid1 {
             @argument [__pgrx_c_args_GetSysCacheOid1] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheOid1] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GetSysCacheOid1!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2958,6 +3095,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid1 {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheOid1] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid1!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2974,7 +3118,7 @@ macro_rules! __pgrx_c_args_GetSysCacheOid1 {
         $crate::GetSysCacheOid1!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GetSysCacheOid1 from syscache.h:109
@@ -3019,7 +3163,7 @@ macro_rules! GetSysCacheOid1 {
                     $crate::__pgrx_c_bindings::Oid
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_0878a15b9b4a5e606820c2fb94a3bfb9(
+                $crate::__pgrx_c_generated::Inline_eac87870c8c4447d7d984856bb499b17(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -3142,13 +3286,13 @@ macro_rules! GetSysCacheOid1 {
         $crate::__pgrx_c_args_GetSysCacheOid1!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cacheId:tt, $oidcol:tt, $key1:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid1!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cacheId:tt, $oidcol:tt, $key1:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid1!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3164,7 +3308,7 @@ macro_rules! GetSysCacheOid1 {
                         $crate::__pgrx_c_operand!(@check_safety; $key1);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -3173,7 +3317,7 @@ macro_rules! GetSysCacheOid1 {
                                     $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_0878a15b9b4a5e606820c2fb94a3bfb9(
+                                $crate::__pgrx_c_generated::Inline_eac87870c8c4447d7d984856bb499b17(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -3308,7 +3452,7 @@ macro_rules! GetSysCacheOid1 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3325,7 +3469,7 @@ macro_rules! GetSysCacheOid1 {
                         $crate::__pgrx_c_bindings::Oid
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_0878a15b9b4a5e606820c2fb94a3bfb9(
+                    $crate::__pgrx_c_generated::Inline_eac87870c8c4447d7d984856bb499b17(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -3525,6 +3669,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid2 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheOid2] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3579,6 +3730,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid2 {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheOid2] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3630,6 +3788,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid2 {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_GetSysCacheOid2] [p3 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheOid2] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -3694,6 +3859,11 @@ macro_rules! __pgrx_c_args_GetSysCacheOid2 {
             @argument [__pgrx_c_args_GetSysCacheOid2] [p4 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheOid2] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3731,6 +3901,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid2 {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheOid2] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3747,7 +3924,7 @@ macro_rules! __pgrx_c_args_GetSysCacheOid2 {
         $crate::GetSysCacheOid2!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GetSysCacheOid2 from syscache.h:111
@@ -3793,7 +3970,7 @@ macro_rules! GetSysCacheOid2 {
                     $crate::__pgrx_c_bindings::Oid
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_0878a15b9b4a5e606820c2fb94a3bfb9(
+                $crate::__pgrx_c_generated::Inline_eac87870c8c4447d7d984856bb499b17(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -3912,13 +4089,13 @@ macro_rules! GetSysCacheOid2 {
         $crate::__pgrx_c_args_GetSysCacheOid2!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cacheId:tt, $oidcol:tt, $key1:tt, $key2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cacheId:tt, $oidcol:tt, $key1:tt, $key2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3935,7 +4112,7 @@ macro_rules! GetSysCacheOid2 {
                         $crate::__pgrx_c_operand!(@check_safety; $key2);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -3944,7 +4121,7 @@ macro_rules! GetSysCacheOid2 {
                                     $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_0878a15b9b4a5e606820c2fb94a3bfb9(
+                                $crate::__pgrx_c_generated::Inline_eac87870c8c4447d7d984856bb499b17(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -4073,7 +4250,7 @@ macro_rules! GetSysCacheOid2 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4090,7 +4267,7 @@ macro_rules! GetSysCacheOid2 {
                         $crate::__pgrx_c_bindings::Oid
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_0878a15b9b4a5e606820c2fb94a3bfb9(
+                    $crate::__pgrx_c_generated::Inline_eac87870c8c4447d7d984856bb499b17(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -4286,6 +4463,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid3 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheOid3] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4337,6 +4521,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid3 {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_GetSysCacheOid3] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheOid3] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -4394,6 +4585,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid3 {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheOid3] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4445,6 +4643,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid3 {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_GetSysCacheOid3] [p4 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheOid3] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -4509,6 +4714,11 @@ macro_rules! __pgrx_c_args_GetSysCacheOid3 {
             @argument [__pgrx_c_args_GetSysCacheOid3] [p5 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheOid3] [p5 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4546,6 +4756,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid3 {
             ]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheOid3] [p5 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4562,7 +4779,7 @@ macro_rules! __pgrx_c_args_GetSysCacheOid3 {
         $crate::GetSysCacheOid3!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GetSysCacheOid3 from syscache.h:113
@@ -4609,7 +4826,7 @@ macro_rules! GetSysCacheOid3 {
                     $crate::__pgrx_c_bindings::Oid
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_0878a15b9b4a5e606820c2fb94a3bfb9(
+                $crate::__pgrx_c_generated::Inline_eac87870c8c4447d7d984856bb499b17(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -4724,13 +4941,13 @@ macro_rules! GetSysCacheOid3 {
         $crate::__pgrx_c_args_GetSysCacheOid3!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cacheId:tt, $oidcol:tt, $key1:tt, $key2:tt, $key3:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cacheId:tt, $oidcol:tt, $key1:tt, $key2:tt, $key3:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4748,7 +4965,7 @@ macro_rules! GetSysCacheOid3 {
                         $crate::__pgrx_c_operand!(@check_safety; $key3);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -4757,7 +4974,7 @@ macro_rules! GetSysCacheOid3 {
                                     $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_0878a15b9b4a5e606820c2fb94a3bfb9(
+                                $crate::__pgrx_c_generated::Inline_eac87870c8c4447d7d984856bb499b17(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -4880,7 +5097,7 @@ macro_rules! GetSysCacheOid3 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4897,7 +5114,7 @@ macro_rules! GetSysCacheOid3 {
                         $crate::__pgrx_c_bindings::Oid
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_0878a15b9b4a5e606820c2fb94a3bfb9(
+                    $crate::__pgrx_c_generated::Inline_eac87870c8c4447d7d984856bb499b17(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -5089,6 +5306,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid4 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheOid4] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5140,6 +5364,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid4 {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_GetSysCacheOid4] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheOid4] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -5197,6 +5428,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid4 {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheOid4] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5251,6 +5489,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid4 {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheOid4] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5302,6 +5547,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid4 {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_GetSysCacheOid4] [p5 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheOid4] [p5 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -5366,6 +5618,11 @@ macro_rules! __pgrx_c_args_GetSysCacheOid4 {
             @argument [__pgrx_c_args_GetSysCacheOid4] [p6 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p5 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheOid4] [p6 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p5 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
             @p6 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5403,6 +5660,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid4 {
             ]
         )
     };
+    (@p5 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetSysCacheOid4] [p6 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p5 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
             @p6 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5419,7 +5683,7 @@ macro_rules! __pgrx_c_args_GetSysCacheOid4 {
         $crate::GetSysCacheOid4!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GetSysCacheOid4 from syscache.h:115
@@ -5483,7 +5747,7 @@ macro_rules! GetSysCacheOid4 {
                     $crate::__pgrx_c_bindings::Oid
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_0878a15b9b4a5e606820c2fb94a3bfb9(
+                $crate::__pgrx_c_generated::Inline_eac87870c8c4447d7d984856bb499b17(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -5594,13 +5858,13 @@ macro_rules! GetSysCacheOid4 {
         $crate::__pgrx_c_args_GetSysCacheOid4!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cacheId:tt, $oidcol:tt, $key1:tt, $key2:tt, $key3:tt, $key4:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cacheId:tt, $oidcol:tt, $key1:tt, $key2:tt, $key3:tt, $key4:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5619,7 +5883,7 @@ macro_rules! GetSysCacheOid4 {
                         $crate::__pgrx_c_operand!(@check_safety; $key4);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -5628,7 +5892,7 @@ macro_rules! GetSysCacheOid4 {
                                     $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_0878a15b9b4a5e606820c2fb94a3bfb9(
+                                $crate::__pgrx_c_generated::Inline_eac87870c8c4447d7d984856bb499b17(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -5745,7 +6009,7 @@ macro_rules! GetSysCacheOid4 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5762,7 +6026,7 @@ macro_rules! GetSysCacheOid4 {
                         $crate::__pgrx_c_bindings::Oid
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_0878a15b9b4a5e606820c2fb94a3bfb9(
+                    $crate::__pgrx_c_generated::Inline_eac87870c8c4447d7d984856bb499b17(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -5957,6 +6221,11 @@ macro_rules! __pgrx_c_args_ReleaseSysCacheList {
             @argument [__pgrx_c_args_ReleaseSysCacheList] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ReleaseSysCacheList] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ReleaseSysCacheList!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5994,6 +6263,13 @@ macro_rules! __pgrx_c_args_ReleaseSysCacheList {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ReleaseSysCacheList] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ReleaseSysCacheList!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6010,7 +6286,7 @@ macro_rules! __pgrx_c_args_ReleaseSysCacheList {
         $crate::ReleaseSysCacheList!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ReleaseSysCacheList from syscache.h:134
@@ -6077,13 +6353,13 @@ macro_rules! ReleaseSysCacheList {
         $crate::__pgrx_c_args_ReleaseSysCacheList!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ReleaseSysCacheList!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ReleaseSysCacheList!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6097,7 +6373,7 @@ macro_rules! ReleaseSysCacheList {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::ReleaseCatCacheList(
@@ -6129,7 +6405,7 @@ macro_rules! ReleaseSysCacheList {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6245,6 +6521,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy1 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheCopy1] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy1!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6306,6 +6589,11 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy1 {
             @argument [__pgrx_c_args_SearchSysCacheCopy1] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheCopy1] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy1!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6343,6 +6631,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy1 {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheCopy1] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy1!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6359,7 +6654,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy1 {
         $crate::SearchSysCacheCopy1!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SearchSysCacheCopy1 from syscache.h:91
@@ -6405,7 +6700,7 @@ macro_rules! SearchSysCacheCopy1 {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_499cf25baf495404aa24da1584a0e34c(
+                $crate::__pgrx_c_generated::Inline_68eb7fbc65d4369b9bc4d3e206489184(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -6518,13 +6813,13 @@ macro_rules! SearchSysCacheCopy1 {
         $crate::__pgrx_c_args_SearchSysCacheCopy1!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cacheId:tt, $key1:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy1!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cacheId:tt, $key1:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy1!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6539,7 +6834,7 @@ macro_rules! SearchSysCacheCopy1 {
                         $crate::__pgrx_c_operand!(@check_safety; $key1);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -6550,7 +6845,7 @@ macro_rules! SearchSysCacheCopy1 {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_499cf25baf495404aa24da1584a0e34c(
+                                $crate::__pgrx_c_generated::Inline_68eb7fbc65d4369b9bc4d3e206489184(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -6672,7 +6967,7 @@ macro_rules! SearchSysCacheCopy1 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6691,7 +6986,7 @@ macro_rules! SearchSysCacheCopy1 {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_499cf25baf495404aa24da1584a0e34c(
+                    $crate::__pgrx_c_generated::Inline_68eb7fbc65d4369b9bc4d3e206489184(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -6879,6 +7174,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy2 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheCopy2] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy2!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6930,6 +7232,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy2 {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_SearchSysCacheCopy2] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheCopy2] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -6994,6 +7303,11 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy2 {
             @argument [__pgrx_c_args_SearchSysCacheCopy2] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheCopy2] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy2!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7031,6 +7345,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy2 {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheCopy2] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy2!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7047,7 +7368,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy2 {
         $crate::SearchSysCacheCopy2!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SearchSysCacheCopy2 from syscache.h:93
@@ -7094,7 +7415,7 @@ macro_rules! SearchSysCacheCopy2 {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_499cf25baf495404aa24da1584a0e34c(
+                $crate::__pgrx_c_generated::Inline_68eb7fbc65d4369b9bc4d3e206489184(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -7203,13 +7524,13 @@ macro_rules! SearchSysCacheCopy2 {
         $crate::__pgrx_c_args_SearchSysCacheCopy2!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cacheId:tt, $key1:tt, $key2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy2!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cacheId:tt, $key1:tt, $key2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy2!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7225,7 +7546,7 @@ macro_rules! SearchSysCacheCopy2 {
                         $crate::__pgrx_c_operand!(@check_safety; $key2);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -7236,7 +7557,7 @@ macro_rules! SearchSysCacheCopy2 {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_499cf25baf495404aa24da1584a0e34c(
+                                $crate::__pgrx_c_generated::Inline_68eb7fbc65d4369b9bc4d3e206489184(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -7352,7 +7673,7 @@ macro_rules! SearchSysCacheCopy2 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7371,7 +7692,7 @@ macro_rules! SearchSysCacheCopy2 {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_499cf25baf495404aa24da1584a0e34c(
+                    $crate::__pgrx_c_generated::Inline_68eb7fbc65d4369b9bc4d3e206489184(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -7555,6 +7876,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy3 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheCopy3] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7609,6 +7937,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy3 {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheCopy3] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7660,6 +7995,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy3 {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_SearchSysCacheCopy3] [p3 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheCopy3] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -7724,6 +8066,11 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy3 {
             @argument [__pgrx_c_args_SearchSysCacheCopy3] [p4 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheCopy3] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7761,6 +8108,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy3 {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheCopy3] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7777,7 +8131,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy3 {
         $crate::SearchSysCacheCopy3!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SearchSysCacheCopy3 from syscache.h:95
@@ -7825,7 +8179,7 @@ macro_rules! SearchSysCacheCopy3 {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_499cf25baf495404aa24da1584a0e34c(
+                $crate::__pgrx_c_generated::Inline_68eb7fbc65d4369b9bc4d3e206489184(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -7930,13 +8284,13 @@ macro_rules! SearchSysCacheCopy3 {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7953,7 +8307,7 @@ macro_rules! SearchSysCacheCopy3 {
                         $crate::__pgrx_c_operand!(@check_safety; $key3);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -7964,7 +8318,7 @@ macro_rules! SearchSysCacheCopy3 {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_499cf25baf495404aa24da1584a0e34c(
+                                $crate::__pgrx_c_generated::Inline_68eb7fbc65d4369b9bc4d3e206489184(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -8074,7 +8428,7 @@ macro_rules! SearchSysCacheCopy3 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8093,7 +8447,7 @@ macro_rules! SearchSysCacheCopy3 {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_499cf25baf495404aa24da1584a0e34c(
+                    $crate::__pgrx_c_generated::Inline_68eb7fbc65d4369b9bc4d3e206489184(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -8273,6 +8627,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy4 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheCopy4] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8324,6 +8685,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy4 {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_SearchSysCacheCopy4] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheCopy4] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -8381,6 +8749,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy4 {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheCopy4] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8432,6 +8807,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy4 {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_SearchSysCacheCopy4] [p4 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheCopy4] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -8496,6 +8878,11 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy4 {
             @argument [__pgrx_c_args_SearchSysCacheCopy4] [p5 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheCopy4] [p5 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8533,6 +8920,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy4 {
             ]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheCopy4] [p5 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8549,7 +8943,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy4 {
         $crate::SearchSysCacheCopy4!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SearchSysCacheCopy4 from syscache.h:97
@@ -8598,7 +8992,7 @@ macro_rules! SearchSysCacheCopy4 {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_499cf25baf495404aa24da1584a0e34c(
+                $crate::__pgrx_c_generated::Inline_68eb7fbc65d4369b9bc4d3e206489184(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -8699,13 +9093,13 @@ macro_rules! SearchSysCacheCopy4 {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt, $key4:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt, $key4:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8723,7 +9117,7 @@ macro_rules! SearchSysCacheCopy4 {
                         $crate::__pgrx_c_operand!(@check_safety; $key4);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -8734,7 +9128,7 @@ macro_rules! SearchSysCacheCopy4 {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_499cf25baf495404aa24da1584a0e34c(
+                                $crate::__pgrx_c_generated::Inline_68eb7fbc65d4369b9bc4d3e206489184(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -8838,7 +9232,7 @@ macro_rules! SearchSysCacheCopy4 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8857,7 +9251,7 @@ macro_rules! SearchSysCacheCopy4 {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_499cf25baf495404aa24da1584a0e34c(
+                    $crate::__pgrx_c_generated::Inline_68eb7fbc65d4369b9bc4d3e206489184(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -9036,6 +9430,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists1 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheExists1] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists1!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9097,6 +9498,11 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists1 {
             @argument [__pgrx_c_args_SearchSysCacheExists1] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheExists1] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SearchSysCacheExists1!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9134,6 +9540,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists1 {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheExists1] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists1!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9150,7 +9563,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists1 {
         $crate::SearchSysCacheExists1!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SearchSysCacheExists1 from syscache.h:100
@@ -9189,7 +9602,7 @@ macro_rules! SearchSysCacheExists1 {
         /* PGRX: SearchSysCacheExists1 remains expanded because SearchSysCacheExists is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_173ab9d4f30fd07bfc76288431aec7e8(
+                $crate::__pgrx_c_generated::Inline_5d65bed159b14ae0657997a13e1daf96(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -9302,13 +9715,13 @@ macro_rules! SearchSysCacheExists1 {
         $crate::__pgrx_c_args_SearchSysCacheExists1!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cacheId:tt, $key1:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists1!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cacheId:tt, $key1:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists1!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -9323,13 +9736,13 @@ macro_rules! SearchSysCacheExists1 {
                         $crate::__pgrx_c_operand!(@check_safety; $key1);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_173ab9d4f30fd07bfc76288431aec7e8(
+                                $crate::__pgrx_c_generated::Inline_5d65bed159b14ae0657997a13e1daf96(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -9451,7 +9864,7 @@ macro_rules! SearchSysCacheExists1 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9463,7 +9876,7 @@ macro_rules! SearchSysCacheExists1 {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::__pgrx_c_generated::Inline_173ab9d4f30fd07bfc76288431aec7e8(
+                    $crate::__pgrx_c_generated::Inline_5d65bed159b14ae0657997a13e1daf96(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -9654,6 +10067,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists2 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheExists2] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists2!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9705,6 +10125,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists2 {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_SearchSysCacheExists2] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheExists2] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -9769,6 +10196,11 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists2 {
             @argument [__pgrx_c_args_SearchSysCacheExists2] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheExists2] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SearchSysCacheExists2!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9806,6 +10238,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists2 {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheExists2] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists2!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9822,7 +10261,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists2 {
         $crate::SearchSysCacheExists2!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SearchSysCacheExists2 from syscache.h:102
@@ -9862,7 +10301,7 @@ macro_rules! SearchSysCacheExists2 {
         /* PGRX: SearchSysCacheExists2 remains expanded because SearchSysCacheExists is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_173ab9d4f30fd07bfc76288431aec7e8(
+                $crate::__pgrx_c_generated::Inline_5d65bed159b14ae0657997a13e1daf96(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -9971,13 +10410,13 @@ macro_rules! SearchSysCacheExists2 {
         $crate::__pgrx_c_args_SearchSysCacheExists2!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cacheId:tt, $key1:tt, $key2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists2!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cacheId:tt, $key1:tt, $key2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists2!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -9993,13 +10432,13 @@ macro_rules! SearchSysCacheExists2 {
                         $crate::__pgrx_c_operand!(@check_safety; $key2);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_173ab9d4f30fd07bfc76288431aec7e8(
+                                $crate::__pgrx_c_generated::Inline_5d65bed159b14ae0657997a13e1daf96(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -10115,7 +10554,7 @@ macro_rules! SearchSysCacheExists2 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10127,7 +10566,7 @@ macro_rules! SearchSysCacheExists2 {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::__pgrx_c_generated::Inline_173ab9d4f30fd07bfc76288431aec7e8(
+                    $crate::__pgrx_c_generated::Inline_5d65bed159b14ae0657997a13e1daf96(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -10314,6 +10753,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists3 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheExists3] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10368,6 +10814,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists3 {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheExists3] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10419,6 +10872,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists3 {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_SearchSysCacheExists3] [p3 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheExists3] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -10483,6 +10943,11 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists3 {
             @argument [__pgrx_c_args_SearchSysCacheExists3] [p4 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheExists3] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10520,6 +10985,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists3 {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheExists3] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10536,7 +11008,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists3 {
         $crate::SearchSysCacheExists3!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SearchSysCacheExists3 from syscache.h:104
@@ -10577,7 +11049,7 @@ macro_rules! SearchSysCacheExists3 {
         /* PGRX: SearchSysCacheExists3 remains expanded because SearchSysCacheExists is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_173ab9d4f30fd07bfc76288431aec7e8(
+                $crate::__pgrx_c_generated::Inline_5d65bed159b14ae0657997a13e1daf96(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -10682,13 +11154,13 @@ macro_rules! SearchSysCacheExists3 {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -10705,13 +11177,13 @@ macro_rules! SearchSysCacheExists3 {
                         $crate::__pgrx_c_operand!(@check_safety; $key3);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_173ab9d4f30fd07bfc76288431aec7e8(
+                                $crate::__pgrx_c_generated::Inline_5d65bed159b14ae0657997a13e1daf96(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -10821,7 +11293,7 @@ macro_rules! SearchSysCacheExists3 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10833,7 +11305,7 @@ macro_rules! SearchSysCacheExists3 {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::__pgrx_c_generated::Inline_173ab9d4f30fd07bfc76288431aec7e8(
+                    $crate::__pgrx_c_generated::Inline_5d65bed159b14ae0657997a13e1daf96(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -11016,6 +11488,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists4 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheExists4] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11067,6 +11546,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists4 {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_SearchSysCacheExists4] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheExists4] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -11124,6 +11610,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists4 {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheExists4] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11175,6 +11668,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists4 {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_SearchSysCacheExists4] [p4 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheExists4] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -11239,6 +11739,11 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists4 {
             @argument [__pgrx_c_args_SearchSysCacheExists4] [p5 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheExists4] [p5 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11276,6 +11781,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists4 {
             ]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheExists4] [p5 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11292,7 +11804,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists4 {
         $crate::SearchSysCacheExists4!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SearchSysCacheExists4 from syscache.h:106
@@ -11334,7 +11846,7 @@ macro_rules! SearchSysCacheExists4 {
         /* PGRX: SearchSysCacheExists4 remains expanded because SearchSysCacheExists is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_173ab9d4f30fd07bfc76288431aec7e8(
+                $crate::__pgrx_c_generated::Inline_5d65bed159b14ae0657997a13e1daf96(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -11435,13 +11947,13 @@ macro_rules! SearchSysCacheExists4 {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt, $key4:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt, $key4:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -11459,13 +11971,13 @@ macro_rules! SearchSysCacheExists4 {
                         $crate::__pgrx_c_operand!(@check_safety; $key4);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_173ab9d4f30fd07bfc76288431aec7e8(
+                                $crate::__pgrx_c_generated::Inline_5d65bed159b14ae0657997a13e1daf96(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -11569,7 +12081,7 @@ macro_rules! SearchSysCacheExists4 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -11581,7 +12093,7 @@ macro_rules! SearchSysCacheExists4 {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::__pgrx_c_generated::Inline_173ab9d4f30fd07bfc76288431aec7e8(
+                    $crate::__pgrx_c_generated::Inline_5d65bed159b14ae0657997a13e1daf96(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -11757,6 +12269,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheList1 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheList1] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList1!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11818,6 +12337,11 @@ macro_rules! __pgrx_c_args_SearchSysCacheList1 {
             @argument [__pgrx_c_args_SearchSysCacheList1] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheList1] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SearchSysCacheList1!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11855,6 +12379,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheList1 {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheList1] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList1!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11871,7 +12402,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheList1 {
         $crate::SearchSysCacheList1!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SearchSysCacheList1 from syscache.h:127
@@ -11917,7 +12448,7 @@ macro_rules! SearchSysCacheList1 {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_099d336c14fd0e2e4745b3ba2e5076a0(
+                $crate::__pgrx_c_generated::Inline_553a3bc45790b9ec1ce63506e03666cb(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -12020,13 +12551,13 @@ macro_rules! SearchSysCacheList1 {
         $crate::__pgrx_c_args_SearchSysCacheList1!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cacheId:tt, $key1:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList1!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cacheId:tt, $key1:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList1!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -12041,7 +12572,7 @@ macro_rules! SearchSysCacheList1 {
                         $crate::__pgrx_c_operand!(@check_safety; $key1);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -12052,7 +12583,7 @@ macro_rules! SearchSysCacheList1 {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_099d336c14fd0e2e4745b3ba2e5076a0(
+                                $crate::__pgrx_c_generated::Inline_553a3bc45790b9ec1ce63506e03666cb(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -12166,7 +12697,7 @@ macro_rules! SearchSysCacheList1 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -12185,7 +12716,7 @@ macro_rules! SearchSysCacheList1 {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_099d336c14fd0e2e4745b3ba2e5076a0(
+                    $crate::__pgrx_c_generated::Inline_553a3bc45790b9ec1ce63506e03666cb(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -12365,6 +12896,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheList2 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheList2] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList2!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12416,6 +12954,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheList2 {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_SearchSysCacheList2] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheList2] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -12480,6 +13025,11 @@ macro_rules! __pgrx_c_args_SearchSysCacheList2 {
             @argument [__pgrx_c_args_SearchSysCacheList2] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheList2] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SearchSysCacheList2!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12517,6 +13067,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheList2 {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheList2] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList2!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12533,7 +13090,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheList2 {
         $crate::SearchSysCacheList2!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SearchSysCacheList2 from syscache.h:129
@@ -12580,7 +13137,7 @@ macro_rules! SearchSysCacheList2 {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_099d336c14fd0e2e4745b3ba2e5076a0(
+                $crate::__pgrx_c_generated::Inline_553a3bc45790b9ec1ce63506e03666cb(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -12679,13 +13236,13 @@ macro_rules! SearchSysCacheList2 {
         $crate::__pgrx_c_args_SearchSysCacheList2!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cacheId:tt, $key1:tt, $key2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList2!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cacheId:tt, $key1:tt, $key2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList2!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -12701,7 +13258,7 @@ macro_rules! SearchSysCacheList2 {
                         $crate::__pgrx_c_operand!(@check_safety; $key2);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -12712,7 +13269,7 @@ macro_rules! SearchSysCacheList2 {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_099d336c14fd0e2e4745b3ba2e5076a0(
+                                $crate::__pgrx_c_generated::Inline_553a3bc45790b9ec1ce63506e03666cb(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -12820,7 +13377,7 @@ macro_rules! SearchSysCacheList2 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -12839,7 +13396,7 @@ macro_rules! SearchSysCacheList2 {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_099d336c14fd0e2e4745b3ba2e5076a0(
+                    $crate::__pgrx_c_generated::Inline_553a3bc45790b9ec1ce63506e03666cb(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -13015,6 +13572,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheList3 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheList3] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13069,6 +13633,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheList3 {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheList3] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13120,6 +13691,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheList3 {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_SearchSysCacheList3] [p3 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheList3] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -13184,6 +13762,11 @@ macro_rules! __pgrx_c_args_SearchSysCacheList3 {
             @argument [__pgrx_c_args_SearchSysCacheList3] [p4 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheList3] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13221,6 +13804,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheList3 {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SearchSysCacheList3] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13237,7 +13827,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheList3 {
         $crate::SearchSysCacheList3!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SearchSysCacheList3 from syscache.h:131
@@ -13285,7 +13875,7 @@ macro_rules! SearchSysCacheList3 {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_099d336c14fd0e2e4745b3ba2e5076a0(
+                $crate::__pgrx_c_generated::Inline_553a3bc45790b9ec1ce63506e03666cb(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -13380,13 +13970,13 @@ macro_rules! SearchSysCacheList3 {
         $crate::__pgrx_c_args_SearchSysCacheList3!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cacheId:tt, $key1:tt, $key2:tt, $key3:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -13403,7 +13993,7 @@ macro_rules! SearchSysCacheList3 {
                         $crate::__pgrx_c_operand!(@check_safety; $key3);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -13414,7 +14004,7 @@ macro_rules! SearchSysCacheList3 {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_099d336c14fd0e2e4745b3ba2e5076a0(
+                                $crate::__pgrx_c_generated::Inline_553a3bc45790b9ec1ce63506e03666cb(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -13516,7 +14106,7 @@ macro_rules! SearchSysCacheList3 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -13535,7 +14125,7 @@ macro_rules! SearchSysCacheList3 {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_099d336c14fd0e2e4745b3ba2e5076a0(
+                    $crate::__pgrx_c_generated::Inline_553a3bc45790b9ec1ce63506e03666cb(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,

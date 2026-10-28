@@ -74,6 +74,13 @@ macro_rules! __pgrx_c_args_EvalPlanQualSetSlot {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_EvalPlanQualSetSlot] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_EvalPlanQualSetSlot!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -135,6 +142,11 @@ macro_rules! __pgrx_c_args_EvalPlanQualSetSlot {
             @argument [__pgrx_c_args_EvalPlanQualSetSlot] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_EvalPlanQualSetSlot] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_EvalPlanQualSetSlot!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -172,6 +184,13 @@ macro_rules! __pgrx_c_args_EvalPlanQualSetSlot {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_EvalPlanQualSetSlot] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_EvalPlanQualSetSlot!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -188,7 +207,7 @@ macro_rules! __pgrx_c_args_EvalPlanQualSetSlot {
         $crate::EvalPlanQualSetSlot!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro EvalPlanQualSetSlot from executor.h:247
@@ -249,13 +268,13 @@ macro_rules! EvalPlanQualSetSlot {
         $crate::__pgrx_c_args_EvalPlanQualSetSlot!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $epqstate:tt, $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_EvalPlanQualSetSlot!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $epqstate:tt, $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_EvalPlanQualSetSlot!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -269,7 +288,7 @@ macro_rules! EvalPlanQualSetSlot {
                         $crate::__pgrx_c_operand!(@check_safety; $slot);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -297,7 +316,7 @@ macro_rules! EvalPlanQualSetSlot {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -406,6 +425,11 @@ macro_rules! __pgrx_c_args_ExecEvalExpr {
             @argument [__pgrx_c_args_ExecEvalExpr] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecEvalExpr] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExecEvalExpr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -456,6 +480,11 @@ macro_rules! __pgrx_c_args_ExecEvalExpr {
     (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_ExecEvalExpr] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecEvalExpr] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -519,6 +548,11 @@ macro_rules! __pgrx_c_args_ExecEvalExpr {
             @argument [__pgrx_c_args_ExecEvalExpr] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecEvalExpr] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ExecEvalExpr!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -554,6 +588,11 @@ macro_rules! __pgrx_c_args_ExecEvalExpr {
             @argument [__pgrx_c_args_ExecEvalExpr] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecEvalExpr] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExecEvalExpr!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -570,7 +609,7 @@ macro_rules! __pgrx_c_args_ExecEvalExpr {
         $crate::ExecEvalExpr!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ExecEvalExpr from executor.h:335
@@ -693,13 +732,13 @@ macro_rules! ExecEvalExpr {
         $crate::__pgrx_c_args_ExecEvalExpr!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $state:tt, $econtext:tt, $isNull:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecEvalExpr!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $state:tt, $econtext:tt, $isNull:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecEvalExpr!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -714,7 +753,7 @@ macro_rules! ExecEvalExpr {
                         $crate::__pgrx_c_operand!(@check_safety; $isNull);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -795,7 +834,7 @@ macro_rules! ExecEvalExpr {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -960,6 +999,13 @@ macro_rules! __pgrx_c_args_ExecEvalExprSwitchContext {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecEvalExprSwitchContext] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExecEvalExprSwitchContext!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1011,6 +1057,13 @@ macro_rules! __pgrx_c_args_ExecEvalExprSwitchContext {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_ExecEvalExprSwitchContext] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecEvalExprSwitchContext] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -1077,6 +1130,13 @@ macro_rules! __pgrx_c_args_ExecEvalExprSwitchContext {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecEvalExprSwitchContext] [p3 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ExecEvalExprSwitchContext!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1114,6 +1174,13 @@ macro_rules! __pgrx_c_args_ExecEvalExprSwitchContext {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecEvalExprSwitchContext] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExecEvalExprSwitchContext!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1130,7 +1197,7 @@ macro_rules! __pgrx_c_args_ExecEvalExprSwitchContext {
         $crate::ExecEvalExprSwitchContext!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ExecEvalExprSwitchContext from executor.h:350
@@ -1262,13 +1329,13 @@ macro_rules! ExecEvalExprSwitchContext {
         $crate::__pgrx_c_args_ExecEvalExprSwitchContext!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $state:tt, $econtext:tt, $isNull:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecEvalExprSwitchContext!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $state:tt, $econtext:tt, $isNull:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecEvalExprSwitchContext!(
@@ -1286,7 +1353,7 @@ macro_rules! ExecEvalExprSwitchContext {
                         $crate::__pgrx_c_operand!(@check_safety; $isNull);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1367,7 +1434,7 @@ macro_rules! ExecEvalExprSwitchContext {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1532,6 +1599,13 @@ macro_rules! __pgrx_c_args_ExecGetJunkAttribute {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecGetJunkAttribute] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExecGetJunkAttribute!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1583,6 +1657,13 @@ macro_rules! __pgrx_c_args_ExecGetJunkAttribute {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_ExecGetJunkAttribute] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecGetJunkAttribute] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -1647,6 +1728,11 @@ macro_rules! __pgrx_c_args_ExecGetJunkAttribute {
             @argument [__pgrx_c_args_ExecGetJunkAttribute] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecGetJunkAttribute] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ExecGetJunkAttribute!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1684,6 +1770,13 @@ macro_rules! __pgrx_c_args_ExecGetJunkAttribute {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecGetJunkAttribute] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExecGetJunkAttribute!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1700,7 +1793,7 @@ macro_rules! __pgrx_c_args_ExecGetJunkAttribute {
         $crate::ExecGetJunkAttribute!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ExecGetJunkAttribute from executor.h:189
@@ -1810,13 +1903,13 @@ macro_rules! ExecGetJunkAttribute {
         $crate::__pgrx_c_args_ExecGetJunkAttribute!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $slot:tt, $attno:tt, $isNull:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecGetJunkAttribute!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $slot:tt, $attno:tt, $isNull:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecGetJunkAttribute!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1831,7 +1924,7 @@ macro_rules! ExecGetJunkAttribute {
                         $crate::__pgrx_c_operand!(@check_safety; $isNull);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1902,7 +1995,7 @@ macro_rules! ExecGetJunkAttribute {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2061,6 +2154,11 @@ macro_rules! __pgrx_c_args_ExecProcNode {
             @argument [__pgrx_c_args_ExecProcNode] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecProcNode] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ExecProcNode!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2096,6 +2194,11 @@ macro_rules! __pgrx_c_args_ExecProcNode {
             @argument [__pgrx_c_args_ExecProcNode] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecProcNode] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExecProcNode!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2112,7 +2215,7 @@ macro_rules! __pgrx_c_args_ExecProcNode {
         $crate::ExecProcNode!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ExecProcNode from executor.h:271
@@ -2196,13 +2299,13 @@ macro_rules! ExecProcNode {
         $crate::__pgrx_c_args_ExecProcNode!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecProcNode!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $node:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecProcNode!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2215,7 +2318,7 @@ macro_rules! ExecProcNode {
                         $crate::__pgrx_c_operand!(@check_safety; $node);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2256,7 +2359,7 @@ macro_rules! ExecProcNode {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2387,6 +2490,11 @@ macro_rules! __pgrx_c_args_ExecProject {
             @argument [__pgrx_c_args_ExecProject] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecProject] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ExecProject!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2422,6 +2530,11 @@ macro_rules! __pgrx_c_args_ExecProject {
             @argument [__pgrx_c_args_ExecProject] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecProject] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExecProject!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2438,7 +2551,7 @@ macro_rules! __pgrx_c_args_ExecProject {
         $crate::ExecProject!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ExecProject from executor.h:378
@@ -2540,13 +2653,13 @@ macro_rules! ExecProject {
         $crate::__pgrx_c_args_ExecProject!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $projInfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecProject!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $projInfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecProject!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2559,7 +2672,7 @@ macro_rules! ExecProject {
                         $crate::__pgrx_c_operand!(@check_safety; $projInfo);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2600,7 +2713,7 @@ macro_rules! ExecProject {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2722,6 +2835,11 @@ macro_rules! __pgrx_c_args_ExecQual {
             @argument [__pgrx_c_args_ExecQual] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecQual] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExecQual!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2783,6 +2901,11 @@ macro_rules! __pgrx_c_args_ExecQual {
             @argument [__pgrx_c_args_ExecQual] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecQual] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ExecQual!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2818,6 +2941,11 @@ macro_rules! __pgrx_c_args_ExecQual {
             @argument [__pgrx_c_args_ExecQual] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecQual] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExecQual!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2834,7 +2962,7 @@ macro_rules! __pgrx_c_args_ExecQual {
         $crate::ExecQual!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ExecQual from executor.h:415
@@ -2946,13 +3074,13 @@ macro_rules! ExecQual {
         $crate::__pgrx_c_args_ExecQual!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $state:tt, $econtext:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecQual!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $state:tt, $econtext:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecQual!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2966,7 +3094,7 @@ macro_rules! ExecQual {
                         $crate::__pgrx_c_operand!(@check_safety; $econtext);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -3025,7 +3153,7 @@ macro_rules! ExecQual {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3164,6 +3292,13 @@ macro_rules! __pgrx_c_args_ExecQualAndReset {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecQualAndReset] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExecQualAndReset!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3225,6 +3360,11 @@ macro_rules! __pgrx_c_args_ExecQualAndReset {
             @argument [__pgrx_c_args_ExecQualAndReset] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecQualAndReset] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ExecQualAndReset!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3262,6 +3402,13 @@ macro_rules! __pgrx_c_args_ExecQualAndReset {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecQualAndReset] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExecQualAndReset!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3278,7 +3425,7 @@ macro_rules! __pgrx_c_args_ExecQualAndReset {
         $crate::ExecQualAndReset!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ExecQualAndReset from executor.h:442
@@ -3379,13 +3526,13 @@ macro_rules! ExecQualAndReset {
         $crate::__pgrx_c_args_ExecQualAndReset!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $state:tt, $econtext:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecQualAndReset!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $state:tt, $econtext:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecQualAndReset!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3399,7 +3546,7 @@ macro_rules! ExecQualAndReset {
                         $crate::__pgrx_c_operand!(@check_safety; $econtext);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -3458,7 +3605,7 @@ macro_rules! ExecQualAndReset {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3609,6 +3756,11 @@ macro_rules! __pgrx_c_args_GetPerTupleExprContext {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetPerTupleExprContext] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GetPerTupleExprContext!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3646,6 +3798,13 @@ macro_rules! __pgrx_c_args_GetPerTupleExprContext {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetPerTupleExprContext] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetPerTupleExprContext!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3662,7 +3821,7 @@ macro_rules! __pgrx_c_args_GetPerTupleExprContext {
         $crate::GetPerTupleExprContext!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GetPerTupleExprContext from executor.h:553
@@ -3791,13 +3950,13 @@ macro_rules! GetPerTupleExprContext {
         $crate::__pgrx_c_args_GetPerTupleExprContext!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $estate:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetPerTupleExprContext!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $estate:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetPerTupleExprContext!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3810,7 +3969,7 @@ macro_rules! GetPerTupleExprContext {
                         $crate::__pgrx_c_operand!(@check_safety; $estate);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -3920,7 +4079,7 @@ macro_rules! GetPerTupleExprContext {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4105,6 +4264,13 @@ macro_rules! __pgrx_c_args_GetPerTupleMemoryContext {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetPerTupleMemoryContext] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GetPerTupleMemoryContext!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4142,6 +4308,13 @@ macro_rules! __pgrx_c_args_GetPerTupleMemoryContext {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetPerTupleMemoryContext] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetPerTupleMemoryContext!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4158,7 +4331,7 @@ macro_rules! __pgrx_c_args_GetPerTupleMemoryContext {
         $crate::GetPerTupleMemoryContext!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GetPerTupleMemoryContext from executor.h:558
@@ -4583,7 +4756,7 @@ macro_rules! GetPerTupleMemoryContext {
                         $crate::__pgrx_c_operand!(@check_safety; $estate);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_ecxt_per_tuple_memory,
@@ -4706,7 +4879,7 @@ macro_rules! GetPerTupleMemoryContext {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4925,6 +5098,11 @@ macro_rules! __pgrx_c_args_ResetExprContext {
             @argument [__pgrx_c_args_ResetExprContext] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ResetExprContext] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ResetExprContext!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4962,6 +5140,13 @@ macro_rules! __pgrx_c_args_ResetExprContext {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ResetExprContext] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ResetExprContext!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4978,7 +5163,7 @@ macro_rules! __pgrx_c_args_ResetExprContext {
         $crate::ResetExprContext!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ResetExprContext from executor.h:547
@@ -5060,13 +5245,13 @@ macro_rules! ResetExprContext {
         $crate::__pgrx_c_args_ResetExprContext!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $econtext:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ResetExprContext!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $econtext:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ResetExprContext!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5080,7 +5265,7 @@ macro_rules! ResetExprContext {
                         $crate::__pgrx_c_operand!(@check_safety; $econtext);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::MemoryContextReset(
@@ -5134,7 +5319,7 @@ macro_rules! ResetExprContext {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5282,6 +5467,13 @@ macro_rules! __pgrx_c_args_ResetPerTupleExprContext {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ResetPerTupleExprContext] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ResetPerTupleExprContext!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5319,6 +5511,13 @@ macro_rules! __pgrx_c_args_ResetPerTupleExprContext {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ResetPerTupleExprContext] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ResetPerTupleExprContext!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5335,7 +5534,7 @@ macro_rules! __pgrx_c_args_ResetPerTupleExprContext {
         $crate::ResetPerTupleExprContext!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ResetPerTupleExprContext from executor.h:562
@@ -5469,7 +5668,7 @@ macro_rules! ResetPerTupleExprContext {
         $crate::__pgrx_c_args_ResetPerTupleExprContext!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_ResetPerTupleExprContext!(@collect __pgrx_emit_public []; $($raw)*)
@@ -5546,6 +5745,11 @@ macro_rules! __pgrx_c_args_exec_rt_fetch {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_exec_rt_fetch] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_exec_rt_fetch!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5607,6 +5811,11 @@ macro_rules! __pgrx_c_args_exec_rt_fetch {
             @argument [__pgrx_c_args_exec_rt_fetch] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_exec_rt_fetch] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_exec_rt_fetch!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5644,6 +5853,11 @@ macro_rules! __pgrx_c_args_exec_rt_fetch {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_exec_rt_fetch] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_exec_rt_fetch!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5660,7 +5874,7 @@ macro_rules! __pgrx_c_args_exec_rt_fetch {
         $crate::exec_rt_fetch!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function exec_rt_fetch from executor.h:590
@@ -5754,13 +5968,13 @@ macro_rules! exec_rt_fetch {
         $crate::__pgrx_c_args_exec_rt_fetch!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rti:tt, $estate:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_exec_rt_fetch!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rti:tt, $estate:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_exec_rt_fetch!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5774,7 +5988,7 @@ macro_rules! exec_rt_fetch {
                         $crate::__pgrx_c_operand!(@check_safety; $estate);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -5828,7 +6042,7 @@ macro_rules! exec_rt_fetch {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

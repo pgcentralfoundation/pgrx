@@ -60,13 +60,13 @@ macro_rules! SPIN_DELAY {
         $crate::SPIN_DELAY!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::SPIN_DELAY!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::SPIN_DELAY!(@__pgrx_emit_read_place; $($raw)*)
@@ -78,7 +78,7 @@ macro_rules! SPIN_DELAY {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::spin_delay()
@@ -86,7 +86,7 @@ macro_rules! SPIN_DELAY {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -105,13 +105,13 @@ macro_rules! SPIN_DELAY {
         $crate::SPIN_DELAY!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::SPIN_DELAY!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 
@@ -188,6 +188,11 @@ macro_rules! __pgrx_c_args_TAS {
             @argument [__pgrx_c_args_TAS] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TAS] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TAS!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -223,6 +228,11 @@ macro_rules! __pgrx_c_args_TAS {
             @argument [__pgrx_c_args_TAS] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TAS] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TAS!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -239,7 +249,7 @@ macro_rules! __pgrx_c_args_TAS {
         $crate::TAS!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TAS from s_lock.h:201
@@ -306,13 +316,13 @@ macro_rules! TAS {
         $crate::__pgrx_c_args_TAS!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $lock:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TAS!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $lock:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TAS!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -326,7 +336,7 @@ macro_rules! TAS {
                         $crate::__pgrx_c_operand!(@check_safety; $lock);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -362,7 +372,7 @@ macro_rules! TAS {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -487,6 +497,11 @@ macro_rules! __pgrx_c_args_TAS_SPIN {
             @argument [__pgrx_c_args_TAS_SPIN] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TAS_SPIN] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TAS_SPIN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -522,6 +537,11 @@ macro_rules! __pgrx_c_args_TAS_SPIN {
             @argument [__pgrx_c_args_TAS_SPIN] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TAS_SPIN] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TAS_SPIN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -538,7 +558,7 @@ macro_rules! __pgrx_c_args_TAS_SPIN {
         $crate::TAS_SPIN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TAS_SPIN from s_lock.h:212
@@ -638,13 +658,13 @@ macro_rules! TAS_SPIN {
         $crate::__pgrx_c_args_TAS_SPIN!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $lock:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TAS_SPIN!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $lock:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TAS_SPIN!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -658,7 +678,7 @@ macro_rules! TAS_SPIN {
                         $crate::__pgrx_c_operand!(@check_safety; $lock);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -732,7 +752,7 @@ macro_rules! TAS_SPIN {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -879,6 +899,13 @@ macro_rules! __pgrx_c_args_init_spin_delay {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_init_spin_delay] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_init_spin_delay!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -933,6 +960,13 @@ macro_rules! __pgrx_c_args_init_spin_delay {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_init_spin_delay] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_init_spin_delay!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -984,6 +1018,13 @@ macro_rules! __pgrx_c_args_init_spin_delay {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_init_spin_delay] [p3 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_init_spin_delay] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -1048,6 +1089,11 @@ macro_rules! __pgrx_c_args_init_spin_delay {
             @argument [__pgrx_c_args_init_spin_delay] [p4 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_init_spin_delay] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_init_spin_delay!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1085,6 +1131,13 @@ macro_rules! __pgrx_c_args_init_spin_delay {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_init_spin_delay] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_init_spin_delay!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1101,7 +1154,7 @@ macro_rules! __pgrx_c_args_init_spin_delay {
         $crate::init_spin_delay!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function init_spin_delay from s_lock.h:737
@@ -1240,13 +1293,13 @@ macro_rules! init_spin_delay {
         $crate::__pgrx_c_args_init_spin_delay!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $status:tt, $file:tt, $line:tt, $func:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_init_spin_delay!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $status:tt, $file:tt, $line:tt, $func:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_init_spin_delay!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1262,7 +1315,7 @@ macro_rules! init_spin_delay {
                         $crate::__pgrx_c_operand!(@check_safety; $func);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::init_spin_delay(
@@ -1357,7 +1410,7 @@ macro_rules! init_spin_delay {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1526,13 +1579,13 @@ macro_rules! spin_delay {
         $crate::spin_delay!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::spin_delay!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::spin_delay!(@__pgrx_emit_read_place; $($raw)*)
@@ -1543,7 +1596,7 @@ macro_rules! spin_delay {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::spin_delay()
@@ -1551,7 +1604,7 @@ macro_rules! spin_delay {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1569,13 +1622,13 @@ macro_rules! spin_delay {
         $crate::spin_delay!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::spin_delay!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 
@@ -1652,6 +1705,11 @@ macro_rules! __pgrx_c_args_tas {
             @argument [__pgrx_c_args_tas] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_tas] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_tas!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1687,6 +1745,11 @@ macro_rules! __pgrx_c_args_tas {
             @argument [__pgrx_c_args_tas] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_tas] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_tas!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1703,7 +1766,7 @@ macro_rules! __pgrx_c_args_tas {
         $crate::tas!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function tas from s_lock.h:214
@@ -1783,13 +1846,13 @@ macro_rules! tas {
         $crate::__pgrx_c_args_tas!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $lock:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_tas!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $lock:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_tas!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1802,7 +1865,7 @@ macro_rules! tas {
                         $crate::__pgrx_c_operand!(@check_safety; $lock);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1838,7 +1901,7 @@ macro_rules! tas {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

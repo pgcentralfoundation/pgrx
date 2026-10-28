@@ -56,7 +56,7 @@ macro_rules! __pgrx_c_args_SlruPagePrecedesUnitTests {
         )
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SlruPagePrecedesUnitTests!(
@@ -82,13 +82,13 @@ macro_rules! __pgrx_c_args_SlruPagePrecedesUnitTests {
         )
     };
     (@ignore1 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::SlruPagePrecedesUnitTests!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SlruPagePrecedesUnitTests from slru.h:156
@@ -126,7 +126,7 @@ macro_rules! SlruPagePrecedesUnitTests {
         $crate::__pgrx_c_args_SlruPagePrecedesUnitTests!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_SlruPagePrecedesUnitTests!(@collect __pgrx_emit_public []; $($raw)*)

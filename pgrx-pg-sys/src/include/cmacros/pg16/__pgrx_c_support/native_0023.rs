@@ -5,6 +5,39 @@ This code is generated for documentation purposes, so that it is easy to referen
 // Shared generated C macro support.
 
 // SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::core_yy_extra_type, <<c::expression::CRecord<crate::__pgrx_c_bindings::core_yy_extra_type> as c::expression::OrdinaryField<Field_escape_string_warning>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).escape_string_warning) };
+#[doc(hidden)]
+pub struct Field_standard_conforming_strings;
+const _: () = assert!(
+    ::core::mem::offset_of!(
+        crate::__pgrx_c_bindings::core_yy_extra_type,
+        standard_conforming_strings
+    ) == 37
+);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_standard_conforming_strings>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::core_yy_extra_type>
+{
+    type Member = c::CBool;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 37;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::core_yy_extra_type, <<c::expression::CRecord<crate::__pgrx_c_bindings::core_yy_extra_type> as c::expression::OrdinaryField<Field_standard_conforming_strings>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).standard_conforming_strings) };
+#[doc(hidden)]
+pub struct Field_literallen;
+const _: () = assert!(
+    ::core::mem::offset_of!(crate::__pgrx_c_bindings::core_yy_extra_type, literallen) == 48
+);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_literallen>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::core_yy_extra_type>
+{
+    type Member = c::CInt;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 48;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
 const _: Projection<crate::__pgrx_c_bindings::core_yy_extra_type, <<c::expression::CRecord<crate::__pgrx_c_bindings::core_yy_extra_type> as c::expression::OrdinaryField<Field_literallen>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).literallen) };
 #[doc(hidden)]
 pub struct Field_literalalloc;
@@ -4167,29 +4200,3 @@ unsafe impl c::expression::OrdinaryField<Field_leaftopparent>
     type Declared = FieldReadWrite;
     const OFFSET: usize = 32;
 }
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<crate::__pgrx_c_bindings::xl_btree_unlink_page, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_btree_unlink_page> as c::expression::OrdinaryField<Field_leaftopparent>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).leaftopparent) };
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::xl_btree_update>() == 2);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::xl_btree_update>() == 2);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::xl_btree_update {}
-const _: () =
-    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_btree_update, ndeletedtids) == 0);
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field_ndeletedtids>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_btree_update>
-{
-    type Member = c::CUnsignedShort;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 0;
-}
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<crate::__pgrx_c_bindings::xl_btree_update, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_btree_update> as c::expression::OrdinaryField<Field_ndeletedtids>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).ndeletedtids) };
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::xl_btree_vacuum>() == 4);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::xl_btree_vacuum>() == 2);
-};
-impl c::expression::NativeRecord for crate::__pgrx_c_bindings::xl_btree_vacuum {}
-const _: () =
-    assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::xl_btree_vacuum, ndeleted) == 0);

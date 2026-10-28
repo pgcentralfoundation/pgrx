@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_InitDirtySnapshot {
             @argument [__pgrx_c_args_InitDirtySnapshot] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InitDirtySnapshot] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InitDirtySnapshot!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -118,6 +123,13 @@ macro_rules! __pgrx_c_args_InitDirtySnapshot {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InitDirtySnapshot] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitDirtySnapshot!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -134,7 +146,7 @@ macro_rules! __pgrx_c_args_InitDirtySnapshot {
         $crate::InitDirtySnapshot!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro InitDirtySnapshot from snapmgr.h:40
@@ -186,13 +198,13 @@ macro_rules! InitDirtySnapshot {
         $crate::__pgrx_c_args_InitDirtySnapshot!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $snapshotdata:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_InitDirtySnapshot!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $snapshotdata:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_InitDirtySnapshot!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -205,7 +217,7 @@ macro_rules! InitDirtySnapshot {
                         $crate::__pgrx_c_operand!(@check_safety; $snapshotdata);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -224,7 +236,7 @@ macro_rules! InitDirtySnapshot {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -330,6 +342,13 @@ macro_rules! __pgrx_c_args_InitNonVacuumableSnapshot {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InitNonVacuumableSnapshot] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitNonVacuumableSnapshot!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -393,6 +412,13 @@ macro_rules! __pgrx_c_args_InitNonVacuumableSnapshot {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InitNonVacuumableSnapshot] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InitNonVacuumableSnapshot!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -430,6 +456,13 @@ macro_rules! __pgrx_c_args_InitNonVacuumableSnapshot {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InitNonVacuumableSnapshot] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitNonVacuumableSnapshot!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -446,7 +479,7 @@ macro_rules! __pgrx_c_args_InitNonVacuumableSnapshot {
         $crate::InitNonVacuumableSnapshot!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro InitNonVacuumableSnapshot from snapmgr.h:48
@@ -522,13 +555,13 @@ macro_rules! InitNonVacuumableSnapshot {
         $crate::__pgrx_c_args_InitNonVacuumableSnapshot!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $snapshotdata:tt, $vistestp:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_InitNonVacuumableSnapshot!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $snapshotdata:tt, $vistestp:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_InitNonVacuumableSnapshot!(
@@ -545,7 +578,7 @@ macro_rules! InitNonVacuumableSnapshot {
                         $crate::__pgrx_c_operand!(@check_safety; $vistestp);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -593,7 +626,7 @@ macro_rules! InitNonVacuumableSnapshot {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -716,6 +749,13 @@ macro_rules! __pgrx_c_args_InitToastSnapshot {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InitToastSnapshot] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitToastSnapshot!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -767,6 +807,13 @@ macro_rules! __pgrx_c_args_InitToastSnapshot {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_InitToastSnapshot] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InitToastSnapshot] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -831,6 +878,11 @@ macro_rules! __pgrx_c_args_InitToastSnapshot {
             @argument [__pgrx_c_args_InitToastSnapshot] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InitToastSnapshot] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InitToastSnapshot!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -868,6 +920,13 @@ macro_rules! __pgrx_c_args_InitToastSnapshot {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InitToastSnapshot] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitToastSnapshot!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -884,7 +943,7 @@ macro_rules! __pgrx_c_args_InitToastSnapshot {
         $crate::InitToastSnapshot!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro InitToastSnapshot from snapmgr.h:56
@@ -987,13 +1046,13 @@ macro_rules! InitToastSnapshot {
         $crate::__pgrx_c_args_InitToastSnapshot!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $snapshotdata:tt, $l:tt, $w:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_InitToastSnapshot!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $snapshotdata:tt, $l:tt, $w:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_InitToastSnapshot!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1008,7 +1067,7 @@ macro_rules! InitToastSnapshot {
                         $crate::__pgrx_c_operand!(@check_safety; $w);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -1102,7 +1161,7 @@ macro_rules! InitToastSnapshot {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1261,6 +1320,11 @@ macro_rules! __pgrx_c_args_IsMVCCSnapshot {
             @argument [__pgrx_c_args_IsMVCCSnapshot] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IsMVCCSnapshot] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IsMVCCSnapshot!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1298,6 +1362,11 @@ macro_rules! __pgrx_c_args_IsMVCCSnapshot {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IsMVCCSnapshot] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsMVCCSnapshot!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1314,7 +1383,7 @@ macro_rules! __pgrx_c_args_IsMVCCSnapshot {
         $crate::IsMVCCSnapshot!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IsMVCCSnapshot from snapmgr.h:62
@@ -1431,13 +1500,13 @@ macro_rules! IsMVCCSnapshot {
         $crate::__pgrx_c_args_IsMVCCSnapshot!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $snapshot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IsMVCCSnapshot!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $snapshot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IsMVCCSnapshot!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1450,7 +1519,7 @@ macro_rules! IsMVCCSnapshot {
                         $crate::__pgrx_c_operand!(@check_safety; $snapshot);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -1548,7 +1617,7 @@ macro_rules! IsMVCCSnapshot {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1706,13 +1775,13 @@ macro_rules! SnapshotAny {
         $crate::SnapshotAny!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::SnapshotAny!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::SnapshotAny!(@__pgrx_emit_read_place; $($raw)*)
@@ -1723,7 +1792,7 @@ macro_rules! SnapshotAny {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::address(
@@ -1740,7 +1809,7 @@ macro_rules! SnapshotAny {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1763,13 +1832,13 @@ macro_rules! SnapshotAny {
         $crate::SnapshotAny!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::SnapshotAny!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 
@@ -1833,13 +1902,13 @@ macro_rules! SnapshotSelf {
         $crate::SnapshotSelf!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::SnapshotSelf!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::SnapshotSelf!(@__pgrx_emit_read_place; $($raw)*)
@@ -1850,7 +1919,7 @@ macro_rules! SnapshotSelf {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::address(
@@ -1867,7 +1936,7 @@ macro_rules! SnapshotSelf {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1890,13 +1959,13 @@ macro_rules! SnapshotSelf {
         $crate::SnapshotSelf!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::SnapshotSelf!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 

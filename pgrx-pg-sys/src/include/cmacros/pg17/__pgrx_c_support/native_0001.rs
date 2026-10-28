@@ -4,6 +4,65 @@ This code is generated for documentation purposes, so that it is easy to referen
 */
 // Shared generated C macro support.
 
+const _: () = assert!(
+    ::core::mem::size_of::<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(
+                u32,
+                *mut crate::__pgrx_c_bindings::EState,
+            )
+                -> *mut crate::__pgrx_c_bindings::RangeTblEntry,
+        >,
+    >() == 8
+);
+const _: () = assert!(
+    ::core::mem::align_of::<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(
+                u32,
+                *mut crate::__pgrx_c_bindings::EState,
+            )
+                -> *mut crate::__pgrx_c_bindings::RangeTblEntry,
+        >,
+    >() == 8
+);
+#[doc(hidden)]
+#[derive(Clone, Copy)]
+pub struct Signature_95754a9fb3b3bd5e1c379ce944eea1a0;
+impl c::sealed::Sealed for Signature_95754a9fb3b3bd5e1c379ce944eea1a0 {}
+impl c::expression::NativeFunctionSignature for Signature_95754a9fb3b3bd5e1c379ce944eea1a0 {
+    type Physical = PhysicalFunction_C_unwind_2<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(
+                u32,
+                *mut crate::__pgrx_c_bindings::EState,
+            )
+                -> *mut crate::__pgrx_c_bindings::RangeTblEntry,
+        >,
+    >;
+}
+const _: () = assert!(
+    ::core::mem::size_of::<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(
+                *const crate::__pgrx_c_bindings::buftag,
+            ) -> ::core::mem::MaybeUninit<
+                crate::__pgrx_c_bindings::RelFileLocator,
+            >,
+        >,
+    >() == 8
+);
+const _: () = assert!(
+    ::core::mem::align_of::<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(
+                *const crate::__pgrx_c_bindings::buftag,
+            ) -> ::core::mem::MaybeUninit<
+                crate::__pgrx_c_bindings::RelFileLocator,
+            >,
+        >,
+    >() == 8
+);
 #[doc(hidden)]
 #[derive(Clone, Copy)]
 pub struct Signature_cc2bad288167b79319fa8cd07c058490;
@@ -9610,63 +9669,3 @@ impl c::expression::NativeFunctionSignature for Signature_eb81b5cf10a9e9e09b2b9c
         >,
     >;
 }
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::RBTNode,
-                *const crate::__pgrx_c_bindings::RBTNode,
-                *mut ::core::ffi::c_void,
-            ) -> (),
-        >,
-    >() == 8
-);
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::RBTNode,
-                *const crate::__pgrx_c_bindings::RBTNode,
-                *mut ::core::ffi::c_void,
-            ) -> (),
-        >,
-    >() == 8
-);
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_aae35d6bb5e6758abb4387d922147e36;
-impl c::sealed::Sealed for Signature_aae35d6bb5e6758abb4387d922147e36 {}
-impl c::expression::NativeFunctionSignature for Signature_aae35d6bb5e6758abb4387d922147e36 {
-    type Physical = PhysicalFunction_C_unwind_3<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::RBTNode,
-                *const crate::__pgrx_c_bindings::RBTNode,
-                *mut ::core::ffi::c_void,
-            ) -> (),
-        >,
-    >;
-}
-const _: () = assert!(
-    ::core::mem::size_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::RBTNode,
-                *mut ::core::ffi::c_void,
-            ) -> (),
-        >,
-    >() == 8
-);
-const _: () = assert!(
-    ::core::mem::align_of::<
-        ::core::option::Option<
-            unsafe extern "C-unwind" fn(
-                *mut crate::__pgrx_c_bindings::RBTNode,
-                *mut ::core::ffi::c_void,
-            ) -> (),
-        >,
-    >() == 8
-);
-#[doc(hidden)]
-#[derive(Clone, Copy)]
-pub struct Signature_1b4e540c3fe37f937ab7d51eaf344281;

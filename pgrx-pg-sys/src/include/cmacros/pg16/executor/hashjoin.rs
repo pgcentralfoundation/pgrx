@@ -89,6 +89,13 @@ macro_rules! __pgrx_c_args_EstimateParallelHashJoinBatch {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_EstimateParallelHashJoinBatch] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_EstimateParallelHashJoinBatch!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -126,6 +133,13 @@ macro_rules! __pgrx_c_args_EstimateParallelHashJoinBatch {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_EstimateParallelHashJoinBatch] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_EstimateParallelHashJoinBatch!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -142,7 +156,7 @@ macro_rules! __pgrx_c_args_EstimateParallelHashJoinBatch {
         $crate::EstimateParallelHashJoinBatch!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro EstimateParallelHashJoinBatch from hashjoin.h:193
@@ -517,7 +531,7 @@ macro_rules! EstimateParallelHashJoinBatch {
         )
     };
     (@__pgrx_emit_place; $hashtable:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_EstimateParallelHashJoinBatch!(
@@ -526,7 +540,7 @@ macro_rules! EstimateParallelHashJoinBatch {
         )
     };
     (@__pgrx_emit_read_place; $hashtable:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_EstimateParallelHashJoinBatch!(
@@ -543,7 +557,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                         $crate::__pgrx_c_operand!(@check_safety; $hashtable);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                             $crate::__pgrx_c_macros::expression::add::<
@@ -890,7 +904,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1319,6 +1333,11 @@ macro_rules! __pgrx_c_args_HASH_CHUNK_DATA {
             @argument [__pgrx_c_args_HASH_CHUNK_DATA] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HASH_CHUNK_DATA] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HASH_CHUNK_DATA!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1356,6 +1375,13 @@ macro_rules! __pgrx_c_args_HASH_CHUNK_DATA {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HASH_CHUNK_DATA] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HASH_CHUNK_DATA!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1372,7 +1398,7 @@ macro_rules! __pgrx_c_args_HASH_CHUNK_DATA {
         $crate::HASH_CHUNK_DATA!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro HASH_CHUNK_DATA from hashjoin.h:152
@@ -1559,13 +1585,13 @@ macro_rules! HASH_CHUNK_DATA {
         $crate::__pgrx_c_args_HASH_CHUNK_DATA!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $hc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HASH_CHUNK_DATA!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $hc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HASH_CHUNK_DATA!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1579,7 +1605,7 @@ macro_rules! HASH_CHUNK_DATA {
                         $crate::__pgrx_c_operand!(@check_safety; $hc);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::add::<
@@ -1739,7 +1765,7 @@ macro_rules! HASH_CHUNK_DATA {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1980,6 +2006,11 @@ macro_rules! __pgrx_c_args_HJTUPLE_MINTUPLE {
             @argument [__pgrx_c_args_HJTUPLE_MINTUPLE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HJTUPLE_MINTUPLE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HJTUPLE_MINTUPLE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2017,6 +2048,13 @@ macro_rules! __pgrx_c_args_HJTUPLE_MINTUPLE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HJTUPLE_MINTUPLE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HJTUPLE_MINTUPLE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2033,7 +2071,7 @@ macro_rules! __pgrx_c_args_HJTUPLE_MINTUPLE {
         $crate::HJTUPLE_MINTUPLE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro HJTUPLE_MINTUPLE from hashjoin.h:91
@@ -2244,13 +2282,13 @@ macro_rules! HJTUPLE_MINTUPLE {
         $crate::__pgrx_c_args_HJTUPLE_MINTUPLE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $hjtup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HJTUPLE_MINTUPLE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $hjtup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HJTUPLE_MINTUPLE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2264,7 +2302,7 @@ macro_rules! HJTUPLE_MINTUPLE {
                         $crate::__pgrx_c_operand!(@check_safety; $hjtup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -2450,7 +2488,7 @@ macro_rules! HJTUPLE_MINTUPLE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2711,6 +2749,13 @@ macro_rules! __pgrx_c_args_NthParallelHashJoinBatch {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_NthParallelHashJoinBatch] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2762,6 +2807,13 @@ macro_rules! __pgrx_c_args_NthParallelHashJoinBatch {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_NthParallelHashJoinBatch] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_NthParallelHashJoinBatch] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -2828,6 +2880,13 @@ macro_rules! __pgrx_c_args_NthParallelHashJoinBatch {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_NthParallelHashJoinBatch] [p3 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2865,6 +2924,13 @@ macro_rules! __pgrx_c_args_NthParallelHashJoinBatch {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_NthParallelHashJoinBatch] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2881,7 +2947,7 @@ macro_rules! __pgrx_c_args_NthParallelHashJoinBatch {
         $crate::NthParallelHashJoinBatch!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro NthParallelHashJoinBatch from hashjoin.h:198
@@ -3345,13 +3411,13 @@ macro_rules! NthParallelHashJoinBatch {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $base:tt, $n:tt, $hashtable:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $base:tt, $n:tt, $hashtable:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(
@@ -3370,7 +3436,7 @@ macro_rules! NthParallelHashJoinBatch {
                         $crate::__pgrx_c_operand!(@check_safety; $hashtable);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -3805,7 +3871,7 @@ macro_rules! NthParallelHashJoinBatch {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4321,6 +4387,11 @@ macro_rules! __pgrx_c_args_PHJ_GROW_BATCHES_PHASE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PHJ_GROW_BATCHES_PHASE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PHJ_GROW_BATCHES_PHASE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4358,6 +4429,13 @@ macro_rules! __pgrx_c_args_PHJ_GROW_BATCHES_PHASE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PHJ_GROW_BATCHES_PHASE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PHJ_GROW_BATCHES_PHASE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4374,7 +4452,7 @@ macro_rules! __pgrx_c_args_PHJ_GROW_BATCHES_PHASE {
         $crate::PHJ_GROW_BATCHES_PHASE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PHJ_GROW_BATCHES_PHASE from hashjoin.h:290
@@ -4431,13 +4509,13 @@ macro_rules! PHJ_GROW_BATCHES_PHASE {
         $crate::__pgrx_c_args_PHJ_GROW_BATCHES_PHASE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PHJ_GROW_BATCHES_PHASE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PHJ_GROW_BATCHES_PHASE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4450,7 +4528,7 @@ macro_rules! PHJ_GROW_BATCHES_PHASE {
                         $crate::__pgrx_c_operand!(@check_safety; $n);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::rem(
@@ -4469,7 +4547,7 @@ macro_rules! PHJ_GROW_BATCHES_PHASE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4582,6 +4660,11 @@ macro_rules! __pgrx_c_args_PHJ_GROW_BUCKETS_PHASE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PHJ_GROW_BUCKETS_PHASE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PHJ_GROW_BUCKETS_PHASE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4619,6 +4702,13 @@ macro_rules! __pgrx_c_args_PHJ_GROW_BUCKETS_PHASE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PHJ_GROW_BUCKETS_PHASE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PHJ_GROW_BUCKETS_PHASE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4635,7 +4725,7 @@ macro_rules! __pgrx_c_args_PHJ_GROW_BUCKETS_PHASE {
         $crate::PHJ_GROW_BUCKETS_PHASE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PHJ_GROW_BUCKETS_PHASE from hashjoin.h:296
@@ -4692,13 +4782,13 @@ macro_rules! PHJ_GROW_BUCKETS_PHASE {
         $crate::__pgrx_c_args_PHJ_GROW_BUCKETS_PHASE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PHJ_GROW_BUCKETS_PHASE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PHJ_GROW_BUCKETS_PHASE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4711,7 +4801,7 @@ macro_rules! PHJ_GROW_BUCKETS_PHASE {
                         $crate::__pgrx_c_operand!(@check_safety; $n);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::rem(
@@ -4730,7 +4820,7 @@ macro_rules! PHJ_GROW_BUCKETS_PHASE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4843,6 +4933,13 @@ macro_rules! __pgrx_c_args_ParallelHashJoinBatchInner {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ParallelHashJoinBatchInner] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchInner!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4880,6 +4977,13 @@ macro_rules! __pgrx_c_args_ParallelHashJoinBatchInner {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ParallelHashJoinBatchInner] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchInner!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4896,7 +5000,7 @@ macro_rules! __pgrx_c_args_ParallelHashJoinBatchInner {
         $crate::ParallelHashJoinBatchInner!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ParallelHashJoinBatchInner from hashjoin.h:182
@@ -5110,13 +5214,13 @@ macro_rules! ParallelHashJoinBatchInner {
         $crate::__pgrx_c_args_ParallelHashJoinBatchInner!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $batch:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchInner!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $batch:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchInner!(
@@ -5133,7 +5237,7 @@ macro_rules! ParallelHashJoinBatchInner {
                         $crate::__pgrx_c_operand!(@check_safety; $batch);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -5319,7 +5423,7 @@ macro_rules! ParallelHashJoinBatchInner {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5580,6 +5684,13 @@ macro_rules! __pgrx_c_args_ParallelHashJoinBatchOuter {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ParallelHashJoinBatchOuter] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchOuter!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5643,6 +5754,13 @@ macro_rules! __pgrx_c_args_ParallelHashJoinBatchOuter {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ParallelHashJoinBatchOuter] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchOuter!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5680,6 +5798,13 @@ macro_rules! __pgrx_c_args_ParallelHashJoinBatchOuter {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ParallelHashJoinBatchOuter] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchOuter!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5696,7 +5821,7 @@ macro_rules! __pgrx_c_args_ParallelHashJoinBatchOuter {
         $crate::ParallelHashJoinBatchOuter!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ParallelHashJoinBatchOuter from hashjoin.h:187
@@ -6121,13 +6246,13 @@ macro_rules! ParallelHashJoinBatchOuter {
         $crate::__pgrx_c_args_ParallelHashJoinBatchOuter!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $batch:tt, $nparticipants:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchOuter!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $batch:tt, $nparticipants:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchOuter!(
@@ -6145,7 +6270,7 @@ macro_rules! ParallelHashJoinBatchOuter {
                         $crate::__pgrx_c_operand!(@check_safety; $nparticipants);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -6538,7 +6663,7 @@ macro_rules! ParallelHashJoinBatchOuter {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

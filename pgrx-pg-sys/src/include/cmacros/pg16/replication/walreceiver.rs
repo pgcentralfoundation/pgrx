@@ -100,13 +100,13 @@ macro_rules! AllowCascadeReplication {
         $crate::AllowCascadeReplication!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::AllowCascadeReplication!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::AllowCascadeReplication!(@__pgrx_emit_read_place; $($raw)*)
@@ -117,7 +117,7 @@ macro_rules! AllowCascadeReplication {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -172,7 +172,7 @@ macro_rules! AllowCascadeReplication {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -231,13 +231,13 @@ macro_rules! AllowCascadeReplication {
         $crate::AllowCascadeReplication!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::AllowCascadeReplication!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 
@@ -314,6 +314,13 @@ macro_rules! __pgrx_c_args_walrcv_check_conninfo {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_check_conninfo] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_check_conninfo!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -375,6 +382,11 @@ macro_rules! __pgrx_c_args_walrcv_check_conninfo {
             @argument [__pgrx_c_args_walrcv_check_conninfo] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_check_conninfo] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_check_conninfo!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -412,6 +424,13 @@ macro_rules! __pgrx_c_args_walrcv_check_conninfo {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_check_conninfo] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_check_conninfo!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -428,10 +447,10 @@ macro_rules! __pgrx_c_args_walrcv_check_conninfo {
         $crate::walrcv_check_conninfo!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro walrcv_check_conninfo from walreceiver.h:412
+/// C macro walrcv_check_conninfo from walreceiver.h:419
 ///
 /// ```text
 /// #define walrcv_check_conninfo( conninfo , must_use_password ) WalReceiverFunctions -> walrcv_check_conninfo ( conninfo , must_use_password )
@@ -600,7 +619,7 @@ macro_rules! walrcv_check_conninfo {
                         $crate::__pgrx_c_operand!(@check_safety; $must_use_password);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::invoke(
@@ -647,7 +666,7 @@ macro_rules! walrcv_check_conninfo {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -782,6 +801,11 @@ macro_rules! __pgrx_c_args_walrcv_clear_result {
             @argument [__pgrx_c_args_walrcv_clear_result] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_clear_result] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_clear_result!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -819,6 +843,13 @@ macro_rules! __pgrx_c_args_walrcv_clear_result {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_clear_result] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_clear_result!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -835,10 +866,10 @@ macro_rules! __pgrx_c_args_walrcv_clear_result {
         $crate::walrcv_clear_result!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// Typed call adapter for C inline function walrcv_clear_result from walreceiver.h:441
+/// Typed call adapter for C inline function walrcv_clear_result from walreceiver.h:448
 ///
 /// ```c
 /// static inline void
@@ -919,13 +950,13 @@ macro_rules! walrcv_clear_result {
         $crate::__pgrx_c_args_walrcv_clear_result!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $walres:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_walrcv_clear_result!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $walres:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_walrcv_clear_result!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -938,7 +969,7 @@ macro_rules! walrcv_clear_result {
                         $crate::__pgrx_c_operand!(@check_safety; $walres);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::walrcv_clear_result(
@@ -970,7 +1001,7 @@ macro_rules! walrcv_clear_result {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1085,6 +1116,11 @@ macro_rules! __pgrx_c_args_walrcv_connect {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_connect] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1137,6 +1173,11 @@ macro_rules! __pgrx_c_args_walrcv_connect {
             @argument [__pgrx_c_args_walrcv_connect] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
             ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_connect] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -1193,6 +1234,11 @@ macro_rules! __pgrx_c_args_walrcv_connect {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_connect] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1245,6 +1291,11 @@ macro_rules! __pgrx_c_args_walrcv_connect {
             @argument [__pgrx_c_args_walrcv_connect] [p4 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
             ]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_connect] [p4 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -1308,6 +1359,11 @@ macro_rules! __pgrx_c_args_walrcv_connect {
             @argument [__pgrx_c_args_walrcv_connect] [p5 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_connect] [p5 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_connect!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1345,6 +1401,11 @@ macro_rules! __pgrx_c_args_walrcv_connect {
             ]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_connect] [p5 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1361,10 +1422,10 @@ macro_rules! __pgrx_c_args_walrcv_connect {
         $crate::walrcv_connect!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro walrcv_connect from walreceiver.h:410
+/// C macro walrcv_connect from walreceiver.h:417
 ///
 /// ```text
 /// #define walrcv_connect( conninfo , logical , must_use_password , appname , err ) WalReceiverFunctions -> walrcv_connect ( conninfo , logical , must_use_password , appname , err )
@@ -1615,7 +1676,7 @@ macro_rules! walrcv_connect {
                         $crate::__pgrx_c_operand!(@check_safety; $err);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::invoke(
@@ -1671,7 +1732,7 @@ macro_rules! walrcv_connect {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1815,6 +1876,13 @@ macro_rules! __pgrx_c_args_walrcv_create_slot {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_create_slot] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1866,6 +1934,13 @@ macro_rules! __pgrx_c_args_walrcv_create_slot {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_walrcv_create_slot] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_create_slot] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -1923,6 +1998,13 @@ macro_rules! __pgrx_c_args_walrcv_create_slot {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_create_slot] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1977,6 +2059,13 @@ macro_rules! __pgrx_c_args_walrcv_create_slot {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_create_slot] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2028,6 +2117,13 @@ macro_rules! __pgrx_c_args_walrcv_create_slot {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_walrcv_create_slot] [p5 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_create_slot] [p5 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -2092,6 +2188,11 @@ macro_rules! __pgrx_c_args_walrcv_create_slot {
             @argument [__pgrx_c_args_walrcv_create_slot] [p6 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p5 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_create_slot] [p6 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p5 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
             @p6 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2129,6 +2230,13 @@ macro_rules! __pgrx_c_args_walrcv_create_slot {
             ]
         )
     };
+    (@p5 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_create_slot] [p6 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p5 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
             @p6 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2145,10 +2253,10 @@ macro_rules! __pgrx_c_args_walrcv_create_slot {
         $crate::walrcv_create_slot!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro walrcv_create_slot from walreceiver.h:432
+/// C macro walrcv_create_slot from walreceiver.h:439
 ///
 /// ```text
 /// #define walrcv_create_slot( conn , slotname , temporary , two_phase , snapshot_action , lsn ) WalReceiverFunctions -> walrcv_create_slot ( conn , slotname , temporary , two_phase , snapshot_action , lsn )
@@ -2417,7 +2525,7 @@ macro_rules! walrcv_create_slot {
                         $crate::__pgrx_c_operand!(@check_safety; $lsn);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::invoke(
@@ -2476,7 +2584,7 @@ macro_rules! walrcv_create_slot {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2631,6 +2739,11 @@ macro_rules! __pgrx_c_args_walrcv_disconnect {
             @argument [__pgrx_c_args_walrcv_disconnect] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_disconnect] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_disconnect!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2668,6 +2781,13 @@ macro_rules! __pgrx_c_args_walrcv_disconnect {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_disconnect] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_disconnect!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2684,10 +2804,10 @@ macro_rules! __pgrx_c_args_walrcv_disconnect {
         $crate::walrcv_disconnect!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro walrcv_disconnect from walreceiver.h:438
+/// C macro walrcv_disconnect from walreceiver.h:445
 ///
 /// ```text
 /// #define walrcv_disconnect( conn ) WalReceiverFunctions -> walrcv_disconnect ( conn )
@@ -2845,7 +2965,7 @@ macro_rules! walrcv_disconnect {
                         $crate::__pgrx_c_operand!(@check_safety; $conn);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::invoke(
@@ -2889,7 +3009,7 @@ macro_rules! walrcv_disconnect {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3014,6 +3134,13 @@ macro_rules! __pgrx_c_args_walrcv_endstreaming {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_endstreaming] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_endstreaming!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3075,6 +3202,11 @@ macro_rules! __pgrx_c_args_walrcv_endstreaming {
             @argument [__pgrx_c_args_walrcv_endstreaming] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_endstreaming] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_endstreaming!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3112,6 +3244,13 @@ macro_rules! __pgrx_c_args_walrcv_endstreaming {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_endstreaming] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_endstreaming!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3128,10 +3267,10 @@ macro_rules! __pgrx_c_args_walrcv_endstreaming {
         $crate::walrcv_endstreaming!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro walrcv_endstreaming from walreceiver.h:426
+/// C macro walrcv_endstreaming from walreceiver.h:433
 ///
 /// ```text
 /// #define walrcv_endstreaming( conn , next_tli ) WalReceiverFunctions -> walrcv_endstreaming ( conn , next_tli )
@@ -3300,7 +3439,7 @@ macro_rules! walrcv_endstreaming {
                         $crate::__pgrx_c_operand!(@check_safety; $next_tli);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::invoke(
@@ -3347,7 +3486,7 @@ macro_rules! walrcv_endstreaming {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3473,6 +3612,11 @@ macro_rules! __pgrx_c_args_walrcv_exec {
             @argument [__pgrx_c_args_walrcv_exec] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_exec] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_exec!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3525,6 +3669,11 @@ macro_rules! __pgrx_c_args_walrcv_exec {
             @argument [__pgrx_c_args_walrcv_exec] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_exec] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_exec!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3575,6 +3724,11 @@ macro_rules! __pgrx_c_args_walrcv_exec {
     (@p2 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_walrcv_exec] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_exec] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -3638,6 +3792,11 @@ macro_rules! __pgrx_c_args_walrcv_exec {
             @argument [__pgrx_c_args_walrcv_exec] [p4 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_exec] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_exec!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3673,6 +3832,11 @@ macro_rules! __pgrx_c_args_walrcv_exec {
             @argument [__pgrx_c_args_walrcv_exec] [p4 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_exec] [p4 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_exec!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3689,10 +3853,10 @@ macro_rules! __pgrx_c_args_walrcv_exec {
         $crate::walrcv_exec!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro walrcv_exec from walreceiver.h:436
+/// C macro walrcv_exec from walreceiver.h:443
 ///
 /// ```text
 /// #define walrcv_exec( conn , exec , nRetTypes , retTypes ) WalReceiverFunctions -> walrcv_exec ( conn , exec , nRetTypes , retTypes )
@@ -3883,7 +4047,7 @@ macro_rules! walrcv_exec {
                         $crate::__pgrx_c_operand!(@check_safety; $retTypes);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::invoke(
@@ -3936,7 +4100,7 @@ macro_rules! walrcv_exec {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4082,6 +4246,11 @@ macro_rules! __pgrx_c_args_walrcv_get_backend_pid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_get_backend_pid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_get_backend_pid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4119,6 +4288,13 @@ macro_rules! __pgrx_c_args_walrcv_get_backend_pid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_get_backend_pid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_backend_pid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4135,10 +4311,10 @@ macro_rules! __pgrx_c_args_walrcv_get_backend_pid {
         $crate::walrcv_get_backend_pid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro walrcv_get_backend_pid from walreceiver.h:434
+/// C macro walrcv_get_backend_pid from walreceiver.h:441
 ///
 /// ```text
 /// #define walrcv_get_backend_pid( conn ) WalReceiverFunctions -> walrcv_get_backend_pid ( conn )
@@ -4299,7 +4475,7 @@ macro_rules! walrcv_get_backend_pid {
                         $crate::__pgrx_c_operand!(@check_safety; $conn);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::invoke(
@@ -4343,7 +4519,7 @@ macro_rules! walrcv_get_backend_pid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4475,6 +4651,11 @@ macro_rules! __pgrx_c_args_walrcv_get_conninfo {
             @argument [__pgrx_c_args_walrcv_get_conninfo] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_get_conninfo] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_get_conninfo!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4512,6 +4693,13 @@ macro_rules! __pgrx_c_args_walrcv_get_conninfo {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_get_conninfo] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_conninfo!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4528,10 +4716,10 @@ macro_rules! __pgrx_c_args_walrcv_get_conninfo {
         $crate::walrcv_get_conninfo!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro walrcv_get_conninfo from walreceiver.h:414
+/// C macro walrcv_get_conninfo from walreceiver.h:421
 ///
 /// ```text
 /// #define walrcv_get_conninfo( conn ) WalReceiverFunctions -> walrcv_get_conninfo ( conn )
@@ -4689,7 +4877,7 @@ macro_rules! walrcv_get_conninfo {
                         $crate::__pgrx_c_operand!(@check_safety; $conn);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::invoke(
@@ -4733,7 +4921,7 @@ macro_rules! walrcv_get_conninfo {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4861,6 +5049,13 @@ macro_rules! __pgrx_c_args_walrcv_get_senderinfo {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_get_senderinfo] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_senderinfo!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4912,6 +5107,13 @@ macro_rules! __pgrx_c_args_walrcv_get_senderinfo {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_walrcv_get_senderinfo] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_get_senderinfo] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -4976,6 +5178,11 @@ macro_rules! __pgrx_c_args_walrcv_get_senderinfo {
             @argument [__pgrx_c_args_walrcv_get_senderinfo] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_get_senderinfo] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_get_senderinfo!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5013,6 +5220,13 @@ macro_rules! __pgrx_c_args_walrcv_get_senderinfo {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_get_senderinfo] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_senderinfo!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5029,10 +5243,10 @@ macro_rules! __pgrx_c_args_walrcv_get_senderinfo {
         $crate::walrcv_get_senderinfo!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro walrcv_get_senderinfo from walreceiver.h:416
+/// C macro walrcv_get_senderinfo from walreceiver.h:423
 ///
 /// ```text
 /// #define walrcv_get_senderinfo( conn , sender_host , sender_port ) WalReceiverFunctions -> walrcv_get_senderinfo ( conn , sender_host , sender_port )
@@ -5212,7 +5426,7 @@ macro_rules! walrcv_get_senderinfo {
                         $crate::__pgrx_c_operand!(@check_safety; $sender_port);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::invoke(
@@ -5262,7 +5476,7 @@ macro_rules! walrcv_get_senderinfo {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5396,6 +5610,13 @@ macro_rules! __pgrx_c_args_walrcv_identify_system {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_identify_system] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_identify_system!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5459,6 +5680,11 @@ macro_rules! __pgrx_c_args_walrcv_identify_system {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_identify_system] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_identify_system!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5496,6 +5722,13 @@ macro_rules! __pgrx_c_args_walrcv_identify_system {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_identify_system] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_identify_system!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5512,10 +5745,10 @@ macro_rules! __pgrx_c_args_walrcv_identify_system {
         $crate::walrcv_identify_system!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro walrcv_identify_system from walreceiver.h:418
+/// C macro walrcv_identify_system from walreceiver.h:425
 ///
 /// ```text
 /// #define walrcv_identify_system( conn , primary_tli ) WalReceiverFunctions -> walrcv_identify_system ( conn , primary_tli )
@@ -5687,7 +5920,7 @@ macro_rules! walrcv_identify_system {
                         $crate::__pgrx_c_operand!(@check_safety; $primary_tli);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::invoke(
@@ -5734,7 +5967,7 @@ macro_rules! walrcv_identify_system {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5868,6 +6101,13 @@ macro_rules! __pgrx_c_args_walrcv_readtimelinehistoryfile {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_readtimelinehistoryfile] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5923,6 +6163,13 @@ macro_rules! __pgrx_c_args_walrcv_readtimelinehistoryfile {
             @argument [__pgrx_c_args_walrcv_readtimelinehistoryfile] [
                 p2 $mode [$($done)*] [$($rest)*]
             ] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_readtimelinehistoryfile] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -5982,6 +6229,13 @@ macro_rules! __pgrx_c_args_walrcv_readtimelinehistoryfile {
             ] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_readtimelinehistoryfile] [
+                p3 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6037,6 +6291,13 @@ macro_rules! __pgrx_c_args_walrcv_readtimelinehistoryfile {
             @argument [__pgrx_c_args_walrcv_readtimelinehistoryfile] [
                 p4 $mode [$($done)*] [$($rest)*]
             ] [($($inner)*)]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_readtimelinehistoryfile] [
+                p4 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -6105,6 +6366,13 @@ macro_rules! __pgrx_c_args_walrcv_readtimelinehistoryfile {
             ]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_readtimelinehistoryfile] [p5 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6142,6 +6410,13 @@ macro_rules! __pgrx_c_args_walrcv_readtimelinehistoryfile {
             ] [($($inner)*)]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_readtimelinehistoryfile] [
+                p5 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6158,10 +6433,10 @@ macro_rules! __pgrx_c_args_walrcv_readtimelinehistoryfile {
         $crate::walrcv_readtimelinehistoryfile!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro walrcv_readtimelinehistoryfile from walreceiver.h:422
+/// C macro walrcv_readtimelinehistoryfile from walreceiver.h:429
 ///
 /// ```text
 /// #define walrcv_readtimelinehistoryfile( conn , tli , filename , content , size ) WalReceiverFunctions -> walrcv_readtimelinehistoryfile ( conn , tli , filename , content , size )
@@ -6382,7 +6657,7 @@ macro_rules! walrcv_readtimelinehistoryfile {
                         $crate::__pgrx_c_operand!(@check_safety; $size);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::invoke(
@@ -6438,7 +6713,7 @@ macro_rules! walrcv_readtimelinehistoryfile {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6584,6 +6859,11 @@ macro_rules! __pgrx_c_args_walrcv_receive {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_receive] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_receive!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6636,6 +6916,11 @@ macro_rules! __pgrx_c_args_walrcv_receive {
             @argument [__pgrx_c_args_walrcv_receive] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
             ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_receive] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -6699,6 +6984,11 @@ macro_rules! __pgrx_c_args_walrcv_receive {
             @argument [__pgrx_c_args_walrcv_receive] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_receive] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_receive!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6736,6 +7026,11 @@ macro_rules! __pgrx_c_args_walrcv_receive {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_receive] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_receive!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6752,10 +7047,10 @@ macro_rules! __pgrx_c_args_walrcv_receive {
         $crate::walrcv_receive!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro walrcv_receive from walreceiver.h:428
+/// C macro walrcv_receive from walreceiver.h:435
 ///
 /// ```text
 /// #define walrcv_receive( conn , buffer , wait_fd ) WalReceiverFunctions -> walrcv_receive ( conn , buffer , wait_fd )
@@ -6935,7 +7230,7 @@ macro_rules! walrcv_receive {
                         $crate::__pgrx_c_operand!(@check_safety; $wait_fd);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::invoke(
@@ -6985,7 +7280,7 @@ macro_rules! walrcv_receive {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7114,6 +7409,11 @@ macro_rules! __pgrx_c_args_walrcv_send {
             @argument [__pgrx_c_args_walrcv_send] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_send] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_send!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7164,6 +7464,11 @@ macro_rules! __pgrx_c_args_walrcv_send {
     (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_walrcv_send] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_send] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -7227,6 +7532,11 @@ macro_rules! __pgrx_c_args_walrcv_send {
             @argument [__pgrx_c_args_walrcv_send] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_send] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_send!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7262,6 +7572,11 @@ macro_rules! __pgrx_c_args_walrcv_send {
             @argument [__pgrx_c_args_walrcv_send] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_send] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_send!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7278,10 +7593,10 @@ macro_rules! __pgrx_c_args_walrcv_send {
         $crate::walrcv_send!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro walrcv_send from walreceiver.h:430
+/// C macro walrcv_send from walreceiver.h:437
 ///
 /// ```text
 /// #define walrcv_send( conn , buffer , nbytes ) WalReceiverFunctions -> walrcv_send ( conn , buffer , nbytes )
@@ -7461,7 +7776,7 @@ macro_rules! walrcv_send {
                         $crate::__pgrx_c_operand!(@check_safety; $nbytes);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::invoke(
@@ -7511,7 +7826,7 @@ macro_rules! walrcv_send {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7652,6 +7967,11 @@ macro_rules! __pgrx_c_args_walrcv_server_version {
             @argument [__pgrx_c_args_walrcv_server_version] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_server_version] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_server_version!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7689,6 +8009,13 @@ macro_rules! __pgrx_c_args_walrcv_server_version {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_server_version] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_server_version!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7705,10 +8032,10 @@ macro_rules! __pgrx_c_args_walrcv_server_version {
         $crate::walrcv_server_version!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro walrcv_server_version from walreceiver.h:420
+/// C macro walrcv_server_version from walreceiver.h:427
 ///
 /// ```text
 /// #define walrcv_server_version( conn ) WalReceiverFunctions -> walrcv_server_version ( conn )
@@ -7866,7 +8193,7 @@ macro_rules! walrcv_server_version {
                         $crate::__pgrx_c_operand!(@check_safety; $conn);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::invoke(
@@ -7910,7 +8237,7 @@ macro_rules! walrcv_server_version {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8038,6 +8365,13 @@ macro_rules! __pgrx_c_args_walrcv_startstreaming {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_startstreaming] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_startstreaming!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8099,6 +8433,11 @@ macro_rules! __pgrx_c_args_walrcv_startstreaming {
             @argument [__pgrx_c_args_walrcv_startstreaming] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_startstreaming] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_startstreaming!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8136,6 +8475,13 @@ macro_rules! __pgrx_c_args_walrcv_startstreaming {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_startstreaming] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_startstreaming!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8152,10 +8498,10 @@ macro_rules! __pgrx_c_args_walrcv_startstreaming {
         $crate::walrcv_startstreaming!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro walrcv_startstreaming from walreceiver.h:424
+/// C macro walrcv_startstreaming from walreceiver.h:431
 ///
 /// ```text
 /// #define walrcv_startstreaming( conn , options ) WalReceiverFunctions -> walrcv_startstreaming ( conn , options )
@@ -8324,7 +8670,7 @@ macro_rules! walrcv_startstreaming {
                         $crate::__pgrx_c_operand!(@check_safety; $options);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::invoke(
@@ -8371,7 +8717,7 @@ macro_rules! walrcv_startstreaming {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

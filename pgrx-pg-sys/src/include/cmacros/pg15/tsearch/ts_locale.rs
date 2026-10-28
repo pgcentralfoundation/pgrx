@@ -79,6 +79,11 @@ macro_rules! __pgrx_c_args_TOUCHAR {
             @argument [__pgrx_c_args_TOUCHAR] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TOUCHAR] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TOUCHAR!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -114,6 +119,11 @@ macro_rules! __pgrx_c_args_TOUCHAR {
             @argument [__pgrx_c_args_TOUCHAR] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TOUCHAR] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TOUCHAR!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -130,7 +140,7 @@ macro_rules! __pgrx_c_args_TOUCHAR {
         $crate::TOUCHAR!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TOUCHAR from ts_locale.h:43
@@ -250,7 +260,7 @@ macro_rules! TOUCHAR {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::pointee(
                             (
@@ -275,7 +285,7 @@ macro_rules! TOUCHAR {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -383,6 +393,11 @@ macro_rules! __pgrx_c_args_t_iseq {
             @argument [__pgrx_c_args_t_iseq] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_t_iseq] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_t_iseq!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -442,6 +457,11 @@ macro_rules! __pgrx_c_args_t_iseq {
             @argument [__pgrx_c_args_t_iseq] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_t_iseq] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_t_iseq!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -477,6 +497,11 @@ macro_rules! __pgrx_c_args_t_iseq {
             @argument [__pgrx_c_args_t_iseq] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_t_iseq] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_t_iseq!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -493,7 +518,7 @@ macro_rules! __pgrx_c_args_t_iseq {
         $crate::t_iseq!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro t_iseq from ts_locale.h:46
@@ -577,13 +602,13 @@ macro_rules! t_iseq {
         $crate::__pgrx_c_args_t_iseq!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt, $c:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_t_iseq!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt, $c:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_t_iseq!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -598,7 +623,7 @@ macro_rules! t_iseq {
                         $crate::__pgrx_c_operand!(@check_safety; $c);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -652,7 +677,7 @@ macro_rules! t_iseq {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -782,6 +807,13 @@ macro_rules! __pgrx_c_args_ts_copychar_cstr {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ts_copychar_cstr] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ts_copychar_cstr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -843,6 +875,11 @@ macro_rules! __pgrx_c_args_ts_copychar_cstr {
             @argument [__pgrx_c_args_ts_copychar_cstr] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ts_copychar_cstr] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ts_copychar_cstr!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -880,6 +917,13 @@ macro_rules! __pgrx_c_args_ts_copychar_cstr {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ts_copychar_cstr] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ts_copychar_cstr!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -896,7 +940,7 @@ macro_rules! __pgrx_c_args_ts_copychar_cstr {
         $crate::ts_copychar_cstr!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ts_copychar_cstr from ts_locale.h:57
@@ -985,13 +1029,13 @@ macro_rules! ts_copychar_cstr {
         $crate::__pgrx_c_args_ts_copychar_cstr!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $dest:tt, $src:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ts_copychar_cstr!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $dest:tt, $src:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ts_copychar_cstr!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1005,7 +1049,7 @@ macro_rules! ts_copychar_cstr {
                         $crate::__pgrx_c_operand!(@check_safety; $src);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1056,7 +1100,7 @@ macro_rules! ts_copychar_cstr {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1190,6 +1234,13 @@ macro_rules! __pgrx_c_args_ts_copychar_with_len {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ts_copychar_with_len] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ts_copychar_with_len!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1241,6 +1292,13 @@ macro_rules! __pgrx_c_args_ts_copychar_with_len {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_ts_copychar_with_len] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ts_copychar_with_len] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -1305,6 +1363,11 @@ macro_rules! __pgrx_c_args_ts_copychar_with_len {
             @argument [__pgrx_c_args_ts_copychar_with_len] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ts_copychar_with_len] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ts_copychar_with_len!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1342,6 +1405,13 @@ macro_rules! __pgrx_c_args_ts_copychar_with_len {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ts_copychar_with_len] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ts_copychar_with_len!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1358,7 +1428,7 @@ macro_rules! __pgrx_c_args_ts_copychar_with_len {
         $crate::ts_copychar_with_len!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ts_copychar_with_len from ts_locale.h:49
@@ -1459,13 +1529,13 @@ macro_rules! ts_copychar_with_len {
         $crate::__pgrx_c_args_ts_copychar_with_len!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $dest:tt, $src:tt, $length:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ts_copychar_with_len!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $dest:tt, $src:tt, $length:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ts_copychar_with_len!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1480,7 +1550,7 @@ macro_rules! ts_copychar_with_len {
                         $crate::__pgrx_c_operand!(@check_safety; $length);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1544,7 +1614,7 @@ macro_rules! ts_copychar_with_len {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_GBUF_INNER_PARITY {
             @argument [__pgrx_c_args_GBUF_INNER_PARITY] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GBUF_INNER_PARITY] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GBUF_INNER_PARITY!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -118,6 +123,13 @@ macro_rules! __pgrx_c_args_GBUF_INNER_PARITY {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GBUF_INNER_PARITY] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GBUF_INNER_PARITY!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -134,7 +146,7 @@ macro_rules! __pgrx_c_args_GBUF_INNER_PARITY {
         $crate::GBUF_INNER_PARITY!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GBUF_INNER_PARITY from spgist_private.h:486
@@ -188,13 +200,13 @@ macro_rules! GBUF_INNER_PARITY {
         $crate::__pgrx_c_args_GBUF_INNER_PARITY!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GBUF_INNER_PARITY!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GBUF_INNER_PARITY!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -207,7 +219,7 @@ macro_rules! GBUF_INNER_PARITY {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::rem(
@@ -226,7 +238,7 @@ macro_rules! GBUF_INNER_PARITY {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -334,6 +346,11 @@ macro_rules! __pgrx_c_args_GBUF_REQ_LEAF {
             @argument [__pgrx_c_args_GBUF_REQ_LEAF] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GBUF_REQ_LEAF] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GBUF_REQ_LEAF!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -371,6 +388,11 @@ macro_rules! __pgrx_c_args_GBUF_REQ_LEAF {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GBUF_REQ_LEAF] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GBUF_REQ_LEAF!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -387,7 +409,7 @@ macro_rules! __pgrx_c_args_GBUF_REQ_LEAF {
         $crate::GBUF_REQ_LEAF!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GBUF_REQ_LEAF from spgist_private.h:490
@@ -450,13 +472,13 @@ macro_rules! GBUF_REQ_LEAF {
         $crate::__pgrx_c_args_GBUF_REQ_LEAF!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $flags:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GBUF_REQ_LEAF!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $flags:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GBUF_REQ_LEAF!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -469,7 +491,7 @@ macro_rules! GBUF_REQ_LEAF {
                         $crate::__pgrx_c_operand!(@check_safety; $flags);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -505,7 +527,7 @@ macro_rules! GBUF_REQ_LEAF {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -626,6 +648,11 @@ macro_rules! __pgrx_c_args_GBUF_REQ_NULLS {
             @argument [__pgrx_c_args_GBUF_REQ_NULLS] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GBUF_REQ_NULLS] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GBUF_REQ_NULLS!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -663,6 +690,11 @@ macro_rules! __pgrx_c_args_GBUF_REQ_NULLS {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GBUF_REQ_NULLS] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GBUF_REQ_NULLS!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -679,7 +711,7 @@ macro_rules! __pgrx_c_args_GBUF_REQ_NULLS {
         $crate::GBUF_REQ_NULLS!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GBUF_REQ_NULLS from spgist_private.h:491
@@ -731,13 +763,13 @@ macro_rules! GBUF_REQ_NULLS {
         $crate::__pgrx_c_args_GBUF_REQ_NULLS!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $flags:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GBUF_REQ_NULLS!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $flags:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GBUF_REQ_NULLS!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -750,7 +782,7 @@ macro_rules! GBUF_REQ_NULLS {
                         $crate::__pgrx_c_operand!(@check_safety; $flags);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -769,7 +801,7 @@ macro_rules! GBUF_REQ_NULLS {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -879,6 +911,11 @@ macro_rules! __pgrx_c_args_SGITDATAPTR {
             @argument [__pgrx_c_args_SGITDATAPTR] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGITDATAPTR] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SGITDATAPTR!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -914,6 +951,11 @@ macro_rules! __pgrx_c_args_SGITDATAPTR {
             @argument [__pgrx_c_args_SGITDATAPTR] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGITDATAPTR] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGITDATAPTR!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -930,7 +972,7 @@ macro_rules! __pgrx_c_args_SGITDATAPTR {
         $crate::SGITDATAPTR!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SGITDATAPTR from spgist_private.h:315
@@ -1195,13 +1237,13 @@ macro_rules! SGITDATAPTR {
         $crate::__pgrx_c_args_SGITDATAPTR!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGITDATAPTR!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGITDATAPTR!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1215,7 +1257,7 @@ macro_rules! SGITDATAPTR {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -1457,7 +1499,7 @@ macro_rules! SGITDATAPTR {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1767,6 +1809,11 @@ macro_rules! __pgrx_c_args_SGITDATUM {
             @argument [__pgrx_c_args_SGITDATUM] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGITDATUM] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGITDATUM!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1828,6 +1875,11 @@ macro_rules! __pgrx_c_args_SGITDATUM {
             @argument [__pgrx_c_args_SGITDATUM] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGITDATUM] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SGITDATUM!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1863,6 +1915,11 @@ macro_rules! __pgrx_c_args_SGITDATUM {
             @argument [__pgrx_c_args_SGITDATUM] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGITDATUM] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGITDATUM!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1879,7 +1936,7 @@ macro_rules! __pgrx_c_args_SGITDATUM {
         $crate::SGITDATUM!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SGITDATUM from spgist_private.h:316
@@ -2484,13 +2541,13 @@ macro_rules! SGITDATUM {
         $crate::__pgrx_c_args_SGITDATUM!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt, $s:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGITDATUM!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt, $s:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGITDATUM!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2505,7 +2562,7 @@ macro_rules! SGITDATUM {
                         $crate::__pgrx_c_operand!(@check_safety; $s);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -3086,7 +3143,7 @@ macro_rules! SGITDATUM {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3744,6 +3801,11 @@ macro_rules! __pgrx_c_args_SGITNODEPTR {
             @argument [__pgrx_c_args_SGITNODEPTR] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGITNODEPTR] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SGITNODEPTR!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3779,6 +3841,11 @@ macro_rules! __pgrx_c_args_SGITNODEPTR {
             @argument [__pgrx_c_args_SGITNODEPTR] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGITNODEPTR] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGITNODEPTR!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3795,7 +3862,7 @@ macro_rules! __pgrx_c_args_SGITNODEPTR {
         $crate::SGITNODEPTR!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SGITNODEPTR from spgist_private.h:321
@@ -4049,13 +4116,13 @@ macro_rules! SGITNODEPTR {
         $crate::__pgrx_c_args_SGITNODEPTR!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGITNODEPTR!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGITNODEPTR!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4069,7 +4136,7 @@ macro_rules! SGITNODEPTR {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -4298,7 +4365,7 @@ macro_rules! SGITNODEPTR {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4606,6 +4673,11 @@ macro_rules! __pgrx_c_args_SGLTDATAPTR {
             @argument [__pgrx_c_args_SGLTDATAPTR] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGLTDATAPTR] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SGLTDATAPTR!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4641,6 +4713,11 @@ macro_rules! __pgrx_c_args_SGLTDATAPTR {
             @argument [__pgrx_c_args_SGLTDATAPTR] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGLTDATAPTR] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLTDATAPTR!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4657,7 +4734,7 @@ macro_rules! __pgrx_c_args_SGLTDATAPTR {
         $crate::SGLTDATAPTR!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SGLTDATAPTR from spgist_private.h:412
@@ -5103,13 +5180,13 @@ macro_rules! SGLTDATAPTR {
         $crate::__pgrx_c_args_SGLTDATAPTR!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGLTDATAPTR!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGLTDATAPTR!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5123,7 +5200,7 @@ macro_rules! SGLTDATAPTR {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::add::<
@@ -5546,7 +5623,7 @@ macro_rules! SGLTDATAPTR {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6037,6 +6114,11 @@ macro_rules! __pgrx_c_args_SGLTDATUM {
             @argument [__pgrx_c_args_SGLTDATUM] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGLTDATUM] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLTDATUM!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6098,6 +6180,11 @@ macro_rules! __pgrx_c_args_SGLTDATUM {
             @argument [__pgrx_c_args_SGLTDATUM] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGLTDATUM] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SGLTDATUM!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6133,6 +6220,11 @@ macro_rules! __pgrx_c_args_SGLTDATUM {
             @argument [__pgrx_c_args_SGLTDATUM] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGLTDATUM] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLTDATUM!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6149,7 +6241,7 @@ macro_rules! __pgrx_c_args_SGLTDATUM {
         $crate::SGLTDATUM!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SGLTDATUM from spgist_private.h:413
@@ -6710,13 +6802,13 @@ macro_rules! SGLTDATUM {
         $crate::__pgrx_c_args_SGLTDATUM!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt, $s:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGLTDATUM!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt, $s:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGLTDATUM!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6731,7 +6823,7 @@ macro_rules! SGLTDATUM {
                         $crate::__pgrx_c_operand!(@check_safety; $s);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -7282,7 +7374,7 @@ macro_rules! SGLTDATUM {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7914,6 +8006,11 @@ macro_rules! __pgrx_c_args_SGLTHDRSZ {
             @argument [__pgrx_c_args_SGLTHDRSZ] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGLTHDRSZ] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SGLTHDRSZ!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7949,6 +8046,11 @@ macro_rules! __pgrx_c_args_SGLTHDRSZ {
             @argument [__pgrx_c_args_SGLTHDRSZ] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGLTHDRSZ] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLTHDRSZ!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7965,7 +8067,7 @@ macro_rules! __pgrx_c_args_SGLTHDRSZ {
         $crate::SGLTHDRSZ!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SGLTHDRSZ from spgist_private.h:408
@@ -8303,13 +8405,13 @@ macro_rules! SGLTHDRSZ {
         $crate::__pgrx_c_args_SGLTHDRSZ!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $hasnulls:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGLTHDRSZ!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $hasnulls:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGLTHDRSZ!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8323,7 +8425,7 @@ macro_rules! SGLTHDRSZ {
                         $crate::__pgrx_c_operand!(@check_safety; $hasnulls);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -8630,7 +8732,7 @@ macro_rules! SGLTHDRSZ {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9025,6 +9127,11 @@ macro_rules! __pgrx_c_args_SGLT_GET_HASNULLMASK {
             @argument [__pgrx_c_args_SGLT_GET_HASNULLMASK] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGLT_GET_HASNULLMASK] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SGLT_GET_HASNULLMASK!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9062,6 +9169,13 @@ macro_rules! __pgrx_c_args_SGLT_GET_HASNULLMASK {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGLT_GET_HASNULLMASK] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_GET_HASNULLMASK!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9078,7 +9192,7 @@ macro_rules! __pgrx_c_args_SGLT_GET_HASNULLMASK {
         $crate::SGLT_GET_HASNULLMASK!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SGLT_GET_HASNULLMASK from spgist_private.h:399
@@ -9176,13 +9290,13 @@ macro_rules! SGLT_GET_HASNULLMASK {
         $crate::__pgrx_c_args_SGLT_GET_HASNULLMASK!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $spgLeafTuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGLT_GET_HASNULLMASK!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $spgLeafTuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGLT_GET_HASNULLMASK!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -9195,7 +9309,7 @@ macro_rules! SGLT_GET_HASNULLMASK {
                         $crate::__pgrx_c_operand!(@check_safety; $spgLeafTuple);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -9275,7 +9389,7 @@ macro_rules! SGLT_GET_HASNULLMASK {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9431,6 +9545,11 @@ macro_rules! __pgrx_c_args_SGLT_GET_NEXTOFFSET {
             @argument [__pgrx_c_args_SGLT_GET_NEXTOFFSET] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGLT_GET_NEXTOFFSET] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SGLT_GET_NEXTOFFSET!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9468,6 +9587,13 @@ macro_rules! __pgrx_c_args_SGLT_GET_NEXTOFFSET {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGLT_GET_NEXTOFFSET] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_GET_NEXTOFFSET!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9484,7 +9610,7 @@ macro_rules! __pgrx_c_args_SGLT_GET_NEXTOFFSET {
         $crate::SGLT_GET_NEXTOFFSET!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SGLT_GET_NEXTOFFSET from spgist_private.h:397
@@ -9549,13 +9675,13 @@ macro_rules! SGLT_GET_NEXTOFFSET {
         $crate::__pgrx_c_args_SGLT_GET_NEXTOFFSET!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $spgLeafTuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGLT_GET_NEXTOFFSET!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $spgLeafTuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGLT_GET_NEXTOFFSET!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -9568,7 +9694,7 @@ macro_rules! SGLT_GET_NEXTOFFSET {
                         $crate::__pgrx_c_operand!(@check_safety; $spgLeafTuple);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -9605,7 +9731,7 @@ macro_rules! SGLT_GET_NEXTOFFSET {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9724,6 +9850,13 @@ macro_rules! __pgrx_c_args_SGLT_SET_HASNULLMASK {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGLT_SET_HASNULLMASK] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9785,6 +9918,11 @@ macro_rules! __pgrx_c_args_SGLT_SET_HASNULLMASK {
             @argument [__pgrx_c_args_SGLT_SET_HASNULLMASK] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGLT_SET_HASNULLMASK] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9822,6 +9960,13 @@ macro_rules! __pgrx_c_args_SGLT_SET_HASNULLMASK {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGLT_SET_HASNULLMASK] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9838,7 +9983,7 @@ macro_rules! __pgrx_c_args_SGLT_SET_HASNULLMASK {
         $crate::SGLT_SET_HASNULLMASK!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SGLT_SET_HASNULLMASK from spgist_private.h:404
@@ -9981,13 +10126,13 @@ macro_rules! SGLT_SET_HASNULLMASK {
         $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $spgLeafTuple:tt, $hasnulls:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $spgLeafTuple:tt, $hasnulls:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -10001,7 +10146,7 @@ macro_rules! SGLT_SET_HASNULLMASK {
                         $crate::__pgrx_c_operand!(@check_safety; $hasnulls);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -10122,7 +10267,7 @@ macro_rules! SGLT_SET_HASNULLMASK {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10315,6 +10460,13 @@ macro_rules! __pgrx_c_args_SGLT_SET_NEXTOFFSET {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGLT_SET_NEXTOFFSET] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10376,6 +10528,11 @@ macro_rules! __pgrx_c_args_SGLT_SET_NEXTOFFSET {
             @argument [__pgrx_c_args_SGLT_SET_NEXTOFFSET] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGLT_SET_NEXTOFFSET] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10413,6 +10570,13 @@ macro_rules! __pgrx_c_args_SGLT_SET_NEXTOFFSET {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGLT_SET_NEXTOFFSET] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10429,7 +10593,7 @@ macro_rules! __pgrx_c_args_SGLT_SET_NEXTOFFSET {
         $crate::SGLT_SET_NEXTOFFSET!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SGLT_SET_NEXTOFFSET from spgist_private.h:401
@@ -10554,13 +10718,13 @@ macro_rules! SGLT_SET_NEXTOFFSET {
         $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $spgLeafTuple:tt, $offsetNumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $spgLeafTuple:tt, $offsetNumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -10574,7 +10738,7 @@ macro_rules! SGLT_SET_NEXTOFFSET {
                         $crate::__pgrx_c_operand!(@check_safety; $offsetNumber);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -10677,7 +10841,7 @@ macro_rules! SGLT_SET_NEXTOFFSET {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10859,6 +11023,11 @@ macro_rules! __pgrx_c_args_SGNTDATAPTR {
             @argument [__pgrx_c_args_SGNTDATAPTR] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGNTDATAPTR] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SGNTDATAPTR!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10894,6 +11063,11 @@ macro_rules! __pgrx_c_args_SGNTDATAPTR {
             @argument [__pgrx_c_args_SGNTDATAPTR] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGNTDATAPTR] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGNTDATAPTR!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10910,7 +11084,7 @@ macro_rules! __pgrx_c_args_SGNTDATAPTR {
         $crate::SGNTDATAPTR!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SGNTDATAPTR from spgist_private.h:343
@@ -11097,13 +11271,13 @@ macro_rules! SGNTDATAPTR {
         $crate::__pgrx_c_args_SGNTDATAPTR!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGNTDATAPTR!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGNTDATAPTR!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -11117,7 +11291,7 @@ macro_rules! SGNTDATAPTR {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::add::<
@@ -11277,7 +11451,7 @@ macro_rules! SGNTDATAPTR {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -11509,6 +11683,11 @@ macro_rules! __pgrx_c_args_SGNTDATUM {
             @argument [__pgrx_c_args_SGNTDATUM] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGNTDATUM] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGNTDATUM!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11570,6 +11749,11 @@ macro_rules! __pgrx_c_args_SGNTDATUM {
             @argument [__pgrx_c_args_SGNTDATUM] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGNTDATUM] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SGNTDATUM!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11605,6 +11789,11 @@ macro_rules! __pgrx_c_args_SGNTDATUM {
             @argument [__pgrx_c_args_SGNTDATUM] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SGNTDATUM] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGNTDATUM!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11621,7 +11810,7 @@ macro_rules! __pgrx_c_args_SGNTDATUM {
         $crate::SGNTDATUM!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SGNTDATUM from spgist_private.h:344
@@ -12152,13 +12341,13 @@ macro_rules! SGNTDATUM {
         $crate::__pgrx_c_args_SGNTDATUM!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt, $s:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGNTDATUM!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt, $s:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGNTDATUM!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -12173,7 +12362,7 @@ macro_rules! SGNTDATUM {
                         $crate::__pgrx_c_operand!(@check_safety; $s);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -12681,7 +12870,7 @@ macro_rules! SGNTDATUM {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -13256,6 +13445,11 @@ macro_rules! __pgrx_c_args_STORE_STATE {
             @argument [__pgrx_c_args_STORE_STATE] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_STORE_STATE] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_STORE_STATE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13317,6 +13511,11 @@ macro_rules! __pgrx_c_args_STORE_STATE {
             @argument [__pgrx_c_args_STORE_STATE] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_STORE_STATE] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_STORE_STATE!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13352,6 +13551,11 @@ macro_rules! __pgrx_c_args_STORE_STATE {
             @argument [__pgrx_c_args_STORE_STATE] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_STORE_STATE] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_STORE_STATE!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13368,7 +13572,7 @@ macro_rules! __pgrx_c_args_STORE_STATE {
         $crate::STORE_STATE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro STORE_STATE from spgist_private.h:468
@@ -13465,7 +13669,7 @@ macro_rules! STORE_STATE {
         $crate::__pgrx_c_args_STORE_STATE!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_STORE_STATE!(@collect __pgrx_emit_public []; $($raw)*)
@@ -13554,6 +13758,11 @@ macro_rules! __pgrx_c_args_SizeOfSpGistSearchItem {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SizeOfSpGistSearchItem] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SizeOfSpGistSearchItem!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13591,6 +13800,13 @@ macro_rules! __pgrx_c_args_SizeOfSpGistSearchItem {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SizeOfSpGistSearchItem] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SizeOfSpGistSearchItem!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13607,7 +13823,7 @@ macro_rules! __pgrx_c_args_SizeOfSpGistSearchItem {
         $crate::SizeOfSpGistSearchItem!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SizeOfSpGistSearchItem from spgist_private.h:183
@@ -13683,13 +13899,13 @@ macro_rules! SizeOfSpGistSearchItem {
         $crate::__pgrx_c_args_SizeOfSpGistSearchItem!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $n_distances:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SizeOfSpGistSearchItem!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $n_distances:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SizeOfSpGistSearchItem!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -13703,7 +13919,7 @@ macro_rules! SizeOfSpGistSearchItem {
                         $crate::__pgrx_c_operand!(@check_safety; $n_distances);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                             $crate::__pgrx_c_macros::expression::add::<
@@ -13751,7 +13967,7 @@ macro_rules! SizeOfSpGistSearchItem {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -13878,6 +14094,11 @@ macro_rules! __pgrx_c_args_SpGistBlockIsFixed {
             @argument [__pgrx_c_args_SpGistBlockIsFixed] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SpGistBlockIsFixed] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SpGistBlockIsFixed!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13915,6 +14136,13 @@ macro_rules! __pgrx_c_args_SpGistBlockIsFixed {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SpGistBlockIsFixed] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistBlockIsFixed!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13931,7 +14159,7 @@ macro_rules! __pgrx_c_args_SpGistBlockIsFixed {
         $crate::SpGistBlockIsFixed!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SpGistBlockIsFixed from spgist_private.h:54
@@ -14003,13 +14231,13 @@ macro_rules! SpGistBlockIsFixed {
         $crate::__pgrx_c_args_SpGistBlockIsFixed!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $blkno:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SpGistBlockIsFixed!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $blkno:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SpGistBlockIsFixed!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -14022,7 +14250,7 @@ macro_rules! SpGistBlockIsFixed {
                         $crate::__pgrx_c_operand!(@check_safety; $blkno);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::le(
@@ -14063,7 +14291,7 @@ macro_rules! SpGistBlockIsFixed {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -14189,6 +14417,11 @@ macro_rules! __pgrx_c_args_SpGistBlockIsRoot {
             @argument [__pgrx_c_args_SpGistBlockIsRoot] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SpGistBlockIsRoot] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SpGistBlockIsRoot!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14226,6 +14459,13 @@ macro_rules! __pgrx_c_args_SpGistBlockIsRoot {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SpGistBlockIsRoot] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistBlockIsRoot!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14242,7 +14482,7 @@ macro_rules! __pgrx_c_args_SpGistBlockIsRoot {
         $crate::SpGistBlockIsRoot!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SpGistBlockIsRoot from spgist_private.h:52
@@ -14319,13 +14559,13 @@ macro_rules! SpGistBlockIsRoot {
         $crate::__pgrx_c_args_SpGistBlockIsRoot!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $blkno:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SpGistBlockIsRoot!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $blkno:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SpGistBlockIsRoot!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -14338,7 +14578,7 @@ macro_rules! SpGistBlockIsRoot {
                         $crate::__pgrx_c_operand!(@check_safety; $blkno);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -14394,7 +14634,7 @@ macro_rules! SpGistBlockIsRoot {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -14529,6 +14769,11 @@ macro_rules! __pgrx_c_args_SpGistGetFillFactor {
             @argument [__pgrx_c_args_SpGistGetFillFactor] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SpGistGetFillFactor] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SpGistGetFillFactor!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14566,6 +14811,13 @@ macro_rules! __pgrx_c_args_SpGistGetFillFactor {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SpGistGetFillFactor] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistGetFillFactor!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14582,7 +14834,7 @@ macro_rules! __pgrx_c_args_SpGistGetFillFactor {
         $crate::SpGistGetFillFactor!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SpGistGetFillFactor from spgist_private.h:32
@@ -14746,13 +14998,13 @@ macro_rules! SpGistGetFillFactor {
         $crate::__pgrx_c_args_SpGistGetFillFactor!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SpGistGetFillFactor!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SpGistGetFillFactor!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -14766,7 +15018,7 @@ macro_rules! SpGistGetFillFactor {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -14904,7 +15156,7 @@ macro_rules! SpGistGetFillFactor {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -15130,6 +15382,13 @@ macro_rules! __pgrx_c_args_SpGistGetTargetPageFreeSpace {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SpGistGetTargetPageFreeSpace] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SpGistGetTargetPageFreeSpace!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15167,6 +15426,13 @@ macro_rules! __pgrx_c_args_SpGistGetTargetPageFreeSpace {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SpGistGetTargetPageFreeSpace] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistGetTargetPageFreeSpace!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15183,7 +15449,7 @@ macro_rules! __pgrx_c_args_SpGistGetTargetPageFreeSpace {
         $crate::SpGistGetTargetPageFreeSpace!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SpGistGetTargetPageFreeSpace from spgist_private.h:38
@@ -15412,13 +15678,13 @@ macro_rules! SpGistGetTargetPageFreeSpace {
         $crate::__pgrx_c_args_SpGistGetTargetPageFreeSpace!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SpGistGetTargetPageFreeSpace!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SpGistGetTargetPageFreeSpace!(
@@ -15435,7 +15701,7 @@ macro_rules! SpGistGetTargetPageFreeSpace {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                             $crate::__pgrx_c_macros::expression::div(
@@ -15629,7 +15895,7 @@ macro_rules! SpGistGetTargetPageFreeSpace {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -15911,6 +16177,13 @@ macro_rules! __pgrx_c_args_SpGistPageGetFreeSpace {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SpGistPageGetFreeSpace] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetFreeSpace!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15974,6 +16247,11 @@ macro_rules! __pgrx_c_args_SpGistPageGetFreeSpace {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SpGistPageGetFreeSpace] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SpGistPageGetFreeSpace!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16011,6 +16289,13 @@ macro_rules! __pgrx_c_args_SpGistPageGetFreeSpace {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SpGistPageGetFreeSpace] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetFreeSpace!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16027,7 +16312,7 @@ macro_rules! __pgrx_c_args_SpGistPageGetFreeSpace {
         $crate::SpGistPageGetFreeSpace!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SpGistPageGetFreeSpace from spgist_private.h:459
@@ -16625,13 +16910,13 @@ macro_rules! SpGistPageGetFreeSpace {
         $crate::__pgrx_c_args_SpGistPageGetFreeSpace!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $p:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetFreeSpace!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $p:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetFreeSpace!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -16646,7 +16931,7 @@ macro_rules! SpGistPageGetFreeSpace {
                         $crate::__pgrx_c_operand!(@check_safety; $n);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                             $crate::__pgrx_c_macros::expression::add::<
@@ -17221,7 +17506,7 @@ macro_rules! SpGistPageGetFreeSpace {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -17869,6 +18154,11 @@ macro_rules! __pgrx_c_args_SpGistPageGetMeta {
             @argument [__pgrx_c_args_SpGistPageGetMeta] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SpGistPageGetMeta] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SpGistPageGetMeta!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17906,6 +18196,13 @@ macro_rules! __pgrx_c_args_SpGistPageGetMeta {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SpGistPageGetMeta] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetMeta!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17922,7 +18219,7 @@ macro_rules! __pgrx_c_args_SpGistPageGetMeta {
         $crate::SpGistPageGetMeta!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SpGistPageGetMeta from spgist_private.h:124
@@ -18016,13 +18313,13 @@ macro_rules! SpGistPageGetMeta {
         $crate::__pgrx_c_args_SpGistPageGetMeta!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $p:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetMeta!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $p:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetMeta!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -18035,7 +18332,7 @@ macro_rules! SpGistPageGetMeta {
                         $crate::__pgrx_c_operand!(@check_safety; $p);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -18092,7 +18389,7 @@ macro_rules! SpGistPageGetMeta {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -18240,6 +18537,11 @@ macro_rules! __pgrx_c_args_SpGistPageGetOpaque {
             @argument [__pgrx_c_args_SpGistPageGetOpaque] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SpGistPageGetOpaque] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SpGistPageGetOpaque!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18277,6 +18579,13 @@ macro_rules! __pgrx_c_args_SpGistPageGetOpaque {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SpGistPageGetOpaque] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetOpaque!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18293,7 +18602,7 @@ macro_rules! __pgrx_c_args_SpGistPageGetOpaque {
         $crate::SpGistPageGetOpaque!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SpGistPageGetOpaque from spgist_private.h:78
@@ -18454,13 +18763,13 @@ macro_rules! SpGistPageGetOpaque {
         $crate::__pgrx_c_args_SpGistPageGetOpaque!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetOpaque!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetOpaque!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -18474,7 +18783,7 @@ macro_rules! SpGistPageGetOpaque {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -18607,7 +18916,7 @@ macro_rules! SpGistPageGetOpaque {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -18822,6 +19131,11 @@ macro_rules! __pgrx_c_args_SpGistPageIsDeleted {
             @argument [__pgrx_c_args_SpGistPageIsDeleted] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SpGistPageIsDeleted] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SpGistPageIsDeleted!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18859,6 +19173,13 @@ macro_rules! __pgrx_c_args_SpGistPageIsDeleted {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SpGistPageIsDeleted] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageIsDeleted!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18875,7 +19196,7 @@ macro_rules! __pgrx_c_args_SpGistPageIsDeleted {
         $crate::SpGistPageIsDeleted!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SpGistPageIsDeleted from spgist_private.h:80
@@ -19077,13 +19398,13 @@ macro_rules! SpGistPageIsDeleted {
         $crate::__pgrx_c_args_SpGistPageIsDeleted!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageIsDeleted!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageIsDeleted!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -19097,7 +19418,7 @@ macro_rules! SpGistPageIsDeleted {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -19263,7 +19584,7 @@ macro_rules! SpGistPageIsDeleted {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -19519,6 +19840,11 @@ macro_rules! __pgrx_c_args_SpGistPageIsLeaf {
             @argument [__pgrx_c_args_SpGistPageIsLeaf] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SpGistPageIsLeaf] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SpGistPageIsLeaf!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19556,6 +19882,13 @@ macro_rules! __pgrx_c_args_SpGistPageIsLeaf {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SpGistPageIsLeaf] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageIsLeaf!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19572,7 +19905,7 @@ macro_rules! __pgrx_c_args_SpGistPageIsLeaf {
         $crate::SpGistPageIsLeaf!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SpGistPageIsLeaf from spgist_private.h:81
@@ -19774,13 +20107,13 @@ macro_rules! SpGistPageIsLeaf {
         $crate::__pgrx_c_args_SpGistPageIsLeaf!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageIsLeaf!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageIsLeaf!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -19794,7 +20127,7 @@ macro_rules! SpGistPageIsLeaf {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -19960,7 +20293,7 @@ macro_rules! SpGistPageIsLeaf {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -20216,6 +20549,11 @@ macro_rules! __pgrx_c_args_SpGistPageIsMeta {
             @argument [__pgrx_c_args_SpGistPageIsMeta] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SpGistPageIsMeta] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SpGistPageIsMeta!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20253,6 +20591,13 @@ macro_rules! __pgrx_c_args_SpGistPageIsMeta {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SpGistPageIsMeta] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageIsMeta!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20269,7 +20614,7 @@ macro_rules! __pgrx_c_args_SpGistPageIsMeta {
         $crate::SpGistPageIsMeta!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SpGistPageIsMeta from spgist_private.h:79
@@ -20471,13 +20816,13 @@ macro_rules! SpGistPageIsMeta {
         $crate::__pgrx_c_args_SpGistPageIsMeta!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageIsMeta!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageIsMeta!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -20491,7 +20836,7 @@ macro_rules! SpGistPageIsMeta {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -20657,7 +21002,7 @@ macro_rules! SpGistPageIsMeta {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -20916,6 +21261,11 @@ macro_rules! __pgrx_c_args_SpGistPageStoresNulls {
             @argument [__pgrx_c_args_SpGistPageStoresNulls] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SpGistPageStoresNulls] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SpGistPageStoresNulls!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20953,6 +21303,13 @@ macro_rules! __pgrx_c_args_SpGistPageStoresNulls {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SpGistPageStoresNulls] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageStoresNulls!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20969,7 +21326,7 @@ macro_rules! __pgrx_c_args_SpGistPageStoresNulls {
         $crate::SpGistPageStoresNulls!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SpGistPageStoresNulls from spgist_private.h:82
@@ -21171,13 +21528,13 @@ macro_rules! SpGistPageStoresNulls {
         $crate::__pgrx_c_args_SpGistPageStoresNulls!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageStoresNulls!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageStoresNulls!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -21191,7 +21548,7 @@ macro_rules! SpGistPageStoresNulls {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -21357,7 +21714,7 @@ macro_rules! SpGistPageStoresNulls {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -21613,6 +21970,11 @@ macro_rules! __pgrx_c_args__SGITDATA {
             @argument [__pgrx_c_args__SGITDATA] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args__SGITDATA] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args__SGITDATA!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -21648,6 +22010,11 @@ macro_rules! __pgrx_c_args__SGITDATA {
             @argument [__pgrx_c_args__SGITDATA] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args__SGITDATA] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args__SGITDATA!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -21664,7 +22031,7 @@ macro_rules! __pgrx_c_args__SGITDATA {
         $crate::_SGITDATA!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro _SGITDATA from spgist_private.h:314
@@ -21851,13 +22218,13 @@ macro_rules! _SGITDATA {
         $crate::__pgrx_c_args__SGITDATA!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args__SGITDATA!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args__SGITDATA!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -21871,7 +22238,7 @@ macro_rules! _SGITDATA {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::add::<
@@ -22031,7 +22398,7 @@ macro_rules! _SGITDATA {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

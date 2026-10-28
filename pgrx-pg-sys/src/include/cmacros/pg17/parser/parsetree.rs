@@ -72,6 +72,11 @@ macro_rules! __pgrx_c_args_rt_fetch {
             @argument [__pgrx_c_args_rt_fetch] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rt_fetch] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rt_fetch!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -133,6 +138,11 @@ macro_rules! __pgrx_c_args_rt_fetch {
             @argument [__pgrx_c_args_rt_fetch] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rt_fetch] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_rt_fetch!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -168,6 +178,11 @@ macro_rules! __pgrx_c_args_rt_fetch {
             @argument [__pgrx_c_args_rt_fetch] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rt_fetch] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rt_fetch!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -184,7 +199,7 @@ macro_rules! __pgrx_c_args_rt_fetch {
         $crate::rt_fetch!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro rt_fetch from parsetree.h:31
@@ -313,13 +328,13 @@ macro_rules! rt_fetch {
         $crate::__pgrx_c_args_rt_fetch!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rangetable_index:tt, $rangetable:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rt_fetch!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rangetable_index:tt, $rangetable:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rt_fetch!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -333,7 +348,7 @@ macro_rules! rt_fetch {
                         $crate::__pgrx_c_operand!(@check_safety; $rangetable);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -429,7 +444,7 @@ macro_rules! rt_fetch {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

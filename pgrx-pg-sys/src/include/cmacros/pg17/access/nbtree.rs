@@ -86,6 +86,11 @@ macro_rules! __pgrx_c_args_BTCommuteStrategyNumber {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTCommuteStrategyNumber] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTCommuteStrategyNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -123,6 +128,13 @@ macro_rules! __pgrx_c_args_BTCommuteStrategyNumber {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTCommuteStrategyNumber] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTCommuteStrategyNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -139,7 +151,7 @@ macro_rules! __pgrx_c_args_BTCommuteStrategyNumber {
         $crate::BTCommuteStrategyNumber!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BTCommuteStrategyNumber from nbtree.h:685
@@ -211,13 +223,13 @@ macro_rules! BTCommuteStrategyNumber {
         $crate::__pgrx_c_args_BTCommuteStrategyNumber!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $strat:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTCommuteStrategyNumber!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $strat:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTCommuteStrategyNumber!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -230,7 +242,7 @@ macro_rules! BTCommuteStrategyNumber {
                         $crate::__pgrx_c_operand!(@check_safety; $strat);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::sub::<
@@ -274,7 +286,7 @@ macro_rules! BTCommuteStrategyNumber {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -400,6 +412,11 @@ macro_rules! __pgrx_c_args_BTGetDeduplicateItems {
             @argument [__pgrx_c_args_BTGetDeduplicateItems] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTGetDeduplicateItems] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTGetDeduplicateItems!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -437,6 +454,13 @@ macro_rules! __pgrx_c_args_BTGetDeduplicateItems {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTGetDeduplicateItems] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTGetDeduplicateItems!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -453,7 +477,7 @@ macro_rules! __pgrx_c_args_BTGetDeduplicateItems {
         $crate::BTGetDeduplicateItems!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BTGetDeduplicateItems from nbtree.h:1146
@@ -624,13 +648,13 @@ macro_rules! BTGetDeduplicateItems {
         $crate::__pgrx_c_args_BTGetDeduplicateItems!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTGetDeduplicateItems!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTGetDeduplicateItems!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -644,7 +668,7 @@ macro_rules! BTGetDeduplicateItems {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -783,7 +807,7 @@ macro_rules! BTGetDeduplicateItems {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1008,6 +1032,11 @@ macro_rules! __pgrx_c_args_BTGetFillFactor {
             @argument [__pgrx_c_args_BTGetFillFactor] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTGetFillFactor] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTGetFillFactor!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1045,6 +1074,13 @@ macro_rules! __pgrx_c_args_BTGetFillFactor {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTGetFillFactor] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTGetFillFactor!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1061,7 +1097,7 @@ macro_rules! __pgrx_c_args_BTGetFillFactor {
         $crate::BTGetFillFactor!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BTGetFillFactor from nbtree.h:1138
@@ -1225,13 +1261,13 @@ macro_rules! BTGetFillFactor {
         $crate::__pgrx_c_args_BTGetFillFactor!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTGetFillFactor!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTGetFillFactor!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1245,7 +1281,7 @@ macro_rules! BTGetFillFactor {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -1383,7 +1419,7 @@ macro_rules! BTGetFillFactor {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1606,6 +1642,13 @@ macro_rules! __pgrx_c_args_BTGetTargetPageFreeSpace {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTGetTargetPageFreeSpace] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTGetTargetPageFreeSpace!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1643,6 +1686,13 @@ macro_rules! __pgrx_c_args_BTGetTargetPageFreeSpace {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTGetTargetPageFreeSpace] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTGetTargetPageFreeSpace!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1659,7 +1709,7 @@ macro_rules! __pgrx_c_args_BTGetTargetPageFreeSpace {
         $crate::BTGetTargetPageFreeSpace!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BTGetTargetPageFreeSpace from nbtree.h:1144
@@ -1888,13 +1938,13 @@ macro_rules! BTGetTargetPageFreeSpace {
         $crate::__pgrx_c_args_BTGetTargetPageFreeSpace!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTGetTargetPageFreeSpace!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTGetTargetPageFreeSpace!(
@@ -1911,7 +1961,7 @@ macro_rules! BTGetTargetPageFreeSpace {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                             $crate::__pgrx_c_macros::expression::div(
@@ -2105,7 +2155,7 @@ macro_rules! BTGetTargetPageFreeSpace {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2385,6 +2435,11 @@ macro_rules! __pgrx_c_args_BTMaxItemSize {
             @argument [__pgrx_c_args_BTMaxItemSize] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTMaxItemSize] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTMaxItemSize!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2422,6 +2477,11 @@ macro_rules! __pgrx_c_args_BTMaxItemSize {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTMaxItemSize] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTMaxItemSize!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2438,7 +2498,7 @@ macro_rules! __pgrx_c_args_BTMaxItemSize {
         $crate::BTMaxItemSize!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BTMaxItemSize from nbtree.h:164
@@ -3083,13 +3143,13 @@ macro_rules! BTMaxItemSize {
         $crate::__pgrx_c_args_BTMaxItemSize!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTMaxItemSize!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTMaxItemSize!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3103,7 +3163,7 @@ macro_rules! BTMaxItemSize {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                             $crate::__pgrx_c_macros::expression::sub::<
@@ -3726,7 +3786,7 @@ macro_rules! BTMaxItemSize {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4430,6 +4490,11 @@ macro_rules! __pgrx_c_args_BTMaxItemSizeNoHeapTid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTMaxItemSizeNoHeapTid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTMaxItemSizeNoHeapTid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4467,6 +4532,13 @@ macro_rules! __pgrx_c_args_BTMaxItemSizeNoHeapTid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTMaxItemSizeNoHeapTid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTMaxItemSizeNoHeapTid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4483,7 +4555,7 @@ macro_rules! __pgrx_c_args_BTMaxItemSizeNoHeapTid {
         $crate::BTMaxItemSizeNoHeapTid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BTMaxItemSizeNoHeapTid from nbtree.h:169
@@ -4914,8 +4986,8 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                             )
                         )
                     )
-                ] [compile_error!("C expression is not a place in this operation")] [
-                    compile_error!("C expression is not a place in this operation")
+                ] [::core::compile_error!("C expression is not a place in this operation")] [
+                    ::core::compile_error!("C expression is not a place in this operation")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -4924,7 +4996,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                     $crate::__pgrx_c_operand!(@check_safety; $page);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                         $crate::__pgrx_c_macros::expression::div(
@@ -5331,7 +5403,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -5735,8 +5807,8 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                             )
                         )
                     )
-                ] [compile_error!("C expression is not a place in this operation")] [
-                    compile_error!("C expression is not a place in this operation")
+                ] [::core::compile_error!("C expression is not a place in this operation")] [
+                    ::core::compile_error!("C expression is not a place in this operation")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -5745,7 +5817,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                     $crate::__pgrx_c_operand!(@check_safety; $page);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                         $crate::__pgrx_c_macros::expression::div(
@@ -6152,7 +6224,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -6556,8 +6628,8 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                             )
                         )
                     )
-                ] [compile_error!("C expression is not a place in this operation")] [
-                    compile_error!("C expression is not a place in this operation")
+                ] [::core::compile_error!("C expression is not a place in this operation")] [
+                    ::core::compile_error!("C expression is not a place in this operation")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -6566,7 +6638,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                     $crate::__pgrx_c_operand!(@check_safety; $page);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                         $crate::__pgrx_c_macros::expression::div(
@@ -6973,7 +7045,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -7377,8 +7449,8 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                             )
                         )
                     )
-                ] [compile_error!("C expression is not a place in this operation")] [
-                    compile_error!("C expression is not a place in this operation")
+                ] [::core::compile_error!("C expression is not a place in this operation")] [
+                    ::core::compile_error!("C expression is not a place in this operation")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -7387,7 +7459,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                     $crate::__pgrx_c_operand!(@check_safety; $page);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                         $crate::__pgrx_c_macros::expression::div(
@@ -7794,7 +7866,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -8198,8 +8270,8 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                             )
                         )
                     )
-                ] [compile_error!("C expression is not a place in this operation")] [
-                    compile_error!("C expression is not a place in this operation")
+                ] [::core::compile_error!("C expression is not a place in this operation")] [
+                    ::core::compile_error!("C expression is not a place in this operation")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -8208,7 +8280,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                     $crate::__pgrx_c_operand!(@check_safety; $page);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                         $crate::__pgrx_c_macros::expression::div(
@@ -8615,7 +8687,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -8707,6 +8779,11 @@ macro_rules! __pgrx_c_args_BTPageGetDeleteXid {
             @argument [__pgrx_c_args_BTPageGetDeleteXid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageGetDeleteXid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTPageGetDeleteXid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8744,6 +8821,13 @@ macro_rules! __pgrx_c_args_BTPageGetDeleteXid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageGetDeleteXid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTPageGetDeleteXid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8760,7 +8844,7 @@ macro_rules! __pgrx_c_args_BTPageGetDeleteXid {
         $crate::BTPageGetDeleteXid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BTPageGetDeleteXid from nbtree.h:259
@@ -8821,7 +8905,7 @@ macro_rules! BTPageGetDeleteXid {
                     $crate::__pgrx_c_bindings::FullTransactionId
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_8332070c52bb0e9b1f535a59a9addea1(
+                $crate::__pgrx_c_generated::Inline_56759e62af8ee39bfc28ef6db73c3529(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -8854,13 +8938,13 @@ macro_rules! BTPageGetDeleteXid {
         $crate::__pgrx_c_args_BTPageGetDeleteXid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTPageGetDeleteXid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTPageGetDeleteXid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8873,7 +8957,7 @@ macro_rules! BTPageGetDeleteXid {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -8881,7 +8965,7 @@ macro_rules! BTPageGetDeleteXid {
                                     $crate::__pgrx_c_bindings::FullTransactionId
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_8332070c52bb0e9b1f535a59a9addea1(
+                                $crate::__pgrx_c_generated::Inline_56759e62af8ee39bfc28ef6db73c3529(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -8913,7 +8997,7 @@ macro_rules! BTPageGetDeleteXid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8928,7 +9012,7 @@ macro_rules! BTPageGetDeleteXid {
                         $crate::__pgrx_c_bindings::FullTransactionId
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_8332070c52bb0e9b1f535a59a9addea1(
+                    $crate::__pgrx_c_generated::Inline_56759e62af8ee39bfc28ef6db73c3529(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -9043,6 +9127,11 @@ macro_rules! __pgrx_c_args_BTPageGetMeta {
             @argument [__pgrx_c_args_BTPageGetMeta] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageGetMeta] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTPageGetMeta!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9080,6 +9169,11 @@ macro_rules! __pgrx_c_args_BTPageGetMeta {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageGetMeta] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTPageGetMeta!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9096,7 +9190,7 @@ macro_rules! __pgrx_c_args_BTPageGetMeta {
         $crate::BTPageGetMeta!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BTPageGetMeta from nbtree.h:121
@@ -9190,13 +9284,13 @@ macro_rules! BTPageGetMeta {
         $crate::__pgrx_c_args_BTPageGetMeta!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $p:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTPageGetMeta!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $p:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTPageGetMeta!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -9209,7 +9303,7 @@ macro_rules! BTPageGetMeta {
                         $crate::__pgrx_c_operand!(@check_safety; $p);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -9266,7 +9360,7 @@ macro_rules! BTPageGetMeta {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9414,6 +9508,11 @@ macro_rules! __pgrx_c_args_BTPageGetOpaque {
             @argument [__pgrx_c_args_BTPageGetOpaque] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageGetOpaque] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTPageGetOpaque!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9451,6 +9550,13 @@ macro_rules! __pgrx_c_args_BTPageGetOpaque {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageGetOpaque] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTPageGetOpaque!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9467,7 +9573,7 @@ macro_rules! __pgrx_c_args_BTPageGetOpaque {
         $crate::BTPageGetOpaque!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BTPageGetOpaque from nbtree.h:73
@@ -9561,13 +9667,13 @@ macro_rules! BTPageGetOpaque {
         $crate::__pgrx_c_args_BTPageGetOpaque!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTPageGetOpaque!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTPageGetOpaque!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -9580,7 +9686,7 @@ macro_rules! BTPageGetOpaque {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -9642,7 +9748,7 @@ macro_rules! BTPageGetOpaque {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9783,6 +9889,13 @@ macro_rules! __pgrx_c_args_BTPageIsRecyclable {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageIsRecyclable] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTPageIsRecyclable!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9844,6 +9957,11 @@ macro_rules! __pgrx_c_args_BTPageIsRecyclable {
             @argument [__pgrx_c_args_BTPageIsRecyclable] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageIsRecyclable] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTPageIsRecyclable!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9881,6 +9999,13 @@ macro_rules! __pgrx_c_args_BTPageIsRecyclable {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageIsRecyclable] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTPageIsRecyclable!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9897,7 +10022,7 @@ macro_rules! __pgrx_c_args_BTPageIsRecyclable {
         $crate::BTPageIsRecyclable!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BTPageIsRecyclable from nbtree.h:290
@@ -10020,13 +10145,13 @@ macro_rules! BTPageIsRecyclable {
         $crate::__pgrx_c_args_BTPageIsRecyclable!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt, $heaprel:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTPageIsRecyclable!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt, $heaprel:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTPageIsRecyclable!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -10040,7 +10165,7 @@ macro_rules! BTPageIsRecyclable {
                         $crate::__pgrx_c_operand!(@check_safety; $heaprel);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -10101,7 +10226,7 @@ macro_rules! BTPageIsRecyclable {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10242,6 +10367,13 @@ macro_rules! __pgrx_c_args_BTPageSetDeleted {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageSetDeleted] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTPageSetDeleted!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10303,6 +10435,11 @@ macro_rules! __pgrx_c_args_BTPageSetDeleted {
             @argument [__pgrx_c_args_BTPageSetDeleted] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageSetDeleted] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTPageSetDeleted!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10340,6 +10477,13 @@ macro_rules! __pgrx_c_args_BTPageSetDeleted {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageSetDeleted] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTPageSetDeleted!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10356,7 +10500,7 @@ macro_rules! __pgrx_c_args_BTPageSetDeleted {
         $crate::BTPageSetDeleted!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BTPageSetDeleted from nbtree.h:238
@@ -10414,7 +10558,7 @@ macro_rules! BTPageSetDeleted {
     };
     (@__pgrx_emit_value; $page:tt, $safexid:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            $crate::__pgrx_c_generated::Inline_f1b2460d0196e2156865894362ad6136(
+            $crate::__pgrx_c_generated::Inline_0374cbb470ce3297364428b9d74faa2d(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -10462,13 +10606,13 @@ macro_rules! BTPageSetDeleted {
         $crate::__pgrx_c_args_BTPageSetDeleted!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt, $safexid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTPageSetDeleted!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt, $safexid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTPageSetDeleted!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -10482,10 +10626,10 @@ macro_rules! BTPageSetDeleted {
                         $crate::__pgrx_c_operand!(@check_safety; $safexid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::__pgrx_c_generated::Inline_f1b2460d0196e2156865894362ad6136(
+                            $crate::__pgrx_c_generated::Inline_0374cbb470ce3297364428b9d74faa2d(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -10533,7 +10677,7 @@ macro_rules! BTPageSetDeleted {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10543,7 +10687,7 @@ macro_rules! BTPageSetDeleted {
     (@__pgrx_emit_discard; $page:tt, $safexid:tt $(,)?) => {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::__pgrx_c_generated::Inline_f1b2460d0196e2156865894362ad6136(
+                $crate::__pgrx_c_generated::Inline_0374cbb470ce3297364428b9d74faa2d(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -10673,6 +10817,11 @@ macro_rules! __pgrx_c_args_BTScanPosInvalidate {
             @argument [__pgrx_c_args_BTScanPosInvalidate] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosInvalidate] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTScanPosInvalidate!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10710,6 +10859,13 @@ macro_rules! __pgrx_c_args_BTScanPosInvalidate {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosInvalidate] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTScanPosInvalidate!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10726,7 +10882,7 @@ macro_rules! __pgrx_c_args_BTScanPosInvalidate {
         $crate::BTScanPosInvalidate!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BTScanPosInvalidate from nbtree.h:1022
@@ -10850,7 +11006,7 @@ macro_rules! BTScanPosInvalidate {
         $crate::__pgrx_c_args_BTScanPosInvalidate!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_BTScanPosInvalidate!(@collect __pgrx_emit_public []; $($raw)*)
@@ -10934,6 +11090,11 @@ macro_rules! __pgrx_c_args_BTScanPosIsPinned {
             @argument [__pgrx_c_args_BTScanPosIsPinned] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosIsPinned] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTScanPosIsPinned!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10971,6 +11132,13 @@ macro_rules! __pgrx_c_args_BTScanPosIsPinned {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosIsPinned] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTScanPosIsPinned!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10987,7 +11155,7 @@ macro_rules! __pgrx_c_args_BTScanPosIsPinned {
         $crate::BTScanPosIsPinned!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BTScanPosIsPinned from nbtree.h:999
@@ -11087,13 +11255,13 @@ macro_rules! BTScanPosIsPinned {
         $crate::__pgrx_c_args_BTScanPosIsPinned!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $scanpos:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTScanPosIsPinned!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $scanpos:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTScanPosIsPinned!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -11107,7 +11275,7 @@ macro_rules! BTScanPosIsPinned {
                         $crate::__pgrx_c_operand!(@check_safety; $scanpos);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -11172,7 +11340,7 @@ macro_rules! BTScanPosIsPinned {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -11326,6 +11494,11 @@ macro_rules! __pgrx_c_args_BTScanPosIsValid {
             @argument [__pgrx_c_args_BTScanPosIsValid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosIsValid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTScanPosIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11363,6 +11536,13 @@ macro_rules! __pgrx_c_args_BTScanPosIsValid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosIsValid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTScanPosIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11379,7 +11559,7 @@ macro_rules! __pgrx_c_args_BTScanPosIsValid {
         $crate::BTScanPosIsValid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BTScanPosIsValid from nbtree.h:1016
@@ -11479,13 +11659,13 @@ macro_rules! BTScanPosIsValid {
         $crate::__pgrx_c_args_BTScanPosIsValid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $scanpos:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTScanPosIsValid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $scanpos:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTScanPosIsValid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -11499,7 +11679,7 @@ macro_rules! BTScanPosIsValid {
                         $crate::__pgrx_c_operand!(@check_safety; $scanpos);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -11564,7 +11744,7 @@ macro_rules! BTScanPosIsValid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -11718,6 +11898,11 @@ macro_rules! __pgrx_c_args_BTScanPosUnpin {
             @argument [__pgrx_c_args_BTScanPosUnpin] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosUnpin] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTScanPosUnpin!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11755,6 +11940,11 @@ macro_rules! __pgrx_c_args_BTScanPosUnpin {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosUnpin] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTScanPosUnpin!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11771,7 +11961,7 @@ macro_rules! __pgrx_c_args_BTScanPosUnpin {
         $crate::BTScanPosUnpin!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BTScanPosUnpin from nbtree.h:1005
@@ -11855,7 +12045,7 @@ macro_rules! BTScanPosUnpin {
         $crate::__pgrx_c_args_BTScanPosUnpin!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_BTScanPosUnpin!(@collect __pgrx_emit_public []; $($raw)*)
@@ -11944,6 +12134,11 @@ macro_rules! __pgrx_c_args_BTScanPosUnpinIfPinned {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosUnpinIfPinned] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTScanPosUnpinIfPinned!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11981,6 +12176,13 @@ macro_rules! __pgrx_c_args_BTScanPosUnpinIfPinned {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosUnpinIfPinned] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTScanPosUnpinIfPinned!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11997,7 +12199,7 @@ macro_rules! __pgrx_c_args_BTScanPosUnpinIfPinned {
         $crate::BTScanPosUnpinIfPinned!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BTScanPosUnpinIfPinned from nbtree.h:1010
@@ -12164,7 +12366,7 @@ macro_rules! BTScanPosUnpinIfPinned {
         $crate::__pgrx_c_args_BTScanPosUnpinIfPinned!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_BTScanPosUnpinIfPinned!(@collect __pgrx_emit_public []; $($raw)*)
@@ -12251,6 +12453,11 @@ macro_rules! __pgrx_c_args_BTreeTupleGetDownLink {
             @argument [__pgrx_c_args_BTreeTupleGetDownLink] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetDownLink] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTreeTupleGetDownLink!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12288,6 +12495,13 @@ macro_rules! __pgrx_c_args_BTreeTupleGetDownLink {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetDownLink] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetDownLink!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12304,7 +12518,7 @@ macro_rules! __pgrx_c_args_BTreeTupleGetDownLink {
         $crate::BTreeTupleGetDownLink!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BTreeTupleGetDownLink from nbtree.h:555
@@ -12378,13 +12592,13 @@ macro_rules! BTreeTupleGetDownLink {
         $crate::__pgrx_c_args_BTreeTupleGetDownLink!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $pivot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetDownLink!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $pivot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetDownLink!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -12397,7 +12611,7 @@ macro_rules! BTreeTupleGetDownLink {
                         $crate::__pgrx_c_operand!(@check_safety; $pivot);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -12433,7 +12647,7 @@ macro_rules! BTreeTupleGetDownLink {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -12562,6 +12776,11 @@ macro_rules! __pgrx_c_args_BTreeTupleGetHeapTID {
             @argument [__pgrx_c_args_BTreeTupleGetHeapTID] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetHeapTID] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTreeTupleGetHeapTID!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12599,6 +12818,13 @@ macro_rules! __pgrx_c_args_BTreeTupleGetHeapTID {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetHeapTID] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetHeapTID!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12615,7 +12841,7 @@ macro_rules! __pgrx_c_args_BTreeTupleGetHeapTID {
         $crate::BTreeTupleGetHeapTID!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BTreeTupleGetHeapTID from nbtree.h:637
@@ -12710,13 +12936,13 @@ macro_rules! BTreeTupleGetHeapTID {
         $crate::__pgrx_c_args_BTreeTupleGetHeapTID!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetHeapTID!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetHeapTID!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -12729,7 +12955,7 @@ macro_rules! BTreeTupleGetHeapTID {
                         $crate::__pgrx_c_operand!(@check_safety; $itup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -12770,7 +12996,7 @@ macro_rules! BTreeTupleGetHeapTID {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -12906,6 +13132,11 @@ macro_rules! __pgrx_c_args_BTreeTupleGetMaxHeapTID {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetMaxHeapTID] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTreeTupleGetMaxHeapTID!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12943,6 +13174,13 @@ macro_rules! __pgrx_c_args_BTreeTupleGetMaxHeapTID {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetMaxHeapTID] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetMaxHeapTID!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12959,7 +13197,7 @@ macro_rules! __pgrx_c_args_BTreeTupleGetMaxHeapTID {
         $crate::BTreeTupleGetMaxHeapTID!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BTreeTupleGetMaxHeapTID from nbtree.h:663
@@ -13052,13 +13290,13 @@ macro_rules! BTreeTupleGetMaxHeapTID {
         $crate::__pgrx_c_args_BTreeTupleGetMaxHeapTID!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetMaxHeapTID!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetMaxHeapTID!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -13071,7 +13309,7 @@ macro_rules! BTreeTupleGetMaxHeapTID {
                         $crate::__pgrx_c_operand!(@check_safety; $itup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -13112,7 +13350,7 @@ macro_rules! BTreeTupleGetMaxHeapTID {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -13236,6 +13474,13 @@ macro_rules! __pgrx_c_args_BTreeTupleGetNAtts {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetNAtts] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetNAtts!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13297,6 +13542,11 @@ macro_rules! __pgrx_c_args_BTreeTupleGetNAtts {
             @argument [__pgrx_c_args_BTreeTupleGetNAtts] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetNAtts] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTreeTupleGetNAtts!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13334,6 +13584,13 @@ macro_rules! __pgrx_c_args_BTreeTupleGetNAtts {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetNAtts] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetNAtts!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13350,7 +13607,7 @@ macro_rules! __pgrx_c_args_BTreeTupleGetNAtts {
         $crate::BTreeTupleGetNAtts!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BTreeTupleGetNAtts from nbtree.h:577
@@ -13551,13 +13808,13 @@ macro_rules! BTreeTupleGetNAtts {
         $crate::__pgrx_c_args_BTreeTupleGetNAtts!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $itup:tt, $rel:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetNAtts!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $itup:tt, $rel:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetNAtts!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -13572,7 +13829,7 @@ macro_rules! BTreeTupleGetNAtts {
                         $crate::__pgrx_c_operand!(@check_safety; $rel);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -13752,7 +14009,7 @@ macro_rules! BTreeTupleGetNAtts {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -14009,6 +14266,11 @@ macro_rules! __pgrx_c_args_BTreeTupleGetNPosting {
             @argument [__pgrx_c_args_BTreeTupleGetNPosting] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetNPosting] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTreeTupleGetNPosting!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14046,6 +14308,13 @@ macro_rules! __pgrx_c_args_BTreeTupleGetNPosting {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetNPosting] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetNPosting!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14062,7 +14331,7 @@ macro_rules! __pgrx_c_args_BTreeTupleGetNPosting {
         $crate::BTreeTupleGetNPosting!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BTreeTupleGetNPosting from nbtree.h:517
@@ -14141,13 +14410,13 @@ macro_rules! BTreeTupleGetNPosting {
         $crate::__pgrx_c_args_BTreeTupleGetNPosting!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $posting:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetNPosting!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $posting:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetNPosting!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -14160,7 +14429,7 @@ macro_rules! BTreeTupleGetNPosting {
                         $crate::__pgrx_c_operand!(@check_safety; $posting);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -14196,7 +14465,7 @@ macro_rules! BTreeTupleGetNPosting {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -14325,6 +14594,11 @@ macro_rules! __pgrx_c_args_BTreeTupleGetPosting {
             @argument [__pgrx_c_args_BTreeTupleGetPosting] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPosting] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTreeTupleGetPosting!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14362,6 +14636,13 @@ macro_rules! __pgrx_c_args_BTreeTupleGetPosting {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPosting] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetPosting!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14378,7 +14659,7 @@ macro_rules! __pgrx_c_args_BTreeTupleGetPosting {
         $crate::BTreeTupleGetPosting!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BTreeTupleGetPosting from nbtree.h:536
@@ -14460,13 +14741,13 @@ macro_rules! BTreeTupleGetPosting {
         $crate::__pgrx_c_args_BTreeTupleGetPosting!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $posting:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetPosting!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $posting:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetPosting!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -14479,7 +14760,7 @@ macro_rules! BTreeTupleGetPosting {
                         $crate::__pgrx_c_operand!(@check_safety; $posting);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -14520,7 +14801,7 @@ macro_rules! BTreeTupleGetPosting {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -14647,6 +14928,13 @@ macro_rules! __pgrx_c_args_BTreeTupleGetPostingN {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPostingN] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetPostingN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14708,6 +14996,11 @@ macro_rules! __pgrx_c_args_BTreeTupleGetPostingN {
             @argument [__pgrx_c_args_BTreeTupleGetPostingN] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPostingN] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTreeTupleGetPostingN!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14745,6 +15038,13 @@ macro_rules! __pgrx_c_args_BTreeTupleGetPostingN {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPostingN] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetPostingN!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14761,7 +15061,7 @@ macro_rules! __pgrx_c_args_BTreeTupleGetPostingN {
         $crate::BTreeTupleGetPostingN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BTreeTupleGetPostingN from nbtree.h:543
@@ -14853,13 +15153,13 @@ macro_rules! BTreeTupleGetPostingN {
         $crate::__pgrx_c_args_BTreeTupleGetPostingN!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $posting:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetPostingN!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $posting:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetPostingN!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -14873,7 +15173,7 @@ macro_rules! BTreeTupleGetPostingN {
                         $crate::__pgrx_c_operand!(@check_safety; $n);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -14927,7 +15227,7 @@ macro_rules! BTreeTupleGetPostingN {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -15075,6 +15375,13 @@ macro_rules! __pgrx_c_args_BTreeTupleGetPostingOffset {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPostingOffset] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTreeTupleGetPostingOffset!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15112,6 +15419,13 @@ macro_rules! __pgrx_c_args_BTreeTupleGetPostingOffset {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPostingOffset] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetPostingOffset!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15128,7 +15442,7 @@ macro_rules! __pgrx_c_args_BTreeTupleGetPostingOffset {
         $crate::BTreeTupleGetPostingOffset!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BTreeTupleGetPostingOffset from nbtree.h:528
@@ -15207,13 +15521,13 @@ macro_rules! BTreeTupleGetPostingOffset {
         $crate::__pgrx_c_args_BTreeTupleGetPostingOffset!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $posting:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetPostingOffset!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $posting:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetPostingOffset!(
@@ -15229,7 +15543,7 @@ macro_rules! BTreeTupleGetPostingOffset {
                         $crate::__pgrx_c_operand!(@check_safety; $posting);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -15265,7 +15579,7 @@ macro_rules! BTreeTupleGetPostingOffset {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -15396,6 +15710,11 @@ macro_rules! __pgrx_c_args_BTreeTupleGetTopParent {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetTopParent] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTreeTupleGetTopParent!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15433,6 +15752,13 @@ macro_rules! __pgrx_c_args_BTreeTupleGetTopParent {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetTopParent] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetTopParent!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15449,7 +15775,7 @@ macro_rules! __pgrx_c_args_BTreeTupleGetTopParent {
         $crate::BTreeTupleGetTopParent!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BTreeTupleGetTopParent from nbtree.h:619
@@ -15526,13 +15852,13 @@ macro_rules! BTreeTupleGetTopParent {
         $crate::__pgrx_c_args_BTreeTupleGetTopParent!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $leafhikey:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetTopParent!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $leafhikey:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetTopParent!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -15545,7 +15871,7 @@ macro_rules! BTreeTupleGetTopParent {
                         $crate::__pgrx_c_operand!(@check_safety; $leafhikey);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -15581,7 +15907,7 @@ macro_rules! BTreeTupleGetTopParent {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -15707,6 +16033,11 @@ macro_rules! __pgrx_c_args_BTreeTupleIsPivot {
             @argument [__pgrx_c_args_BTreeTupleIsPivot] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleIsPivot] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTreeTupleIsPivot!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15744,6 +16075,13 @@ macro_rules! __pgrx_c_args_BTreeTupleIsPivot {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleIsPivot] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleIsPivot!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15760,7 +16098,7 @@ macro_rules! __pgrx_c_args_BTreeTupleIsPivot {
         $crate::BTreeTupleIsPivot!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BTreeTupleIsPivot from nbtree.h:479
@@ -15840,13 +16178,13 @@ macro_rules! BTreeTupleIsPivot {
         $crate::__pgrx_c_args_BTreeTupleIsPivot!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleIsPivot!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleIsPivot!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -15859,7 +16197,7 @@ macro_rules! BTreeTupleIsPivot {
                         $crate::__pgrx_c_operand!(@check_safety; $itup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -15895,7 +16233,7 @@ macro_rules! BTreeTupleIsPivot {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -16019,6 +16357,11 @@ macro_rules! __pgrx_c_args_BTreeTupleIsPosting {
             @argument [__pgrx_c_args_BTreeTupleIsPosting] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleIsPosting] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTreeTupleIsPosting!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16056,6 +16399,13 @@ macro_rules! __pgrx_c_args_BTreeTupleIsPosting {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleIsPosting] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleIsPosting!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16072,7 +16422,7 @@ macro_rules! __pgrx_c_args_BTreeTupleIsPosting {
         $crate::BTreeTupleIsPosting!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BTreeTupleIsPosting from nbtree.h:491
@@ -16152,13 +16502,13 @@ macro_rules! BTreeTupleIsPosting {
         $crate::__pgrx_c_args_BTreeTupleIsPosting!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleIsPosting!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleIsPosting!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -16171,7 +16521,7 @@ macro_rules! BTreeTupleIsPosting {
                         $crate::__pgrx_c_operand!(@check_safety; $itup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -16207,7 +16557,7 @@ macro_rules! BTreeTupleIsPosting {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -16327,6 +16677,13 @@ macro_rules! __pgrx_c_args_BTreeTupleSetDownLink {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetDownLink] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleSetDownLink!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16388,6 +16745,11 @@ macro_rules! __pgrx_c_args_BTreeTupleSetDownLink {
             @argument [__pgrx_c_args_BTreeTupleSetDownLink] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetDownLink] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTreeTupleSetDownLink!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16425,6 +16787,13 @@ macro_rules! __pgrx_c_args_BTreeTupleSetDownLink {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetDownLink] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleSetDownLink!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16441,7 +16810,7 @@ macro_rules! __pgrx_c_args_BTreeTupleSetDownLink {
         $crate::BTreeTupleSetDownLink!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BTreeTupleSetDownLink from nbtree.h:561
@@ -16526,13 +16895,13 @@ macro_rules! BTreeTupleSetDownLink {
         $crate::__pgrx_c_args_BTreeTupleSetDownLink!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $pivot:tt, $blkno:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleSetDownLink!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $pivot:tt, $blkno:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleSetDownLink!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -16546,7 +16915,7 @@ macro_rules! BTreeTupleSetDownLink {
                         $crate::__pgrx_c_operand!(@check_safety; $blkno);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::BTreeTupleSetDownLink(
@@ -16591,7 +16960,7 @@ macro_rules! BTreeTupleSetDownLink {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -16718,6 +17087,13 @@ macro_rules! __pgrx_c_args_BTreeTupleSetNAtts {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetNAtts] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleSetNAtts!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16769,6 +17145,13 @@ macro_rules! __pgrx_c_args_BTreeTupleSetNAtts {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_BTreeTupleSetNAtts] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetNAtts] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -16833,6 +17216,11 @@ macro_rules! __pgrx_c_args_BTreeTupleSetNAtts {
             @argument [__pgrx_c_args_BTreeTupleSetNAtts] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetNAtts] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTreeTupleSetNAtts!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16870,6 +17258,13 @@ macro_rules! __pgrx_c_args_BTreeTupleSetNAtts {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetNAtts] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleSetNAtts!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16886,7 +17281,7 @@ macro_rules! __pgrx_c_args_BTreeTupleSetNAtts {
         $crate::BTreeTupleSetNAtts!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BTreeTupleSetNAtts from nbtree.h:594
@@ -16994,13 +17389,13 @@ macro_rules! BTreeTupleSetNAtts {
         $crate::__pgrx_c_args_BTreeTupleSetNAtts!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $itup:tt, $nkeyatts:tt, $heaptid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleSetNAtts!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $itup:tt, $nkeyatts:tt, $heaptid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleSetNAtts!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -17015,7 +17410,7 @@ macro_rules! BTreeTupleSetNAtts {
                         $crate::__pgrx_c_operand!(@check_safety; $heaptid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::BTreeTupleSetNAtts(
@@ -17073,7 +17468,7 @@ macro_rules! BTreeTupleSetNAtts {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -17213,6 +17608,13 @@ macro_rules! __pgrx_c_args_BTreeTupleSetPosting {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetPosting] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleSetPosting!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17264,6 +17666,13 @@ macro_rules! __pgrx_c_args_BTreeTupleSetPosting {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_BTreeTupleSetPosting] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetPosting] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -17328,6 +17737,11 @@ macro_rules! __pgrx_c_args_BTreeTupleSetPosting {
             @argument [__pgrx_c_args_BTreeTupleSetPosting] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetPosting] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTreeTupleSetPosting!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17365,6 +17779,13 @@ macro_rules! __pgrx_c_args_BTreeTupleSetPosting {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetPosting] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleSetPosting!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17381,7 +17802,7 @@ macro_rules! __pgrx_c_args_BTreeTupleSetPosting {
         $crate::BTreeTupleSetPosting!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BTreeTupleSetPosting from nbtree.h:503
@@ -17485,13 +17906,13 @@ macro_rules! BTreeTupleSetPosting {
         $crate::__pgrx_c_args_BTreeTupleSetPosting!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $itup:tt, $nhtids:tt, $postingoffset:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleSetPosting!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $itup:tt, $nhtids:tt, $postingoffset:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleSetPosting!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -17506,7 +17927,7 @@ macro_rules! BTreeTupleSetPosting {
                         $crate::__pgrx_c_operand!(@check_safety; $postingoffset);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::BTreeTupleSetPosting(
@@ -17564,7 +17985,7 @@ macro_rules! BTreeTupleSetPosting {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -17704,6 +18125,13 @@ macro_rules! __pgrx_c_args_BTreeTupleSetTopParent {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetTopParent] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleSetTopParent!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17767,6 +18195,11 @@ macro_rules! __pgrx_c_args_BTreeTupleSetTopParent {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetTopParent] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTreeTupleSetTopParent!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17804,6 +18237,13 @@ macro_rules! __pgrx_c_args_BTreeTupleSetTopParent {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetTopParent] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleSetTopParent!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17820,7 +18260,7 @@ macro_rules! __pgrx_c_args_BTreeTupleSetTopParent {
         $crate::BTreeTupleSetTopParent!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BTreeTupleSetTopParent from nbtree.h:625
@@ -17909,13 +18349,13 @@ macro_rules! BTreeTupleSetTopParent {
         $crate::__pgrx_c_args_BTreeTupleSetTopParent!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $leafhikey:tt, $blkno:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleSetTopParent!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $leafhikey:tt, $blkno:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleSetTopParent!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -17929,7 +18369,7 @@ macro_rules! BTreeTupleSetTopParent {
                         $crate::__pgrx_c_operand!(@check_safety; $blkno);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::BTreeTupleSetTopParent(
@@ -17974,7 +18414,7 @@ macro_rules! BTreeTupleSetTopParent {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -18108,6 +18548,11 @@ macro_rules! __pgrx_c_args_P_FIRSTDATAKEY {
             @argument [__pgrx_c_args_P_FIRSTDATAKEY] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_P_FIRSTDATAKEY] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_P_FIRSTDATAKEY!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18145,6 +18590,11 @@ macro_rules! __pgrx_c_args_P_FIRSTDATAKEY {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_P_FIRSTDATAKEY] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_FIRSTDATAKEY!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18161,7 +18611,7 @@ macro_rules! __pgrx_c_args_P_FIRSTDATAKEY {
         $crate::P_FIRSTDATAKEY!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro P_FIRSTDATAKEY from nbtree.h:369
@@ -18258,13 +18708,13 @@ macro_rules! P_FIRSTDATAKEY {
         $crate::__pgrx_c_args_P_FIRSTDATAKEY!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $opaque:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_FIRSTDATAKEY!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $opaque:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_FIRSTDATAKEY!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -18278,7 +18728,7 @@ macro_rules! P_FIRSTDATAKEY {
                         $crate::__pgrx_c_operand!(@check_safety; $opaque);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -18358,7 +18808,7 @@ macro_rules! P_FIRSTDATAKEY {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -18513,6 +18963,11 @@ macro_rules! __pgrx_c_args_P_HAS_FULLXID {
             @argument [__pgrx_c_args_P_HAS_FULLXID] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_P_HAS_FULLXID] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_P_HAS_FULLXID!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18550,6 +19005,11 @@ macro_rules! __pgrx_c_args_P_HAS_FULLXID {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_P_HAS_FULLXID] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_HAS_FULLXID!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18566,7 +19026,7 @@ macro_rules! __pgrx_c_args_P_HAS_FULLXID {
         $crate::P_HAS_FULLXID!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro P_HAS_FULLXID from nbtree.h:228
@@ -18649,13 +19109,13 @@ macro_rules! P_HAS_FULLXID {
         $crate::__pgrx_c_args_P_HAS_FULLXID!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $opaque:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_HAS_FULLXID!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $opaque:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_HAS_FULLXID!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -18668,7 +19128,7 @@ macro_rules! P_HAS_FULLXID {
                         $crate::__pgrx_c_operand!(@check_safety; $opaque);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -18726,7 +19186,7 @@ macro_rules! P_HAS_FULLXID {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -18867,6 +19327,11 @@ macro_rules! __pgrx_c_args_P_HAS_GARBAGE {
             @argument [__pgrx_c_args_P_HAS_GARBAGE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_P_HAS_GARBAGE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_P_HAS_GARBAGE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18904,6 +19369,11 @@ macro_rules! __pgrx_c_args_P_HAS_GARBAGE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_P_HAS_GARBAGE] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_HAS_GARBAGE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18920,7 +19390,7 @@ macro_rules! __pgrx_c_args_P_HAS_GARBAGE {
         $crate::P_HAS_GARBAGE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro P_HAS_GARBAGE from nbtree.h:226
@@ -19003,13 +19473,13 @@ macro_rules! P_HAS_GARBAGE {
         $crate::__pgrx_c_args_P_HAS_GARBAGE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $opaque:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_HAS_GARBAGE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $opaque:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_HAS_GARBAGE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -19022,7 +19492,7 @@ macro_rules! P_HAS_GARBAGE {
                         $crate::__pgrx_c_operand!(@check_safety; $opaque);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -19080,7 +19550,7 @@ macro_rules! P_HAS_GARBAGE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -19221,6 +19691,11 @@ macro_rules! __pgrx_c_args_P_IGNORE {
             @argument [__pgrx_c_args_P_IGNORE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_P_IGNORE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_P_IGNORE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19256,6 +19731,11 @@ macro_rules! __pgrx_c_args_P_IGNORE {
             @argument [__pgrx_c_args_P_IGNORE] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_P_IGNORE] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_IGNORE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19272,7 +19752,7 @@ macro_rules! __pgrx_c_args_P_IGNORE {
         $crate::P_IGNORE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro P_IGNORE from nbtree.h:225
@@ -19376,13 +19856,13 @@ macro_rules! P_IGNORE {
         $crate::__pgrx_c_args_P_IGNORE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $opaque:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_IGNORE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $opaque:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_IGNORE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -19395,7 +19875,7 @@ macro_rules! P_IGNORE {
                         $crate::__pgrx_c_operand!(@check_safety; $opaque);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -19472,7 +19952,7 @@ macro_rules! P_IGNORE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -19634,6 +20114,11 @@ macro_rules! __pgrx_c_args_P_INCOMPLETE_SPLIT {
             @argument [__pgrx_c_args_P_INCOMPLETE_SPLIT] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_P_INCOMPLETE_SPLIT] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_P_INCOMPLETE_SPLIT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19671,6 +20156,13 @@ macro_rules! __pgrx_c_args_P_INCOMPLETE_SPLIT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_P_INCOMPLETE_SPLIT] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_INCOMPLETE_SPLIT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19687,7 +20179,7 @@ macro_rules! __pgrx_c_args_P_INCOMPLETE_SPLIT {
         $crate::P_INCOMPLETE_SPLIT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro P_INCOMPLETE_SPLIT from nbtree.h:227
@@ -19770,13 +20262,13 @@ macro_rules! P_INCOMPLETE_SPLIT {
         $crate::__pgrx_c_args_P_INCOMPLETE_SPLIT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $opaque:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_INCOMPLETE_SPLIT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $opaque:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_INCOMPLETE_SPLIT!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -19789,7 +20281,7 @@ macro_rules! P_INCOMPLETE_SPLIT {
                         $crate::__pgrx_c_operand!(@check_safety; $opaque);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -19847,7 +20339,7 @@ macro_rules! P_INCOMPLETE_SPLIT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -19988,6 +20480,11 @@ macro_rules! __pgrx_c_args_P_ISDELETED {
             @argument [__pgrx_c_args_P_ISDELETED] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_P_ISDELETED] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_P_ISDELETED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20023,6 +20520,11 @@ macro_rules! __pgrx_c_args_P_ISDELETED {
             @argument [__pgrx_c_args_P_ISDELETED] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_P_ISDELETED] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_ISDELETED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20039,7 +20541,7 @@ macro_rules! __pgrx_c_args_P_ISDELETED {
         $crate::P_ISDELETED!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro P_ISDELETED from nbtree.h:222
@@ -20122,13 +20624,13 @@ macro_rules! P_ISDELETED {
         $crate::__pgrx_c_args_P_ISDELETED!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $opaque:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_ISDELETED!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $opaque:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_ISDELETED!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -20141,7 +20643,7 @@ macro_rules! P_ISDELETED {
                         $crate::__pgrx_c_operand!(@check_safety; $opaque);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -20199,7 +20701,7 @@ macro_rules! P_ISDELETED {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -20340,6 +20842,11 @@ macro_rules! __pgrx_c_args_P_ISHALFDEAD {
             @argument [__pgrx_c_args_P_ISHALFDEAD] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_P_ISHALFDEAD] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_P_ISHALFDEAD!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20375,6 +20882,11 @@ macro_rules! __pgrx_c_args_P_ISHALFDEAD {
             @argument [__pgrx_c_args_P_ISHALFDEAD] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_P_ISHALFDEAD] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_ISHALFDEAD!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20391,7 +20903,7 @@ macro_rules! __pgrx_c_args_P_ISHALFDEAD {
         $crate::P_ISHALFDEAD!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro P_ISHALFDEAD from nbtree.h:224
@@ -20474,13 +20986,13 @@ macro_rules! P_ISHALFDEAD {
         $crate::__pgrx_c_args_P_ISHALFDEAD!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $opaque:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_ISHALFDEAD!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $opaque:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_ISHALFDEAD!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -20493,7 +21005,7 @@ macro_rules! P_ISHALFDEAD {
                         $crate::__pgrx_c_operand!(@check_safety; $opaque);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -20551,7 +21063,7 @@ macro_rules! P_ISHALFDEAD {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -20692,6 +21204,11 @@ macro_rules! __pgrx_c_args_P_ISLEAF {
             @argument [__pgrx_c_args_P_ISLEAF] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_P_ISLEAF] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_P_ISLEAF!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20727,6 +21244,11 @@ macro_rules! __pgrx_c_args_P_ISLEAF {
             @argument [__pgrx_c_args_P_ISLEAF] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_P_ISLEAF] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_ISLEAF!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20743,7 +21265,7 @@ macro_rules! __pgrx_c_args_P_ISLEAF {
         $crate::P_ISLEAF!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro P_ISLEAF from nbtree.h:220
@@ -20826,13 +21348,13 @@ macro_rules! P_ISLEAF {
         $crate::__pgrx_c_args_P_ISLEAF!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $opaque:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_ISLEAF!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $opaque:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_ISLEAF!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -20845,7 +21367,7 @@ macro_rules! P_ISLEAF {
                         $crate::__pgrx_c_operand!(@check_safety; $opaque);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -20901,7 +21423,7 @@ macro_rules! P_ISLEAF {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -21042,6 +21564,11 @@ macro_rules! __pgrx_c_args_P_ISMETA {
             @argument [__pgrx_c_args_P_ISMETA] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_P_ISMETA] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_P_ISMETA!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -21077,6 +21604,11 @@ macro_rules! __pgrx_c_args_P_ISMETA {
             @argument [__pgrx_c_args_P_ISMETA] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_P_ISMETA] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_ISMETA!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -21093,7 +21625,7 @@ macro_rules! __pgrx_c_args_P_ISMETA {
         $crate::P_ISMETA!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro P_ISMETA from nbtree.h:223
@@ -21176,13 +21708,13 @@ macro_rules! P_ISMETA {
         $crate::__pgrx_c_args_P_ISMETA!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $opaque:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_ISMETA!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $opaque:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_ISMETA!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -21195,7 +21727,7 @@ macro_rules! P_ISMETA {
                         $crate::__pgrx_c_operand!(@check_safety; $opaque);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -21251,7 +21783,7 @@ macro_rules! P_ISMETA {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -21392,6 +21924,11 @@ macro_rules! __pgrx_c_args_P_ISROOT {
             @argument [__pgrx_c_args_P_ISROOT] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_P_ISROOT] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_P_ISROOT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -21427,6 +21964,11 @@ macro_rules! __pgrx_c_args_P_ISROOT {
             @argument [__pgrx_c_args_P_ISROOT] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_P_ISROOT] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_ISROOT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -21443,7 +21985,7 @@ macro_rules! __pgrx_c_args_P_ISROOT {
         $crate::P_ISROOT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro P_ISROOT from nbtree.h:221
@@ -21526,13 +22068,13 @@ macro_rules! P_ISROOT {
         $crate::__pgrx_c_args_P_ISROOT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $opaque:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_ISROOT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $opaque:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_ISROOT!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -21545,7 +22087,7 @@ macro_rules! P_ISROOT {
                         $crate::__pgrx_c_operand!(@check_safety; $opaque);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -21601,7 +22143,7 @@ macro_rules! P_ISROOT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -21742,6 +22284,11 @@ macro_rules! __pgrx_c_args_P_LEFTMOST {
             @argument [__pgrx_c_args_P_LEFTMOST] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_P_LEFTMOST] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_P_LEFTMOST!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -21777,6 +22324,11 @@ macro_rules! __pgrx_c_args_P_LEFTMOST {
             @argument [__pgrx_c_args_P_LEFTMOST] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_P_LEFTMOST] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_LEFTMOST!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -21793,7 +22345,7 @@ macro_rules! __pgrx_c_args_P_LEFTMOST {
         $crate::P_LEFTMOST!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro P_LEFTMOST from nbtree.h:218
@@ -21860,13 +22412,13 @@ macro_rules! P_LEFTMOST {
         $crate::__pgrx_c_args_P_LEFTMOST!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $opaque:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_LEFTMOST!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $opaque:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_LEFTMOST!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -21879,7 +22431,7 @@ macro_rules! P_LEFTMOST {
                         $crate::__pgrx_c_operand!(@check_safety; $opaque);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -21918,7 +22470,7 @@ macro_rules! P_LEFTMOST {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -22043,6 +22595,11 @@ macro_rules! __pgrx_c_args_P_RIGHTMOST {
             @argument [__pgrx_c_args_P_RIGHTMOST] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_P_RIGHTMOST] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_P_RIGHTMOST!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -22078,6 +22635,11 @@ macro_rules! __pgrx_c_args_P_RIGHTMOST {
             @argument [__pgrx_c_args_P_RIGHTMOST] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_P_RIGHTMOST] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_RIGHTMOST!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -22094,7 +22656,7 @@ macro_rules! __pgrx_c_args_P_RIGHTMOST {
         $crate::P_RIGHTMOST!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro P_RIGHTMOST from nbtree.h:219
@@ -22161,13 +22723,13 @@ macro_rules! P_RIGHTMOST {
         $crate::__pgrx_c_args_P_RIGHTMOST!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $opaque:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_RIGHTMOST!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $opaque:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_RIGHTMOST!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -22180,7 +22742,7 @@ macro_rules! P_RIGHTMOST {
                         $crate::__pgrx_c_operand!(@check_safety; $opaque);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -22219,7 +22781,7 @@ macro_rules! P_RIGHTMOST {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

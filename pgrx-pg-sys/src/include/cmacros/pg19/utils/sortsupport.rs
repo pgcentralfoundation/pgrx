@@ -80,6 +80,13 @@ macro_rules! __pgrx_c_args_ApplySortAbbrevFullComparator {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ApplySortAbbrevFullComparator] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ApplySortAbbrevFullComparator!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -135,6 +142,13 @@ macro_rules! __pgrx_c_args_ApplySortAbbrevFullComparator {
             @argument [__pgrx_c_args_ApplySortAbbrevFullComparator] [
                 p2 $mode [$($done)*] [$($rest)*]
             ] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ApplySortAbbrevFullComparator] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -194,6 +208,13 @@ macro_rules! __pgrx_c_args_ApplySortAbbrevFullComparator {
             ] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ApplySortAbbrevFullComparator] [
+                p3 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ApplySortAbbrevFullComparator!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -249,6 +270,13 @@ macro_rules! __pgrx_c_args_ApplySortAbbrevFullComparator {
             @argument [__pgrx_c_args_ApplySortAbbrevFullComparator] [
                 p4 $mode [$($done)*] [$($rest)*]
             ] [($($inner)*)]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ApplySortAbbrevFullComparator] [
+                p4 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -317,6 +345,13 @@ macro_rules! __pgrx_c_args_ApplySortAbbrevFullComparator {
             ]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ApplySortAbbrevFullComparator] [p5 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ApplySortAbbrevFullComparator!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -354,6 +389,13 @@ macro_rules! __pgrx_c_args_ApplySortAbbrevFullComparator {
             ] [($($inner)*)]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ApplySortAbbrevFullComparator] [
+                p5 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ApplySortAbbrevFullComparator!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -370,7 +412,7 @@ macro_rules! __pgrx_c_args_ApplySortAbbrevFullComparator {
         $crate::ApplySortAbbrevFullComparator!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ApplySortAbbrevFullComparator from sortsupport.h:237
@@ -544,7 +586,7 @@ macro_rules! ApplySortAbbrevFullComparator {
         )
     };
     (@__pgrx_emit_place; $datum1:tt, $isNull1:tt, $datum2:tt, $isNull2:tt, $ssup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ApplySortAbbrevFullComparator!(
@@ -553,7 +595,7 @@ macro_rules! ApplySortAbbrevFullComparator {
         )
     };
     (@__pgrx_emit_read_place; $datum1:tt, $isNull1:tt, $datum2:tt, $isNull2:tt, $ssup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ApplySortAbbrevFullComparator!(
@@ -573,7 +615,7 @@ macro_rules! ApplySortAbbrevFullComparator {
                         $crate::__pgrx_c_operand!(@check_safety; $ssup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -673,7 +715,7 @@ macro_rules! ApplySortAbbrevFullComparator {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -856,6 +898,13 @@ macro_rules! __pgrx_c_args_ApplySortComparator {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ApplySortComparator] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ApplySortComparator!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -907,6 +956,13 @@ macro_rules! __pgrx_c_args_ApplySortComparator {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_ApplySortComparator] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ApplySortComparator] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -964,6 +1020,13 @@ macro_rules! __pgrx_c_args_ApplySortComparator {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ApplySortComparator] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ApplySortComparator!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1015,6 +1078,13 @@ macro_rules! __pgrx_c_args_ApplySortComparator {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_ApplySortComparator] [p4 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ApplySortComparator] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -1079,6 +1149,11 @@ macro_rules! __pgrx_c_args_ApplySortComparator {
             @argument [__pgrx_c_args_ApplySortComparator] [p5 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ApplySortComparator] [p5 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ApplySortComparator!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1116,6 +1191,13 @@ macro_rules! __pgrx_c_args_ApplySortComparator {
             ]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ApplySortComparator] [p5 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ApplySortComparator!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1132,7 +1214,7 @@ macro_rules! __pgrx_c_args_ApplySortComparator {
         $crate::ApplySortComparator!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ApplySortComparator from sortsupport.h:199
@@ -1300,13 +1382,13 @@ macro_rules! ApplySortComparator {
         $crate::__pgrx_c_args_ApplySortComparator!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $datum1:tt, $isNull1:tt, $datum2:tt, $isNull2:tt, $ssup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ApplySortComparator!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $datum1:tt, $isNull1:tt, $datum2:tt, $isNull2:tt, $ssup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ApplySortComparator!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1323,7 +1405,7 @@ macro_rules! ApplySortComparator {
                         $crate::__pgrx_c_operand!(@check_safety; $ssup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1423,7 +1505,7 @@ macro_rules! ApplySortComparator {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

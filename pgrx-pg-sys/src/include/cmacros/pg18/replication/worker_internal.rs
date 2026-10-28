@@ -62,7 +62,7 @@ macro_rules! am_leader_apply_worker {
     (@__pgrx_emit_value;) => {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_03da92eb8c76ae600c4c75228441564e()
+                $crate::__pgrx_c_generated::Inline_060f026edd2aa5376df466bb51c97811()
             )
         )
     };
@@ -70,13 +70,13 @@ macro_rules! am_leader_apply_worker {
         $crate::am_leader_apply_worker!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::am_leader_apply_worker!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::am_leader_apply_worker!(@__pgrx_emit_read_place; $($raw)*)
@@ -87,19 +87,19 @@ macro_rules! am_leader_apply_worker {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_03da92eb8c76ae600c4c75228441564e()
+                                $crate::__pgrx_c_generated::Inline_060f026edd2aa5376df466bb51c97811()
                             )
                         )
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -110,7 +110,7 @@ macro_rules! am_leader_apply_worker {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::__pgrx_c_generated::Inline_03da92eb8c76ae600c4c75228441564e()
+                    $crate::__pgrx_c_generated::Inline_060f026edd2aa5376df466bb51c97811()
                 )
             );
         }
@@ -119,13 +119,13 @@ macro_rules! am_leader_apply_worker {
         $crate::am_leader_apply_worker!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::am_leader_apply_worker!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 
@@ -187,7 +187,7 @@ macro_rules! am_parallel_apply_worker {
     (@__pgrx_emit_value;) => {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_c62761a6c96f051c4ea619048ee6c7e5()
+                $crate::__pgrx_c_generated::Inline_8bb220c41d660e247f7ed7f7332ecfb3()
             )
         )
     };
@@ -195,13 +195,13 @@ macro_rules! am_parallel_apply_worker {
         $crate::am_parallel_apply_worker!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::am_parallel_apply_worker!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::am_parallel_apply_worker!(@__pgrx_emit_read_place; $($raw)*)
@@ -212,19 +212,19 @@ macro_rules! am_parallel_apply_worker {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_c62761a6c96f051c4ea619048ee6c7e5()
+                                $crate::__pgrx_c_generated::Inline_8bb220c41d660e247f7ed7f7332ecfb3()
                             )
                         )
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -235,7 +235,7 @@ macro_rules! am_parallel_apply_worker {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::__pgrx_c_generated::Inline_c62761a6c96f051c4ea619048ee6c7e5()
+                    $crate::__pgrx_c_generated::Inline_8bb220c41d660e247f7ed7f7332ecfb3()
                 )
             );
         }
@@ -244,13 +244,13 @@ macro_rules! am_parallel_apply_worker {
         $crate::am_parallel_apply_worker!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::am_parallel_apply_worker!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 
@@ -311,7 +311,7 @@ macro_rules! am_tablesync_worker {
     (@__pgrx_emit_value;) => {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_16bed45aa284c19152b32a60740edb39()
+                $crate::__pgrx_c_generated::Inline_6817312acf2d52e66a37345b4f0a1555()
             )
         )
     };
@@ -319,13 +319,13 @@ macro_rules! am_tablesync_worker {
         $crate::am_tablesync_worker!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::am_tablesync_worker!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::am_tablesync_worker!(@__pgrx_emit_read_place; $($raw)*)
@@ -336,19 +336,19 @@ macro_rules! am_tablesync_worker {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_16bed45aa284c19152b32a60740edb39()
+                                $crate::__pgrx_c_generated::Inline_6817312acf2d52e66a37345b4f0a1555()
                             )
                         )
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -359,7 +359,7 @@ macro_rules! am_tablesync_worker {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::__pgrx_c_generated::Inline_16bed45aa284c19152b32a60740edb39()
+                    $crate::__pgrx_c_generated::Inline_6817312acf2d52e66a37345b4f0a1555()
                 )
             );
         }
@@ -368,13 +368,13 @@ macro_rules! am_tablesync_worker {
         $crate::am_tablesync_worker!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::am_tablesync_worker!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 
@@ -458,6 +458,11 @@ macro_rules! __pgrx_c_args_isParallelApplyWorker {
             @argument [__pgrx_c_args_isParallelApplyWorker] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_isParallelApplyWorker] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_isParallelApplyWorker!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -495,6 +500,13 @@ macro_rules! __pgrx_c_args_isParallelApplyWorker {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_isParallelApplyWorker] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_isParallelApplyWorker!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -511,7 +523,7 @@ macro_rules! __pgrx_c_args_isParallelApplyWorker {
         $crate::isParallelApplyWorker!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro isParallelApplyWorker from worker_internal.h:329
@@ -610,13 +622,13 @@ macro_rules! isParallelApplyWorker {
         $crate::__pgrx_c_args_isParallelApplyWorker!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $worker:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_isParallelApplyWorker!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $worker:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_isParallelApplyWorker!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -629,7 +641,7 @@ macro_rules! isParallelApplyWorker {
                         $crate::__pgrx_c_operand!(@check_safety; $worker);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -708,7 +720,7 @@ macro_rules! isParallelApplyWorker {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -865,6 +877,11 @@ macro_rules! __pgrx_c_args_isTablesyncWorker {
             @argument [__pgrx_c_args_isTablesyncWorker] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_isTablesyncWorker] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_isTablesyncWorker!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -902,6 +919,13 @@ macro_rules! __pgrx_c_args_isTablesyncWorker {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_isTablesyncWorker] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_isTablesyncWorker!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -918,7 +942,7 @@ macro_rules! __pgrx_c_args_isTablesyncWorker {
         $crate::isTablesyncWorker!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro isTablesyncWorker from worker_internal.h:331
@@ -1017,13 +1041,13 @@ macro_rules! isTablesyncWorker {
         $crate::__pgrx_c_args_isTablesyncWorker!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $worker:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_isTablesyncWorker!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $worker:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_isTablesyncWorker!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1036,7 +1060,7 @@ macro_rules! isTablesyncWorker {
                         $crate::__pgrx_c_operand!(@check_safety; $worker);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -1115,7 +1139,7 @@ macro_rules! isTablesyncWorker {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

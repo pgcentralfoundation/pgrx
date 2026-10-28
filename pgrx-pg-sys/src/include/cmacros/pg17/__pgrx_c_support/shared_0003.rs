@@ -34,7 +34,7 @@ macro_rules! __pgrx_c_field_marker {
         >
     };
     (@walk []; $($rest:tt)+) => {
-        compile_error!("offsetof member path exceeds the 64-component bound")
+        ::core::compile_error!("offsetof member path exceeds the 64-component bound")
     };
     (CanPartialClearThrough) => {
         $crate::__pgrx_c_generated::Field_CanPartialClearThrough
@@ -107,6 +107,12 @@ macro_rules! __pgrx_c_field_marker {
     };
     (__mask_was_saved) => {
         $crate::__pgrx_c_generated::Field___mask_was_saved
+    };
+    (__pad5) => {
+        $crate::__pgrx_c_generated::Field___pad5
+    };
+    (__ss_align) => {
+        $crate::__pgrx_c_generated::Field___ss_align
     };
     (_cur_column) => {
         $crate::__pgrx_c_generated::Field__cur_column
@@ -5193,6 +5199,9 @@ macro_rules! __pgrx_c_field_marker {
     (log_verbosity) => {
         $crate::__pgrx_c_generated::Field_log_verbosity
     };
+    (logical) => {
+        $crate::__pgrx_c_generated::Field_logical
+    };
     (logicalrep_worker_generation) => {
         $crate::__pgrx_c_generated::Field_logicalrep_worker_generation
     };
@@ -9435,6 +9444,9 @@ macro_rules! __pgrx_c_field_marker {
     (srvowner) => {
         $crate::__pgrx_c_generated::Field_srvowner
     };
+    (ss_family) => {
+        $crate::__pgrx_c_generated::Field_ss_family
+    };
     (ssize) => {
         $crate::__pgrx_c_generated::Field_ssize
     };
@@ -11269,6 +11281,6 @@ macro_rules! __pgrx_c_field_marker {
         $crate::__pgrx_c_generated::Field_zone
     };
     ($($unknown:tt)*) => {
-        compile_error!("field has no compiler-verified PostgreSQL binding capability")
+        ::core::compile_error!("field has no compiler-verified PostgreSQL binding capability")
     };
 }

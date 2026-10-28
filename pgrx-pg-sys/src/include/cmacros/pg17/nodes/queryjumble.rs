@@ -65,7 +65,7 @@ macro_rules! IsQueryIdEnabled {
     (@__pgrx_emit_value;) => {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_f47c9ad82edec7a9430785300f2a8af9()
+                $crate::__pgrx_c_generated::Inline_af392e8483171673c1d347b22b526b34()
             )
         )
     };
@@ -73,13 +73,13 @@ macro_rules! IsQueryIdEnabled {
         $crate::IsQueryIdEnabled!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::IsQueryIdEnabled!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::IsQueryIdEnabled!(@__pgrx_emit_read_place; $($raw)*)
@@ -90,19 +90,19 @@ macro_rules! IsQueryIdEnabled {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_f47c9ad82edec7a9430785300f2a8af9()
+                                $crate::__pgrx_c_generated::Inline_af392e8483171673c1d347b22b526b34()
                             )
                         )
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -113,7 +113,7 @@ macro_rules! IsQueryIdEnabled {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::__pgrx_c_generated::Inline_f47c9ad82edec7a9430785300f2a8af9()
+                    $crate::__pgrx_c_generated::Inline_af392e8483171673c1d347b22b526b34()
                 )
             );
         }
@@ -122,13 +122,13 @@ macro_rules! IsQueryIdEnabled {
         $crate::IsQueryIdEnabled!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::IsQueryIdEnabled!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 

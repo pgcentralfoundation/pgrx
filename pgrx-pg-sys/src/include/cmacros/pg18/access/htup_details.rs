@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_BITMAPLEN {
             @argument [__pgrx_c_args_BITMAPLEN] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BITMAPLEN] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BITMAPLEN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -116,6 +121,11 @@ macro_rules! __pgrx_c_args_BITMAPLEN {
             @argument [__pgrx_c_args_BITMAPLEN] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BITMAPLEN] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BITMAPLEN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -132,7 +142,7 @@ macro_rules! __pgrx_c_args_BITMAPLEN {
         $crate::BITMAPLEN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BITMAPLEN from htup_details.h:598
@@ -194,13 +204,13 @@ macro_rules! BITMAPLEN {
         $crate::__pgrx_c_args_BITMAPLEN!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $NATTS:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BITMAPLEN!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $NATTS:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BITMAPLEN!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -213,7 +223,7 @@ macro_rules! BITMAPLEN {
                         $crate::__pgrx_c_operand!(@check_safety; $NATTS);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -239,7 +249,7 @@ macro_rules! BITMAPLEN {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -353,6 +363,11 @@ macro_rules! __pgrx_c_args_GETSTRUCT {
             @argument [__pgrx_c_args_GETSTRUCT] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GETSTRUCT] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GETSTRUCT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -388,6 +403,11 @@ macro_rules! __pgrx_c_args_GETSTRUCT {
             @argument [__pgrx_c_args_GETSTRUCT] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GETSTRUCT] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GETSTRUCT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -404,7 +424,7 @@ macro_rules! __pgrx_c_args_GETSTRUCT {
         $crate::GETSTRUCT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function GETSTRUCT from htup_details.h:732
@@ -483,13 +503,13 @@ macro_rules! GETSTRUCT {
         $crate::__pgrx_c_args_GETSTRUCT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GETSTRUCT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GETSTRUCT!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -502,7 +522,7 @@ macro_rules! GETSTRUCT {
                         $crate::__pgrx_c_operand!(@check_safety; $tuple);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -541,7 +561,7 @@ macro_rules! GETSTRUCT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -673,6 +693,11 @@ macro_rules! __pgrx_c_args_HEAP_LOCKED_UPGRADED {
             @argument [__pgrx_c_args_HEAP_LOCKED_UPGRADED] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HEAP_LOCKED_UPGRADED] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HEAP_LOCKED_UPGRADED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -710,6 +735,13 @@ macro_rules! __pgrx_c_args_HEAP_LOCKED_UPGRADED {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HEAP_LOCKED_UPGRADED] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_LOCKED_UPGRADED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -726,7 +758,7 @@ macro_rules! __pgrx_c_args_HEAP_LOCKED_UPGRADED {
         $crate::HEAP_LOCKED_UPGRADED!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HEAP_LOCKED_UPGRADED from htup_details.h:254
@@ -793,13 +825,13 @@ macro_rules! HEAP_LOCKED_UPGRADED {
         $crate::__pgrx_c_args_HEAP_LOCKED_UPGRADED!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $infomask:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HEAP_LOCKED_UPGRADED!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $infomask:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HEAP_LOCKED_UPGRADED!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -812,7 +844,7 @@ macro_rules! HEAP_LOCKED_UPGRADED {
                         $crate::__pgrx_c_operand!(@check_safety; $infomask);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -838,7 +870,7 @@ macro_rules! HEAP_LOCKED_UPGRADED {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -957,6 +989,13 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_EXCL_LOCKED {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HEAP_XMAX_IS_EXCL_LOCKED] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_EXCL_LOCKED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -994,6 +1033,13 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_EXCL_LOCKED {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HEAP_XMAX_IS_EXCL_LOCKED] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_EXCL_LOCKED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1010,7 +1056,7 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_EXCL_LOCKED {
         $crate::HEAP_XMAX_IS_EXCL_LOCKED!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HEAP_XMAX_IS_EXCL_LOCKED from htup_details.h:272
@@ -1075,13 +1121,13 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_EXCL_LOCKED!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $infomask:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_EXCL_LOCKED!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $infomask:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_EXCL_LOCKED!(
@@ -1097,7 +1143,7 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
                         $crate::__pgrx_c_operand!(@check_safety; $infomask);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1123,7 +1169,7 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1242,6 +1288,13 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_KEYSHR_LOCKED {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HEAP_XMAX_IS_KEYSHR_LOCKED] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_KEYSHR_LOCKED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1279,6 +1332,13 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_KEYSHR_LOCKED {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HEAP_XMAX_IS_KEYSHR_LOCKED] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_KEYSHR_LOCKED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1295,7 +1355,7 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_KEYSHR_LOCKED {
         $crate::HEAP_XMAX_IS_KEYSHR_LOCKED!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HEAP_XMAX_IS_KEYSHR_LOCKED from htup_details.h:278
@@ -1360,13 +1420,13 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_KEYSHR_LOCKED!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $infomask:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_KEYSHR_LOCKED!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $infomask:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_KEYSHR_LOCKED!(
@@ -1382,7 +1442,7 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
                         $crate::__pgrx_c_operand!(@check_safety; $infomask);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1408,7 +1468,7 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1527,6 +1587,13 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_LOCKED_ONLY {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HEAP_XMAX_IS_LOCKED_ONLY] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_LOCKED_ONLY!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1564,6 +1631,13 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_LOCKED_ONLY {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HEAP_XMAX_IS_LOCKED_ONLY] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_LOCKED_ONLY!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1580,7 +1654,7 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_LOCKED_ONLY {
         $crate::HEAP_XMAX_IS_LOCKED_ONLY!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HEAP_XMAX_IS_LOCKED_ONLY from htup_details.h:229
@@ -1648,13 +1722,13 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_LOCKED_ONLY!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $infomask:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_LOCKED_ONLY!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $infomask:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_LOCKED_ONLY!(
@@ -1670,7 +1744,7 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
                         $crate::__pgrx_c_operand!(@check_safety; $infomask);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1696,7 +1770,7 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1815,6 +1889,11 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_SHR_LOCKED {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HEAP_XMAX_IS_SHR_LOCKED] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_SHR_LOCKED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1852,6 +1931,13 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_SHR_LOCKED {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HEAP_XMAX_IS_SHR_LOCKED] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_SHR_LOCKED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1868,7 +1954,7 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_SHR_LOCKED {
         $crate::HEAP_XMAX_IS_SHR_LOCKED!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HEAP_XMAX_IS_SHR_LOCKED from htup_details.h:266
@@ -1933,13 +2019,13 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_SHR_LOCKED!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $infomask:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_SHR_LOCKED!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $infomask:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_SHR_LOCKED!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1952,7 +2038,7 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
                         $crate::__pgrx_c_operand!(@check_safety; $infomask);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1978,7 +2064,7 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2092,6 +2178,11 @@ macro_rules! __pgrx_c_args_HeapTupleAllFixed {
             @argument [__pgrx_c_args_HeapTupleAllFixed] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleAllFixed] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleAllFixed!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2129,6 +2220,13 @@ macro_rules! __pgrx_c_args_HeapTupleAllFixed {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleAllFixed] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleAllFixed!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2145,7 +2243,7 @@ macro_rules! __pgrx_c_args_HeapTupleAllFixed {
         $crate::HeapTupleAllFixed!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleAllFixed from htup_details.h:760
@@ -2219,13 +2317,13 @@ macro_rules! HeapTupleAllFixed {
         $crate::__pgrx_c_args_HeapTupleAllFixed!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleAllFixed!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleAllFixed!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2238,7 +2336,7 @@ macro_rules! HeapTupleAllFixed {
                         $crate::__pgrx_c_operand!(@check_safety; $tuple);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2274,7 +2372,7 @@ macro_rules! HeapTupleAllFixed {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2403,6 +2501,11 @@ macro_rules! __pgrx_c_args_HeapTupleClearHeapOnly {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleClearHeapOnly] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleClearHeapOnly!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2440,6 +2543,13 @@ macro_rules! __pgrx_c_args_HeapTupleClearHeapOnly {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleClearHeapOnly] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleClearHeapOnly!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2456,7 +2566,7 @@ macro_rules! __pgrx_c_args_HeapTupleClearHeapOnly {
         $crate::HeapTupleClearHeapOnly!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleClearHeapOnly from htup_details.h:802
@@ -2531,13 +2641,13 @@ macro_rules! HeapTupleClearHeapOnly {
         $crate::__pgrx_c_args_HeapTupleClearHeapOnly!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleClearHeapOnly!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleClearHeapOnly!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2550,7 +2660,7 @@ macro_rules! HeapTupleClearHeapOnly {
                         $crate::__pgrx_c_operand!(@check_safety; $tuple);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::HeapTupleClearHeapOnly(
@@ -2582,7 +2692,7 @@ macro_rules! HeapTupleClearHeapOnly {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2709,6 +2819,13 @@ macro_rules! __pgrx_c_args_HeapTupleClearHotUpdated {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleClearHotUpdated] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleClearHotUpdated!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2746,6 +2863,13 @@ macro_rules! __pgrx_c_args_HeapTupleClearHotUpdated {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleClearHotUpdated] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleClearHotUpdated!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2762,7 +2886,7 @@ macro_rules! __pgrx_c_args_HeapTupleClearHotUpdated {
         $crate::HeapTupleClearHotUpdated!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleClearHotUpdated from htup_details.h:784
@@ -2837,13 +2961,13 @@ macro_rules! HeapTupleClearHotUpdated {
         $crate::__pgrx_c_args_HeapTupleClearHotUpdated!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleClearHotUpdated!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleClearHotUpdated!(
@@ -2859,7 +2983,7 @@ macro_rules! HeapTupleClearHotUpdated {
                         $crate::__pgrx_c_operand!(@check_safety; $tuple);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::HeapTupleClearHotUpdated(
@@ -2891,7 +3015,7 @@ macro_rules! HeapTupleClearHotUpdated {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3016,6 +3140,11 @@ macro_rules! __pgrx_c_args_HeapTupleHasExternal {
             @argument [__pgrx_c_args_HeapTupleHasExternal] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHasExternal] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHasExternal!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3053,6 +3182,13 @@ macro_rules! __pgrx_c_args_HeapTupleHasExternal {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHasExternal] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHasExternal!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3069,7 +3205,7 @@ macro_rules! __pgrx_c_args_HeapTupleHasExternal {
         $crate::HeapTupleHasExternal!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHasExternal from htup_details.h:766
@@ -3143,13 +3279,13 @@ macro_rules! HeapTupleHasExternal {
         $crate::__pgrx_c_args_HeapTupleHasExternal!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHasExternal!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHasExternal!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3162,7 +3298,7 @@ macro_rules! HeapTupleHasExternal {
                         $crate::__pgrx_c_operand!(@check_safety; $tuple);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -3198,7 +3334,7 @@ macro_rules! HeapTupleHasExternal {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3322,6 +3458,11 @@ macro_rules! __pgrx_c_args_HeapTupleHasNulls {
             @argument [__pgrx_c_args_HeapTupleHasNulls] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHasNulls] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHasNulls!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3359,6 +3500,13 @@ macro_rules! __pgrx_c_args_HeapTupleHasNulls {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHasNulls] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHasNulls!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3375,7 +3523,7 @@ macro_rules! __pgrx_c_args_HeapTupleHasNulls {
         $crate::HeapTupleHasNulls!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHasNulls from htup_details.h:742
@@ -3449,13 +3597,13 @@ macro_rules! HeapTupleHasNulls {
         $crate::__pgrx_c_args_HeapTupleHasNulls!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHasNulls!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHasNulls!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3468,7 +3616,7 @@ macro_rules! HeapTupleHasNulls {
                         $crate::__pgrx_c_operand!(@check_safety; $tuple);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -3504,7 +3652,7 @@ macro_rules! HeapTupleHasNulls {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3631,6 +3779,11 @@ macro_rules! __pgrx_c_args_HeapTupleHasVarWidth {
             @argument [__pgrx_c_args_HeapTupleHasVarWidth] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHasVarWidth] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHasVarWidth!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3668,6 +3821,13 @@ macro_rules! __pgrx_c_args_HeapTupleHasVarWidth {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHasVarWidth] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHasVarWidth!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3684,7 +3844,7 @@ macro_rules! __pgrx_c_args_HeapTupleHasVarWidth {
         $crate::HeapTupleHasVarWidth!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHasVarWidth from htup_details.h:754
@@ -3758,13 +3918,13 @@ macro_rules! HeapTupleHasVarWidth {
         $crate::__pgrx_c_args_HeapTupleHasVarWidth!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHasVarWidth!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHasVarWidth!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3777,7 +3937,7 @@ macro_rules! HeapTupleHasVarWidth {
                         $crate::__pgrx_c_operand!(@check_safety; $tuple);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -3813,7 +3973,7 @@ macro_rules! HeapTupleHasVarWidth {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3945,6 +4105,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderClearHeapOnly {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderClearHeapOnly] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHeapOnly!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3982,6 +4149,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderClearHeapOnly {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderClearHeapOnly] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHeapOnly!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3998,7 +4172,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderClearHeapOnly {
         $crate::HeapTupleHeaderClearHeapOnly!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderClearHeapOnly from htup_details.h:571
@@ -4073,13 +4247,13 @@ macro_rules! HeapTupleHeaderClearHeapOnly {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHeapOnly!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHeapOnly!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHeapOnly!(
@@ -4095,7 +4269,7 @@ macro_rules! HeapTupleHeaderClearHeapOnly {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::HeapTupleHeaderClearHeapOnly(
@@ -4127,7 +4301,7 @@ macro_rules! HeapTupleHeaderClearHeapOnly {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4263,6 +4437,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderClearHotUpdated {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderClearHotUpdated] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHotUpdated!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4300,6 +4481,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderClearHotUpdated {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderClearHotUpdated] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHotUpdated!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4316,7 +4504,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderClearHotUpdated {
         $crate::HeapTupleHeaderClearHotUpdated!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderClearHotUpdated from htup_details.h:553
@@ -4394,7 +4582,7 @@ macro_rules! HeapTupleHeaderClearHotUpdated {
         )
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHotUpdated!(
@@ -4403,7 +4591,7 @@ macro_rules! HeapTupleHeaderClearHotUpdated {
         )
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHotUpdated!(
@@ -4419,7 +4607,7 @@ macro_rules! HeapTupleHeaderClearHotUpdated {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::HeapTupleHeaderClearHotUpdated(
@@ -4451,7 +4639,7 @@ macro_rules! HeapTupleHeaderClearHotUpdated {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4587,6 +4775,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderClearMatch {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderClearMatch] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearMatch!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4624,6 +4819,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderClearMatch {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderClearMatch] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearMatch!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4640,7 +4842,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderClearMatch {
         $crate::HeapTupleHeaderClearMatch!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderClearMatch from htup_details.h:722
@@ -4715,13 +4917,13 @@ macro_rules! HeapTupleHeaderClearMatch {
         $crate::__pgrx_c_args_HeapTupleHeaderClearMatch!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearMatch!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearMatch!(
@@ -4737,7 +4939,7 @@ macro_rules! HeapTupleHeaderClearMatch {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::HeapTupleHeaderClearMatch(
@@ -4769,7 +4971,7 @@ macro_rules! HeapTupleHeaderClearMatch {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4899,6 +5101,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetDatumLength {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetDatumLength] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetDatumLength!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4936,6 +5145,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetDatumLength {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetDatumLength] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetDatumLength!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4952,7 +5168,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetDatumLength {
         $crate::HeapTupleHeaderGetDatumLength!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderGetDatumLength from htup_details.h:496
@@ -5032,7 +5248,7 @@ macro_rules! HeapTupleHeaderGetDatumLength {
         )
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetDatumLength!(
@@ -5041,7 +5257,7 @@ macro_rules! HeapTupleHeaderGetDatumLength {
         )
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetDatumLength!(
@@ -5057,7 +5273,7 @@ macro_rules! HeapTupleHeaderGetDatumLength {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -5093,7 +5309,7 @@ macro_rules! HeapTupleHeaderGetDatumLength {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5230,6 +5446,11 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetNatts {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetNatts] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetNatts!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5267,6 +5488,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetNatts {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetNatts] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetNatts!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5283,7 +5511,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetNatts {
         $crate::HeapTupleHeaderGetNatts!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro HeapTupleHeaderGetNatts from htup_details.h:582
@@ -5351,13 +5579,13 @@ macro_rules! HeapTupleHeaderGetNatts {
         $crate::__pgrx_c_args_HeapTupleHeaderGetNatts!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetNatts!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetNatts!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5370,7 +5598,7 @@ macro_rules! HeapTupleHeaderGetNatts {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -5407,7 +5635,7 @@ macro_rules! HeapTupleHeaderGetNatts {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5538,6 +5766,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetRawCommandId {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetRawCommandId] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawCommandId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5575,6 +5810,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetRawCommandId {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetRawCommandId] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawCommandId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5591,7 +5833,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetRawCommandId {
         $crate::HeapTupleHeaderGetRawCommandId!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderGetRawCommandId from htup_details.h:419
@@ -5671,7 +5913,7 @@ macro_rules! HeapTupleHeaderGetRawCommandId {
         )
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawCommandId!(
@@ -5680,7 +5922,7 @@ macro_rules! HeapTupleHeaderGetRawCommandId {
         )
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawCommandId!(
@@ -5696,7 +5938,7 @@ macro_rules! HeapTupleHeaderGetRawCommandId {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -5732,7 +5974,7 @@ macro_rules! HeapTupleHeaderGetRawCommandId {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5872,6 +6114,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetRawXmax {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetRawXmax] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmax!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5909,6 +6158,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetRawXmax {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetRawXmax] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmax!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5925,7 +6181,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetRawXmax {
         $crate::HeapTupleHeaderGetRawXmax!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderGetRawXmax from htup_details.h:381
@@ -6007,13 +6263,13 @@ macro_rules! HeapTupleHeaderGetRawXmax {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmax!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmax!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmax!(
@@ -6029,7 +6285,7 @@ macro_rules! HeapTupleHeaderGetRawXmax {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -6068,7 +6324,7 @@ macro_rules! HeapTupleHeaderGetRawXmax {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6202,6 +6458,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetRawXmin {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetRawXmin] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmin!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6239,6 +6502,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetRawXmin {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetRawXmin] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmin!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6255,7 +6525,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetRawXmin {
         $crate::HeapTupleHeaderGetRawXmin!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderGetRawXmin from htup_details.h:322
@@ -6337,13 +6607,13 @@ macro_rules! HeapTupleHeaderGetRawXmin {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmin!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmin!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmin!(
@@ -6359,7 +6629,7 @@ macro_rules! HeapTupleHeaderGetRawXmin {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -6398,7 +6668,7 @@ macro_rules! HeapTupleHeaderGetRawXmin {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6535,6 +6805,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetSpeculativeToken {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6572,6 +6849,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetSpeculativeToken {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6588,7 +6872,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetSpeculativeToken {
         $crate::HeapTupleHeaderGetSpeculativeToken!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderGetSpeculativeToken from htup_details.h:471
@@ -6669,7 +6953,7 @@ macro_rules! HeapTupleHeaderGetSpeculativeToken {
         )
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken!(
@@ -6678,7 +6962,7 @@ macro_rules! HeapTupleHeaderGetSpeculativeToken {
         )
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken!(
@@ -6694,7 +6978,7 @@ macro_rules! HeapTupleHeaderGetSpeculativeToken {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -6730,7 +7014,7 @@ macro_rules! HeapTupleHeaderGetSpeculativeToken {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6870,6 +7154,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetTypMod {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetTypMod] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypMod!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6907,6 +7198,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetTypMod {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetTypMod] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypMod!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6923,7 +7221,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetTypMod {
         $crate::HeapTupleHeaderGetTypMod!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderGetTypMod from htup_details.h:520
@@ -7000,13 +7298,13 @@ macro_rules! HeapTupleHeaderGetTypMod {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypMod!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypMod!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypMod!(
@@ -7022,7 +7320,7 @@ macro_rules! HeapTupleHeaderGetTypMod {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -7058,7 +7356,7 @@ macro_rules! HeapTupleHeaderGetTypMod {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7187,6 +7485,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetTypeId {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetTypeId] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypeId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7224,6 +7529,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetTypeId {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetTypeId] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypeId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7240,7 +7552,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetTypeId {
         $crate::HeapTupleHeaderGetTypeId!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderGetTypeId from htup_details.h:508
@@ -7322,13 +7634,13 @@ macro_rules! HeapTupleHeaderGetTypeId {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypeId!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypeId!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypeId!(
@@ -7344,7 +7656,7 @@ macro_rules! HeapTupleHeaderGetTypeId {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -7383,7 +7695,7 @@ macro_rules! HeapTupleHeaderGetTypeId {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7517,6 +7829,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetUpdateXid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetUpdateXid] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetUpdateXid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7554,6 +7873,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetUpdateXid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetUpdateXid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetUpdateXid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7570,7 +7896,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetUpdateXid {
         $crate::HeapTupleHeaderGetUpdateXid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderGetUpdateXid from htup_details.h:401
@@ -7657,13 +7983,13 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
         $crate::__pgrx_c_args_HeapTupleHeaderGetUpdateXid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetUpdateXid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetUpdateXid!(
@@ -7679,7 +8005,7 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -7718,7 +8044,7 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7855,6 +8181,11 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetXmin {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetXmin] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXmin!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7892,6 +8223,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetXmin {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetXmin] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXmin!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7908,7 +8246,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetXmin {
         $crate::HeapTupleHeaderGetXmin!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderGetXmin from htup_details.h:328
@@ -7991,13 +8329,13 @@ macro_rules! HeapTupleHeaderGetXmin {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXmin!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXmin!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXmin!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8010,7 +8348,7 @@ macro_rules! HeapTupleHeaderGetXmin {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -8049,7 +8387,7 @@ macro_rules! HeapTupleHeaderGetXmin {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8183,6 +8521,11 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetXvac {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetXvac] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXvac!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8220,6 +8563,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetXvac {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetXvac] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXvac!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8236,7 +8586,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetXvac {
         $crate::HeapTupleHeaderGetXvac!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderGetXvac from htup_details.h:446
@@ -8321,13 +8671,13 @@ macro_rules! HeapTupleHeaderGetXvac {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXvac!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXvac!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXvac!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8340,7 +8690,7 @@ macro_rules! HeapTupleHeaderGetXvac {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -8379,7 +8729,7 @@ macro_rules! HeapTupleHeaderGetXvac {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8513,6 +8863,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderHasExternal {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderHasExternal] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasExternal!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8550,6 +8907,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderHasExternal {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderHasExternal] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasExternal!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8566,7 +8930,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderHasExternal {
         $crate::HeapTupleHeaderHasExternal!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro HeapTupleHeaderHasExternal from htup_details.h:590
@@ -8652,13 +9016,13 @@ macro_rules! HeapTupleHeaderHasExternal {
         $crate::__pgrx_c_args_HeapTupleHeaderHasExternal!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasExternal!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasExternal!(
@@ -8674,7 +9038,7 @@ macro_rules! HeapTupleHeaderHasExternal {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -8732,7 +9096,7 @@ macro_rules! HeapTupleHeaderHasExternal {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8878,6 +9242,11 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderHasMatch {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderHasMatch] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasMatch!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8915,6 +9284,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderHasMatch {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderHasMatch] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasMatch!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8931,7 +9307,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderHasMatch {
         $crate::HeapTupleHeaderHasMatch!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderHasMatch from htup_details.h:710
@@ -9008,13 +9384,13 @@ macro_rules! HeapTupleHeaderHasMatch {
         $crate::__pgrx_c_args_HeapTupleHeaderHasMatch!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasMatch!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasMatch!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -9027,7 +9403,7 @@ macro_rules! HeapTupleHeaderHasMatch {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -9063,7 +9439,7 @@ macro_rules! HeapTupleHeaderHasMatch {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9198,6 +9574,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIndicatesMovedPartitions {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderIndicatesMovedPartitions] [
+                p1 $mode [$($done)*] []
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIndicatesMovedPartitions!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9235,6 +9618,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIndicatesMovedPartitions {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderIndicatesMovedPartitions] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIndicatesMovedPartitions!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9251,7 +9641,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIndicatesMovedPartitions {
         $crate::HeapTupleHeaderIndicatesMovedPartitions!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderIndicatesMovedPartitions from htup_details.h:484
@@ -9331,7 +9721,7 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
         )
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIndicatesMovedPartitions!(
@@ -9340,7 +9730,7 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
         )
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIndicatesMovedPartitions!(
@@ -9356,7 +9746,7 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -9392,7 +9782,7 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9530,6 +9920,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIsHeapOnly {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderIsHeapOnly] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHeapOnly!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9567,6 +9964,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIsHeapOnly {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderIsHeapOnly] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHeapOnly!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9583,7 +9987,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIsHeapOnly {
         $crate::HeapTupleHeaderIsHeapOnly!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderIsHeapOnly from htup_details.h:559
@@ -9660,13 +10064,13 @@ macro_rules! HeapTupleHeaderIsHeapOnly {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHeapOnly!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHeapOnly!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHeapOnly!(
@@ -9682,7 +10086,7 @@ macro_rules! HeapTupleHeaderIsHeapOnly {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -9718,7 +10122,7 @@ macro_rules! HeapTupleHeaderIsHeapOnly {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9847,6 +10251,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIsHotUpdated {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderIsHotUpdated] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHotUpdated!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9884,6 +10295,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIsHotUpdated {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderIsHotUpdated] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHotUpdated!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9900,7 +10318,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIsHotUpdated {
         $crate::HeapTupleHeaderIsHotUpdated!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderIsHotUpdated from htup_details.h:538
@@ -9980,13 +10398,13 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHotUpdated!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHotUpdated!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHotUpdated!(
@@ -10002,7 +10420,7 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -10038,7 +10456,7 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10173,6 +10591,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIsSpeculative {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderIsSpeculative] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsSpeculative!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10210,6 +10635,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIsSpeculative {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderIsSpeculative] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsSpeculative!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10226,7 +10658,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIsSpeculative {
         $crate::HeapTupleHeaderIsSpeculative!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderIsSpeculative from htup_details.h:465
@@ -10303,13 +10735,13 @@ macro_rules! HeapTupleHeaderIsSpeculative {
         $crate::__pgrx_c_args_HeapTupleHeaderIsSpeculative!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsSpeculative!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsSpeculative!(
@@ -10325,7 +10757,7 @@ macro_rules! HeapTupleHeaderIsSpeculative {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -10361,7 +10793,7 @@ macro_rules! HeapTupleHeaderIsSpeculative {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10487,6 +10919,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetCmax {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmax] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10538,6 +10977,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetCmax {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_HeapTupleHeaderSetCmax] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmax] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -10604,6 +11050,11 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetCmax {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmax] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10641,6 +11092,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetCmax {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmax] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10657,7 +11115,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetCmax {
         $crate::HeapTupleHeaderSetCmax!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderSetCmax from htup_details.h:435
@@ -10761,13 +11219,13 @@ macro_rules! HeapTupleHeaderSetCmax {
         $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt, $cid:tt, $iscombo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt, $cid:tt, $iscombo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -10782,7 +11240,7 @@ macro_rules! HeapTupleHeaderSetCmax {
                         $crate::__pgrx_c_operand!(@check_safety; $iscombo);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::HeapTupleHeaderSetCmax(
@@ -10840,7 +11298,7 @@ macro_rules! HeapTupleHeaderSetCmax {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10980,6 +11438,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetCmin {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmin] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11043,6 +11508,11 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetCmin {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmin] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11080,6 +11550,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetCmin {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmin] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11096,7 +11573,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetCmin {
         $crate::HeapTupleHeaderSetCmin!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderSetCmin from htup_details.h:426
@@ -11186,13 +11663,13 @@ macro_rules! HeapTupleHeaderSetCmin {
         $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt, $cid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt, $cid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -11206,7 +11683,7 @@ macro_rules! HeapTupleHeaderSetCmin {
                         $crate::__pgrx_c_operand!(@check_safety; $cid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::HeapTupleHeaderSetCmin(
@@ -11251,7 +11728,7 @@ macro_rules! HeapTupleHeaderSetCmin {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -11384,6 +11861,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetDatumLength {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetDatumLength] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetDatumLength!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11450,6 +11934,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetDatumLength {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetDatumLength] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetDatumLength!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11487,6 +11978,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetDatumLength {
             ] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetDatumLength] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetDatumLength!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11503,7 +12001,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetDatumLength {
         $crate::HeapTupleHeaderSetDatumLength!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderSetDatumLength from htup_details.h:502
@@ -11594,7 +12092,7 @@ macro_rules! HeapTupleHeaderSetDatumLength {
         )
     };
     (@__pgrx_emit_place; $tup:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetDatumLength!(
@@ -11603,7 +12101,7 @@ macro_rules! HeapTupleHeaderSetDatumLength {
         )
     };
     (@__pgrx_emit_read_place; $tup:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetDatumLength!(
@@ -11620,7 +12118,7 @@ macro_rules! HeapTupleHeaderSetDatumLength {
                         $crate::__pgrx_c_operand!(@check_safety; $len);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::HeapTupleHeaderSetDatumLength(
@@ -11665,7 +12163,7 @@ macro_rules! HeapTupleHeaderSetDatumLength {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -11810,6 +12308,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetHeapOnly {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetHeapOnly] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHeapOnly!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11847,6 +12352,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetHeapOnly {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetHeapOnly] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHeapOnly!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11863,7 +12375,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetHeapOnly {
         $crate::HeapTupleHeaderSetHeapOnly!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderSetHeapOnly from htup_details.h:565
@@ -11938,13 +12450,13 @@ macro_rules! HeapTupleHeaderSetHeapOnly {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHeapOnly!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHeapOnly!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHeapOnly!(
@@ -11960,7 +12472,7 @@ macro_rules! HeapTupleHeaderSetHeapOnly {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::HeapTupleHeaderSetHeapOnly(
@@ -11992,7 +12504,7 @@ macro_rules! HeapTupleHeaderSetHeapOnly {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -12122,6 +12634,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetHotUpdated {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetHotUpdated] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHotUpdated!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12159,6 +12678,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetHotUpdated {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetHotUpdated] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHotUpdated!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12175,7 +12701,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetHotUpdated {
         $crate::HeapTupleHeaderSetHotUpdated!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderSetHotUpdated from htup_details.h:547
@@ -12250,13 +12776,13 @@ macro_rules! HeapTupleHeaderSetHotUpdated {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHotUpdated!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHotUpdated!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHotUpdated!(
@@ -12272,7 +12798,7 @@ macro_rules! HeapTupleHeaderSetHotUpdated {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::HeapTupleHeaderSetHotUpdated(
@@ -12304,7 +12830,7 @@ macro_rules! HeapTupleHeaderSetHotUpdated {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -12437,6 +12963,11 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetMatch {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetMatch] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMatch!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12474,6 +13005,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetMatch {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetMatch] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMatch!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12490,7 +13028,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetMatch {
         $crate::HeapTupleHeaderSetMatch!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderSetMatch from htup_details.h:716
@@ -12565,13 +13103,13 @@ macro_rules! HeapTupleHeaderSetMatch {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMatch!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMatch!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMatch!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -12584,7 +13122,7 @@ macro_rules! HeapTupleHeaderSetMatch {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::HeapTupleHeaderSetMatch(
@@ -12616,7 +13154,7 @@ macro_rules! HeapTupleHeaderSetMatch {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -12746,6 +13284,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetMovedPartitions {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetMovedPartitions] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMovedPartitions!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12783,6 +13328,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetMovedPartitions {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetMovedPartitions] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMovedPartitions!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12799,7 +13351,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetMovedPartitions {
         $crate::HeapTupleHeaderSetMovedPartitions!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderSetMovedPartitions from htup_details.h:490
@@ -12877,7 +13429,7 @@ macro_rules! HeapTupleHeaderSetMovedPartitions {
         )
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMovedPartitions!(
@@ -12886,7 +13438,7 @@ macro_rules! HeapTupleHeaderSetMovedPartitions {
         )
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMovedPartitions!(
@@ -12902,7 +13454,7 @@ macro_rules! HeapTupleHeaderSetMovedPartitions {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::HeapTupleHeaderSetMovedPartitions(
@@ -12934,7 +13486,7 @@ macro_rules! HeapTupleHeaderSetMovedPartitions {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -13061,6 +13613,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetNatts {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetNatts] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetNatts!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13124,6 +13683,11 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetNatts {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetNatts] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetNatts!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13161,6 +13725,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetNatts {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetNatts] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetNatts!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13177,7 +13748,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetNatts {
         $crate::HeapTupleHeaderSetNatts!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro HeapTupleHeaderSetNatts from htup_details.h:585
@@ -13294,13 +13865,13 @@ macro_rules! HeapTupleHeaderSetNatts {
         $crate::__pgrx_c_args_HeapTupleHeaderSetNatts!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt, $natts:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetNatts!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt, $natts:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetNatts!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -13314,7 +13885,7 @@ macro_rules! HeapTupleHeaderSetNatts {
                         $crate::__pgrx_c_operand!(@check_safety; $natts);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -13399,7 +13970,7 @@ macro_rules! HeapTupleHeaderSetNatts {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -13569,6 +14140,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetSpeculativeToken {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetSpeculativeToken] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetSpeculativeToken!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13635,6 +14213,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetSpeculativeToken {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetSpeculativeToken] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetSpeculativeToken!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13672,6 +14257,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetSpeculativeToken {
             ] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetSpeculativeToken] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetSpeculativeToken!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13688,7 +14280,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetSpeculativeToken {
         $crate::HeapTupleHeaderSetSpeculativeToken!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderSetSpeculativeToken from htup_details.h:478
@@ -13779,7 +14371,7 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
         )
     };
     (@__pgrx_emit_place; $tup:tt, $token:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetSpeculativeToken!(
@@ -13788,7 +14380,7 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
         )
     };
     (@__pgrx_emit_read_place; $tup:tt, $token:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetSpeculativeToken!(
@@ -13805,7 +14397,7 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
                         $crate::__pgrx_c_operand!(@check_safety; $token);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::HeapTupleHeaderSetSpeculativeToken(
@@ -13850,7 +14442,7 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -13989,6 +14581,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetTypMod {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetTypMod] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypMod!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14052,6 +14651,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetTypMod {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetTypMod] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypMod!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14089,6 +14695,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetTypMod {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetTypMod] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypMod!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14105,7 +14718,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetTypMod {
         $crate::HeapTupleHeaderSetTypMod!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderSetTypMod from htup_details.h:526
@@ -14191,13 +14804,13 @@ macro_rules! HeapTupleHeaderSetTypMod {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypMod!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt, $typmod:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypMod!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt, $typmod:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypMod!(
@@ -14214,7 +14827,7 @@ macro_rules! HeapTupleHeaderSetTypMod {
                         $crate::__pgrx_c_operand!(@check_safety; $typmod);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::HeapTupleHeaderSetTypMod(
@@ -14259,7 +14872,7 @@ macro_rules! HeapTupleHeaderSetTypMod {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -14387,6 +15000,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetTypeId {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetTypeId] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypeId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14450,6 +15070,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetTypeId {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetTypeId] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypeId!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14487,6 +15114,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetTypeId {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetTypeId] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypeId!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14503,7 +15137,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetTypeId {
         $crate::HeapTupleHeaderSetTypeId!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderSetTypeId from htup_details.h:514
@@ -14597,13 +15231,13 @@ macro_rules! HeapTupleHeaderSetTypeId {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypeId!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt, $datum_typeid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypeId!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt, $datum_typeid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypeId!(
@@ -14620,7 +15254,7 @@ macro_rules! HeapTupleHeaderSetTypeId {
                         $crate::__pgrx_c_operand!(@check_safety; $datum_typeid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::HeapTupleHeaderSetTypeId(
@@ -14671,7 +15305,7 @@ macro_rules! HeapTupleHeaderSetTypeId {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -14807,6 +15441,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXmax {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXmax] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmax!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14870,6 +15511,11 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXmax {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXmax] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmax!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14907,6 +15553,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXmax {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXmax] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmax!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14923,7 +15576,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXmax {
         $crate::HeapTupleHeaderSetXmax!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderSetXmax from htup_details.h:387
@@ -15017,13 +15670,13 @@ macro_rules! HeapTupleHeaderSetXmax {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmax!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt, $xid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmax!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt, $xid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmax!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -15037,7 +15690,7 @@ macro_rules! HeapTupleHeaderSetXmax {
                         $crate::__pgrx_c_operand!(@check_safety; $xid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::HeapTupleHeaderSetXmax(
@@ -15088,7 +15741,7 @@ macro_rules! HeapTupleHeaderSetXmax {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -15224,6 +15877,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXmin {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXmin] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmin!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15287,6 +15947,11 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXmin {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXmin] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmin!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15324,6 +15989,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXmin {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXmin] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmin!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15340,7 +16012,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXmin {
         $crate::HeapTupleHeaderSetXmin!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderSetXmin from htup_details.h:335
@@ -15434,13 +16106,13 @@ macro_rules! HeapTupleHeaderSetXmin {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmin!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt, $xid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmin!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt, $xid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmin!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -15454,7 +16126,7 @@ macro_rules! HeapTupleHeaderSetXmin {
                         $crate::__pgrx_c_operand!(@check_safety; $xid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::HeapTupleHeaderSetXmin(
@@ -15505,7 +16177,7 @@ macro_rules! HeapTupleHeaderSetXmin {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -15653,6 +16325,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXminCommitted {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXminCommitted] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXminCommitted!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15690,6 +16369,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXminCommitted {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXminCommitted] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXminCommitted!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15706,7 +16392,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXminCommitted {
         $crate::HeapTupleHeaderSetXminCommitted!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderSetXminCommitted from htup_details.h:360
@@ -15785,7 +16471,7 @@ macro_rules! HeapTupleHeaderSetXminCommitted {
         )
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXminCommitted!(
@@ -15794,7 +16480,7 @@ macro_rules! HeapTupleHeaderSetXminCommitted {
         )
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXminCommitted!(
@@ -15810,7 +16496,7 @@ macro_rules! HeapTupleHeaderSetXminCommitted {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::HeapTupleHeaderSetXminCommitted(
@@ -15842,7 +16528,7 @@ macro_rules! HeapTupleHeaderSetXminCommitted {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -15981,6 +16667,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXminFrozen {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXminFrozen] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXminFrozen!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16018,6 +16711,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXminFrozen {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXminFrozen] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXminFrozen!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16034,7 +16734,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXminFrozen {
         $crate::HeapTupleHeaderSetXminFrozen!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderSetXminFrozen from htup_details.h:374
@@ -16110,13 +16810,13 @@ macro_rules! HeapTupleHeaderSetXminFrozen {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXminFrozen!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXminFrozen!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXminFrozen!(
@@ -16132,7 +16832,7 @@ macro_rules! HeapTupleHeaderSetXminFrozen {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::HeapTupleHeaderSetXminFrozen(
@@ -16164,7 +16864,7 @@ macro_rules! HeapTupleHeaderSetXminFrozen {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -16300,6 +17000,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXminInvalid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXminInvalid] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXminInvalid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16337,6 +17044,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXminInvalid {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXminInvalid] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXminInvalid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16353,7 +17067,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXminInvalid {
         $crate::HeapTupleHeaderSetXminInvalid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderSetXminInvalid from htup_details.h:367
@@ -16432,7 +17146,7 @@ macro_rules! HeapTupleHeaderSetXminInvalid {
         )
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXminInvalid!(
@@ -16441,7 +17155,7 @@ macro_rules! HeapTupleHeaderSetXminInvalid {
         )
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXminInvalid!(
@@ -16457,7 +17171,7 @@ macro_rules! HeapTupleHeaderSetXminInvalid {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::HeapTupleHeaderSetXminInvalid(
@@ -16489,7 +17203,7 @@ macro_rules! HeapTupleHeaderSetXminInvalid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -16613,6 +17327,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXvac {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXvac] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16676,6 +17397,11 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXvac {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXvac] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16713,6 +17439,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXvac {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXvac] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16729,7 +17462,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXvac {
         $crate::HeapTupleHeaderSetXvac!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderSetXvac from htup_details.h:455
@@ -16824,13 +17557,13 @@ macro_rules! HeapTupleHeaderSetXvac {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt, $xid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt, $xid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -16844,7 +17577,7 @@ macro_rules! HeapTupleHeaderSetXvac {
                         $crate::__pgrx_c_operand!(@check_safety; $xid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::HeapTupleHeaderSetXvac(
@@ -16895,7 +17628,7 @@ macro_rules! HeapTupleHeaderSetXvac {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -17043,6 +17776,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderXminCommitted {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderXminCommitted] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminCommitted!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17080,6 +17820,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderXminCommitted {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderXminCommitted] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminCommitted!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17096,7 +17843,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderXminCommitted {
         $crate::HeapTupleHeaderXminCommitted!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderXminCommitted from htup_details.h:341
@@ -17173,13 +17920,13 @@ macro_rules! HeapTupleHeaderXminCommitted {
         $crate::__pgrx_c_args_HeapTupleHeaderXminCommitted!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminCommitted!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminCommitted!(
@@ -17195,7 +17942,7 @@ macro_rules! HeapTupleHeaderXminCommitted {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -17231,7 +17978,7 @@ macro_rules! HeapTupleHeaderXminCommitted {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -17366,6 +18113,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderXminFrozen {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderXminFrozen] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminFrozen!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17403,6 +18157,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderXminFrozen {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderXminFrozen] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminFrozen!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17419,7 +18180,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderXminFrozen {
         $crate::HeapTupleHeaderXminFrozen!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderXminFrozen from htup_details.h:354
@@ -17496,13 +18257,13 @@ macro_rules! HeapTupleHeaderXminFrozen {
         $crate::__pgrx_c_args_HeapTupleHeaderXminFrozen!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminFrozen!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminFrozen!(
@@ -17518,7 +18279,7 @@ macro_rules! HeapTupleHeaderXminFrozen {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -17554,7 +18315,7 @@ macro_rules! HeapTupleHeaderXminFrozen {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -17683,6 +18444,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderXminInvalid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderXminInvalid] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminInvalid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17720,6 +18488,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderXminInvalid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderXminInvalid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminInvalid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17736,7 +18511,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderXminInvalid {
         $crate::HeapTupleHeaderXminInvalid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleHeaderXminInvalid from htup_details.h:347
@@ -17814,13 +18589,13 @@ macro_rules! HeapTupleHeaderXminInvalid {
         $crate::__pgrx_c_args_HeapTupleHeaderXminInvalid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminInvalid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminInvalid!(
@@ -17836,7 +18611,7 @@ macro_rules! HeapTupleHeaderXminInvalid {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -17872,7 +18647,7 @@ macro_rules! HeapTupleHeaderXminInvalid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -17996,6 +18771,11 @@ macro_rules! __pgrx_c_args_HeapTupleIsHeapOnly {
             @argument [__pgrx_c_args_HeapTupleIsHeapOnly] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleIsHeapOnly] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleIsHeapOnly!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18033,6 +18813,13 @@ macro_rules! __pgrx_c_args_HeapTupleIsHeapOnly {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleIsHeapOnly] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleIsHeapOnly!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18049,7 +18836,7 @@ macro_rules! __pgrx_c_args_HeapTupleIsHeapOnly {
         $crate::HeapTupleIsHeapOnly!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleIsHeapOnly from htup_details.h:790
@@ -18123,13 +18910,13 @@ macro_rules! HeapTupleIsHeapOnly {
         $crate::__pgrx_c_args_HeapTupleIsHeapOnly!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleIsHeapOnly!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleIsHeapOnly!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -18142,7 +18929,7 @@ macro_rules! HeapTupleIsHeapOnly {
                         $crate::__pgrx_c_operand!(@check_safety; $tuple);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -18178,7 +18965,7 @@ macro_rules! HeapTupleIsHeapOnly {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -18305,6 +19092,11 @@ macro_rules! __pgrx_c_args_HeapTupleIsHotUpdated {
             @argument [__pgrx_c_args_HeapTupleIsHotUpdated] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleIsHotUpdated] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleIsHotUpdated!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18342,6 +19134,13 @@ macro_rules! __pgrx_c_args_HeapTupleIsHotUpdated {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleIsHotUpdated] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleIsHotUpdated!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18358,7 +19157,7 @@ macro_rules! __pgrx_c_args_HeapTupleIsHotUpdated {
         $crate::HeapTupleIsHotUpdated!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleIsHotUpdated from htup_details.h:772
@@ -18432,13 +19231,13 @@ macro_rules! HeapTupleIsHotUpdated {
         $crate::__pgrx_c_args_HeapTupleIsHotUpdated!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleIsHotUpdated!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleIsHotUpdated!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -18451,7 +19250,7 @@ macro_rules! HeapTupleIsHotUpdated {
                         $crate::__pgrx_c_operand!(@check_safety; $tuple);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -18487,7 +19286,7 @@ macro_rules! HeapTupleIsHotUpdated {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -18611,6 +19410,11 @@ macro_rules! __pgrx_c_args_HeapTupleNoNulls {
             @argument [__pgrx_c_args_HeapTupleNoNulls] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleNoNulls] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleNoNulls!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18648,6 +19452,13 @@ macro_rules! __pgrx_c_args_HeapTupleNoNulls {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleNoNulls] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleNoNulls!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18664,7 +19475,7 @@ macro_rules! __pgrx_c_args_HeapTupleNoNulls {
         $crate::HeapTupleNoNulls!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleNoNulls from htup_details.h:748
@@ -18738,13 +19549,13 @@ macro_rules! HeapTupleNoNulls {
         $crate::__pgrx_c_args_HeapTupleNoNulls!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleNoNulls!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleNoNulls!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -18757,7 +19568,7 @@ macro_rules! HeapTupleNoNulls {
                         $crate::__pgrx_c_operand!(@check_safety; $tuple);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -18793,7 +19604,7 @@ macro_rules! HeapTupleNoNulls {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -18920,6 +19731,11 @@ macro_rules! __pgrx_c_args_HeapTupleSetHeapOnly {
             @argument [__pgrx_c_args_HeapTupleSetHeapOnly] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleSetHeapOnly] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleSetHeapOnly!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18957,6 +19773,13 @@ macro_rules! __pgrx_c_args_HeapTupleSetHeapOnly {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleSetHeapOnly] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleSetHeapOnly!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18973,7 +19796,7 @@ macro_rules! __pgrx_c_args_HeapTupleSetHeapOnly {
         $crate::HeapTupleSetHeapOnly!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleSetHeapOnly from htup_details.h:796
@@ -19045,13 +19868,13 @@ macro_rules! HeapTupleSetHeapOnly {
         $crate::__pgrx_c_args_HeapTupleSetHeapOnly!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleSetHeapOnly!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleSetHeapOnly!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -19064,7 +19887,7 @@ macro_rules! HeapTupleSetHeapOnly {
                         $crate::__pgrx_c_operand!(@check_safety; $tuple);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::HeapTupleSetHeapOnly(
@@ -19096,7 +19919,7 @@ macro_rules! HeapTupleSetHeapOnly {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -19223,6 +20046,11 @@ macro_rules! __pgrx_c_args_HeapTupleSetHotUpdated {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleSetHotUpdated] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleSetHotUpdated!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19260,6 +20088,13 @@ macro_rules! __pgrx_c_args_HeapTupleSetHotUpdated {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleSetHotUpdated] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleSetHotUpdated!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19276,7 +20111,7 @@ macro_rules! __pgrx_c_args_HeapTupleSetHotUpdated {
         $crate::HeapTupleSetHotUpdated!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function HeapTupleSetHotUpdated from htup_details.h:778
@@ -19351,13 +20186,13 @@ macro_rules! HeapTupleSetHotUpdated {
         $crate::__pgrx_c_args_HeapTupleSetHotUpdated!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleSetHotUpdated!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleSetHotUpdated!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -19370,7 +20205,7 @@ macro_rules! HeapTupleSetHotUpdated {
                         $crate::__pgrx_c_operand!(@check_safety; $tuple);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::HeapTupleSetHotUpdated(
@@ -19402,7 +20237,7 @@ macro_rules! HeapTupleSetHotUpdated {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -19515,6 +20350,11 @@ macro_rules! __pgrx_c_args_fastgetattr {
             @argument [__pgrx_c_args_fastgetattr] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fastgetattr] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_fastgetattr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19567,6 +20407,11 @@ macro_rules! __pgrx_c_args_fastgetattr {
             @argument [__pgrx_c_args_fastgetattr] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fastgetattr] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_fastgetattr!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19617,6 +20462,11 @@ macro_rules! __pgrx_c_args_fastgetattr {
     (@p2 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_fastgetattr] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fastgetattr] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -19680,6 +20530,11 @@ macro_rules! __pgrx_c_args_fastgetattr {
             @argument [__pgrx_c_args_fastgetattr] [p4 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fastgetattr] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_fastgetattr!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19715,6 +20570,11 @@ macro_rules! __pgrx_c_args_fastgetattr {
             @argument [__pgrx_c_args_fastgetattr] [p4 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fastgetattr] [p4 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_fastgetattr!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19731,7 +20591,7 @@ macro_rules! __pgrx_c_args_fastgetattr {
         $crate::fastgetattr!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function fastgetattr from htup_details.h:865
@@ -19886,13 +20746,13 @@ macro_rules! fastgetattr {
         $crate::__pgrx_c_args_fastgetattr!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt, $attnum:tt, $tupleDesc:tt, $isnull:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_fastgetattr!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt, $attnum:tt, $tupleDesc:tt, $isnull:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_fastgetattr!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -19908,7 +20768,7 @@ macro_rules! fastgetattr {
                         $crate::__pgrx_c_operand!(@check_safety; $isnull);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -20002,7 +20862,7 @@ macro_rules! fastgetattr {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -20174,6 +21034,11 @@ macro_rules! __pgrx_c_args_heap_getattr {
             @argument [__pgrx_c_args_heap_getattr] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_heap_getattr] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_heap_getattr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20226,6 +21091,11 @@ macro_rules! __pgrx_c_args_heap_getattr {
             @argument [__pgrx_c_args_heap_getattr] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_heap_getattr] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_heap_getattr!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20276,6 +21146,11 @@ macro_rules! __pgrx_c_args_heap_getattr {
     (@p2 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_heap_getattr] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_heap_getattr] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -20339,6 +21214,11 @@ macro_rules! __pgrx_c_args_heap_getattr {
             @argument [__pgrx_c_args_heap_getattr] [p4 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_heap_getattr] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_heap_getattr!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20374,6 +21254,11 @@ macro_rules! __pgrx_c_args_heap_getattr {
             @argument [__pgrx_c_args_heap_getattr] [p4 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_heap_getattr] [p4 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_heap_getattr!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20390,7 +21275,7 @@ macro_rules! __pgrx_c_args_heap_getattr {
         $crate::heap_getattr!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function heap_getattr from htup_details.h:908
@@ -20530,13 +21415,13 @@ macro_rules! heap_getattr {
         $crate::__pgrx_c_args_heap_getattr!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt, $attnum:tt, $tupleDesc:tt, $isnull:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_heap_getattr!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt, $attnum:tt, $tupleDesc:tt, $isnull:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_heap_getattr!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -20552,7 +21437,7 @@ macro_rules! heap_getattr {
                         $crate::__pgrx_c_operand!(@check_safety; $isnull);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -20646,7 +21531,7 @@ macro_rules! heap_getattr {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

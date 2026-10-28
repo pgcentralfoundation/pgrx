@@ -86,6 +86,11 @@ macro_rules! __pgrx_c_args_ISUPDATE_from_mxstatus {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ISUPDATE_from_mxstatus] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ISUPDATE_from_mxstatus!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -123,6 +128,13 @@ macro_rules! __pgrx_c_args_ISUPDATE_from_mxstatus {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ISUPDATE_from_mxstatus] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ISUPDATE_from_mxstatus!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -139,7 +151,7 @@ macro_rules! __pgrx_c_args_ISUPDATE_from_mxstatus {
         $crate::ISUPDATE_from_mxstatus!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ISUPDATE_from_mxstatus from multixact.h:79
@@ -194,13 +206,13 @@ macro_rules! ISUPDATE_from_mxstatus {
         $crate::__pgrx_c_args_ISUPDATE_from_mxstatus!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $status:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ISUPDATE_from_mxstatus!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $status:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ISUPDATE_from_mxstatus!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -213,7 +225,7 @@ macro_rules! ISUPDATE_from_mxstatus {
                         $crate::__pgrx_c_operand!(@check_safety; $status);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::gt(
@@ -232,7 +244,7 @@ macro_rules! ISUPDATE_from_mxstatus {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -342,6 +354,11 @@ macro_rules! __pgrx_c_args_MultiXactIdIsValid {
             @argument [__pgrx_c_args_MultiXactIdIsValid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MultiXactIdIsValid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_MultiXactIdIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -379,6 +396,13 @@ macro_rules! __pgrx_c_args_MultiXactIdIsValid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MultiXactIdIsValid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MultiXactIdIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -395,7 +419,7 @@ macro_rules! __pgrx_c_args_MultiXactIdIsValid {
         $crate::MultiXactIdIsValid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro MultiXactIdIsValid from multixact.h:29
@@ -449,13 +473,13 @@ macro_rules! MultiXactIdIsValid {
         $crate::__pgrx_c_args_MultiXactIdIsValid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $multi:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MultiXactIdIsValid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $multi:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MultiXactIdIsValid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -468,7 +492,7 @@ macro_rules! MultiXactIdIsValid {
                         $crate::__pgrx_c_operand!(@check_safety; $multi);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -489,7 +513,7 @@ macro_rules! MultiXactIdIsValid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -594,6 +618,13 @@ macro_rules! __pgrx_c_args_MultiXactIdPrecedes {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MultiXactIdPrecedes] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MultiXactIdPrecedes!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -655,6 +686,11 @@ macro_rules! __pgrx_c_args_MultiXactIdPrecedes {
             @argument [__pgrx_c_args_MultiXactIdPrecedes] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MultiXactIdPrecedes] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_MultiXactIdPrecedes!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -692,6 +728,13 @@ macro_rules! __pgrx_c_args_MultiXactIdPrecedes {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MultiXactIdPrecedes] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MultiXactIdPrecedes!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -708,7 +751,7 @@ macro_rules! __pgrx_c_args_MultiXactIdPrecedes {
         $crate::MultiXactIdPrecedes!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function MultiXactIdPrecedes from multixact.h:37
@@ -799,13 +842,13 @@ macro_rules! MultiXactIdPrecedes {
         $crate::__pgrx_c_args_MultiXactIdPrecedes!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $multi1:tt, $multi2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MultiXactIdPrecedes!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $multi1:tt, $multi2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MultiXactIdPrecedes!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -819,7 +862,7 @@ macro_rules! MultiXactIdPrecedes {
                         $crate::__pgrx_c_operand!(@check_safety; $multi2);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -870,7 +913,7 @@ macro_rules! MultiXactIdPrecedes {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1004,6 +1047,13 @@ macro_rules! __pgrx_c_args_MultiXactIdPrecedesOrEquals {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MultiXactIdPrecedesOrEquals] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MultiXactIdPrecedesOrEquals!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1067,6 +1117,13 @@ macro_rules! __pgrx_c_args_MultiXactIdPrecedesOrEquals {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MultiXactIdPrecedesOrEquals] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_MultiXactIdPrecedesOrEquals!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1104,6 +1161,13 @@ macro_rules! __pgrx_c_args_MultiXactIdPrecedesOrEquals {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MultiXactIdPrecedesOrEquals] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MultiXactIdPrecedesOrEquals!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1120,7 +1184,7 @@ macro_rules! __pgrx_c_args_MultiXactIdPrecedesOrEquals {
         $crate::MultiXactIdPrecedesOrEquals!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function MultiXactIdPrecedesOrEquals from multixact.h:51
@@ -1214,13 +1278,13 @@ macro_rules! MultiXactIdPrecedesOrEquals {
         $crate::__pgrx_c_args_MultiXactIdPrecedesOrEquals!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $multi1:tt, $multi2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MultiXactIdPrecedesOrEquals!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $multi1:tt, $multi2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MultiXactIdPrecedesOrEquals!(
@@ -1237,7 +1301,7 @@ macro_rules! MultiXactIdPrecedesOrEquals {
                         $crate::__pgrx_c_operand!(@check_safety; $multi2);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1288,7 +1352,7 @@ macro_rules! MultiXactIdPrecedesOrEquals {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

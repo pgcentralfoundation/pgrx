@@ -84,6 +84,11 @@ macro_rules! __pgrx_c_args_MaximumBytesPerTuple {
             @argument [__pgrx_c_args_MaximumBytesPerTuple] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MaximumBytesPerTuple] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_MaximumBytesPerTuple!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -121,6 +126,13 @@ macro_rules! __pgrx_c_args_MaximumBytesPerTuple {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MaximumBytesPerTuple] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MaximumBytesPerTuple!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -137,7 +149,7 @@ macro_rules! __pgrx_c_args_MaximumBytesPerTuple {
         $crate::MaximumBytesPerTuple!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro MaximumBytesPerTuple from heaptoast.h:23
@@ -387,8 +399,8 @@ macro_rules! MaximumBytesPerTuple {
                             )
                         )
                     )
-                ] [compile_error!("C expression is not a place in this operation")] [
-                    compile_error!("C expression is not a place in this operation")
+                ] [::core::compile_error!("C expression is not a place in this operation")] [
+                    ::core::compile_error!("C expression is not a place in this operation")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -397,7 +409,7 @@ macro_rules! MaximumBytesPerTuple {
                                     $crate::__pgrx_c_operand!(@check_safety; $tuplesPerPage);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                         $crate::__pgrx_c_macros::expression::div(
@@ -627,7 +639,7 @@ macro_rules! MaximumBytesPerTuple {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -853,8 +865,8 @@ macro_rules! MaximumBytesPerTuple {
                             )
                         )
                     )
-                ] [compile_error!("C expression is not a place in this operation")] [
-                    compile_error!("C expression is not a place in this operation")
+                ] [::core::compile_error!("C expression is not a place in this operation")] [
+                    ::core::compile_error!("C expression is not a place in this operation")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -863,7 +875,7 @@ macro_rules! MaximumBytesPerTuple {
                                     $crate::__pgrx_c_operand!(@check_safety; $tuplesPerPage);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                         $crate::__pgrx_c_macros::expression::div(
@@ -1093,7 +1105,7 @@ macro_rules! MaximumBytesPerTuple {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -1319,8 +1331,8 @@ macro_rules! MaximumBytesPerTuple {
                             )
                         )
                     )
-                ] [compile_error!("C expression is not a place in this operation")] [
-                    compile_error!("C expression is not a place in this operation")
+                ] [::core::compile_error!("C expression is not a place in this operation")] [
+                    ::core::compile_error!("C expression is not a place in this operation")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -1329,7 +1341,7 @@ macro_rules! MaximumBytesPerTuple {
                                     $crate::__pgrx_c_operand!(@check_safety; $tuplesPerPage);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                         $crate::__pgrx_c_macros::expression::div(
@@ -1559,7 +1571,7 @@ macro_rules! MaximumBytesPerTuple {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -1785,8 +1797,8 @@ macro_rules! MaximumBytesPerTuple {
                             )
                         )
                     )
-                ] [compile_error!("C expression is not a place in this operation")] [
-                    compile_error!("C expression is not a place in this operation")
+                ] [::core::compile_error!("C expression is not a place in this operation")] [
+                    ::core::compile_error!("C expression is not a place in this operation")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -1795,7 +1807,7 @@ macro_rules! MaximumBytesPerTuple {
                                     $crate::__pgrx_c_operand!(@check_safety; $tuplesPerPage);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                         $crate::__pgrx_c_macros::expression::div(
@@ -2025,7 +2037,7 @@ macro_rules! MaximumBytesPerTuple {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -2251,8 +2263,8 @@ macro_rules! MaximumBytesPerTuple {
                             )
                         )
                     )
-                ] [compile_error!("C expression is not a place in this operation")] [
-                    compile_error!("C expression is not a place in this operation")
+                ] [::core::compile_error!("C expression is not a place in this operation")] [
+                    ::core::compile_error!("C expression is not a place in this operation")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -2261,7 +2273,7 @@ macro_rules! MaximumBytesPerTuple {
                                     $crate::__pgrx_c_operand!(@check_safety; $tuplesPerPage);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                         $crate::__pgrx_c_macros::expression::div(
@@ -2491,7 +2503,7 @@ macro_rules! MaximumBytesPerTuple {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]

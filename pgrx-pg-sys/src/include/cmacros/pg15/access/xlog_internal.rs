@@ -79,6 +79,11 @@ macro_rules! __pgrx_c_args_GetRmgr {
             @argument [__pgrx_c_args_GetRmgr] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetRmgr] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GetRmgr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -114,6 +119,11 @@ macro_rules! __pgrx_c_args_GetRmgr {
             @argument [__pgrx_c_args_GetRmgr] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetRmgr] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetRmgr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -130,7 +140,7 @@ macro_rules! __pgrx_c_args_GetRmgr {
         $crate::GetRmgr!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function GetRmgr from xlog_internal.h:336
@@ -177,7 +187,7 @@ macro_rules! GetRmgr {
             <
                 $crate::__pgrx_c_macros::expression::CRawRecord<$crate::__pgrx_c_bindings::RmgrData> as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_e4da2b176892dbb864973d411cd3feff(
+                $crate::__pgrx_c_generated::Inline_29af621e1f50dbe3d5e2d39c779a59c0(
                     <
                         $crate::__pgrx_c_macros::CUnsignedChar as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
@@ -198,13 +208,13 @@ macro_rules! GetRmgr {
         $crate::__pgrx_c_args_GetRmgr!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rmid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetRmgr!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rmid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetRmgr!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -217,7 +227,7 @@ macro_rules! GetRmgr {
                         $crate::__pgrx_c_operand!(@check_safety; $rmid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -225,7 +235,7 @@ macro_rules! GetRmgr {
                                     $crate::__pgrx_c_bindings::RmgrData
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_e4da2b176892dbb864973d411cd3feff(
+                                $crate::__pgrx_c_generated::Inline_29af621e1f50dbe3d5e2d39c779a59c0(
                                     <
                                         $crate::__pgrx_c_macros::CUnsignedChar as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
@@ -245,7 +255,7 @@ macro_rules! GetRmgr {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -260,7 +270,7 @@ macro_rules! GetRmgr {
                         $crate::__pgrx_c_bindings::RmgrData
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_e4da2b176892dbb864973d411cd3feff(
+                    $crate::__pgrx_c_generated::Inline_29af621e1f50dbe3d5e2d39c779a59c0(
                         <
                             $crate::__pgrx_c_macros::CUnsignedChar as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
@@ -368,6 +378,11 @@ macro_rules! __pgrx_c_args_IsBackupHistoryFileName {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IsBackupHistoryFileName] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IsBackupHistoryFileName!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -405,6 +420,13 @@ macro_rules! __pgrx_c_args_IsBackupHistoryFileName {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IsBackupHistoryFileName] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsBackupHistoryFileName!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -421,7 +443,7 @@ macro_rules! __pgrx_c_args_IsBackupHistoryFileName {
         $crate::IsBackupHistoryFileName!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IsBackupHistoryFileName from xlog_internal.h:220
@@ -475,7 +497,7 @@ macro_rules! IsBackupHistoryFileName {
                                                 <
                                                     $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_cfda0375bc925253811acb9bae765d8a(
+                                                    $crate::__pgrx_c_generated::Inline_0f08cb8a3b22316d65a36a06f382a411(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::CChar,
@@ -525,7 +547,7 @@ macro_rules! IsBackupHistoryFileName {
                                                 <
                                                     $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_b65855b5c96a350a5f826f484c1c6d1f(
+                                                    $crate::__pgrx_c_generated::Inline_93bed29cd859906edbb4ac62d8516f0c(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::CChar,
@@ -628,7 +650,7 @@ macro_rules! IsBackupHistoryFileName {
                                     <
                                         $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_778c1d83de00c46918746528d7c237b0(
+                                        $crate::__pgrx_c_generated::Inline_e536b28e5b01eb1eea053ae86eee46f5(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::CChar,
@@ -678,7 +700,7 @@ macro_rules! IsBackupHistoryFileName {
                                                                         <
                                                                             $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                                         >::from_storage(
-                                                                            $crate::__pgrx_c_generated::Inline_cfda0375bc925253811acb9bae765d8a(
+                                                                            $crate::__pgrx_c_generated::Inline_0f08cb8a3b22316d65a36a06f382a411(
                                                                                 <
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::CChar,
@@ -717,7 +739,7 @@ macro_rules! IsBackupHistoryFileName {
                                                                 <
                                                                     $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_cfda0375bc925253811acb9bae765d8a(
+                                                                    $crate::__pgrx_c_generated::Inline_0f08cb8a3b22316d65a36a06f382a411(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::CChar,
@@ -827,13 +849,13 @@ macro_rules! IsBackupHistoryFileName {
         $crate::__pgrx_c_args_IsBackupHistoryFileName!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $fname:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IsBackupHistoryFileName!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $fname:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IsBackupHistoryFileName!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -846,7 +868,7 @@ macro_rules! IsBackupHistoryFileName {
                         $crate::__pgrx_c_operand!(@check_safety; $fname);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -868,7 +890,7 @@ macro_rules! IsBackupHistoryFileName {
                                                             <
                                                                 $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                             >::from_storage(
-                                                                $crate::__pgrx_c_generated::Inline_cfda0375bc925253811acb9bae765d8a(
+                                                                $crate::__pgrx_c_generated::Inline_0f08cb8a3b22316d65a36a06f382a411(
                                                                     <
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::CChar,
@@ -921,7 +943,7 @@ macro_rules! IsBackupHistoryFileName {
                                                             <
                                                                 $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                             >::from_storage(
-                                                                $crate::__pgrx_c_generated::Inline_b65855b5c96a350a5f826f484c1c6d1f(
+                                                                $crate::__pgrx_c_generated::Inline_93bed29cd859906edbb4ac62d8516f0c(
                                                                     <
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::CChar,
@@ -1027,7 +1049,7 @@ macro_rules! IsBackupHistoryFileName {
                                                 <
                                                     $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_778c1d83de00c46918746528d7c237b0(
+                                                    $crate::__pgrx_c_generated::Inline_e536b28e5b01eb1eea053ae86eee46f5(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::CChar,
@@ -1079,7 +1101,7 @@ macro_rules! IsBackupHistoryFileName {
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::from_storage(
-                                                                                        $crate::__pgrx_c_generated::Inline_cfda0375bc925253811acb9bae765d8a(
+                                                                                        $crate::__pgrx_c_generated::Inline_0f08cb8a3b22316d65a36a06f382a411(
                                                                                             <
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                     $crate::__pgrx_c_macros::CChar,
@@ -1118,7 +1140,7 @@ macro_rules! IsBackupHistoryFileName {
                                                                             <
                                                                                 $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                                             >::from_storage(
-                                                                                $crate::__pgrx_c_generated::Inline_cfda0375bc925253811acb9bae765d8a(
+                                                                                $crate::__pgrx_c_generated::Inline_0f08cb8a3b22316d65a36a06f382a411(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                             $crate::__pgrx_c_macros::CChar,
@@ -1231,7 +1253,7 @@ macro_rules! IsBackupHistoryFileName {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1255,7 +1277,7 @@ macro_rules! IsBackupHistoryFileName {
                                                 <
                                                     $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_cfda0375bc925253811acb9bae765d8a(
+                                                    $crate::__pgrx_c_generated::Inline_0f08cb8a3b22316d65a36a06f382a411(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::CChar,
@@ -1305,7 +1327,7 @@ macro_rules! IsBackupHistoryFileName {
                                                 <
                                                     $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_b65855b5c96a350a5f826f484c1c6d1f(
+                                                    $crate::__pgrx_c_generated::Inline_93bed29cd859906edbb4ac62d8516f0c(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::CChar,
@@ -1408,7 +1430,7 @@ macro_rules! IsBackupHistoryFileName {
                                     <
                                         $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_778c1d83de00c46918746528d7c237b0(
+                                        $crate::__pgrx_c_generated::Inline_e536b28e5b01eb1eea053ae86eee46f5(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::CChar,
@@ -1458,7 +1480,7 @@ macro_rules! IsBackupHistoryFileName {
                                                                         <
                                                                             $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                                         >::from_storage(
-                                                                            $crate::__pgrx_c_generated::Inline_cfda0375bc925253811acb9bae765d8a(
+                                                                            $crate::__pgrx_c_generated::Inline_0f08cb8a3b22316d65a36a06f382a411(
                                                                                 <
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::CChar,
@@ -1497,7 +1519,7 @@ macro_rules! IsBackupHistoryFileName {
                                                                 <
                                                                     $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_cfda0375bc925253811acb9bae765d8a(
+                                                                    $crate::__pgrx_c_generated::Inline_0f08cb8a3b22316d65a36a06f382a411(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::CChar,
@@ -1691,6 +1713,11 @@ macro_rules! __pgrx_c_args_IsPartialXLogFileName {
             @argument [__pgrx_c_args_IsPartialXLogFileName] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IsPartialXLogFileName] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IsPartialXLogFileName!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1728,6 +1755,13 @@ macro_rules! __pgrx_c_args_IsPartialXLogFileName {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IsPartialXLogFileName] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsPartialXLogFileName!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1744,7 +1778,7 @@ macro_rules! __pgrx_c_args_IsPartialXLogFileName {
         $crate::IsPartialXLogFileName!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IsPartialXLogFileName from xlog_internal.h:182
@@ -1795,7 +1829,7 @@ macro_rules! IsPartialXLogFileName {
                                                 <
                                                     $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_cfda0375bc925253811acb9bae765d8a(
+                                                    $crate::__pgrx_c_generated::Inline_0f08cb8a3b22316d65a36a06f382a411(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::CChar,
@@ -1849,7 +1883,7 @@ macro_rules! IsPartialXLogFileName {
                                                         <
                                                             $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                         >::from_storage(
-                                                            $crate::__pgrx_c_generated::Inline_cfda0375bc925253811acb9bae765d8a(
+                                                            $crate::__pgrx_c_generated::Inline_0f08cb8a3b22316d65a36a06f382a411(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::CChar,
@@ -1908,7 +1942,7 @@ macro_rules! IsPartialXLogFileName {
                                                 <
                                                     $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_b65855b5c96a350a5f826f484c1c6d1f(
+                                                    $crate::__pgrx_c_generated::Inline_93bed29cd859906edbb4ac62d8516f0c(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::CChar,
@@ -2011,7 +2045,7 @@ macro_rules! IsPartialXLogFileName {
                                     <
                                         $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_778c1d83de00c46918746528d7c237b0(
+                                        $crate::__pgrx_c_generated::Inline_e536b28e5b01eb1eea053ae86eee46f5(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::CChar,
@@ -2122,13 +2156,13 @@ macro_rules! IsPartialXLogFileName {
         $crate::__pgrx_c_args_IsPartialXLogFileName!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $fname:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IsPartialXLogFileName!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $fname:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IsPartialXLogFileName!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2141,7 +2175,7 @@ macro_rules! IsPartialXLogFileName {
                         $crate::__pgrx_c_operand!(@check_safety; $fname);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -2163,7 +2197,7 @@ macro_rules! IsPartialXLogFileName {
                                                             <
                                                                 $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                             >::from_storage(
-                                                                $crate::__pgrx_c_generated::Inline_cfda0375bc925253811acb9bae765d8a(
+                                                                $crate::__pgrx_c_generated::Inline_0f08cb8a3b22316d65a36a06f382a411(
                                                                     <
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::CChar,
@@ -2217,7 +2251,7 @@ macro_rules! IsPartialXLogFileName {
                                                                     <
                                                                         $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                                     >::from_storage(
-                                                                        $crate::__pgrx_c_generated::Inline_cfda0375bc925253811acb9bae765d8a(
+                                                                        $crate::__pgrx_c_generated::Inline_0f08cb8a3b22316d65a36a06f382a411(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                     $crate::__pgrx_c_macros::CChar,
@@ -2279,7 +2313,7 @@ macro_rules! IsPartialXLogFileName {
                                                             <
                                                                 $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                             >::from_storage(
-                                                                $crate::__pgrx_c_generated::Inline_b65855b5c96a350a5f826f484c1c6d1f(
+                                                                $crate::__pgrx_c_generated::Inline_93bed29cd859906edbb4ac62d8516f0c(
                                                                     <
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::CChar,
@@ -2385,7 +2419,7 @@ macro_rules! IsPartialXLogFileName {
                                                 <
                                                     $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_778c1d83de00c46918746528d7c237b0(
+                                                    $crate::__pgrx_c_generated::Inline_e536b28e5b01eb1eea053ae86eee46f5(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::CChar,
@@ -2499,7 +2533,7 @@ macro_rules! IsPartialXLogFileName {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2523,7 +2557,7 @@ macro_rules! IsPartialXLogFileName {
                                                 <
                                                     $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_cfda0375bc925253811acb9bae765d8a(
+                                                    $crate::__pgrx_c_generated::Inline_0f08cb8a3b22316d65a36a06f382a411(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::CChar,
@@ -2577,7 +2611,7 @@ macro_rules! IsPartialXLogFileName {
                                                         <
                                                             $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                         >::from_storage(
-                                                            $crate::__pgrx_c_generated::Inline_cfda0375bc925253811acb9bae765d8a(
+                                                            $crate::__pgrx_c_generated::Inline_0f08cb8a3b22316d65a36a06f382a411(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::CChar,
@@ -2636,7 +2670,7 @@ macro_rules! IsPartialXLogFileName {
                                                 <
                                                     $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_b65855b5c96a350a5f826f484c1c6d1f(
+                                                    $crate::__pgrx_c_generated::Inline_93bed29cd859906edbb4ac62d8516f0c(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::CChar,
@@ -2739,7 +2773,7 @@ macro_rules! IsPartialXLogFileName {
                                     <
                                         $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_778c1d83de00c46918746528d7c237b0(
+                                        $crate::__pgrx_c_generated::Inline_e536b28e5b01eb1eea053ae86eee46f5(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::CChar,
@@ -2883,7 +2917,7 @@ macro_rules! __pgrx_c_args_IsPowerOf2 {
         $crate::__pgrx_c_args_IsPowerOf2!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_IsPowerOf2!(
@@ -2891,7 +2925,7 @@ macro_rules! __pgrx_c_args_IsPowerOf2 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsPowerOf2!(
@@ -2900,7 +2934,7 @@ macro_rules! __pgrx_c_args_IsPowerOf2 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_IsPowerOf2!(
@@ -2977,7 +3011,7 @@ macro_rules! __pgrx_c_args_IsPowerOf2 {
         $crate::IsPowerOf2!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IsPowerOf2 from xlog_internal.h:95
@@ -3099,13 +3133,13 @@ macro_rules! IsPowerOf2 {
         $crate::__pgrx_c_args_IsPowerOf2!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IsPowerOf2!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IsPowerOf2!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3118,7 +3152,7 @@ macro_rules! IsPowerOf2 {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -3218,7 +3252,7 @@ macro_rules! IsPowerOf2 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3394,6 +3428,11 @@ macro_rules! __pgrx_c_args_IsTLHistoryFileName {
             @argument [__pgrx_c_args_IsTLHistoryFileName] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IsTLHistoryFileName] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IsTLHistoryFileName!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3431,6 +3470,13 @@ macro_rules! __pgrx_c_args_IsTLHistoryFileName {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IsTLHistoryFileName] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsTLHistoryFileName!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3447,7 +3493,7 @@ macro_rules! __pgrx_c_args_IsTLHistoryFileName {
         $crate::IsTLHistoryFileName!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IsTLHistoryFileName from xlog_internal.h:203
@@ -3498,7 +3544,7 @@ macro_rules! IsTLHistoryFileName {
                                                 <
                                                     $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_cfda0375bc925253811acb9bae765d8a(
+                                                    $crate::__pgrx_c_generated::Inline_0f08cb8a3b22316d65a36a06f382a411(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::CChar,
@@ -3550,7 +3596,7 @@ macro_rules! IsTLHistoryFileName {
                                                         <
                                                             $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                         >::from_storage(
-                                                            $crate::__pgrx_c_generated::Inline_cfda0375bc925253811acb9bae765d8a(
+                                                            $crate::__pgrx_c_generated::Inline_0f08cb8a3b22316d65a36a06f382a411(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::CChar,
@@ -3609,7 +3655,7 @@ macro_rules! IsTLHistoryFileName {
                                                 <
                                                     $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_b65855b5c96a350a5f826f484c1c6d1f(
+                                                    $crate::__pgrx_c_generated::Inline_93bed29cd859906edbb4ac62d8516f0c(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::CChar,
@@ -3710,7 +3756,7 @@ macro_rules! IsTLHistoryFileName {
                                     <
                                         $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_778c1d83de00c46918746528d7c237b0(
+                                        $crate::__pgrx_c_generated::Inline_e536b28e5b01eb1eea053ae86eee46f5(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::CChar,
@@ -3819,13 +3865,13 @@ macro_rules! IsTLHistoryFileName {
         $crate::__pgrx_c_args_IsTLHistoryFileName!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $fname:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IsTLHistoryFileName!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $fname:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IsTLHistoryFileName!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3838,7 +3884,7 @@ macro_rules! IsTLHistoryFileName {
                         $crate::__pgrx_c_operand!(@check_safety; $fname);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -3860,7 +3906,7 @@ macro_rules! IsTLHistoryFileName {
                                                             <
                                                                 $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                             >::from_storage(
-                                                                $crate::__pgrx_c_generated::Inline_cfda0375bc925253811acb9bae765d8a(
+                                                                $crate::__pgrx_c_generated::Inline_0f08cb8a3b22316d65a36a06f382a411(
                                                                     <
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::CChar,
@@ -3912,7 +3958,7 @@ macro_rules! IsTLHistoryFileName {
                                                                     <
                                                                         $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                                     >::from_storage(
-                                                                        $crate::__pgrx_c_generated::Inline_cfda0375bc925253811acb9bae765d8a(
+                                                                        $crate::__pgrx_c_generated::Inline_0f08cb8a3b22316d65a36a06f382a411(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                     $crate::__pgrx_c_macros::CChar,
@@ -3974,7 +4020,7 @@ macro_rules! IsTLHistoryFileName {
                                                             <
                                                                 $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                             >::from_storage(
-                                                                $crate::__pgrx_c_generated::Inline_b65855b5c96a350a5f826f484c1c6d1f(
+                                                                $crate::__pgrx_c_generated::Inline_93bed29cd859906edbb4ac62d8516f0c(
                                                                     <
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::CChar,
@@ -4078,7 +4124,7 @@ macro_rules! IsTLHistoryFileName {
                                                 <
                                                     $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_778c1d83de00c46918746528d7c237b0(
+                                                    $crate::__pgrx_c_generated::Inline_e536b28e5b01eb1eea053ae86eee46f5(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::CChar,
@@ -4190,7 +4236,7 @@ macro_rules! IsTLHistoryFileName {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4214,7 +4260,7 @@ macro_rules! IsTLHistoryFileName {
                                                 <
                                                     $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_cfda0375bc925253811acb9bae765d8a(
+                                                    $crate::__pgrx_c_generated::Inline_0f08cb8a3b22316d65a36a06f382a411(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::CChar,
@@ -4266,7 +4312,7 @@ macro_rules! IsTLHistoryFileName {
                                                         <
                                                             $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                         >::from_storage(
-                                                            $crate::__pgrx_c_generated::Inline_cfda0375bc925253811acb9bae765d8a(
+                                                            $crate::__pgrx_c_generated::Inline_0f08cb8a3b22316d65a36a06f382a411(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::CChar,
@@ -4325,7 +4371,7 @@ macro_rules! IsTLHistoryFileName {
                                                 <
                                                     $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_b65855b5c96a350a5f826f484c1c6d1f(
+                                                    $crate::__pgrx_c_generated::Inline_93bed29cd859906edbb4ac62d8516f0c(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::CChar,
@@ -4426,7 +4472,7 @@ macro_rules! IsTLHistoryFileName {
                                     <
                                         $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_778c1d83de00c46918746528d7c237b0(
+                                        $crate::__pgrx_c_generated::Inline_e536b28e5b01eb1eea053ae86eee46f5(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::CChar,
@@ -4568,7 +4614,7 @@ macro_rules! __pgrx_c_args_IsValidWalSegSize {
         $crate::__pgrx_c_args_IsValidWalSegSize!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_IsValidWalSegSize!(
@@ -4576,7 +4622,7 @@ macro_rules! __pgrx_c_args_IsValidWalSegSize {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsValidWalSegSize!(
@@ -4585,7 +4631,7 @@ macro_rules! __pgrx_c_args_IsValidWalSegSize {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_IsValidWalSegSize!(
@@ -4664,7 +4710,7 @@ macro_rules! __pgrx_c_args_IsValidWalSegSize {
         $crate::IsValidWalSegSize!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IsValidWalSegSize from xlog_internal.h:96
@@ -4943,13 +4989,13 @@ macro_rules! IsValidWalSegSize {
         $crate::__pgrx_c_args_IsValidWalSegSize!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $size:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IsValidWalSegSize!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $size:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IsValidWalSegSize!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4963,7 +5009,7 @@ macro_rules! IsValidWalSegSize {
                         $crate::__pgrx_c_operand!(@check_safety; $size);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -5221,7 +5267,7 @@ macro_rules! IsValidWalSegSize {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5554,6 +5600,11 @@ macro_rules! __pgrx_c_args_IsXLogFileName {
             @argument [__pgrx_c_args_IsXLogFileName] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IsXLogFileName] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IsXLogFileName!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5591,6 +5642,11 @@ macro_rules! __pgrx_c_args_IsXLogFileName {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IsXLogFileName] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsXLogFileName!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5607,7 +5663,7 @@ macro_rules! __pgrx_c_args_IsXLogFileName {
         $crate::IsXLogFileName!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IsXLogFileName from xlog_internal.h:173
@@ -5652,7 +5708,7 @@ macro_rules! IsXLogFileName {
                                     <
                                         $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_cfda0375bc925253811acb9bae765d8a(
+                                        $crate::__pgrx_c_generated::Inline_0f08cb8a3b22316d65a36a06f382a411(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::CChar,
@@ -5694,7 +5750,7 @@ macro_rules! IsXLogFileName {
                                     <
                                         $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_b65855b5c96a350a5f826f484c1c6d1f(
+                                        $crate::__pgrx_c_generated::Inline_93bed29cd859906edbb4ac62d8516f0c(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::CChar,
@@ -5788,13 +5844,13 @@ macro_rules! IsXLogFileName {
         $crate::__pgrx_c_args_IsXLogFileName!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $fname:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IsXLogFileName!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $fname:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IsXLogFileName!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5807,7 +5863,7 @@ macro_rules! IsXLogFileName {
                         $crate::__pgrx_c_operand!(@check_safety; $fname);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -5821,7 +5877,7 @@ macro_rules! IsXLogFileName {
                                                 <
                                                     $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_cfda0375bc925253811acb9bae765d8a(
+                                                    $crate::__pgrx_c_generated::Inline_0f08cb8a3b22316d65a36a06f382a411(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::CChar,
@@ -5871,7 +5927,7 @@ macro_rules! IsXLogFileName {
                                                 <
                                                     $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_b65855b5c96a350a5f826f484c1c6d1f(
+                                                    $crate::__pgrx_c_generated::Inline_93bed29cd859906edbb4ac62d8516f0c(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::CChar,
@@ -5970,7 +6026,7 @@ macro_rules! IsXLogFileName {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5988,7 +6044,7 @@ macro_rules! IsXLogFileName {
                                     <
                                         $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_cfda0375bc925253811acb9bae765d8a(
+                                        $crate::__pgrx_c_generated::Inline_0f08cb8a3b22316d65a36a06f382a411(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::CChar,
@@ -6030,7 +6086,7 @@ macro_rules! IsXLogFileName {
                                     <
                                         $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_b65855b5c96a350a5f826f484c1c6d1f(
+                                        $crate::__pgrx_c_generated::Inline_93bed29cd859906edbb4ac62d8516f0c(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::CChar,
@@ -6205,6 +6261,11 @@ macro_rules! __pgrx_c_args_RmgrIdExists {
             @argument [__pgrx_c_args_RmgrIdExists] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RmgrIdExists] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RmgrIdExists!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6240,6 +6301,11 @@ macro_rules! __pgrx_c_args_RmgrIdExists {
             @argument [__pgrx_c_args_RmgrIdExists] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RmgrIdExists] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RmgrIdExists!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6256,7 +6322,7 @@ macro_rules! __pgrx_c_args_RmgrIdExists {
         $crate::RmgrIdExists!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function RmgrIdExists from xlog_internal.h:330
@@ -6320,13 +6386,13 @@ macro_rules! RmgrIdExists {
         $crate::__pgrx_c_args_RmgrIdExists!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rmid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RmgrIdExists!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rmid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RmgrIdExists!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6339,7 +6405,7 @@ macro_rules! RmgrIdExists {
                         $crate::__pgrx_c_operand!(@check_safety; $rmid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -6365,7 +6431,7 @@ macro_rules! RmgrIdExists {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6472,6 +6538,13 @@ macro_rules! __pgrx_c_args_XLByteInPrevSeg {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLByteInPrevSeg] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLByteInPrevSeg!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6523,6 +6596,13 @@ macro_rules! __pgrx_c_args_XLByteInPrevSeg {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_XLByteInPrevSeg] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLByteInPrevSeg] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -6587,6 +6667,11 @@ macro_rules! __pgrx_c_args_XLByteInPrevSeg {
             @argument [__pgrx_c_args_XLByteInPrevSeg] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLByteInPrevSeg] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XLByteInPrevSeg!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6624,6 +6709,13 @@ macro_rules! __pgrx_c_args_XLByteInPrevSeg {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLByteInPrevSeg] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLByteInPrevSeg!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6640,7 +6732,7 @@ macro_rules! __pgrx_c_args_XLByteInPrevSeg {
         $crate::XLByteInPrevSeg!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XLByteInPrevSeg from xlog_internal.h:139
@@ -6728,13 +6820,13 @@ macro_rules! XLByteInPrevSeg {
         $crate::__pgrx_c_args_XLByteInPrevSeg!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $xlrp:tt, $logSegNo:tt, $wal_segsz_bytes:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLByteInPrevSeg!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $xlrp:tt, $logSegNo:tt, $wal_segsz_bytes:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLByteInPrevSeg!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6749,7 +6841,7 @@ macro_rules! XLByteInPrevSeg {
                         $crate::__pgrx_c_operand!(@check_safety; $wal_segsz_bytes);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -6812,7 +6904,7 @@ macro_rules! XLByteInPrevSeg {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6943,6 +7035,11 @@ macro_rules! __pgrx_c_args_XLByteInSeg {
             @argument [__pgrx_c_args_XLByteInSeg] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLByteInSeg] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLByteInSeg!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6993,6 +7090,11 @@ macro_rules! __pgrx_c_args_XLByteInSeg {
     (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_XLByteInSeg] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLByteInSeg] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -7056,6 +7158,11 @@ macro_rules! __pgrx_c_args_XLByteInSeg {
             @argument [__pgrx_c_args_XLByteInSeg] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLByteInSeg] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XLByteInSeg!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7091,6 +7198,11 @@ macro_rules! __pgrx_c_args_XLByteInSeg {
             @argument [__pgrx_c_args_XLByteInSeg] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLByteInSeg] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLByteInSeg!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7107,7 +7219,7 @@ macro_rules! __pgrx_c_args_XLByteInSeg {
         $crate::XLByteInSeg!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XLByteInSeg from xlog_internal.h:136
@@ -7176,13 +7288,13 @@ macro_rules! XLByteInSeg {
         $crate::__pgrx_c_args_XLByteInSeg!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $xlrp:tt, $logSegNo:tt, $wal_segsz_bytes:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLByteInSeg!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $xlrp:tt, $logSegNo:tt, $wal_segsz_bytes:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLByteInSeg!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7197,7 +7309,7 @@ macro_rules! XLByteInSeg {
                         $crate::__pgrx_c_operand!(@check_safety; $wal_segsz_bytes);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -7234,7 +7346,7 @@ macro_rules! XLByteInSeg {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7348,6 +7460,13 @@ macro_rules! __pgrx_c_args_XLByteToPrevSeg {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLByteToPrevSeg] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLByteToPrevSeg!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7361,7 +7480,7 @@ macro_rules! __pgrx_c_args_XLByteToPrevSeg {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLByteToPrevSeg!(
@@ -7370,7 +7489,7 @@ macro_rules! __pgrx_c_args_XLByteToPrevSeg {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLByteToPrevSeg!(
@@ -7460,6 +7579,11 @@ macro_rules! __pgrx_c_args_XLByteToPrevSeg {
             @argument [__pgrx_c_args_XLByteToPrevSeg] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLByteToPrevSeg] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XLByteToPrevSeg!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7497,6 +7621,13 @@ macro_rules! __pgrx_c_args_XLByteToPrevSeg {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLByteToPrevSeg] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLByteToPrevSeg!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7513,7 +7644,7 @@ macro_rules! __pgrx_c_args_XLByteToPrevSeg {
         $crate::XLByteToPrevSeg!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XLByteToPrevSeg from xlog_internal.h:120
@@ -7543,7 +7674,7 @@ macro_rules! XLByteToPrevSeg {
             }
         }
     };
-    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+    (@__pgrx_c_check_safety; @__pgrx_c_expression; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLByteToPrevSeg!(@collect __pgrx_emit_check_safety []; $($raw)*)
     };
     (@__pgrx_emit_public; $xlrp:tt, $logSegNo:tt, $wal_segsz_bytes:tt $(,)?) => {
@@ -7592,13 +7723,13 @@ macro_rules! XLByteToPrevSeg {
         $crate::__pgrx_c_args_XLByteToPrevSeg!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $xlrp:tt, $logSegNo:tt, $wal_segsz_bytes:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; @__pgrx_c_expression; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLByteToPrevSeg!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $xlrp:tt, $logSegNo:tt, $wal_segsz_bytes:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; @__pgrx_c_expression; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLByteToPrevSeg!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7613,7 +7744,7 @@ macro_rules! XLByteToPrevSeg {
                         $crate::__pgrx_c_operand!(@check_safety; $wal_segsz_bytes);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -7670,7 +7801,7 @@ macro_rules! XLByteToPrevSeg {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7726,7 +7857,7 @@ macro_rules! XLByteToPrevSeg {
         $crate::__pgrx_c_args_XLByteToPrevSeg!(@collect __pgrx_emit_public []; $($raw)*)
     };
     ($($raw:tt)*) => {
-        compile_error!(
+        ::core::compile_error!(
             "this C replacement requires an explicit parenthesized invocation: use @__pgrx_c_expression; before its arguments"
         )
     };
@@ -7800,6 +7931,11 @@ macro_rules! __pgrx_c_args_XLByteToSeg {
             @argument [__pgrx_c_args_XLByteToSeg] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLByteToSeg] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLByteToSeg!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7813,7 +7949,7 @@ macro_rules! __pgrx_c_args_XLByteToSeg {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLByteToSeg!(
@@ -7822,7 +7958,7 @@ macro_rules! __pgrx_c_args_XLByteToSeg {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLByteToSeg!(
@@ -7910,6 +8046,11 @@ macro_rules! __pgrx_c_args_XLByteToSeg {
             @argument [__pgrx_c_args_XLByteToSeg] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLByteToSeg] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XLByteToSeg!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7945,6 +8086,11 @@ macro_rules! __pgrx_c_args_XLByteToSeg {
             @argument [__pgrx_c_args_XLByteToSeg] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLByteToSeg] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLByteToSeg!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7961,7 +8107,7 @@ macro_rules! __pgrx_c_args_XLByteToSeg {
         $crate::XLByteToSeg!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XLByteToSeg from xlog_internal.h:117
@@ -7991,7 +8137,7 @@ macro_rules! XLByteToSeg {
             }
         }
     };
-    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+    (@__pgrx_c_check_safety; @__pgrx_c_expression; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLByteToSeg!(@collect __pgrx_emit_check_safety []; $($raw)*)
     };
     (@__pgrx_emit_public; $xlrp:tt, $logSegNo:tt, $wal_segsz_bytes:tt $(,)?) => {
@@ -8024,13 +8170,13 @@ macro_rules! XLByteToSeg {
         $crate::__pgrx_c_args_XLByteToSeg!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $xlrp:tt, $logSegNo:tt, $wal_segsz_bytes:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; @__pgrx_c_expression; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLByteToSeg!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $xlrp:tt, $logSegNo:tt, $wal_segsz_bytes:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; @__pgrx_c_expression; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLByteToSeg!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8045,7 +8191,7 @@ macro_rules! XLByteToSeg {
                         $crate::__pgrx_c_operand!(@check_safety; $wal_segsz_bytes);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -8076,7 +8222,7 @@ macro_rules! XLByteToSeg {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8113,7 +8259,7 @@ macro_rules! XLByteToSeg {
         $crate::__pgrx_c_args_XLByteToSeg!(@collect __pgrx_emit_public []; $($raw)*)
     };
     ($($raw:tt)*) => {
-        compile_error!(
+        ::core::compile_error!(
             "this C replacement requires an explicit parenthesized invocation: use @__pgrx_c_expression; before its arguments"
         )
     };
@@ -8189,6 +8335,13 @@ macro_rules! __pgrx_c_args_XLogMBVarToSegs {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogMBVarToSegs] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogMBVarToSegs!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8250,6 +8403,11 @@ macro_rules! __pgrx_c_args_XLogMBVarToSegs {
             @argument [__pgrx_c_args_XLogMBVarToSegs] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogMBVarToSegs] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XLogMBVarToSegs!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8287,6 +8445,13 @@ macro_rules! __pgrx_c_args_XLogMBVarToSegs {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogMBVarToSegs] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogMBVarToSegs!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8303,7 +8468,7 @@ macro_rules! __pgrx_c_args_XLogMBVarToSegs {
         $crate::XLogMBVarToSegs!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XLogMBVarToSegs from xlog_internal.h:127
@@ -8392,13 +8557,13 @@ macro_rules! XLogMBVarToSegs {
         $crate::__pgrx_c_args_XLogMBVarToSegs!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $mbvar:tt, $wal_segsz_bytes:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLogMBVarToSegs!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $mbvar:tt, $wal_segsz_bytes:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLogMBVarToSegs!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8412,7 +8577,7 @@ macro_rules! XLogMBVarToSegs {
                         $crate::__pgrx_c_operand!(@check_safety; $wal_segsz_bytes);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::div(
@@ -8472,7 +8637,7 @@ macro_rules! XLogMBVarToSegs {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8614,6 +8779,11 @@ macro_rules! __pgrx_c_args_XLogPageHeaderSize {
             @argument [__pgrx_c_args_XLogPageHeaderSize] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogPageHeaderSize] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XLogPageHeaderSize!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8651,6 +8821,13 @@ macro_rules! __pgrx_c_args_XLogPageHeaderSize {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogPageHeaderSize] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogPageHeaderSize!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8667,7 +8844,7 @@ macro_rules! __pgrx_c_args_XLogPageHeaderSize {
         $crate::XLogPageHeaderSize!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XLogPageHeaderSize from xlog_internal.h:84
@@ -9014,13 +9191,13 @@ macro_rules! XLogPageHeaderSize {
         $crate::__pgrx_c_args_XLogPageHeaderSize!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $hdr:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLogPageHeaderSize!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $hdr:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLogPageHeaderSize!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -9034,7 +9211,7 @@ macro_rules! XLogPageHeaderSize {
                         $crate::__pgrx_c_operand!(@check_safety; $hdr);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -9360,7 +9537,7 @@ macro_rules! XLogPageHeaderSize {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9757,6 +9934,13 @@ macro_rules! __pgrx_c_args_XLogSegNoOffsetToRecPtr {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogSegNoOffsetToRecPtr] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogSegNoOffsetToRecPtr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9811,6 +9995,13 @@ macro_rules! __pgrx_c_args_XLogSegNoOffsetToRecPtr {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogSegNoOffsetToRecPtr] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogSegNoOffsetToRecPtr!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9862,6 +10053,13 @@ macro_rules! __pgrx_c_args_XLogSegNoOffsetToRecPtr {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_XLogSegNoOffsetToRecPtr] [p3 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogSegNoOffsetToRecPtr] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -9928,6 +10126,11 @@ macro_rules! __pgrx_c_args_XLogSegNoOffsetToRecPtr {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogSegNoOffsetToRecPtr] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XLogSegNoOffsetToRecPtr!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9965,6 +10168,13 @@ macro_rules! __pgrx_c_args_XLogSegNoOffsetToRecPtr {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogSegNoOffsetToRecPtr] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogSegNoOffsetToRecPtr!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9981,7 +10191,7 @@ macro_rules! __pgrx_c_args_XLogSegNoOffsetToRecPtr {
         $crate::XLogSegNoOffsetToRecPtr!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XLogSegNoOffsetToRecPtr from xlog_internal.h:103
@@ -10012,7 +10222,7 @@ macro_rules! XLogSegNoOffsetToRecPtr {
             }
         }
     };
-    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+    (@__pgrx_c_check_safety; @__pgrx_c_expression; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLogSegNoOffsetToRecPtr!(
             @collect __pgrx_emit_check_safety [];
             $($raw)*
@@ -10071,13 +10281,13 @@ macro_rules! XLogSegNoOffsetToRecPtr {
         $crate::__pgrx_c_args_XLogSegNoOffsetToRecPtr!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $segno:tt, $offset:tt, $wal_segsz_bytes:tt, $dest:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; @__pgrx_c_expression; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLogSegNoOffsetToRecPtr!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $segno:tt, $offset:tt, $wal_segsz_bytes:tt, $dest:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; @__pgrx_c_expression; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLogSegNoOffsetToRecPtr!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -10093,7 +10303,7 @@ macro_rules! XLogSegNoOffsetToRecPtr {
                         $crate::__pgrx_c_operand!(@check_safety; $dest);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -10150,7 +10360,7 @@ macro_rules! XLogSegNoOffsetToRecPtr {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10211,7 +10421,7 @@ macro_rules! XLogSegNoOffsetToRecPtr {
         $crate::__pgrx_c_args_XLogSegNoOffsetToRecPtr!(@collect __pgrx_emit_public []; $($raw)*)
     };
     ($($raw:tt)*) => {
-        compile_error!(
+        ::core::compile_error!(
             "this C replacement requires an explicit parenthesized invocation: use @__pgrx_c_expression; before its arguments"
         )
     };
@@ -10287,6 +10497,13 @@ macro_rules! __pgrx_c_args_XLogSegmentOffset {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogSegmentOffset] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogSegmentOffset!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10348,6 +10565,11 @@ macro_rules! __pgrx_c_args_XLogSegmentOffset {
             @argument [__pgrx_c_args_XLogSegmentOffset] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogSegmentOffset] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XLogSegmentOffset!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10385,6 +10607,13 @@ macro_rules! __pgrx_c_args_XLogSegmentOffset {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogSegmentOffset] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogSegmentOffset!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10401,7 +10630,7 @@ macro_rules! __pgrx_c_args_XLogSegmentOffset {
         $crate::XLogSegmentOffset!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XLogSegmentOffset from xlog_internal.h:106
@@ -10473,13 +10702,13 @@ macro_rules! XLogSegmentOffset {
         $crate::__pgrx_c_args_XLogSegmentOffset!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $xlogptr:tt, $wal_segsz_bytes:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLogSegmentOffset!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $xlogptr:tt, $wal_segsz_bytes:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLogSegmentOffset!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -10493,7 +10722,7 @@ macro_rules! XLogSegmentOffset {
                         $crate::__pgrx_c_operand!(@check_safety; $wal_segsz_bytes);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -10536,7 +10765,7 @@ macro_rules! XLogSegmentOffset {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10664,6 +10893,11 @@ macro_rules! __pgrx_c_args_XLogSegmentsPerXLogId {
             @argument [__pgrx_c_args_XLogSegmentsPerXLogId] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogSegmentsPerXLogId] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XLogSegmentsPerXLogId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10701,6 +10935,13 @@ macro_rules! __pgrx_c_args_XLogSegmentsPerXLogId {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XLogSegmentsPerXLogId] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XLogSegmentsPerXLogId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10717,7 +10958,7 @@ macro_rules! __pgrx_c_args_XLogSegmentsPerXLogId {
         $crate::XLogSegmentsPerXLogId!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XLogSegmentsPerXLogId from xlog_internal.h:100
@@ -10776,13 +11017,13 @@ macro_rules! XLogSegmentsPerXLogId {
         $crate::__pgrx_c_args_XLogSegmentsPerXLogId!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $wal_segsz_bytes:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLogSegmentsPerXLogId!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $wal_segsz_bytes:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XLogSegmentsPerXLogId!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -10796,7 +11037,7 @@ macro_rules! XLogSegmentsPerXLogId {
                         $crate::__pgrx_c_operand!(@check_safety; $wal_segsz_bytes);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::div(
@@ -10817,7 +11058,7 @@ macro_rules! XLogSegmentsPerXLogId {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10930,6 +11171,11 @@ macro_rules! __pgrx_c_args_XRecOffIsValid {
             @argument [__pgrx_c_args_XRecOffIsValid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XRecOffIsValid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XRecOffIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10967,6 +11213,11 @@ macro_rules! __pgrx_c_args_XRecOffIsValid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_XRecOffIsValid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XRecOffIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10983,7 +11234,7 @@ macro_rules! __pgrx_c_args_XRecOffIsValid {
         $crate::XRecOffIsValid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XRecOffIsValid from xlog_internal.h:143
@@ -11167,13 +11418,13 @@ macro_rules! XRecOffIsValid {
         $crate::__pgrx_c_args_XRecOffIsValid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $xlrp:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XRecOffIsValid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $xlrp:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XRecOffIsValid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -11187,7 +11438,7 @@ macro_rules! XRecOffIsValid {
                         $crate::__pgrx_c_operand!(@check_safety; $xlrp);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ge(
@@ -11343,7 +11594,7 @@ macro_rules! XRecOffIsValid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

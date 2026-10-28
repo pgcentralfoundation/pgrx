@@ -74,6 +74,13 @@ macro_rules! __pgrx_c_args_fitness_compare {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fitness_compare] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_fitness_compare!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -135,6 +142,11 @@ macro_rules! __pgrx_c_args_fitness_compare {
             @argument [__pgrx_c_args_fitness_compare] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fitness_compare] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_fitness_compare!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -172,6 +184,13 @@ macro_rules! __pgrx_c_args_fitness_compare {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fitness_compare] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_fitness_compare!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -188,7 +207,7 @@ macro_rules! __pgrx_c_args_fitness_compare {
         $crate::fitness_compare!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function fitness_compare from geqo_gene.h:62
@@ -236,7 +255,7 @@ macro_rules! fitness_compare {
     (@__pgrx_emit_value; $fitness1:tt, $fitness2:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_cda3214959a31b72e5c54de9ed847c1a(
+                $crate::__pgrx_c_generated::Inline_2b1c978bb74548d5efd9ee2ce81d0eea(
                     <
                         $crate::__pgrx_c_macros::expression::CRawRecord<
                             $crate::__pgrx_c_bindings::Fitness
@@ -277,13 +296,13 @@ macro_rules! fitness_compare {
         $crate::__pgrx_c_args_fitness_compare!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $fitness1:tt, $fitness2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_fitness_compare!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $fitness1:tt, $fitness2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_fitness_compare!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -297,13 +316,13 @@ macro_rules! fitness_compare {
                         $crate::__pgrx_c_operand!(@check_safety; $fitness2);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_cda3214959a31b72e5c54de9ed847c1a(
+                                $crate::__pgrx_c_generated::Inline_2b1c978bb74548d5efd9ee2ce81d0eea(
                                     <
                                         $crate::__pgrx_c_macros::expression::CRawRecord<
                                             $crate::__pgrx_c_bindings::Fitness
@@ -344,7 +363,7 @@ macro_rules! fitness_compare {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -355,7 +374,7 @@ macro_rules! fitness_compare {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::__pgrx_c_generated::Inline_cda3214959a31b72e5c54de9ed847c1a(
+                    $crate::__pgrx_c_generated::Inline_2b1c978bb74548d5efd9ee2ce81d0eea(
                         <
                             $crate::__pgrx_c_macros::expression::CRawRecord<
                                 $crate::__pgrx_c_bindings::Fitness
@@ -478,6 +497,11 @@ macro_rules! __pgrx_c_args_fitness_is_valid {
             @argument [__pgrx_c_args_fitness_is_valid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fitness_is_valid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_fitness_is_valid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -515,6 +539,13 @@ macro_rules! __pgrx_c_args_fitness_is_valid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fitness_is_valid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_fitness_is_valid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -531,7 +562,7 @@ macro_rules! __pgrx_c_args_fitness_is_valid {
         $crate::fitness_is_valid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function fitness_is_valid from geqo_gene.h:53
@@ -574,7 +605,7 @@ macro_rules! fitness_is_valid {
     (@__pgrx_emit_value; $fitness:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_29711a90b591869eea8e25ed0db392ee(
+                $crate::__pgrx_c_generated::Inline_667b564e269d4b8e3c3dddc904d64979(
                     <
                         $crate::__pgrx_c_macros::expression::CRawRecord<
                             $crate::__pgrx_c_bindings::Fitness
@@ -599,13 +630,13 @@ macro_rules! fitness_is_valid {
         $crate::__pgrx_c_args_fitness_is_valid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $fitness:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_fitness_is_valid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $fitness:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_fitness_is_valid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -618,13 +649,13 @@ macro_rules! fitness_is_valid {
                         $crate::__pgrx_c_operand!(@check_safety; $fitness);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_29711a90b591869eea8e25ed0db392ee(
+                                $crate::__pgrx_c_generated::Inline_667b564e269d4b8e3c3dddc904d64979(
                                     <
                                         $crate::__pgrx_c_macros::expression::CRawRecord<
                                             $crate::__pgrx_c_bindings::Fitness
@@ -648,7 +679,7 @@ macro_rules! fitness_is_valid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -659,7 +690,7 @@ macro_rules! fitness_is_valid {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::__pgrx_c_generated::Inline_29711a90b591869eea8e25ed0db392ee(
+                    $crate::__pgrx_c_generated::Inline_667b564e269d4b8e3c3dddc904d64979(
                         <
                             $crate::__pgrx_c_macros::expression::CRawRecord<
                                 $crate::__pgrx_c_bindings::Fitness

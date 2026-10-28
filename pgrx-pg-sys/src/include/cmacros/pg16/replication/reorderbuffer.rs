@@ -36,7 +36,7 @@ macro_rules! __pgrx_c_args_ReorderBufferTupleBufData {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_ReorderBufferTupleBufData!(
@@ -44,7 +44,7 @@ macro_rules! __pgrx_c_args_ReorderBufferTupleBufData {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ReorderBufferTupleBufData!(
@@ -53,7 +53,7 @@ macro_rules! __pgrx_c_args_ReorderBufferTupleBufData {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_ReorderBufferTupleBufData!(
@@ -134,7 +134,7 @@ macro_rules! __pgrx_c_args_ReorderBufferTupleBufData {
         $crate::ReorderBufferTupleBufData!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ReorderBufferTupleBufData from reorderbuffer.h:47
@@ -353,13 +353,13 @@ macro_rules! ReorderBufferTupleBufData {
         $crate::__pgrx_c_args_ReorderBufferTupleBufData!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $p:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ReorderBufferTupleBufData!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $p:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ReorderBufferTupleBufData!(
@@ -376,7 +376,7 @@ macro_rules! ReorderBufferTupleBufData {
                         $crate::__pgrx_c_operand!(@check_safety; $p);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -560,7 +560,7 @@ macro_rules! ReorderBufferTupleBufData {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -838,6 +838,13 @@ macro_rules! __pgrx_c_args_rbtxn_distr_inval_overflowed {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_distr_inval_overflowed] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_rbtxn_distr_inval_overflowed!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -875,6 +882,13 @@ macro_rules! __pgrx_c_args_rbtxn_distr_inval_overflowed {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_distr_inval_overflowed] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_distr_inval_overflowed!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -891,7 +905,7 @@ macro_rules! __pgrx_c_args_rbtxn_distr_inval_overflowed {
         $crate::rbtxn_distr_inval_overflowed!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro rbtxn_distr_inval_overflowed from reorderbuffer.h:254
@@ -977,13 +991,13 @@ macro_rules! rbtxn_distr_inval_overflowed {
         $crate::__pgrx_c_args_rbtxn_distr_inval_overflowed!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_distr_inval_overflowed!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_distr_inval_overflowed!(
@@ -999,7 +1013,7 @@ macro_rules! rbtxn_distr_inval_overflowed {
                         $crate::__pgrx_c_operand!(@check_safety; $txn);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -1057,7 +1071,7 @@ macro_rules! rbtxn_distr_inval_overflowed {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1204,6 +1218,11 @@ macro_rules! __pgrx_c_args_rbtxn_get_toptxn {
             @argument [__pgrx_c_args_rbtxn_get_toptxn] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_get_toptxn] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_rbtxn_get_toptxn!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1241,6 +1260,13 @@ macro_rules! __pgrx_c_args_rbtxn_get_toptxn {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_get_toptxn] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_get_toptxn!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1257,7 +1283,7 @@ macro_rules! __pgrx_c_args_rbtxn_get_toptxn {
         $crate::rbtxn_get_toptxn!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro rbtxn_get_toptxn from reorderbuffer.h:272
@@ -1391,13 +1417,13 @@ macro_rules! rbtxn_get_toptxn {
         $crate::__pgrx_c_args_rbtxn_get_toptxn!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_get_toptxn!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_get_toptxn!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1411,7 +1437,7 @@ macro_rules! rbtxn_get_toptxn {
                         $crate::__pgrx_c_operand!(@check_safety; $txn);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -1522,7 +1548,7 @@ macro_rules! rbtxn_get_toptxn {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1715,6 +1741,13 @@ macro_rules! __pgrx_c_args_rbtxn_has_catalog_changes {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_has_catalog_changes] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_rbtxn_has_catalog_changes!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1752,6 +1785,13 @@ macro_rules! __pgrx_c_args_rbtxn_has_catalog_changes {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_has_catalog_changes] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_has_catalog_changes!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1768,7 +1808,7 @@ macro_rules! __pgrx_c_args_rbtxn_has_catalog_changes {
         $crate::rbtxn_has_catalog_changes!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro rbtxn_has_catalog_changes from reorderbuffer.h:192
@@ -1854,13 +1894,13 @@ macro_rules! rbtxn_has_catalog_changes {
         $crate::__pgrx_c_args_rbtxn_has_catalog_changes!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_has_catalog_changes!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_has_catalog_changes!(
@@ -1876,7 +1916,7 @@ macro_rules! rbtxn_has_catalog_changes {
                         $crate::__pgrx_c_operand!(@check_safety; $txn);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -1934,7 +1974,7 @@ macro_rules! rbtxn_has_catalog_changes {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2080,6 +2120,13 @@ macro_rules! __pgrx_c_args_rbtxn_has_partial_change {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_has_partial_change] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_rbtxn_has_partial_change!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2117,6 +2164,13 @@ macro_rules! __pgrx_c_args_rbtxn_has_partial_change {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_has_partial_change] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_has_partial_change!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2133,7 +2187,7 @@ macro_rules! __pgrx_c_args_rbtxn_has_partial_change {
         $crate::rbtxn_has_partial_change!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro rbtxn_has_partial_change from reorderbuffer.h:216
@@ -2219,13 +2273,13 @@ macro_rules! rbtxn_has_partial_change {
         $crate::__pgrx_c_args_rbtxn_has_partial_change!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_has_partial_change!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_has_partial_change!(
@@ -2241,7 +2295,7 @@ macro_rules! rbtxn_has_partial_change {
                         $crate::__pgrx_c_operand!(@check_safety; $txn);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -2299,7 +2353,7 @@ macro_rules! rbtxn_has_partial_change {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2445,6 +2499,13 @@ macro_rules! __pgrx_c_args_rbtxn_has_streamable_change {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_has_streamable_change] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_rbtxn_has_streamable_change!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2482,6 +2543,13 @@ macro_rules! __pgrx_c_args_rbtxn_has_streamable_change {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_has_streamable_change] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_has_streamable_change!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2498,7 +2566,7 @@ macro_rules! __pgrx_c_args_rbtxn_has_streamable_change {
         $crate::rbtxn_has_streamable_change!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro rbtxn_has_streamable_change from reorderbuffer.h:222
@@ -2584,13 +2652,13 @@ macro_rules! rbtxn_has_streamable_change {
         $crate::__pgrx_c_args_rbtxn_has_streamable_change!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_has_streamable_change!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_has_streamable_change!(
@@ -2606,7 +2674,7 @@ macro_rules! rbtxn_has_streamable_change {
                         $crate::__pgrx_c_operand!(@check_safety; $txn);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -2664,7 +2732,7 @@ macro_rules! rbtxn_has_streamable_change {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2813,6 +2881,11 @@ macro_rules! __pgrx_c_args_rbtxn_is_known_subxact {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_is_known_subxact] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_rbtxn_is_known_subxact!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2850,6 +2923,13 @@ macro_rules! __pgrx_c_args_rbtxn_is_known_subxact {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_is_known_subxact] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_known_subxact!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2866,7 +2946,7 @@ macro_rules! __pgrx_c_args_rbtxn_is_known_subxact {
         $crate::rbtxn_is_known_subxact!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro rbtxn_is_known_subxact from reorderbuffer.h:198
@@ -2952,13 +3032,13 @@ macro_rules! rbtxn_is_known_subxact {
         $crate::__pgrx_c_args_rbtxn_is_known_subxact!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_known_subxact!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_known_subxact!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2971,7 +3051,7 @@ macro_rules! rbtxn_is_known_subxact {
                         $crate::__pgrx_c_operand!(@check_safety; $txn);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -3029,7 +3109,7 @@ macro_rules! rbtxn_is_known_subxact {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3170,6 +3250,11 @@ macro_rules! __pgrx_c_args_rbtxn_is_serialized {
             @argument [__pgrx_c_args_rbtxn_is_serialized] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_is_serialized] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_rbtxn_is_serialized!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3207,6 +3292,13 @@ macro_rules! __pgrx_c_args_rbtxn_is_serialized {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_is_serialized] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_serialized!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3223,7 +3315,7 @@ macro_rules! __pgrx_c_args_rbtxn_is_serialized {
         $crate::rbtxn_is_serialized!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro rbtxn_is_serialized from reorderbuffer.h:204
@@ -3306,13 +3398,13 @@ macro_rules! rbtxn_is_serialized {
         $crate::__pgrx_c_args_rbtxn_is_serialized!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_serialized!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_serialized!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3325,7 +3417,7 @@ macro_rules! rbtxn_is_serialized {
                         $crate::__pgrx_c_operand!(@check_safety; $txn);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -3383,7 +3475,7 @@ macro_rules! rbtxn_is_serialized {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3529,6 +3621,13 @@ macro_rules! __pgrx_c_args_rbtxn_is_serialized_clear {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_is_serialized_clear] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_rbtxn_is_serialized_clear!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3566,6 +3665,13 @@ macro_rules! __pgrx_c_args_rbtxn_is_serialized_clear {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_is_serialized_clear] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_serialized_clear!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3582,7 +3688,7 @@ macro_rules! __pgrx_c_args_rbtxn_is_serialized_clear {
         $crate::rbtxn_is_serialized_clear!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro rbtxn_is_serialized_clear from reorderbuffer.h:210
@@ -3668,13 +3774,13 @@ macro_rules! rbtxn_is_serialized_clear {
         $crate::__pgrx_c_args_rbtxn_is_serialized_clear!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_serialized_clear!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_serialized_clear!(
@@ -3690,7 +3796,7 @@ macro_rules! rbtxn_is_serialized_clear {
                         $crate::__pgrx_c_operand!(@check_safety; $txn);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -3748,7 +3854,7 @@ macro_rules! rbtxn_is_serialized_clear {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3889,6 +3995,11 @@ macro_rules! __pgrx_c_args_rbtxn_is_streamed {
             @argument [__pgrx_c_args_rbtxn_is_streamed] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_is_streamed] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_rbtxn_is_streamed!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3926,6 +4037,13 @@ macro_rules! __pgrx_c_args_rbtxn_is_streamed {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_is_streamed] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_streamed!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3942,7 +4060,7 @@ macro_rules! __pgrx_c_args_rbtxn_is_streamed {
         $crate::rbtxn_is_streamed!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro rbtxn_is_streamed from reorderbuffer.h:236
@@ -4025,13 +4143,13 @@ macro_rules! rbtxn_is_streamed {
         $crate::__pgrx_c_args_rbtxn_is_streamed!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_streamed!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_streamed!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4044,7 +4162,7 @@ macro_rules! rbtxn_is_streamed {
                         $crate::__pgrx_c_operand!(@check_safety; $txn);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -4102,7 +4220,7 @@ macro_rules! rbtxn_is_streamed {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4243,6 +4361,11 @@ macro_rules! __pgrx_c_args_rbtxn_is_subtxn {
             @argument [__pgrx_c_args_rbtxn_is_subtxn] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_is_subtxn] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_rbtxn_is_subtxn!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4280,6 +4403,13 @@ macro_rules! __pgrx_c_args_rbtxn_is_subtxn {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_is_subtxn] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_subtxn!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4296,7 +4426,7 @@ macro_rules! __pgrx_c_args_rbtxn_is_subtxn {
         $crate::rbtxn_is_subtxn!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro rbtxn_is_subtxn from reorderbuffer.h:266
@@ -4382,13 +4512,13 @@ macro_rules! rbtxn_is_subtxn {
         $crate::__pgrx_c_args_rbtxn_is_subtxn!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_subtxn!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_subtxn!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4402,7 +4532,7 @@ macro_rules! rbtxn_is_subtxn {
                         $crate::__pgrx_c_operand!(@check_safety; $txn);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -4458,7 +4588,7 @@ macro_rules! rbtxn_is_subtxn {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4598,6 +4728,11 @@ macro_rules! __pgrx_c_args_rbtxn_is_toptxn {
             @argument [__pgrx_c_args_rbtxn_is_toptxn] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_is_toptxn] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_rbtxn_is_toptxn!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4635,6 +4770,13 @@ macro_rules! __pgrx_c_args_rbtxn_is_toptxn {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_is_toptxn] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_toptxn!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4651,7 +4793,7 @@ macro_rules! __pgrx_c_args_rbtxn_is_toptxn {
         $crate::rbtxn_is_toptxn!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro rbtxn_is_toptxn from reorderbuffer.h:260
@@ -4737,13 +4879,13 @@ macro_rules! rbtxn_is_toptxn {
         $crate::__pgrx_c_args_rbtxn_is_toptxn!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_toptxn!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_toptxn!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4757,7 +4899,7 @@ macro_rules! rbtxn_is_toptxn {
                         $crate::__pgrx_c_operand!(@check_safety; $txn);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -4813,7 +4955,7 @@ macro_rules! rbtxn_is_toptxn {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4953,6 +5095,11 @@ macro_rules! __pgrx_c_args_rbtxn_prepared {
             @argument [__pgrx_c_args_rbtxn_prepared] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_prepared] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_rbtxn_prepared!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4990,6 +5137,11 @@ macro_rules! __pgrx_c_args_rbtxn_prepared {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_prepared] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_prepared!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5006,7 +5158,7 @@ macro_rules! __pgrx_c_args_rbtxn_prepared {
         $crate::rbtxn_prepared!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro rbtxn_prepared from reorderbuffer.h:242
@@ -5089,13 +5241,13 @@ macro_rules! rbtxn_prepared {
         $crate::__pgrx_c_args_rbtxn_prepared!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_prepared!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_prepared!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5108,7 +5260,7 @@ macro_rules! rbtxn_prepared {
                         $crate::__pgrx_c_operand!(@check_safety; $txn);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -5166,7 +5318,7 @@ macro_rules! rbtxn_prepared {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5307,6 +5459,11 @@ macro_rules! __pgrx_c_args_rbtxn_skip_prepared {
             @argument [__pgrx_c_args_rbtxn_skip_prepared] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_skip_prepared] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_rbtxn_skip_prepared!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5344,6 +5501,13 @@ macro_rules! __pgrx_c_args_rbtxn_skip_prepared {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_rbtxn_skip_prepared] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_skip_prepared!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5360,7 +5524,7 @@ macro_rules! __pgrx_c_args_rbtxn_skip_prepared {
         $crate::rbtxn_skip_prepared!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro rbtxn_skip_prepared from reorderbuffer.h:248
@@ -5443,13 +5607,13 @@ macro_rules! rbtxn_skip_prepared {
         $crate::__pgrx_c_args_rbtxn_skip_prepared!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_skip_prepared!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $txn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_skip_prepared!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5462,7 +5626,7 @@ macro_rules! rbtxn_skip_prepared {
                         $crate::__pgrx_c_operand!(@check_safety; $txn);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -5520,7 +5684,7 @@ macro_rules! rbtxn_skip_prepared {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

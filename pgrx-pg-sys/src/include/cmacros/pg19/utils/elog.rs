@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_ERRCODE_IS_CATEGORY {
             @argument [__pgrx_c_args_ERRCODE_IS_CATEGORY] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ERRCODE_IS_CATEGORY] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ERRCODE_IS_CATEGORY!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -118,6 +123,13 @@ macro_rules! __pgrx_c_args_ERRCODE_IS_CATEGORY {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ERRCODE_IS_CATEGORY] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ERRCODE_IS_CATEGORY!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -134,7 +146,7 @@ macro_rules! __pgrx_c_args_ERRCODE_IS_CATEGORY {
         $crate::ERRCODE_IS_CATEGORY!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ERRCODE_IS_CATEGORY from elog.h:78
@@ -252,13 +264,13 @@ macro_rules! ERRCODE_IS_CATEGORY {
         $crate::__pgrx_c_args_ERRCODE_IS_CATEGORY!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ec:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ERRCODE_IS_CATEGORY!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $ec:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ERRCODE_IS_CATEGORY!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -271,7 +283,7 @@ macro_rules! ERRCODE_IS_CATEGORY {
                         $crate::__pgrx_c_operand!(@check_safety; $ec);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -356,7 +368,7 @@ macro_rules! ERRCODE_IS_CATEGORY {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -528,6 +540,11 @@ macro_rules! __pgrx_c_args_ERRCODE_TO_CATEGORY {
             @argument [__pgrx_c_args_ERRCODE_TO_CATEGORY] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ERRCODE_TO_CATEGORY] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ERRCODE_TO_CATEGORY!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -565,6 +582,13 @@ macro_rules! __pgrx_c_args_ERRCODE_TO_CATEGORY {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ERRCODE_TO_CATEGORY] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ERRCODE_TO_CATEGORY!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -581,7 +605,7 @@ macro_rules! __pgrx_c_args_ERRCODE_TO_CATEGORY {
         $crate::ERRCODE_TO_CATEGORY!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ERRCODE_TO_CATEGORY from elog.h:77
@@ -673,13 +697,13 @@ macro_rules! ERRCODE_TO_CATEGORY {
         $crate::__pgrx_c_args_ERRCODE_TO_CATEGORY!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ec:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ERRCODE_TO_CATEGORY!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $ec:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ERRCODE_TO_CATEGORY!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -692,7 +716,7 @@ macro_rules! ERRCODE_TO_CATEGORY {
                         $crate::__pgrx_c_operand!(@check_safety; $ec);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -753,7 +777,7 @@ macro_rules! ERRCODE_TO_CATEGORY {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -892,6 +916,11 @@ macro_rules! __pgrx_c_args_MAKE_SQLSTATE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MAKE_SQLSTATE] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MAKE_SQLSTATE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -944,6 +973,11 @@ macro_rules! __pgrx_c_args_MAKE_SQLSTATE {
             @argument [__pgrx_c_args_MAKE_SQLSTATE] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
             ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MAKE_SQLSTATE] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -1000,6 +1034,11 @@ macro_rules! __pgrx_c_args_MAKE_SQLSTATE {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MAKE_SQLSTATE] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MAKE_SQLSTATE!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1052,6 +1091,11 @@ macro_rules! __pgrx_c_args_MAKE_SQLSTATE {
             @argument [__pgrx_c_args_MAKE_SQLSTATE] [p4 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
             ]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MAKE_SQLSTATE] [p4 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -1115,6 +1159,11 @@ macro_rules! __pgrx_c_args_MAKE_SQLSTATE {
             @argument [__pgrx_c_args_MAKE_SQLSTATE] [p5 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MAKE_SQLSTATE] [p5 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_MAKE_SQLSTATE!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1152,6 +1201,11 @@ macro_rules! __pgrx_c_args_MAKE_SQLSTATE {
             ]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MAKE_SQLSTATE] [p5 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MAKE_SQLSTATE!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1168,7 +1222,7 @@ macro_rules! __pgrx_c_args_MAKE_SQLSTATE {
         $crate::MAKE_SQLSTATE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro MAKE_SQLSTATE from elog.h:72
@@ -1564,13 +1618,13 @@ macro_rules! MAKE_SQLSTATE {
         $crate::__pgrx_c_args_MAKE_SQLSTATE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ch1:tt, $ch2:tt, $ch3:tt, $ch4:tt, $ch5:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MAKE_SQLSTATE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $ch1:tt, $ch2:tt, $ch3:tt, $ch4:tt, $ch5:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MAKE_SQLSTATE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1588,7 +1642,7 @@ macro_rules! MAKE_SQLSTATE {
                         $crate::__pgrx_c_operand!(@check_safety; $ch5);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::add::<
@@ -1971,7 +2025,7 @@ macro_rules! MAKE_SQLSTATE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2417,6 +2471,11 @@ macro_rules! __pgrx_c_args_PGSIXBIT {
             @argument [__pgrx_c_args_PGSIXBIT] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PGSIXBIT] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PGSIXBIT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2452,6 +2511,11 @@ macro_rules! __pgrx_c_args_PGSIXBIT {
             @argument [__pgrx_c_args_PGSIXBIT] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PGSIXBIT] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PGSIXBIT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2468,7 +2532,7 @@ macro_rules! __pgrx_c_args_PGSIXBIT {
         $crate::PGSIXBIT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PGSIXBIT from elog.h:69
@@ -2539,13 +2603,13 @@ macro_rules! PGSIXBIT {
         $crate::__pgrx_c_args_PGSIXBIT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ch:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PGSIXBIT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $ch:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PGSIXBIT!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2558,7 +2622,7 @@ macro_rules! PGSIXBIT {
                         $crate::__pgrx_c_operand!(@check_safety; $ch);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -2596,7 +2660,7 @@ macro_rules! PGSIXBIT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2721,6 +2785,11 @@ macro_rules! __pgrx_c_args_PGUNSIXBIT {
             @argument [__pgrx_c_args_PGUNSIXBIT] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PGUNSIXBIT] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PGUNSIXBIT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2756,6 +2825,11 @@ macro_rules! __pgrx_c_args_PGUNSIXBIT {
             @argument [__pgrx_c_args_PGUNSIXBIT] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PGUNSIXBIT] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PGUNSIXBIT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2772,7 +2846,7 @@ macro_rules! __pgrx_c_args_PGUNSIXBIT {
         $crate::PGUNSIXBIT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PGUNSIXBIT from elog.h:70
@@ -2839,13 +2913,13 @@ macro_rules! PGUNSIXBIT {
         $crate::__pgrx_c_args_PGUNSIXBIT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $val:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PGUNSIXBIT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $val:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PGUNSIXBIT!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2858,7 +2932,7 @@ macro_rules! PGUNSIXBIT {
                         $crate::__pgrx_c_operand!(@check_safety; $val);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::add::<
@@ -2896,7 +2970,7 @@ macro_rules! PGUNSIXBIT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2991,20 +3065,20 @@ macro_rules! PG_RE_THROW {
     (@__pgrx_emit_value;) => {
         /* PGRX: PG_RE_THROW remains expanded because pg_re_throw is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            $crate::__pgrx_c_generated::Inline_ef34b09bd2770e4c7b87efc686263a82()
+            $crate::__pgrx_c_generated::Inline_a7ed21ee981ee88e41f08dad6e927f1b()
         )
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::PG_RE_THROW!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::PG_RE_THROW!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::PG_RE_THROW!(@__pgrx_emit_read_place; $($raw)*)
@@ -3016,15 +3090,15 @@ macro_rules! PG_RE_THROW {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::__pgrx_c_generated::Inline_ef34b09bd2770e4c7b87efc686263a82()
+                            $crate::__pgrx_c_generated::Inline_a7ed21ee981ee88e41f08dad6e927f1b()
                         )
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3035,7 +3109,7 @@ macro_rules! PG_RE_THROW {
         /* PGRX: PG_RE_THROW remains expanded because pg_re_throw is not an active function-like macro. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::__pgrx_c_generated::Inline_ef34b09bd2770e4c7b87efc686263a82()
+                $crate::__pgrx_c_generated::Inline_a7ed21ee981ee88e41f08dad6e927f1b()
             );
         }
     };
@@ -3043,13 +3117,13 @@ macro_rules! PG_RE_THROW {
         $crate::PG_RE_THROW!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::PG_RE_THROW!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 

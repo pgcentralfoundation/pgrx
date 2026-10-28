@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_CStringGetTextDatum {
             @argument [__pgrx_c_args_CStringGetTextDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_CStringGetTextDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_CStringGetTextDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -118,6 +123,13 @@ macro_rules! __pgrx_c_args_CStringGetTextDatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_CStringGetTextDatum] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_CStringGetTextDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -134,7 +146,7 @@ macro_rules! __pgrx_c_args_CStringGetTextDatum {
         $crate::CStringGetTextDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro CStringGetTextDatum from builtins.h:86
@@ -211,8 +223,8 @@ macro_rules! CStringGetTextDatum {
                             )
                         )
                     )
-                ] [compile_error!("C expression is not a place in this operation")] [
-                    compile_error!("C expression is not a place in this operation")
+                ] [::core::compile_error!("C expression is not a place in this operation")] [
+                    ::core::compile_error!("C expression is not a place in this operation")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -221,7 +233,7 @@ macro_rules! CStringGetTextDatum {
                                     $crate::__pgrx_c_operand!(@check_safety; $s);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         <
@@ -269,7 +281,7 @@ macro_rules! CStringGetTextDatum {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -322,8 +334,8 @@ macro_rules! CStringGetTextDatum {
                             )
                         )
                     )
-                ] [compile_error!("C expression is not a place in this operation")] [
-                    compile_error!("C expression is not a place in this operation")
+                ] [::core::compile_error!("C expression is not a place in this operation")] [
+                    ::core::compile_error!("C expression is not a place in this operation")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -332,7 +344,7 @@ macro_rules! CStringGetTextDatum {
                                     $crate::__pgrx_c_operand!(@check_safety; $s);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         <
@@ -380,7 +392,7 @@ macro_rules! CStringGetTextDatum {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -433,8 +445,8 @@ macro_rules! CStringGetTextDatum {
                             )
                         )
                     )
-                ] [compile_error!("C expression is not a place in this operation")] [
-                    compile_error!("C expression is not a place in this operation")
+                ] [::core::compile_error!("C expression is not a place in this operation")] [
+                    ::core::compile_error!("C expression is not a place in this operation")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -443,7 +455,7 @@ macro_rules! CStringGetTextDatum {
                                     $crate::__pgrx_c_operand!(@check_safety; $s);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         <
@@ -491,7 +503,7 @@ macro_rules! CStringGetTextDatum {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -544,8 +556,8 @@ macro_rules! CStringGetTextDatum {
                             )
                         )
                     )
-                ] [compile_error!("C expression is not a place in this operation")] [
-                    compile_error!("C expression is not a place in this operation")
+                ] [::core::compile_error!("C expression is not a place in this operation")] [
+                    ::core::compile_error!("C expression is not a place in this operation")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -554,7 +566,7 @@ macro_rules! CStringGetTextDatum {
                                     $crate::__pgrx_c_operand!(@check_safety; $s);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         <
@@ -602,7 +614,7 @@ macro_rules! CStringGetTextDatum {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -655,8 +667,8 @@ macro_rules! CStringGetTextDatum {
                             )
                         )
                     )
-                ] [compile_error!("C expression is not a place in this operation")] [
-                    compile_error!("C expression is not a place in this operation")
+                ] [::core::compile_error!("C expression is not a place in this operation")] [
+                    ::core::compile_error!("C expression is not a place in this operation")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -665,7 +677,7 @@ macro_rules! CStringGetTextDatum {
                                     $crate::__pgrx_c_operand!(@check_safety; $s);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         <
@@ -713,7 +725,7 @@ macro_rules! CStringGetTextDatum {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -805,6 +817,11 @@ macro_rules! __pgrx_c_args_TextDatumGetCString {
             @argument [__pgrx_c_args_TextDatumGetCString] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TextDatumGetCString] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TextDatumGetCString!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -842,6 +859,13 @@ macro_rules! __pgrx_c_args_TextDatumGetCString {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TextDatumGetCString] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TextDatumGetCString!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -858,7 +882,7 @@ macro_rules! __pgrx_c_args_TextDatumGetCString {
         $crate::TextDatumGetCString!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TextDatumGetCString from builtins.h:87
@@ -970,13 +994,13 @@ macro_rules! TextDatumGetCString {
         $crate::__pgrx_c_args_TextDatumGetCString!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $d:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TextDatumGetCString!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $d:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TextDatumGetCString!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -990,7 +1014,7 @@ macro_rules! TextDatumGetCString {
                         $crate::__pgrx_c_operand!(@check_safety; $d);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1074,7 +1098,7 @@ macro_rules! TextDatumGetCString {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

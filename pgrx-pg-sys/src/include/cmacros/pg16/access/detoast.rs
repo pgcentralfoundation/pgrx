@@ -77,6 +77,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_POINTER {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_EXTERNAL_GET_POINTER] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_POINTER!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -140,6 +147,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_POINTER {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_EXTERNAL_GET_POINTER] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_POINTER!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -177,6 +191,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_POINTER {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_EXTERNAL_GET_POINTER] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_POINTER!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -193,7 +214,7 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_POINTER {
         $crate::VARATT_EXTERNAL_GET_POINTER!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_EXTERNAL_GET_POINTER from detoast.h:22
@@ -305,7 +326,7 @@ macro_rules! VARATT_EXTERNAL_GET_POINTER {
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_fa2de769efb6f5d32583dd258b847209(
+                        $crate::__pgrx_c_generated::Inline_34990f1c8d0145bf9569dd176f895395(
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -441,7 +462,7 @@ macro_rules! VARATT_EXTERNAL_GET_POINTER {
         }
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::VARATT_EXTERNAL_GET_POINTER!(@__pgrx_c_guard_locals __pgrx_emit_public []; $($raw)*)

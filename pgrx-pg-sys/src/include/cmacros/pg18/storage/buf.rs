@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_BufferIsInvalid {
             @argument [__pgrx_c_args_BufferIsInvalid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufferIsInvalid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BufferIsInvalid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -118,6 +123,13 @@ macro_rules! __pgrx_c_args_BufferIsInvalid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufferIsInvalid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufferIsInvalid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -134,7 +146,7 @@ macro_rules! __pgrx_c_args_BufferIsInvalid {
         $crate::BufferIsInvalid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BufferIsInvalid from buf.h:31
@@ -188,13 +200,13 @@ macro_rules! BufferIsInvalid {
         $crate::__pgrx_c_args_BufferIsInvalid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $buffer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufferIsInvalid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $buffer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufferIsInvalid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -207,7 +219,7 @@ macro_rules! BufferIsInvalid {
                         $crate::__pgrx_c_operand!(@check_safety; $buffer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -228,7 +240,7 @@ macro_rules! BufferIsInvalid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -340,6 +352,11 @@ macro_rules! __pgrx_c_args_BufferIsLocal {
             @argument [__pgrx_c_args_BufferIsLocal] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufferIsLocal] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BufferIsLocal!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -377,6 +394,11 @@ macro_rules! __pgrx_c_args_BufferIsLocal {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufferIsLocal] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufferIsLocal!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -393,7 +415,7 @@ macro_rules! __pgrx_c_args_BufferIsLocal {
         $crate::BufferIsLocal!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BufferIsLocal from buf.h:37
@@ -447,13 +469,13 @@ macro_rules! BufferIsLocal {
         $crate::__pgrx_c_args_BufferIsLocal!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $buffer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufferIsLocal!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $buffer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufferIsLocal!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -466,7 +488,7 @@ macro_rules! BufferIsLocal {
                         $crate::__pgrx_c_operand!(@check_safety; $buffer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::lt(
@@ -487,7 +509,7 @@ macro_rules! BufferIsLocal {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

@@ -72,13 +72,13 @@ macro_rules! IsolationIsSerializable {
         $crate::IsolationIsSerializable!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::IsolationIsSerializable!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::IsolationIsSerializable!(@__pgrx_emit_read_place; $($raw)*)
@@ -89,7 +89,7 @@ macro_rules! IsolationIsSerializable {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -114,7 +114,7 @@ macro_rules! IsolationIsSerializable {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -145,13 +145,13 @@ macro_rules! IsolationIsSerializable {
         $crate::IsolationIsSerializable!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::IsolationIsSerializable!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 
@@ -223,13 +223,13 @@ macro_rules! IsolationUsesXactSnapshot {
         $crate::IsolationUsesXactSnapshot!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::IsolationUsesXactSnapshot!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::IsolationUsesXactSnapshot!(@__pgrx_emit_read_place; $($raw)*)
@@ -240,7 +240,7 @@ macro_rules! IsolationUsesXactSnapshot {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ge(
@@ -265,7 +265,7 @@ macro_rules! IsolationUsesXactSnapshot {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -296,13 +296,13 @@ macro_rules! IsolationUsesXactSnapshot {
         $crate::IsolationUsesXactSnapshot!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::IsolationUsesXactSnapshot!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 
@@ -338,7 +338,7 @@ macro_rules! __pgrx_c_args_XactCompletionApplyFeedback {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_XactCompletionApplyFeedback!(
@@ -346,7 +346,7 @@ macro_rules! __pgrx_c_args_XactCompletionApplyFeedback {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XactCompletionApplyFeedback!(
@@ -355,7 +355,7 @@ macro_rules! __pgrx_c_args_XactCompletionApplyFeedback {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_XactCompletionApplyFeedback!(
@@ -436,7 +436,7 @@ macro_rules! __pgrx_c_args_XactCompletionApplyFeedback {
         $crate::XactCompletionApplyFeedback!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XactCompletionApplyFeedback from xact.h:212
@@ -504,13 +504,13 @@ macro_rules! XactCompletionApplyFeedback {
         $crate::__pgrx_c_args_XactCompletionApplyFeedback!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $xinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XactCompletionApplyFeedback!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $xinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XactCompletionApplyFeedback!(
@@ -526,7 +526,7 @@ macro_rules! XactCompletionApplyFeedback {
                         $crate::__pgrx_c_operand!(@check_safety; $xinfo);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -562,7 +562,7 @@ macro_rules! XactCompletionApplyFeedback {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -643,7 +643,7 @@ macro_rules! __pgrx_c_args_XactCompletionForceSyncCommit {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_XactCompletionForceSyncCommit!(
@@ -651,7 +651,7 @@ macro_rules! __pgrx_c_args_XactCompletionForceSyncCommit {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XactCompletionForceSyncCommit!(
@@ -660,7 +660,7 @@ macro_rules! __pgrx_c_args_XactCompletionForceSyncCommit {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_XactCompletionForceSyncCommit!(
@@ -741,7 +741,7 @@ macro_rules! __pgrx_c_args_XactCompletionForceSyncCommit {
         $crate::XactCompletionForceSyncCommit!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XactCompletionForceSyncCommit from xact.h:216
@@ -812,7 +812,7 @@ macro_rules! XactCompletionForceSyncCommit {
         )
     };
     (@__pgrx_emit_place; $xinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XactCompletionForceSyncCommit!(
@@ -821,7 +821,7 @@ macro_rules! XactCompletionForceSyncCommit {
         )
     };
     (@__pgrx_emit_read_place; $xinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XactCompletionForceSyncCommit!(
@@ -837,7 +837,7 @@ macro_rules! XactCompletionForceSyncCommit {
                         $crate::__pgrx_c_operand!(@check_safety; $xinfo);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -873,7 +873,7 @@ macro_rules! XactCompletionForceSyncCommit {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -957,7 +957,7 @@ macro_rules! __pgrx_c_args_XactCompletionRelcacheInitFileInval {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_XactCompletionRelcacheInitFileInval!(
@@ -965,7 +965,7 @@ macro_rules! __pgrx_c_args_XactCompletionRelcacheInitFileInval {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XactCompletionRelcacheInitFileInval!(
@@ -974,7 +974,7 @@ macro_rules! __pgrx_c_args_XactCompletionRelcacheInitFileInval {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_XactCompletionRelcacheInitFileInval!(
@@ -1055,7 +1055,7 @@ macro_rules! __pgrx_c_args_XactCompletionRelcacheInitFileInval {
         $crate::XactCompletionRelcacheInitFileInval!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro XactCompletionRelcacheInitFileInval from xact.h:214
@@ -1126,7 +1126,7 @@ macro_rules! XactCompletionRelcacheInitFileInval {
         )
     };
     (@__pgrx_emit_place; $xinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XactCompletionRelcacheInitFileInval!(
@@ -1135,7 +1135,7 @@ macro_rules! XactCompletionRelcacheInitFileInval {
         )
     };
     (@__pgrx_emit_read_place; $xinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_XactCompletionRelcacheInitFileInval!(
@@ -1151,7 +1151,7 @@ macro_rules! XactCompletionRelcacheInitFileInval {
                         $crate::__pgrx_c_operand!(@check_safety; $xinfo);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -1187,7 +1187,7 @@ macro_rules! XactCompletionRelcacheInitFileInval {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

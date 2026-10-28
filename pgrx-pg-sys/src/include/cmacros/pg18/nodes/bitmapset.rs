@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_bms_is_empty {
             @argument [__pgrx_c_args_bms_is_empty] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_bms_is_empty] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_bms_is_empty!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -116,6 +121,11 @@ macro_rules! __pgrx_c_args_bms_is_empty {
             @argument [__pgrx_c_args_bms_is_empty] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_bms_is_empty] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_bms_is_empty!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -132,7 +142,7 @@ macro_rules! __pgrx_c_args_bms_is_empty {
         $crate::bms_is_empty!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro bms_is_empty from bitmapset.h:118
@@ -205,13 +215,13 @@ macro_rules! bms_is_empty {
         $crate::__pgrx_c_args_bms_is_empty!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_bms_is_empty!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_bms_is_empty!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -225,7 +235,7 @@ macro_rules! bms_is_empty {
                         $crate::__pgrx_c_operand!(@check_safety; $a);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -263,7 +273,7 @@ macro_rules! bms_is_empty {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -393,6 +403,11 @@ macro_rules! __pgrx_c_args_bmw_leftmost_one_pos {
             @argument [__pgrx_c_args_bmw_leftmost_one_pos] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_bmw_leftmost_one_pos] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_bmw_leftmost_one_pos!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -430,6 +445,13 @@ macro_rules! __pgrx_c_args_bmw_leftmost_one_pos {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_bmw_leftmost_one_pos] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_bmw_leftmost_one_pos!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -446,7 +468,7 @@ macro_rules! __pgrx_c_args_bmw_leftmost_one_pos {
         $crate::bmw_leftmost_one_pos!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro bmw_leftmost_one_pos from bitmapset.h:82
@@ -505,13 +527,13 @@ macro_rules! bmw_leftmost_one_pos {
         $crate::__pgrx_c_args_bmw_leftmost_one_pos!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $w:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_bmw_leftmost_one_pos!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $w:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_bmw_leftmost_one_pos!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -525,7 +547,7 @@ macro_rules! bmw_leftmost_one_pos {
                         $crate::__pgrx_c_operand!(@check_safety; $w);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -551,7 +573,7 @@ macro_rules! bmw_leftmost_one_pos {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -666,6 +688,11 @@ macro_rules! __pgrx_c_args_bmw_popcount {
             @argument [__pgrx_c_args_bmw_popcount] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_bmw_popcount] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_bmw_popcount!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -701,6 +728,11 @@ macro_rules! __pgrx_c_args_bmw_popcount {
             @argument [__pgrx_c_args_bmw_popcount] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_bmw_popcount] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_bmw_popcount!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -717,7 +749,7 @@ macro_rules! __pgrx_c_args_bmw_popcount {
         $crate::bmw_popcount!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro bmw_popcount from bitmapset.h:84
@@ -825,7 +857,7 @@ macro_rules! bmw_popcount {
                         $crate::__pgrx_c_operand!(@check_safety; $w);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::invoke(
@@ -851,7 +883,7 @@ macro_rules! bmw_popcount {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -970,6 +1002,11 @@ macro_rules! __pgrx_c_args_bmw_rightmost_one_pos {
             @argument [__pgrx_c_args_bmw_rightmost_one_pos] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_bmw_rightmost_one_pos] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_bmw_rightmost_one_pos!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1007,6 +1044,13 @@ macro_rules! __pgrx_c_args_bmw_rightmost_one_pos {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_bmw_rightmost_one_pos] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_bmw_rightmost_one_pos!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1023,7 +1067,7 @@ macro_rules! __pgrx_c_args_bmw_rightmost_one_pos {
         $crate::bmw_rightmost_one_pos!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro bmw_rightmost_one_pos from bitmapset.h:83
@@ -1082,13 +1126,13 @@ macro_rules! bmw_rightmost_one_pos {
         $crate::__pgrx_c_args_bmw_rightmost_one_pos!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $w:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_bmw_rightmost_one_pos!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $w:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_bmw_rightmost_one_pos!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1102,7 +1146,7 @@ macro_rules! bmw_rightmost_one_pos {
                         $crate::__pgrx_c_operand!(@check_safety; $w);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1128,7 +1172,7 @@ macro_rules! bmw_rightmost_one_pos {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

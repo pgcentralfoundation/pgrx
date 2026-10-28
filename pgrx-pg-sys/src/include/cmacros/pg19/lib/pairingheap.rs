@@ -84,6 +84,11 @@ macro_rules! __pgrx_c_args_pairingheap_is_empty {
             @argument [__pgrx_c_args_pairingheap_is_empty] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pairingheap_is_empty] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pairingheap_is_empty!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -121,6 +126,13 @@ macro_rules! __pgrx_c_args_pairingheap_is_empty {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pairingheap_is_empty] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pairingheap_is_empty!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -137,7 +149,7 @@ macro_rules! __pgrx_c_args_pairingheap_is_empty {
         $crate::pairingheap_is_empty!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro pairingheap_is_empty from pairingheap.h:99
@@ -223,13 +235,13 @@ macro_rules! pairingheap_is_empty {
         $crate::__pgrx_c_args_pairingheap_is_empty!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $h:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pairingheap_is_empty!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $h:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pairingheap_is_empty!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -243,7 +255,7 @@ macro_rules! pairingheap_is_empty {
                         $crate::__pgrx_c_operand!(@check_safety; $h);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -294,7 +306,7 @@ macro_rules! pairingheap_is_empty {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -439,6 +451,11 @@ macro_rules! __pgrx_c_args_pairingheap_is_singular {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pairingheap_is_singular] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pairingheap_is_singular!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -476,6 +493,13 @@ macro_rules! __pgrx_c_args_pairingheap_is_singular {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pairingheap_is_singular] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pairingheap_is_singular!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -492,7 +516,7 @@ macro_rules! __pgrx_c_args_pairingheap_is_singular {
         $crate::pairingheap_is_singular!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro pairingheap_is_singular from pairingheap.h:102
@@ -633,13 +657,13 @@ macro_rules! pairingheap_is_singular {
         $crate::__pgrx_c_args_pairingheap_is_singular!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $h:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pairingheap_is_singular!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $h:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pairingheap_is_singular!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -653,7 +677,7 @@ macro_rules! pairingheap_is_singular {
                         $crate::__pgrx_c_operand!(@check_safety; $h);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -766,7 +790,7 @@ macro_rules! pairingheap_is_singular {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -958,6 +982,11 @@ macro_rules! __pgrx_c_args_pairingheap_reset {
             @argument [__pgrx_c_args_pairingheap_reset] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pairingheap_reset] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pairingheap_reset!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -995,6 +1024,13 @@ macro_rules! __pgrx_c_args_pairingheap_reset {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pairingheap_reset] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pairingheap_reset!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1011,7 +1047,7 @@ macro_rules! __pgrx_c_args_pairingheap_reset {
         $crate::pairingheap_reset!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro pairingheap_reset from pairingheap.h:96
@@ -1092,13 +1128,13 @@ macro_rules! pairingheap_reset {
         $crate::__pgrx_c_args_pairingheap_reset!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $h:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pairingheap_reset!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $h:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pairingheap_reset!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1112,7 +1148,7 @@ macro_rules! pairingheap_reset {
                         $crate::__pgrx_c_operand!(@check_safety; $h);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -1159,7 +1195,7 @@ macro_rules! pairingheap_reset {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

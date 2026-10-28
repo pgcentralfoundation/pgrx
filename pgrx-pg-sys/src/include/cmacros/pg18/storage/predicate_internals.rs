@@ -89,6 +89,13 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -126,6 +133,13 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -142,7 +156,7 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB {
         $crate::GET_PREDICATELOCKTARGETTAG_DB!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GET_PREDICATELOCKTARGETTAG_DB from predicate_internals.h:406
@@ -210,7 +224,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_DB {
         )
     };
     (@__pgrx_emit_place; $locktag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB!(
@@ -219,7 +233,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_DB {
         )
     };
     (@__pgrx_emit_read_place; $locktag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB!(
@@ -235,7 +249,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_DB {
                         $crate::__pgrx_c_operand!(@check_safety; $locktag);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -260,7 +274,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_DB {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -390,6 +404,13 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -427,6 +448,13 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -443,7 +471,7 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET {
         $crate::GET_PREDICATELOCKTARGETTAG_OFFSET!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GET_PREDICATELOCKTARGETTAG_OFFSET from predicate_internals.h:412
@@ -508,7 +536,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_OFFSET {
         )
     };
     (@__pgrx_emit_place; $locktag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET!(
@@ -517,7 +545,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_OFFSET {
         )
     };
     (@__pgrx_emit_read_place; $locktag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET!(
@@ -533,7 +561,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_OFFSET {
                         $crate::__pgrx_c_operand!(@check_safety; $locktag);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -555,7 +583,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_OFFSET {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -685,6 +713,13 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -722,6 +757,13 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -738,7 +780,7 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE {
         $crate::GET_PREDICATELOCKTARGETTAG_PAGE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GET_PREDICATELOCKTARGETTAG_PAGE from predicate_internals.h:410
@@ -803,7 +845,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_PAGE {
         )
     };
     (@__pgrx_emit_place; $locktag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE!(
@@ -812,7 +854,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_PAGE {
         )
     };
     (@__pgrx_emit_read_place; $locktag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE!(
@@ -828,7 +870,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_PAGE {
                         $crate::__pgrx_c_operand!(@check_safety; $locktag);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -850,7 +892,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_PAGE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -980,6 +1022,13 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1017,6 +1066,13 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1033,7 +1089,7 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION {
         $crate::GET_PREDICATELOCKTARGETTAG_RELATION!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GET_PREDICATELOCKTARGETTAG_RELATION from predicate_internals.h:408
@@ -1101,7 +1157,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_RELATION {
         )
     };
     (@__pgrx_emit_place; $locktag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION!(
@@ -1110,7 +1166,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_RELATION {
         )
     };
     (@__pgrx_emit_read_place; $locktag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION!(
@@ -1126,7 +1182,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_RELATION {
                         $crate::__pgrx_c_operand!(@check_safety; $locktag);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -1151,7 +1207,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_RELATION {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1284,6 +1340,13 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1321,6 +1384,13 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1337,7 +1407,7 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE {
         $crate::GET_PREDICATELOCKTARGETTAG_TYPE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GET_PREDICATELOCKTARGETTAG_TYPE from predicate_internals.h:414
@@ -1496,7 +1566,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
         )
     };
     (@__pgrx_emit_place; $locktag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE!(
@@ -1505,7 +1575,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
         )
     };
     (@__pgrx_emit_read_place; $locktag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE!(
@@ -1521,7 +1591,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
                         $crate::__pgrx_c_operand!(@check_safety; $locktag);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -1665,7 +1735,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1884,6 +1954,13 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1941,6 +2018,13 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE {
             ] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1996,6 +2080,13 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE {
             @argument [__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE] [
                 p3 $mode [$($done)*] [$($rest)*]
             ] [($($inner)*)]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE] [
+                p3 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -2064,6 +2155,13 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE] [p4 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2101,6 +2199,13 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE {
             ] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE] [
+                p4 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2117,7 +2222,7 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE {
         $crate::SET_PREDICATELOCKTARGETTAG_PAGE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_PREDICATELOCKTARGETTAG_PAGE from predicate_internals.h:394
@@ -2275,7 +2380,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
         )
     };
     (@__pgrx_emit_place; $locktag:tt, $dboid:tt, $reloid:tt, $blocknum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
@@ -2284,7 +2389,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
         )
     };
     (@__pgrx_emit_read_place; $locktag:tt, $dboid:tt, $reloid:tt, $blocknum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
@@ -2303,7 +2408,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
                         $crate::__pgrx_c_operand!(@check_safety; $blocknum);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -2436,7 +2541,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2645,6 +2750,13 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2700,6 +2812,13 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION {
             @argument [__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION] [
                 p2 $mode [$($done)*] [$($rest)*]
             ] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -2768,6 +2887,13 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION] [p3 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2805,6 +2931,13 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION {
             ] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION] [
+                p3 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2821,7 +2954,7 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION {
         $crate::SET_PREDICATELOCKTARGETTAG_RELATION!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_PREDICATELOCKTARGETTAG_RELATION from predicate_internals.h:388
@@ -2981,7 +3114,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
         )
     };
     (@__pgrx_emit_place; $locktag:tt, $dboid:tt, $reloid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
@@ -2990,7 +3123,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
         )
     };
     (@__pgrx_emit_read_place; $locktag:tt, $dboid:tt, $reloid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
@@ -3008,7 +3141,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
                         $crate::__pgrx_c_operand!(@check_safety; $reloid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -3140,7 +3273,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3353,6 +3486,13 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3408,6 +3548,13 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE {
             @argument [__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE] [
                 p2 $mode [$($done)*] [$($rest)*]
             ] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -3467,6 +3614,13 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE {
             ] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE] [
+                p3 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3522,6 +3676,13 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE {
             @argument [__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE] [
                 p4 $mode [$($done)*] [$($rest)*]
             ] [($($inner)*)]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE] [
+                p4 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -3590,6 +3751,13 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE {
             ]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE] [p5 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3627,6 +3795,13 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE {
             ] [($($inner)*)]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE] [
+                p5 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3643,7 +3818,7 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE {
         $crate::SET_PREDICATELOCKTARGETTAG_TUPLE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SET_PREDICATELOCKTARGETTAG_TUPLE from predicate_internals.h:400
@@ -3801,7 +3976,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_TUPLE {
         )
     };
     (@__pgrx_emit_place; $locktag:tt, $dboid:tt, $reloid:tt, $blocknum:tt, $offnum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
@@ -3810,7 +3985,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_TUPLE {
         )
     };
     (@__pgrx_emit_read_place; $locktag:tt, $dboid:tt, $reloid:tt, $blocknum:tt, $offnum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
@@ -3830,7 +4005,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_TUPLE {
                         $crate::__pgrx_c_operand!(@check_safety; $offnum);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -3957,7 +4132,7 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_TUPLE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

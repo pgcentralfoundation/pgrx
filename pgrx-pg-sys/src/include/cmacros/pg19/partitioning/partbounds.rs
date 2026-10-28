@@ -89,6 +89,13 @@ macro_rules! __pgrx_c_args_partition_bound_accepts_nulls {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_partition_bound_accepts_nulls] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_partition_bound_accepts_nulls!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -126,6 +133,13 @@ macro_rules! __pgrx_c_args_partition_bound_accepts_nulls {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_partition_bound_accepts_nulls] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_partition_bound_accepts_nulls!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -142,7 +156,7 @@ macro_rules! __pgrx_c_args_partition_bound_accepts_nulls {
         $crate::partition_bound_accepts_nulls!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro partition_bound_accepts_nulls from partbounds.h:98
@@ -224,7 +238,7 @@ macro_rules! partition_bound_accepts_nulls {
         )
     };
     (@__pgrx_emit_place; $bi:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_partition_bound_accepts_nulls!(
@@ -233,7 +247,7 @@ macro_rules! partition_bound_accepts_nulls {
         )
     };
     (@__pgrx_emit_read_place; $bi:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_partition_bound_accepts_nulls!(
@@ -249,7 +263,7 @@ macro_rules! partition_bound_accepts_nulls {
                         $crate::__pgrx_c_operand!(@check_safety; $bi);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -291,7 +305,7 @@ macro_rules! partition_bound_accepts_nulls {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -432,6 +446,13 @@ macro_rules! __pgrx_c_args_partition_bound_has_default {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_partition_bound_has_default] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_partition_bound_has_default!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -469,6 +490,13 @@ macro_rules! __pgrx_c_args_partition_bound_has_default {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_partition_bound_has_default] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_partition_bound_has_default!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -485,7 +513,7 @@ macro_rules! __pgrx_c_args_partition_bound_has_default {
         $crate::partition_bound_has_default!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro partition_bound_has_default from partbounds.h:99
@@ -564,13 +592,13 @@ macro_rules! partition_bound_has_default {
         $crate::__pgrx_c_args_partition_bound_has_default!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $bi:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_partition_bound_has_default!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $bi:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_partition_bound_has_default!(
@@ -586,7 +614,7 @@ macro_rules! partition_bound_has_default {
                         $crate::__pgrx_c_operand!(@check_safety; $bi);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -628,7 +656,7 @@ macro_rules! partition_bound_has_default {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

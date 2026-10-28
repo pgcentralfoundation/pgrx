@@ -80,6 +80,13 @@ macro_rules! __pgrx_c_args_DatumIsReadWriteExpandedObject {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumIsReadWriteExpandedObject] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumIsReadWriteExpandedObject!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -135,6 +142,13 @@ macro_rules! __pgrx_c_args_DatumIsReadWriteExpandedObject {
             @argument [__pgrx_c_args_DatumIsReadWriteExpandedObject] [
                 p2 $mode [$($done)*] [$($rest)*]
             ] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumIsReadWriteExpandedObject] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -203,6 +217,13 @@ macro_rules! __pgrx_c_args_DatumIsReadWriteExpandedObject {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumIsReadWriteExpandedObject] [p3 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumIsReadWriteExpandedObject!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -240,6 +261,13 @@ macro_rules! __pgrx_c_args_DatumIsReadWriteExpandedObject {
             ] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumIsReadWriteExpandedObject] [
+                p3 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumIsReadWriteExpandedObject!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -256,7 +284,7 @@ macro_rules! __pgrx_c_args_DatumIsReadWriteExpandedObject {
         $crate::DatumIsReadWriteExpandedObject!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DatumIsReadWriteExpandedObject from expandeddatum.h:151
@@ -442,7 +470,7 @@ macro_rules! DatumIsReadWriteExpandedObject {
         )
     };
     (@__pgrx_emit_place; $d:tt, $isnull:tt, $typlen:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumIsReadWriteExpandedObject!(
@@ -451,7 +479,7 @@ macro_rules! DatumIsReadWriteExpandedObject {
         )
     };
     (@__pgrx_emit_read_place; $d:tt, $isnull:tt, $typlen:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumIsReadWriteExpandedObject!(
@@ -469,7 +497,7 @@ macro_rules! DatumIsReadWriteExpandedObject {
                         $crate::__pgrx_c_operand!(@check_safety; $typlen);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -628,7 +656,7 @@ macro_rules! DatumIsReadWriteExpandedObject {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -869,6 +897,11 @@ macro_rules! __pgrx_c_args_EOHPGetRODatum {
             @argument [__pgrx_c_args_EOHPGetRODatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_EOHPGetRODatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_EOHPGetRODatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -906,6 +939,11 @@ macro_rules! __pgrx_c_args_EOHPGetRODatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_EOHPGetRODatum] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_EOHPGetRODatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -922,7 +960,7 @@ macro_rules! __pgrx_c_args_EOHPGetRODatum {
         $crate::EOHPGetRODatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function EOHPGetRODatum from expandeddatum.h:144
@@ -1001,13 +1039,13 @@ macro_rules! EOHPGetRODatum {
         $crate::__pgrx_c_args_EOHPGetRODatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $eohptr:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_EOHPGetRODatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $eohptr:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_EOHPGetRODatum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1020,7 +1058,7 @@ macro_rules! EOHPGetRODatum {
                         $crate::__pgrx_c_operand!(@check_safety; $eohptr);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1059,7 +1097,7 @@ macro_rules! EOHPGetRODatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1188,6 +1226,11 @@ macro_rules! __pgrx_c_args_EOHPGetRWDatum {
             @argument [__pgrx_c_args_EOHPGetRWDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_EOHPGetRWDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_EOHPGetRWDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1225,6 +1268,11 @@ macro_rules! __pgrx_c_args_EOHPGetRWDatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_EOHPGetRWDatum] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_EOHPGetRWDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1241,7 +1289,7 @@ macro_rules! __pgrx_c_args_EOHPGetRWDatum {
         $crate::EOHPGetRWDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function EOHPGetRWDatum from expandeddatum.h:138
@@ -1320,13 +1368,13 @@ macro_rules! EOHPGetRWDatum {
         $crate::__pgrx_c_args_EOHPGetRWDatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $eohptr:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_EOHPGetRWDatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $eohptr:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_EOHPGetRWDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1339,7 +1387,7 @@ macro_rules! EOHPGetRWDatum {
                         $crate::__pgrx_c_operand!(@check_safety; $eohptr);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1378,7 +1426,7 @@ macro_rules! EOHPGetRWDatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1503,6 +1551,13 @@ macro_rules! __pgrx_c_args_MakeExpandedObjectReadOnly {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MakeExpandedObjectReadOnly] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MakeExpandedObjectReadOnly!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1554,6 +1609,13 @@ macro_rules! __pgrx_c_args_MakeExpandedObjectReadOnly {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_MakeExpandedObjectReadOnly] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MakeExpandedObjectReadOnly] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -1620,6 +1682,13 @@ macro_rules! __pgrx_c_args_MakeExpandedObjectReadOnly {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MakeExpandedObjectReadOnly] [p3 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_MakeExpandedObjectReadOnly!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1657,6 +1726,13 @@ macro_rules! __pgrx_c_args_MakeExpandedObjectReadOnly {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MakeExpandedObjectReadOnly] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MakeExpandedObjectReadOnly!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1673,7 +1749,7 @@ macro_rules! __pgrx_c_args_MakeExpandedObjectReadOnly {
         $crate::MakeExpandedObjectReadOnly!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro MakeExpandedObjectReadOnly from expandeddatum.h:155
@@ -1822,13 +1898,13 @@ macro_rules! MakeExpandedObjectReadOnly {
         $crate::__pgrx_c_args_MakeExpandedObjectReadOnly!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $d:tt, $isnull:tt, $typlen:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MakeExpandedObjectReadOnly!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $d:tt, $isnull:tt, $typlen:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MakeExpandedObjectReadOnly!(
@@ -1846,7 +1922,7 @@ macro_rules! MakeExpandedObjectReadOnly {
                         $crate::__pgrx_c_operand!(@check_safety; $typlen);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -1972,7 +2048,7 @@ macro_rules! MakeExpandedObjectReadOnly {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2175,6 +2251,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXPANDED_HEADER {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXPANDED_HEADER] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXPANDED_HEADER!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2212,6 +2295,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXPANDED_HEADER {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_VARATT_IS_EXPANDED_HEADER] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXPANDED_HEADER!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2228,7 +2318,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXPANDED_HEADER {
         $crate::VARATT_IS_EXPANDED_HEADER!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro VARATT_IS_EXPANDED_HEADER from expandeddatum.h:130
@@ -2337,13 +2427,13 @@ macro_rules! VARATT_IS_EXPANDED_HEADER {
         $crate::__pgrx_c_args_VARATT_IS_EXPANDED_HEADER!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXPANDED_HEADER!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $PTR:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXPANDED_HEADER!(
@@ -2359,7 +2449,7 @@ macro_rules! VARATT_IS_EXPANDED_HEADER {
                         $crate::__pgrx_c_operand!(@check_safety; $PTR);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -2433,7 +2523,7 @@ macro_rules! VARATT_IS_EXPANDED_HEADER {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

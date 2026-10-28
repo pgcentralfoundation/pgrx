@@ -77,6 +77,13 @@ macro_rules! __pgrx_c_args_appendStringInfoCharMacro {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_appendStringInfoCharMacro] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_appendStringInfoCharMacro!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -140,6 +147,13 @@ macro_rules! __pgrx_c_args_appendStringInfoCharMacro {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_appendStringInfoCharMacro] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_appendStringInfoCharMacro!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -177,6 +191,13 @@ macro_rules! __pgrx_c_args_appendStringInfoCharMacro {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_appendStringInfoCharMacro] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_appendStringInfoCharMacro!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -193,7 +214,7 @@ macro_rules! __pgrx_c_args_appendStringInfoCharMacro {
         $crate::appendStringInfoCharMacro!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro appendStringInfoCharMacro from stringinfo.h:204
@@ -310,7 +331,7 @@ macro_rules! appendStringInfoCharMacro {
                     ) {
                         $crate::__pgrx_c_macros::Either::Left(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_generated::Inline_f41ab4a6e6c0050dedaec355995c7de3(
+                                $crate::__pgrx_c_generated::Inline_5f4cb997fe80cf56c2dbfd8dc9b40ef6(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -537,13 +558,13 @@ macro_rules! appendStringInfoCharMacro {
         $crate::__pgrx_c_args_appendStringInfoCharMacro!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $str:tt, $ch:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_appendStringInfoCharMacro!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $str:tt, $ch:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_appendStringInfoCharMacro!(
@@ -560,7 +581,7 @@ macro_rules! appendStringInfoCharMacro {
                         $crate::__pgrx_c_operand!(@check_safety; $ch);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -651,7 +672,7 @@ macro_rules! appendStringInfoCharMacro {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_generated::Inline_f41ab4a6e6c0050dedaec355995c7de3(
+                                            $crate::__pgrx_c_generated::Inline_5f4cb997fe80cf56c2dbfd8dc9b40ef6(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -891,7 +912,7 @@ macro_rules! appendStringInfoCharMacro {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -977,7 +998,7 @@ macro_rules! appendStringInfoCharMacro {
                     ) {
                         $crate::__pgrx_c_macros::Either::Left(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_generated::Inline_f41ab4a6e6c0050dedaec355995c7de3(
+                                $crate::__pgrx_c_generated::Inline_5f4cb997fe80cf56c2dbfd8dc9b40ef6(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -1281,6 +1302,13 @@ macro_rules! __pgrx_c_args_initReadOnlyStringInfo {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_initReadOnlyStringInfo] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_initReadOnlyStringInfo!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1332,6 +1360,13 @@ macro_rules! __pgrx_c_args_initReadOnlyStringInfo {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_initReadOnlyStringInfo] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_initReadOnlyStringInfo] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -1398,6 +1433,11 @@ macro_rules! __pgrx_c_args_initReadOnlyStringInfo {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_initReadOnlyStringInfo] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_initReadOnlyStringInfo!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1435,6 +1475,13 @@ macro_rules! __pgrx_c_args_initReadOnlyStringInfo {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_initReadOnlyStringInfo] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_initReadOnlyStringInfo!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1451,7 +1498,7 @@ macro_rules! __pgrx_c_args_initReadOnlyStringInfo {
         $crate::initReadOnlyStringInfo!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function initReadOnlyStringInfo from stringinfo.h:129
@@ -1565,13 +1612,13 @@ macro_rules! initReadOnlyStringInfo {
         $crate::__pgrx_c_args_initReadOnlyStringInfo!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $str:tt, $data:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_initReadOnlyStringInfo!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $str:tt, $data:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_initReadOnlyStringInfo!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1586,7 +1633,7 @@ macro_rules! initReadOnlyStringInfo {
                         $crate::__pgrx_c_operand!(@check_safety; $len);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::initReadOnlyStringInfo(
@@ -1656,7 +1703,7 @@ macro_rules! initReadOnlyStringInfo {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1808,6 +1855,13 @@ macro_rules! __pgrx_c_args_initStringInfoFromString {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_initStringInfoFromString] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_initStringInfoFromString!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1859,6 +1913,13 @@ macro_rules! __pgrx_c_args_initStringInfoFromString {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_initStringInfoFromString] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_initStringInfoFromString] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -1925,6 +1986,13 @@ macro_rules! __pgrx_c_args_initStringInfoFromString {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_initStringInfoFromString] [p3 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_initStringInfoFromString!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1962,6 +2030,13 @@ macro_rules! __pgrx_c_args_initStringInfoFromString {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_initStringInfoFromString] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_initStringInfoFromString!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1978,7 +2053,7 @@ macro_rules! __pgrx_c_args_initStringInfoFromString {
         $crate::initStringInfoFromString!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function initStringInfoFromString from stringinfo.h:147
@@ -2094,13 +2169,13 @@ macro_rules! initStringInfoFromString {
         $crate::__pgrx_c_args_initStringInfoFromString!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $str:tt, $data:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_initStringInfoFromString!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $str:tt, $data:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_initStringInfoFromString!(
@@ -2118,7 +2193,7 @@ macro_rules! initStringInfoFromString {
                         $crate::__pgrx_c_operand!(@check_safety; $len);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::initStringInfoFromString(
@@ -2188,7 +2263,7 @@ macro_rules! initStringInfoFromString {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

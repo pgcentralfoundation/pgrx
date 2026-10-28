@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_DsaPointerIsValid {
             @argument [__pgrx_c_args_DsaPointerIsValid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DsaPointerIsValid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DsaPointerIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -118,6 +123,13 @@ macro_rules! __pgrx_c_args_DsaPointerIsValid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DsaPointerIsValid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DsaPointerIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -134,7 +146,7 @@ macro_rules! __pgrx_c_args_DsaPointerIsValid {
         $crate::DsaPointerIsValid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DsaPointerIsValid from dsa.h:81
@@ -188,13 +200,13 @@ macro_rules! DsaPointerIsValid {
         $crate::__pgrx_c_args_DsaPointerIsValid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DsaPointerIsValid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DsaPointerIsValid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -207,7 +219,7 @@ macro_rules! DsaPointerIsValid {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -228,7 +240,7 @@ macro_rules! DsaPointerIsValid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -331,6 +343,11 @@ macro_rules! __pgrx_c_args_dsa_allocate {
             @argument [__pgrx_c_args_dsa_allocate] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dsa_allocate] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_allocate!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -392,6 +409,11 @@ macro_rules! __pgrx_c_args_dsa_allocate {
             @argument [__pgrx_c_args_dsa_allocate] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dsa_allocate] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dsa_allocate!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -427,6 +449,11 @@ macro_rules! __pgrx_c_args_dsa_allocate {
             @argument [__pgrx_c_args_dsa_allocate] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dsa_allocate] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_allocate!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -443,7 +470,7 @@ macro_rules! __pgrx_c_args_dsa_allocate {
         $crate::dsa_allocate!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro dsa_allocate from dsa.h:84
@@ -545,13 +572,13 @@ macro_rules! dsa_allocate {
         $crate::__pgrx_c_args_dsa_allocate!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $area:tt, $size:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dsa_allocate!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $area:tt, $size:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dsa_allocate!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -566,7 +593,7 @@ macro_rules! dsa_allocate {
                         $crate::__pgrx_c_operand!(@check_safety; $size);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -640,7 +667,7 @@ macro_rules! dsa_allocate {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -794,6 +821,11 @@ macro_rules! __pgrx_c_args_dsa_allocate0 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dsa_allocate0] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_allocate0!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -855,6 +887,11 @@ macro_rules! __pgrx_c_args_dsa_allocate0 {
             @argument [__pgrx_c_args_dsa_allocate0] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dsa_allocate0] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_dsa_allocate0!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -892,6 +929,11 @@ macro_rules! __pgrx_c_args_dsa_allocate0 {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_dsa_allocate0] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_allocate0!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -908,7 +950,7 @@ macro_rules! __pgrx_c_args_dsa_allocate0 {
         $crate::dsa_allocate0!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro dsa_allocate0 from dsa.h:88
@@ -1008,13 +1050,13 @@ macro_rules! dsa_allocate0 {
         $crate::__pgrx_c_args_dsa_allocate0!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $area:tt, $size:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dsa_allocate0!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $area:tt, $size:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_dsa_allocate0!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1029,7 +1071,7 @@ macro_rules! dsa_allocate0 {
                         $crate::__pgrx_c_operand!(@check_safety; $size);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1103,7 +1145,7 @@ macro_rules! dsa_allocate0 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

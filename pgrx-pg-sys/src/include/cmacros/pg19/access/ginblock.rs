@@ -74,6 +74,13 @@ macro_rules! __pgrx_c_args_GinCategoryOffset {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinCategoryOffset] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinCategoryOffset!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -135,6 +142,11 @@ macro_rules! __pgrx_c_args_GinCategoryOffset {
             @argument [__pgrx_c_args_GinCategoryOffset] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinCategoryOffset] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinCategoryOffset!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -172,6 +184,13 @@ macro_rules! __pgrx_c_args_GinCategoryOffset {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinCategoryOffset] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinCategoryOffset!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -188,7 +207,7 @@ macro_rules! __pgrx_c_args_GinCategoryOffset {
         $crate::GinCategoryOffset!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinCategoryOffset from ginblock.h:218
@@ -336,13 +355,13 @@ macro_rules! GinCategoryOffset {
         $crate::__pgrx_c_args_GinCategoryOffset!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $itup:tt, $ginstate:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinCategoryOffset!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $itup:tt, $ginstate:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinCategoryOffset!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -356,7 +375,7 @@ macro_rules! GinCategoryOffset {
                         $crate::__pgrx_c_operand!(@check_safety; $ginstate);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::add::<
@@ -473,7 +492,7 @@ macro_rules! GinCategoryOffset {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -679,6 +698,13 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetFreeSpace {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinDataLeafPageGetFreeSpace] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetFreeSpace!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -716,6 +742,13 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetFreeSpace {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinDataLeafPageGetFreeSpace] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetFreeSpace!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -732,7 +765,7 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetFreeSpace {
         $crate::GinDataLeafPageGetFreeSpace!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinDataLeafPageGetFreeSpace from ginblock.h:287
@@ -811,13 +844,13 @@ macro_rules! GinDataLeafPageGetFreeSpace {
         $crate::__pgrx_c_args_GinDataLeafPageGetFreeSpace!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetFreeSpace!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetFreeSpace!(
@@ -834,7 +867,7 @@ macro_rules! GinDataLeafPageGetFreeSpace {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -875,7 +908,7 @@ macro_rules! GinDataLeafPageGetFreeSpace {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1018,6 +1051,13 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetPostingList {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinDataLeafPageGetPostingList] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingList!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1055,6 +1095,13 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetPostingList {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinDataLeafPageGetPostingList] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingList!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1071,7 +1118,7 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetPostingList {
         $crate::GinDataLeafPageGetPostingList!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinDataLeafPageGetPostingList from ginblock.h:279
@@ -1099,7 +1146,7 @@ macro_rules! GinDataLeafPageGetPostingList {
             }
         }
     };
-    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+    (@__pgrx_c_check_safety; @__pgrx_c_expression; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingList!(
             @collect __pgrx_emit_check_safety [];
             $($raw)*
@@ -1318,7 +1365,7 @@ macro_rules! GinDataLeafPageGetPostingList {
         )
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; @__pgrx_c_expression; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingList!(
@@ -1327,7 +1374,7 @@ macro_rules! GinDataLeafPageGetPostingList {
         )
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; @__pgrx_c_expression; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingList!(
@@ -1344,7 +1391,7 @@ macro_rules! GinDataLeafPageGetPostingList {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -1558,7 +1605,7 @@ macro_rules! GinDataLeafPageGetPostingList {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1784,7 +1831,7 @@ macro_rules! GinDataLeafPageGetPostingList {
         )
     };
     ($($raw:tt)*) => {
-        compile_error!(
+        ::core::compile_error!(
             "this C replacement requires an explicit parenthesized invocation: use @__pgrx_c_expression; before its arguments"
         )
     };
@@ -1822,7 +1869,7 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetPostingListSize {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingListSize!(
@@ -1830,7 +1877,7 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetPostingListSize {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingListSize!(
@@ -1839,7 +1886,7 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetPostingListSize {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingListSize!(
@@ -1920,7 +1967,7 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetPostingListSize {
         $crate::GinDataLeafPageGetPostingListSize!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinDataLeafPageGetPostingListSize from ginblock.h:281
@@ -2279,7 +2326,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
         )
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingListSize!(
@@ -2288,7 +2335,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
         )
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingListSize!(
@@ -2305,7 +2352,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::sub::<
@@ -2636,7 +2683,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3007,7 +3054,7 @@ macro_rules! __pgrx_c_args_GinDataLeafPageIsEmpty {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinDataLeafPageIsEmpty!(
@@ -3015,7 +3062,7 @@ macro_rules! __pgrx_c_args_GinDataLeafPageIsEmpty {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageIsEmpty!(
@@ -3024,7 +3071,7 @@ macro_rules! __pgrx_c_args_GinDataLeafPageIsEmpty {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_GinDataLeafPageIsEmpty!(
@@ -3105,7 +3152,7 @@ macro_rules! __pgrx_c_args_GinDataLeafPageIsEmpty {
         $crate::GinDataLeafPageIsEmpty!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinDataLeafPageIsEmpty from ginblock.h:284
@@ -3884,13 +3931,13 @@ macro_rules! GinDataLeafPageIsEmpty {
         $crate::__pgrx_c_args_GinDataLeafPageIsEmpty!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageIsEmpty!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageIsEmpty!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3904,7 +3951,7 @@ macro_rules! GinDataLeafPageIsEmpty {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -4654,7 +4701,7 @@ macro_rules! GinDataLeafPageIsEmpty {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5484,6 +5531,11 @@ macro_rules! __pgrx_c_args_GinDataPageGetData {
             @argument [__pgrx_c_args_GinDataPageGetData] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinDataPageGetData] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinDataPageGetData!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5521,6 +5573,13 @@ macro_rules! __pgrx_c_args_GinDataPageGetData {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinDataPageGetData] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetData!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5537,7 +5596,7 @@ macro_rules! __pgrx_c_args_GinDataPageGetData {
         $crate::GinDataPageGetData!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinDataPageGetData from ginblock.h:296
@@ -5746,13 +5805,13 @@ macro_rules! GinDataPageGetData {
         $crate::__pgrx_c_args_GinDataPageGetData!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetData!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetData!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5766,7 +5825,7 @@ macro_rules! GinDataPageGetData {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::add::<
@@ -5952,7 +6011,7 @@ macro_rules! GinDataPageGetData {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6211,6 +6270,13 @@ macro_rules! __pgrx_c_args_GinDataPageGetPostingItem {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinDataPageGetPostingItem] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetPostingItem!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6274,6 +6340,13 @@ macro_rules! __pgrx_c_args_GinDataPageGetPostingItem {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinDataPageGetPostingItem] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinDataPageGetPostingItem!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6311,6 +6384,13 @@ macro_rules! __pgrx_c_args_GinDataPageGetPostingItem {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinDataPageGetPostingItem] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetPostingItem!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6327,7 +6407,7 @@ macro_rules! __pgrx_c_args_GinDataPageGetPostingItem {
         $crate::GinDataPageGetPostingItem!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinDataPageGetPostingItem from ginblock.h:299
@@ -6637,13 +6717,13 @@ macro_rules! GinDataPageGetPostingItem {
         $crate::__pgrx_c_args_GinDataPageGetPostingItem!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt, $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetPostingItem!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt, $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetPostingItem!(
@@ -6661,7 +6741,7 @@ macro_rules! GinDataPageGetPostingItem {
                         $crate::__pgrx_c_operand!(@check_safety; $i);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -6937,7 +7017,7 @@ macro_rules! GinDataPageGetPostingItem {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7302,6 +7382,13 @@ macro_rules! __pgrx_c_args_GinDataPageGetRightBound {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinDataPageGetRightBound] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinDataPageGetRightBound!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7339,6 +7426,13 @@ macro_rules! __pgrx_c_args_GinDataPageGetRightBound {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinDataPageGetRightBound] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetRightBound!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7355,7 +7449,7 @@ macro_rules! __pgrx_c_args_GinDataPageGetRightBound {
         $crate::GinDataPageGetRightBound!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinDataPageGetRightBound from ginblock.h:289
@@ -7452,13 +7546,13 @@ macro_rules! GinDataPageGetRightBound {
         $crate::__pgrx_c_args_GinDataPageGetRightBound!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetRightBound!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetRightBound!(
@@ -7474,7 +7568,7 @@ macro_rules! GinDataPageGetRightBound {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -7536,7 +7630,7 @@ macro_rules! GinDataPageGetRightBound {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7639,7 +7733,7 @@ macro_rules! __pgrx_c_args_GinDataPageSetDataSize {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageSetDataSize!(
@@ -7648,7 +7742,7 @@ macro_rules! __pgrx_c_args_GinDataPageSetDataSize {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageSetDataSize!(
@@ -7740,6 +7834,11 @@ macro_rules! __pgrx_c_args_GinDataPageSetDataSize {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinDataPageSetDataSize] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinDataPageSetDataSize!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7777,6 +7876,13 @@ macro_rules! __pgrx_c_args_GinDataPageSetDataSize {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinDataPageSetDataSize] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageSetDataSize!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7793,7 +7899,7 @@ macro_rules! __pgrx_c_args_GinDataPageSetDataSize {
         $crate::GinDataPageSetDataSize!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinDataPageSetDataSize from ginblock.h:310
@@ -8177,7 +8283,7 @@ macro_rules! GinDataPageSetDataSize {
         $crate::__pgrx_c_args_GinDataPageSetDataSize!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageSetDataSize!(@collect __pgrx_emit_public []; $($raw)*)
@@ -8261,6 +8367,11 @@ macro_rules! __pgrx_c_args_GinGetDownlink {
             @argument [__pgrx_c_args_GinGetDownlink] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinGetDownlink] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinGetDownlink!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8298,6 +8409,11 @@ macro_rules! __pgrx_c_args_GinGetDownlink {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinGetDownlink] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetDownlink!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8314,7 +8430,7 @@ macro_rules! __pgrx_c_args_GinGetDownlink {
         $crate::GinGetDownlink!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinGetDownlink from ginblock.h:258
@@ -8407,13 +8523,13 @@ macro_rules! GinGetDownlink {
         $crate::__pgrx_c_args_GinGetDownlink!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinGetDownlink!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinGetDownlink!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8427,7 +8543,7 @@ macro_rules! GinGetDownlink {
                         $crate::__pgrx_c_operand!(@check_safety; $itup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -8485,7 +8601,7 @@ macro_rules! GinGetDownlink {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8632,6 +8748,11 @@ macro_rules! __pgrx_c_args_GinGetNPosting {
             @argument [__pgrx_c_args_GinGetNPosting] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinGetNPosting] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinGetNPosting!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8669,6 +8790,11 @@ macro_rules! __pgrx_c_args_GinGetNPosting {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinGetNPosting] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetNPosting!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8685,7 +8811,7 @@ macro_rules! __pgrx_c_args_GinGetNPosting {
         $crate::GinGetNPosting!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinGetNPosting from ginblock.h:229
@@ -8778,13 +8904,13 @@ macro_rules! GinGetNPosting {
         $crate::__pgrx_c_args_GinGetNPosting!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinGetNPosting!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinGetNPosting!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8798,7 +8924,7 @@ macro_rules! GinGetNPosting {
                         $crate::__pgrx_c_operand!(@check_safety; $itup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -8856,7 +8982,7 @@ macro_rules! GinGetNPosting {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8996,6 +9122,13 @@ macro_rules! __pgrx_c_args_GinGetNullCategory {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinGetNullCategory] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetNullCategory!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9057,6 +9190,11 @@ macro_rules! __pgrx_c_args_GinGetNullCategory {
             @argument [__pgrx_c_args_GinGetNullCategory] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinGetNullCategory] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinGetNullCategory!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9094,6 +9232,13 @@ macro_rules! __pgrx_c_args_GinGetNullCategory {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinGetNullCategory] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetNullCategory!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9110,7 +9255,7 @@ macro_rules! __pgrx_c_args_GinGetNullCategory {
         $crate::GinGetNullCategory!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinGetNullCategory from ginblock.h:221
@@ -9709,7 +9854,7 @@ macro_rules! GinGetNullCategory {
                         $crate::__pgrx_c_operand!(@check_safety; $ginstate);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::pointee(
                             (
@@ -9895,7 +10040,7 @@ macro_rules! GinGetNullCategory {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10170,6 +10315,11 @@ macro_rules! __pgrx_c_args_GinGetPosting {
             @argument [__pgrx_c_args_GinGetPosting] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinGetPosting] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinGetPosting!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10207,6 +10357,11 @@ macro_rules! __pgrx_c_args_GinGetPosting {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinGetPosting] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetPosting!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10223,7 +10378,7 @@ macro_rules! __pgrx_c_args_GinGetPosting {
         $crate::GinGetPosting!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinGetPosting from ginblock.h:239
@@ -10388,13 +10543,13 @@ macro_rules! GinGetPosting {
         $crate::__pgrx_c_args_GinGetPosting!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinGetPosting!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinGetPosting!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -10408,7 +10563,7 @@ macro_rules! GinGetPosting {
                         $crate::__pgrx_c_operand!(@check_safety; $itup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -10546,7 +10701,7 @@ macro_rules! GinGetPosting {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10765,6 +10920,11 @@ macro_rules! __pgrx_c_args_GinGetPostingOffset {
             @argument [__pgrx_c_args_GinGetPostingOffset] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinGetPostingOffset] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinGetPostingOffset!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10802,6 +10962,13 @@ macro_rules! __pgrx_c_args_GinGetPostingOffset {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinGetPostingOffset] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetPostingOffset!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10818,7 +10985,7 @@ macro_rules! __pgrx_c_args_GinGetPostingOffset {
         $crate::GinGetPostingOffset!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinGetPostingOffset from ginblock.h:237
@@ -10931,13 +11098,13 @@ macro_rules! GinGetPostingOffset {
         $crate::__pgrx_c_args_GinGetPostingOffset!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinGetPostingOffset!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinGetPostingOffset!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -10951,7 +11118,7 @@ macro_rules! GinGetPostingOffset {
                         $crate::__pgrx_c_operand!(@check_safety; $itup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -11031,7 +11198,7 @@ macro_rules! GinGetPostingOffset {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -11198,6 +11365,11 @@ macro_rules! __pgrx_c_args_GinGetPostingTree {
             @argument [__pgrx_c_args_GinGetPostingTree] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinGetPostingTree] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinGetPostingTree!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11235,6 +11407,13 @@ macro_rules! __pgrx_c_args_GinGetPostingTree {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinGetPostingTree] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetPostingTree!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11251,7 +11430,7 @@ macro_rules! __pgrx_c_args_GinGetPostingTree {
         $crate::GinGetPostingTree!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinGetPostingTree from ginblock.h:234
@@ -11344,13 +11523,13 @@ macro_rules! GinGetPostingTree {
         $crate::__pgrx_c_args_GinGetPostingTree!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinGetPostingTree!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinGetPostingTree!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -11364,7 +11543,7 @@ macro_rules! GinGetPostingTree {
                         $crate::__pgrx_c_operand!(@check_safety; $itup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -11422,7 +11601,7 @@ macro_rules! GinGetPostingTree {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -11569,6 +11748,11 @@ macro_rules! __pgrx_c_args_GinIsPostingTree {
             @argument [__pgrx_c_args_GinIsPostingTree] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinIsPostingTree] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinIsPostingTree!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11606,6 +11790,13 @@ macro_rules! __pgrx_c_args_GinIsPostingTree {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinIsPostingTree] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinIsPostingTree!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11622,7 +11813,7 @@ macro_rules! __pgrx_c_args_GinIsPostingTree {
         $crate::GinIsPostingTree!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinIsPostingTree from ginblock.h:232
@@ -11729,13 +11920,13 @@ macro_rules! GinIsPostingTree {
         $crate::__pgrx_c_args_GinIsPostingTree!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinIsPostingTree!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinIsPostingTree!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -11749,7 +11940,7 @@ macro_rules! GinIsPostingTree {
                         $crate::__pgrx_c_operand!(@check_safety; $itup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -11818,7 +12009,7 @@ macro_rules! GinIsPostingTree {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -11987,6 +12178,13 @@ macro_rules! __pgrx_c_args_GinItemPointerGetBlockNumber {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinItemPointerGetBlockNumber] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinItemPointerGetBlockNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12024,6 +12222,13 @@ macro_rules! __pgrx_c_args_GinItemPointerGetBlockNumber {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinItemPointerGetBlockNumber] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerGetBlockNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12040,7 +12245,7 @@ macro_rules! __pgrx_c_args_GinItemPointerGetBlockNumber {
         $crate::GinItemPointerGetBlockNumber!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinItemPointerGetBlockNumber from ginblock.h:144
@@ -12116,13 +12321,13 @@ macro_rules! GinItemPointerGetBlockNumber {
         $crate::__pgrx_c_args_GinItemPointerGetBlockNumber!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerGetBlockNumber!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerGetBlockNumber!(
@@ -12139,7 +12344,7 @@ macro_rules! GinItemPointerGetBlockNumber {
                         $crate::__pgrx_c_operand!(@check_safety; $pointer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -12175,7 +12380,7 @@ macro_rules! GinItemPointerGetBlockNumber {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -12316,6 +12521,13 @@ macro_rules! __pgrx_c_args_GinItemPointerGetOffsetNumber {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinItemPointerGetOffsetNumber] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinItemPointerGetOffsetNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12353,6 +12565,13 @@ macro_rules! __pgrx_c_args_GinItemPointerGetOffsetNumber {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinItemPointerGetOffsetNumber] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerGetOffsetNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12369,7 +12588,7 @@ macro_rules! __pgrx_c_args_GinItemPointerGetOffsetNumber {
         $crate::GinItemPointerGetOffsetNumber!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinItemPointerGetOffsetNumber from ginblock.h:147
@@ -12448,7 +12667,7 @@ macro_rules! GinItemPointerGetOffsetNumber {
         )
     };
     (@__pgrx_emit_place; $pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerGetOffsetNumber!(
@@ -12457,7 +12676,7 @@ macro_rules! GinItemPointerGetOffsetNumber {
         )
     };
     (@__pgrx_emit_read_place; $pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerGetOffsetNumber!(
@@ -12474,7 +12693,7 @@ macro_rules! GinItemPointerGetOffsetNumber {
                         $crate::__pgrx_c_operand!(@check_safety; $pointer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -12510,7 +12729,7 @@ macro_rules! GinItemPointerGetOffsetNumber {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -12642,6 +12861,13 @@ macro_rules! __pgrx_c_args_GinItemPointerSetBlockNumber {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinItemPointerSetBlockNumber] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetBlockNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12708,6 +12934,13 @@ macro_rules! __pgrx_c_args_GinItemPointerSetBlockNumber {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinItemPointerSetBlockNumber] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinItemPointerSetBlockNumber!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12745,6 +12978,13 @@ macro_rules! __pgrx_c_args_GinItemPointerSetBlockNumber {
             ] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinItemPointerSetBlockNumber] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetBlockNumber!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12761,7 +13001,7 @@ macro_rules! __pgrx_c_args_GinItemPointerSetBlockNumber {
         $crate::GinItemPointerSetBlockNumber!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinItemPointerSetBlockNumber from ginblock.h:150
@@ -12850,13 +13090,13 @@ macro_rules! GinItemPointerSetBlockNumber {
         $crate::__pgrx_c_args_GinItemPointerSetBlockNumber!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $pointer:tt, $blkno:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetBlockNumber!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $pointer:tt, $blkno:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetBlockNumber!(
@@ -12874,7 +13114,7 @@ macro_rules! GinItemPointerSetBlockNumber {
                         $crate::__pgrx_c_operand!(@check_safety; $blkno);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::ItemPointerSetBlockNumber(
@@ -12923,7 +13163,7 @@ macro_rules! GinItemPointerSetBlockNumber {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -13067,6 +13307,13 @@ macro_rules! __pgrx_c_args_GinItemPointerSetOffsetNumber {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinItemPointerSetOffsetNumber] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetOffsetNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13133,6 +13380,13 @@ macro_rules! __pgrx_c_args_GinItemPointerSetOffsetNumber {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinItemPointerSetOffsetNumber] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinItemPointerSetOffsetNumber!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13170,6 +13424,13 @@ macro_rules! __pgrx_c_args_GinItemPointerSetOffsetNumber {
             ] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinItemPointerSetOffsetNumber] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetOffsetNumber!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13186,7 +13447,7 @@ macro_rules! __pgrx_c_args_GinItemPointerSetOffsetNumber {
         $crate::GinItemPointerSetOffsetNumber!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinItemPointerSetOffsetNumber from ginblock.h:153
@@ -13278,7 +13539,7 @@ macro_rules! GinItemPointerSetOffsetNumber {
         )
     };
     (@__pgrx_emit_place; $pointer:tt, $offnum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetOffsetNumber!(
@@ -13287,7 +13548,7 @@ macro_rules! GinItemPointerSetOffsetNumber {
         )
     };
     (@__pgrx_emit_read_place; $pointer:tt, $offnum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetOffsetNumber!(
@@ -13305,7 +13566,7 @@ macro_rules! GinItemPointerSetOffsetNumber {
                         $crate::__pgrx_c_operand!(@check_safety; $offnum);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::ItemPointerSetOffsetNumber(
@@ -13354,7 +13615,7 @@ macro_rules! GinItemPointerSetOffsetNumber {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -13499,6 +13760,11 @@ macro_rules! __pgrx_c_args_GinItupIsCompressed {
             @argument [__pgrx_c_args_GinItupIsCompressed] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinItupIsCompressed] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinItupIsCompressed!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13536,6 +13802,13 @@ macro_rules! __pgrx_c_args_GinItupIsCompressed {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinItupIsCompressed] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItupIsCompressed!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13552,7 +13825,7 @@ macro_rules! __pgrx_c_args_GinItupIsCompressed {
         $crate::GinItupIsCompressed!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinItupIsCompressed from ginblock.h:240
@@ -13672,13 +13945,13 @@ macro_rules! GinItupIsCompressed {
         $crate::__pgrx_c_args_GinItupIsCompressed!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinItupIsCompressed!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinItupIsCompressed!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -13692,7 +13965,7 @@ macro_rules! GinItupIsCompressed {
                         $crate::__pgrx_c_operand!(@check_safety; $itup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -13784,7 +14057,7 @@ macro_rules! GinItupIsCompressed {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -13963,6 +14236,13 @@ macro_rules! __pgrx_c_args_GinNextPostingListSegment {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinNextPostingListSegment] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinNextPostingListSegment!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14000,6 +14280,13 @@ macro_rules! __pgrx_c_args_GinNextPostingListSegment {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinNextPostingListSegment] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinNextPostingListSegment!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14016,7 +14303,7 @@ macro_rules! __pgrx_c_args_GinNextPostingListSegment {
         $crate::GinNextPostingListSegment!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinNextPostingListSegment from ginblock.h:344
@@ -14279,13 +14566,13 @@ macro_rules! GinNextPostingListSegment {
         $crate::__pgrx_c_args_GinNextPostingListSegment!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cur:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinNextPostingListSegment!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cur:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinNextPostingListSegment!(
@@ -14302,7 +14589,7 @@ macro_rules! GinNextPostingListSegment {
                         $crate::__pgrx_c_operand!(@check_safety; $cur);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -14540,7 +14827,7 @@ macro_rules! GinNextPostingListSegment {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -14862,6 +15149,13 @@ macro_rules! __pgrx_c_args_GinNonLeafDataPageGetFreeSpace {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinNonLeafDataPageGetFreeSpace] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinNonLeafDataPageGetFreeSpace!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14899,6 +15193,13 @@ macro_rules! __pgrx_c_args_GinNonLeafDataPageGetFreeSpace {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinNonLeafDataPageGetFreeSpace] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinNonLeafDataPageGetFreeSpace!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14915,7 +15216,7 @@ macro_rules! __pgrx_c_args_GinNonLeafDataPageGetFreeSpace {
         $crate::GinNonLeafDataPageGetFreeSpace!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinNonLeafDataPageGetFreeSpace from ginblock.h:316
@@ -15573,7 +15874,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
         )
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinNonLeafDataPageGetFreeSpace!(
@@ -15582,7 +15883,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
         )
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinNonLeafDataPageGetFreeSpace!(
@@ -15599,7 +15900,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                             $crate::__pgrx_c_macros::expression::sub::<
@@ -16239,7 +16540,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -16954,6 +17255,11 @@ macro_rules! __pgrx_c_args_GinPageGetDeleteXid {
             @argument [__pgrx_c_args_GinPageGetDeleteXid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageGetDeleteXid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinPageGetDeleteXid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16991,6 +17297,13 @@ macro_rules! __pgrx_c_args_GinPageGetDeleteXid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageGetDeleteXid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageGetDeleteXid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17007,7 +17320,7 @@ macro_rules! __pgrx_c_args_GinPageGetDeleteXid {
         $crate::GinPageGetDeleteXid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinPageGetDeleteXid from ginblock.h:136
@@ -17159,7 +17472,7 @@ macro_rules! GinPageGetDeleteXid {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_pd_prune_xid,
@@ -17193,7 +17506,7 @@ macro_rules! GinPageGetDeleteXid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -17322,6 +17635,11 @@ macro_rules! __pgrx_c_args_GinPageGetMeta {
             @argument [__pgrx_c_args_GinPageGetMeta] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageGetMeta] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinPageGetMeta!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17359,6 +17677,11 @@ macro_rules! __pgrx_c_args_GinPageGetMeta {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageGetMeta] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageGetMeta!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17375,7 +17698,7 @@ macro_rules! __pgrx_c_args_GinPageGetMeta {
         $crate::GinPageGetMeta!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinPageGetMeta from ginblock.h:105
@@ -17469,13 +17792,13 @@ macro_rules! GinPageGetMeta {
         $crate::__pgrx_c_args_GinPageGetMeta!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $p:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageGetMeta!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $p:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageGetMeta!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -17488,7 +17811,7 @@ macro_rules! GinPageGetMeta {
                         $crate::__pgrx_c_operand!(@check_safety; $p);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -17545,7 +17868,7 @@ macro_rules! GinPageGetMeta {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -17693,6 +18016,11 @@ macro_rules! __pgrx_c_args_GinPageGetOpaque {
             @argument [__pgrx_c_args_GinPageGetOpaque] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageGetOpaque] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinPageGetOpaque!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17730,6 +18058,13 @@ macro_rules! __pgrx_c_args_GinPageGetOpaque {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageGetOpaque] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageGetOpaque!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17746,7 +18081,7 @@ macro_rules! __pgrx_c_args_GinPageGetOpaque {
         $crate::GinPageGetOpaque!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinPageGetOpaque from ginblock.h:111
@@ -17907,13 +18242,13 @@ macro_rules! GinPageGetOpaque {
         $crate::__pgrx_c_args_GinPageGetOpaque!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageGetOpaque!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageGetOpaque!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -17927,7 +18262,7 @@ macro_rules! GinPageGetOpaque {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -18060,7 +18395,7 @@ macro_rules! GinPageGetOpaque {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -18275,6 +18610,11 @@ macro_rules! __pgrx_c_args_GinPageHasFullRow {
             @argument [__pgrx_c_args_GinPageHasFullRow] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageHasFullRow] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinPageHasFullRow!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18312,6 +18652,13 @@ macro_rules! __pgrx_c_args_GinPageHasFullRow {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageHasFullRow] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageHasFullRow!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -18328,7 +18675,7 @@ macro_rules! __pgrx_c_args_GinPageHasFullRow {
         $crate::GinPageHasFullRow!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinPageHasFullRow from ginblock.h:120
@@ -18545,13 +18892,13 @@ macro_rules! GinPageHasFullRow {
         $crate::__pgrx_c_args_GinPageHasFullRow!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageHasFullRow!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageHasFullRow!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -18565,7 +18912,7 @@ macro_rules! GinPageHasFullRow {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -18752,7 +19099,7 @@ macro_rules! GinPageHasFullRow {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -19023,6 +19370,11 @@ macro_rules! __pgrx_c_args_GinPageIsCompressed {
             @argument [__pgrx_c_args_GinPageIsCompressed] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageIsCompressed] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinPageIsCompressed!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19060,6 +19412,13 @@ macro_rules! __pgrx_c_args_GinPageIsCompressed {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageIsCompressed] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsCompressed!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19076,7 +19435,7 @@ macro_rules! __pgrx_c_args_GinPageIsCompressed {
         $crate::GinPageIsCompressed!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinPageIsCompressed from ginblock.h:122
@@ -19293,13 +19652,13 @@ macro_rules! GinPageIsCompressed {
         $crate::__pgrx_c_args_GinPageIsCompressed!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsCompressed!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsCompressed!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -19313,7 +19672,7 @@ macro_rules! GinPageIsCompressed {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -19500,7 +19859,7 @@ macro_rules! GinPageIsCompressed {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -19771,6 +20130,11 @@ macro_rules! __pgrx_c_args_GinPageIsData {
             @argument [__pgrx_c_args_GinPageIsData] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageIsData] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinPageIsData!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19808,6 +20172,11 @@ macro_rules! __pgrx_c_args_GinPageIsData {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageIsData] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsData!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -19824,7 +20193,7 @@ macro_rules! __pgrx_c_args_GinPageIsData {
         $crate::GinPageIsData!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinPageIsData from ginblock.h:116
@@ -20041,13 +20410,13 @@ macro_rules! GinPageIsData {
         $crate::__pgrx_c_args_GinPageIsData!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsData!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsData!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -20061,7 +20430,7 @@ macro_rules! GinPageIsData {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -20246,7 +20615,7 @@ macro_rules! GinPageIsData {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -20517,6 +20886,11 @@ macro_rules! __pgrx_c_args_GinPageIsDeleted {
             @argument [__pgrx_c_args_GinPageIsDeleted] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageIsDeleted] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinPageIsDeleted!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20554,6 +20928,13 @@ macro_rules! __pgrx_c_args_GinPageIsDeleted {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageIsDeleted] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsDeleted!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -20570,7 +20951,7 @@ macro_rules! __pgrx_c_args_GinPageIsDeleted {
         $crate::GinPageIsDeleted!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinPageIsDeleted from ginblock.h:125
@@ -20787,13 +21168,13 @@ macro_rules! GinPageIsDeleted {
         $crate::__pgrx_c_args_GinPageIsDeleted!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsDeleted!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsDeleted!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -20807,7 +21188,7 @@ macro_rules! GinPageIsDeleted {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -20994,7 +21375,7 @@ macro_rules! GinPageIsDeleted {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -21270,6 +21651,13 @@ macro_rules! __pgrx_c_args_GinPageIsIncompleteSplit {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageIsIncompleteSplit] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinPageIsIncompleteSplit!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -21307,6 +21695,13 @@ macro_rules! __pgrx_c_args_GinPageIsIncompleteSplit {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageIsIncompleteSplit] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsIncompleteSplit!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -21323,7 +21718,7 @@ macro_rules! __pgrx_c_args_GinPageIsIncompleteSplit {
         $crate::GinPageIsIncompleteSplit!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinPageIsIncompleteSplit from ginblock.h:128
@@ -21543,13 +21938,13 @@ macro_rules! GinPageIsIncompleteSplit {
         $crate::__pgrx_c_args_GinPageIsIncompleteSplit!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsIncompleteSplit!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsIncompleteSplit!(
@@ -21566,7 +21961,7 @@ macro_rules! GinPageIsIncompleteSplit {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -21753,7 +22148,7 @@ macro_rules! GinPageIsIncompleteSplit {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -22024,6 +22419,11 @@ macro_rules! __pgrx_c_args_GinPageIsLeaf {
             @argument [__pgrx_c_args_GinPageIsLeaf] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageIsLeaf] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinPageIsLeaf!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -22061,6 +22461,11 @@ macro_rules! __pgrx_c_args_GinPageIsLeaf {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageIsLeaf] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsLeaf!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -22077,7 +22482,7 @@ macro_rules! __pgrx_c_args_GinPageIsLeaf {
         $crate::GinPageIsLeaf!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinPageIsLeaf from ginblock.h:113
@@ -22294,13 +22699,13 @@ macro_rules! GinPageIsLeaf {
         $crate::__pgrx_c_args_GinPageIsLeaf!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsLeaf!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsLeaf!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -22314,7 +22719,7 @@ macro_rules! GinPageIsLeaf {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -22499,7 +22904,7 @@ macro_rules! GinPageIsLeaf {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -22770,6 +23175,11 @@ macro_rules! __pgrx_c_args_GinPageIsList {
             @argument [__pgrx_c_args_GinPageIsList] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageIsList] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinPageIsList!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -22807,6 +23217,11 @@ macro_rules! __pgrx_c_args_GinPageIsList {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageIsList] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsList!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -22823,7 +23238,7 @@ macro_rules! __pgrx_c_args_GinPageIsList {
         $crate::GinPageIsList!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinPageIsList from ginblock.h:118
@@ -23040,13 +23455,13 @@ macro_rules! GinPageIsList {
         $crate::__pgrx_c_args_GinPageIsList!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsList!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsList!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -23060,7 +23475,7 @@ macro_rules! GinPageIsList {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -23245,7 +23660,7 @@ macro_rules! GinPageIsList {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -23516,6 +23931,11 @@ macro_rules! __pgrx_c_args_GinPageRightMost {
             @argument [__pgrx_c_args_GinPageRightMost] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageRightMost] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinPageRightMost!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -23553,6 +23973,13 @@ macro_rules! __pgrx_c_args_GinPageRightMost {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageRightMost] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageRightMost!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -23569,7 +23996,7 @@ macro_rules! __pgrx_c_args_GinPageRightMost {
         $crate::GinPageRightMost!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinPageRightMost from ginblock.h:130
@@ -23771,13 +24198,13 @@ macro_rules! GinPageRightMost {
         $crate::__pgrx_c_args_GinPageRightMost!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageRightMost!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageRightMost!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -23791,7 +24218,7 @@ macro_rules! GinPageRightMost {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -23957,7 +24384,7 @@ macro_rules! GinPageRightMost {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -24216,6 +24643,11 @@ macro_rules! __pgrx_c_args_GinPageSetCompressed {
             @argument [__pgrx_c_args_GinPageSetCompressed] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageSetCompressed] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinPageSetCompressed!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -24253,6 +24685,13 @@ macro_rules! __pgrx_c_args_GinPageSetCompressed {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageSetCompressed] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetCompressed!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -24269,7 +24708,7 @@ macro_rules! __pgrx_c_args_GinPageSetCompressed {
         $crate::GinPageSetCompressed!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinPageSetCompressed from ginblock.h:123
@@ -24464,13 +24903,13 @@ macro_rules! GinPageSetCompressed {
         $crate::__pgrx_c_args_GinPageSetCompressed!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetCompressed!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetCompressed!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -24484,7 +24923,7 @@ macro_rules! GinPageSetCompressed {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::modify(
@@ -24651,7 +25090,7 @@ macro_rules! GinPageSetCompressed {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -24900,6 +25339,11 @@ macro_rules! __pgrx_c_args_GinPageSetData {
             @argument [__pgrx_c_args_GinPageSetData] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageSetData] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinPageSetData!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -24937,6 +25381,11 @@ macro_rules! __pgrx_c_args_GinPageSetData {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageSetData] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetData!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -24953,7 +25402,7 @@ macro_rules! __pgrx_c_args_GinPageSetData {
         $crate::GinPageSetData!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinPageSetData from ginblock.h:117
@@ -25148,13 +25597,13 @@ macro_rules! GinPageSetData {
         $crate::__pgrx_c_args_GinPageSetData!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetData!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetData!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -25168,7 +25617,7 @@ macro_rules! GinPageSetData {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::modify(
@@ -25335,7 +25784,7 @@ macro_rules! GinPageSetData {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -25577,6 +26026,13 @@ macro_rules! __pgrx_c_args_GinPageSetDeleteXid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageSetDeleteXid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetDeleteXid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -25590,7 +26046,7 @@ macro_rules! __pgrx_c_args_GinPageSetDeleteXid {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinPageSetDeleteXid!(
@@ -25598,7 +26054,7 @@ macro_rules! __pgrx_c_args_GinPageSetDeleteXid {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetDeleteXid!(
@@ -25607,7 +26063,7 @@ macro_rules! __pgrx_c_args_GinPageSetDeleteXid {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_GinPageSetDeleteXid!(
@@ -25686,7 +26142,7 @@ macro_rules! __pgrx_c_args_GinPageSetDeleteXid {
         $crate::GinPageSetDeleteXid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinPageSetDeleteXid from ginblock.h:137
@@ -25765,13 +26221,13 @@ macro_rules! GinPageSetDeleteXid {
         $crate::__pgrx_c_args_GinPageSetDeleteXid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt, $xid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetDeleteXid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt, $xid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetDeleteXid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -25785,7 +26241,7 @@ macro_rules! GinPageSetDeleteXid {
                         $crate::__pgrx_c_operand!(@check_safety; $xid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -25834,7 +26290,7 @@ macro_rules! GinPageSetDeleteXid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -25966,6 +26422,11 @@ macro_rules! __pgrx_c_args_GinPageSetDeleted {
             @argument [__pgrx_c_args_GinPageSetDeleted] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageSetDeleted] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinPageSetDeleted!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -26003,6 +26464,13 @@ macro_rules! __pgrx_c_args_GinPageSetDeleted {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageSetDeleted] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetDeleted!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -26019,7 +26487,7 @@ macro_rules! __pgrx_c_args_GinPageSetDeleted {
         $crate::GinPageSetDeleted!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinPageSetDeleted from ginblock.h:126
@@ -26214,13 +26682,13 @@ macro_rules! GinPageSetDeleted {
         $crate::__pgrx_c_args_GinPageSetDeleted!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetDeleted!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetDeleted!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -26234,7 +26702,7 @@ macro_rules! GinPageSetDeleted {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::modify(
@@ -26401,7 +26869,7 @@ macro_rules! GinPageSetDeleted {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -26650,6 +27118,11 @@ macro_rules! __pgrx_c_args_GinPageSetFullRow {
             @argument [__pgrx_c_args_GinPageSetFullRow] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageSetFullRow] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinPageSetFullRow!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -26687,6 +27160,13 @@ macro_rules! __pgrx_c_args_GinPageSetFullRow {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageSetFullRow] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetFullRow!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -26703,7 +27183,7 @@ macro_rules! __pgrx_c_args_GinPageSetFullRow {
         $crate::GinPageSetFullRow!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinPageSetFullRow from ginblock.h:121
@@ -26898,13 +27378,13 @@ macro_rules! GinPageSetFullRow {
         $crate::__pgrx_c_args_GinPageSetFullRow!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetFullRow!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetFullRow!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -26918,7 +27398,7 @@ macro_rules! GinPageSetFullRow {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::modify(
@@ -27085,7 +27565,7 @@ macro_rules! GinPageSetFullRow {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -27334,6 +27814,11 @@ macro_rules! __pgrx_c_args_GinPageSetLeaf {
             @argument [__pgrx_c_args_GinPageSetLeaf] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageSetLeaf] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinPageSetLeaf!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -27371,6 +27856,11 @@ macro_rules! __pgrx_c_args_GinPageSetLeaf {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageSetLeaf] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetLeaf!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -27387,7 +27877,7 @@ macro_rules! __pgrx_c_args_GinPageSetLeaf {
         $crate::GinPageSetLeaf!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinPageSetLeaf from ginblock.h:114
@@ -27582,13 +28072,13 @@ macro_rules! GinPageSetLeaf {
         $crate::__pgrx_c_args_GinPageSetLeaf!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetLeaf!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetLeaf!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -27602,7 +28092,7 @@ macro_rules! GinPageSetLeaf {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::modify(
@@ -27769,7 +28259,7 @@ macro_rules! GinPageSetLeaf {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -28018,6 +28508,11 @@ macro_rules! __pgrx_c_args_GinPageSetList {
             @argument [__pgrx_c_args_GinPageSetList] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageSetList] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinPageSetList!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -28055,6 +28550,11 @@ macro_rules! __pgrx_c_args_GinPageSetList {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageSetList] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetList!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -28071,7 +28571,7 @@ macro_rules! __pgrx_c_args_GinPageSetList {
         $crate::GinPageSetList!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinPageSetList from ginblock.h:119
@@ -28266,13 +28766,13 @@ macro_rules! GinPageSetList {
         $crate::__pgrx_c_args_GinPageSetList!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetList!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetList!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -28286,7 +28786,7 @@ macro_rules! GinPageSetList {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::modify(
@@ -28453,7 +28953,7 @@ macro_rules! GinPageSetList {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -28705,6 +29205,11 @@ macro_rules! __pgrx_c_args_GinPageSetNonDeleted {
             @argument [__pgrx_c_args_GinPageSetNonDeleted] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageSetNonDeleted] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinPageSetNonDeleted!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -28742,6 +29247,13 @@ macro_rules! __pgrx_c_args_GinPageSetNonDeleted {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageSetNonDeleted] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetNonDeleted!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -28758,7 +29270,7 @@ macro_rules! __pgrx_c_args_GinPageSetNonDeleted {
         $crate::GinPageSetNonDeleted!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinPageSetNonDeleted from ginblock.h:127
@@ -28957,13 +29469,13 @@ macro_rules! GinPageSetNonDeleted {
         $crate::__pgrx_c_args_GinPageSetNonDeleted!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetNonDeleted!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetNonDeleted!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -28977,7 +29489,7 @@ macro_rules! GinPageSetNonDeleted {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::modify(
@@ -29151,7 +29663,7 @@ macro_rules! GinPageSetNonDeleted {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -29404,6 +29916,11 @@ macro_rules! __pgrx_c_args_GinPageSetNonLeaf {
             @argument [__pgrx_c_args_GinPageSetNonLeaf] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageSetNonLeaf] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinPageSetNonLeaf!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -29441,6 +29958,13 @@ macro_rules! __pgrx_c_args_GinPageSetNonLeaf {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinPageSetNonLeaf] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetNonLeaf!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -29457,7 +29981,7 @@ macro_rules! __pgrx_c_args_GinPageSetNonLeaf {
         $crate::GinPageSetNonLeaf!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinPageSetNonLeaf from ginblock.h:115
@@ -29656,13 +30180,13 @@ macro_rules! GinPageSetNonLeaf {
         $crate::__pgrx_c_args_GinPageSetNonLeaf!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetNonLeaf!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetNonLeaf!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -29676,7 +30200,7 @@ macro_rules! GinPageSetNonLeaf {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::modify(
@@ -29850,7 +30374,7 @@ macro_rules! GinPageSetNonLeaf {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -30096,6 +30620,11 @@ macro_rules! __pgrx_c_args_GinSetDownlink {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinSetDownlink] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetDownlink!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -30157,6 +30686,11 @@ macro_rules! __pgrx_c_args_GinSetDownlink {
             @argument [__pgrx_c_args_GinSetDownlink] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinSetDownlink] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinSetDownlink!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -30194,6 +30728,11 @@ macro_rules! __pgrx_c_args_GinSetDownlink {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinSetDownlink] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetDownlink!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -30210,7 +30749,7 @@ macro_rules! __pgrx_c_args_GinSetDownlink {
         $crate::GinSetDownlink!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinSetDownlink from ginblock.h:259
@@ -30321,13 +30860,13 @@ macro_rules! GinSetDownlink {
         $crate::__pgrx_c_args_GinSetDownlink!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $itup:tt, $blkno:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinSetDownlink!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $itup:tt, $blkno:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinSetDownlink!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -30342,7 +30881,7 @@ macro_rules! GinSetDownlink {
                         $crate::__pgrx_c_operand!(@check_safety; $blkno);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::ItemPointerSet(
@@ -30430,7 +30969,7 @@ macro_rules! GinSetDownlink {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -30589,6 +31128,11 @@ macro_rules! __pgrx_c_args_GinSetNPosting {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinSetNPosting] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNPosting!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -30650,6 +31194,11 @@ macro_rules! __pgrx_c_args_GinSetNPosting {
             @argument [__pgrx_c_args_GinSetNPosting] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinSetNPosting] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinSetNPosting!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -30687,6 +31236,11 @@ macro_rules! __pgrx_c_args_GinSetNPosting {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinSetNPosting] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNPosting!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -30703,7 +31257,7 @@ macro_rules! __pgrx_c_args_GinSetNPosting {
         $crate::GinSetNPosting!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinSetNPosting from ginblock.h:230
@@ -30798,13 +31352,13 @@ macro_rules! GinSetNPosting {
         $crate::__pgrx_c_args_GinSetNPosting!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $itup:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinSetNPosting!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $itup:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinSetNPosting!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -30819,7 +31373,7 @@ macro_rules! GinSetNPosting {
                         $crate::__pgrx_c_operand!(@check_safety; $n);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::ItemPointerSetOffsetNumber(
@@ -30886,7 +31440,7 @@ macro_rules! GinSetNPosting {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -31029,6 +31583,13 @@ macro_rules! __pgrx_c_args_GinSetNullCategory {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinSetNullCategory] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNullCategory!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -31080,6 +31641,13 @@ macro_rules! __pgrx_c_args_GinSetNullCategory {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_GinSetNullCategory] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinSetNullCategory] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -31144,6 +31712,11 @@ macro_rules! __pgrx_c_args_GinSetNullCategory {
             @argument [__pgrx_c_args_GinSetNullCategory] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinSetNullCategory] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinSetNullCategory!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -31181,6 +31754,13 @@ macro_rules! __pgrx_c_args_GinSetNullCategory {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinSetNullCategory] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNullCategory!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -31197,7 +31777,7 @@ macro_rules! __pgrx_c_args_GinSetNullCategory {
         $crate::GinSetNullCategory!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinSetNullCategory from ginblock.h:223
@@ -31430,13 +32010,13 @@ macro_rules! GinSetNullCategory {
         $crate::__pgrx_c_args_GinSetNullCategory!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $itup:tt, $ginstate:tt, $c:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinSetNullCategory!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $itup:tt, $ginstate:tt, $c:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinSetNullCategory!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -31452,7 +32032,7 @@ macro_rules! GinSetNullCategory {
                         $crate::__pgrx_c_operand!(@check_safety; $c);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -31650,7 +32230,7 @@ macro_rules! GinSetNullCategory {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -31928,6 +32508,13 @@ macro_rules! __pgrx_c_args_GinSetPostingOffset {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinSetPostingOffset] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingOffset!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -31989,6 +32576,11 @@ macro_rules! __pgrx_c_args_GinSetPostingOffset {
             @argument [__pgrx_c_args_GinSetPostingOffset] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinSetPostingOffset] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinSetPostingOffset!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -32026,6 +32618,13 @@ macro_rules! __pgrx_c_args_GinSetPostingOffset {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinSetPostingOffset] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingOffset!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -32042,7 +32641,7 @@ macro_rules! __pgrx_c_args_GinSetPostingOffset {
         $crate::GinSetPostingOffset!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinSetPostingOffset from ginblock.h:238
@@ -32148,13 +32747,13 @@ macro_rules! GinSetPostingOffset {
         $crate::__pgrx_c_args_GinSetPostingOffset!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $itup:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingOffset!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $itup:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingOffset!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -32169,7 +32768,7 @@ macro_rules! GinSetPostingOffset {
                         $crate::__pgrx_c_operand!(@check_safety; $n);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::ItemPointerSetBlockNumber(
@@ -32255,7 +32854,7 @@ macro_rules! GinSetPostingOffset {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -32412,6 +33011,13 @@ macro_rules! __pgrx_c_args_GinSetPostingTree {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinSetPostingTree] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingTree!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -32473,6 +33079,11 @@ macro_rules! __pgrx_c_args_GinSetPostingTree {
             @argument [__pgrx_c_args_GinSetPostingTree] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinSetPostingTree] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinSetPostingTree!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -32510,6 +33121,13 @@ macro_rules! __pgrx_c_args_GinSetPostingTree {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinSetPostingTree] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingTree!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -32526,7 +33144,7 @@ macro_rules! __pgrx_c_args_GinSetPostingTree {
         $crate::GinSetPostingTree!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinSetPostingTree from ginblock.h:233
@@ -32704,13 +33322,13 @@ macro_rules! GinSetPostingTree {
         $crate::__pgrx_c_args_GinSetPostingTree!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $itup:tt, $blkno:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingTree!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $itup:tt, $blkno:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingTree!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -32725,7 +33343,7 @@ macro_rules! GinSetPostingTree {
                         $crate::__pgrx_c_operand!(@check_safety; $blkno);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -32871,7 +33489,7 @@ macro_rules! GinSetPostingTree {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -33107,6 +33725,11 @@ macro_rules! __pgrx_c_args_ItemPointerIsLossyPage {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerIsLossyPage] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ItemPointerIsLossyPage!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -33144,6 +33767,13 @@ macro_rules! __pgrx_c_args_ItemPointerIsLossyPage {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerIsLossyPage] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerIsLossyPage!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -33160,7 +33790,7 @@ macro_rules! __pgrx_c_args_ItemPointerIsLossyPage {
         $crate::ItemPointerIsLossyPage!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ItemPointerIsLossyPage from ginblock.h:176
@@ -33322,13 +33952,13 @@ macro_rules! ItemPointerIsLossyPage {
         $crate::__pgrx_c_args_ItemPointerIsLossyPage!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $p:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerIsLossyPage!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $p:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerIsLossyPage!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -33342,7 +33972,7 @@ macro_rules! ItemPointerIsLossyPage {
                         $crate::__pgrx_c_operand!(@check_safety; $p);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -33477,7 +34107,7 @@ macro_rules! ItemPointerIsLossyPage {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -33690,6 +34320,11 @@ macro_rules! __pgrx_c_args_ItemPointerIsMin {
             @argument [__pgrx_c_args_ItemPointerIsMin] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerIsMin] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ItemPointerIsMin!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -33727,6 +34362,13 @@ macro_rules! __pgrx_c_args_ItemPointerIsMin {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerIsMin] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerIsMin!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -33743,7 +34385,7 @@ macro_rules! __pgrx_c_args_ItemPointerIsMin {
         $crate::ItemPointerIsMin!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ItemPointerIsMin from ginblock.h:169
@@ -33921,13 +34563,13 @@ macro_rules! ItemPointerIsMin {
         $crate::__pgrx_c_args_ItemPointerIsMin!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $p:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerIsMin!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $p:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerIsMin!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -33941,7 +34583,7 @@ macro_rules! ItemPointerIsMin {
                         $crate::__pgrx_c_operand!(@check_safety; $p);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -34093,7 +34735,7 @@ macro_rules! ItemPointerIsMin {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -34321,6 +34963,13 @@ macro_rules! __pgrx_c_args_ItemPointerSetLossyPage {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerSetLossyPage] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetLossyPage!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -34384,6 +35033,11 @@ macro_rules! __pgrx_c_args_ItemPointerSetLossyPage {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerSetLossyPage] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ItemPointerSetLossyPage!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -34421,6 +35075,13 @@ macro_rules! __pgrx_c_args_ItemPointerSetLossyPage {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerSetLossyPage] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetLossyPage!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -34437,7 +35098,7 @@ macro_rules! __pgrx_c_args_ItemPointerSetLossyPage {
         $crate::ItemPointerSetLossyPage!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ItemPointerSetLossyPage from ginblock.h:174
@@ -34546,13 +35207,13 @@ macro_rules! ItemPointerSetLossyPage {
         $crate::__pgrx_c_args_ItemPointerSetLossyPage!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $p:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetLossyPage!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $p:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetLossyPage!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -34567,7 +35228,7 @@ macro_rules! ItemPointerSetLossyPage {
                         $crate::__pgrx_c_operand!(@check_safety; $b);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::ItemPointerSet(
@@ -34644,7 +35305,7 @@ macro_rules! ItemPointerSetLossyPage {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -34805,6 +35466,11 @@ macro_rules! __pgrx_c_args_ItemPointerSetMax {
             @argument [__pgrx_c_args_ItemPointerSetMax] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerSetMax] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ItemPointerSetMax!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -34842,6 +35508,13 @@ macro_rules! __pgrx_c_args_ItemPointerSetMax {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerSetMax] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetMax!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -34858,7 +35531,7 @@ macro_rules! __pgrx_c_args_ItemPointerSetMax {
         $crate::ItemPointerSetMax!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ItemPointerSetMax from ginblock.h:172
@@ -34963,13 +35636,13 @@ macro_rules! ItemPointerSetMax {
         $crate::__pgrx_c_args_ItemPointerSetMax!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $p:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetMax!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $p:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetMax!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -34983,7 +35656,7 @@ macro_rules! ItemPointerSetMax {
                         $crate::__pgrx_c_operand!(@check_safety; $p);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::ItemPointerSet(
@@ -35064,7 +35737,7 @@ macro_rules! ItemPointerSetMax {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -35225,6 +35898,11 @@ macro_rules! __pgrx_c_args_ItemPointerSetMin {
             @argument [__pgrx_c_args_ItemPointerSetMin] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerSetMin] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ItemPointerSetMin!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -35262,6 +35940,13 @@ macro_rules! __pgrx_c_args_ItemPointerSetMin {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ItemPointerSetMin] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetMin!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -35278,7 +35963,7 @@ macro_rules! __pgrx_c_args_ItemPointerSetMin {
         $crate::ItemPointerSetMin!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro ItemPointerSetMin from ginblock.h:167
@@ -35399,13 +36084,13 @@ macro_rules! ItemPointerSetMin {
         $crate::__pgrx_c_args_ItemPointerSetMin!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $p:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetMin!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $p:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetMin!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -35419,7 +36104,7 @@ macro_rules! ItemPointerSetMin {
                         $crate::__pgrx_c_operand!(@check_safety; $p);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::ItemPointerSet(
@@ -35517,7 +36202,7 @@ macro_rules! ItemPointerSetMin {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -35705,6 +36390,13 @@ macro_rules! __pgrx_c_args_PostingItemGetBlockNumber {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PostingItemGetBlockNumber] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PostingItemGetBlockNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -35742,6 +36434,13 @@ macro_rules! __pgrx_c_args_PostingItemGetBlockNumber {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PostingItemGetBlockNumber] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PostingItemGetBlockNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -35758,7 +36457,7 @@ macro_rules! __pgrx_c_args_PostingItemGetBlockNumber {
         $crate::PostingItemGetBlockNumber!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PostingItemGetBlockNumber from ginblock.h:190
@@ -35850,13 +36549,13 @@ macro_rules! PostingItemGetBlockNumber {
         $crate::__pgrx_c_args_PostingItemGetBlockNumber!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PostingItemGetBlockNumber!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PostingItemGetBlockNumber!(
@@ -35873,7 +36572,7 @@ macro_rules! PostingItemGetBlockNumber {
                         $crate::__pgrx_c_operand!(@check_safety; $pointer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -35931,7 +36630,7 @@ macro_rules! PostingItemGetBlockNumber {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -36074,6 +36773,13 @@ macro_rules! __pgrx_c_args_PostingItemSetBlockNumber {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PostingItemSetBlockNumber] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PostingItemSetBlockNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -36137,6 +36843,13 @@ macro_rules! __pgrx_c_args_PostingItemSetBlockNumber {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PostingItemSetBlockNumber] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PostingItemSetBlockNumber!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -36174,6 +36887,13 @@ macro_rules! __pgrx_c_args_PostingItemSetBlockNumber {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PostingItemSetBlockNumber] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PostingItemSetBlockNumber!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -36190,7 +36910,7 @@ macro_rules! __pgrx_c_args_PostingItemSetBlockNumber {
         $crate::PostingItemSetBlockNumber!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PostingItemSetBlockNumber from ginblock.h:193
@@ -36297,13 +37017,13 @@ macro_rules! PostingItemSetBlockNumber {
         $crate::__pgrx_c_args_PostingItemSetBlockNumber!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $pointer:tt, $blockNumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PostingItemSetBlockNumber!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $pointer:tt, $blockNumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PostingItemSetBlockNumber!(
@@ -36321,7 +37041,7 @@ macro_rules! PostingItemSetBlockNumber {
                         $crate::__pgrx_c_operand!(@check_safety; $blockNumber);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::BlockIdSet(
@@ -36397,7 +37117,7 @@ macro_rules! PostingItemSetBlockNumber {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -36559,6 +37279,11 @@ macro_rules! __pgrx_c_args_SizeOfGinPostingList {
             @argument [__pgrx_c_args_SizeOfGinPostingList] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SizeOfGinPostingList] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SizeOfGinPostingList!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -36596,6 +37321,13 @@ macro_rules! __pgrx_c_args_SizeOfGinPostingList {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SizeOfGinPostingList] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SizeOfGinPostingList!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -36612,7 +37344,7 @@ macro_rules! __pgrx_c_args_SizeOfGinPostingList {
         $crate::SizeOfGinPostingList!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SizeOfGinPostingList from ginblock.h:343
@@ -36809,13 +37541,13 @@ macro_rules! SizeOfGinPostingList {
         $crate::__pgrx_c_args_SizeOfGinPostingList!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $plist:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SizeOfGinPostingList!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $plist:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SizeOfGinPostingList!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -36829,7 +37561,7 @@ macro_rules! SizeOfGinPostingList {
                         $crate::__pgrx_c_operand!(@check_safety; $plist);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::add::<
@@ -36998,7 +37730,7 @@ macro_rules! SizeOfGinPostingList {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

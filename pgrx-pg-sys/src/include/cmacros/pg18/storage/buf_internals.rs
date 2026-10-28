@@ -86,6 +86,11 @@ macro_rules! __pgrx_c_args_BUF_STATE_GET_REFCOUNT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BUF_STATE_GET_REFCOUNT] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BUF_STATE_GET_REFCOUNT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -123,6 +128,13 @@ macro_rules! __pgrx_c_args_BUF_STATE_GET_REFCOUNT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BUF_STATE_GET_REFCOUNT] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUF_STATE_GET_REFCOUNT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -139,7 +151,7 @@ macro_rules! __pgrx_c_args_BUF_STATE_GET_REFCOUNT {
         $crate::BUF_STATE_GET_REFCOUNT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BUF_STATE_GET_REFCOUNT from buf_internals.h:59
@@ -194,13 +206,13 @@ macro_rules! BUF_STATE_GET_REFCOUNT {
         $crate::__pgrx_c_args_BUF_STATE_GET_REFCOUNT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $state:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BUF_STATE_GET_REFCOUNT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $state:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BUF_STATE_GET_REFCOUNT!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -213,7 +225,7 @@ macro_rules! BUF_STATE_GET_REFCOUNT {
                         $crate::__pgrx_c_operand!(@check_safety; $state);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -232,7 +244,7 @@ macro_rules! BUF_STATE_GET_REFCOUNT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -347,6 +359,13 @@ macro_rules! __pgrx_c_args_BUF_STATE_GET_USAGECOUNT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BUF_STATE_GET_USAGECOUNT] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BUF_STATE_GET_USAGECOUNT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -384,6 +403,13 @@ macro_rules! __pgrx_c_args_BUF_STATE_GET_USAGECOUNT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BUF_STATE_GET_USAGECOUNT] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUF_STATE_GET_USAGECOUNT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -400,7 +426,7 @@ macro_rules! __pgrx_c_args_BUF_STATE_GET_USAGECOUNT {
         $crate::BUF_STATE_GET_USAGECOUNT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BUF_STATE_GET_USAGECOUNT from buf_internals.h:60
@@ -470,13 +496,13 @@ macro_rules! BUF_STATE_GET_USAGECOUNT {
         $crate::__pgrx_c_args_BUF_STATE_GET_USAGECOUNT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $state:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BUF_STATE_GET_USAGECOUNT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $state:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BUF_STATE_GET_USAGECOUNT!(
@@ -492,7 +518,7 @@ macro_rules! BUF_STATE_GET_USAGECOUNT {
                         $crate::__pgrx_c_operand!(@check_safety; $state);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::shr(
@@ -528,7 +554,7 @@ macro_rules! BUF_STATE_GET_USAGECOUNT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -654,6 +680,11 @@ macro_rules! __pgrx_c_args_BufMappingPartitionLock {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufMappingPartitionLock] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BufMappingPartitionLock!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -691,6 +722,13 @@ macro_rules! __pgrx_c_args_BufMappingPartitionLock {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufMappingPartitionLock] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufMappingPartitionLock!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -707,7 +745,7 @@ macro_rules! __pgrx_c_args_BufMappingPartitionLock {
         $crate::BufMappingPartitionLock!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BufMappingPartitionLock from buf_internals.h:198
@@ -780,13 +818,13 @@ macro_rules! BufMappingPartitionLock {
         $crate::__pgrx_c_args_BufMappingPartitionLock!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $hashcode:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufMappingPartitionLock!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $hashcode:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufMappingPartitionLock!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -799,7 +837,7 @@ macro_rules! BufMappingPartitionLock {
                         $crate::__pgrx_c_operand!(@check_safety; $hashcode);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -830,7 +868,7 @@ macro_rules! BufMappingPartitionLock {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -959,6 +997,13 @@ macro_rules! __pgrx_c_args_BufMappingPartitionLockByIndex {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufMappingPartitionLockByIndex] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BufMappingPartitionLockByIndex!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -996,6 +1041,13 @@ macro_rules! __pgrx_c_args_BufMappingPartitionLockByIndex {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufMappingPartitionLockByIndex] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufMappingPartitionLockByIndex!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1012,7 +1064,7 @@ macro_rules! __pgrx_c_args_BufMappingPartitionLockByIndex {
         $crate::BufMappingPartitionLockByIndex!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BufMappingPartitionLockByIndex from buf_internals.h:205
@@ -1087,7 +1139,7 @@ macro_rules! BufMappingPartitionLockByIndex {
         )
     };
     (@__pgrx_emit_place; $index:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufMappingPartitionLockByIndex!(
@@ -1096,7 +1148,7 @@ macro_rules! BufMappingPartitionLockByIndex {
         )
     };
     (@__pgrx_emit_read_place; $index:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufMappingPartitionLockByIndex!(
@@ -1112,7 +1164,7 @@ macro_rules! BufMappingPartitionLockByIndex {
                         $crate::__pgrx_c_operand!(@check_safety; $index);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1143,7 +1195,7 @@ macro_rules! BufMappingPartitionLockByIndex {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1276,6 +1328,11 @@ macro_rules! __pgrx_c_args_BufTableHashPartition {
             @argument [__pgrx_c_args_BufTableHashPartition] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufTableHashPartition] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BufTableHashPartition!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1313,6 +1370,13 @@ macro_rules! __pgrx_c_args_BufTableHashPartition {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufTableHashPartition] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufTableHashPartition!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1329,7 +1393,7 @@ macro_rules! __pgrx_c_args_BufTableHashPartition {
         $crate::BufTableHashPartition!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BufTableHashPartition from buf_internals.h:192
@@ -1393,13 +1457,13 @@ macro_rules! BufTableHashPartition {
         $crate::__pgrx_c_args_BufTableHashPartition!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $hashcode:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufTableHashPartition!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $hashcode:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufTableHashPartition!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1412,7 +1476,7 @@ macro_rules! BufTableHashPartition {
                         $crate::__pgrx_c_operand!(@check_safety; $hashcode);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1438,7 +1502,7 @@ macro_rules! BufTableHashPartition {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1554,6 +1618,11 @@ macro_rules! __pgrx_c_args_BufTagGetForkNum {
             @argument [__pgrx_c_args_BufTagGetForkNum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufTagGetForkNum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BufTagGetForkNum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1591,6 +1660,13 @@ macro_rules! __pgrx_c_args_BufTagGetForkNum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufTagGetForkNum] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufTagGetForkNum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1607,7 +1683,7 @@ macro_rules! __pgrx_c_args_BufTagGetForkNum {
         $crate::BufTagGetForkNum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BufTagGetForkNum from buf_internals.h:121
@@ -1656,7 +1732,7 @@ macro_rules! BufTagGetForkNum {
                     i32
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_bf3f64fca00d834185ad27ab8e38c84d(
+                $crate::__pgrx_c_generated::Inline_e8555f9f593ea8ffde0d5c01c839a16e(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -1687,13 +1763,13 @@ macro_rules! BufTagGetForkNum {
         $crate::__pgrx_c_args_BufTagGetForkNum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufTagGetForkNum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufTagGetForkNum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1706,7 +1782,7 @@ macro_rules! BufTagGetForkNum {
                         $crate::__pgrx_c_operand!(@check_safety; $tag);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1716,7 +1792,7 @@ macro_rules! BufTagGetForkNum {
                                     i32
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_bf3f64fca00d834185ad27ab8e38c84d(
+                                $crate::__pgrx_c_generated::Inline_e8555f9f593ea8ffde0d5c01c839a16e(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -1746,7 +1822,7 @@ macro_rules! BufTagGetForkNum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1763,7 +1839,7 @@ macro_rules! BufTagGetForkNum {
                         i32
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_bf3f64fca00d834185ad27ab8e38c84d(
+                    $crate::__pgrx_c_generated::Inline_e8555f9f593ea8ffde0d5c01c839a16e(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
@@ -1881,6 +1957,11 @@ macro_rules! __pgrx_c_args_BufTagGetRelFileLocator {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufTagGetRelFileLocator] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BufTagGetRelFileLocator!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1918,6 +1999,13 @@ macro_rules! __pgrx_c_args_BufTagGetRelFileLocator {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufTagGetRelFileLocator] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufTagGetRelFileLocator!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1934,7 +2022,7 @@ macro_rules! __pgrx_c_args_BufTagGetRelFileLocator {
         $crate::BufTagGetRelFileLocator!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BufTagGetRelFileLocator from buf_internals.h:135
@@ -1990,7 +2078,7 @@ macro_rules! BufTagGetRelFileLocator {
                     $crate::__pgrx_c_bindings::RelFileLocator
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_2bdbf2ab1dd2a9eefb053098063c8b6f(
+                $crate::__pgrx_c_generated::Inline_607c8523a81cde8cf1c612b5f11cb07e(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -2021,13 +2109,13 @@ macro_rules! BufTagGetRelFileLocator {
         $crate::__pgrx_c_args_BufTagGetRelFileLocator!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufTagGetRelFileLocator!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufTagGetRelFileLocator!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2040,7 +2128,7 @@ macro_rules! BufTagGetRelFileLocator {
                         $crate::__pgrx_c_operand!(@check_safety; $tag);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2048,7 +2136,7 @@ macro_rules! BufTagGetRelFileLocator {
                                     $crate::__pgrx_c_bindings::RelFileLocator
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_2bdbf2ab1dd2a9eefb053098063c8b6f(
+                                $crate::__pgrx_c_generated::Inline_607c8523a81cde8cf1c612b5f11cb07e(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -2078,7 +2166,7 @@ macro_rules! BufTagGetRelFileLocator {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2093,7 +2181,7 @@ macro_rules! BufTagGetRelFileLocator {
                         $crate::__pgrx_c_bindings::RelFileLocator
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_2bdbf2ab1dd2a9eefb053098063c8b6f(
+                    $crate::__pgrx_c_generated::Inline_607c8523a81cde8cf1c612b5f11cb07e(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
@@ -2206,6 +2294,11 @@ macro_rules! __pgrx_c_args_BufTagGetRelNumber {
             @argument [__pgrx_c_args_BufTagGetRelNumber] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufTagGetRelNumber] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BufTagGetRelNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2243,6 +2336,13 @@ macro_rules! __pgrx_c_args_BufTagGetRelNumber {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufTagGetRelNumber] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufTagGetRelNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2259,7 +2359,7 @@ macro_rules! __pgrx_c_args_BufTagGetRelNumber {
         $crate::BufTagGetRelNumber!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BufTagGetRelNumber from buf_internals.h:115
@@ -2338,13 +2438,13 @@ macro_rules! BufTagGetRelNumber {
         $crate::__pgrx_c_args_BufTagGetRelNumber!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufTagGetRelNumber!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufTagGetRelNumber!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2357,7 +2457,7 @@ macro_rules! BufTagGetRelNumber {
                         $crate::__pgrx_c_operand!(@check_safety; $tag);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2396,7 +2496,7 @@ macro_rules! BufTagGetRelNumber {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2521,6 +2621,13 @@ macro_rules! __pgrx_c_args_BufTagMatchesRelFileLocator {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufTagMatchesRelFileLocator] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufTagMatchesRelFileLocator!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2584,6 +2691,13 @@ macro_rules! __pgrx_c_args_BufTagMatchesRelFileLocator {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufTagMatchesRelFileLocator] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BufTagMatchesRelFileLocator!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2621,6 +2735,13 @@ macro_rules! __pgrx_c_args_BufTagMatchesRelFileLocator {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufTagMatchesRelFileLocator] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufTagMatchesRelFileLocator!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2637,7 +2758,7 @@ macro_rules! __pgrx_c_args_BufTagMatchesRelFileLocator {
         $crate::BufTagMatchesRelFileLocator!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BufTagMatchesRelFileLocator from buf_internals.h:176
@@ -2740,13 +2861,13 @@ macro_rules! BufTagMatchesRelFileLocator {
         $crate::__pgrx_c_args_BufTagMatchesRelFileLocator!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tag:tt, $rlocator:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufTagMatchesRelFileLocator!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tag:tt, $rlocator:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufTagMatchesRelFileLocator!(
@@ -2763,7 +2884,7 @@ macro_rules! BufTagMatchesRelFileLocator {
                         $crate::__pgrx_c_operand!(@check_safety; $rlocator);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2822,7 +2943,7 @@ macro_rules! BufTagMatchesRelFileLocator {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2967,6 +3088,13 @@ macro_rules! __pgrx_c_args_BufTagSetRelForkDetails {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufTagSetRelForkDetails] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufTagSetRelForkDetails!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3018,6 +3146,13 @@ macro_rules! __pgrx_c_args_BufTagSetRelForkDetails {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_BufTagSetRelForkDetails] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufTagSetRelForkDetails] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -3084,6 +3219,11 @@ macro_rules! __pgrx_c_args_BufTagSetRelForkDetails {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufTagSetRelForkDetails] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BufTagSetRelForkDetails!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3121,6 +3261,13 @@ macro_rules! __pgrx_c_args_BufTagSetRelForkDetails {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufTagSetRelForkDetails] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufTagSetRelForkDetails!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3137,7 +3284,7 @@ macro_rules! __pgrx_c_args_BufTagSetRelForkDetails {
         $crate::BufTagSetRelForkDetails!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BufTagSetRelForkDetails from buf_internals.h:127
@@ -3186,7 +3333,7 @@ macro_rules! BufTagSetRelForkDetails {
     };
     (@__pgrx_emit_value; $tag:tt, $relnumber:tt, $forknum:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            $crate::__pgrx_c_generated::Inline_a421bb7c48741a719a69d97874877237(
+            $crate::__pgrx_c_generated::Inline_5584bb246b51e73acb78c0055b3acd2f(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -3254,13 +3401,13 @@ macro_rules! BufTagSetRelForkDetails {
         $crate::__pgrx_c_args_BufTagSetRelForkDetails!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tag:tt, $relnumber:tt, $forknum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufTagSetRelForkDetails!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tag:tt, $relnumber:tt, $forknum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufTagSetRelForkDetails!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3275,10 +3422,10 @@ macro_rules! BufTagSetRelForkDetails {
                         $crate::__pgrx_c_operand!(@check_safety; $forknum);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::__pgrx_c_generated::Inline_a421bb7c48741a719a69d97874877237(
+                            $crate::__pgrx_c_generated::Inline_5584bb246b51e73acb78c0055b3acd2f(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -3347,7 +3494,7 @@ macro_rules! BufTagSetRelForkDetails {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3357,7 +3504,7 @@ macro_rules! BufTagSetRelForkDetails {
     (@__pgrx_emit_discard; $tag:tt, $relnumber:tt, $forknum:tt $(,)?) => {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::__pgrx_c_generated::Inline_a421bb7c48741a719a69d97874877237(
+                $crate::__pgrx_c_generated::Inline_5584bb246b51e73acb78c0055b3acd2f(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -3512,6 +3659,13 @@ macro_rules! __pgrx_c_args_BufferDescriptorGetBuffer {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufferDescriptorGetBuffer] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BufferDescriptorGetBuffer!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3549,6 +3703,13 @@ macro_rules! __pgrx_c_args_BufferDescriptorGetBuffer {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufferDescriptorGetBuffer] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufferDescriptorGetBuffer!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3565,7 +3726,7 @@ macro_rules! __pgrx_c_args_BufferDescriptorGetBuffer {
         $crate::BufferDescriptorGetBuffer!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BufferDescriptorGetBuffer from buf_internals.h:345
@@ -3642,13 +3803,13 @@ macro_rules! BufferDescriptorGetBuffer {
         $crate::__pgrx_c_args_BufferDescriptorGetBuffer!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $bdesc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufferDescriptorGetBuffer!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $bdesc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufferDescriptorGetBuffer!(
@@ -3664,7 +3825,7 @@ macro_rules! BufferDescriptorGetBuffer {
                         $crate::__pgrx_c_operand!(@check_safety; $bdesc);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -3700,7 +3861,7 @@ macro_rules! BufferDescriptorGetBuffer {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3832,6 +3993,13 @@ macro_rules! __pgrx_c_args_BufferDescriptorGetContentLock {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufferDescriptorGetContentLock] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BufferDescriptorGetContentLock!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3869,6 +4037,13 @@ macro_rules! __pgrx_c_args_BufferDescriptorGetContentLock {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufferDescriptorGetContentLock] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufferDescriptorGetContentLock!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3885,7 +4060,7 @@ macro_rules! __pgrx_c_args_BufferDescriptorGetContentLock {
         $crate::BufferDescriptorGetContentLock!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BufferDescriptorGetContentLock from buf_internals.h:357
@@ -3970,7 +4145,7 @@ macro_rules! BufferDescriptorGetContentLock {
         )
     };
     (@__pgrx_emit_place; $bdesc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufferDescriptorGetContentLock!(
@@ -3979,7 +4154,7 @@ macro_rules! BufferDescriptorGetContentLock {
         )
     };
     (@__pgrx_emit_read_place; $bdesc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufferDescriptorGetContentLock!(
@@ -3995,7 +4170,7 @@ macro_rules! BufferDescriptorGetContentLock {
                         $crate::__pgrx_c_operand!(@check_safety; $bdesc);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -4036,7 +4211,7 @@ macro_rules! BufferDescriptorGetContentLock {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4181,6 +4356,11 @@ macro_rules! __pgrx_c_args_BufferDescriptorGetIOCV {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufferDescriptorGetIOCV] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BufferDescriptorGetIOCV!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4218,6 +4398,13 @@ macro_rules! __pgrx_c_args_BufferDescriptorGetIOCV {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufferDescriptorGetIOCV] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufferDescriptorGetIOCV!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4234,7 +4421,7 @@ macro_rules! __pgrx_c_args_BufferDescriptorGetIOCV {
         $crate::BufferDescriptorGetIOCV!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BufferDescriptorGetIOCV from buf_internals.h:351
@@ -4318,13 +4505,13 @@ macro_rules! BufferDescriptorGetIOCV {
         $crate::__pgrx_c_args_BufferDescriptorGetIOCV!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $bdesc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufferDescriptorGetIOCV!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $bdesc:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufferDescriptorGetIOCV!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4337,7 +4524,7 @@ macro_rules! BufferDescriptorGetIOCV {
                         $crate::__pgrx_c_operand!(@check_safety; $bdesc);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -4378,7 +4565,7 @@ macro_rules! BufferDescriptorGetIOCV {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4502,6 +4689,13 @@ macro_rules! __pgrx_c_args_BufferTagsEqual {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufferTagsEqual] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufferTagsEqual!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4563,6 +4757,11 @@ macro_rules! __pgrx_c_args_BufferTagsEqual {
             @argument [__pgrx_c_args_BufferTagsEqual] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufferTagsEqual] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BufferTagsEqual!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4600,6 +4799,13 @@ macro_rules! __pgrx_c_args_BufferTagsEqual {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BufferTagsEqual] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufferTagsEqual!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4616,7 +4822,7 @@ macro_rules! __pgrx_c_args_BufferTagsEqual {
         $crate::BufferTagsEqual!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function BufferTagsEqual from buf_internals.h:166
@@ -4717,13 +4923,13 @@ macro_rules! BufferTagsEqual {
         $crate::__pgrx_c_args_BufferTagsEqual!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tag1:tt, $tag2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufferTagsEqual!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tag1:tt, $tag2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BufferTagsEqual!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4737,7 +4943,7 @@ macro_rules! BufferTagsEqual {
                         $crate::__pgrx_c_operand!(@check_safety; $tag2);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -4796,7 +5002,7 @@ macro_rules! BufferTagsEqual {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4942,6 +5148,11 @@ macro_rules! __pgrx_c_args_ClearBufferTag {
             @argument [__pgrx_c_args_ClearBufferTag] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ClearBufferTag] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ClearBufferTag!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4979,6 +5190,11 @@ macro_rules! __pgrx_c_args_ClearBufferTag {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ClearBufferTag] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ClearBufferTag!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4995,7 +5211,7 @@ macro_rules! __pgrx_c_args_ClearBufferTag {
         $crate::ClearBufferTag!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ClearBufferTag from buf_internals.h:147
@@ -5070,13 +5286,13 @@ macro_rules! ClearBufferTag {
         $crate::__pgrx_c_args_ClearBufferTag!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ClearBufferTag!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ClearBufferTag!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5089,7 +5305,7 @@ macro_rules! ClearBufferTag {
                         $crate::__pgrx_c_operand!(@check_safety; $tag);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::ClearBufferTag(
@@ -5121,7 +5337,7 @@ macro_rules! ClearBufferTag {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5243,6 +5459,11 @@ macro_rules! __pgrx_c_args_GetBufferDescriptor {
             @argument [__pgrx_c_args_GetBufferDescriptor] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetBufferDescriptor] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GetBufferDescriptor!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5280,6 +5501,13 @@ macro_rules! __pgrx_c_args_GetBufferDescriptor {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetBufferDescriptor] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetBufferDescriptor!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5296,7 +5524,7 @@ macro_rules! __pgrx_c_args_GetBufferDescriptor {
         $crate::GetBufferDescriptor!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function GetBufferDescriptor from buf_internals.h:333
@@ -5367,13 +5595,13 @@ macro_rules! GetBufferDescriptor {
         $crate::__pgrx_c_args_GetBufferDescriptor!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $id:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetBufferDescriptor!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $id:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetBufferDescriptor!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5386,7 +5614,7 @@ macro_rules! GetBufferDescriptor {
                         $crate::__pgrx_c_operand!(@check_safety; $id);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -5417,7 +5645,7 @@ macro_rules! GetBufferDescriptor {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5543,6 +5771,13 @@ macro_rules! __pgrx_c_args_GetLocalBufferDescriptor {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetLocalBufferDescriptor] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GetLocalBufferDescriptor!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5580,6 +5815,13 @@ macro_rules! __pgrx_c_args_GetLocalBufferDescriptor {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GetLocalBufferDescriptor] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetLocalBufferDescriptor!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5596,7 +5838,7 @@ macro_rules! __pgrx_c_args_GetLocalBufferDescriptor {
         $crate::GetLocalBufferDescriptor!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function GetLocalBufferDescriptor from buf_internals.h:339
@@ -5670,13 +5912,13 @@ macro_rules! GetLocalBufferDescriptor {
         $crate::__pgrx_c_args_GetLocalBufferDescriptor!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $id:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetLocalBufferDescriptor!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $id:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GetLocalBufferDescriptor!(
@@ -5692,7 +5934,7 @@ macro_rules! GetLocalBufferDescriptor {
                         $crate::__pgrx_c_operand!(@check_safety; $id);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -5723,7 +5965,7 @@ macro_rules! GetLocalBufferDescriptor {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5837,6 +6079,11 @@ macro_rules! __pgrx_c_args_InitBufferTag {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InitBufferTag] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitBufferTag!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5891,6 +6138,11 @@ macro_rules! __pgrx_c_args_InitBufferTag {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InitBufferTag] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitBufferTag!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5943,6 +6195,11 @@ macro_rules! __pgrx_c_args_InitBufferTag {
             @argument [__pgrx_c_args_InitBufferTag] [p3 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
             ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InitBufferTag] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -6006,6 +6263,11 @@ macro_rules! __pgrx_c_args_InitBufferTag {
             @argument [__pgrx_c_args_InitBufferTag] [p4 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InitBufferTag] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InitBufferTag!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6043,6 +6305,11 @@ macro_rules! __pgrx_c_args_InitBufferTag {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_InitBufferTag] [p4 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitBufferTag!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6059,7 +6326,7 @@ macro_rules! __pgrx_c_args_InitBufferTag {
         $crate::InitBufferTag!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function InitBufferTag from buf_internals.h:156
@@ -6108,7 +6375,7 @@ macro_rules! InitBufferTag {
     };
     (@__pgrx_emit_value; $tag:tt, $rlocator:tt, $forkNum:tt, $blockNum:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            $crate::__pgrx_c_generated::Inline_fbd2bd2d92283c83287dfc7ca58e7962(
+            $crate::__pgrx_c_generated::Inline_d16e6ac149df70a2f96b9a414ded278c(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -6192,13 +6459,13 @@ macro_rules! InitBufferTag {
         $crate::__pgrx_c_args_InitBufferTag!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tag:tt, $rlocator:tt, $forkNum:tt, $blockNum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_InitBufferTag!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tag:tt, $rlocator:tt, $forkNum:tt, $blockNum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_InitBufferTag!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6214,10 +6481,10 @@ macro_rules! InitBufferTag {
                         $crate::__pgrx_c_operand!(@check_safety; $blockNum);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::__pgrx_c_generated::Inline_fbd2bd2d92283c83287dfc7ca58e7962(
+                            $crate::__pgrx_c_generated::Inline_d16e6ac149df70a2f96b9a414ded278c(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -6303,7 +6570,7 @@ macro_rules! InitBufferTag {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6313,7 +6580,7 @@ macro_rules! InitBufferTag {
     (@__pgrx_emit_discard; $tag:tt, $rlocator:tt, $forkNum:tt, $blockNum:tt $(,)?) => {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::__pgrx_c_generated::Inline_fbd2bd2d92283c83287dfc7ca58e7962(
+                $crate::__pgrx_c_generated::Inline_d16e6ac149df70a2f96b9a414ded278c(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -6475,6 +6742,13 @@ macro_rules! __pgrx_c_args_ResourceOwnerForgetBuffer {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ResourceOwnerForgetBuffer] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ResourceOwnerForgetBuffer!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6538,6 +6812,13 @@ macro_rules! __pgrx_c_args_ResourceOwnerForgetBuffer {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ResourceOwnerForgetBuffer] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ResourceOwnerForgetBuffer!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6575,6 +6856,13 @@ macro_rules! __pgrx_c_args_ResourceOwnerForgetBuffer {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ResourceOwnerForgetBuffer] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ResourceOwnerForgetBuffer!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6591,7 +6879,7 @@ macro_rules! __pgrx_c_args_ResourceOwnerForgetBuffer {
         $crate::ResourceOwnerForgetBuffer!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ResourceOwnerForgetBuffer from buf_internals.h:412
@@ -6677,13 +6965,13 @@ macro_rules! ResourceOwnerForgetBuffer {
         $crate::__pgrx_c_args_ResourceOwnerForgetBuffer!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $owner:tt, $buffer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ResourceOwnerForgetBuffer!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $owner:tt, $buffer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ResourceOwnerForgetBuffer!(
@@ -6700,7 +6988,7 @@ macro_rules! ResourceOwnerForgetBuffer {
                         $crate::__pgrx_c_operand!(@check_safety; $buffer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::ResourceOwnerForgetBuffer(
@@ -6745,7 +7033,7 @@ macro_rules! ResourceOwnerForgetBuffer {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6873,6 +7161,13 @@ macro_rules! __pgrx_c_args_ResourceOwnerForgetBufferIO {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ResourceOwnerForgetBufferIO] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ResourceOwnerForgetBufferIO!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6936,6 +7231,13 @@ macro_rules! __pgrx_c_args_ResourceOwnerForgetBufferIO {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ResourceOwnerForgetBufferIO] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ResourceOwnerForgetBufferIO!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6973,6 +7275,13 @@ macro_rules! __pgrx_c_args_ResourceOwnerForgetBufferIO {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ResourceOwnerForgetBufferIO] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ResourceOwnerForgetBufferIO!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6989,7 +7298,7 @@ macro_rules! __pgrx_c_args_ResourceOwnerForgetBufferIO {
         $crate::ResourceOwnerForgetBufferIO!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ResourceOwnerForgetBufferIO from buf_internals.h:422
@@ -7075,13 +7384,13 @@ macro_rules! ResourceOwnerForgetBufferIO {
         $crate::__pgrx_c_args_ResourceOwnerForgetBufferIO!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $owner:tt, $buffer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ResourceOwnerForgetBufferIO!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $owner:tt, $buffer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ResourceOwnerForgetBufferIO!(
@@ -7098,7 +7407,7 @@ macro_rules! ResourceOwnerForgetBufferIO {
                         $crate::__pgrx_c_operand!(@check_safety; $buffer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::ResourceOwnerForgetBufferIO(
@@ -7143,7 +7452,7 @@ macro_rules! ResourceOwnerForgetBufferIO {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7274,6 +7583,13 @@ macro_rules! __pgrx_c_args_ResourceOwnerRememberBuffer {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ResourceOwnerRememberBuffer] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ResourceOwnerRememberBuffer!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7337,6 +7653,13 @@ macro_rules! __pgrx_c_args_ResourceOwnerRememberBuffer {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ResourceOwnerRememberBuffer] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ResourceOwnerRememberBuffer!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7374,6 +7697,13 @@ macro_rules! __pgrx_c_args_ResourceOwnerRememberBuffer {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ResourceOwnerRememberBuffer] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ResourceOwnerRememberBuffer!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7390,7 +7720,7 @@ macro_rules! __pgrx_c_args_ResourceOwnerRememberBuffer {
         $crate::ResourceOwnerRememberBuffer!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ResourceOwnerRememberBuffer from buf_internals.h:407
@@ -7476,13 +7806,13 @@ macro_rules! ResourceOwnerRememberBuffer {
         $crate::__pgrx_c_args_ResourceOwnerRememberBuffer!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $owner:tt, $buffer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ResourceOwnerRememberBuffer!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $owner:tt, $buffer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ResourceOwnerRememberBuffer!(
@@ -7499,7 +7829,7 @@ macro_rules! ResourceOwnerRememberBuffer {
                         $crate::__pgrx_c_operand!(@check_safety; $buffer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::ResourceOwnerRememberBuffer(
@@ -7544,7 +7874,7 @@ macro_rules! ResourceOwnerRememberBuffer {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7678,6 +8008,13 @@ macro_rules! __pgrx_c_args_ResourceOwnerRememberBufferIO {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ResourceOwnerRememberBufferIO] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ResourceOwnerRememberBufferIO!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7744,6 +8081,13 @@ macro_rules! __pgrx_c_args_ResourceOwnerRememberBufferIO {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ResourceOwnerRememberBufferIO] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ResourceOwnerRememberBufferIO!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7781,6 +8125,13 @@ macro_rules! __pgrx_c_args_ResourceOwnerRememberBufferIO {
             ] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ResourceOwnerRememberBufferIO] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ResourceOwnerRememberBufferIO!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7797,7 +8148,7 @@ macro_rules! __pgrx_c_args_ResourceOwnerRememberBufferIO {
         $crate::ResourceOwnerRememberBufferIO!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ResourceOwnerRememberBufferIO from buf_internals.h:417
@@ -7886,7 +8237,7 @@ macro_rules! ResourceOwnerRememberBufferIO {
         )
     };
     (@__pgrx_emit_place; $owner:tt, $buffer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ResourceOwnerRememberBufferIO!(
@@ -7895,7 +8246,7 @@ macro_rules! ResourceOwnerRememberBufferIO {
         )
     };
     (@__pgrx_emit_read_place; $owner:tt, $buffer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ResourceOwnerRememberBufferIO!(
@@ -7912,7 +8263,7 @@ macro_rules! ResourceOwnerRememberBufferIO {
                         $crate::__pgrx_c_operand!(@check_safety; $buffer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::ResourceOwnerRememberBufferIO(
@@ -7957,7 +8308,7 @@ macro_rules! ResourceOwnerRememberBufferIO {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8086,6 +8437,11 @@ macro_rules! __pgrx_c_args_UnlockBufHdr {
             @argument [__pgrx_c_args_UnlockBufHdr] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_UnlockBufHdr] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_UnlockBufHdr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8147,6 +8503,11 @@ macro_rules! __pgrx_c_args_UnlockBufHdr {
             @argument [__pgrx_c_args_UnlockBufHdr] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_UnlockBufHdr] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_UnlockBufHdr!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8182,6 +8543,11 @@ macro_rules! __pgrx_c_args_UnlockBufHdr {
             @argument [__pgrx_c_args_UnlockBufHdr] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_UnlockBufHdr] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_UnlockBufHdr!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8198,7 +8564,7 @@ macro_rules! __pgrx_c_args_UnlockBufHdr {
         $crate::UnlockBufHdr!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function UnlockBufHdr from buf_internals.h:376
@@ -8284,13 +8650,13 @@ macro_rules! UnlockBufHdr {
         $crate::__pgrx_c_args_UnlockBufHdr!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $desc:tt, $buf_state:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_UnlockBufHdr!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $desc:tt, $buf_state:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_UnlockBufHdr!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8304,7 +8670,7 @@ macro_rules! UnlockBufHdr {
                         $crate::__pgrx_c_operand!(@check_safety; $buf_state);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::UnlockBufHdr(
@@ -8349,7 +8715,7 @@ macro_rules! UnlockBufHdr {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

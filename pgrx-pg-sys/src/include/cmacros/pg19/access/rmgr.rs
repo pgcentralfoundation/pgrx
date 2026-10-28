@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_RmgrIdIsBuiltin {
             @argument [__pgrx_c_args_RmgrIdIsBuiltin] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RmgrIdIsBuiltin] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RmgrIdIsBuiltin!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -118,6 +123,13 @@ macro_rules! __pgrx_c_args_RmgrIdIsBuiltin {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RmgrIdIsBuiltin] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RmgrIdIsBuiltin!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -134,7 +146,7 @@ macro_rules! __pgrx_c_args_RmgrIdIsBuiltin {
         $crate::RmgrIdIsBuiltin!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function RmgrIdIsBuiltin from rmgr.h:41
@@ -196,13 +208,13 @@ macro_rules! RmgrIdIsBuiltin {
         $crate::__pgrx_c_args_RmgrIdIsBuiltin!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rmid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RmgrIdIsBuiltin!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rmid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RmgrIdIsBuiltin!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -215,7 +227,7 @@ macro_rules! RmgrIdIsBuiltin {
                         $crate::__pgrx_c_operand!(@check_safety; $rmid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -241,7 +253,7 @@ macro_rules! RmgrIdIsBuiltin {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -355,6 +367,11 @@ macro_rules! __pgrx_c_args_RmgrIdIsCustom {
             @argument [__pgrx_c_args_RmgrIdIsCustom] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RmgrIdIsCustom] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RmgrIdIsCustom!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -392,6 +409,11 @@ macro_rules! __pgrx_c_args_RmgrIdIsCustom {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RmgrIdIsCustom] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RmgrIdIsCustom!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -408,7 +430,7 @@ macro_rules! __pgrx_c_args_RmgrIdIsCustom {
         $crate::RmgrIdIsCustom!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function RmgrIdIsCustom from rmgr.h:47
@@ -470,13 +492,13 @@ macro_rules! RmgrIdIsCustom {
         $crate::__pgrx_c_args_RmgrIdIsCustom!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rmid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RmgrIdIsCustom!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rmid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RmgrIdIsCustom!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -489,7 +511,7 @@ macro_rules! RmgrIdIsCustom {
                         $crate::__pgrx_c_operand!(@check_safety; $rmid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -515,7 +537,7 @@ macro_rules! RmgrIdIsCustom {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -629,6 +651,11 @@ macro_rules! __pgrx_c_args_RmgrIdIsValid {
             @argument [__pgrx_c_args_RmgrIdIsValid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RmgrIdIsValid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RmgrIdIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -666,6 +693,11 @@ macro_rules! __pgrx_c_args_RmgrIdIsValid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RmgrIdIsValid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RmgrIdIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -682,7 +714,7 @@ macro_rules! __pgrx_c_args_RmgrIdIsValid {
         $crate::RmgrIdIsValid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RmgrIdIsValid from rmgr.h:53
@@ -781,13 +813,13 @@ macro_rules! RmgrIdIsValid {
         $crate::__pgrx_c_args_RmgrIdIsValid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rmid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RmgrIdIsValid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rmid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RmgrIdIsValid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -800,7 +832,7 @@ macro_rules! RmgrIdIsValid {
                         $crate::__pgrx_c_operand!(@check_safety; $rmid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -872,7 +904,7 @@ macro_rules! RmgrIdIsValid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

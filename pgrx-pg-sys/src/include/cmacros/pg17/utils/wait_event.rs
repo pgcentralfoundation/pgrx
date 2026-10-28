@@ -68,13 +68,13 @@ macro_rules! pgstat_report_wait_end {
         $crate::pgstat_report_wait_end!(@__pgrx_emit_value; $($raw)*)
     };
     (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::pgstat_report_wait_end!(@__pgrx_emit_place; $($raw)*)
     };
     (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::pgstat_report_wait_end!(@__pgrx_emit_read_place; $($raw)*)
@@ -85,7 +85,7 @@ macro_rules! pgstat_report_wait_end {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::pgstat_report_wait_end()
@@ -93,7 +93,7 @@ macro_rules! pgstat_report_wait_end {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -111,13 +111,13 @@ macro_rules! pgstat_report_wait_end {
         $crate::pgstat_report_wait_end!(@__pgrx_emit_discard; $($raw)*)
     };
     (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
     () => {
         $crate::pgstat_report_wait_end!(@__pgrx_emit_public;)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 
@@ -203,6 +203,13 @@ macro_rules! __pgrx_c_args_pgstat_report_wait_start {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_report_wait_start] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_report_wait_start!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -240,6 +247,13 @@ macro_rules! __pgrx_c_args_pgstat_report_wait_start {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pgstat_report_wait_start] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_report_wait_start!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -256,7 +270,7 @@ macro_rules! __pgrx_c_args_pgstat_report_wait_start {
         $crate::pgstat_report_wait_start!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pgstat_report_wait_start from wait_event.h:84
@@ -325,13 +339,13 @@ macro_rules! pgstat_report_wait_start {
         $crate::__pgrx_c_args_pgstat_report_wait_start!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $wait_event_info:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pgstat_report_wait_start!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $wait_event_info:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pgstat_report_wait_start!(
@@ -347,7 +361,7 @@ macro_rules! pgstat_report_wait_start {
                         $crate::__pgrx_c_operand!(@check_safety; $wait_event_info);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::pgstat_report_wait_start(
@@ -374,7 +388,7 @@ macro_rules! pgstat_report_wait_start {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

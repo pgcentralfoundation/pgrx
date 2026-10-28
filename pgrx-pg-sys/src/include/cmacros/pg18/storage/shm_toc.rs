@@ -77,6 +77,13 @@ macro_rules! __pgrx_c_args_shm_toc_estimate_chunk {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_shm_toc_estimate_chunk] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_chunk!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -140,6 +147,11 @@ macro_rules! __pgrx_c_args_shm_toc_estimate_chunk {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_shm_toc_estimate_chunk] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_shm_toc_estimate_chunk!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -177,6 +189,13 @@ macro_rules! __pgrx_c_args_shm_toc_estimate_chunk {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_shm_toc_estimate_chunk] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_chunk!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -193,7 +212,7 @@ macro_rules! __pgrx_c_args_shm_toc_estimate_chunk {
         $crate::shm_toc_estimate_chunk!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro shm_toc_estimate_chunk from shm_toc.h:51
@@ -458,13 +477,13 @@ macro_rules! shm_toc_estimate_chunk {
         $crate::__pgrx_c_args_shm_toc_estimate_chunk!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $e:tt, $sz:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_chunk!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $e:tt, $sz:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_chunk!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -479,7 +498,7 @@ macro_rules! shm_toc_estimate_chunk {
                         $crate::__pgrx_c_operand!(@check_safety; $sz);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -707,7 +726,7 @@ macro_rules! shm_toc_estimate_chunk {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1018,6 +1037,13 @@ macro_rules! __pgrx_c_args_shm_toc_estimate_keys {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_shm_toc_estimate_keys] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_keys!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1079,6 +1105,11 @@ macro_rules! __pgrx_c_args_shm_toc_estimate_keys {
             @argument [__pgrx_c_args_shm_toc_estimate_keys] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_shm_toc_estimate_keys] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_shm_toc_estimate_keys!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1116,6 +1147,13 @@ macro_rules! __pgrx_c_args_shm_toc_estimate_keys {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_shm_toc_estimate_keys] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_keys!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1132,7 +1170,7 @@ macro_rules! __pgrx_c_args_shm_toc_estimate_keys {
         $crate::shm_toc_estimate_keys!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro shm_toc_estimate_keys from shm_toc.h:53
@@ -1263,13 +1301,13 @@ macro_rules! shm_toc_estimate_keys {
         $crate::__pgrx_c_args_shm_toc_estimate_keys!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $e:tt, $cnt:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_keys!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $e:tt, $cnt:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_keys!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1283,7 +1321,7 @@ macro_rules! shm_toc_estimate_keys {
                         $crate::__pgrx_c_operand!(@check_safety; $cnt);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -1382,7 +1420,7 @@ macro_rules! shm_toc_estimate_keys {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1574,6 +1612,13 @@ macro_rules! __pgrx_c_args_shm_toc_initialize_estimator {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_shm_toc_initialize_estimator] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_shm_toc_initialize_estimator!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1611,6 +1656,13 @@ macro_rules! __pgrx_c_args_shm_toc_initialize_estimator {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_shm_toc_initialize_estimator] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_initialize_estimator!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1627,7 +1679,7 @@ macro_rules! __pgrx_c_args_shm_toc_initialize_estimator {
         $crate::shm_toc_initialize_estimator!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro shm_toc_initialize_estimator from shm_toc.h:49
@@ -1724,13 +1776,13 @@ macro_rules! shm_toc_initialize_estimator {
         $crate::__pgrx_c_args_shm_toc_initialize_estimator!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $e:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_initialize_estimator!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $e:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_initialize_estimator!(
@@ -1746,7 +1798,7 @@ macro_rules! shm_toc_initialize_estimator {
                         $crate::__pgrx_c_operand!(@check_safety; $e);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -1821,7 +1873,7 @@ macro_rules! shm_toc_initialize_estimator {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_ExecClearTuple {
             @argument [__pgrx_c_args_ExecClearTuple] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecClearTuple] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ExecClearTuple!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -118,6 +123,11 @@ macro_rules! __pgrx_c_args_ExecClearTuple {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecClearTuple] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExecClearTuple!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -134,7 +144,7 @@ macro_rules! __pgrx_c_args_ExecClearTuple {
         $crate::ExecClearTuple!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ExecClearTuple from tuptable.h:453
@@ -217,13 +227,13 @@ macro_rules! ExecClearTuple {
         $crate::__pgrx_c_args_ExecClearTuple!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecClearTuple!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecClearTuple!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -236,7 +246,7 @@ macro_rules! ExecClearTuple {
                         $crate::__pgrx_c_operand!(@check_safety; $slot);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -277,7 +287,7 @@ macro_rules! ExecClearTuple {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -399,6 +409,11 @@ macro_rules! __pgrx_c_args_ExecCopySlot {
             @argument [__pgrx_c_args_ExecCopySlot] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecCopySlot] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExecCopySlot!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -460,6 +475,11 @@ macro_rules! __pgrx_c_args_ExecCopySlot {
             @argument [__pgrx_c_args_ExecCopySlot] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecCopySlot] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ExecCopySlot!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -495,6 +515,11 @@ macro_rules! __pgrx_c_args_ExecCopySlot {
             @argument [__pgrx_c_args_ExecCopySlot] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecCopySlot] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExecCopySlot!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -511,7 +536,7 @@ macro_rules! __pgrx_c_args_ExecCopySlot {
         $crate::ExecCopySlot!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ExecCopySlot from tuptable.h:508
@@ -622,13 +647,13 @@ macro_rules! ExecCopySlot {
         $crate::__pgrx_c_args_ExecCopySlot!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $dstslot:tt, $srcslot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecCopySlot!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $dstslot:tt, $srcslot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecCopySlot!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -642,7 +667,7 @@ macro_rules! ExecCopySlot {
                         $crate::__pgrx_c_operand!(@check_safety; $srcslot);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -706,7 +731,7 @@ macro_rules! ExecCopySlot {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -862,6 +887,11 @@ macro_rules! __pgrx_c_args_ExecCopySlotHeapTuple {
             @argument [__pgrx_c_args_ExecCopySlotHeapTuple] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecCopySlotHeapTuple] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ExecCopySlotHeapTuple!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -899,6 +929,13 @@ macro_rules! __pgrx_c_args_ExecCopySlotHeapTuple {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecCopySlotHeapTuple] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExecCopySlotHeapTuple!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -915,7 +952,7 @@ macro_rules! __pgrx_c_args_ExecCopySlotHeapTuple {
         $crate::ExecCopySlotHeapTuple!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ExecCopySlotHeapTuple from tuptable.h:480
@@ -998,13 +1035,13 @@ macro_rules! ExecCopySlotHeapTuple {
         $crate::__pgrx_c_args_ExecCopySlotHeapTuple!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecCopySlotHeapTuple!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecCopySlotHeapTuple!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1017,7 +1054,7 @@ macro_rules! ExecCopySlotHeapTuple {
                         $crate::__pgrx_c_operand!(@check_safety; $slot);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1058,7 +1095,7 @@ macro_rules! ExecCopySlotHeapTuple {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1194,6 +1231,13 @@ macro_rules! __pgrx_c_args_ExecCopySlotMinimalTuple {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecCopySlotMinimalTuple] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ExecCopySlotMinimalTuple!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1231,6 +1275,13 @@ macro_rules! __pgrx_c_args_ExecCopySlotMinimalTuple {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecCopySlotMinimalTuple] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExecCopySlotMinimalTuple!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1247,7 +1298,7 @@ macro_rules! __pgrx_c_args_ExecCopySlotMinimalTuple {
         $crate::ExecCopySlotMinimalTuple!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ExecCopySlotMinimalTuple from tuptable.h:491
@@ -1331,13 +1382,13 @@ macro_rules! ExecCopySlotMinimalTuple {
         $crate::__pgrx_c_args_ExecCopySlotMinimalTuple!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecCopySlotMinimalTuple!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecCopySlotMinimalTuple!(
@@ -1353,7 +1404,7 @@ macro_rules! ExecCopySlotMinimalTuple {
                         $crate::__pgrx_c_operand!(@check_safety; $slot);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1394,7 +1445,7 @@ macro_rules! ExecCopySlotMinimalTuple {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1525,6 +1576,11 @@ macro_rules! __pgrx_c_args_ExecMaterializeSlot {
             @argument [__pgrx_c_args_ExecMaterializeSlot] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecMaterializeSlot] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ExecMaterializeSlot!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1562,6 +1618,13 @@ macro_rules! __pgrx_c_args_ExecMaterializeSlot {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecMaterializeSlot] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExecMaterializeSlot!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1578,7 +1641,7 @@ macro_rules! __pgrx_c_args_ExecMaterializeSlot {
         $crate::ExecMaterializeSlot!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ExecMaterializeSlot from tuptable.h:471
@@ -1650,13 +1713,13 @@ macro_rules! ExecMaterializeSlot {
         $crate::__pgrx_c_args_ExecMaterializeSlot!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecMaterializeSlot!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecMaterializeSlot!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1669,7 +1732,7 @@ macro_rules! ExecMaterializeSlot {
                         $crate::__pgrx_c_operand!(@check_safety; $slot);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::ExecMaterializeSlot(
@@ -1701,7 +1764,7 @@ macro_rules! ExecMaterializeSlot {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1823,6 +1886,11 @@ macro_rules! __pgrx_c_args_TTS_EMPTY {
             @argument [__pgrx_c_args_TTS_EMPTY] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TTS_EMPTY] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TTS_EMPTY!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1858,6 +1926,11 @@ macro_rules! __pgrx_c_args_TTS_EMPTY {
             @argument [__pgrx_c_args_TTS_EMPTY] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TTS_EMPTY] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TTS_EMPTY!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1874,7 +1947,7 @@ macro_rules! __pgrx_c_args_TTS_EMPTY {
         $crate::TTS_EMPTY!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TTS_EMPTY from tuptable.h:96
@@ -1957,13 +2030,13 @@ macro_rules! TTS_EMPTY {
         $crate::__pgrx_c_args_TTS_EMPTY!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TTS_EMPTY!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TTS_EMPTY!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1976,7 +2049,7 @@ macro_rules! TTS_EMPTY {
                         $crate::__pgrx_c_operand!(@check_safety; $slot);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -2034,7 +2107,7 @@ macro_rules! TTS_EMPTY {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2175,6 +2248,11 @@ macro_rules! __pgrx_c_args_TTS_FIXED {
             @argument [__pgrx_c_args_TTS_FIXED] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TTS_FIXED] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TTS_FIXED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2210,6 +2288,11 @@ macro_rules! __pgrx_c_args_TTS_FIXED {
             @argument [__pgrx_c_args_TTS_FIXED] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TTS_FIXED] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TTS_FIXED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2226,7 +2309,7 @@ macro_rules! __pgrx_c_args_TTS_FIXED {
         $crate::TTS_FIXED!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TTS_FIXED from tuptable.h:108
@@ -2309,13 +2392,13 @@ macro_rules! TTS_FIXED {
         $crate::__pgrx_c_args_TTS_FIXED!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TTS_FIXED!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TTS_FIXED!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2328,7 +2411,7 @@ macro_rules! TTS_FIXED {
                         $crate::__pgrx_c_operand!(@check_safety; $slot);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -2386,7 +2469,7 @@ macro_rules! TTS_FIXED {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2527,6 +2610,11 @@ macro_rules! __pgrx_c_args_TTS_IS_BUFFERTUPLE {
             @argument [__pgrx_c_args_TTS_IS_BUFFERTUPLE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TTS_IS_BUFFERTUPLE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TTS_IS_BUFFERTUPLE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2564,6 +2652,13 @@ macro_rules! __pgrx_c_args_TTS_IS_BUFFERTUPLE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TTS_IS_BUFFERTUPLE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TTS_IS_BUFFERTUPLE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2580,7 +2675,7 @@ macro_rules! __pgrx_c_args_TTS_IS_BUFFERTUPLE {
         $crate::TTS_IS_BUFFERTUPLE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TTS_IS_BUFFERTUPLE from tuptable.h:237
@@ -2652,13 +2747,13 @@ macro_rules! TTS_IS_BUFFERTUPLE {
         $crate::__pgrx_c_args_TTS_IS_BUFFERTUPLE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TTS_IS_BUFFERTUPLE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TTS_IS_BUFFERTUPLE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2671,7 +2766,7 @@ macro_rules! TTS_IS_BUFFERTUPLE {
                         $crate::__pgrx_c_operand!(@check_safety; $slot);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -2715,7 +2810,7 @@ macro_rules! TTS_IS_BUFFERTUPLE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2845,6 +2940,11 @@ macro_rules! __pgrx_c_args_TTS_IS_HEAPTUPLE {
             @argument [__pgrx_c_args_TTS_IS_HEAPTUPLE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TTS_IS_HEAPTUPLE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TTS_IS_HEAPTUPLE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2882,6 +2982,13 @@ macro_rules! __pgrx_c_args_TTS_IS_HEAPTUPLE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TTS_IS_HEAPTUPLE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TTS_IS_HEAPTUPLE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2898,7 +3005,7 @@ macro_rules! __pgrx_c_args_TTS_IS_HEAPTUPLE {
         $crate::TTS_IS_HEAPTUPLE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TTS_IS_HEAPTUPLE from tuptable.h:235
@@ -2968,13 +3075,13 @@ macro_rules! TTS_IS_HEAPTUPLE {
         $crate::__pgrx_c_args_TTS_IS_HEAPTUPLE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TTS_IS_HEAPTUPLE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TTS_IS_HEAPTUPLE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2987,7 +3094,7 @@ macro_rules! TTS_IS_HEAPTUPLE {
                         $crate::__pgrx_c_operand!(@check_safety; $slot);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -3031,7 +3138,7 @@ macro_rules! TTS_IS_HEAPTUPLE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3159,6 +3266,11 @@ macro_rules! __pgrx_c_args_TTS_IS_MINIMALTUPLE {
             @argument [__pgrx_c_args_TTS_IS_MINIMALTUPLE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TTS_IS_MINIMALTUPLE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TTS_IS_MINIMALTUPLE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3196,6 +3308,13 @@ macro_rules! __pgrx_c_args_TTS_IS_MINIMALTUPLE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TTS_IS_MINIMALTUPLE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TTS_IS_MINIMALTUPLE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3212,7 +3331,7 @@ macro_rules! __pgrx_c_args_TTS_IS_MINIMALTUPLE {
         $crate::TTS_IS_MINIMALTUPLE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TTS_IS_MINIMALTUPLE from tuptable.h:236
@@ -3282,13 +3401,13 @@ macro_rules! TTS_IS_MINIMALTUPLE {
         $crate::__pgrx_c_args_TTS_IS_MINIMALTUPLE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TTS_IS_MINIMALTUPLE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TTS_IS_MINIMALTUPLE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3301,7 +3420,7 @@ macro_rules! TTS_IS_MINIMALTUPLE {
                         $crate::__pgrx_c_operand!(@check_safety; $slot);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -3345,7 +3464,7 @@ macro_rules! TTS_IS_MINIMALTUPLE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3473,6 +3592,11 @@ macro_rules! __pgrx_c_args_TTS_IS_VIRTUAL {
             @argument [__pgrx_c_args_TTS_IS_VIRTUAL] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TTS_IS_VIRTUAL] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TTS_IS_VIRTUAL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3510,6 +3634,11 @@ macro_rules! __pgrx_c_args_TTS_IS_VIRTUAL {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TTS_IS_VIRTUAL] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TTS_IS_VIRTUAL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3526,7 +3655,7 @@ macro_rules! __pgrx_c_args_TTS_IS_VIRTUAL {
         $crate::TTS_IS_VIRTUAL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TTS_IS_VIRTUAL from tuptable.h:234
@@ -3594,13 +3723,13 @@ macro_rules! TTS_IS_VIRTUAL {
         $crate::__pgrx_c_args_TTS_IS_VIRTUAL!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TTS_IS_VIRTUAL!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TTS_IS_VIRTUAL!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3613,7 +3742,7 @@ macro_rules! TTS_IS_VIRTUAL {
                         $crate::__pgrx_c_operand!(@check_safety; $slot);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -3657,7 +3786,7 @@ macro_rules! TTS_IS_VIRTUAL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3783,6 +3912,11 @@ macro_rules! __pgrx_c_args_TTS_SHOULDFREE {
             @argument [__pgrx_c_args_TTS_SHOULDFREE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TTS_SHOULDFREE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TTS_SHOULDFREE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3820,6 +3954,11 @@ macro_rules! __pgrx_c_args_TTS_SHOULDFREE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TTS_SHOULDFREE] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TTS_SHOULDFREE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3836,7 +3975,7 @@ macro_rules! __pgrx_c_args_TTS_SHOULDFREE {
         $crate::TTS_SHOULDFREE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TTS_SHOULDFREE from tuptable.h:100
@@ -3919,13 +4058,13 @@ macro_rules! TTS_SHOULDFREE {
         $crate::__pgrx_c_args_TTS_SHOULDFREE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TTS_SHOULDFREE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TTS_SHOULDFREE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3938,7 +4077,7 @@ macro_rules! TTS_SHOULDFREE {
                         $crate::__pgrx_c_operand!(@check_safety; $slot);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -3996,7 +4135,7 @@ macro_rules! TTS_SHOULDFREE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4137,6 +4276,11 @@ macro_rules! __pgrx_c_args_TTS_SLOW {
             @argument [__pgrx_c_args_TTS_SLOW] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TTS_SLOW] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TTS_SLOW!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4172,6 +4316,11 @@ macro_rules! __pgrx_c_args_TTS_SLOW {
             @argument [__pgrx_c_args_TTS_SLOW] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TTS_SLOW] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TTS_SLOW!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4188,7 +4337,7 @@ macro_rules! __pgrx_c_args_TTS_SLOW {
         $crate::TTS_SLOW!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TTS_SLOW from tuptable.h:104
@@ -4271,13 +4420,13 @@ macro_rules! TTS_SLOW {
         $crate::__pgrx_c_args_TTS_SLOW!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TTS_SLOW!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TTS_SLOW!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4290,7 +4439,7 @@ macro_rules! TTS_SLOW {
                         $crate::__pgrx_c_operand!(@check_safety; $slot);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -4348,7 +4497,7 @@ macro_rules! TTS_SLOW {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4489,6 +4638,11 @@ macro_rules! __pgrx_c_args_TupIsNull {
             @argument [__pgrx_c_args_TupIsNull] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TupIsNull] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TupIsNull!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4524,6 +4678,11 @@ macro_rules! __pgrx_c_args_TupIsNull {
             @argument [__pgrx_c_args_TupIsNull] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TupIsNull] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TupIsNull!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4540,7 +4699,7 @@ macro_rules! __pgrx_c_args_TupIsNull {
         $crate::TupIsNull!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TupIsNull from tuptable.h:306
@@ -4685,13 +4844,13 @@ macro_rules! TupIsNull {
         $crate::__pgrx_c_args_TupIsNull!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TupIsNull!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TupIsNull!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4705,7 +4864,7 @@ macro_rules! TupIsNull {
                         $crate::__pgrx_c_operand!(@check_safety; $slot);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -4824,7 +4983,7 @@ macro_rules! TupIsNull {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5016,6 +5175,11 @@ macro_rules! __pgrx_c_args_slot_attisnull {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slot_attisnull] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slot_attisnull!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5077,6 +5241,11 @@ macro_rules! __pgrx_c_args_slot_attisnull {
             @argument [__pgrx_c_args_slot_attisnull] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slot_attisnull] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_slot_attisnull!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5114,6 +5283,11 @@ macro_rules! __pgrx_c_args_slot_attisnull {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slot_attisnull] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slot_attisnull!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5130,7 +5304,7 @@ macro_rules! __pgrx_c_args_slot_attisnull {
         $crate::slot_attisnull!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function slot_attisnull from tuptable.h:380
@@ -5220,13 +5394,13 @@ macro_rules! slot_attisnull {
         $crate::__pgrx_c_args_slot_attisnull!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $slot:tt, $attnum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slot_attisnull!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $slot:tt, $attnum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slot_attisnull!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5240,7 +5414,7 @@ macro_rules! slot_attisnull {
                         $crate::__pgrx_c_operand!(@check_safety; $attnum);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -5289,7 +5463,7 @@ macro_rules! slot_attisnull {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5425,6 +5599,11 @@ macro_rules! __pgrx_c_args_slot_getallattrs {
             @argument [__pgrx_c_args_slot_getallattrs] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slot_getallattrs] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_slot_getallattrs!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5462,6 +5641,13 @@ macro_rules! __pgrx_c_args_slot_getallattrs {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slot_getallattrs] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slot_getallattrs!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5478,7 +5664,7 @@ macro_rules! __pgrx_c_args_slot_getallattrs {
         $crate::slot_getallattrs!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function slot_getallattrs from tuptable.h:367
@@ -5550,13 +5736,13 @@ macro_rules! slot_getallattrs {
         $crate::__pgrx_c_args_slot_getallattrs!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slot_getallattrs!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slot_getallattrs!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5569,7 +5755,7 @@ macro_rules! slot_getallattrs {
                         $crate::__pgrx_c_operand!(@check_safety; $slot);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::slot_getallattrs(
@@ -5601,7 +5787,7 @@ macro_rules! slot_getallattrs {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5714,6 +5900,11 @@ macro_rules! __pgrx_c_args_slot_getattr {
             @argument [__pgrx_c_args_slot_getattr] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slot_getattr] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slot_getattr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5764,6 +5955,11 @@ macro_rules! __pgrx_c_args_slot_getattr {
     (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_slot_getattr] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slot_getattr] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -5827,6 +6023,11 @@ macro_rules! __pgrx_c_args_slot_getattr {
             @argument [__pgrx_c_args_slot_getattr] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slot_getattr] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_slot_getattr!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5862,6 +6063,11 @@ macro_rules! __pgrx_c_args_slot_getattr {
             @argument [__pgrx_c_args_slot_getattr] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slot_getattr] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slot_getattr!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5878,7 +6084,7 @@ macro_rules! __pgrx_c_args_slot_getattr {
         $crate::slot_getattr!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function slot_getattr from tuptable.h:394
@@ -5995,13 +6201,13 @@ macro_rules! slot_getattr {
         $crate::__pgrx_c_args_slot_getattr!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $slot:tt, $attnum:tt, $isnull:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slot_getattr!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $slot:tt, $attnum:tt, $isnull:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slot_getattr!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6016,7 +6222,7 @@ macro_rules! slot_getattr {
                         $crate::__pgrx_c_operand!(@check_safety; $isnull);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -6087,7 +6293,7 @@ macro_rules! slot_getattr {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6239,6 +6445,13 @@ macro_rules! __pgrx_c_args_slot_getsomeattrs {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slot_getsomeattrs] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slot_getsomeattrs!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6300,6 +6513,11 @@ macro_rules! __pgrx_c_args_slot_getsomeattrs {
             @argument [__pgrx_c_args_slot_getsomeattrs] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slot_getsomeattrs] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_slot_getsomeattrs!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6337,6 +6555,13 @@ macro_rules! __pgrx_c_args_slot_getsomeattrs {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slot_getsomeattrs] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slot_getsomeattrs!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6353,7 +6578,7 @@ macro_rules! __pgrx_c_args_slot_getsomeattrs {
         $crate::slot_getsomeattrs!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function slot_getsomeattrs from tuptable.h:354
@@ -6437,13 +6662,13 @@ macro_rules! slot_getsomeattrs {
         $crate::__pgrx_c_args_slot_getsomeattrs!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $slot:tt, $attnum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slot_getsomeattrs!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $slot:tt, $attnum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slot_getsomeattrs!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6457,7 +6682,7 @@ macro_rules! slot_getsomeattrs {
                         $crate::__pgrx_c_operand!(@check_safety; $attnum);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::slot_getsomeattrs(
@@ -6502,7 +6727,7 @@ macro_rules! slot_getsomeattrs {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6627,6 +6852,13 @@ macro_rules! __pgrx_c_args_slot_getsysattr {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slot_getsysattr] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slot_getsysattr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6678,6 +6910,13 @@ macro_rules! __pgrx_c_args_slot_getsysattr {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_slot_getsysattr] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slot_getsysattr] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -6742,6 +6981,11 @@ macro_rules! __pgrx_c_args_slot_getsysattr {
             @argument [__pgrx_c_args_slot_getsysattr] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slot_getsysattr] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_slot_getsysattr!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6779,6 +7023,13 @@ macro_rules! __pgrx_c_args_slot_getsysattr {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slot_getsysattr] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slot_getsysattr!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6795,7 +7046,7 @@ macro_rules! __pgrx_c_args_slot_getsysattr {
         $crate::slot_getsysattr!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function slot_getsysattr from tuptable.h:415
@@ -6918,13 +7169,13 @@ macro_rules! slot_getsysattr {
         $crate::__pgrx_c_args_slot_getsysattr!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $slot:tt, $attnum:tt, $isnull:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slot_getsysattr!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $slot:tt, $attnum:tt, $isnull:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slot_getsysattr!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6939,7 +7190,7 @@ macro_rules! slot_getsysattr {
                         $crate::__pgrx_c_operand!(@check_safety; $isnull);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -7010,7 +7261,7 @@ macro_rules! slot_getsysattr {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7174,6 +7425,13 @@ macro_rules! __pgrx_c_args_slot_is_current_xact_tuple {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slot_is_current_xact_tuple] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_slot_is_current_xact_tuple!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7211,6 +7469,13 @@ macro_rules! __pgrx_c_args_slot_is_current_xact_tuple {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_slot_is_current_xact_tuple] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_slot_is_current_xact_tuple!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7227,7 +7492,7 @@ macro_rules! __pgrx_c_args_slot_is_current_xact_tuple {
         $crate::slot_is_current_xact_tuple!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function slot_is_current_xact_tuple from tuptable.h:444
@@ -7304,13 +7569,13 @@ macro_rules! slot_is_current_xact_tuple {
         $crate::__pgrx_c_args_slot_is_current_xact_tuple!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slot_is_current_xact_tuple!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $slot:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_slot_is_current_xact_tuple!(
@@ -7326,7 +7591,7 @@ macro_rules! slot_is_current_xact_tuple {
                         $crate::__pgrx_c_operand!(@check_safety; $slot);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -7362,7 +7627,7 @@ macro_rules! slot_is_current_xact_tuple {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

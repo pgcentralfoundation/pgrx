@@ -86,6 +86,11 @@ macro_rules! __pgrx_c_args_DatumGetGinTernaryValue {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetGinTernaryValue] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetGinTernaryValue!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -123,6 +128,13 @@ macro_rules! __pgrx_c_args_DatumGetGinTernaryValue {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetGinTernaryValue] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetGinTernaryValue!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -139,7 +151,7 @@ macro_rules! __pgrx_c_args_DatumGetGinTernaryValue {
         $crate::DatumGetGinTernaryValue!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function DatumGetGinTernaryValue from gin.h:68
@@ -185,7 +197,7 @@ macro_rules! DatumGetGinTernaryValue {
     (@__pgrx_emit_value; $X:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_8802d53919734aaab323463bf21a4f72(
+                $crate::__pgrx_c_generated::Inline_3b16f9f336f36deaaff7b6bdbfaade07(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLong,
@@ -212,13 +224,13 @@ macro_rules! DatumGetGinTernaryValue {
         $crate::__pgrx_c_args_DatumGetGinTernaryValue!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetGinTernaryValue!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DatumGetGinTernaryValue!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -231,13 +243,13 @@ macro_rules! DatumGetGinTernaryValue {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_8802d53919734aaab323463bf21a4f72(
+                                $crate::__pgrx_c_generated::Inline_3b16f9f336f36deaaff7b6bdbfaade07(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedLong,
@@ -263,7 +275,7 @@ macro_rules! DatumGetGinTernaryValue {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -274,7 +286,7 @@ macro_rules! DatumGetGinTernaryValue {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::__pgrx_c_generated::Inline_8802d53919734aaab323463bf21a4f72(
+                    $crate::__pgrx_c_generated::Inline_3b16f9f336f36deaaff7b6bdbfaade07(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedLong,
@@ -388,6 +400,11 @@ macro_rules! __pgrx_c_args_GinTernaryValueGetDatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinTernaryValueGetDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinTernaryValueGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -425,6 +442,13 @@ macro_rules! __pgrx_c_args_GinTernaryValueGetDatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinTernaryValueGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinTernaryValueGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -441,7 +465,7 @@ macro_rules! __pgrx_c_args_GinTernaryValueGetDatum {
         $crate::GinTernaryValueGetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function GinTernaryValueGetDatum from gin.h:74
@@ -492,7 +516,7 @@ macro_rules! GinTernaryValueGetDatum {
                     $crate::__pgrx_c_bindings::Datum
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_2db297143921ce978942de9541dd39f4(
+                $crate::__pgrx_c_generated::Inline_fa854ee38b53d22929917fa8d77c6b45(
                     <$crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType>::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::CChar,
@@ -511,13 +535,13 @@ macro_rules! GinTernaryValueGetDatum {
         $crate::__pgrx_c_args_GinTernaryValueGetDatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinTernaryValueGetDatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $X:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinTernaryValueGetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -530,7 +554,7 @@ macro_rules! GinTernaryValueGetDatum {
                         $crate::__pgrx_c_operand!(@check_safety; $X);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -539,7 +563,7 @@ macro_rules! GinTernaryValueGetDatum {
                                     $crate::__pgrx_c_bindings::Datum
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_2db297143921ce978942de9541dd39f4(
+                                $crate::__pgrx_c_generated::Inline_fa854ee38b53d22929917fa8d77c6b45(
                                     <
                                         $crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
@@ -559,7 +583,7 @@ macro_rules! GinTernaryValueGetDatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -575,7 +599,7 @@ macro_rules! GinTernaryValueGetDatum {
                         $crate::__pgrx_c_bindings::Datum
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_2db297143921ce978942de9541dd39f4(
+                    $crate::__pgrx_c_generated::Inline_fa854ee38b53d22929917fa8d77c6b45(
                         <
                             $crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
@@ -683,6 +707,13 @@ macro_rules! __pgrx_c_args_PG_RETURN_GIN_TERNARY_VALUE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_RETURN_GIN_TERNARY_VALUE] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PG_RETURN_GIN_TERNARY_VALUE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -720,6 +751,13 @@ macro_rules! __pgrx_c_args_PG_RETURN_GIN_TERNARY_VALUE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PG_RETURN_GIN_TERNARY_VALUE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_GIN_TERNARY_VALUE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -736,7 +774,7 @@ macro_rules! __pgrx_c_args_PG_RETURN_GIN_TERNARY_VALUE {
         $crate::PG_RETURN_GIN_TERNARY_VALUE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PG_RETURN_GIN_TERNARY_VALUE from gin.h:80
@@ -780,7 +818,7 @@ macro_rules! PG_RETURN_GIN_TERNARY_VALUE {
                             $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_2db297143921ce978942de9541dd39f4(
+                        $crate::__pgrx_c_generated::Inline_fa854ee38b53d22929917fa8d77c6b45(
                             <
                                 $crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -812,7 +850,7 @@ macro_rules! PG_RETURN_GIN_TERNARY_VALUE {
                             $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::__pgrx_c_generated::Inline_2db297143921ce978942de9541dd39f4(
+                        $crate::__pgrx_c_generated::Inline_fa854ee38b53d22929917fa8d77c6b45(
                             <
                                 $crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -838,7 +876,7 @@ macro_rules! PG_RETURN_GIN_TERNARY_VALUE {
         )
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_GIN_TERNARY_VALUE!(@collect __pgrx_emit_public []; $($raw)*)

@@ -89,6 +89,13 @@ macro_rules! __pgrx_c_args_GinGetPendingListCleanupSize {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinGetPendingListCleanupSize] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinGetPendingListCleanupSize!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -126,6 +133,13 @@ macro_rules! __pgrx_c_args_GinGetPendingListCleanupSize {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinGetPendingListCleanupSize] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetPendingListCleanupSize!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -142,7 +156,7 @@ macro_rules! __pgrx_c_args_GinGetPendingListCleanupSize {
         $crate::GinGetPendingListCleanupSize!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinGetPendingListCleanupSize from gin_private.h:41
@@ -413,13 +427,13 @@ macro_rules! GinGetPendingListCleanupSize {
         $crate::__pgrx_c_args_GinGetPendingListCleanupSize!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinGetPendingListCleanupSize!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinGetPendingListCleanupSize!(
@@ -436,7 +450,7 @@ macro_rules! GinGetPendingListCleanupSize {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -680,7 +694,7 @@ macro_rules! GinGetPendingListCleanupSize {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1008,6 +1022,11 @@ macro_rules! __pgrx_c_args_GinGetUseFastUpdate {
             @argument [__pgrx_c_args_GinGetUseFastUpdate] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinGetUseFastUpdate] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinGetUseFastUpdate!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1045,6 +1064,13 @@ macro_rules! __pgrx_c_args_GinGetUseFastUpdate {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinGetUseFastUpdate] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetUseFastUpdate!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1061,7 +1087,7 @@ macro_rules! __pgrx_c_args_GinGetUseFastUpdate {
         $crate::GinGetUseFastUpdate!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro GinGetUseFastUpdate from gin_private.h:36
@@ -1225,13 +1251,13 @@ macro_rules! GinGetUseFastUpdate {
         $crate::__pgrx_c_args_GinGetUseFastUpdate!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinGetUseFastUpdate!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_GinGetUseFastUpdate!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1245,7 +1271,7 @@ macro_rules! GinGetUseFastUpdate {
                         $crate::__pgrx_c_operand!(@check_safety; $relation);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -1383,7 +1409,7 @@ macro_rules! GinGetUseFastUpdate {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1597,6 +1623,13 @@ macro_rules! __pgrx_c_args_ginCompareAttEntries {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ginCompareAttEntries] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ginCompareAttEntries!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1648,6 +1681,13 @@ macro_rules! __pgrx_c_args_ginCompareAttEntries {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_ginCompareAttEntries] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ginCompareAttEntries] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -1705,6 +1745,13 @@ macro_rules! __pgrx_c_args_ginCompareAttEntries {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ginCompareAttEntries] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ginCompareAttEntries!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1756,6 +1803,13 @@ macro_rules! __pgrx_c_args_ginCompareAttEntries {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_ginCompareAttEntries] [p4 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ginCompareAttEntries] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -1813,6 +1867,13 @@ macro_rules! __pgrx_c_args_ginCompareAttEntries {
             ]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ginCompareAttEntries] [p5 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ginCompareAttEntries!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1864,6 +1925,13 @@ macro_rules! __pgrx_c_args_ginCompareAttEntries {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_ginCompareAttEntries] [p6 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p5 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ginCompareAttEntries] [p6 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -1928,6 +1996,11 @@ macro_rules! __pgrx_c_args_ginCompareAttEntries {
             @argument [__pgrx_c_args_ginCompareAttEntries] [p7 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p6 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ginCompareAttEntries] [p7 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p6 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ginCompareAttEntries!(
             @p7 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1965,6 +2038,13 @@ macro_rules! __pgrx_c_args_ginCompareAttEntries {
             ]
         )
     };
+    (@p6 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ginCompareAttEntries] [p7 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p6 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ginCompareAttEntries!(
             @p7 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1981,7 +2061,7 @@ macro_rules! __pgrx_c_args_ginCompareAttEntries {
         $crate::ginCompareAttEntries!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ginCompareAttEntries from gin_private.h:525
@@ -2197,7 +2277,7 @@ macro_rules! ginCompareAttEntries {
         $b:tt,
         $categoryb:tt $(,)?
     ) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ginCompareAttEntries!(@collect __pgrx_emit_place []; $($raw)*)
@@ -2212,7 +2292,7 @@ macro_rules! ginCompareAttEntries {
         $b:tt,
         $categoryb:tt $(,)?
     ) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ginCompareAttEntries!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2240,7 +2320,7 @@ macro_rules! ginCompareAttEntries {
                         $crate::__pgrx_c_operand!(@check_safety; $categoryb);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2366,7 +2446,7 @@ macro_rules! ginCompareAttEntries {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2576,6 +2656,13 @@ macro_rules! __pgrx_c_args_ginCompareEntries {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ginCompareEntries] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ginCompareEntries!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2627,6 +2714,13 @@ macro_rules! __pgrx_c_args_ginCompareEntries {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_ginCompareEntries] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ginCompareEntries] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -2684,6 +2778,13 @@ macro_rules! __pgrx_c_args_ginCompareEntries {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ginCompareEntries] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ginCompareEntries!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2738,6 +2839,13 @@ macro_rules! __pgrx_c_args_ginCompareEntries {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ginCompareEntries] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ginCompareEntries!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2789,6 +2897,13 @@ macro_rules! __pgrx_c_args_ginCompareEntries {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_ginCompareEntries] [p5 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ginCompareEntries] [p5 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -2853,6 +2968,11 @@ macro_rules! __pgrx_c_args_ginCompareEntries {
             @argument [__pgrx_c_args_ginCompareEntries] [p6 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p5 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ginCompareEntries] [p6 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p5 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ginCompareEntries!(
             @p6 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2890,6 +3010,13 @@ macro_rules! __pgrx_c_args_ginCompareEntries {
             ]
         )
     };
+    (@p5 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ginCompareEntries] [p6 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p5 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ginCompareEntries!(
             @p6 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2906,7 +3033,7 @@ macro_rules! __pgrx_c_args_ginCompareEntries {
         $crate::ginCompareEntries!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ginCompareEntries from gin_private.h:503
@@ -3094,7 +3221,7 @@ macro_rules! ginCompareEntries {
         $crate::__pgrx_c_args_ginCompareEntries!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ginstate:tt, $attnum:tt, $a:tt, $categorya:tt, $b:tt, $categoryb:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ginCompareEntries!(@collect __pgrx_emit_place []; $($raw)*)
@@ -3108,7 +3235,7 @@ macro_rules! ginCompareEntries {
         $b:tt,
         $categoryb:tt $(,)?
     ) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ginCompareEntries!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3126,7 +3253,7 @@ macro_rules! ginCompareEntries {
                         $crate::__pgrx_c_operand!(@check_safety; $categoryb);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -3239,7 +3366,7 @@ macro_rules! ginCompareEntries {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3439,6 +3566,13 @@ macro_rules! __pgrx_c_args_ginCompareItemPointers {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ginCompareItemPointers] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ginCompareItemPointers!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3502,6 +3636,11 @@ macro_rules! __pgrx_c_args_ginCompareItemPointers {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ginCompareItemPointers] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ginCompareItemPointers!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3539,6 +3678,13 @@ macro_rules! __pgrx_c_args_ginCompareItemPointers {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ginCompareItemPointers] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ginCompareItemPointers!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3555,7 +3701,7 @@ macro_rules! __pgrx_c_args_ginCompareItemPointers {
         $crate::ginCompareItemPointers!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ginCompareItemPointers from gin_private.h:491
@@ -3658,13 +3804,13 @@ macro_rules! ginCompareItemPointers {
         $crate::__pgrx_c_args_ginCompareItemPointers!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ginCompareItemPointers!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ginCompareItemPointers!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3678,7 +3824,7 @@ macro_rules! ginCompareItemPointers {
                         $crate::__pgrx_c_operand!(@check_safety; $b);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -3737,7 +3883,7 @@ macro_rules! ginCompareItemPointers {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

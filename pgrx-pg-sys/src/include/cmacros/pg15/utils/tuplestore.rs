@@ -56,13 +56,13 @@ macro_rules! __pgrx_c_args_tuplestore_donestoring {
         )
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::tuplestore_donestoring!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro tuplestore_donestoring from tuplestore.h:60
@@ -118,13 +118,13 @@ macro_rules! tuplestore_donestoring {
         $crate::__pgrx_c_args_tuplestore_donestoring!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $state:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_tuplestore_donestoring!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $state:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_tuplestore_donestoring!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -135,7 +135,7 @@ macro_rules! tuplestore_donestoring {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -156,7 +156,7 @@ macro_rules! tuplestore_donestoring {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

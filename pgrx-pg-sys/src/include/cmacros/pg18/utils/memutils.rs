@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_AllocSizeIsValid {
             @argument [__pgrx_c_args_AllocSizeIsValid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_AllocSizeIsValid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_AllocSizeIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -118,6 +123,13 @@ macro_rules! __pgrx_c_args_AllocSizeIsValid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_AllocSizeIsValid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_AllocSizeIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -134,7 +146,7 @@ macro_rules! __pgrx_c_args_AllocSizeIsValid {
         $crate::AllocSizeIsValid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro AllocSizeIsValid from memutils.h:42
@@ -201,13 +213,13 @@ macro_rules! AllocSizeIsValid {
         $crate::__pgrx_c_args_AllocSizeIsValid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $size:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_AllocSizeIsValid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $size:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_AllocSizeIsValid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -220,7 +232,7 @@ macro_rules! AllocSizeIsValid {
                         $crate::__pgrx_c_operand!(@check_safety; $size);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::le(
@@ -251,7 +263,7 @@ macro_rules! AllocSizeIsValid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -371,6 +383,13 @@ macro_rules! __pgrx_c_args_MemoryContextCopyAndSetIdentifier {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MemoryContextCopyAndSetIdentifier] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MemoryContextCopyAndSetIdentifier!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -437,6 +456,13 @@ macro_rules! __pgrx_c_args_MemoryContextCopyAndSetIdentifier {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MemoryContextCopyAndSetIdentifier] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_MemoryContextCopyAndSetIdentifier!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -474,6 +500,13 @@ macro_rules! __pgrx_c_args_MemoryContextCopyAndSetIdentifier {
             ] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MemoryContextCopyAndSetIdentifier] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MemoryContextCopyAndSetIdentifier!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -490,7 +523,7 @@ macro_rules! __pgrx_c_args_MemoryContextCopyAndSetIdentifier {
         $crate::MemoryContextCopyAndSetIdentifier!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro MemoryContextCopyAndSetIdentifier from memutils.h:101
@@ -647,7 +680,7 @@ macro_rules! MemoryContextCopyAndSetIdentifier {
         )
     };
     (@__pgrx_emit_place; $cxt:tt, $id:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MemoryContextCopyAndSetIdentifier!(
@@ -656,7 +689,7 @@ macro_rules! MemoryContextCopyAndSetIdentifier {
         )
     };
     (@__pgrx_emit_read_place; $cxt:tt, $id:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MemoryContextCopyAndSetIdentifier!(
@@ -674,7 +707,7 @@ macro_rules! MemoryContextCopyAndSetIdentifier {
                         $crate::__pgrx_c_operand!(@check_safety; $id);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::MemoryContextSetIdentifier(
@@ -802,7 +835,7 @@ macro_rules! MemoryContextCopyAndSetIdentifier {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1013,6 +1046,13 @@ macro_rules! __pgrx_c_args_pg_memory_is_all_zeros {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_memory_is_all_zeros] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_memory_is_all_zeros!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1076,6 +1116,11 @@ macro_rules! __pgrx_c_args_pg_memory_is_all_zeros {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_memory_is_all_zeros] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pg_memory_is_all_zeros!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1113,6 +1158,13 @@ macro_rules! __pgrx_c_args_pg_memory_is_all_zeros {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_memory_is_all_zeros] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_memory_is_all_zeros!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1129,7 +1181,7 @@ macro_rules! __pgrx_c_args_pg_memory_is_all_zeros {
         $crate::pg_memory_is_all_zeros!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function pg_memory_is_all_zeros from memutils.h:218
@@ -1319,13 +1371,13 @@ macro_rules! pg_memory_is_all_zeros {
         $crate::__pgrx_c_args_pg_memory_is_all_zeros!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ptr:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_memory_is_all_zeros!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $ptr:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_memory_is_all_zeros!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1339,7 +1391,7 @@ macro_rules! pg_memory_is_all_zeros {
                         $crate::__pgrx_c_operand!(@check_safety; $len);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1390,7 +1442,7 @@ macro_rules! pg_memory_is_all_zeros {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

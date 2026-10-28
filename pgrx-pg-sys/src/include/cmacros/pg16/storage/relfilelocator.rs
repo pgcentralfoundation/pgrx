@@ -77,6 +77,13 @@ macro_rules! __pgrx_c_args_RelFileLocatorBackendEquals {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelFileLocatorBackendEquals] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelFileLocatorBackendEquals!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -140,6 +147,13 @@ macro_rules! __pgrx_c_args_RelFileLocatorBackendEquals {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelFileLocatorBackendEquals] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelFileLocatorBackendEquals!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -177,6 +191,13 @@ macro_rules! __pgrx_c_args_RelFileLocatorBackendEquals {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelFileLocatorBackendEquals] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelFileLocatorBackendEquals!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -193,7 +214,7 @@ macro_rules! __pgrx_c_args_RelFileLocatorBackendEquals {
         $crate::RelFileLocatorBackendEquals!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelFileLocatorBackendEquals from relfilelocator.h:93
@@ -460,13 +481,13 @@ macro_rules! RelFileLocatorBackendEquals {
         $crate::__pgrx_c_args_RelFileLocatorBackendEquals!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $locator1:tt, $locator2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelFileLocatorBackendEquals!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $locator1:tt, $locator2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelFileLocatorBackendEquals!(
@@ -483,7 +504,7 @@ macro_rules! RelFileLocatorBackendEquals {
                         $crate::__pgrx_c_operand!(@check_safety; $locator2);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -741,7 +762,7 @@ macro_rules! RelFileLocatorBackendEquals {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1070,6 +1091,13 @@ macro_rules! __pgrx_c_args_RelFileLocatorBackendIsTemp {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelFileLocatorBackendIsTemp] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelFileLocatorBackendIsTemp!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1107,6 +1135,13 @@ macro_rules! __pgrx_c_args_RelFileLocatorBackendIsTemp {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelFileLocatorBackendIsTemp] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelFileLocatorBackendIsTemp!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1123,7 +1158,7 @@ macro_rules! __pgrx_c_args_RelFileLocatorBackendIsTemp {
         $crate::RelFileLocatorBackendIsTemp!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelFileLocatorBackendIsTemp from relfilelocator.h:78
@@ -1182,13 +1217,13 @@ macro_rules! RelFileLocatorBackendIsTemp {
         $crate::__pgrx_c_args_RelFileLocatorBackendIsTemp!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rlocator:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelFileLocatorBackendIsTemp!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rlocator:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelFileLocatorBackendIsTemp!(
@@ -1204,7 +1239,7 @@ macro_rules! RelFileLocatorBackendIsTemp {
                         $crate::__pgrx_c_operand!(@check_safety; $rlocator);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -1227,7 +1262,7 @@ macro_rules! RelFileLocatorBackendIsTemp {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1340,6 +1375,13 @@ macro_rules! __pgrx_c_args_RelFileLocatorEquals {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelFileLocatorEquals] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelFileLocatorEquals!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1401,6 +1443,11 @@ macro_rules! __pgrx_c_args_RelFileLocatorEquals {
             @argument [__pgrx_c_args_RelFileLocatorEquals] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelFileLocatorEquals] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelFileLocatorEquals!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1438,6 +1485,13 @@ macro_rules! __pgrx_c_args_RelFileLocatorEquals {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelFileLocatorEquals] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelFileLocatorEquals!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1454,7 +1508,7 @@ macro_rules! __pgrx_c_args_RelFileLocatorEquals {
         $crate::RelFileLocatorEquals!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelFileLocatorEquals from relfilelocator.h:88
@@ -1621,13 +1675,13 @@ macro_rules! RelFileLocatorEquals {
         $crate::__pgrx_c_args_RelFileLocatorEquals!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $locator1:tt, $locator2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelFileLocatorEquals!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $locator1:tt, $locator2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelFileLocatorEquals!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1641,7 +1695,7 @@ macro_rules! RelFileLocatorEquals {
                         $crate::__pgrx_c_operand!(@check_safety; $locator2);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -1802,7 +1856,7 @@ macro_rules! RelFileLocatorEquals {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

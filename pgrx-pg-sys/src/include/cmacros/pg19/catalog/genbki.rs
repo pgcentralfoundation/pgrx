@@ -53,13 +53,13 @@ macro_rules! __pgrx_c_args_BKI_ARRAY_DEFAULT {
         )
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::BKI_ARRAY_DEFAULT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BKI_ARRAY_DEFAULT from genbki.h:56
@@ -84,31 +84,31 @@ macro_rules! BKI_ARRAY_DEFAULT {
     };
     (@__pgrx_emit_public; $value:tt $(,)?) => {};
     (@__pgrx_emit_value; $value:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_ARRAY_DEFAULT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $value:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_ARRAY_DEFAULT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $value:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_ARRAY_DEFAULT!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $value:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_size; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_ARRAY_DEFAULT!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $value:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_discard; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_ARRAY_DEFAULT!(@collect __pgrx_emit_discard []; $($raw)*)
@@ -164,13 +164,13 @@ macro_rules! __pgrx_c_args_BKI_DEFAULT {
         $crate::__pgrx_c_args_BKI_DEFAULT!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::BKI_DEFAULT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BKI_DEFAULT from genbki.h:54
@@ -195,31 +195,31 @@ macro_rules! BKI_DEFAULT {
     };
     (@__pgrx_emit_public; $value:tt $(,)?) => {};
     (@__pgrx_emit_value; $value:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_DEFAULT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $value:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_DEFAULT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $value:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_DEFAULT!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $value:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_size; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_DEFAULT!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $value:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_discard; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_DEFAULT!(@collect __pgrx_emit_discard []; $($raw)*)
@@ -275,13 +275,13 @@ macro_rules! __pgrx_c_args_BKI_LOOKUP {
         $crate::__pgrx_c_args_BKI_LOOKUP!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::BKI_LOOKUP!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BKI_LOOKUP from genbki.h:65
@@ -306,31 +306,31 @@ macro_rules! BKI_LOOKUP {
     };
     (@__pgrx_emit_public; $catalog:tt $(,)?) => {};
     (@__pgrx_emit_value; $catalog:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_LOOKUP!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $catalog:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_LOOKUP!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $catalog:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_LOOKUP!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $catalog:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_size; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_LOOKUP!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $catalog:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_discard; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_LOOKUP!(@collect __pgrx_emit_discard []; $($raw)*)
@@ -386,13 +386,13 @@ macro_rules! __pgrx_c_args_BKI_LOOKUP_OPT {
         $crate::__pgrx_c_args_BKI_LOOKUP_OPT!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::BKI_LOOKUP_OPT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BKI_LOOKUP_OPT from genbki.h:66
@@ -417,31 +417,31 @@ macro_rules! BKI_LOOKUP_OPT {
     };
     (@__pgrx_emit_public; $catalog:tt $(,)?) => {};
     (@__pgrx_emit_value; $catalog:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_LOOKUP_OPT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $catalog:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_LOOKUP_OPT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $catalog:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_LOOKUP_OPT!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $catalog:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_size; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_LOOKUP_OPT!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $catalog:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_discard; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_LOOKUP_OPT!(@collect __pgrx_emit_discard []; $($raw)*)
@@ -494,7 +494,7 @@ macro_rules! __pgrx_c_args_BKI_ROWTYPE_OID {
         $crate::__pgrx_c_args_BKI_ROWTYPE_OID!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_ROWTYPE_OID!(
@@ -514,13 +514,13 @@ macro_rules! __pgrx_c_args_BKI_ROWTYPE_OID {
         $crate::__pgrx_c_args_BKI_ROWTYPE_OID!(@ignore1 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore1 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::BKI_ROWTYPE_OID!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BKI_ROWTYPE_OID from genbki.h:47
@@ -545,31 +545,31 @@ macro_rules! BKI_ROWTYPE_OID {
     };
     (@__pgrx_emit_public; $oid:tt, $oidmacro:tt $(,)?) => {};
     (@__pgrx_emit_value; $oid:tt, $oidmacro:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_ROWTYPE_OID!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $oid:tt, $oidmacro:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_ROWTYPE_OID!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $oid:tt, $oidmacro:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_ROWTYPE_OID!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $oid:tt, $oidmacro:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_size; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_ROWTYPE_OID!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $oid:tt, $oidmacro:tt $(,)?) => {
-        compile_error!("an empty C macro has no expression operand")
+        ::core::compile_error!("an empty C macro has no expression operand")
     };
     (@__pgrx_c_discard; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BKI_ROWTYPE_OID!(@collect __pgrx_emit_discard []; $($raw)*)

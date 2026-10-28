@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_BRIN_IS_META_PAGE {
             @argument [__pgrx_c_args_BRIN_IS_META_PAGE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BRIN_IS_META_PAGE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BRIN_IS_META_PAGE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -118,6 +123,13 @@ macro_rules! __pgrx_c_args_BRIN_IS_META_PAGE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BRIN_IS_META_PAGE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BRIN_IS_META_PAGE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -134,7 +146,7 @@ macro_rules! __pgrx_c_args_BRIN_IS_META_PAGE {
         $crate::BRIN_IS_META_PAGE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BRIN_IS_META_PAGE from brin_page.h:55
@@ -514,13 +526,13 @@ macro_rules! BRIN_IS_META_PAGE {
         $crate::__pgrx_c_args_BRIN_IS_META_PAGE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BRIN_IS_META_PAGE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BRIN_IS_META_PAGE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -534,7 +546,7 @@ macro_rules! BRIN_IS_META_PAGE {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -882,7 +894,7 @@ macro_rules! BRIN_IS_META_PAGE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1319,6 +1331,11 @@ macro_rules! __pgrx_c_args_BRIN_IS_REGULAR_PAGE {
             @argument [__pgrx_c_args_BRIN_IS_REGULAR_PAGE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BRIN_IS_REGULAR_PAGE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BRIN_IS_REGULAR_PAGE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1356,6 +1373,13 @@ macro_rules! __pgrx_c_args_BRIN_IS_REGULAR_PAGE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BRIN_IS_REGULAR_PAGE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BRIN_IS_REGULAR_PAGE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1372,7 +1396,7 @@ macro_rules! __pgrx_c_args_BRIN_IS_REGULAR_PAGE {
         $crate::BRIN_IS_REGULAR_PAGE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BRIN_IS_REGULAR_PAGE from brin_page.h:57
@@ -1752,13 +1776,13 @@ macro_rules! BRIN_IS_REGULAR_PAGE {
         $crate::__pgrx_c_args_BRIN_IS_REGULAR_PAGE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BRIN_IS_REGULAR_PAGE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BRIN_IS_REGULAR_PAGE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1772,7 +1796,7 @@ macro_rules! BRIN_IS_REGULAR_PAGE {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -2120,7 +2144,7 @@ macro_rules! BRIN_IS_REGULAR_PAGE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2554,6 +2578,11 @@ macro_rules! __pgrx_c_args_BRIN_IS_REVMAP_PAGE {
             @argument [__pgrx_c_args_BRIN_IS_REVMAP_PAGE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BRIN_IS_REVMAP_PAGE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BRIN_IS_REVMAP_PAGE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2591,6 +2620,13 @@ macro_rules! __pgrx_c_args_BRIN_IS_REVMAP_PAGE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BRIN_IS_REVMAP_PAGE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BRIN_IS_REVMAP_PAGE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2607,7 +2643,7 @@ macro_rules! __pgrx_c_args_BRIN_IS_REVMAP_PAGE {
         $crate::BRIN_IS_REVMAP_PAGE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BRIN_IS_REVMAP_PAGE from brin_page.h:56
@@ -2987,13 +3023,13 @@ macro_rules! BRIN_IS_REVMAP_PAGE {
         $crate::__pgrx_c_args_BRIN_IS_REVMAP_PAGE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BRIN_IS_REVMAP_PAGE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BRIN_IS_REVMAP_PAGE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3007,7 +3043,7 @@ macro_rules! BRIN_IS_REVMAP_PAGE {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -3355,7 +3391,7 @@ macro_rules! BRIN_IS_REVMAP_PAGE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3789,6 +3825,11 @@ macro_rules! __pgrx_c_args_BrinPageFlags {
             @argument [__pgrx_c_args_BrinPageFlags] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BrinPageFlags] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BrinPageFlags!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3826,6 +3867,11 @@ macro_rules! __pgrx_c_args_BrinPageFlags {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BrinPageFlags] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinPageFlags!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3842,7 +3888,7 @@ macro_rules! __pgrx_c_args_BrinPageFlags {
         $crate::BrinPageFlags!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BrinPageFlags from brin_page.h:46
@@ -4817,7 +4863,7 @@ macro_rules! BrinPageFlags {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::index(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -5134,7 +5180,7 @@ macro_rules! BrinPageFlags {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5545,6 +5591,11 @@ macro_rules! __pgrx_c_args_BrinPageType {
             @argument [__pgrx_c_args_BrinPageType] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BrinPageType] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BrinPageType!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5580,6 +5631,11 @@ macro_rules! __pgrx_c_args_BrinPageType {
             @argument [__pgrx_c_args_BrinPageType] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BrinPageType] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinPageType!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5596,7 +5652,7 @@ macro_rules! __pgrx_c_args_BrinPageType {
         $crate::BrinPageType!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BrinPageType from brin_page.h:42
@@ -6571,7 +6627,7 @@ macro_rules! BrinPageType {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::index(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -6888,7 +6944,7 @@ macro_rules! BrinPageType {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

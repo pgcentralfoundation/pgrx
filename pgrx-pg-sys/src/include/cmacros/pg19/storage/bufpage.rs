@@ -72,6 +72,11 @@ macro_rules! __pgrx_c_args_PageAddItem {
             @argument [__pgrx_c_args_PageAddItem] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageAddItem] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageAddItem!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -122,6 +127,11 @@ macro_rules! __pgrx_c_args_PageAddItem {
     (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_PageAddItem] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageAddItem] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -176,6 +186,11 @@ macro_rules! __pgrx_c_args_PageAddItem {
             @argument [__pgrx_c_args_PageAddItem] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageAddItem] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageAddItem!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -228,6 +243,11 @@ macro_rules! __pgrx_c_args_PageAddItem {
             @argument [__pgrx_c_args_PageAddItem] [p4 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageAddItem] [p4 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageAddItem!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -278,6 +298,11 @@ macro_rules! __pgrx_c_args_PageAddItem {
     (@p4 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_PageAddItem] [p5 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageAddItem] [p5 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -341,6 +366,11 @@ macro_rules! __pgrx_c_args_PageAddItem {
             @argument [__pgrx_c_args_PageAddItem] [p6 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p5 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageAddItem] [p6 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p5 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageAddItem!(
             @p6 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -376,6 +406,11 @@ macro_rules! __pgrx_c_args_PageAddItem {
             @argument [__pgrx_c_args_PageAddItem] [p6 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p5 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageAddItem] [p6 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p5 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageAddItem!(
             @p6 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -392,7 +427,7 @@ macro_rules! __pgrx_c_args_PageAddItem {
         $crate::PageAddItem!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PageAddItem from bufpage.h:505
@@ -663,7 +698,7 @@ macro_rules! PageAddItem {
         $overwrite:tt,
         $is_heap:tt $(,)?
     ) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageAddItem!(@collect __pgrx_emit_place []; $($raw)*)
@@ -677,7 +712,7 @@ macro_rules! PageAddItem {
         $overwrite:tt,
         $is_heap:tt $(,)?
     ) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageAddItem!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -704,7 +739,7 @@ macro_rules! PageAddItem {
                         $crate::__pgrx_c_operand!(@check_safety; $is_heap);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -910,7 +945,7 @@ macro_rules! PageAddItem {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1204,6 +1239,11 @@ macro_rules! __pgrx_c_args_PageClearAllVisible {
             @argument [__pgrx_c_args_PageClearAllVisible] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageClearAllVisible] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageClearAllVisible!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1241,6 +1281,13 @@ macro_rules! __pgrx_c_args_PageClearAllVisible {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageClearAllVisible] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageClearAllVisible!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1257,7 +1304,7 @@ macro_rules! __pgrx_c_args_PageClearAllVisible {
         $crate::PageClearAllVisible!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function PageClearAllVisible from bufpage.h:464
@@ -1331,13 +1378,13 @@ macro_rules! PageClearAllVisible {
         $crate::__pgrx_c_args_PageClearAllVisible!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageClearAllVisible!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageClearAllVisible!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1350,7 +1397,7 @@ macro_rules! PageClearAllVisible {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::PageClearAllVisible(
@@ -1384,7 +1431,7 @@ macro_rules! PageClearAllVisible {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1508,6 +1555,11 @@ macro_rules! __pgrx_c_args_PageClearFull {
             @argument [__pgrx_c_args_PageClearFull] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageClearFull] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageClearFull!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1545,6 +1597,11 @@ macro_rules! __pgrx_c_args_PageClearFull {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageClearFull] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageClearFull!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1561,7 +1618,7 @@ macro_rules! __pgrx_c_args_PageClearFull {
         $crate::PageClearFull!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function PageClearFull from bufpage.h:448
@@ -1635,13 +1692,13 @@ macro_rules! PageClearFull {
         $crate::__pgrx_c_args_PageClearFull!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageClearFull!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageClearFull!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1654,7 +1711,7 @@ macro_rules! PageClearFull {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::PageClearFull(
@@ -1688,7 +1745,7 @@ macro_rules! PageClearFull {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1820,6 +1877,13 @@ macro_rules! __pgrx_c_args_PageClearHasFreeLinePointers {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageClearHasFreeLinePointers] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageClearHasFreeLinePointers!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1857,6 +1921,13 @@ macro_rules! __pgrx_c_args_PageClearHasFreeLinePointers {
             ] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageClearHasFreeLinePointers] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageClearHasFreeLinePointers!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1873,7 +1944,7 @@ macro_rules! __pgrx_c_args_PageClearHasFreeLinePointers {
         $crate::PageClearHasFreeLinePointers!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function PageClearHasFreeLinePointers from bufpage.h:432
@@ -1950,13 +2021,13 @@ macro_rules! PageClearHasFreeLinePointers {
         $crate::__pgrx_c_args_PageClearHasFreeLinePointers!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageClearHasFreeLinePointers!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageClearHasFreeLinePointers!(
@@ -1972,7 +2043,7 @@ macro_rules! PageClearHasFreeLinePointers {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::PageClearHasFreeLinePointers(
@@ -2006,7 +2077,7 @@ macro_rules! PageClearHasFreeLinePointers {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2136,6 +2207,11 @@ macro_rules! __pgrx_c_args_PageClearPrunable {
             @argument [__pgrx_c_args_PageClearPrunable] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageClearPrunable] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageClearPrunable!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2173,6 +2249,13 @@ macro_rules! __pgrx_c_args_PageClearPrunable {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageClearPrunable] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageClearPrunable!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2189,7 +2272,7 @@ macro_rules! __pgrx_c_args_PageClearPrunable {
         $crate::PageClearPrunable!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PageClearPrunable from bufpage.h:486
@@ -2271,13 +2354,13 @@ macro_rules! PageClearPrunable {
         $crate::__pgrx_c_args_PageClearPrunable!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageClearPrunable!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageClearPrunable!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2290,7 +2373,7 @@ macro_rules! PageClearPrunable {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -2345,7 +2428,7 @@ macro_rules! PageClearPrunable {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2481,6 +2564,11 @@ macro_rules! __pgrx_c_args_PageGetContents {
             @argument [__pgrx_c_args_PageGetContents] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageGetContents] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageGetContents!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2518,6 +2606,13 @@ macro_rules! __pgrx_c_args_PageGetContents {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageGetContents] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageGetContents!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2534,7 +2629,7 @@ macro_rules! __pgrx_c_args_PageGetContents {
         $crate::PageGetContents!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function PageGetContents from bufpage.h:282
@@ -2618,13 +2713,13 @@ macro_rules! PageGetContents {
         $crate::__pgrx_c_args_PageGetContents!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageGetContents!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageGetContents!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2637,7 +2732,7 @@ macro_rules! PageGetContents {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2681,7 +2776,7 @@ macro_rules! PageGetContents {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2806,6 +2901,11 @@ macro_rules! __pgrx_c_args_PageGetItem {
             @argument [__pgrx_c_args_PageGetItem] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageGetItem] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageGetItem!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2867,6 +2967,11 @@ macro_rules! __pgrx_c_args_PageGetItem {
             @argument [__pgrx_c_args_PageGetItem] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageGetItem] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageGetItem!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2902,6 +3007,11 @@ macro_rules! __pgrx_c_args_PageGetItem {
             @argument [__pgrx_c_args_PageGetItem] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageGetItem] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageGetItem!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2918,7 +3028,7 @@ macro_rules! __pgrx_c_args_PageGetItem {
         $crate::PageGetItem!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function PageGetItem from bufpage.h:378
@@ -3025,13 +3135,13 @@ macro_rules! PageGetItem {
         $crate::__pgrx_c_args_PageGetItem!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt, $itemId:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageGetItem!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt, $itemId:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageGetItem!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3045,7 +3155,7 @@ macro_rules! PageGetItem {
                         $crate::__pgrx_c_operand!(@check_safety; $itemId);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -3109,7 +3219,7 @@ macro_rules! PageGetItem {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3255,6 +3365,11 @@ macro_rules! __pgrx_c_args_PageGetItemId {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageGetItemId] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageGetItemId!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3316,6 +3431,11 @@ macro_rules! __pgrx_c_args_PageGetItemId {
             @argument [__pgrx_c_args_PageGetItemId] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageGetItemId] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageGetItemId!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3353,6 +3473,11 @@ macro_rules! __pgrx_c_args_PageGetItemId {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageGetItemId] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageGetItemId!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3369,7 +3494,7 @@ macro_rules! __pgrx_c_args_PageGetItemId {
         $crate::PageGetItemId!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function PageGetItemId from bufpage.h:268
@@ -3465,13 +3590,13 @@ macro_rules! PageGetItemId {
         $crate::__pgrx_c_args_PageGetItemId!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt, $offsetNumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageGetItemId!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt, $offsetNumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageGetItemId!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3485,7 +3610,7 @@ macro_rules! PageGetItemId {
                         $crate::__pgrx_c_operand!(@check_safety; $offsetNumber);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -3546,7 +3671,7 @@ macro_rules! PageGetItemId {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3691,6 +3816,11 @@ macro_rules! __pgrx_c_args_PageGetLSN {
             @argument [__pgrx_c_args_PageGetLSN] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageGetLSN] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageGetLSN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3726,6 +3856,11 @@ macro_rules! __pgrx_c_args_PageGetLSN {
             @argument [__pgrx_c_args_PageGetLSN] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageGetLSN] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageGetLSN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3742,7 +3877,7 @@ macro_rules! __pgrx_c_args_PageGetLSN {
         $crate::PageGetLSN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function PageGetLSN from bufpage.h:410
@@ -3818,13 +3953,13 @@ macro_rules! PageGetLSN {
         $crate::__pgrx_c_args_PageGetLSN!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageGetLSN!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageGetLSN!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3837,7 +3972,7 @@ macro_rules! PageGetLSN {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -3875,7 +4010,7 @@ macro_rules! PageGetLSN {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4008,6 +4143,11 @@ macro_rules! __pgrx_c_args_PageGetMaxOffsetNumber {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageGetMaxOffsetNumber] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageGetMaxOffsetNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4045,6 +4185,13 @@ macro_rules! __pgrx_c_args_PageGetMaxOffsetNumber {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageGetMaxOffsetNumber] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageGetMaxOffsetNumber!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4061,7 +4208,7 @@ macro_rules! __pgrx_c_args_PageGetMaxOffsetNumber {
         $crate::PageGetMaxOffsetNumber!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function PageGetMaxOffsetNumber from bufpage.h:396
@@ -4145,13 +4292,13 @@ macro_rules! PageGetMaxOffsetNumber {
         $crate::__pgrx_c_args_PageGetMaxOffsetNumber!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageGetMaxOffsetNumber!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageGetMaxOffsetNumber!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4164,7 +4311,7 @@ macro_rules! PageGetMaxOffsetNumber {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -4202,7 +4349,7 @@ macro_rules! PageGetMaxOffsetNumber {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4335,6 +4482,13 @@ macro_rules! __pgrx_c_args_PageGetPageLayoutVersion {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageGetPageLayoutVersion] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageGetPageLayoutVersion!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4372,6 +4526,13 @@ macro_rules! __pgrx_c_args_PageGetPageLayoutVersion {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageGetPageLayoutVersion] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageGetPageLayoutVersion!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4388,7 +4549,7 @@ macro_rules! __pgrx_c_args_PageGetPageLayoutVersion {
         $crate::PageGetPageLayoutVersion!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function PageGetPageLayoutVersion from bufpage.h:311
@@ -4467,13 +4628,13 @@ macro_rules! PageGetPageLayoutVersion {
         $crate::__pgrx_c_args_PageGetPageLayoutVersion!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageGetPageLayoutVersion!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageGetPageLayoutVersion!(
@@ -4489,7 +4650,7 @@ macro_rules! PageGetPageLayoutVersion {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -4527,7 +4688,7 @@ macro_rules! PageGetPageLayoutVersion {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4655,6 +4816,11 @@ macro_rules! __pgrx_c_args_PageGetPageSize {
             @argument [__pgrx_c_args_PageGetPageSize] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageGetPageSize] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageGetPageSize!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4692,6 +4858,13 @@ macro_rules! __pgrx_c_args_PageGetPageSize {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageGetPageSize] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageGetPageSize!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4708,7 +4881,7 @@ macro_rules! __pgrx_c_args_PageGetPageSize {
         $crate::PageGetPageSize!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function PageGetPageSize from bufpage.h:301
@@ -4789,13 +4962,13 @@ macro_rules! PageGetPageSize {
         $crate::__pgrx_c_args_PageGetPageSize!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageGetPageSize!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageGetPageSize!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4808,7 +4981,7 @@ macro_rules! PageGetPageSize {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -4849,7 +5022,7 @@ macro_rules! PageGetPageSize {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4980,6 +5153,11 @@ macro_rules! __pgrx_c_args_PageGetPruneXid {
             @argument [__pgrx_c_args_PageGetPruneXid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageGetPruneXid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageGetPruneXid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5017,6 +5195,13 @@ macro_rules! __pgrx_c_args_PageGetPruneXid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageGetPruneXid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageGetPruneXid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5033,7 +5218,7 @@ macro_rules! __pgrx_c_args_PageGetPruneXid {
         $crate::PageGetPruneXid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function PageGetPruneXid from bufpage.h:470
@@ -5114,13 +5299,13 @@ macro_rules! PageGetPruneXid {
         $crate::__pgrx_c_args_PageGetPruneXid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageGetPruneXid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageGetPruneXid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5133,7 +5318,7 @@ macro_rules! PageGetPruneXid {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -5174,7 +5359,7 @@ macro_rules! PageGetPruneXid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5308,6 +5493,11 @@ macro_rules! __pgrx_c_args_PageGetSpecialPointer {
             @argument [__pgrx_c_args_PageGetSpecialPointer] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageGetSpecialPointer] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageGetSpecialPointer!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5345,6 +5535,13 @@ macro_rules! __pgrx_c_args_PageGetSpecialPointer {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageGetSpecialPointer] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageGetSpecialPointer!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5361,7 +5558,7 @@ macro_rules! __pgrx_c_args_PageGetSpecialPointer {
         $crate::PageGetSpecialPointer!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PageGetSpecialPointer from bufpage.h:364
@@ -5494,13 +5691,13 @@ macro_rules! PageGetSpecialPointer {
         $crate::__pgrx_c_args_PageGetSpecialPointer!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageGetSpecialPointer!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageGetSpecialPointer!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5513,7 +5710,7 @@ macro_rules! PageGetSpecialPointer {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -5621,7 +5818,7 @@ macro_rules! PageGetSpecialPointer {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5808,6 +6005,11 @@ macro_rules! __pgrx_c_args_PageGetSpecialSize {
             @argument [__pgrx_c_args_PageGetSpecialSize] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageGetSpecialSize] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageGetSpecialSize!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5845,6 +6047,13 @@ macro_rules! __pgrx_c_args_PageGetSpecialSize {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageGetSpecialSize] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageGetSpecialSize!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5861,7 +6070,7 @@ macro_rules! __pgrx_c_args_PageGetSpecialSize {
         $crate::PageGetSpecialSize!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function PageGetSpecialSize from bufpage.h:341
@@ -5937,13 +6146,13 @@ macro_rules! PageGetSpecialSize {
         $crate::__pgrx_c_args_PageGetSpecialSize!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageGetSpecialSize!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageGetSpecialSize!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5956,7 +6165,7 @@ macro_rules! PageGetSpecialSize {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -5994,7 +6203,7 @@ macro_rules! PageGetSpecialSize {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6127,6 +6336,11 @@ macro_rules! __pgrx_c_args_PageHasFreeLinePointers {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageHasFreeLinePointers] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageHasFreeLinePointers!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6164,6 +6378,13 @@ macro_rules! __pgrx_c_args_PageHasFreeLinePointers {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageHasFreeLinePointers] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageHasFreeLinePointers!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6180,7 +6401,7 @@ macro_rules! __pgrx_c_args_PageHasFreeLinePointers {
         $crate::PageHasFreeLinePointers!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function PageHasFreeLinePointers from bufpage.h:422
@@ -6259,13 +6480,13 @@ macro_rules! PageHasFreeLinePointers {
         $crate::__pgrx_c_args_PageHasFreeLinePointers!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageHasFreeLinePointers!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageHasFreeLinePointers!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6278,7 +6499,7 @@ macro_rules! PageHasFreeLinePointers {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -6316,7 +6537,7 @@ macro_rules! PageHasFreeLinePointers {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6442,6 +6663,11 @@ macro_rules! __pgrx_c_args_PageIsAllVisible {
             @argument [__pgrx_c_args_PageIsAllVisible] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageIsAllVisible] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageIsAllVisible!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6479,6 +6705,13 @@ macro_rules! __pgrx_c_args_PageIsAllVisible {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageIsAllVisible] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageIsAllVisible!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6495,7 +6728,7 @@ macro_rules! __pgrx_c_args_PageIsAllVisible {
         $crate::PageIsAllVisible!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function PageIsAllVisible from bufpage.h:454
@@ -6571,13 +6804,13 @@ macro_rules! PageIsAllVisible {
         $crate::__pgrx_c_args_PageIsAllVisible!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageIsAllVisible!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageIsAllVisible!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6590,7 +6823,7 @@ macro_rules! PageIsAllVisible {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -6628,7 +6861,7 @@ macro_rules! PageIsAllVisible {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6754,6 +6987,11 @@ macro_rules! __pgrx_c_args_PageIsEmpty {
             @argument [__pgrx_c_args_PageIsEmpty] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageIsEmpty] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageIsEmpty!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6789,6 +7027,11 @@ macro_rules! __pgrx_c_args_PageIsEmpty {
             @argument [__pgrx_c_args_PageIsEmpty] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageIsEmpty] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageIsEmpty!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6805,7 +7048,7 @@ macro_rules! __pgrx_c_args_PageIsEmpty {
         $crate::PageIsEmpty!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function PageIsEmpty from bufpage.h:248
@@ -6881,13 +7124,13 @@ macro_rules! PageIsEmpty {
         $crate::__pgrx_c_args_PageIsEmpty!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageIsEmpty!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageIsEmpty!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6900,7 +7143,7 @@ macro_rules! PageIsEmpty {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -6938,7 +7181,7 @@ macro_rules! PageIsEmpty {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7064,6 +7307,11 @@ macro_rules! __pgrx_c_args_PageIsFull {
             @argument [__pgrx_c_args_PageIsFull] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageIsFull] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageIsFull!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7099,6 +7347,11 @@ macro_rules! __pgrx_c_args_PageIsFull {
             @argument [__pgrx_c_args_PageIsFull] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageIsFull] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageIsFull!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7115,7 +7368,7 @@ macro_rules! __pgrx_c_args_PageIsFull {
         $crate::PageIsFull!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function PageIsFull from bufpage.h:438
@@ -7191,13 +7444,13 @@ macro_rules! PageIsFull {
         $crate::__pgrx_c_args_PageIsFull!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageIsFull!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageIsFull!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7210,7 +7463,7 @@ macro_rules! PageIsFull {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -7248,7 +7501,7 @@ macro_rules! PageIsFull {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7374,6 +7627,11 @@ macro_rules! __pgrx_c_args_PageIsNew {
             @argument [__pgrx_c_args_PageIsNew] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageIsNew] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageIsNew!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7409,6 +7667,11 @@ macro_rules! __pgrx_c_args_PageIsNew {
             @argument [__pgrx_c_args_PageIsNew] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageIsNew] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageIsNew!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7425,7 +7688,7 @@ macro_rules! __pgrx_c_args_PageIsNew {
         $crate::PageIsNew!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function PageIsNew from bufpage.h:258
@@ -7501,13 +7764,13 @@ macro_rules! PageIsNew {
         $crate::__pgrx_c_args_PageIsNew!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageIsNew!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageIsNew!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7520,7 +7783,7 @@ macro_rules! PageIsNew {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -7558,7 +7821,7 @@ macro_rules! PageIsNew {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7684,6 +7947,11 @@ macro_rules! __pgrx_c_args_PageSetAllVisible {
             @argument [__pgrx_c_args_PageSetAllVisible] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageSetAllVisible] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageSetAllVisible!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7721,6 +7989,13 @@ macro_rules! __pgrx_c_args_PageSetAllVisible {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageSetAllVisible] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageSetAllVisible!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7737,7 +8012,7 @@ macro_rules! __pgrx_c_args_PageSetAllVisible {
         $crate::PageSetAllVisible!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function PageSetAllVisible from bufpage.h:459
@@ -7811,13 +8086,13 @@ macro_rules! PageSetAllVisible {
         $crate::__pgrx_c_args_PageSetAllVisible!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageSetAllVisible!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageSetAllVisible!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -7830,7 +8105,7 @@ macro_rules! PageSetAllVisible {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::PageSetAllVisible(
@@ -7864,7 +8139,7 @@ macro_rules! PageSetAllVisible {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7988,6 +8263,11 @@ macro_rules! __pgrx_c_args_PageSetFull {
             @argument [__pgrx_c_args_PageSetFull] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageSetFull] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageSetFull!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8023,6 +8303,11 @@ macro_rules! __pgrx_c_args_PageSetFull {
             @argument [__pgrx_c_args_PageSetFull] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageSetFull] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageSetFull!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8039,7 +8324,7 @@ macro_rules! __pgrx_c_args_PageSetFull {
         $crate::PageSetFull!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function PageSetFull from bufpage.h:443
@@ -8113,13 +8398,13 @@ macro_rules! PageSetFull {
         $crate::__pgrx_c_args_PageSetFull!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageSetFull!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageSetFull!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8132,7 +8417,7 @@ macro_rules! PageSetFull {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::PageSetFull(
@@ -8166,7 +8451,7 @@ macro_rules! PageSetFull {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8295,6 +8580,13 @@ macro_rules! __pgrx_c_args_PageSetHasFreeLinePointers {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageSetHasFreeLinePointers] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageSetHasFreeLinePointers!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8332,6 +8624,13 @@ macro_rules! __pgrx_c_args_PageSetHasFreeLinePointers {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageSetHasFreeLinePointers] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageSetHasFreeLinePointers!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8348,7 +8647,7 @@ macro_rules! __pgrx_c_args_PageSetHasFreeLinePointers {
         $crate::PageSetHasFreeLinePointers!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function PageSetHasFreeLinePointers from bufpage.h:427
@@ -8425,13 +8724,13 @@ macro_rules! PageSetHasFreeLinePointers {
         $crate::__pgrx_c_args_PageSetHasFreeLinePointers!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageSetHasFreeLinePointers!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageSetHasFreeLinePointers!(
@@ -8447,7 +8746,7 @@ macro_rules! PageSetHasFreeLinePointers {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::PageSetHasFreeLinePointers(
@@ -8481,7 +8780,7 @@ macro_rules! PageSetHasFreeLinePointers {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8596,6 +8895,11 @@ macro_rules! __pgrx_c_args_PageSetLSN {
             @argument [__pgrx_c_args_PageSetLSN] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageSetLSN] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageSetLSN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8657,6 +8961,11 @@ macro_rules! __pgrx_c_args_PageSetLSN {
             @argument [__pgrx_c_args_PageSetLSN] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageSetLSN] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageSetLSN!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8692,6 +9001,11 @@ macro_rules! __pgrx_c_args_PageSetLSN {
             @argument [__pgrx_c_args_PageSetLSN] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageSetLSN] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageSetLSN!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8708,7 +9022,7 @@ macro_rules! __pgrx_c_args_PageSetLSN {
         $crate::PageSetLSN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function PageSetLSN from bufpage.h:416
@@ -8795,13 +9109,13 @@ macro_rules! PageSetLSN {
         $crate::__pgrx_c_args_PageSetLSN!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt, $lsn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageSetLSN!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt, $lsn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageSetLSN!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8815,7 +9129,7 @@ macro_rules! PageSetLSN {
                         $crate::__pgrx_c_operand!(@check_safety; $lsn);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::PageSetLSN(
@@ -8862,7 +9176,7 @@ macro_rules! PageSetLSN {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -8994,6 +9308,13 @@ macro_rules! __pgrx_c_args_PageSetPageSizeAndVersion {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageSetPageSizeAndVersion] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageSetPageSizeAndVersion!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9045,6 +9366,13 @@ macro_rules! __pgrx_c_args_PageSetPageSizeAndVersion {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_PageSetPageSizeAndVersion] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageSetPageSizeAndVersion] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -9111,6 +9439,13 @@ macro_rules! __pgrx_c_args_PageSetPageSizeAndVersion {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageSetPageSizeAndVersion] [p3 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageSetPageSizeAndVersion!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9148,6 +9483,13 @@ macro_rules! __pgrx_c_args_PageSetPageSizeAndVersion {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageSetPageSizeAndVersion] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageSetPageSizeAndVersion!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9164,7 +9506,7 @@ macro_rules! __pgrx_c_args_PageSetPageSizeAndVersion {
         $crate::PageSetPageSizeAndVersion!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function PageSetPageSizeAndVersion from bufpage.h:324
@@ -9276,13 +9618,13 @@ macro_rules! PageSetPageSizeAndVersion {
         $crate::__pgrx_c_args_PageSetPageSizeAndVersion!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt, $size:tt, $version:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageSetPageSizeAndVersion!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt, $size:tt, $version:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageSetPageSizeAndVersion!(
@@ -9300,7 +9642,7 @@ macro_rules! PageSetPageSizeAndVersion {
                         $crate::__pgrx_c_operand!(@check_safety; $version);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::PageSetPageSizeAndVersion(
@@ -9366,7 +9708,7 @@ macro_rules! PageSetPageSizeAndVersion {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9513,6 +9855,13 @@ macro_rules! __pgrx_c_args_PageSetPrunable {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageSetPrunable] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageSetPrunable!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9574,6 +9923,11 @@ macro_rules! __pgrx_c_args_PageSetPrunable {
             @argument [__pgrx_c_args_PageSetPrunable] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageSetPrunable] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageSetPrunable!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9611,6 +9965,13 @@ macro_rules! __pgrx_c_args_PageSetPrunable {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageSetPrunable] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageSetPrunable!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9627,7 +9988,7 @@ macro_rules! __pgrx_c_args_PageSetPrunable {
         $crate::PageSetPrunable!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro PageSetPrunable from bufpage.h:479
@@ -9915,7 +10276,7 @@ macro_rules! PageSetPrunable {
         $crate::__pgrx_c_args_PageSetPrunable!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_PageSetPrunable!(@collect __pgrx_emit_public []; $($raw)*)
@@ -10004,6 +10365,13 @@ macro_rules! __pgrx_c_args_PageValidateSpecialPointer {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageValidateSpecialPointer] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageValidateSpecialPointer!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10041,6 +10409,13 @@ macro_rules! __pgrx_c_args_PageValidateSpecialPointer {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageValidateSpecialPointer] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageValidateSpecialPointer!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10057,7 +10432,7 @@ macro_rules! __pgrx_c_args_PageValidateSpecialPointer {
         $crate::PageValidateSpecialPointer!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function PageValidateSpecialPointer from bufpage.h:352
@@ -10136,13 +10511,13 @@ macro_rules! PageValidateSpecialPointer {
         $crate::__pgrx_c_args_PageValidateSpecialPointer!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageValidateSpecialPointer!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageValidateSpecialPointer!(
@@ -10158,7 +10533,7 @@ macro_rules! PageValidateSpecialPointer {
                         $crate::__pgrx_c_operand!(@check_safety; $page);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
@@ -10192,7 +10567,7 @@ macro_rules! PageValidateSpecialPointer {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10316,6 +10691,11 @@ macro_rules! __pgrx_c_args_PageXLogRecPtrGet {
             @argument [__pgrx_c_args_PageXLogRecPtrGet] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageXLogRecPtrGet] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageXLogRecPtrGet!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10353,6 +10733,13 @@ macro_rules! __pgrx_c_args_PageXLogRecPtrGet {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageXLogRecPtrGet] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageXLogRecPtrGet!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10369,7 +10756,7 @@ macro_rules! __pgrx_c_args_PageXLogRecPtrGet {
         $crate::PageXLogRecPtrGet!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function PageXLogRecPtrGet from bufpage.h:122
@@ -10447,13 +10834,13 @@ macro_rules! PageXLogRecPtrGet {
         $crate::__pgrx_c_args_PageXLogRecPtrGet!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $val:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageXLogRecPtrGet!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $val:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageXLogRecPtrGet!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -10466,7 +10853,7 @@ macro_rules! PageXLogRecPtrGet {
                         $crate::__pgrx_c_operand!(@check_safety; $val);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -10504,7 +10891,7 @@ macro_rules! PageXLogRecPtrGet {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10625,6 +11012,13 @@ macro_rules! __pgrx_c_args_PageXLogRecPtrSet {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageXLogRecPtrSet] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageXLogRecPtrSet!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10686,6 +11080,11 @@ macro_rules! __pgrx_c_args_PageXLogRecPtrSet {
             @argument [__pgrx_c_args_PageXLogRecPtrSet] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageXLogRecPtrSet] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PageXLogRecPtrSet!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10723,6 +11122,13 @@ macro_rules! __pgrx_c_args_PageXLogRecPtrSet {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PageXLogRecPtrSet] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PageXLogRecPtrSet!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10739,7 +11145,7 @@ macro_rules! __pgrx_c_args_PageXLogRecPtrSet {
         $crate::PageXLogRecPtrSet!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function PageXLogRecPtrSet from bufpage.h:130
@@ -10826,13 +11232,13 @@ macro_rules! PageXLogRecPtrSet {
         $crate::__pgrx_c_args_PageXLogRecPtrSet!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ptr:tt, $lsn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageXLogRecPtrSet!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $ptr:tt, $lsn:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PageXLogRecPtrSet!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -10846,7 +11252,7 @@ macro_rules! PageXLogRecPtrSet {
                         $crate::__pgrx_c_operand!(@check_safety; $lsn);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::PageXLogRecPtrSet(
@@ -10893,7 +11299,7 @@ macro_rules! PageXLogRecPtrSet {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

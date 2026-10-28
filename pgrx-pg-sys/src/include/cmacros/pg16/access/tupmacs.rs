@@ -74,6 +74,13 @@ macro_rules! __pgrx_c_args_att_addlength_datum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_att_addlength_datum] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_att_addlength_datum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -125,6 +132,13 @@ macro_rules! __pgrx_c_args_att_addlength_datum {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_att_addlength_datum] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_att_addlength_datum] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -189,6 +203,11 @@ macro_rules! __pgrx_c_args_att_addlength_datum {
             @argument [__pgrx_c_args_att_addlength_datum] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_att_addlength_datum] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_att_addlength_datum!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -226,6 +245,13 @@ macro_rules! __pgrx_c_args_att_addlength_datum {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_att_addlength_datum] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_att_addlength_datum!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -242,7 +268,7 @@ macro_rules! __pgrx_c_args_att_addlength_datum {
         $crate::att_addlength_datum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro att_addlength_datum from tupmacs.h:145
@@ -1420,7 +1446,7 @@ macro_rules! att_addlength_datum {
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::from_storage(
-                                                                                        $crate::__pgrx_c_generated::Inline_8e86e99340f3708faffea5d0a57983d9(
+                                                                                        $crate::__pgrx_c_generated::Inline_634b71231fe23ccd338634e45388df2d(
                                                                                             <
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                     $crate::__pgrx_c_macros::CChar,
@@ -1528,13 +1554,13 @@ macro_rules! att_addlength_datum {
         $crate::__pgrx_c_args_att_addlength_datum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cur_offset:tt, $attlen:tt, $attdatum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_att_addlength_datum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cur_offset:tt, $attlen:tt, $attdatum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_att_addlength_datum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1550,7 +1576,7 @@ macro_rules! att_addlength_datum {
                         $crate::__pgrx_c_operand!(@check_safety; $attdatum);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -2722,7 +2748,7 @@ macro_rules! att_addlength_datum {
                                                                                                 <
                                                                                                     $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                                                                 >::from_storage(
-                                                                                                    $crate::__pgrx_c_generated::Inline_8e86e99340f3708faffea5d0a57983d9(
+                                                                                                    $crate::__pgrx_c_generated::Inline_634b71231fe23ccd338634e45388df2d(
                                                                                                         <
                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                 $crate::__pgrx_c_macros::CChar,
@@ -2829,7 +2855,7 @@ macro_rules! att_addlength_datum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3978,7 +4004,7 @@ macro_rules! att_addlength_datum {
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::from_storage(
-                                                                                        $crate::__pgrx_c_generated::Inline_8e86e99340f3708faffea5d0a57983d9(
+                                                                                        $crate::__pgrx_c_generated::Inline_634b71231fe23ccd338634e45388df2d(
                                                                                             <
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                     $crate::__pgrx_c_macros::CChar,
@@ -4163,6 +4189,13 @@ macro_rules! __pgrx_c_args_att_addlength_pointer {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_att_addlength_pointer] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_att_addlength_pointer!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4214,6 +4247,13 @@ macro_rules! __pgrx_c_args_att_addlength_pointer {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_att_addlength_pointer] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_att_addlength_pointer] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -4278,6 +4318,11 @@ macro_rules! __pgrx_c_args_att_addlength_pointer {
             @argument [__pgrx_c_args_att_addlength_pointer] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_att_addlength_pointer] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_att_addlength_pointer!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4315,6 +4360,13 @@ macro_rules! __pgrx_c_args_att_addlength_pointer {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_att_addlength_pointer] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_att_addlength_pointer!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4331,7 +4383,7 @@ macro_rules! __pgrx_c_args_att_addlength_pointer {
         $crate::att_addlength_pointer!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro att_addlength_pointer from tupmacs.h:157
@@ -5285,7 +5337,7 @@ macro_rules! att_addlength_pointer {
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::from_storage(
-                                                                                        $crate::__pgrx_c_generated::Inline_8e86e99340f3708faffea5d0a57983d9(
+                                                                                        $crate::__pgrx_c_generated::Inline_634b71231fe23ccd338634e45388df2d(
                                                                                             <
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                     $crate::__pgrx_c_macros::CChar,
@@ -5361,13 +5413,13 @@ macro_rules! att_addlength_pointer {
         $crate::__pgrx_c_args_att_addlength_pointer!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cur_offset:tt, $attlen:tt, $attptr:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_att_addlength_pointer!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cur_offset:tt, $attlen:tt, $attptr:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_att_addlength_pointer!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5383,7 +5435,7 @@ macro_rules! att_addlength_pointer {
                         $crate::__pgrx_c_operand!(@check_safety; $attptr);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -6331,7 +6383,7 @@ macro_rules! att_addlength_pointer {
                                                                                                 <
                                                                                                     $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                                                                 >::from_storage(
-                                                                                                    $crate::__pgrx_c_generated::Inline_8e86e99340f3708faffea5d0a57983d9(
+                                                                                                    $crate::__pgrx_c_generated::Inline_634b71231fe23ccd338634e45388df2d(
                                                                                                         <
                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                 $crate::__pgrx_c_macros::CChar,
@@ -6406,7 +6458,7 @@ macro_rules! att_addlength_pointer {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7331,7 +7383,7 @@ macro_rules! att_addlength_pointer {
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::from_storage(
-                                                                                        $crate::__pgrx_c_generated::Inline_8e86e99340f3708faffea5d0a57983d9(
+                                                                                        $crate::__pgrx_c_generated::Inline_634b71231fe23ccd338634e45388df2d(
                                                                                             <
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                     $crate::__pgrx_c_macros::CChar,
@@ -7481,6 +7533,13 @@ macro_rules! __pgrx_c_args_att_align_datum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_att_align_datum] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_att_align_datum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7535,6 +7594,13 @@ macro_rules! __pgrx_c_args_att_align_datum {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_att_align_datum] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_att_align_datum!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7586,6 +7652,13 @@ macro_rules! __pgrx_c_args_att_align_datum {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_att_align_datum] [p3 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_att_align_datum] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -7650,6 +7723,11 @@ macro_rules! __pgrx_c_args_att_align_datum {
             @argument [__pgrx_c_args_att_align_datum] [p4 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_att_align_datum] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_att_align_datum!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7687,6 +7765,13 @@ macro_rules! __pgrx_c_args_att_align_datum {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_att_align_datum] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_att_align_datum!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7703,7 +7788,7 @@ macro_rules! __pgrx_c_args_att_align_datum {
         $crate::att_align_datum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro att_align_datum from tupmacs.h:86
@@ -8545,13 +8630,13 @@ macro_rules! att_align_datum {
         $crate::__pgrx_c_args_att_align_datum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cur_offset:tt, $attalign:tt, $attlen:tt, $attdatum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_att_align_datum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cur_offset:tt, $attalign:tt, $attlen:tt, $attdatum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_att_align_datum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -8568,7 +8653,7 @@ macro_rules! att_align_datum {
                         $crate::__pgrx_c_operand!(@check_safety; $attdatum);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -9387,7 +9472,7 @@ macro_rules! att_align_datum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10273,6 +10358,13 @@ macro_rules! __pgrx_c_args_att_align_nominal {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_att_align_nominal] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_att_align_nominal!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10334,6 +10426,11 @@ macro_rules! __pgrx_c_args_att_align_nominal {
             @argument [__pgrx_c_args_att_align_nominal] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_att_align_nominal] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_att_align_nominal!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10371,6 +10468,13 @@ macro_rules! __pgrx_c_args_att_align_nominal {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_att_align_nominal] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_att_align_nominal!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10387,7 +10491,7 @@ macro_rules! __pgrx_c_args_att_align_nominal {
         $crate::att_align_nominal!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro att_align_nominal from tupmacs.h:129
@@ -11011,13 +11115,13 @@ macro_rules! att_align_nominal {
         $crate::__pgrx_c_args_att_align_nominal!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cur_offset:tt, $attalign:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_att_align_nominal!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cur_offset:tt, $attalign:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_att_align_nominal!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -11032,7 +11136,7 @@ macro_rules! att_align_nominal {
                         $crate::__pgrx_c_operand!(@check_safety; $attalign);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -11638,7 +11742,7 @@ macro_rules! att_align_nominal {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -12308,6 +12412,13 @@ macro_rules! __pgrx_c_args_att_align_pointer {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_att_align_pointer] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_att_align_pointer!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12362,6 +12473,13 @@ macro_rules! __pgrx_c_args_att_align_pointer {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_att_align_pointer] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_att_align_pointer!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12413,6 +12531,13 @@ macro_rules! __pgrx_c_args_att_align_pointer {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_att_align_pointer] [p3 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_att_align_pointer] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -12477,6 +12602,11 @@ macro_rules! __pgrx_c_args_att_align_pointer {
             @argument [__pgrx_c_args_att_align_pointer] [p4 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_att_align_pointer] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_att_align_pointer!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12514,6 +12644,13 @@ macro_rules! __pgrx_c_args_att_align_pointer {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_att_align_pointer] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_att_align_pointer!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12530,7 +12667,7 @@ macro_rules! __pgrx_c_args_att_align_pointer {
         $crate::att_align_pointer!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro att_align_pointer from tupmacs.h:107
@@ -13313,13 +13450,13 @@ macro_rules! att_align_pointer {
         $crate::__pgrx_c_args_att_align_pointer!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $cur_offset:tt, $attalign:tt, $attlen:tt, $attptr:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_att_align_pointer!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $cur_offset:tt, $attalign:tt, $attlen:tt, $attptr:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_att_align_pointer!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -13336,7 +13473,7 @@ macro_rules! att_align_pointer {
                         $crate::__pgrx_c_operand!(@check_safety; $attptr);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -14098,7 +14235,7 @@ macro_rules! att_align_pointer {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -14923,6 +15060,11 @@ macro_rules! __pgrx_c_args_att_isnull {
             @argument [__pgrx_c_args_att_isnull] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_att_isnull] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_att_isnull!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14984,6 +15126,11 @@ macro_rules! __pgrx_c_args_att_isnull {
             @argument [__pgrx_c_args_att_isnull] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_att_isnull] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_att_isnull!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15019,6 +15166,11 @@ macro_rules! __pgrx_c_args_att_isnull {
             @argument [__pgrx_c_args_att_isnull] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_att_isnull] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_att_isnull!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15035,7 +15187,7 @@ macro_rules! __pgrx_c_args_att_isnull {
         $crate::att_isnull!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function att_isnull from tupmacs.h:25
@@ -15116,13 +15268,13 @@ macro_rules! att_isnull {
         $crate::__pgrx_c_args_att_isnull!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ATT:tt, $BITS:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_att_isnull!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $ATT:tt, $BITS:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_att_isnull!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -15136,7 +15288,7 @@ macro_rules! att_isnull {
                         $crate::__pgrx_c_operand!(@check_safety; $BITS);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -15181,7 +15333,7 @@ macro_rules! att_isnull {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -15304,6 +15456,11 @@ macro_rules! __pgrx_c_args_fetch_att {
             @argument [__pgrx_c_args_fetch_att] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fetch_att] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_fetch_att!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15354,6 +15511,11 @@ macro_rules! __pgrx_c_args_fetch_att {
     (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_fetch_att] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fetch_att] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -15417,6 +15579,11 @@ macro_rules! __pgrx_c_args_fetch_att {
             @argument [__pgrx_c_args_fetch_att] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fetch_att] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_fetch_att!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15452,6 +15619,11 @@ macro_rules! __pgrx_c_args_fetch_att {
             @argument [__pgrx_c_args_fetch_att] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fetch_att] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_fetch_att!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15468,7 +15640,7 @@ macro_rules! __pgrx_c_args_fetch_att {
         $crate::fetch_att!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function fetch_att from tupmacs.h:51
@@ -15585,13 +15757,13 @@ macro_rules! fetch_att {
         $crate::__pgrx_c_args_fetch_att!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $T:tt, $attbyval:tt, $attlen:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_fetch_att!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $T:tt, $attbyval:tt, $attlen:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_fetch_att!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -15606,7 +15778,7 @@ macro_rules! fetch_att {
                         $crate::__pgrx_c_operand!(@check_safety; $attlen);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -15667,7 +15839,7 @@ macro_rules! fetch_att {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -15807,6 +15979,11 @@ macro_rules! __pgrx_c_args_fetchatt {
             @argument [__pgrx_c_args_fetchatt] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fetchatt] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_fetchatt!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15868,6 +16045,11 @@ macro_rules! __pgrx_c_args_fetchatt {
             @argument [__pgrx_c_args_fetchatt] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fetchatt] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_fetchatt!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15903,6 +16085,11 @@ macro_rules! __pgrx_c_args_fetchatt {
             @argument [__pgrx_c_args_fetchatt] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fetchatt] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_fetchatt!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15919,7 +16106,7 @@ macro_rules! __pgrx_c_args_fetchatt {
         $crate::fetchatt!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro fetchatt from tupmacs.h:46
@@ -16040,13 +16227,13 @@ macro_rules! fetchatt {
         $crate::__pgrx_c_args_fetchatt!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $A:tt, $T:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_fetchatt!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $A:tt, $T:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_fetchatt!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -16061,7 +16248,7 @@ macro_rules! fetchatt {
                         $crate::__pgrx_c_operand!(@check_safety; $T);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -16166,7 +16353,7 @@ macro_rules! fetchatt {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -16339,6 +16526,13 @@ macro_rules! __pgrx_c_args_store_att_byval {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_store_att_byval] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_store_att_byval!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16390,6 +16584,13 @@ macro_rules! __pgrx_c_args_store_att_byval {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_store_att_byval] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_store_att_byval] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -16454,6 +16655,11 @@ macro_rules! __pgrx_c_args_store_att_byval {
             @argument [__pgrx_c_args_store_att_byval] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_store_att_byval] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_store_att_byval!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16491,6 +16697,13 @@ macro_rules! __pgrx_c_args_store_att_byval {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_store_att_byval] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_store_att_byval!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16507,7 +16720,7 @@ macro_rules! __pgrx_c_args_store_att_byval {
         $crate::store_att_byval!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function store_att_byval from tupmacs.h:182
@@ -16623,13 +16836,13 @@ macro_rules! store_att_byval {
         $crate::__pgrx_c_args_store_att_byval!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $T:tt, $newdatum:tt, $attlen:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_store_att_byval!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $T:tt, $newdatum:tt, $attlen:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_store_att_byval!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -16644,7 +16857,7 @@ macro_rules! store_att_byval {
                         $crate::__pgrx_c_operand!(@check_safety; $attlen);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::store_att_byval(
@@ -16704,7 +16917,7 @@ macro_rules! store_att_byval {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

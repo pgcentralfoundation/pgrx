@@ -50,16 +50,16 @@ macro_rules! __pgrx_c_args_Assert {
         $crate::__pgrx_c_args_Assert!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::Assert!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro Assert from c.h:852
+/// C macro Assert from c.h:859
 ///
 /// ```text
 /// #define Assert( condition ) ( ( void ) true )
@@ -108,13 +108,13 @@ macro_rules! Assert {
         $crate::__pgrx_c_args_Assert!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $condition:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_Assert!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $condition:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_Assert!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -125,7 +125,7 @@ macro_rules! Assert {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -145,7 +145,7 @@ macro_rules! Assert {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -222,16 +222,16 @@ macro_rules! __pgrx_c_args_AssertMacro {
         $crate::__pgrx_c_args_AssertMacro!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::AssertMacro!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro AssertMacro from c.h:853
+/// C macro AssertMacro from c.h:860
 ///
 /// ```text
 /// #define AssertMacro( condition ) ( ( void ) true )
@@ -280,13 +280,13 @@ macro_rules! AssertMacro {
         $crate::__pgrx_c_args_AssertMacro!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $condition:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_AssertMacro!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $condition:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_AssertMacro!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -297,7 +297,7 @@ macro_rules! AssertMacro {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -317,7 +317,7 @@ macro_rules! AssertMacro {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -397,7 +397,7 @@ macro_rules! __pgrx_c_args_AssertPointerAlignment {
         )
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
         $crate::__pgrx_c_args_AssertPointerAlignment!(
@@ -420,16 +420,16 @@ macro_rules! __pgrx_c_args_AssertPointerAlignment {
         )
     };
     (@ignore1 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::AssertPointerAlignment!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro AssertPointerAlignment from c.h:888
+/// C macro AssertPointerAlignment from c.h:895
 ///
 /// ```text
 /// #define AssertPointerAlignment( ptr , bndr ) Assert ( TYPEALIGN ( bndr , ( uintptr_t ) ( ptr ) ) == ( uintptr_t ) ( ptr ) )
@@ -482,13 +482,13 @@ macro_rules! AssertPointerAlignment {
         $crate::__pgrx_c_args_AssertPointerAlignment!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ptr:tt, $bndr:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_AssertPointerAlignment!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $ptr:tt, $bndr:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_AssertPointerAlignment!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -500,7 +500,7 @@ macro_rules! AssertPointerAlignment {
                 {
                     if false {}
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             {
@@ -520,7 +520,7 @@ macro_rules! AssertPointerAlignment {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -629,6 +629,11 @@ macro_rules! __pgrx_c_args_BUFFERALIGN {
             @argument [__pgrx_c_args_BUFFERALIGN] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BUFFERALIGN] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BUFFERALIGN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -664,6 +669,11 @@ macro_rules! __pgrx_c_args_BUFFERALIGN {
             @argument [__pgrx_c_args_BUFFERALIGN] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BUFFERALIGN] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFERALIGN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -680,10 +690,10 @@ macro_rules! __pgrx_c_args_BUFFERALIGN {
         $crate::BUFFERALIGN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro BUFFERALIGN from c.h:807
+/// C macro BUFFERALIGN from c.h:814
 ///
 /// ```text
 /// #define BUFFERALIGN( LEN ) TYPEALIGN ( ALIGNOF_BUFFER , ( LEN ) )
@@ -724,8 +734,8 @@ macro_rules! BUFFERALIGN {
                             $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -734,7 +744,7 @@ macro_rules! BUFFERALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -744,7 +754,7 @@ macro_rules! BUFFERALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -765,8 +775,8 @@ macro_rules! BUFFERALIGN {
                             $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -775,7 +785,7 @@ macro_rules! BUFFERALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -785,7 +795,7 @@ macro_rules! BUFFERALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -806,8 +816,8 @@ macro_rules! BUFFERALIGN {
                             $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -816,7 +826,7 @@ macro_rules! BUFFERALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -826,7 +836,7 @@ macro_rules! BUFFERALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -847,8 +857,8 @@ macro_rules! BUFFERALIGN {
                             $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -857,7 +867,7 @@ macro_rules! BUFFERALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -867,7 +877,7 @@ macro_rules! BUFFERALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -888,8 +898,8 @@ macro_rules! BUFFERALIGN {
                             $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -898,7 +908,7 @@ macro_rules! BUFFERALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -908,7 +918,7 @@ macro_rules! BUFFERALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -1001,6 +1011,11 @@ macro_rules! __pgrx_c_args_BUFFERALIGN_DOWN {
             @argument [__pgrx_c_args_BUFFERALIGN_DOWN] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BUFFERALIGN_DOWN] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BUFFERALIGN_DOWN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1038,6 +1053,13 @@ macro_rules! __pgrx_c_args_BUFFERALIGN_DOWN {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BUFFERALIGN_DOWN] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFERALIGN_DOWN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1054,10 +1076,10 @@ macro_rules! __pgrx_c_args_BUFFERALIGN_DOWN {
         $crate::BUFFERALIGN_DOWN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro BUFFERALIGN_DOWN from c.h:818
+/// C macro BUFFERALIGN_DOWN from c.h:825
 ///
 /// ```text
 /// #define BUFFERALIGN_DOWN( LEN ) TYPEALIGN_DOWN ( ALIGNOF_BUFFER , ( LEN ) )
@@ -1098,8 +1120,8 @@ macro_rules! BUFFERALIGN_DOWN {
                             $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -1108,7 +1130,7 @@ macro_rules! BUFFERALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1118,7 +1140,7 @@ macro_rules! BUFFERALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -1139,8 +1161,8 @@ macro_rules! BUFFERALIGN_DOWN {
                             $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -1149,7 +1171,7 @@ macro_rules! BUFFERALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1159,7 +1181,7 @@ macro_rules! BUFFERALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -1180,8 +1202,8 @@ macro_rules! BUFFERALIGN_DOWN {
                             $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -1190,7 +1212,7 @@ macro_rules! BUFFERALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1200,7 +1222,7 @@ macro_rules! BUFFERALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -1221,8 +1243,8 @@ macro_rules! BUFFERALIGN_DOWN {
                             $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -1231,7 +1253,7 @@ macro_rules! BUFFERALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1241,7 +1263,7 @@ macro_rules! BUFFERALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -1262,8 +1284,8 @@ macro_rules! BUFFERALIGN_DOWN {
                             $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -1272,7 +1294,7 @@ macro_rules! BUFFERALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1282,7 +1304,7 @@ macro_rules! BUFFERALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -1375,6 +1397,11 @@ macro_rules! __pgrx_c_args_BoolIsValid {
             @argument [__pgrx_c_args_BoolIsValid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BoolIsValid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BoolIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1410,6 +1437,11 @@ macro_rules! __pgrx_c_args_BoolIsValid {
             @argument [__pgrx_c_args_BoolIsValid] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BoolIsValid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BoolIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1426,10 +1458,10 @@ macro_rules! __pgrx_c_args_BoolIsValid {
         $crate::BoolIsValid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro BoolIsValid from c.h:751
+/// C macro BoolIsValid from c.h:758
 ///
 /// ```text
 /// #define BoolIsValid( boolean ) ( ( boolean ) == false || ( boolean ) == true )
@@ -1507,13 +1539,13 @@ macro_rules! BoolIsValid {
         $crate::__pgrx_c_args_BoolIsValid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $boolean:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BoolIsValid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $boolean:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BoolIsValid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1526,7 +1558,7 @@ macro_rules! BoolIsValid {
                         $crate::__pgrx_c_operand!(@check_safety; $boolean);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -1592,7 +1624,7 @@ macro_rules! BoolIsValid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1731,6 +1763,11 @@ macro_rules! __pgrx_c_args_CACHELINEALIGN {
             @argument [__pgrx_c_args_CACHELINEALIGN] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_CACHELINEALIGN] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_CACHELINEALIGN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1768,6 +1805,11 @@ macro_rules! __pgrx_c_args_CACHELINEALIGN {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_CACHELINEALIGN] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_CACHELINEALIGN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1784,10 +1826,10 @@ macro_rules! __pgrx_c_args_CACHELINEALIGN {
         $crate::CACHELINEALIGN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro CACHELINEALIGN from c.h:808
+/// C macro CACHELINEALIGN from c.h:815
 ///
 /// ```text
 /// #define CACHELINEALIGN( LEN ) TYPEALIGN ( PG_CACHE_LINE_SIZE , ( LEN ) )
@@ -1828,8 +1870,8 @@ macro_rules! CACHELINEALIGN {
                             $crate::__pgrx_c_bindings::PG_CACHE_LINE_SIZE as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -1838,7 +1880,7 @@ macro_rules! CACHELINEALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1848,7 +1890,7 @@ macro_rules! CACHELINEALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -1869,8 +1911,8 @@ macro_rules! CACHELINEALIGN {
                             $crate::__pgrx_c_bindings::PG_CACHE_LINE_SIZE as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -1879,7 +1921,7 @@ macro_rules! CACHELINEALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1889,7 +1931,7 @@ macro_rules! CACHELINEALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -1910,8 +1952,8 @@ macro_rules! CACHELINEALIGN {
                             $crate::__pgrx_c_bindings::PG_CACHE_LINE_SIZE as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -1920,7 +1962,7 @@ macro_rules! CACHELINEALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1930,7 +1972,7 @@ macro_rules! CACHELINEALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -1951,8 +1993,8 @@ macro_rules! CACHELINEALIGN {
                             $crate::__pgrx_c_bindings::PG_CACHE_LINE_SIZE as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -1961,7 +2003,7 @@ macro_rules! CACHELINEALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -1971,7 +2013,7 @@ macro_rules! CACHELINEALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -1992,8 +2034,8 @@ macro_rules! CACHELINEALIGN {
                             $crate::__pgrx_c_bindings::PG_CACHE_LINE_SIZE as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -2002,7 +2044,7 @@ macro_rules! CACHELINEALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2012,7 +2054,7 @@ macro_rules! CACHELINEALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -2105,6 +2147,11 @@ macro_rules! __pgrx_c_args_DOUBLEALIGN {
             @argument [__pgrx_c_args_DOUBLEALIGN] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DOUBLEALIGN] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DOUBLEALIGN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2140,6 +2187,11 @@ macro_rules! __pgrx_c_args_DOUBLEALIGN {
             @argument [__pgrx_c_args_DOUBLEALIGN] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DOUBLEALIGN] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DOUBLEALIGN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2156,10 +2208,10 @@ macro_rules! __pgrx_c_args_DOUBLEALIGN {
         $crate::DOUBLEALIGN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro DOUBLEALIGN from c.h:804
+/// C macro DOUBLEALIGN from c.h:811
 ///
 /// ```text
 /// #define DOUBLEALIGN( LEN ) TYPEALIGN ( ALIGNOF_DOUBLE , ( LEN ) )
@@ -2200,8 +2252,8 @@ macro_rules! DOUBLEALIGN {
                             $crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -2210,7 +2262,7 @@ macro_rules! DOUBLEALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2220,7 +2272,7 @@ macro_rules! DOUBLEALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -2241,8 +2293,8 @@ macro_rules! DOUBLEALIGN {
                             $crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -2251,7 +2303,7 @@ macro_rules! DOUBLEALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2261,7 +2313,7 @@ macro_rules! DOUBLEALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -2282,8 +2334,8 @@ macro_rules! DOUBLEALIGN {
                             $crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -2292,7 +2344,7 @@ macro_rules! DOUBLEALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2302,7 +2354,7 @@ macro_rules! DOUBLEALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -2323,8 +2375,8 @@ macro_rules! DOUBLEALIGN {
                             $crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -2333,7 +2385,7 @@ macro_rules! DOUBLEALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2343,7 +2395,7 @@ macro_rules! DOUBLEALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -2364,8 +2416,8 @@ macro_rules! DOUBLEALIGN {
                             $crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -2374,7 +2426,7 @@ macro_rules! DOUBLEALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2384,7 +2436,7 @@ macro_rules! DOUBLEALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -2477,6 +2529,11 @@ macro_rules! __pgrx_c_args_DOUBLEALIGN_DOWN {
             @argument [__pgrx_c_args_DOUBLEALIGN_DOWN] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DOUBLEALIGN_DOWN] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DOUBLEALIGN_DOWN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2514,6 +2571,13 @@ macro_rules! __pgrx_c_args_DOUBLEALIGN_DOWN {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DOUBLEALIGN_DOWN] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DOUBLEALIGN_DOWN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2530,10 +2594,10 @@ macro_rules! __pgrx_c_args_DOUBLEALIGN_DOWN {
         $crate::DOUBLEALIGN_DOWN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro DOUBLEALIGN_DOWN from c.h:816
+/// C macro DOUBLEALIGN_DOWN from c.h:823
 ///
 /// ```text
 /// #define DOUBLEALIGN_DOWN( LEN ) TYPEALIGN_DOWN ( ALIGNOF_DOUBLE , ( LEN ) )
@@ -2574,8 +2638,8 @@ macro_rules! DOUBLEALIGN_DOWN {
                             $crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -2584,7 +2648,7 @@ macro_rules! DOUBLEALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2594,7 +2658,7 @@ macro_rules! DOUBLEALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -2615,8 +2679,8 @@ macro_rules! DOUBLEALIGN_DOWN {
                             $crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -2625,7 +2689,7 @@ macro_rules! DOUBLEALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2635,7 +2699,7 @@ macro_rules! DOUBLEALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -2656,8 +2720,8 @@ macro_rules! DOUBLEALIGN_DOWN {
                             $crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -2666,7 +2730,7 @@ macro_rules! DOUBLEALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2676,7 +2740,7 @@ macro_rules! DOUBLEALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -2697,8 +2761,8 @@ macro_rules! DOUBLEALIGN_DOWN {
                             $crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -2707,7 +2771,7 @@ macro_rules! DOUBLEALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2717,7 +2781,7 @@ macro_rules! DOUBLEALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -2738,8 +2802,8 @@ macro_rules! DOUBLEALIGN_DOWN {
                             $crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -2748,7 +2812,7 @@ macro_rules! DOUBLEALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -2758,7 +2822,7 @@ macro_rules! DOUBLEALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -2854,6 +2918,11 @@ macro_rules! __pgrx_c_args_FLOAT4_FITS_IN_INT16 {
             @argument [__pgrx_c_args_FLOAT4_FITS_IN_INT16] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FLOAT4_FITS_IN_INT16] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT16!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2891,6 +2960,13 @@ macro_rules! __pgrx_c_args_FLOAT4_FITS_IN_INT16 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FLOAT4_FITS_IN_INT16] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT16!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2907,10 +2983,10 @@ macro_rules! __pgrx_c_args_FLOAT4_FITS_IN_INT16 {
         $crate::FLOAT4_FITS_IN_INT16!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro FLOAT4_FITS_IN_INT16 from c.h:1103
+/// C macro FLOAT4_FITS_IN_INT16 from c.h:1110
 ///
 /// ```text
 /// #define FLOAT4_FITS_IN_INT16( num ) ( ( num ) >= ( float4 ) PG_INT16_MIN && ( num ) < - ( ( float4 ) PG_INT16_MIN ) )
@@ -3024,13 +3100,13 @@ macro_rules! FLOAT4_FITS_IN_INT16 {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT16!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $num:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT16!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $num:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT16!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3043,7 +3119,7 @@ macro_rules! FLOAT4_FITS_IN_INT16 {
                         $crate::__pgrx_c_operand!(@check_safety; $num);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -3133,7 +3209,7 @@ macro_rules! FLOAT4_FITS_IN_INT16 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3307,6 +3383,11 @@ macro_rules! __pgrx_c_args_FLOAT4_FITS_IN_INT32 {
             @argument [__pgrx_c_args_FLOAT4_FITS_IN_INT32] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FLOAT4_FITS_IN_INT32] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT32!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3344,6 +3425,13 @@ macro_rules! __pgrx_c_args_FLOAT4_FITS_IN_INT32 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FLOAT4_FITS_IN_INT32] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT32!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3360,10 +3448,10 @@ macro_rules! __pgrx_c_args_FLOAT4_FITS_IN_INT32 {
         $crate::FLOAT4_FITS_IN_INT32!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro FLOAT4_FITS_IN_INT32 from c.h:1105
+/// C macro FLOAT4_FITS_IN_INT32 from c.h:1112
 ///
 /// ```text
 /// #define FLOAT4_FITS_IN_INT32( num ) ( ( num ) >= ( float4 ) PG_INT32_MIN && ( num ) < - ( ( float4 ) PG_INT32_MIN ) )
@@ -3477,13 +3565,13 @@ macro_rules! FLOAT4_FITS_IN_INT32 {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT32!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $num:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT32!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $num:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT32!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3496,7 +3584,7 @@ macro_rules! FLOAT4_FITS_IN_INT32 {
                         $crate::__pgrx_c_operand!(@check_safety; $num);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -3586,7 +3674,7 @@ macro_rules! FLOAT4_FITS_IN_INT32 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3760,6 +3848,11 @@ macro_rules! __pgrx_c_args_FLOAT4_FITS_IN_INT64 {
             @argument [__pgrx_c_args_FLOAT4_FITS_IN_INT64] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FLOAT4_FITS_IN_INT64] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT64!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3797,6 +3890,13 @@ macro_rules! __pgrx_c_args_FLOAT4_FITS_IN_INT64 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FLOAT4_FITS_IN_INT64] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT64!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3813,10 +3913,10 @@ macro_rules! __pgrx_c_args_FLOAT4_FITS_IN_INT64 {
         $crate::FLOAT4_FITS_IN_INT64!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro FLOAT4_FITS_IN_INT64 from c.h:1107
+/// C macro FLOAT4_FITS_IN_INT64 from c.h:1114
 ///
 /// ```text
 /// #define FLOAT4_FITS_IN_INT64( num ) ( ( num ) >= ( float4 ) PG_INT64_MIN && ( num ) < - ( ( float4 ) PG_INT64_MIN ) )
@@ -3931,13 +4031,13 @@ macro_rules! FLOAT4_FITS_IN_INT64 {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT64!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $num:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT64!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $num:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT64!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3951,7 +4051,7 @@ macro_rules! FLOAT4_FITS_IN_INT64 {
                         $crate::__pgrx_c_operand!(@check_safety; $num);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -4041,7 +4141,7 @@ macro_rules! FLOAT4_FITS_IN_INT64 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4216,6 +4316,11 @@ macro_rules! __pgrx_c_args_FLOAT8_FITS_IN_INT16 {
             @argument [__pgrx_c_args_FLOAT8_FITS_IN_INT16] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FLOAT8_FITS_IN_INT16] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT16!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4253,6 +4358,13 @@ macro_rules! __pgrx_c_args_FLOAT8_FITS_IN_INT16 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FLOAT8_FITS_IN_INT16] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT16!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4269,10 +4381,10 @@ macro_rules! __pgrx_c_args_FLOAT8_FITS_IN_INT16 {
         $crate::FLOAT8_FITS_IN_INT16!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro FLOAT8_FITS_IN_INT16 from c.h:1109
+/// C macro FLOAT8_FITS_IN_INT16 from c.h:1116
 ///
 /// ```text
 /// #define FLOAT8_FITS_IN_INT16( num ) ( ( num ) >= ( float8 ) PG_INT16_MIN && ( num ) < - ( ( float8 ) PG_INT16_MIN ) )
@@ -4386,13 +4498,13 @@ macro_rules! FLOAT8_FITS_IN_INT16 {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT16!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $num:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT16!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $num:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT16!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4405,7 +4517,7 @@ macro_rules! FLOAT8_FITS_IN_INT16 {
                         $crate::__pgrx_c_operand!(@check_safety; $num);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -4495,7 +4607,7 @@ macro_rules! FLOAT8_FITS_IN_INT16 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -4669,6 +4781,11 @@ macro_rules! __pgrx_c_args_FLOAT8_FITS_IN_INT32 {
             @argument [__pgrx_c_args_FLOAT8_FITS_IN_INT32] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FLOAT8_FITS_IN_INT32] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT32!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4706,6 +4823,13 @@ macro_rules! __pgrx_c_args_FLOAT8_FITS_IN_INT32 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FLOAT8_FITS_IN_INT32] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT32!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -4722,10 +4846,10 @@ macro_rules! __pgrx_c_args_FLOAT8_FITS_IN_INT32 {
         $crate::FLOAT8_FITS_IN_INT32!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro FLOAT8_FITS_IN_INT32 from c.h:1111
+/// C macro FLOAT8_FITS_IN_INT32 from c.h:1118
 ///
 /// ```text
 /// #define FLOAT8_FITS_IN_INT32( num ) ( ( num ) >= ( float8 ) PG_INT32_MIN && ( num ) < - ( ( float8 ) PG_INT32_MIN ) )
@@ -4839,13 +4963,13 @@ macro_rules! FLOAT8_FITS_IN_INT32 {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT32!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $num:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT32!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $num:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT32!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -4858,7 +4982,7 @@ macro_rules! FLOAT8_FITS_IN_INT32 {
                         $crate::__pgrx_c_operand!(@check_safety; $num);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -4948,7 +5072,7 @@ macro_rules! FLOAT8_FITS_IN_INT32 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5122,6 +5246,11 @@ macro_rules! __pgrx_c_args_FLOAT8_FITS_IN_INT64 {
             @argument [__pgrx_c_args_FLOAT8_FITS_IN_INT64] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FLOAT8_FITS_IN_INT64] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT64!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5159,6 +5288,13 @@ macro_rules! __pgrx_c_args_FLOAT8_FITS_IN_INT64 {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_FLOAT8_FITS_IN_INT64] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT64!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5175,10 +5311,10 @@ macro_rules! __pgrx_c_args_FLOAT8_FITS_IN_INT64 {
         $crate::FLOAT8_FITS_IN_INT64!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro FLOAT8_FITS_IN_INT64 from c.h:1113
+/// C macro FLOAT8_FITS_IN_INT64 from c.h:1120
 ///
 /// ```text
 /// #define FLOAT8_FITS_IN_INT64( num ) ( ( num ) >= ( float8 ) PG_INT64_MIN && ( num ) < - ( ( float8 ) PG_INT64_MIN ) )
@@ -5293,13 +5429,13 @@ macro_rules! FLOAT8_FITS_IN_INT64 {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT64!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $num:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT64!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $num:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT64!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -5313,7 +5449,7 @@ macro_rules! FLOAT8_FITS_IN_INT64 {
                         $crate::__pgrx_c_operand!(@check_safety; $num);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -5403,7 +5539,7 @@ macro_rules! FLOAT8_FITS_IN_INT64 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -5575,6 +5711,11 @@ macro_rules! __pgrx_c_args_INTALIGN {
             @argument [__pgrx_c_args_INTALIGN] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INTALIGN] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INTALIGN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5610,6 +5751,11 @@ macro_rules! __pgrx_c_args_INTALIGN {
             @argument [__pgrx_c_args_INTALIGN] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INTALIGN] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INTALIGN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5626,10 +5772,10 @@ macro_rules! __pgrx_c_args_INTALIGN {
         $crate::INTALIGN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro INTALIGN from c.h:802
+/// C macro INTALIGN from c.h:809
 ///
 /// ```text
 /// #define INTALIGN( LEN ) TYPEALIGN ( ALIGNOF_INT , ( LEN ) )
@@ -5670,8 +5816,8 @@ macro_rules! INTALIGN {
                             $crate::__pgrx_c_bindings::ALIGNOF_INT as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -5680,7 +5826,7 @@ macro_rules! INTALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -5690,7 +5836,7 @@ macro_rules! INTALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -5711,8 +5857,8 @@ macro_rules! INTALIGN {
                             $crate::__pgrx_c_bindings::ALIGNOF_INT as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -5721,7 +5867,7 @@ macro_rules! INTALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -5731,7 +5877,7 @@ macro_rules! INTALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -5752,8 +5898,8 @@ macro_rules! INTALIGN {
                             $crate::__pgrx_c_bindings::ALIGNOF_INT as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -5762,7 +5908,7 @@ macro_rules! INTALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -5772,7 +5918,7 @@ macro_rules! INTALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -5793,8 +5939,8 @@ macro_rules! INTALIGN {
                             $crate::__pgrx_c_bindings::ALIGNOF_INT as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -5803,7 +5949,7 @@ macro_rules! INTALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -5813,7 +5959,7 @@ macro_rules! INTALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -5834,8 +5980,8 @@ macro_rules! INTALIGN {
                             $crate::__pgrx_c_bindings::ALIGNOF_INT as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -5844,7 +5990,7 @@ macro_rules! INTALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -5854,7 +6000,7 @@ macro_rules! INTALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -5947,6 +6093,11 @@ macro_rules! __pgrx_c_args_INTALIGN_DOWN {
             @argument [__pgrx_c_args_INTALIGN_DOWN] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INTALIGN_DOWN] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INTALIGN_DOWN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -5984,6 +6135,11 @@ macro_rules! __pgrx_c_args_INTALIGN_DOWN {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INTALIGN_DOWN] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INTALIGN_DOWN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6000,10 +6156,10 @@ macro_rules! __pgrx_c_args_INTALIGN_DOWN {
         $crate::INTALIGN_DOWN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro INTALIGN_DOWN from c.h:814
+/// C macro INTALIGN_DOWN from c.h:821
 ///
 /// ```text
 /// #define INTALIGN_DOWN( LEN ) TYPEALIGN_DOWN ( ALIGNOF_INT , ( LEN ) )
@@ -6044,8 +6200,8 @@ macro_rules! INTALIGN_DOWN {
                             $crate::__pgrx_c_bindings::ALIGNOF_INT as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -6054,7 +6210,7 @@ macro_rules! INTALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -6064,7 +6220,7 @@ macro_rules! INTALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -6085,8 +6241,8 @@ macro_rules! INTALIGN_DOWN {
                             $crate::__pgrx_c_bindings::ALIGNOF_INT as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -6095,7 +6251,7 @@ macro_rules! INTALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -6105,7 +6261,7 @@ macro_rules! INTALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -6126,8 +6282,8 @@ macro_rules! INTALIGN_DOWN {
                             $crate::__pgrx_c_bindings::ALIGNOF_INT as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -6136,7 +6292,7 @@ macro_rules! INTALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -6146,7 +6302,7 @@ macro_rules! INTALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -6167,8 +6323,8 @@ macro_rules! INTALIGN_DOWN {
                             $crate::__pgrx_c_bindings::ALIGNOF_INT as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -6177,7 +6333,7 @@ macro_rules! INTALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -6187,7 +6343,7 @@ macro_rules! INTALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -6208,8 +6364,8 @@ macro_rules! INTALIGN_DOWN {
                             $crate::__pgrx_c_bindings::ALIGNOF_INT as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -6218,7 +6374,7 @@ macro_rules! INTALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -6228,7 +6384,7 @@ macro_rules! INTALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -6324,6 +6480,11 @@ macro_rules! __pgrx_c_args_INVERT_COMPARE_RESULT {
             @argument [__pgrx_c_args_INVERT_COMPARE_RESULT] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INVERT_COMPARE_RESULT] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INVERT_COMPARE_RESULT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6361,6 +6522,13 @@ macro_rules! __pgrx_c_args_INVERT_COMPARE_RESULT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_INVERT_COMPARE_RESULT] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INVERT_COMPARE_RESULT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6377,10 +6545,10 @@ macro_rules! __pgrx_c_args_INVERT_COMPARE_RESULT {
         $crate::INVERT_COMPARE_RESULT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro INVERT_COMPARE_RESULT from c.h:1127
+/// C macro INVERT_COMPARE_RESULT from c.h:1134
 ///
 /// ```text
 /// #define INVERT_COMPARE_RESULT( var ) ( ( var ) = ( ( var ) < 0 ) ? 1 : - ( var ) )
@@ -6476,13 +6644,13 @@ macro_rules! INVERT_COMPARE_RESULT {
         $crate::__pgrx_c_args_INVERT_COMPARE_RESULT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $var:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INVERT_COMPARE_RESULT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $var:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_INVERT_COMPARE_RESULT!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6495,7 +6663,7 @@ macro_rules! INVERT_COMPARE_RESULT {
                         $crate::__pgrx_c_operand!(@check_safety; $var);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -6576,7 +6744,7 @@ macro_rules! INVERT_COMPARE_RESULT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -6729,6 +6897,11 @@ macro_rules! __pgrx_c_args_IS_HIGHBIT_SET {
             @argument [__pgrx_c_args_IS_HIGHBIT_SET] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_HIGHBIT_SET] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IS_HIGHBIT_SET!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6766,6 +6939,11 @@ macro_rules! __pgrx_c_args_IS_HIGHBIT_SET {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_HIGHBIT_SET] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_HIGHBIT_SET!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -6782,10 +6960,10 @@ macro_rules! __pgrx_c_args_IS_HIGHBIT_SET {
         $crate::IS_HIGHBIT_SET!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro IS_HIGHBIT_SET from c.h:1176
+/// C macro IS_HIGHBIT_SET from c.h:1183
 ///
 /// ```text
 /// #define IS_HIGHBIT_SET( ch ) ( ( unsigned char ) ( ch ) & HIGHBIT )
@@ -6845,13 +7023,13 @@ macro_rules! IS_HIGHBIT_SET {
         $crate::__pgrx_c_args_IS_HIGHBIT_SET!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ch:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_HIGHBIT_SET!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $ch:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_HIGHBIT_SET!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -6864,7 +7042,7 @@ macro_rules! IS_HIGHBIT_SET {
                         $crate::__pgrx_c_operand!(@check_safety; $ch);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -6891,7 +7069,7 @@ macro_rules! IS_HIGHBIT_SET {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -7008,6 +7186,11 @@ macro_rules! __pgrx_c_args_LONGALIGN {
             @argument [__pgrx_c_args_LONGALIGN] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LONGALIGN] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_LONGALIGN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7043,6 +7226,11 @@ macro_rules! __pgrx_c_args_LONGALIGN {
             @argument [__pgrx_c_args_LONGALIGN] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LONGALIGN] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_LONGALIGN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7059,10 +7247,10 @@ macro_rules! __pgrx_c_args_LONGALIGN {
         $crate::LONGALIGN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro LONGALIGN from c.h:803
+/// C macro LONGALIGN from c.h:810
 ///
 /// ```text
 /// #define LONGALIGN( LEN ) TYPEALIGN ( ALIGNOF_LONG , ( LEN ) )
@@ -7103,8 +7291,8 @@ macro_rules! LONGALIGN {
                             $crate::__pgrx_c_bindings::ALIGNOF_LONG as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -7113,7 +7301,7 @@ macro_rules! LONGALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -7123,7 +7311,7 @@ macro_rules! LONGALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -7144,8 +7332,8 @@ macro_rules! LONGALIGN {
                             $crate::__pgrx_c_bindings::ALIGNOF_LONG as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -7154,7 +7342,7 @@ macro_rules! LONGALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -7164,7 +7352,7 @@ macro_rules! LONGALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -7185,8 +7373,8 @@ macro_rules! LONGALIGN {
                             $crate::__pgrx_c_bindings::ALIGNOF_LONG as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -7195,7 +7383,7 @@ macro_rules! LONGALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -7205,7 +7393,7 @@ macro_rules! LONGALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -7226,8 +7414,8 @@ macro_rules! LONGALIGN {
                             $crate::__pgrx_c_bindings::ALIGNOF_LONG as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -7236,7 +7424,7 @@ macro_rules! LONGALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -7246,7 +7434,7 @@ macro_rules! LONGALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -7267,8 +7455,8 @@ macro_rules! LONGALIGN {
                             $crate::__pgrx_c_bindings::ALIGNOF_LONG as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -7277,7 +7465,7 @@ macro_rules! LONGALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -7287,7 +7475,7 @@ macro_rules! LONGALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -7380,6 +7568,11 @@ macro_rules! __pgrx_c_args_LONGALIGN_DOWN {
             @argument [__pgrx_c_args_LONGALIGN_DOWN] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LONGALIGN_DOWN] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_LONGALIGN_DOWN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7417,6 +7610,11 @@ macro_rules! __pgrx_c_args_LONGALIGN_DOWN {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_LONGALIGN_DOWN] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_LONGALIGN_DOWN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7433,10 +7631,10 @@ macro_rules! __pgrx_c_args_LONGALIGN_DOWN {
         $crate::LONGALIGN_DOWN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro LONGALIGN_DOWN from c.h:815
+/// C macro LONGALIGN_DOWN from c.h:822
 ///
 /// ```text
 /// #define LONGALIGN_DOWN( LEN ) TYPEALIGN_DOWN ( ALIGNOF_LONG , ( LEN ) )
@@ -7477,8 +7675,8 @@ macro_rules! LONGALIGN_DOWN {
                             $crate::__pgrx_c_bindings::ALIGNOF_LONG as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -7487,7 +7685,7 @@ macro_rules! LONGALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -7497,7 +7695,7 @@ macro_rules! LONGALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -7518,8 +7716,8 @@ macro_rules! LONGALIGN_DOWN {
                             $crate::__pgrx_c_bindings::ALIGNOF_LONG as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -7528,7 +7726,7 @@ macro_rules! LONGALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -7538,7 +7736,7 @@ macro_rules! LONGALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -7559,8 +7757,8 @@ macro_rules! LONGALIGN_DOWN {
                             $crate::__pgrx_c_bindings::ALIGNOF_LONG as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -7569,7 +7767,7 @@ macro_rules! LONGALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -7579,7 +7777,7 @@ macro_rules! LONGALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -7600,8 +7798,8 @@ macro_rules! LONGALIGN_DOWN {
                             $crate::__pgrx_c_bindings::ALIGNOF_LONG as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -7610,7 +7808,7 @@ macro_rules! LONGALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -7620,7 +7818,7 @@ macro_rules! LONGALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -7641,8 +7839,8 @@ macro_rules! LONGALIGN_DOWN {
                             $crate::__pgrx_c_bindings::ALIGNOF_LONG as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -7651,7 +7849,7 @@ macro_rules! LONGALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -7661,7 +7859,7 @@ macro_rules! LONGALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -7754,6 +7952,11 @@ macro_rules! __pgrx_c_args_MAXALIGN {
             @argument [__pgrx_c_args_MAXALIGN] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MAXALIGN] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_MAXALIGN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7789,6 +7992,11 @@ macro_rules! __pgrx_c_args_MAXALIGN {
             @argument [__pgrx_c_args_MAXALIGN] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MAXALIGN] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MAXALIGN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -7805,10 +8013,10 @@ macro_rules! __pgrx_c_args_MAXALIGN {
         $crate::MAXALIGN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro MAXALIGN from c.h:805
+/// C macro MAXALIGN from c.h:812
 ///
 /// ```text
 /// #define MAXALIGN( LEN ) TYPEALIGN ( MAXIMUM_ALIGNOF , ( LEN ) )
@@ -7849,8 +8057,8 @@ macro_rules! MAXALIGN {
                             $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -7859,7 +8067,7 @@ macro_rules! MAXALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -7869,7 +8077,7 @@ macro_rules! MAXALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -7890,8 +8098,8 @@ macro_rules! MAXALIGN {
                             $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -7900,7 +8108,7 @@ macro_rules! MAXALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -7910,7 +8118,7 @@ macro_rules! MAXALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -7931,8 +8139,8 @@ macro_rules! MAXALIGN {
                             $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -7941,7 +8149,7 @@ macro_rules! MAXALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -7951,7 +8159,7 @@ macro_rules! MAXALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -7972,8 +8180,8 @@ macro_rules! MAXALIGN {
                             $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -7982,7 +8190,7 @@ macro_rules! MAXALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -7992,7 +8200,7 @@ macro_rules! MAXALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -8013,8 +8221,8 @@ macro_rules! MAXALIGN {
                             $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -8023,7 +8231,7 @@ macro_rules! MAXALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -8033,7 +8241,7 @@ macro_rules! MAXALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -8126,6 +8334,11 @@ macro_rules! __pgrx_c_args_MAXALIGN64 {
             @argument [__pgrx_c_args_MAXALIGN64] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MAXALIGN64] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_MAXALIGN64!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8161,6 +8374,11 @@ macro_rules! __pgrx_c_args_MAXALIGN64 {
             @argument [__pgrx_c_args_MAXALIGN64] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MAXALIGN64] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MAXALIGN64!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8177,10 +8395,10 @@ macro_rules! __pgrx_c_args_MAXALIGN64 {
         $crate::MAXALIGN64!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro MAXALIGN64 from c.h:830
+/// C macro MAXALIGN64 from c.h:837
 ///
 /// ```text
 /// #define MAXALIGN64( LEN ) TYPEALIGN64 ( MAXIMUM_ALIGNOF , ( LEN ) )
@@ -8221,8 +8439,8 @@ macro_rules! MAXALIGN64 {
                             $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -8231,7 +8449,7 @@ macro_rules! MAXALIGN64 {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -8241,7 +8459,7 @@ macro_rules! MAXALIGN64 {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -8262,8 +8480,8 @@ macro_rules! MAXALIGN64 {
                             $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -8272,7 +8490,7 @@ macro_rules! MAXALIGN64 {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -8282,7 +8500,7 @@ macro_rules! MAXALIGN64 {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -8303,8 +8521,8 @@ macro_rules! MAXALIGN64 {
                             $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -8313,7 +8531,7 @@ macro_rules! MAXALIGN64 {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -8323,7 +8541,7 @@ macro_rules! MAXALIGN64 {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -8344,8 +8562,8 @@ macro_rules! MAXALIGN64 {
                             $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -8354,7 +8572,7 @@ macro_rules! MAXALIGN64 {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -8364,7 +8582,7 @@ macro_rules! MAXALIGN64 {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -8385,8 +8603,8 @@ macro_rules! MAXALIGN64 {
                             $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -8395,7 +8613,7 @@ macro_rules! MAXALIGN64 {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -8405,7 +8623,7 @@ macro_rules! MAXALIGN64 {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -8498,6 +8716,11 @@ macro_rules! __pgrx_c_args_MAXALIGN_DOWN {
             @argument [__pgrx_c_args_MAXALIGN_DOWN] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MAXALIGN_DOWN] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_MAXALIGN_DOWN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8535,6 +8758,11 @@ macro_rules! __pgrx_c_args_MAXALIGN_DOWN {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MAXALIGN_DOWN] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MAXALIGN_DOWN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8551,10 +8779,10 @@ macro_rules! __pgrx_c_args_MAXALIGN_DOWN {
         $crate::MAXALIGN_DOWN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro MAXALIGN_DOWN from c.h:817
+/// C macro MAXALIGN_DOWN from c.h:824
 ///
 /// ```text
 /// #define MAXALIGN_DOWN( LEN ) TYPEALIGN_DOWN ( MAXIMUM_ALIGNOF , ( LEN ) )
@@ -8595,8 +8823,8 @@ macro_rules! MAXALIGN_DOWN {
                             $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -8605,7 +8833,7 @@ macro_rules! MAXALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -8615,7 +8843,7 @@ macro_rules! MAXALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -8636,8 +8864,8 @@ macro_rules! MAXALIGN_DOWN {
                             $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -8646,7 +8874,7 @@ macro_rules! MAXALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -8656,7 +8884,7 @@ macro_rules! MAXALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -8677,8 +8905,8 @@ macro_rules! MAXALIGN_DOWN {
                             $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -8687,7 +8915,7 @@ macro_rules! MAXALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -8697,7 +8925,7 @@ macro_rules! MAXALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -8718,8 +8946,8 @@ macro_rules! MAXALIGN_DOWN {
                             $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -8728,7 +8956,7 @@ macro_rules! MAXALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -8738,7 +8966,7 @@ macro_rules! MAXALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -8759,8 +8987,8 @@ macro_rules! MAXALIGN_DOWN {
                             $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -8769,7 +8997,7 @@ macro_rules! MAXALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -8779,7 +9007,7 @@ macro_rules! MAXALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -8863,6 +9091,11 @@ macro_rules! __pgrx_c_args_Max {
             @argument [__pgrx_c_args_Max] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_Max] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_Max!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8920,6 +9153,11 @@ macro_rules! __pgrx_c_args_Max {
             @argument [__pgrx_c_args_Max] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_Max] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_Max!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8955,6 +9193,11 @@ macro_rules! __pgrx_c_args_Max {
             @argument [__pgrx_c_args_Max] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_Max] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_Max!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -8971,10 +9214,10 @@ macro_rules! __pgrx_c_args_Max {
         $crate::Max!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro Max from c.h:992
+/// C macro Max from c.h:999
 ///
 /// ```text
 /// #define Max( x , y ) ( ( x ) > ( y ) ? ( x ) : ( y ) )
@@ -9044,13 +9287,13 @@ macro_rules! Max {
         $crate::__pgrx_c_args_Max!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt, $y:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_Max!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt, $y:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_Max!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -9064,7 +9307,7 @@ macro_rules! Max {
                         $crate::__pgrx_c_operand!(@check_safety; $y);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -9109,7 +9352,7 @@ macro_rules! Max {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -9232,6 +9475,11 @@ macro_rules! __pgrx_c_args_MemSetTest {
             @argument [__pgrx_c_args_MemSetTest] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MemSetTest] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MemSetTest!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9293,6 +9541,11 @@ macro_rules! __pgrx_c_args_MemSetTest {
             @argument [__pgrx_c_args_MemSetTest] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MemSetTest] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_MemSetTest!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9328,6 +9581,11 @@ macro_rules! __pgrx_c_args_MemSetTest {
             @argument [__pgrx_c_args_MemSetTest] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MemSetTest] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MemSetTest!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -9344,10 +9602,10 @@ macro_rules! __pgrx_c_args_MemSetTest {
         $crate::MemSetTest!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro MemSetTest from c.h:1076
+/// C macro MemSetTest from c.h:1083
 ///
 /// ```text
 /// #define MemSetTest( val , len ) ( ( ( len ) & LONG_ALIGN_MASK ) == 0 && ( len ) <= MEMSET_LOOP_LIMIT && MEMSET_LOOP_LIMIT != 0 && ( val ) == 0 )
@@ -9557,13 +9815,13 @@ macro_rules! MemSetTest {
         $crate::__pgrx_c_args_MemSetTest!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $val:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MemSetTest!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $val:tt, $len:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MemSetTest!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -9578,7 +9836,7 @@ macro_rules! MemSetTest {
                         $crate::__pgrx_c_operand!(@check_safety; $len);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -9768,7 +10026,7 @@ macro_rules! MemSetTest {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10025,6 +10283,11 @@ macro_rules! __pgrx_c_args_Min {
             @argument [__pgrx_c_args_Min] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_Min] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_Min!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10082,6 +10345,11 @@ macro_rules! __pgrx_c_args_Min {
             @argument [__pgrx_c_args_Min] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_Min] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_Min!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10117,6 +10385,11 @@ macro_rules! __pgrx_c_args_Min {
             @argument [__pgrx_c_args_Min] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_Min] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_Min!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10133,10 +10406,10 @@ macro_rules! __pgrx_c_args_Min {
         $crate::Min!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro Min from c.h:998
+/// C macro Min from c.h:1005
 ///
 /// ```text
 /// #define Min( x , y ) ( ( x ) < ( y ) ? ( x ) : ( y ) )
@@ -10206,13 +10479,13 @@ macro_rules! Min {
         $crate::__pgrx_c_args_Min!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt, $y:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_Min!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt, $y:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_Min!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -10226,7 +10499,7 @@ macro_rules! Min {
                         $crate::__pgrx_c_operand!(@check_safety; $y);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -10271,7 +10544,7 @@ macro_rules! Min {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10401,6 +10674,11 @@ macro_rules! __pgrx_c_args_NameStr {
             @argument [__pgrx_c_args_NameStr] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_NameStr] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_NameStr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10436,6 +10714,11 @@ macro_rules! __pgrx_c_args_NameStr {
             @argument [__pgrx_c_args_NameStr] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_NameStr] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_NameStr!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -10452,10 +10735,10 @@ macro_rules! __pgrx_c_args_NameStr {
         $crate::NameStr!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro NameStr from c.h:740
+/// C macro NameStr from c.h:747
 ///
 /// ```text
 /// #define NameStr( name ) ( ( name ) . data )
@@ -10530,7 +10813,7 @@ macro_rules! NameStr {
                         $crate::__pgrx_c_operand!(@check_safety; $name);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_data,
@@ -10540,7 +10823,7 @@ macro_rules! NameStr {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -10597,7 +10880,7 @@ macro_rules! __pgrx_c_args_OffsetToPointer {
         $crate::__pgrx_c_args_OffsetToPointer!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_OffsetToPointer!(
@@ -10606,7 +10889,7 @@ macro_rules! __pgrx_c_args_OffsetToPointer {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_OffsetToPointer!(
@@ -10648,7 +10931,7 @@ macro_rules! __pgrx_c_args_OffsetToPointer {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_OffsetToPointer!(
@@ -10656,7 +10939,7 @@ macro_rules! __pgrx_c_args_OffsetToPointer {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_OffsetToPointer!(
@@ -10665,7 +10948,7 @@ macro_rules! __pgrx_c_args_OffsetToPointer {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_OffsetToPointer!(
@@ -10744,10 +11027,10 @@ macro_rules! __pgrx_c_args_OffsetToPointer {
         $crate::OffsetToPointer!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro OffsetToPointer from c.h:766
+/// C macro OffsetToPointer from c.h:773
 ///
 /// ```text
 /// #define OffsetToPointer( base , offset ) ( ( void * ) ( ( char * ) base + offset ) )
@@ -10824,13 +11107,13 @@ macro_rules! OffsetToPointer {
         $crate::__pgrx_c_args_OffsetToPointer!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $base:tt, $offset:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_OffsetToPointer!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $base:tt, $offset:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_OffsetToPointer!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -10844,7 +11127,7 @@ macro_rules! OffsetToPointer {
                         $crate::__pgrx_c_operand!(@check_safety; $offset);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -10895,7 +11178,7 @@ macro_rules! OffsetToPointer {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -11028,6 +11311,11 @@ macro_rules! __pgrx_c_args_OidIsValid {
             @argument [__pgrx_c_args_OidIsValid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_OidIsValid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_OidIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11063,6 +11351,11 @@ macro_rules! __pgrx_c_args_OidIsValid {
             @argument [__pgrx_c_args_OidIsValid] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_OidIsValid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_OidIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11079,10 +11372,10 @@ macro_rules! __pgrx_c_args_OidIsValid {
         $crate::OidIsValid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro OidIsValid from c.h:769
+/// C macro OidIsValid from c.h:776
 ///
 /// ```text
 /// #define OidIsValid( objectId ) ( ( bool ) ( ( objectId ) != InvalidOid ) )
@@ -11144,13 +11437,13 @@ macro_rules! OidIsValid {
         $crate::__pgrx_c_args_OidIsValid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $objectId:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_OidIsValid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $objectId:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_OidIsValid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -11164,7 +11457,7 @@ macro_rules! OidIsValid {
                         $crate::__pgrx_c_operand!(@check_safety; $objectId);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -11205,7 +11498,7 @@ macro_rules! OidIsValid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -11317,6 +11610,13 @@ macro_rules! __pgrx_c_args_PointerIsAligned {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PointerIsAligned] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PointerIsAligned!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11378,6 +11678,11 @@ macro_rules! __pgrx_c_args_PointerIsAligned {
             @argument [__pgrx_c_args_PointerIsAligned] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PointerIsAligned] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PointerIsAligned!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11415,6 +11720,13 @@ macro_rules! __pgrx_c_args_PointerIsAligned {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PointerIsAligned] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PointerIsAligned!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11431,10 +11743,10 @@ macro_rules! __pgrx_c_args_PointerIsAligned {
         $crate::PointerIsAligned!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro PointerIsAligned from c.h:763
+/// C macro PointerIsAligned from c.h:770
 ///
 /// ```text
 /// #define PointerIsAligned( pointer , type ) ( ( ( uintptr_t ) ( pointer ) % ( sizeof ( type ) ) ) == 0 )
@@ -11510,13 +11822,13 @@ macro_rules! PointerIsAligned {
         $crate::__pgrx_c_args_PointerIsAligned!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $pointer:tt, $type:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PointerIsAligned!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $pointer:tt, $type:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PointerIsAligned!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -11530,7 +11842,7 @@ macro_rules! PointerIsAligned {
                         $crate::__pgrx_c_operand!(@check_safety; $type);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -11580,7 +11892,7 @@ macro_rules! PointerIsAligned {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -11712,6 +12024,11 @@ macro_rules! __pgrx_c_args_PointerIsValid {
             @argument [__pgrx_c_args_PointerIsValid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PointerIsValid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PointerIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11749,6 +12066,11 @@ macro_rules! __pgrx_c_args_PointerIsValid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_PointerIsValid] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PointerIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -11765,10 +12087,10 @@ macro_rules! __pgrx_c_args_PointerIsValid {
         $crate::PointerIsValid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro PointerIsValid from c.h:757
+/// C macro PointerIsValid from c.h:764
 ///
 /// ```text
 /// #define PointerIsValid( pointer ) ( ( const void * ) ( pointer ) != NULL )
@@ -11848,13 +12170,13 @@ macro_rules! PointerIsValid {
         $crate::__pgrx_c_args_PointerIsValid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PointerIsValid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $pointer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_PointerIsValid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -11868,7 +12190,7 @@ macro_rules! PointerIsValid {
                         $crate::__pgrx_c_operand!(@check_safety; $pointer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -11917,7 +12239,7 @@ macro_rules! PointerIsValid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -12054,6 +12376,11 @@ macro_rules! __pgrx_c_args_RegProcedureIsValid {
             @argument [__pgrx_c_args_RegProcedureIsValid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RegProcedureIsValid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RegProcedureIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12091,6 +12418,13 @@ macro_rules! __pgrx_c_args_RegProcedureIsValid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RegProcedureIsValid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RegProcedureIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12107,10 +12441,10 @@ macro_rules! __pgrx_c_args_RegProcedureIsValid {
         $crate::RegProcedureIsValid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro RegProcedureIsValid from c.h:771
+/// C macro RegProcedureIsValid from c.h:778
 ///
 /// ```text
 /// #define RegProcedureIsValid( p ) OidIsValid ( p )
@@ -12258,6 +12592,11 @@ macro_rules! __pgrx_c_args_SHORTALIGN {
             @argument [__pgrx_c_args_SHORTALIGN] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SHORTALIGN] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SHORTALIGN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12293,6 +12632,11 @@ macro_rules! __pgrx_c_args_SHORTALIGN {
             @argument [__pgrx_c_args_SHORTALIGN] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SHORTALIGN] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SHORTALIGN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12309,10 +12653,10 @@ macro_rules! __pgrx_c_args_SHORTALIGN {
         $crate::SHORTALIGN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro SHORTALIGN from c.h:801
+/// C macro SHORTALIGN from c.h:808
 ///
 /// ```text
 /// #define SHORTALIGN( LEN ) TYPEALIGN ( ALIGNOF_SHORT , ( LEN ) )
@@ -12353,8 +12697,8 @@ macro_rules! SHORTALIGN {
                             $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -12363,7 +12707,7 @@ macro_rules! SHORTALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -12373,7 +12717,7 @@ macro_rules! SHORTALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -12394,8 +12738,8 @@ macro_rules! SHORTALIGN {
                             $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -12404,7 +12748,7 @@ macro_rules! SHORTALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -12414,7 +12758,7 @@ macro_rules! SHORTALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -12435,8 +12779,8 @@ macro_rules! SHORTALIGN {
                             $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -12445,7 +12789,7 @@ macro_rules! SHORTALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -12455,7 +12799,7 @@ macro_rules! SHORTALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -12476,8 +12820,8 @@ macro_rules! SHORTALIGN {
                             $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -12486,7 +12830,7 @@ macro_rules! SHORTALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -12496,7 +12840,7 @@ macro_rules! SHORTALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -12517,8 +12861,8 @@ macro_rules! SHORTALIGN {
                             $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -12527,7 +12871,7 @@ macro_rules! SHORTALIGN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -12537,7 +12881,7 @@ macro_rules! SHORTALIGN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -12630,6 +12974,11 @@ macro_rules! __pgrx_c_args_SHORTALIGN_DOWN {
             @argument [__pgrx_c_args_SHORTALIGN_DOWN] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SHORTALIGN_DOWN] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SHORTALIGN_DOWN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12667,6 +13016,13 @@ macro_rules! __pgrx_c_args_SHORTALIGN_DOWN {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SHORTALIGN_DOWN] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SHORTALIGN_DOWN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -12683,10 +13039,10 @@ macro_rules! __pgrx_c_args_SHORTALIGN_DOWN {
         $crate::SHORTALIGN_DOWN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro SHORTALIGN_DOWN from c.h:813
+/// C macro SHORTALIGN_DOWN from c.h:820
 ///
 /// ```text
 /// #define SHORTALIGN_DOWN( LEN ) TYPEALIGN_DOWN ( ALIGNOF_SHORT , ( LEN ) )
@@ -12727,8 +13083,8 @@ macro_rules! SHORTALIGN_DOWN {
                             $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -12737,7 +13093,7 @@ macro_rules! SHORTALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -12747,7 +13103,7 @@ macro_rules! SHORTALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -12768,8 +13124,8 @@ macro_rules! SHORTALIGN_DOWN {
                             $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -12778,7 +13134,7 @@ macro_rules! SHORTALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -12788,7 +13144,7 @@ macro_rules! SHORTALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -12809,8 +13165,8 @@ macro_rules! SHORTALIGN_DOWN {
                             $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -12819,7 +13175,7 @@ macro_rules! SHORTALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -12829,7 +13185,7 @@ macro_rules! SHORTALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -12850,8 +13206,8 @@ macro_rules! SHORTALIGN_DOWN {
                             $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -12860,7 +13216,7 @@ macro_rules! SHORTALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -12870,7 +13226,7 @@ macro_rules! SHORTALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -12891,8 +13247,8 @@ macro_rules! SHORTALIGN_DOWN {
                             $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                         )
                     )
-                ] [compile_error!("a C literal or constant is not an object place")] [
-                    compile_error!("a C literal or constant is not an object place")
+                ] [::core::compile_error!("a C literal or constant is not an object place")] [
+                    ::core::compile_error!("a C literal or constant is not an object place")
                 ] [
                     $crate::__pgrx_c_macros::expression::size_of_value_type(
                         if false {
@@ -12901,7 +13257,7 @@ macro_rules! SHORTALIGN_DOWN {
                                     $crate::__pgrx_c_operand!(@check_safety; $LEN);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
@@ -12911,7 +13267,7 @@ macro_rules! SHORTALIGN_DOWN {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -12997,6 +13353,11 @@ macro_rules! __pgrx_c_args_SQL_STR_DOUBLE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SQL_STR_DOUBLE] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SQL_STR_DOUBLE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13058,6 +13419,11 @@ macro_rules! __pgrx_c_args_SQL_STR_DOUBLE {
             @argument [__pgrx_c_args_SQL_STR_DOUBLE] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SQL_STR_DOUBLE] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SQL_STR_DOUBLE!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13095,6 +13461,11 @@ macro_rules! __pgrx_c_args_SQL_STR_DOUBLE {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SQL_STR_DOUBLE] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SQL_STR_DOUBLE!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13111,10 +13482,10 @@ macro_rules! __pgrx_c_args_SQL_STR_DOUBLE {
         $crate::SQL_STR_DOUBLE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro SQL_STR_DOUBLE from c.h:1184
+/// C macro SQL_STR_DOUBLE from c.h:1191
 ///
 /// ```text
 /// #define SQL_STR_DOUBLE( ch , escape_backslash ) ( ( ch ) == '\'' || ( ( ch ) == '\\' && ( escape_backslash ) ) )
@@ -13220,13 +13591,13 @@ macro_rules! SQL_STR_DOUBLE {
         $crate::__pgrx_c_args_SQL_STR_DOUBLE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ch:tt, $escape_backslash:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SQL_STR_DOUBLE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $ch:tt, $escape_backslash:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SQL_STR_DOUBLE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -13240,7 +13611,7 @@ macro_rules! SQL_STR_DOUBLE {
                         $crate::__pgrx_c_operand!(@check_safety; $escape_backslash);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -13329,7 +13700,7 @@ macro_rules! SQL_STR_DOUBLE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -13486,6 +13857,11 @@ macro_rules! __pgrx_c_args_TYPEALIGN {
             @argument [__pgrx_c_args_TYPEALIGN] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TYPEALIGN] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13547,6 +13923,11 @@ macro_rules! __pgrx_c_args_TYPEALIGN {
             @argument [__pgrx_c_args_TYPEALIGN] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TYPEALIGN] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TYPEALIGN!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13582,6 +13963,11 @@ macro_rules! __pgrx_c_args_TYPEALIGN {
             @argument [__pgrx_c_args_TYPEALIGN] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TYPEALIGN] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -13598,10 +13984,10 @@ macro_rules! __pgrx_c_args_TYPEALIGN {
         $crate::TYPEALIGN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro TYPEALIGN from c.h:798
+/// C macro TYPEALIGN from c.h:805
 ///
 /// ```text
 /// #define TYPEALIGN( ALIGNVAL , LEN ) ( ( ( uintptr_t ) ( LEN ) + ( ( ALIGNVAL ) - 1 ) ) & ~ ( ( uintptr_t ) ( ( ALIGNVAL ) - 1 ) ) )
@@ -13744,13 +14130,13 @@ macro_rules! TYPEALIGN {
         $crate::__pgrx_c_args_TYPEALIGN!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ALIGNVAL:tt, $LEN:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $ALIGNVAL:tt, $LEN:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -13764,7 +14150,7 @@ macro_rules! TYPEALIGN {
                         $crate::__pgrx_c_operand!(@check_safety; $LEN);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -13886,7 +14272,7 @@ macro_rules! TYPEALIGN {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -14076,6 +14462,11 @@ macro_rules! __pgrx_c_args_TYPEALIGN64 {
             @argument [__pgrx_c_args_TYPEALIGN64] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TYPEALIGN64] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN64!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14137,6 +14528,11 @@ macro_rules! __pgrx_c_args_TYPEALIGN64 {
             @argument [__pgrx_c_args_TYPEALIGN64] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TYPEALIGN64] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TYPEALIGN64!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14172,6 +14568,11 @@ macro_rules! __pgrx_c_args_TYPEALIGN64 {
             @argument [__pgrx_c_args_TYPEALIGN64] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TYPEALIGN64] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN64!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14188,10 +14589,10 @@ macro_rules! __pgrx_c_args_TYPEALIGN64 {
         $crate::TYPEALIGN64!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro TYPEALIGN64 from c.h:826
+/// C macro TYPEALIGN64 from c.h:833
 ///
 /// ```text
 /// #define TYPEALIGN64( ALIGNVAL , LEN ) ( ( ( uint64 ) ( LEN ) + ( ( ALIGNVAL ) - 1 ) ) & ~ ( ( uint64 ) ( ( ALIGNVAL ) - 1 ) ) )
@@ -14334,13 +14735,13 @@ macro_rules! TYPEALIGN64 {
         $crate::__pgrx_c_args_TYPEALIGN64!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ALIGNVAL:tt, $LEN:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN64!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $ALIGNVAL:tt, $LEN:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN64!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -14354,7 +14755,7 @@ macro_rules! TYPEALIGN64 {
                         $crate::__pgrx_c_operand!(@check_safety; $LEN);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -14476,7 +14877,7 @@ macro_rules! TYPEALIGN64 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -14668,6 +15069,11 @@ macro_rules! __pgrx_c_args_TYPEALIGN_DOWN {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TYPEALIGN_DOWN] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN_DOWN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14729,6 +15135,11 @@ macro_rules! __pgrx_c_args_TYPEALIGN_DOWN {
             @argument [__pgrx_c_args_TYPEALIGN_DOWN] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TYPEALIGN_DOWN] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TYPEALIGN_DOWN!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14766,6 +15177,11 @@ macro_rules! __pgrx_c_args_TYPEALIGN_DOWN {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TYPEALIGN_DOWN] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN_DOWN!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -14782,10 +15198,10 @@ macro_rules! __pgrx_c_args_TYPEALIGN_DOWN {
         $crate::TYPEALIGN_DOWN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro TYPEALIGN_DOWN from c.h:810
+/// C macro TYPEALIGN_DOWN from c.h:817
 ///
 /// ```text
 /// #define TYPEALIGN_DOWN( ALIGNVAL , LEN ) ( ( ( uintptr_t ) ( LEN ) ) & ~ ( ( uintptr_t ) ( ( ALIGNVAL ) - 1 ) ) )
@@ -14890,13 +15306,13 @@ macro_rules! TYPEALIGN_DOWN {
         $crate::__pgrx_c_args_TYPEALIGN_DOWN!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ALIGNVAL:tt, $LEN:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN_DOWN!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $ALIGNVAL:tt, $LEN:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN_DOWN!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -14910,7 +15326,7 @@ macro_rules! TYPEALIGN_DOWN {
                         $crate::__pgrx_c_operand!(@check_safety; $LEN);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -14984,7 +15400,7 @@ macro_rules! TYPEALIGN_DOWN {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -15145,6 +15561,11 @@ macro_rules! __pgrx_c_args_gettext_noop {
             @argument [__pgrx_c_args_gettext_noop] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_gettext_noop] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_gettext_noop!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15180,6 +15601,11 @@ macro_rules! __pgrx_c_args_gettext_noop {
             @argument [__pgrx_c_args_gettext_noop] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_gettext_noop] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gettext_noop!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15196,10 +15622,10 @@ macro_rules! __pgrx_c_args_gettext_noop {
         $crate::gettext_noop!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro gettext_noop from c.h:1217
+/// C macro gettext_noop from c.h:1224
 ///
 /// ```text
 /// #define gettext_noop( x ) ( x )
@@ -15340,6 +15766,11 @@ macro_rules! __pgrx_c_args_i64abs {
             @argument [__pgrx_c_args_i64abs] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_i64abs] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_i64abs!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15375,6 +15806,11 @@ macro_rules! __pgrx_c_args_i64abs {
             @argument [__pgrx_c_args_i64abs] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_i64abs] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_i64abs!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15391,10 +15827,10 @@ macro_rules! __pgrx_c_args_i64abs {
         $crate::i64abs!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro i64abs from c.h:1323
+/// C macro i64abs from c.h:1330
 ///
 /// ```text
 /// #define i64abs( i ) labs ( i )
@@ -15427,7 +15863,7 @@ macro_rules! i64abs {
         /* PGRX: i64abs remains expanded because labs is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_4f6c509a1500b6d8db3a4ff2d890f927(
+                $crate::__pgrx_c_generated::Inline_8e07868313cb69ad4607618f2e4aea51(
                     <$crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType>::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::CLong,
@@ -15446,13 +15882,13 @@ macro_rules! i64abs {
         $crate::__pgrx_c_args_i64abs!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_i64abs!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $i:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_i64abs!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -15466,13 +15902,13 @@ macro_rules! i64abs {
                         $crate::__pgrx_c_operand!(@check_safety; $i);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4f6c509a1500b6d8db3a4ff2d890f927(
+                                $crate::__pgrx_c_generated::Inline_8e07868313cb69ad4607618f2e4aea51(
                                     <
                                         $crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
@@ -15492,7 +15928,7 @@ macro_rules! i64abs {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -15504,7 +15940,7 @@ macro_rules! i64abs {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::__pgrx_c_generated::Inline_4f6c509a1500b6d8db3a4ff2d890f927(
+                    $crate::__pgrx_c_generated::Inline_8e07868313cb69ad4607618f2e4aea51(
                         <
                             $crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
@@ -15607,6 +16043,11 @@ macro_rules! __pgrx_c_args_lengthof {
             @argument [__pgrx_c_args_lengthof] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lengthof] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_lengthof!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15642,6 +16083,11 @@ macro_rules! __pgrx_c_args_lengthof {
             @argument [__pgrx_c_args_lengthof] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_lengthof] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_lengthof!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15658,10 +16104,10 @@ macro_rules! __pgrx_c_args_lengthof {
         $crate::lengthof!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro lengthof from c.h:782
+/// C macro lengthof from c.h:789
 ///
 /// ```text
 /// #define lengthof( array ) ( sizeof ( array ) / sizeof ( ( array ) [ 0 ] ) )
@@ -15707,7 +16153,7 @@ macro_rules! lengthof {
                                         $crate::__pgrx_c_operand!(@check_safety; $array);
                                     }
                                 }
-                                Some(
+                                ::core::option::Option::Some(
                                     unsafe {
                                         $crate::__pgrx_c_macros::expression::index(
                                             (
@@ -15730,7 +16176,7 @@ macro_rules! lengthof {
                                     }
                                 )
                             } else {
-                                None
+                                ::core::option::Option::None
                             }
                         )
                     )
@@ -15742,13 +16188,13 @@ macro_rules! lengthof {
         $crate::__pgrx_c_args_lengthof!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $array:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_lengthof!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $array:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_lengthof!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -15761,7 +16207,7 @@ macro_rules! lengthof {
                         $crate::__pgrx_c_operand!(@check_safety; $array);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::div(
@@ -15776,7 +16222,7 @@ macro_rules! lengthof {
                                                     $crate::__pgrx_c_operand!(@check_safety; $array);
                                                 }
                                             }
-                                            Some(
+                                            ::core::option::Option::Some(
                                                 unsafe {
                                                     $crate::__pgrx_c_macros::expression::index(
                                                         (
@@ -15804,7 +16250,7 @@ macro_rules! lengthof {
                                                 }
                                             )
                                         } else {
-                                            None
+                                            ::core::option::Option::None
                                         }
                                     )
                                 )
@@ -15813,7 +16259,7 @@ macro_rules! lengthof {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -15835,7 +16281,7 @@ macro_rules! lengthof {
                                         $crate::__pgrx_c_operand!(@check_safety; $array);
                                     }
                                 }
-                                Some(
+                                ::core::option::Option::Some(
                                     unsafe {
                                         $crate::__pgrx_c_macros::expression::index(
                                             (
@@ -15858,7 +16304,7 @@ macro_rules! lengthof {
                                     }
                                 )
                             } else {
-                                None
+                                ::core::option::Option::None
                             }
                         )
                     )
@@ -15949,6 +16395,11 @@ macro_rules! __pgrx_c_args_likely {
             @argument [__pgrx_c_args_likely] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_likely] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_likely!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -15984,6 +16435,11 @@ macro_rules! __pgrx_c_args_likely {
             @argument [__pgrx_c_args_likely] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_likely] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_likely!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16000,10 +16456,10 @@ macro_rules! __pgrx_c_args_likely {
         $crate::likely!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro likely from c.h:301
+/// C macro likely from c.h:308
 ///
 /// ```text
 /// #define likely( x ) __builtin_expect ( ( x ) != 0 , 1 )
@@ -16136,7 +16592,7 @@ macro_rules! likely {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::expect(
@@ -16180,7 +16636,7 @@ macro_rules! likely {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -16303,6 +16759,11 @@ macro_rules! __pgrx_c_args_strtoi64 {
             @argument [__pgrx_c_args_strtoi64] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_strtoi64] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_strtoi64!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16353,6 +16814,11 @@ macro_rules! __pgrx_c_args_strtoi64 {
     (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_strtoi64] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_strtoi64] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -16416,6 +16882,11 @@ macro_rules! __pgrx_c_args_strtoi64 {
             @argument [__pgrx_c_args_strtoi64] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_strtoi64] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_strtoi64!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16451,6 +16922,11 @@ macro_rules! __pgrx_c_args_strtoi64 {
             @argument [__pgrx_c_args_strtoi64] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_strtoi64] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_strtoi64!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16467,10 +16943,10 @@ macro_rules! __pgrx_c_args_strtoi64 {
         $crate::strtoi64!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro strtoi64 from c.h:1312
+/// C macro strtoi64 from c.h:1319
 ///
 /// ```text
 /// #define strtoi64( str , endptr , base ) ( ( int64 ) strtol ( str , endptr , base ) )
@@ -16515,7 +16991,7 @@ macro_rules! strtoi64 {
                         <
                             $crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::__pgrx_c_generated::Inline_07a372404c1fb92db1a6283621faa19b(
+                            $crate::__pgrx_c_generated::Inline_9c8a4cde0e763024879375ac9e6a2466(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::CChar,
@@ -16584,13 +17060,13 @@ macro_rules! strtoi64 {
         $crate::__pgrx_c_args_strtoi64!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $str:tt, $endptr:tt, $base:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_strtoi64!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $str:tt, $endptr:tt, $base:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_strtoi64!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -16605,7 +17081,7 @@ macro_rules! strtoi64 {
                         $crate::__pgrx_c_operand!(@check_safety; $base);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -16617,7 +17093,7 @@ macro_rules! strtoi64 {
                                     <
                                         $crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_07a372404c1fb92db1a6283621faa19b(
+                                        $crate::__pgrx_c_generated::Inline_9c8a4cde0e763024879375ac9e6a2466(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::CChar,
@@ -16698,7 +17174,7 @@ macro_rules! strtoi64 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -16717,7 +17193,7 @@ macro_rules! strtoi64 {
                         <
                             $crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::__pgrx_c_generated::Inline_07a372404c1fb92db1a6283621faa19b(
+                            $crate::__pgrx_c_generated::Inline_9c8a4cde0e763024879375ac9e6a2466(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::CChar,
@@ -16858,6 +17334,11 @@ macro_rules! __pgrx_c_args_strtou64 {
             @argument [__pgrx_c_args_strtou64] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_strtou64] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_strtou64!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -16908,6 +17389,11 @@ macro_rules! __pgrx_c_args_strtou64 {
     (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_strtou64] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_strtou64] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -16971,6 +17457,11 @@ macro_rules! __pgrx_c_args_strtou64 {
             @argument [__pgrx_c_args_strtou64] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_strtou64] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_strtou64!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17006,6 +17497,11 @@ macro_rules! __pgrx_c_args_strtou64 {
             @argument [__pgrx_c_args_strtou64] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_strtou64] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_strtou64!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17022,10 +17518,10 @@ macro_rules! __pgrx_c_args_strtou64 {
         $crate::strtou64!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro strtou64 from c.h:1313
+/// C macro strtou64 from c.h:1320
 ///
 /// ```text
 /// #define strtou64( str , endptr , base ) ( ( uint64 ) strtoul ( str , endptr , base ) )
@@ -17070,7 +17566,7 @@ macro_rules! strtou64 {
                         <
                             $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::__pgrx_c_generated::Inline_3b6173683eb29b4acfb9943a8c46bdda(
+                            $crate::__pgrx_c_generated::Inline_9962ee10af84375584dce89d2e1a83de(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::CChar,
@@ -17139,13 +17635,13 @@ macro_rules! strtou64 {
         $crate::__pgrx_c_args_strtou64!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $str:tt, $endptr:tt, $base:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_strtou64!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $str:tt, $endptr:tt, $base:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_strtou64!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -17160,7 +17656,7 @@ macro_rules! strtou64 {
                         $crate::__pgrx_c_operand!(@check_safety; $base);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -17172,7 +17668,7 @@ macro_rules! strtou64 {
                                     <
                                         $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_3b6173683eb29b4acfb9943a8c46bdda(
+                                        $crate::__pgrx_c_generated::Inline_9962ee10af84375584dce89d2e1a83de(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::CChar,
@@ -17253,7 +17749,7 @@ macro_rules! strtou64 {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -17272,7 +17768,7 @@ macro_rules! strtou64 {
                         <
                             $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::__pgrx_c_generated::Inline_3b6173683eb29b4acfb9943a8c46bdda(
+                            $crate::__pgrx_c_generated::Inline_9962ee10af84375584dce89d2e1a83de(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::CChar,
@@ -17422,6 +17918,11 @@ macro_rules! __pgrx_c_args_unlikely {
             @argument [__pgrx_c_args_unlikely] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_unlikely] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_unlikely!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17457,6 +17958,11 @@ macro_rules! __pgrx_c_args_unlikely {
             @argument [__pgrx_c_args_unlikely] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_unlikely] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_unlikely!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -17473,10 +17979,10 @@ macro_rules! __pgrx_c_args_unlikely {
         $crate::unlikely!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro unlikely from c.h:302
+/// C macro unlikely from c.h:309
 ///
 /// ```text
 /// #define unlikely( x ) __builtin_expect ( ( x ) != 0 , 0 )
@@ -17619,7 +18125,7 @@ macro_rules! unlikely {
                         $crate::__pgrx_c_operand!(@check_safety; $x);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::expect(
@@ -17665,7 +18171,7 @@ macro_rules! unlikely {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

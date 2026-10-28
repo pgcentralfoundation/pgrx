@@ -74,6 +74,13 @@ macro_rules! __pgrx_c_args_ExecScanExtended {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecScanExtended] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExecScanExtended!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -125,6 +132,13 @@ macro_rules! __pgrx_c_args_ExecScanExtended {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_ExecScanExtended] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecScanExtended] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -182,6 +196,13 @@ macro_rules! __pgrx_c_args_ExecScanExtended {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecScanExtended] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExecScanExtended!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -236,6 +257,13 @@ macro_rules! __pgrx_c_args_ExecScanExtended {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecScanExtended] [p4 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExecScanExtended!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -287,6 +315,13 @@ macro_rules! __pgrx_c_args_ExecScanExtended {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_ExecScanExtended] [p5 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecScanExtended] [p5 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -351,6 +386,11 @@ macro_rules! __pgrx_c_args_ExecScanExtended {
             @argument [__pgrx_c_args_ExecScanExtended] [p6 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p5 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecScanExtended] [p6 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p5 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ExecScanExtended!(
             @p6 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -388,6 +428,13 @@ macro_rules! __pgrx_c_args_ExecScanExtended {
             ]
         )
     };
+    (@p5 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecScanExtended] [p6 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p5 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExecScanExtended!(
             @p6 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -404,13 +451,13 @@ macro_rules! __pgrx_c_args_ExecScanExtended {
         $crate::ExecScanExtended!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ExecScanExtended from execScan.h:159
 ///
 /// ```c
-/// static pg_attribute_always_inline TupleTableSlot *
+/// static pg_always_inline TupleTableSlot *
 /// ExecScanExtended(ScanState *node,
 /// 				 ExecScanAccessMtd accessMtd,	/* function returning a tuple */
 /// 				 ExecScanRecheckMtd recheckMtd,
@@ -717,7 +764,7 @@ macro_rules! ExecScanExtended {
         $qual:tt,
         $projInfo:tt $(,)?
     ) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecScanExtended!(@collect __pgrx_emit_place []; $($raw)*)
@@ -731,7 +778,7 @@ macro_rules! ExecScanExtended {
         $qual:tt,
         $projInfo:tt $(,)?
     ) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecScanExtended!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -757,7 +804,7 @@ macro_rules! ExecScanExtended {
                         $crate::__pgrx_c_operand!(@check_safety; $projInfo);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -901,7 +948,7 @@ macro_rules! ExecScanExtended {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1131,6 +1178,11 @@ macro_rules! __pgrx_c_args_ExecScanFetch {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecScanFetch] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExecScanFetch!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1185,6 +1237,11 @@ macro_rules! __pgrx_c_args_ExecScanFetch {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecScanFetch] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExecScanFetch!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1237,6 +1294,11 @@ macro_rules! __pgrx_c_args_ExecScanFetch {
             @argument [__pgrx_c_args_ExecScanFetch] [p3 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
             ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecScanFetch] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -1300,6 +1362,11 @@ macro_rules! __pgrx_c_args_ExecScanFetch {
             @argument [__pgrx_c_args_ExecScanFetch] [p4 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecScanFetch] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ExecScanFetch!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1337,6 +1404,11 @@ macro_rules! __pgrx_c_args_ExecScanFetch {
             ]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_ExecScanFetch] [p4 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ExecScanFetch!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1353,13 +1425,13 @@ macro_rules! __pgrx_c_args_ExecScanFetch {
         $crate::ExecScanFetch!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function ExecScanFetch from execScan.h:31
 ///
 /// ```c
-/// static pg_attribute_always_inline TupleTableSlot *
+/// static pg_always_inline TupleTableSlot *
 /// ExecScanFetch(ScanState *node,
 /// 			  EPQState *epqstate,
 /// 			  ExecScanAccessMtd accessMtd,
@@ -1591,13 +1663,13 @@ macro_rules! ExecScanFetch {
         $crate::__pgrx_c_args_ExecScanFetch!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $node:tt, $epqstate:tt, $accessMtd:tt, $recheckMtd:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecScanFetch!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $node:tt, $epqstate:tt, $accessMtd:tt, $recheckMtd:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_ExecScanFetch!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1613,7 +1685,7 @@ macro_rules! ExecScanFetch {
                         $crate::__pgrx_c_operand!(@check_safety; $recheckMtd);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1711,7 +1783,7 @@ macro_rules! ExecScanFetch {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

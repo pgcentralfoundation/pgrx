@@ -4,6 +4,32 @@ This code is generated for documentation purposes, so that it is easy to referen
 */
 // Shared generated C macro support.
 
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_src_db_id>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec>
+{
+    type Member = c::expression::CIntegerStorage<c::CUnsignedInt, crate::__pgrx_c_bindings::Oid>;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 8;
+}
+// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
+const _: Projection<crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec> as c::expression::OrdinaryField<Field_src_db_id>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).src_db_id) };
+#[doc(hidden)]
+pub struct Field_src_tablespace_id;
+const _: () = assert!(
+    ::core::mem::offset_of!(
+        crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec,
+        src_tablespace_id
+    ) == 12
+);
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_src_tablespace_id>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec>
+{
+    type Member = c::expression::CIntegerStorage<c::CUnsignedInt, crate::__pgrx_c_bindings::Oid>;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 12;
+}
 // SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
 const _: Projection<crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_dbase_create_file_copy_rec> as c::expression::OrdinaryField<Field_src_tablespace_id>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).src_tablespace_id) };
 const _: () = {
@@ -4116,33 +4142,5 @@ const _: () = {
 impl c::expression::NativeRecord for crate::__pgrx_c_bindings::SortPath {}
 impl c::sealed::Sealed for crate::__pgrx_c_bindings::SnapBuild {}
 impl c::expression::NativeType for crate::__pgrx_c_bindings::SnapBuild {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::Sharedsort {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::Sharedsort {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::SharedTuplestoreAccessor {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::SharedTuplestoreAccessor {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::SharedTuplestore {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::SharedTuplestore {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::SharedRecordTypmodRegistry {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::SharedRecordTypmodRegistry {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::SharedHashJoinBatch {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::SharedHashJoinBatch {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::SharedExecutorInstrumentation {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::SharedExecutorInstrumentation {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::SetOpStatePerGroupData {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::SetOpStatePerGroupData {
     type Marker = c::expression::COpaque<Self>;
 }

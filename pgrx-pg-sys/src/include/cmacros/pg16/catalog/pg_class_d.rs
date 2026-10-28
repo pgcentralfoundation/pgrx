@@ -86,6 +86,11 @@ macro_rules! __pgrx_c_args_RELKIND_HAS_PARTITIONS {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RELKIND_HAS_PARTITIONS] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RELKIND_HAS_PARTITIONS!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -123,6 +128,13 @@ macro_rules! __pgrx_c_args_RELKIND_HAS_PARTITIONS {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RELKIND_HAS_PARTITIONS] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RELKIND_HAS_PARTITIONS!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -139,7 +151,7 @@ macro_rules! __pgrx_c_args_RELKIND_HAS_PARTITIONS {
         $crate::RELKIND_HAS_PARTITIONS!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RELKIND_HAS_PARTITIONS from pg_class_d.h:104
@@ -219,13 +231,13 @@ macro_rules! RELKIND_HAS_PARTITIONS {
         $crate::__pgrx_c_args_RELKIND_HAS_PARTITIONS!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relkind:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RELKIND_HAS_PARTITIONS!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relkind:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RELKIND_HAS_PARTITIONS!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -238,7 +250,7 @@ macro_rules! RELKIND_HAS_PARTITIONS {
                         $crate::__pgrx_c_operand!(@check_safety; $relkind);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -304,7 +316,7 @@ macro_rules! RELKIND_HAS_PARTITIONS {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -439,6 +451,11 @@ macro_rules! __pgrx_c_args_RELKIND_HAS_STORAGE {
             @argument [__pgrx_c_args_RELKIND_HAS_STORAGE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RELKIND_HAS_STORAGE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RELKIND_HAS_STORAGE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -476,6 +493,13 @@ macro_rules! __pgrx_c_args_RELKIND_HAS_STORAGE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RELKIND_HAS_STORAGE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RELKIND_HAS_STORAGE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -492,7 +516,7 @@ macro_rules! __pgrx_c_args_RELKIND_HAS_STORAGE {
         $crate::RELKIND_HAS_STORAGE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RELKIND_HAS_STORAGE from pg_class_d.h:97
@@ -704,13 +728,13 @@ macro_rules! RELKIND_HAS_STORAGE {
         $crate::__pgrx_c_args_RELKIND_HAS_STORAGE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relkind:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RELKIND_HAS_STORAGE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relkind:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RELKIND_HAS_STORAGE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -723,7 +747,7 @@ macro_rules! RELKIND_HAS_STORAGE {
                         $crate::__pgrx_c_operand!(@check_safety; $relkind);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -925,7 +949,7 @@ macro_rules! RELKIND_HAS_STORAGE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1200,6 +1224,11 @@ macro_rules! __pgrx_c_args_RELKIND_HAS_TABLESPACE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RELKIND_HAS_TABLESPACE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RELKIND_HAS_TABLESPACE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1237,6 +1266,13 @@ macro_rules! __pgrx_c_args_RELKIND_HAS_TABLESPACE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RELKIND_HAS_TABLESPACE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RELKIND_HAS_TABLESPACE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1253,7 +1289,7 @@ macro_rules! __pgrx_c_args_RELKIND_HAS_TABLESPACE {
         $crate::RELKIND_HAS_TABLESPACE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RELKIND_HAS_TABLESPACE from pg_class_d.h:115
@@ -1621,13 +1657,13 @@ macro_rules! RELKIND_HAS_TABLESPACE {
         $crate::__pgrx_c_args_RELKIND_HAS_TABLESPACE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relkind:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RELKIND_HAS_TABLESPACE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relkind:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RELKIND_HAS_TABLESPACE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1641,7 +1677,7 @@ macro_rules! RELKIND_HAS_TABLESPACE {
                         $crate::__pgrx_c_operand!(@check_safety; $relkind);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -1994,7 +2030,7 @@ macro_rules! RELKIND_HAS_TABLESPACE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2420,6 +2456,11 @@ macro_rules! __pgrx_c_args_RELKIND_HAS_TABLE_AM {
             @argument [__pgrx_c_args_RELKIND_HAS_TABLE_AM] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RELKIND_HAS_TABLE_AM] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RELKIND_HAS_TABLE_AM!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2457,6 +2498,13 @@ macro_rules! __pgrx_c_args_RELKIND_HAS_TABLE_AM {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RELKIND_HAS_TABLE_AM] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RELKIND_HAS_TABLE_AM!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2473,7 +2521,7 @@ macro_rules! __pgrx_c_args_RELKIND_HAS_TABLE_AM {
         $crate::RELKIND_HAS_TABLE_AM!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RELKIND_HAS_TABLE_AM from pg_class_d.h:124
@@ -2597,13 +2645,13 @@ macro_rules! RELKIND_HAS_TABLE_AM {
         $crate::__pgrx_c_args_RELKIND_HAS_TABLE_AM!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relkind:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RELKIND_HAS_TABLE_AM!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relkind:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RELKIND_HAS_TABLE_AM!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2616,7 +2664,7 @@ macro_rules! RELKIND_HAS_TABLE_AM {
                         $crate::__pgrx_c_operand!(@check_safety; $relkind);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -2726,7 +2774,7 @@ macro_rules! RELKIND_HAS_TABLE_AM {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

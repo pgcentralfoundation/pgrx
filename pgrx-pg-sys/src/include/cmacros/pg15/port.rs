@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_IS_DIR_SEP {
             @argument [__pgrx_c_args_IS_DIR_SEP] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_DIR_SEP] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IS_DIR_SEP!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -116,6 +121,11 @@ macro_rules! __pgrx_c_args_IS_DIR_SEP {
             @argument [__pgrx_c_args_IS_DIR_SEP] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_DIR_SEP] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_DIR_SEP!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -132,7 +142,7 @@ macro_rules! __pgrx_c_args_IS_DIR_SEP {
         $crate::IS_DIR_SEP!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IS_DIR_SEP from port.h:104
@@ -277,6 +287,11 @@ macro_rules! __pgrx_c_args_IS_NONWINDOWS_DIR_SEP {
             @argument [__pgrx_c_args_IS_NONWINDOWS_DIR_SEP] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_NONWINDOWS_DIR_SEP] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IS_NONWINDOWS_DIR_SEP!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -314,6 +329,13 @@ macro_rules! __pgrx_c_args_IS_NONWINDOWS_DIR_SEP {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_NONWINDOWS_DIR_SEP] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_NONWINDOWS_DIR_SEP!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -330,7 +352,7 @@ macro_rules! __pgrx_c_args_IS_NONWINDOWS_DIR_SEP {
         $crate::IS_NONWINDOWS_DIR_SEP!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IS_NONWINDOWS_DIR_SEP from port.h:83
@@ -382,13 +404,13 @@ macro_rules! IS_NONWINDOWS_DIR_SEP {
         $crate::__pgrx_c_args_IS_NONWINDOWS_DIR_SEP!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ch:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_NONWINDOWS_DIR_SEP!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $ch:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_NONWINDOWS_DIR_SEP!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -401,7 +423,7 @@ macro_rules! IS_NONWINDOWS_DIR_SEP {
                         $crate::__pgrx_c_operand!(@check_safety; $ch);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -420,7 +442,7 @@ macro_rules! IS_NONWINDOWS_DIR_SEP {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -530,6 +552,11 @@ macro_rules! __pgrx_c_args_IS_WINDOWS_DIR_SEP {
             @argument [__pgrx_c_args_IS_WINDOWS_DIR_SEP] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_WINDOWS_DIR_SEP] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IS_WINDOWS_DIR_SEP!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -567,6 +594,13 @@ macro_rules! __pgrx_c_args_IS_WINDOWS_DIR_SEP {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_WINDOWS_DIR_SEP] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_WINDOWS_DIR_SEP!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -583,7 +617,7 @@ macro_rules! __pgrx_c_args_IS_WINDOWS_DIR_SEP {
         $crate::IS_WINDOWS_DIR_SEP!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IS_WINDOWS_DIR_SEP from port.h:89
@@ -660,13 +694,13 @@ macro_rules! IS_WINDOWS_DIR_SEP {
         $crate::__pgrx_c_args_IS_WINDOWS_DIR_SEP!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ch:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_WINDOWS_DIR_SEP!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $ch:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_WINDOWS_DIR_SEP!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -679,7 +713,7 @@ macro_rules! IS_WINDOWS_DIR_SEP {
                         $crate::__pgrx_c_operand!(@check_safety; $ch);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -731,7 +765,7 @@ macro_rules! IS_WINDOWS_DIR_SEP {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -866,6 +900,11 @@ macro_rules! __pgrx_c_args_is_absolute_path {
             @argument [__pgrx_c_args_is_absolute_path] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_is_absolute_path] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_is_absolute_path!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -903,6 +942,13 @@ macro_rules! __pgrx_c_args_is_absolute_path {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_is_absolute_path] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_is_absolute_path!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -919,7 +965,7 @@ macro_rules! __pgrx_c_args_is_absolute_path {
         $crate::is_absolute_path!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro is_absolute_path from port.h:105
@@ -993,13 +1039,13 @@ macro_rules! is_absolute_path {
         $crate::__pgrx_c_args_is_absolute_path!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $filename:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_is_absolute_path!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $filename:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_is_absolute_path!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1013,7 +1059,7 @@ macro_rules! is_absolute_path {
                         $crate::__pgrx_c_operand!(@check_safety; $filename);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -1056,7 +1102,7 @@ macro_rules! is_absolute_path {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1188,6 +1234,13 @@ macro_rules! __pgrx_c_args_is_nonwindows_absolute_path {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_is_nonwindows_absolute_path] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_is_nonwindows_absolute_path!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1225,6 +1278,13 @@ macro_rules! __pgrx_c_args_is_nonwindows_absolute_path {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_is_nonwindows_absolute_path] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_is_nonwindows_absolute_path!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1241,7 +1301,7 @@ macro_rules! __pgrx_c_args_is_nonwindows_absolute_path {
         $crate::is_nonwindows_absolute_path!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro is_nonwindows_absolute_path from port.h:84
@@ -1335,7 +1395,7 @@ macro_rules! is_nonwindows_absolute_path {
                                     $crate::__pgrx_c_operand!(@check_safety; $filename);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::index(
                                         (
@@ -1358,7 +1418,7 @@ macro_rules! is_nonwindows_absolute_path {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -1429,7 +1489,7 @@ macro_rules! is_nonwindows_absolute_path {
                                     $crate::__pgrx_c_operand!(@check_safety; $filename);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::index(
                                         (
@@ -1452,7 +1512,7 @@ macro_rules! is_nonwindows_absolute_path {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -1523,7 +1583,7 @@ macro_rules! is_nonwindows_absolute_path {
                                     $crate::__pgrx_c_operand!(@check_safety; $filename);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::index(
                                         (
@@ -1546,7 +1606,7 @@ macro_rules! is_nonwindows_absolute_path {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -1620,7 +1680,7 @@ macro_rules! is_nonwindows_absolute_path {
                                     $crate::__pgrx_c_operand!(@check_safety; $filename);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::index(
                                         (
@@ -1643,7 +1703,7 @@ macro_rules! is_nonwindows_absolute_path {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -1714,7 +1774,7 @@ macro_rules! is_nonwindows_absolute_path {
                                     $crate::__pgrx_c_operand!(@check_safety; $filename);
                                 }
                             }
-                            Some(
+                            ::core::option::Option::Some(
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::index(
                                         (
@@ -1737,7 +1797,7 @@ macro_rules! is_nonwindows_absolute_path {
                                 }
                             )
                         } else {
-                            None
+                            ::core::option::Option::None
                         }
                     )
                 ]
@@ -1837,6 +1897,13 @@ macro_rules! __pgrx_c_args_is_windows_absolute_path {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_is_windows_absolute_path] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_is_windows_absolute_path!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1874,6 +1941,13 @@ macro_rules! __pgrx_c_args_is_windows_absolute_path {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_is_windows_absolute_path] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_is_windows_absolute_path!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1890,7 +1964,7 @@ macro_rules! __pgrx_c_args_is_windows_absolute_path {
         $crate::is_windows_absolute_path!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro is_windows_absolute_path from port.h:91
@@ -2084,7 +2158,7 @@ macro_rules! is_windows_absolute_path {
                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                                             >::from_storage(
-                                                                                                $crate::__pgrx_c_generated::Inline_0d60e00211417dac72fb7388df86c125()
+                                                                                                $crate::__pgrx_c_generated::Inline_87fedfd3b9f5369304aa02d6d0dff4e6()
                                                                                             )
                                                                                         )
                                                                                     )
@@ -2360,13 +2434,13 @@ macro_rules! is_windows_absolute_path {
         $crate::__pgrx_c_args_is_windows_absolute_path!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $filename:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_is_windows_absolute_path!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $filename:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_is_windows_absolute_path!(
@@ -2383,7 +2457,7 @@ macro_rules! is_windows_absolute_path {
                         $crate::__pgrx_c_operand!(@check_safety; $filename);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -2553,7 +2627,7 @@ macro_rules! is_windows_absolute_path {
                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                                                         >::from_storage(
-                                                                                                            $crate::__pgrx_c_generated::Inline_0d60e00211417dac72fb7388df86c125()
+                                                                                                            $crate::__pgrx_c_generated::Inline_87fedfd3b9f5369304aa02d6d0dff4e6()
                                                                                                         )
                                                                                                     )
                                                                                                 )
@@ -2834,7 +2908,7 @@ macro_rules! is_windows_absolute_path {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2998,7 +3072,7 @@ macro_rules! is_windows_absolute_path {
                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                                             >::from_storage(
-                                                                                                $crate::__pgrx_c_generated::Inline_0d60e00211417dac72fb7388df86c125()
+                                                                                                $crate::__pgrx_c_generated::Inline_87fedfd3b9f5369304aa02d6d0dff4e6()
                                                                                             )
                                                                                         )
                                                                                     )
@@ -3346,6 +3420,11 @@ macro_rules! __pgrx_c_args_qsort {
             @argument [__pgrx_c_args_qsort] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_qsort] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_qsort!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3398,6 +3477,11 @@ macro_rules! __pgrx_c_args_qsort {
             @argument [__pgrx_c_args_qsort] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_qsort] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_qsort!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3448,6 +3532,11 @@ macro_rules! __pgrx_c_args_qsort {
     (@p2 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_qsort] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_qsort] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -3507,6 +3596,11 @@ macro_rules! __pgrx_c_args_qsort {
             @argument [__pgrx_c_args_qsort] [p4 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_qsort] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_qsort!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3542,6 +3636,11 @@ macro_rules! __pgrx_c_args_qsort {
             @argument [__pgrx_c_args_qsort] [p4 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_qsort] [p4 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_qsort!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3558,7 +3657,7 @@ macro_rules! __pgrx_c_args_qsort {
         $crate::qsort!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro qsort from port.h:531
@@ -3676,13 +3775,13 @@ macro_rules! qsort {
         $crate::__pgrx_c_args_qsort!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $a:tt, $b:tt, $c:tt, $d:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_qsort!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $a:tt, $b:tt, $c:tt, $d:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_qsort!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3699,7 +3798,7 @@ macro_rules! qsort {
                         $crate::__pgrx_c_operand!(@check_safety; $d);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::pg_qsort(
@@ -3782,7 +3881,7 @@ macro_rules! qsort {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

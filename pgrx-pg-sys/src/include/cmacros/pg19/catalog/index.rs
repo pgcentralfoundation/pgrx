@@ -74,6 +74,11 @@ macro_rules! __pgrx_c_args_itemptr_decode {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_itemptr_decode] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_itemptr_decode!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -135,6 +140,11 @@ macro_rules! __pgrx_c_args_itemptr_decode {
             @argument [__pgrx_c_args_itemptr_decode] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_itemptr_decode] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_itemptr_decode!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -172,6 +182,11 @@ macro_rules! __pgrx_c_args_itemptr_decode {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_itemptr_decode] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_itemptr_decode!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -188,7 +203,7 @@ macro_rules! __pgrx_c_args_itemptr_decode {
         $crate::itemptr_decode!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function itemptr_decode from index.h:221
@@ -274,13 +289,13 @@ macro_rules! itemptr_decode {
         $crate::__pgrx_c_args_itemptr_decode!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $itemptr:tt, $encoded:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_itemptr_decode!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $itemptr:tt, $encoded:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_itemptr_decode!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -294,7 +309,7 @@ macro_rules! itemptr_decode {
                         $crate::__pgrx_c_operand!(@check_safety; $encoded);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_bindings::itemptr_decode(
@@ -339,7 +354,7 @@ macro_rules! itemptr_decode {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -471,6 +486,11 @@ macro_rules! __pgrx_c_args_itemptr_encode {
             @argument [__pgrx_c_args_itemptr_encode] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_itemptr_encode] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_itemptr_encode!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -508,6 +528,11 @@ macro_rules! __pgrx_c_args_itemptr_encode {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_itemptr_encode] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_itemptr_encode!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -524,7 +549,7 @@ macro_rules! __pgrx_c_args_itemptr_encode {
         $crate::itemptr_encode!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function itemptr_encode from index.h:200
@@ -610,13 +635,13 @@ macro_rules! itemptr_encode {
         $crate::__pgrx_c_args_itemptr_encode!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $itemptr:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_itemptr_encode!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $itemptr:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_itemptr_encode!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -629,7 +654,7 @@ macro_rules! itemptr_encode {
                         $crate::__pgrx_c_operand!(@check_safety; $itemptr);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -665,7 +690,7 @@ macro_rules! itemptr_encode {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

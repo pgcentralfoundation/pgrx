@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_DO_AGGSPLIT_COMBINE {
             @argument [__pgrx_c_args_DO_AGGSPLIT_COMBINE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DO_AGGSPLIT_COMBINE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DO_AGGSPLIT_COMBINE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -118,6 +123,13 @@ macro_rules! __pgrx_c_args_DO_AGGSPLIT_COMBINE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DO_AGGSPLIT_COMBINE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DO_AGGSPLIT_COMBINE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -134,7 +146,7 @@ macro_rules! __pgrx_c_args_DO_AGGSPLIT_COMBINE {
         $crate::DO_AGGSPLIT_COMBINE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DO_AGGSPLIT_COMBINE from nodes.h:384
@@ -199,13 +211,13 @@ macro_rules! DO_AGGSPLIT_COMBINE {
         $crate::__pgrx_c_args_DO_AGGSPLIT_COMBINE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $as:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DO_AGGSPLIT_COMBINE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $as:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DO_AGGSPLIT_COMBINE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -218,7 +230,7 @@ macro_rules! DO_AGGSPLIT_COMBINE {
                         $crate::__pgrx_c_operand!(@check_safety; $as);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -256,7 +268,7 @@ macro_rules! DO_AGGSPLIT_COMBINE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -384,6 +396,11 @@ macro_rules! __pgrx_c_args_DO_AGGSPLIT_DESERIALIZE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DO_AGGSPLIT_DESERIALIZE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DO_AGGSPLIT_DESERIALIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -421,6 +438,13 @@ macro_rules! __pgrx_c_args_DO_AGGSPLIT_DESERIALIZE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DO_AGGSPLIT_DESERIALIZE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DO_AGGSPLIT_DESERIALIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -437,7 +461,7 @@ macro_rules! __pgrx_c_args_DO_AGGSPLIT_DESERIALIZE {
         $crate::DO_AGGSPLIT_DESERIALIZE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DO_AGGSPLIT_DESERIALIZE from nodes.h:387
@@ -505,13 +529,13 @@ macro_rules! DO_AGGSPLIT_DESERIALIZE {
         $crate::__pgrx_c_args_DO_AGGSPLIT_DESERIALIZE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $as:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DO_AGGSPLIT_DESERIALIZE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $as:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DO_AGGSPLIT_DESERIALIZE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -524,7 +548,7 @@ macro_rules! DO_AGGSPLIT_DESERIALIZE {
                         $crate::__pgrx_c_operand!(@check_safety; $as);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -562,7 +586,7 @@ macro_rules! DO_AGGSPLIT_DESERIALIZE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -688,6 +712,11 @@ macro_rules! __pgrx_c_args_DO_AGGSPLIT_SERIALIZE {
             @argument [__pgrx_c_args_DO_AGGSPLIT_SERIALIZE] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DO_AGGSPLIT_SERIALIZE] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DO_AGGSPLIT_SERIALIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -725,6 +754,13 @@ macro_rules! __pgrx_c_args_DO_AGGSPLIT_SERIALIZE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DO_AGGSPLIT_SERIALIZE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DO_AGGSPLIT_SERIALIZE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -741,7 +777,7 @@ macro_rules! __pgrx_c_args_DO_AGGSPLIT_SERIALIZE {
         $crate::DO_AGGSPLIT_SERIALIZE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DO_AGGSPLIT_SERIALIZE from nodes.h:386
@@ -806,13 +842,13 @@ macro_rules! DO_AGGSPLIT_SERIALIZE {
         $crate::__pgrx_c_args_DO_AGGSPLIT_SERIALIZE!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $as:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DO_AGGSPLIT_SERIALIZE!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $as:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DO_AGGSPLIT_SERIALIZE!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -825,7 +861,7 @@ macro_rules! DO_AGGSPLIT_SERIALIZE {
                         $crate::__pgrx_c_operand!(@check_safety; $as);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -863,7 +899,7 @@ macro_rules! DO_AGGSPLIT_SERIALIZE {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -989,6 +1025,11 @@ macro_rules! __pgrx_c_args_DO_AGGSPLIT_SKIPFINAL {
             @argument [__pgrx_c_args_DO_AGGSPLIT_SKIPFINAL] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DO_AGGSPLIT_SKIPFINAL] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DO_AGGSPLIT_SKIPFINAL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1026,6 +1067,13 @@ macro_rules! __pgrx_c_args_DO_AGGSPLIT_SKIPFINAL {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DO_AGGSPLIT_SKIPFINAL] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DO_AGGSPLIT_SKIPFINAL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1042,7 +1090,7 @@ macro_rules! __pgrx_c_args_DO_AGGSPLIT_SKIPFINAL {
         $crate::DO_AGGSPLIT_SKIPFINAL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro DO_AGGSPLIT_SKIPFINAL from nodes.h:385
@@ -1107,13 +1155,13 @@ macro_rules! DO_AGGSPLIT_SKIPFINAL {
         $crate::__pgrx_c_args_DO_AGGSPLIT_SKIPFINAL!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $as:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DO_AGGSPLIT_SKIPFINAL!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $as:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_DO_AGGSPLIT_SKIPFINAL!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1126,7 +1174,7 @@ macro_rules! DO_AGGSPLIT_SKIPFINAL {
                         $crate::__pgrx_c_operand!(@check_safety; $as);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -1164,7 +1212,7 @@ macro_rules! DO_AGGSPLIT_SKIPFINAL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1287,6 +1335,11 @@ macro_rules! __pgrx_c_args_IS_OUTER_JOIN {
             @argument [__pgrx_c_args_IS_OUTER_JOIN] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_OUTER_JOIN] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IS_OUTER_JOIN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1324,6 +1377,11 @@ macro_rules! __pgrx_c_args_IS_OUTER_JOIN {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IS_OUTER_JOIN] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_OUTER_JOIN!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1340,7 +1398,7 @@ macro_rules! __pgrx_c_args_IS_OUTER_JOIN {
         $crate::IS_OUTER_JOIN!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IS_OUTER_JOIN from nodes.h:337
@@ -1610,13 +1668,13 @@ macro_rules! IS_OUTER_JOIN {
         $crate::__pgrx_c_args_IS_OUTER_JOIN!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $jointype:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_OUTER_JOIN!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $jointype:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_OUTER_JOIN!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1629,7 +1687,7 @@ macro_rules! IS_OUTER_JOIN {
                         $crate::__pgrx_c_operand!(@check_safety; $jointype);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -1872,7 +1930,7 @@ macro_rules! IS_OUTER_JOIN {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2187,6 +2245,11 @@ macro_rules! __pgrx_c_args_NodeSetTag {
             @argument [__pgrx_c_args_NodeSetTag] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_NodeSetTag] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_NodeSetTag!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2248,6 +2311,11 @@ macro_rules! __pgrx_c_args_NodeSetTag {
             @argument [__pgrx_c_args_NodeSetTag] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_NodeSetTag] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_NodeSetTag!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2283,6 +2351,11 @@ macro_rules! __pgrx_c_args_NodeSetTag {
             @argument [__pgrx_c_args_NodeSetTag] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_NodeSetTag] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_NodeSetTag!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2299,7 +2372,7 @@ macro_rules! __pgrx_c_args_NodeSetTag {
         $crate::NodeSetTag!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro NodeSetTag from nodes.h:156
@@ -2380,13 +2453,13 @@ macro_rules! NodeSetTag {
         $crate::__pgrx_c_args_NodeSetTag!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $nodeptr:tt, $t:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NodeSetTag!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $nodeptr:tt, $t:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_NodeSetTag!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2400,7 +2473,7 @@ macro_rules! NodeSetTag {
                         $crate::__pgrx_c_operand!(@check_safety; $t);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::assign(
@@ -2451,7 +2524,7 @@ macro_rules! NodeSetTag {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2588,6 +2661,11 @@ macro_rules! __pgrx_c_args_castNode {
             @argument [__pgrx_c_args_castNode] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_castNode] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_castNode!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2623,6 +2701,11 @@ macro_rules! __pgrx_c_args_castNode {
             @argument [__pgrx_c_args_castNode] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_castNode] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_castNode!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2639,7 +2722,7 @@ macro_rules! __pgrx_c_args_castNode {
         $crate::castNode!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro castNode from nodes.h:176
@@ -2694,13 +2777,13 @@ macro_rules! castNode {
         $crate::__pgrx_c_args_castNode!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $_type_:ty, $nodeptr:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_castNode!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $_type_:ty, $nodeptr:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_castNode!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2713,7 +2796,7 @@ macro_rules! castNode {
                         $crate::__pgrx_c_operand!(@check_safety; $nodeptr);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -2731,7 +2814,7 @@ macro_rules! castNode {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2831,6 +2914,11 @@ macro_rules! __pgrx_c_args_newNode {
             @argument [__pgrx_c_args_newNode] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_newNode] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_newNode!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2890,6 +2978,11 @@ macro_rules! __pgrx_c_args_newNode {
             @argument [__pgrx_c_args_newNode] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_newNode] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_newNode!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2925,6 +3018,11 @@ macro_rules! __pgrx_c_args_newNode {
             @argument [__pgrx_c_args_newNode] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_newNode] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_newNode!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2941,7 +3039,7 @@ macro_rules! __pgrx_c_args_newNode {
         $crate::newNode!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function newNode from nodes.h:143
@@ -2996,7 +3094,7 @@ macro_rules! newNode {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_e8d4b0d7e7d630489be38b543e7c5b14(
+                $crate::__pgrx_c_generated::Inline_903baaa3a44cca53f859144765942ce8(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLong,
@@ -3043,13 +3141,13 @@ macro_rules! newNode {
         $crate::__pgrx_c_args_newNode!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $size:tt, $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_newNode!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $size:tt, $tag:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_newNode!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3063,7 +3161,7 @@ macro_rules! newNode {
                         $crate::__pgrx_c_operand!(@check_safety; $tag);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -3074,7 +3172,7 @@ macro_rules! newNode {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_e8d4b0d7e7d630489be38b543e7c5b14(
+                                $crate::__pgrx_c_generated::Inline_903baaa3a44cca53f859144765942ce8(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedLong,
@@ -3121,7 +3219,7 @@ macro_rules! newNode {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -3139,7 +3237,7 @@ macro_rules! newNode {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_e8d4b0d7e7d630489be38b543e7c5b14(
+                    $crate::__pgrx_c_generated::Inline_903baaa3a44cca53f859144765942ce8(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedLong,
@@ -3266,6 +3364,11 @@ macro_rules! __pgrx_c_args_nodeTag {
             @argument [__pgrx_c_args_nodeTag] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_nodeTag] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_nodeTag!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3301,6 +3404,11 @@ macro_rules! __pgrx_c_args_nodeTag {
             @argument [__pgrx_c_args_nodeTag] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_nodeTag] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_nodeTag!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3317,7 +3425,7 @@ macro_rules! __pgrx_c_args_nodeTag {
         $crate::nodeTag!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro nodeTag from nodes.h:133
@@ -3469,7 +3577,7 @@ macro_rules! nodeTag {
                         $crate::__pgrx_c_operand!(@check_safety; $nodeptr);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::project::<
                             $crate::__pgrx_c_generated::Field_type,
@@ -3508,7 +3616,7 @@ macro_rules! nodeTag {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

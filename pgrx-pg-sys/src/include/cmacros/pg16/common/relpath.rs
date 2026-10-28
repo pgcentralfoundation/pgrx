@@ -84,6 +84,11 @@ macro_rules! __pgrx_c_args_RelFileNumberIsValid {
             @argument [__pgrx_c_args_RelFileNumberIsValid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelFileNumberIsValid] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelFileNumberIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -121,6 +126,13 @@ macro_rules! __pgrx_c_args_RelFileNumberIsValid {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelFileNumberIsValid] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelFileNumberIsValid!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -137,7 +149,7 @@ macro_rules! __pgrx_c_args_RelFileNumberIsValid {
         $crate::RelFileNumberIsValid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelFileNumberIsValid from relpath.h:27
@@ -204,13 +216,13 @@ macro_rules! RelFileNumberIsValid {
         $crate::__pgrx_c_args_RelFileNumberIsValid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $relnumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelFileNumberIsValid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $relnumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelFileNumberIsValid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -224,7 +236,7 @@ macro_rules! RelFileNumberIsValid {
                         $crate::__pgrx_c_operand!(@check_safety; $relnumber);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -265,7 +277,7 @@ macro_rules! RelFileNumberIsValid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -377,6 +389,11 @@ macro_rules! __pgrx_c_args_relpath {
             @argument [__pgrx_c_args_relpath] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_relpath] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_relpath!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -436,6 +453,11 @@ macro_rules! __pgrx_c_args_relpath {
             @argument [__pgrx_c_args_relpath] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_relpath] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_relpath!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -471,6 +493,11 @@ macro_rules! __pgrx_c_args_relpath {
             @argument [__pgrx_c_args_relpath] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_relpath] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_relpath!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -487,7 +514,7 @@ macro_rules! __pgrx_c_args_relpath {
         $crate::relpath!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro relpath from relpath.h:94
@@ -534,7 +561,7 @@ macro_rules! relpath {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_a56a43eb912c5ced815979ff53811b70(
+                $crate::__pgrx_c_generated::Inline_0f749a17ec3d00c4f223370e765dc53a(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedInt,
@@ -675,13 +702,13 @@ macro_rules! relpath {
         $crate::__pgrx_c_args_relpath!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rlocator:tt, $forknum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_relpath!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rlocator:tt, $forknum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_relpath!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -696,7 +723,7 @@ macro_rules! relpath {
                         $crate::__pgrx_c_operand!(@check_safety; $forknum);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -708,7 +735,7 @@ macro_rules! relpath {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_a56a43eb912c5ced815979ff53811b70(
+                                $crate::__pgrx_c_generated::Inline_0f749a17ec3d00c4f223370e765dc53a(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedInt,
@@ -890,7 +917,7 @@ macro_rules! relpath {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -910,7 +937,7 @@ macro_rules! relpath {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_a56a43eb912c5ced815979ff53811b70(
+                    $crate::__pgrx_c_generated::Inline_0f749a17ec3d00c4f223370e765dc53a(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -1149,6 +1176,11 @@ macro_rules! __pgrx_c_args_relpathbackend {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_relpathbackend] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_relpathbackend!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1201,6 +1233,11 @@ macro_rules! __pgrx_c_args_relpathbackend {
             @argument [__pgrx_c_args_relpathbackend] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
             ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_relpathbackend] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -1264,6 +1301,11 @@ macro_rules! __pgrx_c_args_relpathbackend {
             @argument [__pgrx_c_args_relpathbackend] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_relpathbackend] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_relpathbackend!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1301,6 +1343,11 @@ macro_rules! __pgrx_c_args_relpathbackend {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_relpathbackend] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_relpathbackend!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1317,7 +1364,7 @@ macro_rules! __pgrx_c_args_relpathbackend {
         $crate::relpathbackend!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro relpathbackend from relpath.h:85
@@ -1365,7 +1412,7 @@ macro_rules! relpathbackend {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_a56a43eb912c5ced815979ff53811b70(
+                $crate::__pgrx_c_generated::Inline_0f749a17ec3d00c4f223370e765dc53a(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedInt,
@@ -1476,13 +1523,13 @@ macro_rules! relpathbackend {
         $crate::__pgrx_c_args_relpathbackend!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rlocator:tt, $backend:tt, $forknum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_relpathbackend!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rlocator:tt, $backend:tt, $forknum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_relpathbackend!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1498,7 +1545,7 @@ macro_rules! relpathbackend {
                         $crate::__pgrx_c_operand!(@check_safety; $forknum);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1510,7 +1557,7 @@ macro_rules! relpathbackend {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_a56a43eb912c5ced815979ff53811b70(
+                                $crate::__pgrx_c_generated::Inline_0f749a17ec3d00c4f223370e765dc53a(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedInt,
@@ -1653,7 +1700,7 @@ macro_rules! relpathbackend {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1673,7 +1720,7 @@ macro_rules! relpathbackend {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_a56a43eb912c5ced815979ff53811b70(
+                    $crate::__pgrx_c_generated::Inline_0f749a17ec3d00c4f223370e765dc53a(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
@@ -1859,6 +1906,11 @@ macro_rules! __pgrx_c_args_relpathperm {
             @argument [__pgrx_c_args_relpathperm] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_relpathperm] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_relpathperm!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1920,6 +1972,11 @@ macro_rules! __pgrx_c_args_relpathperm {
             @argument [__pgrx_c_args_relpathperm] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_relpathperm] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_relpathperm!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1955,6 +2012,11 @@ macro_rules! __pgrx_c_args_relpathperm {
             @argument [__pgrx_c_args_relpathperm] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_relpathperm] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_relpathperm!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1971,7 +2033,7 @@ macro_rules! __pgrx_c_args_relpathperm {
         $crate::relpathperm!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro relpathperm from relpath.h:90
@@ -2018,7 +2080,7 @@ macro_rules! relpathperm {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_a56a43eb912c5ced815979ff53811b70(
+                $crate::__pgrx_c_generated::Inline_0f749a17ec3d00c4f223370e765dc53a(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedInt,
@@ -2131,13 +2193,13 @@ macro_rules! relpathperm {
         $crate::__pgrx_c_args_relpathperm!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rlocator:tt, $forknum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_relpathperm!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rlocator:tt, $forknum:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_relpathperm!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2152,7 +2214,7 @@ macro_rules! relpathperm {
                         $crate::__pgrx_c_operand!(@check_safety; $forknum);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2164,7 +2226,7 @@ macro_rules! relpathperm {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_a56a43eb912c5ced815979ff53811b70(
+                                $crate::__pgrx_c_generated::Inline_0f749a17ec3d00c4f223370e765dc53a(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedInt,
@@ -2313,7 +2375,7 @@ macro_rules! relpathperm {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2333,7 +2395,7 @@ macro_rules! relpathperm {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_a56a43eb912c5ced815979ff53811b70(
+                    $crate::__pgrx_c_generated::Inline_0f749a17ec3d00c4f223370e765dc53a(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,

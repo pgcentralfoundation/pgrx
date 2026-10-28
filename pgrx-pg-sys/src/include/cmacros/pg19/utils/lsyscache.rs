@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_TypeIsToastable {
             @argument [__pgrx_c_args_TypeIsToastable] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TypeIsToastable] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TypeIsToastable!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -118,6 +123,13 @@ macro_rules! __pgrx_c_args_TypeIsToastable {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TypeIsToastable] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TypeIsToastable!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -134,7 +146,7 @@ macro_rules! __pgrx_c_args_TypeIsToastable {
         $crate::TypeIsToastable!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TypeIsToastable from lsyscache.h:223
@@ -176,7 +188,7 @@ macro_rules! TypeIsToastable {
                         <
                             $crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::__pgrx_c_generated::Inline_463f0f9513f6fc335ee4689ae31f9c40(
+                            $crate::__pgrx_c_generated::Inline_ff669712991059d84d57f650358632c1(
                                 <
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
@@ -212,13 +224,13 @@ macro_rules! TypeIsToastable {
         $crate::__pgrx_c_args_TypeIsToastable!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $typid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TypeIsToastable!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $typid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TypeIsToastable!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -231,7 +243,7 @@ macro_rules! TypeIsToastable {
                         $crate::__pgrx_c_operand!(@check_safety; $typid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -239,7 +251,7 @@ macro_rules! TypeIsToastable {
                                     <
                                         $crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_463f0f9513f6fc335ee4689ae31f9c40(
+                                        $crate::__pgrx_c_generated::Inline_ff669712991059d84d57f650358632c1(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
@@ -277,7 +289,7 @@ macro_rules! TypeIsToastable {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -292,7 +304,7 @@ macro_rules! TypeIsToastable {
                         <
                             $crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::__pgrx_c_generated::Inline_463f0f9513f6fc335ee4689ae31f9c40(
+                            $crate::__pgrx_c_generated::Inline_ff669712991059d84d57f650358632c1(
                                 <
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
@@ -409,6 +421,11 @@ macro_rules! __pgrx_c_args_type_is_array {
             @argument [__pgrx_c_args_type_is_array] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_type_is_array] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_type_is_array!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -446,6 +463,11 @@ macro_rules! __pgrx_c_args_type_is_array {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_type_is_array] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_type_is_array!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -462,7 +484,7 @@ macro_rules! __pgrx_c_args_type_is_array {
         $crate::type_is_array!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro type_is_array from lsyscache.h:219
@@ -545,13 +567,13 @@ macro_rules! type_is_array {
         $crate::__pgrx_c_args_type_is_array!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $typid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_type_is_array!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $typid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_type_is_array!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -564,7 +586,7 @@ macro_rules! type_is_array {
                         $crate::__pgrx_c_operand!(@check_safety; $typid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -615,7 +637,7 @@ macro_rules! type_is_array {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -755,6 +777,11 @@ macro_rules! __pgrx_c_args_type_is_array_domain {
             @argument [__pgrx_c_args_type_is_array_domain] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_type_is_array_domain] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_type_is_array_domain!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -792,6 +819,13 @@ macro_rules! __pgrx_c_args_type_is_array_domain {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_type_is_array_domain] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_type_is_array_domain!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -808,7 +842,7 @@ macro_rules! __pgrx_c_args_type_is_array_domain {
         $crate::type_is_array_domain!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro type_is_array_domain from lsyscache.h:221
@@ -891,13 +925,13 @@ macro_rules! type_is_array_domain {
         $crate::__pgrx_c_args_type_is_array_domain!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $typid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_type_is_array_domain!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $typid:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_type_is_array_domain!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -910,7 +944,7 @@ macro_rules! type_is_array_domain {
                         $crate::__pgrx_c_operand!(@check_safety; $typid);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -961,7 +995,7 @@ macro_rules! type_is_array_domain {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

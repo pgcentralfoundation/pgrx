@@ -33,7 +33,7 @@ macro_rules! __pgrx_c_args_OffsetNumberIsValid {
         $crate::__pgrx_c_args_OffsetNumberIsValid!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_OffsetNumberIsValid!(
@@ -41,7 +41,7 @@ macro_rules! __pgrx_c_args_OffsetNumberIsValid {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+        ::core::compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_OffsetNumberIsValid!(
@@ -50,7 +50,7 @@ macro_rules! __pgrx_c_args_OffsetNumberIsValid {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        compile_error!("an ungrouped C parameter requires one token tree")
+        ::core::compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_OffsetNumberIsValid!(
@@ -129,7 +129,7 @@ macro_rules! __pgrx_c_args_OffsetNumberIsValid {
         $crate::OffsetNumberIsValid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro OffsetNumberIsValid from off.h:39
@@ -278,13 +278,13 @@ macro_rules! OffsetNumberIsValid {
         $crate::__pgrx_c_args_OffsetNumberIsValid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $offsetNumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_OffsetNumberIsValid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $offsetNumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_OffsetNumberIsValid!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -298,7 +298,7 @@ macro_rules! OffsetNumberIsValid {
                         $crate::__pgrx_c_operand!(@check_safety; $offsetNumber);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast::<
@@ -414,7 +414,7 @@ macro_rules! OffsetNumberIsValid {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -617,6 +617,11 @@ macro_rules! __pgrx_c_args_OffsetNumberNext {
             @argument [__pgrx_c_args_OffsetNumberNext] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_OffsetNumberNext] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_OffsetNumberNext!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -654,6 +659,13 @@ macro_rules! __pgrx_c_args_OffsetNumberNext {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_OffsetNumberNext] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_OffsetNumberNext!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -670,7 +682,7 @@ macro_rules! __pgrx_c_args_OffsetNumberNext {
         $crate::OffsetNumberNext!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro OffsetNumberNext from off.h:52
@@ -740,13 +752,13 @@ macro_rules! OffsetNumberNext {
         $crate::__pgrx_c_args_OffsetNumberNext!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $offsetNumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_OffsetNumberNext!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $offsetNumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_OffsetNumberNext!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -759,7 +771,7 @@ macro_rules! OffsetNumberNext {
                         $crate::__pgrx_c_operand!(@check_safety; $offsetNumber);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -801,7 +813,7 @@ macro_rules! OffsetNumberNext {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -925,6 +937,11 @@ macro_rules! __pgrx_c_args_OffsetNumberPrev {
             @argument [__pgrx_c_args_OffsetNumberPrev] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_OffsetNumberPrev] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_OffsetNumberPrev!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -962,6 +979,13 @@ macro_rules! __pgrx_c_args_OffsetNumberPrev {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_OffsetNumberPrev] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_OffsetNumberPrev!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -978,7 +1002,7 @@ macro_rules! __pgrx_c_args_OffsetNumberPrev {
         $crate::OffsetNumberPrev!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro OffsetNumberPrev from off.h:54
@@ -1058,13 +1082,13 @@ macro_rules! OffsetNumberPrev {
         $crate::__pgrx_c_args_OffsetNumberPrev!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $offsetNumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_OffsetNumberPrev!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $offsetNumber:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_OffsetNumberPrev!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1077,7 +1101,7 @@ macro_rules! OffsetNumberPrev {
                         $crate::__pgrx_c_operand!(@check_safety; $offsetNumber);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -1129,7 +1153,7 @@ macro_rules! OffsetNumberPrev {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

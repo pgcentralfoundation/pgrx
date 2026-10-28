@@ -77,6 +77,13 @@ macro_rules! __pgrx_c_args_SimpleLruGetBankLock {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SimpleLruGetBankLock] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SimpleLruGetBankLock!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -138,6 +145,11 @@ macro_rules! __pgrx_c_args_SimpleLruGetBankLock {
             @argument [__pgrx_c_args_SimpleLruGetBankLock] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SimpleLruGetBankLock] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SimpleLruGetBankLock!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -175,6 +187,13 @@ macro_rules! __pgrx_c_args_SimpleLruGetBankLock {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SimpleLruGetBankLock] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SimpleLruGetBankLock!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -191,7 +210,7 @@ macro_rules! __pgrx_c_args_SimpleLruGetBankLock {
         $crate::SimpleLruGetBankLock!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function SimpleLruGetBankLock from slru.h:206
@@ -285,13 +304,13 @@ macro_rules! SimpleLruGetBankLock {
         $crate::__pgrx_c_args_SimpleLruGetBankLock!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $ctl:tt, $pageno:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SimpleLruGetBankLock!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $ctl:tt, $pageno:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SimpleLruGetBankLock!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -305,7 +324,7 @@ macro_rules! SimpleLruGetBankLock {
                         $crate::__pgrx_c_operand!(@check_safety; $pageno);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -359,7 +378,7 @@ macro_rules! SimpleLruGetBankLock {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -477,7 +496,7 @@ macro_rules! __pgrx_c_args_SlruPagePrecedesUnitTests {
         )
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SlruPagePrecedesUnitTests!(
@@ -503,13 +522,13 @@ macro_rules! __pgrx_c_args_SlruPagePrecedesUnitTests {
         )
     };
     (@ignore1 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::SlruPagePrecedesUnitTests!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SlruPagePrecedesUnitTests from slru.h:233
@@ -547,7 +566,7 @@ macro_rules! SlruPagePrecedesUnitTests {
         $crate::__pgrx_c_args_SlruPagePrecedesUnitTests!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_SlruPagePrecedesUnitTests!(@collect __pgrx_emit_public []; $($raw)*)

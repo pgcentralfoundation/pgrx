@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_SmgrIsTemp {
             @argument [__pgrx_c_args_SmgrIsTemp] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SmgrIsTemp] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SmgrIsTemp!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -116,6 +121,11 @@ macro_rules! __pgrx_c_args_SmgrIsTemp {
             @argument [__pgrx_c_args_SmgrIsTemp] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SmgrIsTemp] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SmgrIsTemp!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -132,7 +142,7 @@ macro_rules! __pgrx_c_args_SmgrIsTemp {
         $crate::SmgrIsTemp!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SmgrIsTemp from smgr.h:74
@@ -206,13 +216,13 @@ macro_rules! SmgrIsTemp {
         $crate::__pgrx_c_args_SmgrIsTemp!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $smgr:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SmgrIsTemp!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $smgr:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SmgrIsTemp!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -226,7 +236,7 @@ macro_rules! SmgrIsTemp {
                         $crate::__pgrx_c_operand!(@check_safety; $smgr);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -271,7 +281,7 @@ macro_rules! SmgrIsTemp {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -394,6 +404,11 @@ macro_rules! __pgrx_c_args_smgrread {
             @argument [__pgrx_c_args_smgrread] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_smgrread] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_smgrread!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -446,6 +461,11 @@ macro_rules! __pgrx_c_args_smgrread {
             @argument [__pgrx_c_args_smgrread] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_smgrread] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_smgrread!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -496,6 +516,11 @@ macro_rules! __pgrx_c_args_smgrread {
     (@p2 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_smgrread] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_smgrread] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -559,6 +584,11 @@ macro_rules! __pgrx_c_args_smgrread {
             @argument [__pgrx_c_args_smgrread] [p4 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_smgrread] [p4 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_smgrread!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -594,6 +624,11 @@ macro_rules! __pgrx_c_args_smgrread {
             @argument [__pgrx_c_args_smgrread] [p4 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_smgrread] [p4 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_smgrread!(
             @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -610,7 +645,7 @@ macro_rules! __pgrx_c_args_smgrread {
         $crate::smgrread!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function smgrread from smgr.h:123
@@ -656,7 +691,7 @@ macro_rules! smgrread {
     };
     (@__pgrx_emit_value; $reln:tt, $forknum:tt, $blocknum:tt, $buffer:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            $crate::__pgrx_c_generated::Inline_4c3e742d28638f5b1022741ab48103e6(
+            $crate::__pgrx_c_generated::Inline_4fe868d9034e9f3e6c12f505cdcf022f(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -736,13 +771,13 @@ macro_rules! smgrread {
         $crate::__pgrx_c_args_smgrread!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $reln:tt, $forknum:tt, $blocknum:tt, $buffer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_smgrread!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $reln:tt, $forknum:tt, $blocknum:tt, $buffer:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_smgrread!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -758,10 +793,10 @@ macro_rules! smgrread {
                         $crate::__pgrx_c_operand!(@check_safety; $buffer);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::__pgrx_c_generated::Inline_4c3e742d28638f5b1022741ab48103e6(
+                            $crate::__pgrx_c_generated::Inline_4fe868d9034e9f3e6c12f505cdcf022f(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -843,7 +878,7 @@ macro_rules! smgrread {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -853,7 +888,7 @@ macro_rules! smgrread {
     (@__pgrx_emit_discard; $reln:tt, $forknum:tt, $blocknum:tt, $buffer:tt $(,)?) => {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::__pgrx_c_generated::Inline_4c3e742d28638f5b1022741ab48103e6(
+                $crate::__pgrx_c_generated::Inline_4fe868d9034e9f3e6c12f505cdcf022f(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CRecord<
@@ -1006,6 +1041,11 @@ macro_rules! __pgrx_c_args_smgrwrite {
             @argument [__pgrx_c_args_smgrwrite] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_smgrwrite] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_smgrwrite!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1056,6 +1096,11 @@ macro_rules! __pgrx_c_args_smgrwrite {
     (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_smgrwrite] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_smgrwrite] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -1110,6 +1155,11 @@ macro_rules! __pgrx_c_args_smgrwrite {
             @argument [__pgrx_c_args_smgrwrite] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_smgrwrite] [p3 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_smgrwrite!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1160,6 +1210,11 @@ macro_rules! __pgrx_c_args_smgrwrite {
     (@p3 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_smgrwrite] [p4 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_smgrwrite] [p4 $mode [$($done)*] [$($rest)*]] [* $operand]
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
@@ -1223,6 +1278,11 @@ macro_rules! __pgrx_c_args_smgrwrite {
             @argument [__pgrx_c_args_smgrwrite] [p5 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_smgrwrite] [p5 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_smgrwrite!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1258,6 +1318,11 @@ macro_rules! __pgrx_c_args_smgrwrite {
             @argument [__pgrx_c_args_smgrwrite] [p5 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
         )
     };
+    (@p4 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_smgrwrite] [p5 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_smgrwrite!(
             @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1274,7 +1339,7 @@ macro_rules! __pgrx_c_args_smgrwrite {
         $crate::smgrwrite!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function smgrwrite from smgr.h:130
@@ -1328,7 +1393,7 @@ macro_rules! smgrwrite {
     };
     (@__pgrx_emit_value; $reln:tt, $forknum:tt, $blocknum:tt, $buffer:tt, $skipFsync:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            $crate::__pgrx_c_generated::Inline_9fe4c627c6cbef260aeec15595a4a680(
+            $crate::__pgrx_c_generated::Inline_df7079116bc493dcdc626d72c3e0f8a0(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -1418,13 +1483,13 @@ macro_rules! smgrwrite {
         $crate::__pgrx_c_args_smgrwrite!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $reln:tt, $forknum:tt, $blocknum:tt, $buffer:tt, $skipFsync:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_smgrwrite!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $reln:tt, $forknum:tt, $blocknum:tt, $buffer:tt, $skipFsync:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_smgrwrite!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1441,10 +1506,10 @@ macro_rules! smgrwrite {
                         $crate::__pgrx_c_operand!(@check_safety; $skipFsync);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::__pgrx_c_generated::Inline_9fe4c627c6cbef260aeec15595a4a680(
+                            $crate::__pgrx_c_generated::Inline_df7079116bc493dcdc626d72c3e0f8a0(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
@@ -1539,7 +1604,7 @@ macro_rules! smgrwrite {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1549,7 +1614,7 @@ macro_rules! smgrwrite {
     (@__pgrx_emit_discard; $reln:tt, $forknum:tt, $blocknum:tt, $buffer:tt, $skipFsync:tt $(,)?) => {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::__pgrx_c_generated::Inline_9fe4c627c6cbef260aeec15595a4a680(
+                $crate::__pgrx_c_generated::Inline_df7079116bc493dcdc626d72c3e0f8a0(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CRecord<

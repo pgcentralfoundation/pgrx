@@ -4,6 +4,57 @@ This code is generated for documentation purposes, so that it is easy to referen
 */
 // Shared generated C macro support.
 
+const _: () = assert!(
+    ::core::mem::size_of::<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(
+                *mut crate::__pgrx_c_bindings::proclist_head,
+                i32,
+                usize,
+            ) -> (),
+        >,
+    >() == 8
+);
+const _: () = assert!(
+    ::core::mem::align_of::<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(
+                *mut crate::__pgrx_c_bindings::proclist_head,
+                i32,
+                usize,
+            ) -> (),
+        >,
+    >() == 8
+);
+#[doc(hidden)]
+#[derive(Clone, Copy)]
+pub struct Signature_0059dd2914ec8626113fa503e67e6820;
+impl c::sealed::Sealed for Signature_0059dd2914ec8626113fa503e67e6820 {}
+impl c::expression::NativeFunctionSignature for Signature_0059dd2914ec8626113fa503e67e6820 {
+    type Physical = PhysicalFunction_C_unwind_3<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(
+                *mut crate::__pgrx_c_bindings::proclist_head,
+                i32,
+                usize,
+            ) -> (),
+        >,
+    >;
+}
+const _: () = assert!(
+    ::core::mem::size_of::<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::slist_head) -> (),
+        >,
+    >() == 8
+);
+const _: () = assert!(
+    ::core::mem::align_of::<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(*mut crate::__pgrx_c_bindings::slist_head) -> (),
+        >,
+    >() == 8
+);
 #[doc(hidden)]
 #[derive(Clone, Copy)]
 pub struct Signature_244a6db45d5f3b40a274b17fd3454eb6;
@@ -5182,16 +5233,3 @@ const _: Projection<crate::__pgrx_c_bindings::RangeBound, <<c::expression::CReco
 pub struct Field_inclusive;
 const _: () =
     assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::RangeBound, inclusive) == 9);
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field_inclusive>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::RangeBound>
-{
-    type Member = c::CBool;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 9;
-}
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<crate::__pgrx_c_bindings::RangeBound, <<c::expression::CRecord<crate::__pgrx_c_bindings::RangeBound> as c::expression::OrdinaryField<Field_inclusive>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).inclusive) };
-#[doc(hidden)]
-pub struct Field_lower;
-const _: () = assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::RangeBound, lower) == 10);

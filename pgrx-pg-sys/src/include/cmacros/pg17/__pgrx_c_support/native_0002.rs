@@ -4,6 +4,66 @@ This code is generated for documentation purposes, so that it is easy to referen
 */
 // Shared generated C macro support.
 
+const _: () = assert!(
+    ::core::mem::size_of::<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(
+                *mut crate::__pgrx_c_bindings::RBTNode,
+                *const crate::__pgrx_c_bindings::RBTNode,
+                *mut ::core::ffi::c_void,
+            ) -> (),
+        >,
+    >() == 8
+);
+const _: () = assert!(
+    ::core::mem::align_of::<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(
+                *mut crate::__pgrx_c_bindings::RBTNode,
+                *const crate::__pgrx_c_bindings::RBTNode,
+                *mut ::core::ffi::c_void,
+            ) -> (),
+        >,
+    >() == 8
+);
+#[doc(hidden)]
+#[derive(Clone, Copy)]
+pub struct Signature_aae35d6bb5e6758abb4387d922147e36;
+impl c::sealed::Sealed for Signature_aae35d6bb5e6758abb4387d922147e36 {}
+impl c::expression::NativeFunctionSignature for Signature_aae35d6bb5e6758abb4387d922147e36 {
+    type Physical = PhysicalFunction_C_unwind_3<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(
+                *mut crate::__pgrx_c_bindings::RBTNode,
+                *const crate::__pgrx_c_bindings::RBTNode,
+                *mut ::core::ffi::c_void,
+            ) -> (),
+        >,
+    >;
+}
+const _: () = assert!(
+    ::core::mem::size_of::<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(
+                *mut crate::__pgrx_c_bindings::RBTNode,
+                *mut ::core::ffi::c_void,
+            ) -> (),
+        >,
+    >() == 8
+);
+const _: () = assert!(
+    ::core::mem::align_of::<
+        ::core::option::Option<
+            unsafe extern "C-unwind" fn(
+                *mut crate::__pgrx_c_bindings::RBTNode,
+                *mut ::core::ffi::c_void,
+            ) -> (),
+        >,
+    >() == 8
+);
+#[doc(hidden)]
+#[derive(Clone, Copy)]
+pub struct Signature_1b4e540c3fe37f937ab7d51eaf344281;
 impl c::sealed::Sealed for Signature_1b4e540c3fe37f937ab7d51eaf344281 {}
 impl c::expression::NativeFunctionSignature for Signature_1b4e540c3fe37f937ab7d51eaf344281 {
     type Physical = PhysicalFunction_C_unwind_2<
@@ -7446,26 +7506,3 @@ const _: Projection<crate::__pgrx_c_bindings::GISTNodeBuffer, <<c::expression::C
 pub struct Field_pageBlocknum;
 const _: () =
     assert!(::core::mem::offset_of!(crate::__pgrx_c_bindings::GISTNodeBuffer, pageBlocknum) == 8);
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field_pageBlocknum>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::GISTNodeBuffer>
-{
-    type Member = c::CUnsignedInt;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 8;
-}
-// SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
-const _: Projection<crate::__pgrx_c_bindings::GISTNodeBuffer, <<c::expression::CRecord<crate::__pgrx_c_bindings::GISTNodeBuffer> as c::expression::OrdinaryField<Field_pageBlocknum>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).pageBlocknum) };
-#[doc(hidden)]
-pub struct Field_queuedForEmptying;
-const _: () = assert!(
-    ::core::mem::offset_of!(crate::__pgrx_c_bindings::GISTNodeBuffer, queuedForEmptying) == 24
-);
-// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
-unsafe impl c::expression::OrdinaryField<Field_queuedForEmptying>
-    for c::expression::CRecord<crate::__pgrx_c_bindings::GISTNodeBuffer>
-{
-    type Member = c::CBool;
-    type Declared = FieldReadWrite;
-    const OFFSET: usize = 24;
-}

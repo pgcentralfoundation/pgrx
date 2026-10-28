@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_HeapTupleGetDatum {
             @argument [__pgrx_c_args_HeapTupleGetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleGetDatum] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -118,6 +123,13 @@ macro_rules! __pgrx_c_args_HeapTupleGetDatum {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleGetDatum!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -134,7 +146,7 @@ macro_rules! __pgrx_c_args_HeapTupleGetDatum {
         $crate::HeapTupleGetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro HeapTupleGetDatum from funcapi.h:220
@@ -223,13 +235,13 @@ macro_rules! HeapTupleGetDatum {
         $crate::__pgrx_c_args_HeapTupleGetDatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleGetDatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleGetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -243,7 +255,7 @@ macro_rules! HeapTupleGetDatum {
                         $crate::__pgrx_c_operand!(@check_safety; $tuple);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -304,7 +316,7 @@ macro_rules! HeapTupleGetDatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -454,6 +466,11 @@ macro_rules! __pgrx_c_args_SRF_FIRSTCALL_INIT {
             @argument [__pgrx_c_args_SRF_FIRSTCALL_INIT] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SRF_FIRSTCALL_INIT] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SRF_FIRSTCALL_INIT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -491,6 +508,13 @@ macro_rules! __pgrx_c_args_SRF_FIRSTCALL_INIT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SRF_FIRSTCALL_INIT] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_FIRSTCALL_INIT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -507,7 +531,7 @@ macro_rules! __pgrx_c_args_SRF_FIRSTCALL_INIT {
         $crate::SRF_FIRSTCALL_INIT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SRF_FIRSTCALL_INIT from funcapi.h:307
@@ -585,13 +609,13 @@ macro_rules! SRF_FIRSTCALL_INIT {
         $crate::__pgrx_c_args_SRF_FIRSTCALL_INIT!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $fcinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SRF_FIRSTCALL_INIT!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $fcinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SRF_FIRSTCALL_INIT!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -605,7 +629,7 @@ macro_rules! SRF_FIRSTCALL_INIT {
                         $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -646,7 +670,7 @@ macro_rules! SRF_FIRSTCALL_INIT {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -778,6 +802,11 @@ macro_rules! __pgrx_c_args_SRF_IS_FIRSTCALL {
             @argument [__pgrx_c_args_SRF_IS_FIRSTCALL] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SRF_IS_FIRSTCALL] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SRF_IS_FIRSTCALL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -815,6 +844,13 @@ macro_rules! __pgrx_c_args_SRF_IS_FIRSTCALL {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SRF_IS_FIRSTCALL] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_IS_FIRSTCALL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -831,7 +867,7 @@ macro_rules! __pgrx_c_args_SRF_IS_FIRSTCALL {
         $crate::SRF_IS_FIRSTCALL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SRF_IS_FIRSTCALL from funcapi.h:305
@@ -934,13 +970,13 @@ macro_rules! SRF_IS_FIRSTCALL {
         $crate::__pgrx_c_args_SRF_IS_FIRSTCALL!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $fcinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SRF_IS_FIRSTCALL!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $fcinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SRF_IS_FIRSTCALL!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -954,7 +990,7 @@ macro_rules! SRF_IS_FIRSTCALL {
                         $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::eq(
@@ -1023,7 +1059,7 @@ macro_rules! SRF_IS_FIRSTCALL {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1178,6 +1214,11 @@ macro_rules! __pgrx_c_args_SRF_PERCALL_SETUP {
             @argument [__pgrx_c_args_SRF_PERCALL_SETUP] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SRF_PERCALL_SETUP] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SRF_PERCALL_SETUP!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1215,6 +1256,13 @@ macro_rules! __pgrx_c_args_SRF_PERCALL_SETUP {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SRF_PERCALL_SETUP] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_PERCALL_SETUP!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1231,7 +1279,7 @@ macro_rules! __pgrx_c_args_SRF_PERCALL_SETUP {
         $crate::SRF_PERCALL_SETUP!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SRF_PERCALL_SETUP from funcapi.h:309
@@ -1309,13 +1357,13 @@ macro_rules! SRF_PERCALL_SETUP {
         $crate::__pgrx_c_args_SRF_PERCALL_SETUP!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $fcinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SRF_PERCALL_SETUP!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $fcinfo:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SRF_PERCALL_SETUP!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1329,7 +1377,7 @@ macro_rules! SRF_PERCALL_SETUP {
                         $crate::__pgrx_c_operand!(@check_safety; $fcinfo);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1370,7 +1418,7 @@ macro_rules! SRF_PERCALL_SETUP {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1495,6 +1543,13 @@ macro_rules! __pgrx_c_args_SRF_RETURN_DONE {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SRF_RETURN_DONE] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_DONE!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1556,6 +1611,11 @@ macro_rules! __pgrx_c_args_SRF_RETURN_DONE {
             @argument [__pgrx_c_args_SRF_RETURN_DONE] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SRF_RETURN_DONE] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SRF_RETURN_DONE!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1593,6 +1653,13 @@ macro_rules! __pgrx_c_args_SRF_RETURN_DONE {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SRF_RETURN_DONE] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_DONE!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1609,7 +1676,7 @@ macro_rules! __pgrx_c_args_SRF_RETURN_DONE {
         $crate::SRF_RETURN_DONE!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SRF_RETURN_DONE from funcapi.h:329
@@ -2041,7 +2108,7 @@ macro_rules! SRF_RETURN_DONE {
         }
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::SRF_RETURN_DONE!(@__pgrx_c_guard_locals __pgrx_emit_public []; $($raw)*)
@@ -2118,6 +2185,13 @@ macro_rules! __pgrx_c_args_SRF_RETURN_NEXT {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SRF_RETURN_NEXT] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2169,6 +2243,13 @@ macro_rules! __pgrx_c_args_SRF_RETURN_NEXT {
         $crate::__pgrx_c_classify!(
             @argument [__pgrx_c_args_SRF_RETURN_NEXT] [p2 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SRF_RETURN_NEXT] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
             ]
         )
     };
@@ -2233,6 +2314,11 @@ macro_rules! __pgrx_c_args_SRF_RETURN_NEXT {
             @argument [__pgrx_c_args_SRF_RETURN_NEXT] [p3 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SRF_RETURN_NEXT] [p3 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2270,6 +2356,13 @@ macro_rules! __pgrx_c_args_SRF_RETURN_NEXT {
             ]
         )
     };
+    (@p2 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SRF_RETURN_NEXT] [p3 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT!(
             @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2286,7 +2379,7 @@ macro_rules! __pgrx_c_args_SRF_RETURN_NEXT {
         $crate::SRF_RETURN_NEXT!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SRF_RETURN_NEXT from funcapi.h:311
@@ -2591,7 +2684,7 @@ macro_rules! SRF_RETURN_NEXT {
         }
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::SRF_RETURN_NEXT!(@__pgrx_c_guard_locals __pgrx_emit_public []; $($raw)*)
@@ -2671,6 +2764,13 @@ macro_rules! __pgrx_c_args_SRF_RETURN_NEXT_NULL {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SRF_RETURN_NEXT_NULL] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT_NULL!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2732,6 +2832,11 @@ macro_rules! __pgrx_c_args_SRF_RETURN_NEXT_NULL {
             @argument [__pgrx_c_args_SRF_RETURN_NEXT_NULL] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SRF_RETURN_NEXT_NULL] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT_NULL!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2769,6 +2874,13 @@ macro_rules! __pgrx_c_args_SRF_RETURN_NEXT_NULL {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SRF_RETURN_NEXT_NULL] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT_NULL!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2785,7 +2897,7 @@ macro_rules! __pgrx_c_args_SRF_RETURN_NEXT_NULL {
         $crate::SRF_RETURN_NEXT_NULL!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SRF_RETURN_NEXT_NULL from funcapi.h:320
@@ -3169,7 +3281,7 @@ macro_rules! SRF_RETURN_NEXT_NULL {
         }
     };
     (@$mode:ident; $($raw:tt)*) => {
-        compile_error!("a C statement body is not an expression operand")
+        ::core::compile_error!("a C statement body is not an expression operand")
     };
     ($($raw:tt)*) => {
         $crate::SRF_RETURN_NEXT_NULL!(@__pgrx_c_guard_locals __pgrx_emit_public []; $($raw)*)
@@ -3219,7 +3331,7 @@ macro_rules! __pgrx_c_args_TupleGetDatum {
         $crate::__pgrx_c_args_TupleGetDatum!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
     };
     (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+        ::core::compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_TupleGetDatum!(
@@ -3270,6 +3382,11 @@ macro_rules! __pgrx_c_args_TupleGetDatum {
             @argument [__pgrx_c_args_TupleGetDatum] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TupleGetDatum] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TupleGetDatum!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3307,6 +3424,11 @@ macro_rules! __pgrx_c_args_TupleGetDatum {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TupleGetDatum] [p2 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TupleGetDatum!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -3323,7 +3445,7 @@ macro_rules! __pgrx_c_args_TupleGetDatum {
         $crate::TupleGetDatum!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro TupleGetDatum from funcapi.h:222
@@ -3412,13 +3534,13 @@ macro_rules! TupleGetDatum {
         $crate::__pgrx_c_args_TupleGetDatum!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $_slot:tt, $_tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TupleGetDatum!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $_slot:tt, $_tuple:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_TupleGetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -3432,7 +3554,7 @@ macro_rules! TupleGetDatum {
                         $crate::__pgrx_c_operand!(@check_safety; $_tuple);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -3493,7 +3615,7 @@ macro_rules! TupleGetDatum {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

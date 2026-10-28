@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_SOFT_ERROR_OCCURRED {
             @argument [__pgrx_c_args_SOFT_ERROR_OCCURRED] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SOFT_ERROR_OCCURRED] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SOFT_ERROR_OCCURRED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -118,6 +123,13 @@ macro_rules! __pgrx_c_args_SOFT_ERROR_OCCURRED {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_SOFT_ERROR_OCCURRED] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SOFT_ERROR_OCCURRED!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -134,7 +146,7 @@ macro_rules! __pgrx_c_args_SOFT_ERROR_OCCURRED {
         $crate::SOFT_ERROR_OCCURRED!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro SOFT_ERROR_OCCURRED from miscnodes.h:52
@@ -349,13 +361,13 @@ macro_rules! SOFT_ERROR_OCCURRED {
         $crate::__pgrx_c_args_SOFT_ERROR_OCCURRED!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $escontext:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SOFT_ERROR_OCCURRED!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $escontext:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_SOFT_ERROR_OCCURRED!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -369,7 +381,7 @@ macro_rules! SOFT_ERROR_OCCURRED {
                         $crate::__pgrx_c_operand!(@check_safety; $escontext);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -551,7 +563,7 @@ macro_rules! SOFT_ERROR_OCCURRED {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

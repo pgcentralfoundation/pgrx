@@ -86,6 +86,11 @@ macro_rules! __pgrx_c_args_MXOffsetToFlagsBitShift {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MXOffsetToFlagsBitShift] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_MXOffsetToFlagsBitShift!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -123,6 +128,13 @@ macro_rules! __pgrx_c_args_MXOffsetToFlagsBitShift {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MXOffsetToFlagsBitShift] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MXOffsetToFlagsBitShift!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -139,7 +151,7 @@ macro_rules! __pgrx_c_args_MXOffsetToFlagsBitShift {
         $crate::MXOffsetToFlagsBitShift!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function MXOffsetToFlagsBitShift from multixact_internal.h:104
@@ -209,13 +221,13 @@ macro_rules! MXOffsetToFlagsBitShift {
         $crate::__pgrx_c_args_MXOffsetToFlagsBitShift!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $offset:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MXOffsetToFlagsBitShift!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $offset:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MXOffsetToFlagsBitShift!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -228,7 +240,7 @@ macro_rules! MXOffsetToFlagsBitShift {
                         $crate::__pgrx_c_operand!(@check_safety; $offset);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -254,7 +266,7 @@ macro_rules! MXOffsetToFlagsBitShift {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -371,6 +383,11 @@ macro_rules! __pgrx_c_args_MXOffsetToFlagsOffset {
             @argument [__pgrx_c_args_MXOffsetToFlagsOffset] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MXOffsetToFlagsOffset] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_MXOffsetToFlagsOffset!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -408,6 +425,13 @@ macro_rules! __pgrx_c_args_MXOffsetToFlagsOffset {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MXOffsetToFlagsOffset] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MXOffsetToFlagsOffset!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -424,7 +448,7 @@ macro_rules! __pgrx_c_args_MXOffsetToFlagsOffset {
         $crate::MXOffsetToFlagsOffset!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function MXOffsetToFlagsOffset from multixact_internal.h:94
@@ -492,13 +516,13 @@ macro_rules! MXOffsetToFlagsOffset {
         $crate::__pgrx_c_args_MXOffsetToFlagsOffset!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $offset:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MXOffsetToFlagsOffset!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $offset:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MXOffsetToFlagsOffset!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -511,7 +535,7 @@ macro_rules! MXOffsetToFlagsOffset {
                         $crate::__pgrx_c_operand!(@check_safety; $offset);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -537,7 +561,7 @@ macro_rules! MXOffsetToFlagsOffset {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -656,6 +680,11 @@ macro_rules! __pgrx_c_args_MXOffsetToMemberOffset {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MXOffsetToMemberOffset] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_MXOffsetToMemberOffset!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -693,6 +722,13 @@ macro_rules! __pgrx_c_args_MXOffsetToMemberOffset {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MXOffsetToMemberOffset] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MXOffsetToMemberOffset!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -709,7 +745,7 @@ macro_rules! __pgrx_c_args_MXOffsetToMemberOffset {
         $crate::MXOffsetToMemberOffset!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function MXOffsetToMemberOffset from multixact_internal.h:114
@@ -780,13 +816,13 @@ macro_rules! MXOffsetToMemberOffset {
         $crate::__pgrx_c_args_MXOffsetToMemberOffset!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $offset:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MXOffsetToMemberOffset!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $offset:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MXOffsetToMemberOffset!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -799,7 +835,7 @@ macro_rules! MXOffsetToMemberOffset {
                         $crate::__pgrx_c_operand!(@check_safety; $offset);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -825,7 +861,7 @@ macro_rules! MXOffsetToMemberOffset {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -942,6 +978,11 @@ macro_rules! __pgrx_c_args_MXOffsetToMemberPage {
             @argument [__pgrx_c_args_MXOffsetToMemberPage] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MXOffsetToMemberPage] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_MXOffsetToMemberPage!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -979,6 +1020,13 @@ macro_rules! __pgrx_c_args_MXOffsetToMemberPage {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MXOffsetToMemberPage] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MXOffsetToMemberPage!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -995,7 +1043,7 @@ macro_rules! __pgrx_c_args_MXOffsetToMemberPage {
         $crate::MXOffsetToMemberPage!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function MXOffsetToMemberPage from multixact_internal.h:81
@@ -1059,13 +1107,13 @@ macro_rules! MXOffsetToMemberPage {
         $crate::__pgrx_c_args_MXOffsetToMemberPage!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $offset:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MXOffsetToMemberPage!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $offset:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MXOffsetToMemberPage!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1078,7 +1126,7 @@ macro_rules! MXOffsetToMemberPage {
                         $crate::__pgrx_c_operand!(@check_safety; $offset);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1104,7 +1152,7 @@ macro_rules! MXOffsetToMemberPage {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1223,6 +1271,11 @@ macro_rules! __pgrx_c_args_MXOffsetToMemberSegment {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MXOffsetToMemberSegment] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_MXOffsetToMemberSegment!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1260,6 +1313,13 @@ macro_rules! __pgrx_c_args_MXOffsetToMemberSegment {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MXOffsetToMemberSegment] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MXOffsetToMemberSegment!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1276,7 +1336,7 @@ macro_rules! __pgrx_c_args_MXOffsetToMemberSegment {
         $crate::MXOffsetToMemberSegment!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function MXOffsetToMemberSegment from multixact_internal.h:87
@@ -1343,13 +1403,13 @@ macro_rules! MXOffsetToMemberSegment {
         $crate::__pgrx_c_args_MXOffsetToMemberSegment!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $offset:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MXOffsetToMemberSegment!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $offset:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MXOffsetToMemberSegment!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1362,7 +1422,7 @@ macro_rules! MXOffsetToMemberSegment {
                         $crate::__pgrx_c_operand!(@check_safety; $offset);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1388,7 +1448,7 @@ macro_rules! MXOffsetToMemberSegment {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1507,6 +1567,13 @@ macro_rules! __pgrx_c_args_MultiXactIdToOffsetEntry {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MultiXactIdToOffsetEntry] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_MultiXactIdToOffsetEntry!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1544,6 +1611,13 @@ macro_rules! __pgrx_c_args_MultiXactIdToOffsetEntry {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MultiXactIdToOffsetEntry] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MultiXactIdToOffsetEntry!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1560,7 +1634,7 @@ macro_rules! __pgrx_c_args_MultiXactIdToOffsetEntry {
         $crate::MultiXactIdToOffsetEntry!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function MultiXactIdToOffsetEntry from multixact_internal.h:40
@@ -1633,13 +1707,13 @@ macro_rules! MultiXactIdToOffsetEntry {
         $crate::__pgrx_c_args_MultiXactIdToOffsetEntry!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $multi:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MultiXactIdToOffsetEntry!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $multi:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MultiXactIdToOffsetEntry!(
@@ -1655,7 +1729,7 @@ macro_rules! MultiXactIdToOffsetEntry {
                         $crate::__pgrx_c_operand!(@check_safety; $multi);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1687,7 +1761,7 @@ macro_rules! MultiXactIdToOffsetEntry {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1812,6 +1886,11 @@ macro_rules! __pgrx_c_args_MultiXactIdToOffsetPage {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MultiXactIdToOffsetPage] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_MultiXactIdToOffsetPage!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1849,6 +1928,13 @@ macro_rules! __pgrx_c_args_MultiXactIdToOffsetPage {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MultiXactIdToOffsetPage] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MultiXactIdToOffsetPage!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1865,7 +1951,7 @@ macro_rules! __pgrx_c_args_MultiXactIdToOffsetPage {
         $crate::MultiXactIdToOffsetPage!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function MultiXactIdToOffsetPage from multixact_internal.h:34
@@ -1938,13 +2024,13 @@ macro_rules! MultiXactIdToOffsetPage {
         $crate::__pgrx_c_args_MultiXactIdToOffsetPage!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $multi:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MultiXactIdToOffsetPage!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $multi:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MultiXactIdToOffsetPage!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1957,7 +2043,7 @@ macro_rules! MultiXactIdToOffsetPage {
                         $crate::__pgrx_c_operand!(@check_safety; $multi);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -1989,7 +2075,7 @@ macro_rules! MultiXactIdToOffsetPage {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2114,6 +2200,13 @@ macro_rules! __pgrx_c_args_MultiXactIdToOffsetSegment {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MultiXactIdToOffsetSegment] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_MultiXactIdToOffsetSegment!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2151,6 +2244,13 @@ macro_rules! __pgrx_c_args_MultiXactIdToOffsetSegment {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MultiXactIdToOffsetSegment] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MultiXactIdToOffsetSegment!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2167,7 +2267,7 @@ macro_rules! __pgrx_c_args_MultiXactIdToOffsetSegment {
         $crate::MultiXactIdToOffsetSegment!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function MultiXactIdToOffsetSegment from multixact_internal.h:46
@@ -2240,13 +2340,13 @@ macro_rules! MultiXactIdToOffsetSegment {
         $crate::__pgrx_c_args_MultiXactIdToOffsetSegment!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $multi:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MultiXactIdToOffsetSegment!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $multi:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MultiXactIdToOffsetSegment!(
@@ -2262,7 +2362,7 @@ macro_rules! MultiXactIdToOffsetSegment {
                         $crate::__pgrx_c_operand!(@check_safety; $multi);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2294,7 +2394,7 @@ macro_rules! MultiXactIdToOffsetSegment {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2410,6 +2510,13 @@ macro_rules! __pgrx_c_args_MultiXactOffsetStorageSize {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MultiXactOffsetStorageSize] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MultiXactOffsetStorageSize!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2473,6 +2580,13 @@ macro_rules! __pgrx_c_args_MultiXactOffsetStorageSize {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MultiXactOffsetStorageSize] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_MultiXactOffsetStorageSize!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2510,6 +2624,13 @@ macro_rules! __pgrx_c_args_MultiXactOffsetStorageSize {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_MultiXactOffsetStorageSize] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MultiXactOffsetStorageSize!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2526,7 +2647,7 @@ macro_rules! __pgrx_c_args_MultiXactOffsetStorageSize {
         $crate::MultiXactOffsetStorageSize!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// Typed call adapter for C inline function MultiXactOffsetStorageSize from multixact_internal.h:125
@@ -2611,13 +2732,13 @@ macro_rules! MultiXactOffsetStorageSize {
         $crate::__pgrx_c_args_MultiXactOffsetStorageSize!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $new_offset:tt, $old_offset:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MultiXactOffsetStorageSize!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $new_offset:tt, $old_offset:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_MultiXactOffsetStorageSize!(
@@ -2634,7 +2755,7 @@ macro_rules! MultiXactOffsetStorageSize {
                         $crate::__pgrx_c_operand!(@check_safety; $old_offset);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
@@ -2673,7 +2794,7 @@ macro_rules! MultiXactOffsetStorageSize {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

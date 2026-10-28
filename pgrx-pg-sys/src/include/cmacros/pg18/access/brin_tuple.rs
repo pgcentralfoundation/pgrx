@@ -81,6 +81,11 @@ macro_rules! __pgrx_c_args_BrinTupleDataOffset {
             @argument [__pgrx_c_args_BrinTupleDataOffset] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BrinTupleDataOffset] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BrinTupleDataOffset!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -118,6 +123,13 @@ macro_rules! __pgrx_c_args_BrinTupleDataOffset {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BrinTupleDataOffset] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleDataOffset!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -134,7 +146,7 @@ macro_rules! __pgrx_c_args_BrinTupleDataOffset {
         $crate::BrinTupleDataOffset!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BrinTupleDataOffset from brin_tuple.h:90
@@ -239,13 +251,13 @@ macro_rules! BrinTupleDataOffset {
         $crate::__pgrx_c_args_BrinTupleDataOffset!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleDataOffset!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleDataOffset!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -258,7 +270,7 @@ macro_rules! BrinTupleDataOffset {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -334,7 +346,7 @@ macro_rules! BrinTupleDataOffset {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -493,6 +505,11 @@ macro_rules! __pgrx_c_args_BrinTupleHasNulls {
             @argument [__pgrx_c_args_BrinTupleHasNulls] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BrinTupleHasNulls] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BrinTupleHasNulls!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -530,6 +547,13 @@ macro_rules! __pgrx_c_args_BrinTupleHasNulls {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BrinTupleHasNulls] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleHasNulls!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -546,7 +570,7 @@ macro_rules! __pgrx_c_args_BrinTupleHasNulls {
         $crate::BrinTupleHasNulls!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BrinTupleHasNulls from brin_tuple.h:91
@@ -653,13 +677,13 @@ macro_rules! BrinTupleHasNulls {
         $crate::__pgrx_c_args_BrinTupleHasNulls!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleHasNulls!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleHasNulls!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -672,7 +696,7 @@ macro_rules! BrinTupleHasNulls {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -755,7 +779,7 @@ macro_rules! BrinTupleHasNulls {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -919,6 +943,11 @@ macro_rules! __pgrx_c_args_BrinTupleIsEmptyRange {
             @argument [__pgrx_c_args_BrinTupleIsEmptyRange] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BrinTupleIsEmptyRange] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BrinTupleIsEmptyRange!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -956,6 +985,13 @@ macro_rules! __pgrx_c_args_BrinTupleIsEmptyRange {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BrinTupleIsEmptyRange] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleIsEmptyRange!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -972,7 +1008,7 @@ macro_rules! __pgrx_c_args_BrinTupleIsEmptyRange {
         $crate::BrinTupleIsEmptyRange!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BrinTupleIsEmptyRange from brin_tuple.h:93
@@ -1081,13 +1117,13 @@ macro_rules! BrinTupleIsEmptyRange {
         $crate::__pgrx_c_args_BrinTupleIsEmptyRange!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleIsEmptyRange!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleIsEmptyRange!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1100,7 +1136,7 @@ macro_rules! BrinTupleIsEmptyRange {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -1183,7 +1219,7 @@ macro_rules! BrinTupleIsEmptyRange {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1351,6 +1387,11 @@ macro_rules! __pgrx_c_args_BrinTupleIsPlaceholder {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BrinTupleIsPlaceholder] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BrinTupleIsPlaceholder!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1388,6 +1429,13 @@ macro_rules! __pgrx_c_args_BrinTupleIsPlaceholder {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BrinTupleIsPlaceholder] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleIsPlaceholder!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1404,7 +1452,7 @@ macro_rules! __pgrx_c_args_BrinTupleIsPlaceholder {
         $crate::BrinTupleIsPlaceholder!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro BrinTupleIsPlaceholder from brin_tuple.h:92
@@ -1516,13 +1564,13 @@ macro_rules! BrinTupleIsPlaceholder {
         $crate::__pgrx_c_args_BrinTupleIsPlaceholder!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleIsPlaceholder!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleIsPlaceholder!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1535,7 +1583,7 @@ macro_rules! BrinTupleIsPlaceholder {
                         $crate::__pgrx_c_operand!(@check_safety; $tup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -1618,7 +1666,7 @@ macro_rules! BrinTupleIsPlaceholder {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

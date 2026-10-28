@@ -4,6 +4,14 @@ This code is generated for documentation purposes, so that it is easy to referen
 */
 // Shared generated C macro support.
 
+// SAFETY: Compiler-owned layout assertions and typed raw projection establish the field storage and offset. Write qualification only narrows.
+unsafe impl c::expression::OrdinaryField<Field_procid>
+    for c::expression::CRecord<crate::__pgrx_c_bindings::xl_hash_init_meta_page>
+{
+    type Member = c::expression::CIntegerStorage<c::CUnsignedInt, crate::__pgrx_c_bindings::Oid>;
+    type Declared = FieldReadWrite;
+    const OFFSET: usize = 8;
+}
 // SAFETY: This uncalled witness checks the exact Rust field storage without accessing an allocation.
 const _: Projection<crate::__pgrx_c_bindings::xl_hash_init_meta_page, <<c::expression::CRecord<crate::__pgrx_c_bindings::xl_hash_init_meta_page> as c::expression::OrdinaryField<Field_procid>>::Member as c::expression::CType>::Storage> = |base| unsafe { ::core::ptr::addr_of_mut!((*base).procid) };
 #[doc(hidden)]
@@ -4194,14 +4202,3 @@ impl c::expression::NativeType for crate::__pgrx_c_bindings::HTAB {
     type Marker = c::expression::COpaque<Self>;
 }
 impl c::sealed::Sealed for crate::__pgrx_c_bindings::HSpool {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::HSpool {
-    type Marker = c::expression::COpaque<Self>;
-}
-impl c::sealed::Sealed for crate::__pgrx_c_bindings::HASHHDR {}
-impl c::expression::NativeType for crate::__pgrx_c_bindings::HASHHDR {
-    type Marker = c::expression::COpaque<Self>;
-}
-const _: () = {
-    assert!(::core::mem::size_of::<crate::__pgrx_c_bindings::GroupResultPath>() == 88);
-    assert!(::core::mem::align_of::<crate::__pgrx_c_bindings::GroupResultPath>() == 8);
-};

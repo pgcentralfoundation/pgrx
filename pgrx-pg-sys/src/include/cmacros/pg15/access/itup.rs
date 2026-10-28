@@ -86,6 +86,11 @@ macro_rules! __pgrx_c_args_IndexInfoFindDataOffset {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IndexInfoFindDataOffset] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IndexInfoFindDataOffset!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -123,6 +128,13 @@ macro_rules! __pgrx_c_args_IndexInfoFindDataOffset {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IndexInfoFindDataOffset] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexInfoFindDataOffset!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -139,7 +151,7 @@ macro_rules! __pgrx_c_args_IndexInfoFindDataOffset {
         $crate::IndexInfoFindDataOffset!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IndexInfoFindDataOffset from itup.h:80
@@ -543,13 +555,13 @@ macro_rules! IndexInfoFindDataOffset {
         $crate::__pgrx_c_args_IndexInfoFindDataOffset!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $t_info:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IndexInfoFindDataOffset!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $t_info:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IndexInfoFindDataOffset!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -563,7 +575,7 @@ macro_rules! IndexInfoFindDataOffset {
                         $crate::__pgrx_c_operand!(@check_safety; $t_info);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::select(
@@ -943,7 +955,7 @@ macro_rules! IndexInfoFindDataOffset {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1398,6 +1410,11 @@ macro_rules! __pgrx_c_args_IndexTupleHasNulls {
             @argument [__pgrx_c_args_IndexTupleHasNulls] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IndexTupleHasNulls] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IndexTupleHasNulls!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1435,6 +1452,13 @@ macro_rules! __pgrx_c_args_IndexTupleHasNulls {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IndexTupleHasNulls] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexTupleHasNulls!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1451,7 +1475,7 @@ macro_rules! __pgrx_c_args_IndexTupleHasNulls {
         $crate::IndexTupleHasNulls!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IndexTupleHasNulls from itup.h:72
@@ -1545,13 +1569,13 @@ macro_rules! IndexTupleHasNulls {
         $crate::__pgrx_c_args_IndexTupleHasNulls!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IndexTupleHasNulls!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IndexTupleHasNulls!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1564,7 +1588,7 @@ macro_rules! IndexTupleHasNulls {
                         $crate::__pgrx_c_operand!(@check_safety; $itup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -1619,7 +1643,7 @@ macro_rules! IndexTupleHasNulls {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1770,6 +1794,11 @@ macro_rules! __pgrx_c_args_IndexTupleHasVarwidths {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IndexTupleHasVarwidths] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IndexTupleHasVarwidths!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1807,6 +1836,13 @@ macro_rules! __pgrx_c_args_IndexTupleHasVarwidths {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IndexTupleHasVarwidths] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexTupleHasVarwidths!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1823,7 +1859,7 @@ macro_rules! __pgrx_c_args_IndexTupleHasVarwidths {
         $crate::IndexTupleHasVarwidths!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IndexTupleHasVarwidths from itup.h:73
@@ -1920,13 +1956,13 @@ macro_rules! IndexTupleHasVarwidths {
         $crate::__pgrx_c_args_IndexTupleHasVarwidths!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IndexTupleHasVarwidths!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IndexTupleHasVarwidths!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1939,7 +1975,7 @@ macro_rules! IndexTupleHasVarwidths {
                         $crate::__pgrx_c_operand!(@check_safety; $itup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::bitand(
@@ -1994,7 +2030,7 @@ macro_rules! IndexTupleHasVarwidths {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -2140,6 +2176,11 @@ macro_rules! __pgrx_c_args_IndexTupleSize {
             @argument [__pgrx_c_args_IndexTupleSize] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IndexTupleSize] [p1 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IndexTupleSize!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2177,6 +2218,11 @@ macro_rules! __pgrx_c_args_IndexTupleSize {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_IndexTupleSize] [p1 $mode [$($done)*] [$($rest)*]] [* $operand]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexTupleSize!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -2193,7 +2239,7 @@ macro_rules! __pgrx_c_args_IndexTupleSize {
         $crate::IndexTupleSize!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro IndexTupleSize from itup.h:71
@@ -2280,13 +2326,13 @@ macro_rules! IndexTupleSize {
         $crate::__pgrx_c_args_IndexTupleSize!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IndexTupleSize!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $itup:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_IndexTupleSize!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -2299,7 +2345,7 @@ macro_rules! IndexTupleSize {
                         $crate::__pgrx_c_operand!(@check_safety; $itup);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
@@ -2357,7 +2403,7 @@ macro_rules! IndexTupleSize {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };

@@ -77,6 +77,13 @@ macro_rules! __pgrx_c_args_RelFileNodeBackendEquals {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelFileNodeBackendEquals] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelFileNodeBackendEquals!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -140,6 +147,13 @@ macro_rules! __pgrx_c_args_RelFileNodeBackendEquals {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelFileNodeBackendEquals] [p2 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelFileNodeBackendEquals!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -177,6 +191,13 @@ macro_rules! __pgrx_c_args_RelFileNodeBackendEquals {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelFileNodeBackendEquals] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelFileNodeBackendEquals!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -193,7 +214,7 @@ macro_rules! __pgrx_c_args_RelFileNodeBackendEquals {
         $crate::RelFileNodeBackendEquals!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelFileNodeBackendEquals from relfilenode.h:93
@@ -460,13 +481,13 @@ macro_rules! RelFileNodeBackendEquals {
         $crate::__pgrx_c_args_RelFileNodeBackendEquals!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $node1:tt, $node2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelFileNodeBackendEquals!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $node1:tt, $node2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelFileNodeBackendEquals!(
@@ -483,7 +504,7 @@ macro_rules! RelFileNodeBackendEquals {
                         $crate::__pgrx_c_operand!(@check_safety; $node2);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -741,7 +762,7 @@ macro_rules! RelFileNodeBackendEquals {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1067,6 +1088,13 @@ macro_rules! __pgrx_c_args_RelFileNodeBackendIsTemp {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelFileNodeBackendIsTemp] [p1 $mode [$($done)*] []] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelFileNodeBackendIsTemp!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1104,6 +1132,13 @@ macro_rules! __pgrx_c_args_RelFileNodeBackendIsTemp {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelFileNodeBackendIsTemp] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelFileNodeBackendIsTemp!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1120,7 +1155,7 @@ macro_rules! __pgrx_c_args_RelFileNodeBackendIsTemp {
         $crate::RelFileNodeBackendIsTemp!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelFileNodeBackendIsTemp from relfilenode.h:78
@@ -1179,13 +1214,13 @@ macro_rules! RelFileNodeBackendIsTemp {
         $crate::__pgrx_c_args_RelFileNodeBackendIsTemp!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $rnode:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelFileNodeBackendIsTemp!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $rnode:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelFileNodeBackendIsTemp!(
@@ -1201,7 +1236,7 @@ macro_rules! RelFileNodeBackendIsTemp {
                         $crate::__pgrx_c_operand!(@check_safety; $rnode);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::ne(
@@ -1224,7 +1259,7 @@ macro_rules! RelFileNodeBackendIsTemp {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
@@ -1331,6 +1366,13 @@ macro_rules! __pgrx_c_args_RelFileNodeEquals {
             ]
         )
     };
+    (@p0 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelFileNodeEquals] [p1 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelFileNodeEquals!(
             @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1392,6 +1434,11 @@ macro_rules! __pgrx_c_args_RelFileNodeEquals {
             @argument [__pgrx_c_args_RelFileNodeEquals] [p2 $mode [$($done)*] []] [($($inner)*)]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelFileNodeEquals] [p2 $mode [$($done)*] []] [* $operand]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelFileNodeEquals!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1429,6 +1476,13 @@ macro_rules! __pgrx_c_args_RelFileNodeEquals {
             ]
         )
     };
+    (@p1 $mode:ident [$($done:tt)*]; * $operand:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelFileNodeEquals] [p2 $mode [$($done)*] [$($rest)*]] [
+                * $operand
+            ]
+        )
+    };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelFileNodeEquals!(
             @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
@@ -1445,7 +1499,7 @@ macro_rules! __pgrx_c_args_RelFileNodeEquals {
         $crate::RelFileNodeEquals!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
+        ::core::compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
 /// C macro RelFileNodeEquals from relfilenode.h:88
@@ -1612,13 +1666,13 @@ macro_rules! RelFileNodeEquals {
         $crate::__pgrx_c_args_RelFileNodeEquals!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $node1:tt, $node2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelFileNodeEquals!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $node1:tt, $node2:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        ::core::compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_RelFileNodeEquals!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -1632,7 +1686,7 @@ macro_rules! RelFileNodeEquals {
                         $crate::__pgrx_c_operand!(@check_safety; $node2);
                     }
                 }
-                Some(
+                ::core::option::Option::Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -1793,7 +1847,7 @@ macro_rules! RelFileNodeEquals {
                     }
                 )
             } else {
-                None
+                ::core::option::Option::None
             }
         )
     };
