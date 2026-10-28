@@ -88,4 +88,12 @@ mod tests {
         drop(lock);
         assert!(!spinlock.is_locked());
     }
+
+    #[cfg(all(feature = "cshim", not(feature = "pg19")))]
+    #[pg_test]
+    pub fn test_spinlock_is_locked_panics_off_the_backend_thread() {
+        let spinlock = pgrx::spinlock::PgSpinLock::new(0_usize);
+        let off_thread = std::thread::scope(|s| s.spawn(|| spinlock.is_locked()).join());
+        assert!(off_thread.is_err(), "is_locked read the lock off the backend thread");
+    }
 }

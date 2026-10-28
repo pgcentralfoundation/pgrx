@@ -58,21 +58,30 @@ impl<T: PGRXSharedMemory> PgSpinLock<T> {
     /// Returns true if the spinlock is locked, and false otherwise.
     ///
     /// Not available on Postgres 19 or later, which removed `SpinLockFree`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if called on a thread other than the PostgreSQL backend thread, as
+    /// [`PgSpinLock::lock`] does.
     #[cfg(not(feature = "pg19"))]
     #[inline]
     #[doc(alias = "SpinLockFree")]
     pub fn is_locked(&self) -> bool {
         use pg_sys::__pgrx_c_macros::expression::{CVolatile, Pointer};
+        // With native spinlocks `S_LOCK_FREE` is a plain load, not a guarded native call, so
+        // check the thread here. A read on another thread would race with this process's
+        // `SpinLockAcquire` and `SpinLockRelease`.
+        pg_sys::submodules::thread_check::check_active_thread();
         // PostgreSQL passes `volatile slock_t *` here. Tag the operand the same way so
         // `S_LOCK_FREE` performs a volatile load that a polling loop cannot hoist.
         let lock = Pointer::<CVolatile<pg_sys::__pgrx_c_types::slock_t>>::new(self.lock.get());
         // SAFETY: `self` keeps the aligned lock initialized by `new` alive. The read goes
-        // through a raw pointer without creating a reference, matching PostgreSQL's own
-        // unlocked `S_LOCK_FREE` reads of a lock other backends may be changing. PG15–17
-        // builds without native spinlocks make this a guarded native call instead, which must
-        // run on the backend thread; the guard panics on any other thread.
-        // `S_LOCK_FREE` is C `int` with native spinlocks and the `bool` result of
-        // `s_lock_free_sema` without them, so test it with C's zero rule.
+        // through a raw pointer without creating a reference. The thread check above keeps
+        // it on the backend thread, which also makes this process's lock and unlock calls;
+        // other backends change a shared lock from their own processes, as PostgreSQL's own
+        // unlocked `S_LOCK_FREE` reads expect. `S_LOCK_FREE` is C `int` with native
+        // spinlocks and the `bool` result of `s_lock_free_sema` without them, so test it with
+        // C's zero rule.
         unsafe { !pg_sys::SpinLockFree!(lock).is_true() }
     }
 
