@@ -152,6 +152,26 @@ fn meson_windows_headers_describe_llp64_windows() {
     ));
 }
 
+/// A CRLF `pg_config.h`, as a Windows checkout or installation may have, verifies like the
+/// LF original.
+#[test]
+fn crlf_headers_are_verified_like_lf_headers() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let server = edited("x86_64_linux", &[("\n", "\r\n")]);
+    verify(&scanner, server.path(), "x86_64-unknown-linux-gnu", 18).unwrap();
+    assert!(matches!(
+        verify(&scanner, server.path(), "aarch64-unknown-linux-gnu", 18),
+        Err(ConfigurationError::Machine { .. })
+    ));
+    assert_eq!(
+        disagreeing_facts(
+            &verify(&scanner, server.path(), "x86_64-unknown-linux-gnux32", 18).unwrap_err()
+        ),
+        ["ALIGNOF_LONG", "SIZEOF_LONG", "SIZEOF_SIZE_T", "SIZEOF_VOID_P"]
+    );
+}
+
 /// Headers without PG_VERSION_NUM are not a PostgreSQL configuration and are not checked. A
 /// PostgreSQL configuration must belong to the selected major and define every required fact.
 #[test]
