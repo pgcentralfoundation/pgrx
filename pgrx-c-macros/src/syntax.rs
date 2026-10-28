@@ -563,6 +563,8 @@ struct Parser<'a, F> {
     formal_strings: bool,
     /// Formals independently established as type operands before ambiguous expressions are reparsed.
     type_parameters: HashSet<usize>,
+    /// Formals under bare GNU alignment, which admit `sizeof(T)` type operands but prove no cast.
+    aligned_parameters: HashSet<usize>,
     /// Potential formal applications that need independent type evidence before becoming casts.
     ambiguous_casts: HashSet<NodeId>,
     /// One shared expression arena for the complete expression or structured statement replacement.
@@ -627,6 +629,7 @@ fn parse(
         parameters: parameters.iter().enumerate().map(|(i, name)| (name.as_str(), i)).collect(),
         formal_strings,
         type_parameters: HashSet::new(),
+        aligned_parameters: HashSet::new(),
         ambiguous_casts: HashSet::new(),
         nodes: Vec::new(),
         is_type,
@@ -690,18 +693,17 @@ fn parse(
     // GNU alignment also accepts expressions, so bare alignment cannot prove
     // that an ambiguous application is a cast. Its existing admitted type
     // family can still resolve sizeof operands after that ambiguity check.
-    parser.type_parameters.extend(parser.nodes.iter().filter_map(|node| match node.kind {
-        ExpressionKind::AlignOfTypeParameter { parameter, .. } => Some(parameter),
-        _ => None,
-    }));
-    if !parser.type_parameters.is_empty()
-        && (!parser.ambiguous_casts.is_empty()
-            || parser
-                .nodes
-                .iter()
-                .any(|node| matches!(node.kind, ExpressionKind::SizeOfExpression { .. })))
-    {
-        // Reparse once so later type uses also resolve earlier sizeof operands.
+    parser.aligned_parameters = parser
+        .nodes
+        .iter()
+        .filter_map(|node| match node.kind {
+            ExpressionKind::AlignOfTypeParameter { parameter, .. } => Some(parameter),
+            _ => None,
+        })
+        .collect();
+    if !parser.type_parameters.is_empty() || !parser.aligned_parameters.is_empty() {
+        // Reparse once so type evidence anywhere in the arena also resolves
+        // earlier sizeof operands and `(T) - 1`-style casts, in either order.
         parser.position = 0;
         parser.nodes.clear();
         parser.ambiguous_casts.clear();
@@ -959,7 +961,8 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
                     && (alignment
                         || pointers != 0
                         || is_const
-                        || self.type_parameters.contains(&parameter))
+                        || self.type_parameters.contains(&parameter)
+                        || self.aligned_parameters.contains(&parameter))
                 {
                     self.position = end + 1;
                     let tokens = TokenRange { start, end: self.tokens[end].index + 1 };
@@ -2106,6 +2109,92 @@ mod tests {
             1,
             "reparsing must not leave the earlier sizeof value hole"
         );
+    }
+
+    /// Once a formal is proven to be a type, `(t)` before a unary-capable operator is a cast in
+    /// either source order, as it is in C.
+    #[test]
+    fn independent_type_uses_resolve_formal_operator_casts_in_either_source_order() {
+        for proof in [
+            vec!["sizeof", "(", "t", "*", ")"],
+            vec!["_Alignof", "(", "const", "t", ")"],
+            vec!["(", "t", "*", ")", "x"],
+            vec!["(", "const", "t", ")", "x"],
+            vec!["__builtin_offsetof", "(", "t", ",", "field", ")"],
+        ] {
+            // `(t) ++ x` is refused by the first pass, where `++` is postfix on a value.
+            for operator in ["-", "+", "*", "&"] {
+                let cast = ["(", "t", ")", operator, "x"];
+                for first in [true, false] {
+                    let body = if first {
+                        [proof.as_slice(), &[","], cast.as_slice()].concat()
+                    } else {
+                        [cast.as_slice(), &[","], proof.as_slice()].concat()
+                    };
+                    let expression =
+                        parse_expression(&tokens(&body), &["t".into(), "x".into()], |_| false)
+                            .unwrap();
+                    assert!(
+                        expression.nodes.iter().any(|node| matches!(
+                            node.kind,
+                            ExpressionKind::TypeParameterCast { parameter: 0, pointers: 0, .. }
+                        )),
+                        "{body:?}"
+                    );
+                    assert!(
+                        !expression.nodes.iter().any(|node| matches!(
+                            node.kind,
+                            ExpressionKind::Parameter { index: 0 }
+                        )),
+                        "a proven type must not leave a value hole: {body:?}"
+                    );
+                }
+            }
+        }
+    }
+
+    /// Bare GNU alignment also accepts an expression, so it never turns `(t) - 1` into a cast,
+    /// even when another operand forces the reparse.
+    #[test]
+    fn bare_alignment_does_not_make_formal_operator_casts() {
+        for body in [
+            vec!["(", "t", ")", "-", "1", ",", "_Alignof", "(", "t", ")"],
+            vec!["_Alignof", "(", "t", ")", ",", "(", "t", ")", "-", "1"],
+            vec!["(", "t", ")", "-", "1", ",", "_Alignof", "(", "t", ")", ",", "sizeof", "x"],
+            vec![
+                "(", "t", ")", "-", "1", ",", "_Alignof", "(", "t", ")", ",", "sizeof", "(", "u",
+                "*", ")",
+            ],
+        ] {
+            let expression =
+                parse_expression(&tokens(&body), &["t".into(), "x".into(), "u".into()], |_| false)
+                    .unwrap();
+            assert!(
+                expression
+                    .nodes
+                    .iter()
+                    .any(|node| matches!(node.kind, ExpressionKind::Parameter { index: 0 })),
+                "{body:?}"
+            );
+            assert!(
+                !expression
+                    .nodes
+                    .iter()
+                    .any(|node| matches!(node.kind, ExpressionKind::TypeParameterCast { .. })),
+                "{body:?}"
+            );
+        }
+        // Bare alignment still admits the same formal as a sizeof type operand.
+        let expression = parse_expression(
+            &tokens(&["sizeof", "(", "t", ")", ",", "_Alignof", "(", "t", ")", ",", "sizeof", "x"]),
+            &["t".into(), "x".into()],
+            |_| false,
+        )
+        .unwrap();
+        assert!(expression.nodes.iter().any(|node| matches!(
+            node.kind,
+            ExpressionKind::SizeOfTypeParameter { parameter: 0, pointers: 0, is_const: false }
+        )));
     }
 
     /// Checks unambiguous callable grouping and catalog casts keep their roles.

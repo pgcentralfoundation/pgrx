@@ -462,6 +462,7 @@ fn type_measurements_keep_earlier_operand_roles_of_the_same_formal() {
         ("ROLE_ALIGN_THEN_VALUE", 0, ParameterRole::Value),
         ("ROLE_MEMBER_THEN_SIZE", 1, ParameterRole::Identifier),
         ("ROLE_SIZE_THEN_MEMBER", 1, ParameterRole::Identifier),
+        ("ROLE_ALIGN_SUBTRACT", 0, ParameterRole::Value),
     ];
     let names = cases.iter().map(|(name, ..)| *name).collect::<Vec<_>>();
     let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
@@ -489,6 +490,8 @@ _Static_assert(sizeof(ROLE_VALUE_THEN_ALIGN(role_value)) == sizeof(unsigned long
 _Static_assert(sizeof(ROLE_ALIGN_THEN_VALUE(role_value)) == sizeof(unsigned long), "GNU alignment of a value");
 _Static_assert(sizeof(ROLE_MEMBER_THEN_SIZE(&role_record, RoleField)) == sizeof(unsigned long), "a member and a typedef can share a name");
 _Static_assert(sizeof(ROLE_SIZE_THEN_MEMBER(&role_record, RoleField)) == sizeof(unsigned long), "a member and a typedef can share a name");
+_Static_assert(sizeof(ROLE_ALIGN_SUBTRACT(role_value, role_value)) == sizeof(unsigned long), "GNU alignment of a value");
+_Static_assert(sizeof(ROLE_ALIGN_SUBTRACT(long, role_value)) == sizeof(unsigned long), "the same replacement casts a type");
 "#,
         &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
         false,
