@@ -3923,9 +3923,13 @@ mod tests {
         assert!(rejected(add::<Undefined, _, _>, wrapping), "p + 2^62 must not wrap to p");
         assert!(rejected(sub::<Undefined, _, _>, wrapping), "p - 2^62 must not wrap to p");
         assert!(rejected(|p, n| index(p, n).pointer(), wrapping), "p[2^62] must not wrap to p[0]");
-        // Negating the most negative count must not wrap back to that count.
+        // LLONG_MIN four-byte elements overflow the stride multiplication.
         let minimum = CValue::<CLongLong>::new(i64::MIN);
         assert!(rejected(sub::<Undefined, _, _>, minimum), "p - LLONG_MIN must not wrap");
+        // -(2^61) four-byte elements span exactly isize::MIN bytes, so only
+        // negating that byte offset for subtraction can overflow.
+        let minimum_bytes = CValue::<CLongLong>::new(-(1 << 61));
+        assert!(rejected(sub::<Undefined, _, _>, minimum_bytes), "p - -(2^61) must not wrap");
         // In-range offsets keep exact element strides in both directions.
         let last = add::<Undefined, _, _>(first, input(3_i32));
         // SAFETY: last points to the initialized fourth element of this live array.
