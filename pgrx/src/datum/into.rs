@@ -235,10 +235,13 @@ impl IntoDatum for i64 {
 }
 
 /// for real
+///
+/// The Datum holds the bits as PostgreSQL's `Float4GetDatum` stores them: as a C `int32`,
+/// sign-extended to the Datum's width.
 impl IntoDatum for f32 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self.to_bits().into())
+        Some((self.to_bits() as i32).into())
     }
 
     fn type_oid() -> pg_sys::Oid {

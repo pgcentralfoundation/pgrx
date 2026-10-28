@@ -173,6 +173,12 @@ and so does an `i8` returned from a `#[pg_extern]` function. On targets where C
 `char` is unsigned, such as Linux AArch64, `(-1_i8).into_datum()` now holds `0xFF`
 instead of all one bits. `FromDatum for i8` reads both as `-1`.
 
+`IntoDatum for f32`, and an `f32` returned from a `#[pg_extern]` function, now
+store the bits as PostgreSQL's `Float4GetDatum` does: as a C `int32`,
+sign-extended to the Datum's width. With 64-bit pointers, the Datum of a negative
+`f32` now has its upper 32 bits set instead of clear. `FromDatum for f32` reads
+both forms.
+
 `pg_sys::Datum`'s integer conversions now follow Rust's exposed-provenance
 rules. `Datum::value()` and `usize::from(datum)` expose a pointer's provenance,
 and `Datum::from` an integer uses `core::ptr::with_exposed_provenance_mut`, so a
