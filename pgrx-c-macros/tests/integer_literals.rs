@@ -190,10 +190,11 @@ fn binary_literals_keep_digits_and_c_types_under_c23() {
     let scanner = MacroScanner::new().expect("libclang must be available");
     let frontend = match inspect(&scanner, &header(), &arguments("c23"), None) {
         Ok(frontend) => frontend,
-        Err(FrontendError::CompilerFailed { diagnostics, .. })
-            if diagnostics
-                .lines()
-                .any(|line| line.ends_with("error: invalid value 'c23' in '-std=c23'")) =>
+        Err(FrontendError::WithInputs { error, .. })
+            if matches!(&*error, FrontendError::CompilerFailed { diagnostics, .. }
+                if diagnostics
+                    .lines()
+                    .any(|line| line.ends_with("error: invalid value 'c23' in '-std=c23'"))) =>
         {
             eprintln!("C23 binary-literal spelling probe unavailable: Clang rejects -std=c23");
             return;

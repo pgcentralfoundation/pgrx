@@ -155,15 +155,11 @@ pub enum FrontendError {
         PathBuf,
     ),
     /// No acceptable executable could be selected for the loaded libclang release.
-    #[error("could not find a compatible Clang executable: {reason}")]
-    CompilerUnavailable {
+    #[error("could not find a compatible Clang executable: {0}")]
+    CompilerUnavailable(
         /// The missing or incompatible compiler selection detail.
-        reason: String,
-        /// Candidates, directories and environment values the lookup examined. A caller that
-        /// caches this refusal must track them, so installing a compatible compiler or changing
-        /// its lookup environment invalidates the refusal.
-        inputs: Box<BuildInputs>,
-    },
+        String,
+    ),
     /// Compiler paths, inputs, or effective semantics disagreed with the recorded inspection.
     #[error("incompatible compiler environment: {0}")]
     Environment(
@@ -176,6 +172,16 @@ pub enum FrontendError {
         /// The malformed or incomplete compiler output detail.
         String,
     ),
+    /// Inspection failed after compiler lookup. A caller that caches the failure must track
+    /// `inputs`: installing, replacing or reordering compilers can change the outcome.
+    #[error("{error}")]
+    WithInputs {
+        /// The failure itself.
+        error: Box<FrontendError>,
+        /// The lookup's candidates, directories and environment, or the complete profile inputs
+        /// once inspection has recorded them.
+        inputs: Box<BuildInputs>,
+    },
 }
 
 /// Owned driver output from one bounded invocation; later phases interpret stdout facts and stderr
@@ -192,6 +198,7 @@ pub(crate) struct CompilerOutput {
 /// Clang's final macro dump supplies active definitions. Libclang supplies physical
 /// origins and compiler/command-line context. Repeated observations of the same
 /// origin are deduplicated; distinct matching physical definitions remain ambiguous.
+/// A failure after compiler lookup is [`FrontendError::WithInputs`].
 pub fn inspect(
     scanner: &MacroScanner,
     header: &Path,
@@ -213,16 +220,46 @@ pub(crate) fn inspect_with_compiler_hint(
     let arguments = prepare_arguments(arguments)?;
     validate_arguments(&arguments)?;
     let requested_header = input_path(header)?;
+    let libclang_version = clang::get_version();
+    let CompilerSelection { executable, search } =
+        find_compiler(preferred_compiler, configured_compiler, &libclang_version)?;
+    // Builds cache a failed inspection like any other result. From here on a
+    // failure carries what it examined, so the changes that would invalidate a
+    // successful profile also retry the failure: the lookup until the profile's
+    // inputs are recorded, then those inputs.
+    let mut frontend = inspect_selected(
+        scanner,
+        requested_header,
+        arguments,
+        executable,
+        libclang_version,
+        &search,
+    )
+    .map_err(|error| search.track(error))?;
+    if let Err(error) = prove_snapshot_facts(scanner, &mut frontend) {
+        let inputs = Box::new(frontend.profile.inputs);
+        return Err(FrontendError::WithInputs { error: Box::new(error), inputs });
+    }
+    Ok(frontend)
+}
+
+/// Reconcile driver and libclang observations under the selected driver and record the inputs
+/// of the resulting profile.
+fn inspect_selected(
+    scanner: &MacroScanner,
+    requested_header: PathBuf,
+    arguments: Vec<String>,
+    compiler: PathBuf,
+    libclang_version: String,
+    search: &CompilerSearch,
+) -> Result<FrontendOutput, FrontendError> {
     // The supplied spelling determines quoted-include lookup, including through
     // symlink wrappers. Canonical paths are only identities for comparison/tracking.
     let header = requested_header.clone();
-    let libclang_version = clang::get_version();
-    let CompilerSelection { executable: compiler, search } =
-        find_compiler(preferred_compiler, configured_compiler, &libclang_version)?;
     let version = run_compiler(&compiler, &["--version".into()])?.stdout;
     let version = version.lines().next().unwrap_or_default().to_owned();
     if version_major(&version) != version_major(&libclang_version) {
-        return Err(search.unavailable(format!(
+        return Err(FrontendError::Environment(format!(
             "{} is {version}; the loaded library is {libclang_version}",
             compiler.display()
         )));
@@ -322,7 +359,7 @@ pub(crate) fn inspect_with_compiler_hint(
         input_files.insert(absolute_path(library.path())?);
     }
     let inputs = build_inputs(&arguments, &preprocessing.stderr, input_files, search)?;
-    let mut frontend = FrontendOutput {
+    Ok(FrontendOutput {
         profile: CompilationProfile {
             header,
             compiler: CompilerIdentity { executable: compiler, version, libclang_version },
@@ -336,8 +373,16 @@ pub(crate) fn inspect_with_compiler_hint(
         declarations,
         inventory,
         dependencies: macro_dependencies,
-    };
-    for (name, definition) in definitions::prove(scanner, &frontend)? {
+    })
+}
+
+/// Prove facts that need the complete frontend snapshot: local inline definitions, bitfield
+/// access and compiler builtins.
+fn prove_snapshot_facts(
+    scanner: &MacroScanner,
+    frontend: &mut FrontendOutput,
+) -> Result<(), FrontendError> {
+    for (name, definition) in definitions::prove(scanner, frontend)? {
         let info = frontend
             .declarations
             .function_signatures
@@ -346,11 +391,11 @@ pub(crate) fn inspect_with_compiler_hint(
         info.definition_available = true;
         info.definition = definition;
     }
-    frontend.declarations.bitfields = bitfields::probe(scanner, &frontend)?;
-    let builtins = builtins::prove(scanner, &frontend)?;
+    frontend.declarations.bitfields = bitfields::probe(scanner, frontend)?;
+    let builtins = builtins::prove(scanner, frontend)?;
     frontend.declarations.builtins = builtins.supported;
     frontend.declarations.builtin_unavailable = builtins.unavailable;
-    Ok(frontend)
+    Ok(())
 }
 
 /// Resolve a filesystem identity for comparison and rebuild tracking without reusing it as include
@@ -429,11 +474,11 @@ fn find_compiler(
 ) -> Result<CompilerSelection, FrontendError> {
     let explicit =
         preferred.map(PathBuf::from).or_else(|| std::env::var_os("CLANG_PATH").map(PathBuf::from));
-    let major =
-        version_major(library_version).ok_or_else(|| FrontendError::CompilerUnavailable {
-            reason: format!("unrecognized libclang version {library_version}"),
-            inputs: Box::default(),
-        })?;
+    let major = version_major(library_version).ok_or_else(|| {
+        FrontendError::CompilerUnavailable(format!(
+            "unrecognized libclang version {library_version}"
+        ))
+    })?;
     let adjacent =
         clang_sys::get_library().and_then(|library| {
             library.path().parent().and_then(Path::parent).map(|prefix| {
@@ -457,10 +502,10 @@ fn select_compiler(
 ) -> Result<CompilerSelection, FrontendError> {
     let mut search = CompilerSearch::default();
     if let Some(explicit) = explicit {
-        return match search.resolve(explicit, search_roots)? {
-            Some(executable) => Ok(CompilerSelection { executable, search }),
-            None => Err(search.unavailable(explicit.display().to_string())),
-        };
+        let executable = search.resolve(explicit, search_roots)?.ok_or_else(|| {
+            search.track(FrontendError::CompilerUnavailable(explicit.display().to_string()))
+        })?;
+        return Ok(CompilerSelection { executable, search });
     }
     let names = [
         format!("clang-{major}{}", std::env::consts::EXE_SUFFIX),
@@ -474,7 +519,9 @@ fn select_compiler(
             return Ok(CompilerSelection { executable, search });
         }
     }
-    Err(search.unavailable(format!("no executable matches libclang major {major}; set CLANG_PATH")))
+    Err(search.track(FrontendError::CompilerUnavailable(format!(
+        "no executable matches libclang major {major}; set CLANG_PATH"
+    ))))
 }
 
 /// Record executable spelling, identity, and lookup roots during driver preference resolution.
@@ -525,13 +572,16 @@ impl CompilerSearch {
         }
     }
 
-    /// Refuse selection together with the lookup that produced the refusal. A build caches the
-    /// refusal, so creating or replacing an examined candidate must still invalidate it. If the
-    /// lookup itself cannot be recorded, report that failure as a successful inspection would.
-    fn unavailable(self, reason: String) -> FrontendError {
+    /// Attach this lookup to a failure that followed it. A build caches the failure, so creating
+    /// or replacing an examined candidate, or changing PATH when it was searched, must retry it.
+    /// If the lookup itself cannot be recorded, report that failure as a successful inspection
+    /// would.
+    fn track(&self, error: FrontendError) -> FrontendError {
         match build_inputs(&[], "", BTreeSet::new(), self) {
-            Ok(inputs) => FrontendError::CompilerUnavailable { reason, inputs: Box::new(inputs) },
-            Err(error) => error,
+            Ok(inputs) => {
+                FrontendError::WithInputs { error: Box::new(error), inputs: Box::new(inputs) }
+            }
+            Err(recording) => recording,
         }
     }
 }
@@ -2098,7 +2148,7 @@ fn build_inputs(
     arguments: &[String],
     verbose: &str,
     mut files: BTreeSet<PathBuf>,
-    compiler_search: CompilerSearch,
+    compiler_search: &CompilerSearch,
 ) -> Result<BuildInputs, FrontendError> {
     // Successful header-availability searches appear in dependency output even
     // when the header is never included. Track both its lookup spelling and
@@ -2171,8 +2221,8 @@ fn build_inputs(
             directories.insert(path);
         }
     }
-    files.extend(compiler_search.files);
-    directories.extend(compiler_search.required_directories);
+    files.extend(compiler_search.files.iter().cloned());
+    directories.extend(compiler_search.required_directories.iter().cloned());
     let environment = [
         "PATH",
         "CLANG_PATH",
@@ -3069,7 +3119,7 @@ mod tests {
         assert_eq!(result.dependencies, BTreeSet::from([dependency.clone()]));
         assert_eq!(result.included, BTreeSet::from([dependency.clone(), header.clone()]));
         let inputs =
-            build_inputs(&[], &verbose, result.dependencies, CompilerSearch::default()).unwrap();
+            build_inputs(&[], &verbose, result.dependencies, &CompilerSearch::default()).unwrap();
         verify_input_files(&inputs).unwrap();
         std::fs::write(&dependency, "changed\n").unwrap();
         assert!(verify_input_files(&inputs).is_err(), "dependency-only changes invalidate facts");
@@ -3576,7 +3626,7 @@ mod tests {
                     .collect::<BTreeSet<_>>(),
                 BTreeSet::from([roots[0].join("clang-21"), roots[1].join("clang-21")])
             );
-            let inputs = build_inputs(&[], "", BTreeSet::new(), selection.search).unwrap();
+            let inputs = build_inputs(&[], "", BTreeSet::new(), &selection.search).unwrap();
             assert!(inputs.files.contains(&adjacent));
             assert_eq!(inputs.fingerprints[&adjacent], None);
             assert!(inputs.fingerprints[&path_compiler].is_some());
@@ -3608,7 +3658,7 @@ mod tests {
             assert_eq!(selection.executable, adjacent);
             assert!(selection.search.files.contains(&configured));
             assert!(selection.search.files.contains(&actual.canonicalize().unwrap()));
-            let inputs = build_inputs(&[], "", BTreeSet::new(), selection.search).unwrap();
+            let inputs = build_inputs(&[], "", BTreeSet::new(), &selection.search).unwrap();
             let rejected_identity = inputs.fingerprints[&configured].clone();
             assert!(rejected_identity.is_some());
 
@@ -3620,7 +3670,7 @@ mod tests {
                 !selection.search.files.contains(&adjacent),
                 "lower-priority tools were not examined"
             );
-            let inputs = build_inputs(&[], "", BTreeSet::new(), selection.search).unwrap();
+            let inputs = build_inputs(&[], "", BTreeSet::new(), &selection.search).unwrap();
             assert_ne!(inputs.fingerprints[&configured], rejected_identity);
         }
 
@@ -3652,7 +3702,8 @@ mod tests {
             let missing = fixture.0.join("missing-explicit-clang");
             assert!(matches!(
                 select_compiler(Some(&missing), Some(hint), Some(&adjacent), 21, &roots),
-                Err(FrontendError::CompilerUnavailable { .. })
+                Err(FrontendError::WithInputs { error, .. })
+                    if matches!(*error, FrontendError::CompilerUnavailable(_))
             ));
         }
 
@@ -3669,11 +3720,12 @@ mod tests {
             }
             let rejected = roots[1].join("clang");
             compiler(&rejected, 19);
-            let Err(FrontendError::CompilerUnavailable { inputs, .. }) =
+            let Err(FrontendError::WithInputs { error, inputs }) =
                 select_compiler(None, None, Some(&adjacent), 21, &roots)
             else {
                 panic!("no candidate matches libclang 21");
             };
+            assert!(matches!(*error, FrontendError::CompilerUnavailable(_)));
             let missing = roots[1].join("clang-21");
             assert_eq!(inputs.fingerprints[&adjacent], None);
             assert_eq!(inputs.fingerprints[&roots[0].join("clang-21")], None);
@@ -3681,17 +3733,65 @@ mod tests {
             assert!(inputs.fingerprints[&rejected].is_some(), "rejected tools are inputs too");
             assert!(inputs.environment.contains_key("PATH"));
 
-            let Err(FrontendError::CompilerUnavailable { inputs, .. }) =
+            let Err(FrontendError::WithInputs { error, inputs }) =
                 select_compiler(Some(&missing), None, Some(&adjacent), 21, &roots)
             else {
                 panic!("a missing explicit compiler is unavailable");
             };
+            assert!(matches!(*error, FrontendError::CompilerUnavailable(_)));
             assert_eq!(inputs.fingerprints[&missing], None);
             assert!(!inputs.environment.contains_key("PATH"), "absolute hints skip PATH");
 
             compiler(&missing, 21);
             let selection = select_compiler(None, None, Some(&adjacent), 21, &roots).unwrap();
             assert_eq!(selection.executable, missing);
+            let FrontendError::WithInputs { inputs, .. } =
+                selection.search.track(FrontendError::Output("a later phase failed".into()))
+            else {
+                panic!("a recorded lookup accompanies later failures");
+            };
+            assert!(inputs.fingerprints[&missing].is_some(), "the selected compiler is an input");
+            assert!(inputs.environment.contains_key("PATH"), "PATH selected the compiler");
+        }
+
+        /// Inspection failures after selection retain the lookup. Builds cache the failure, so
+        /// repairing or replacing the selected compiler must remain observable.
+        #[test]
+        fn failures_after_selection_retain_the_selected_compiler() {
+            let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+            let scanner = MacroScanner::new().unwrap();
+            let major = version_major(&clang::get_version()).unwrap();
+            let fixture = Fixture::new();
+            let header = fixture.0.join("probe.h");
+            fs::write(&header, "#define PROBE 1\n").unwrap();
+            let broken = fixture.0.join("broken-clang");
+            script(&broken, "exit 3");
+            let mismatched = fixture.0.join("mismatched-clang");
+            compiler(&mismatched, major + 1);
+            let partial = fixture.0.join("partial-clang");
+            script(
+                &partial,
+                &format!(
+                    "[ \"$1\" = --version ] || exit 3\nprintf '%s\\n' 'clang version {major}.0.0'"
+                ),
+            );
+            for (selected, wrong_version) in
+                [(&broken, false), (&mismatched, true), (&partial, false)]
+            {
+                let Err(FrontendError::WithInputs { error, inputs }) =
+                    inspect(&scanner, &header, &[], Some(selected))
+                else {
+                    panic!("{} cannot inspect C", selected.display());
+                };
+                let expected = if wrong_version {
+                    matches!(*error, FrontendError::Environment(_))
+                } else {
+                    matches!(*error, FrontendError::CompilerFailed { .. })
+                };
+                assert!(expected, "{}: {error}", selected.display());
+                assert!(inputs.fingerprints[selected].is_some(), "{}", selected.display());
+                assert!(!inputs.environment.contains_key("PATH"), "absolute hints skip PATH");
+            }
         }
 
         /// Checks replacing a direct directory hint keeps it distinct from path lookups.
@@ -3708,7 +3808,7 @@ mod tests {
                 select_compiler(None, Some(&configured), Some(&adjacent), 21, &[]).unwrap();
             assert_eq!(selection.executable, adjacent);
             assert!(!selection.search.searched_path);
-            let inputs = build_inputs(&[], "", BTreeSet::new(), selection.search).unwrap();
+            let inputs = build_inputs(&[], "", BTreeSet::new(), &selection.search).unwrap();
             assert!(inputs.directories.contains(&configured));
             assert!(inputs.directories.contains(&actual.canonicalize().unwrap()));
             assert!(inputs.executable_search_directories.is_empty());
@@ -3761,7 +3861,7 @@ mod tests {
             compiler(&compiler_path, 21);
             let roots = [fixture.0.join("unused-root")];
             let selection = select_compiler(Some(&compiler_path), None, None, 21, &roots).unwrap();
-            let inputs = build_inputs(&[], "", BTreeSet::new(), selection.search).unwrap();
+            let inputs = build_inputs(&[], "", BTreeSet::new(), &selection.search).unwrap();
             assert!(!inputs.environment.contains_key("PATH"));
             assert!(inputs.executable_search_directories.is_empty());
             assert!(inputs.directories.is_empty());
@@ -3770,8 +3870,12 @@ mod tests {
         /// Create a synthetic executable whose version response exercises driver preference and
         /// invalidation without invoking Clang.
         fn compiler(path: &Path, major: u32) {
-            fs::write(path, format!("#!/bin/sh\nprintf '%s\\n' 'clang version {major}.0.0'\n"))
-                .unwrap();
+            script(path, &format!("printf '%s\\n' 'clang version {major}.0.0'"));
+        }
+
+        /// Create a synthetic executable shell script with the given body.
+        fn script(path: &Path, body: &str) {
+            fs::write(path, format!("#!/bin/sh\n{body}\n")).unwrap();
             let mut permissions = fs::metadata(path).unwrap().permissions();
             permissions.set_mode(0o755);
             fs::set_permissions(path, permissions).unwrap();

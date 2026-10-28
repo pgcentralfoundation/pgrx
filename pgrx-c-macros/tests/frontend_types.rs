@@ -97,15 +97,16 @@ fn intrinsic_macro_shadow_disables_only_offsets_and_cannot_spoof_required_type_p
         inspect(&scanner, &header, &["-std=c17".into(), "-Dfirst=0".into()], None).unwrap();
     assert!(!rewritten_field.profile().target.offsetof_supported);
     assert!(rewritten_field.declarations().function_signatures.contains_key("front_external"));
-    let error = inspect(
+    let Err(FrontendError::WithInputs { error, .. }) = inspect(
         &scanner,
         &header,
         &["-std=c17".into(), "-D__builtin_types_compatible_p(a,b)=1".into()],
         None,
-    )
-    .unwrap_err();
+    ) else {
+        panic!("a shadowed type-compatibility builtin must refuse inspection");
+    };
     assert!(
-        matches!(error, FrontendError::Environment(message) if message.contains("unshadowed __builtin_types_compatible_p"))
+        matches!(&*error, FrontendError::Environment(message) if message.contains("unshadowed __builtin_types_compatible_p"))
     );
 }
 

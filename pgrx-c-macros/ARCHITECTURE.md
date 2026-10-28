@@ -1366,11 +1366,17 @@ linkage is published on that path. Unsupported target families and
 `PGRX_C_MACROS=0` skip inspection altogether. Compiler inspection is still
 required for a successful macro artifact; fallback never guesses C semantics.
 Cargo caches the unavailable result like any other build-script output, so a
-refusal must remain invalidated by what it examined. `CompilerUnavailable`
-carries the candidates and environment of the failed compiler lookup, and the
-build tracks them before publishing the refusal. A successful inspection's
-inputs are tracked before the later optional phases run, so a refusal from those
-phases is invalidated by the same changes as a generated tree.
+refusal needs the same invalidation as a generated tree. Every inspection
+failure after compiler lookup, including a failed lookup, is
+`FrontendError::WithInputs`. It carries the lookup's candidates, directories and
+environment, or the profile's complete inputs once inspection has recorded them,
+and the build tracks them before publishing the refusal. A successful
+inspection's inputs are tracked before the later optional phases run, so a
+refusal from those phases is invalidated by the same changes as a generated
+tree. Refusals raised before the lookup, such as rejected arguments or an
+unloadable libclang, and failures while recording PostgreSQL configuration
+inputs after inspection carry no inputs; only the build's fixed environment and
+file directives invalidate them.
 
 The loaded libclang wrapper permits one live runtime owner in a process. The
 build serializes scanner/bindgen inspection around that ownership constraint,

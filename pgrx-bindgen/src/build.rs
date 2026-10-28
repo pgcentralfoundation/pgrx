@@ -1444,9 +1444,7 @@ fn generate_macros(
     ) {
         Ok(frontend) => frontend,
         Err(error) => {
-            if let PostgresError::Frontend(FrontendError::CompilerUnavailable { inputs, .. }) =
-                &error
-            {
+            if let PostgresError::Frontend(FrontendError::WithInputs { inputs, .. }) = &error {
                 emit_macro_rerun_inputs(inputs, native.out_dir)
                     .wrap_err_with(|| error.to_string())?;
             }

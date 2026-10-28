@@ -86,10 +86,11 @@ fn c23_keywords_are_not_captured_as_runtime_identifiers() {
     let frontend =
         match inspect(&scanner, &header, &["-std=c23".into(), "-pedantic-errors".into()], None) {
             Ok(frontend) => frontend,
-            Err(FrontendError::CompilerFailed { diagnostics, .. })
-                if diagnostics
-                    .lines()
-                    .any(|line| line.ends_with("error: invalid value 'c23' in '-std=c23'")) =>
+            Err(FrontendError::WithInputs { error, .. })
+                if matches!(&*error, FrontendError::CompilerFailed { diagnostics, .. }
+                    if diagnostics
+                        .lines()
+                        .any(|line| line.ends_with("error: invalid value 'c23' in '-std=c23'"))) =>
             {
                 eprintln!("C23 keyword probe unavailable: the selected compiler rejects -std=c23");
                 return;
@@ -526,10 +527,11 @@ fn binary_literals_require_c23_and_compile_under_the_original_c23_profile() {
         None,
     ) {
         Ok(frontend) => frontend,
-        Err(FrontendError::CompilerFailed { diagnostics, .. })
-            if diagnostics
-                .lines()
-                .any(|line| line.ends_with("error: invalid value 'c23' in '-std=c23'")) =>
+        Err(FrontendError::WithInputs { error, .. })
+            if matches!(&*error, FrontendError::CompilerFailed { diagnostics, .. }
+                if diagnostics
+                    .lines()
+                    .any(|line| line.ends_with("error: invalid value 'c23' in '-std=c23'"))) =>
         {
             eprintln!(
                 "C23 positive probe unavailable: {} rejects -std=c23; strict C11 regression passed",

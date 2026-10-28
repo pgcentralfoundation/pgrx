@@ -231,21 +231,39 @@ fn main() -> ExitCode {
         Err(CliError::Json(error)) if error.io_error_kind() == Some(io::ErrorKind::BrokenPipe) => {
             ExitCode::SUCCESS
         }
-        Err(CliError::Discovery(Error::Diagnostics(diagnostics)))
-        | Err(CliError::Frontend(FrontendError::Discovery(Error::Diagnostics(diagnostics))))
-        | Err(CliError::Postgres(PostgresError::Discovery(Error::Diagnostics(diagnostics))))
-        | Err(CliError::Postgres(PostgresError::Frontend(FrontendError::Discovery(
-            Error::Diagnostics(diagnostics),
-        )))) => {
-            for diagnostic in &diagnostics {
-                print_diagnostic(diagnostic);
+        Err(error) => {
+            if let Some(diagnostics) = clang_diagnostics(&error) {
+                for diagnostic in diagnostics {
+                    print_diagnostic(diagnostic);
+                }
+            } else {
+                eprintln!("error: {error}");
             }
             ExitCode::FAILURE
         }
-        Err(error) => {
-            eprintln!("error: {error}");
-            ExitCode::FAILURE
+    }
+}
+
+/// Find the Clang diagnostics retained by a discovery failure, including one that a failed
+/// inspection carries together with its inputs.
+fn clang_diagnostics(error: &CliError) -> Option<&[Diagnostic]> {
+    let discovery = match error {
+        CliError::Discovery(error) | CliError::Postgres(PostgresError::Discovery(error)) => error,
+        CliError::Frontend(error) | CliError::Postgres(PostgresError::Frontend(error)) => {
+            let error = match error {
+                FrontendError::WithInputs { error, .. } => error,
+                error => error,
+            };
+            let FrontendError::Discovery(error) = error else {
+                return None;
+            };
+            error
         }
+        _ => return None,
+    };
+    match discovery {
+        Error::Diagnostics(diagnostics) => Some(diagnostics),
+        _ => None,
     }
 }
 

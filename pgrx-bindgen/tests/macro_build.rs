@@ -17,6 +17,7 @@
 
 use std::collections::BTreeMap;
 use std::fs;
+use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -515,8 +516,9 @@ fn main() {
         "failed raw-only imports cannot replace the previously published macro availability tree"
     );
 
-    // Cargo caches a refused compiler lookup like any other build-script result. Installing
-    // the requested compiler changes no tracked variable, but must still rerun generation.
+    // Cargo caches a refused compiler lookup like any other build-script result. Installing,
+    // repairing or replacing the requested compiler changes no tracked variable, but must still
+    // rerun generation.
     let compiler_bin = fixture.0.join("compiler-bin");
     fs::create_dir(&compiler_bin).unwrap();
     let requested = compiler_bin.join("clang");
@@ -530,11 +532,26 @@ fn main() {
         refused["reason"].as_str().unwrap().contains("compatible Clang executable"),
         "{refused}"
     );
-    std::os::unix::fs::symlink(&compiler, &requested).unwrap();
+    let install = |body: &str| {
+        fs::write(&requested, format!("#!/bin/sh\n{body}\n")).unwrap();
+        fs::set_permissions(&requested, fs::Permissions::from_mode(0o755)).unwrap();
+    };
+    install("exit 3");
+    assert_eq!(successful(lookup()), "lookup\n");
+    let refused = fixture.report();
+    assert_eq!(refused["status"], "unavailable");
+    assert!(
+        refused["reason"]
+            .as_str()
+            .unwrap()
+            .contains(&format!("Clang at {} failed", requested.display())),
+        "creating the requested compiler must rerun the refused generation: {refused}"
+    );
+    install(&format!("exec '{}' \"$@\"", compiler.display()));
     assert_eq!(successful(lookup()), "lookup\n");
     assert_eq!(
         fixture.report()["status"],
         "generated",
-        "creating the requested compiler must rerun the refused generation"
+        "repairing the selected compiler must rerun the refused generation"
     );
 }
