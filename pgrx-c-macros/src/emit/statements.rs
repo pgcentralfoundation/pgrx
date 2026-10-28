@@ -9,9 +9,20 @@
 //! Delegation is limited to proved whole-body wrappers, and a token guard rejects
 //! arguments whose local-name capture would differ under Rust macro hygiene.
 
-use super::{BindingCatalog, SUPPORT, macro_identifier, typed, write_fallback};
+use super::{BindingCatalog, INLINE_LABEL, SUPPORT, macro_identifier, typed, write_fallback};
 use crate::{AnalysisSession, MacroAnalysis, SkipReason, syntax::Statement};
 use std::fmt::Write;
+
+/// What a C `return` statement does in the lowered body.
+#[derive(Clone, Copy)]
+pub(super) enum Returns<'a> {
+    /// Exit the Rust function or closure that invoked the macro, converting to the
+    /// explicit C marker when one is given.
+    Caller(Option<&'a str>),
+    /// Yield the value of a translated inline function: break out of the labeled block
+    /// holding its body, converted to the function's C return type marker.
+    Value(&'a str),
+}
 
 /// Lower an entire admitted statement body, preserving ordered effects and return context.
 ///
@@ -22,7 +33,7 @@ pub(super) fn render(
     analysis: &MacroAnalysis,
     bindings: &BindingCatalog,
     renderer: &typed::Renderer<'_>,
-    explicit_marker: Option<&str>,
+    returns: Returns<'_>,
 ) -> Result<String, SkipReason> {
     let expression = analysis.expression.as_ref().expect("candidate statement expression");
     let body = expression.syntax.statement_body.as_ref().expect("statement body");
@@ -37,7 +48,8 @@ pub(super) fn render(
     // Root-only expression matching cannot establish equivalence of local
     // declarations or ordered side effects. Preserve only complete simple-return
     // wrappers until statement-aware delegation proves the entire body.
-    if let Ok(Some(delegation)) = crate::delegation::direct_delegation(session, analysis)
+    if let Returns::Caller(explicit_marker) = returns
+        && let Ok(Some(delegation)) = crate::delegation::direct_delegation(session, analysis)
         && bindings.macros.contains(&delegation.callee)
         && let Some(callee) = macro_identifier(&delegation.callee)
     {
@@ -62,7 +74,7 @@ pub(super) fn render(
             );
         }
     }
-    render_statements(&body.statements, renderer, explicit_marker, &mut rust)?;
+    render_statements(&body.statements, renderer, returns, &mut rust)?;
     rust.push('}');
     Ok(rust)
 }
@@ -71,7 +83,7 @@ pub(super) fn render(
 fn render_statements(
     statements: &[Statement],
     renderer: &typed::Renderer<'_>,
-    explicit_marker: Option<&str>,
+    returns: Returns<'_>,
     rust: &mut String,
 ) -> Result<(), SkipReason> {
     for statement in statements {
@@ -85,17 +97,24 @@ fn render_statements(
             }
             Statement::Block { statements, .. } => {
                 rust.push_str("{ ");
-                render_statements(statements, renderer, explicit_marker, rust)?;
+                render_statements(statements, renderer, returns, rust)?;
                 rust.push_str("} ");
             }
             Statement::Return { expression, .. } => {
-                let helper = if let Some(marker) = explicit_marker {
-                    format!("return_value_as::<${marker}, _>")
-                } else {
-                    String::from("return_value")
-                };
-                write!(rust, "return {SUPPORT}::expression_result::{helper}(")
-                    .expect("String output");
+                match returns {
+                    Returns::Caller(Some(marker)) => write!(
+                        rust,
+                        "return {SUPPORT}::expression_result::return_value_as::<${marker}, _>("
+                    ),
+                    Returns::Caller(None) => {
+                        write!(rust, "return {SUPPORT}::expression_result::return_value(")
+                    }
+                    Returns::Value(marker) => write!(
+                        rust,
+                        "break '{INLINE_LABEL} {SUPPORT}::expression::implicit::<{marker}, _>("
+                    ),
+                }
+                .expect("String output");
                 renderer.render(*expression, typed::Context::Value, rust)?;
                 rust.push_str("); ");
             }
@@ -106,7 +125,7 @@ fn render_statements(
                 render_statements(
                     std::slice::from_ref(then_branch.as_ref()),
                     renderer,
-                    explicit_marker,
+                    returns,
                     rust,
                 )?;
                 rust.push_str("} ");
@@ -115,7 +134,7 @@ fn render_statements(
                     render_statements(
                         std::slice::from_ref(else_branch.as_ref()),
                         renderer,
-                        explicit_marker,
+                        returns,
                         rust,
                     )?;
                     rust.push_str("} ");

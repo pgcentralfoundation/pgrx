@@ -275,36 +275,24 @@ fn emit_with_lowering<'a>(
     adapters: Option<&'a GeneratedAdapters>,
     lowering: &mut Option<types::Lowering<'a>>,
 ) -> MacroEmission {
-    let analysis = session.analyze(name);
-    let lowered = if let Some(reason) = binding_mismatch(session, &analysis, bindings) {
-        Err(reason)
-    } else if let AnalysisStatus::Skipped { reason } = &analysis.status {
-        Err(reason.clone())
-    } else {
-        let original = match session.frontend().environment().active.get(name) {
-            Some(active) => InvocationSource::Macro(&active.definition),
-            None => InvocationSource::Inline(
-                session
-                    .inline_definition(name)
-                    .expect("analyzed native roots retain their compiler-proven definition"),
-            ),
-        };
-        support_abi_assertions(session.frontend().profile())
-            .map_err(|error| {
-                skip(&analysis, SkipReasonCode::UnsupportedProfile, error.to_string(), None)
-            })
-            .and_then(|assertions| {
-                let lowering = lowering.get_or_insert_with(|| {
-                    types::Lowering::new(
-                        session.frontend().declarations(),
-                        bindings,
-                        adapters.map_or(types::GeneratedTypes::NONE, GeneratedAdapters::types),
-                        &session.frontend().profile().target,
-                    )
-                });
-                render(session, &analysis, original, &assertions, bindings, adapters, lowering)
-            })
-    };
+    let mut analysis = session.analyze(name);
+    let mut lowered = lower(session, &analysis, bindings, adapters, lowering);
+    // A translated inline function that cannot be rendered is still callable through
+    // its guarded native binding.
+    if lowered.is_err()
+        && session.inline_definition(name).is_some()
+        && analysis
+            .expression
+            .as_ref()
+            .is_some_and(|expression| expression.syntax.statement_body.is_some())
+        && let Some(call) = session.analyze_inline_call(name)
+    {
+        let fallback = lower(session, &call, bindings, adapters, lowering);
+        if fallback.is_ok() {
+            analysis = call;
+            lowered = fallback;
+        }
+    }
     let status = match lowered {
         Ok((rust, documentation)) => EmissionStatus::Emitted {
             rust,
@@ -314,6 +302,42 @@ fn emit_with_lowering<'a>(
         Err(reason) => EmissionStatus::Skipped { reason },
     };
     MacroEmission { analysis, status }
+}
+
+/// Check bindings and render one analyzed root.
+fn lower<'a>(
+    session: &'a AnalysisSession<'_>,
+    analysis: &MacroAnalysis,
+    bindings: &'a BindingCatalog,
+    adapters: Option<&'a GeneratedAdapters>,
+    lowering: &mut Option<types::Lowering<'a>>,
+) -> Result<(String, MacroDocumentation), SkipReason> {
+    if let Some(reason) = binding_mismatch(session, analysis, bindings) {
+        return Err(reason);
+    }
+    if let AnalysisStatus::Skipped { reason } = &analysis.status {
+        return Err(reason.clone());
+    }
+    let original = match session.frontend().environment().active.get(&analysis.name) {
+        Some(active) => InvocationSource::Macro(&active.definition),
+        None => InvocationSource::Inline(
+            session
+                .inline_definition(&analysis.name)
+                .expect("analyzed native roots retain their compiler-proven definition"),
+        ),
+    };
+    let assertions = support_abi_assertions(session.frontend().profile()).map_err(|error| {
+        skip(analysis, SkipReasonCode::UnsupportedProfile, error.to_string(), None)
+    })?;
+    let lowering = lowering.get_or_insert_with(|| {
+        types::Lowering::new(
+            session.frontend().declarations(),
+            bindings,
+            adapters.map_or(types::GeneratedTypes::NONE, GeneratedAdapters::types),
+            &session.frontend().profile().target,
+        )
+    });
+    render(session, analysis, original, &assertions, bindings, adapters, lowering)
 }
 
 /// Emit a set of macros, preserving available calls and propagating value mismatches.
@@ -935,7 +959,14 @@ fn render(
         &constants,
         lowering,
     );
-    let statement_body = expression.syntax.statement_body.as_ref();
+    // A translated inline function is a statement body whose returns yield the macro's
+    // value; it is emitted as an expression macro with the function's result type.
+    let inline_body = (matches!(original, InvocationSource::Inline(_))
+        && expression.syntax.statement_body.is_some())
+    .then(|| inline_result(session, analysis, lowering))
+    .transpose()?;
+    let statement_body =
+        expression.syntax.statement_body.as_ref().filter(|_| inline_body.is_none());
     let returning = statement_body.is_some_and(|body| body.return_tokens.is_some());
     let statement_boundary = statement_body.is_some_and(|body| body.requires_boundary);
     let normalizer = arguments.as_ref().map(|arguments| arguments.normalizer.as_str());
@@ -950,8 +981,24 @@ fn render(
             format!("$crate::{normalizer}!(@collect {mode} [{prefix}]; $($raw)*)")
         }
     };
-    let value = if statement_body.is_some() {
-        statements::render(session, analysis, bindings, &renderer, None)?
+    let value = if let Some(marker) = &inline_body {
+        let body = statements::render(
+            session,
+            analysis,
+            bindings,
+            &renderer,
+            statements::Returns::Value(marker),
+        )?;
+        // Translation requires every path to return, so the block always breaks with a value.
+        format!("'{INLINE_LABEL}: {body}")
+    } else if statement_body.is_some() {
+        statements::render(
+            session,
+            analysis,
+            bindings,
+            &renderer,
+            statements::Returns::Caller(None),
+        )?
     } else if empty {
         String::new()
     } else {
@@ -963,6 +1010,9 @@ fn render(
     }
     let title = match original {
         InvocationSource::Macro(_) => format!("C macro {}", analysis.name),
+        InvocationSource::Inline(_) if inline_body.is_some() => {
+            format!("C inline function {}", analysis.name)
+        }
         InvocationSource::Inline(_) => {
             format!("Typed call adapter for C inline function {}", analysis.name)
         }
@@ -988,7 +1038,10 @@ fn render(
             None,
         )
     })?);
-    if matches!(original, InvocationSource::Inline(_)) {
+    if inline_body.is_some() {
+        comment.push_str("\n\n");
+        comment.push_str(documentation::INLINE_BODY);
+    } else if matches!(original, InvocationSource::Inline(_)) {
         comment.push_str("\n\n");
         comment.push_str(documentation::INLINE_CALL);
     }
@@ -1022,8 +1075,8 @@ fn render(
     if local_guard.is_some() {
         comment.push_str(" Caller argument tokens must not mention the macro's C local names, even inside groups: those invocations are rejected because C substitution can capture locals that Rust hygiene would resolve differently. The scope check also inspects forwarded expression fragments and is bounded to 4096 stringified bytes. Matches in fields, paths or strings are conservatively rejected.");
     }
-    let explicit_boundary =
-        analysis.invocation == crate::InvocationContract::ExplicitExpressionBoundary;
+    let explicit_boundary = inline_body.is_none()
+        && analysis.invocation == crate::InvocationContract::ExplicitExpressionBoundary;
     let boundary_error = if statement_boundary {
         Some(
             "this C replacement requires an explicit braced invocation: use @__pgrx_c_statement; before its arguments",
@@ -1146,8 +1199,13 @@ fn render(
         let boundary_prefix = if statement_boundary { "@__pgrx_c_statement; " } else { "" };
         if returning {
             let return_marker = arguments::return_marker(analysis);
-            let explicit =
-                statements::render(session, analysis, bindings, &renderer, Some(&return_marker))?;
+            let explicit = statements::render(
+                session,
+                analysis,
+                bindings,
+                &renderer,
+                statements::Returns::Caller(Some(&return_marker)),
+            )?;
             writeln!(
                 &mut rust,
                 "(@__pgrx_emit_return_as; ${return_marker}:ty, {matcher}) => {{ {explicit} }};"
@@ -1194,6 +1252,12 @@ fn render(
                 "::core::compile_error!(\"an empty C macro has no expression operand\")".into()
             } else if mode == "value" {
                 value.clone()
+            } else if let Some(marker) = &inline_body {
+                match context {
+                    typed::Context::Discard => format!("{{ let _ = {value}; }}"),
+                    typed::Context::Size => format!("{SUPPORT}::expression::size_of::<{marker}>()"),
+                    _ => "compile_error!(\"a C function call result is not an lvalue\")".into(),
+                }
             } else {
                 match render_body(session, analysis, bindings, &renderer, context) {
                     Ok(body) => body,
@@ -1266,9 +1330,31 @@ fn render(
             explicit_boundary,
         ),
         hidden,
-        result: documentation::result(analysis, renderer),
+        result: documentation::result(analysis, renderer, inline_body.is_some()),
     };
     Ok((rust, documentation))
+}
+
+/// Label of the block holding a translated inline function body; `return` breaks out of it.
+const INLINE_LABEL: &str = "__pgrx_c_inline";
+
+/// Resolve a translated inline function's C return type to its runtime marker.
+fn inline_result(
+    session: &AnalysisSession<'_>,
+    analysis: &MacroAnalysis,
+    lowering: &types::Lowering<'_>,
+) -> Result<String, SkipReason> {
+    let refuse = |message: String| skip(analysis, SkipReasonCode::UnsupportedType, message, None);
+    let function = session
+        .frontend()
+        .declarations()
+        .function_signatures
+        .get(&analysis.name)
+        .ok_or_else(|| refuse("inline function has no compiler prototype".into()))?;
+    if function.signature.result.category == crate::TypeCategory::Void {
+        return Err(refuse("a void inline function has no value to translate".into()));
+    }
+    lowering.resolve(&function.signature.result).map(|lowered| lowered.marker).map_err(refuse)
 }
 
 /// Render a compiler-owned expression in the context its C caller requests.

@@ -88,6 +88,7 @@ fn compare(scanner: &MacroScanner, native: bool) {
         .iter()
         .copied()
         .chain(native.then_some(rejects).into_iter().flatten())
+        .chain(native.then_some(["ROOT_HIDDEN", "ROOT_PARTIAL"]).into_iter().flatten())
         .collect::<Vec<_>>();
     let session = AnalysisSession::prepare_with_inline_functions(
         scanner,
@@ -113,6 +114,16 @@ fn compare(scanner: &MacroScanner, native: bool) {
         let analysis = session.analyze("ROOT_CAPTURE");
         assert_eq!(analysis.parameters[0].name, "ROOT_CAPTURE");
         assert_eq!(analysis.parameters[0].uses.len(), 1);
+        // ROOT_HIDDEN's ROOT_SHADOW was a macro that is now an enum constant, so its
+        // unexpanded tokens would change meaning: only the native call remains.
+        // A body that can fall off its end without a value is not translated either.
+        for name in ["ROOT_HIDDEN", "ROOT_PARTIAL"] {
+            let analysis = session.analyze(name);
+            assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{analysis:?}");
+            assert!(analysis.expression.unwrap().syntax.statement_body.is_none(), "{name}");
+        }
+        let analysis = session.analyze("ROOT_INT");
+        assert!(analysis.expression.unwrap().syntax.statement_body.is_some());
     }
     let bindings = bindgen::Builder::default()
         .rust_target(bindgen::RustTarget::stable(85, 0).unwrap())
@@ -149,7 +160,22 @@ fn compare(scanner: &MacroScanner, native: bool) {
             panic!("root {} must emit: {emission:?}", emission.analysis.name);
         };
         if native && emission.analysis.name != "ROOT_COLLISION" {
-            assert!(definition.contains("Typed call adapter for C inline function"));
+            // Value-returning definitions the analyzer accepts are translated; a void
+            // function and a parameter named like its own function stay native calls.
+            let translated =
+                !matches!(emission.analysis.name.as_str(), "ROOT_VOID" | "ROOT_CAPTURE");
+            assert_eq!(
+                definition.contains("Translates the original function definition"),
+                translated,
+                "{}",
+                emission.analysis.name
+            );
+            assert_eq!(
+                definition.contains("Typed call adapter for C inline function"),
+                !translated,
+                "{}",
+                emission.analysis.name
+            );
             assert!(definition.contains("static inline"));
             assert!(!definition.contains(&format!("#define {}", emission.analysis.name)));
         }
@@ -170,12 +196,15 @@ fn compare(scanner: &MacroScanner, native: bool) {
             &arguments,
         );
         assert!(error.contains("discards qualifiers"), "{error}");
+        // A native call still needs unsafe; a translated pure function, like the
+        // equivalent C macro, does not.
         let error = rust_oracle::reject_rust(&format!(
-            "{rust}\n{prelude}\nfn main() {{ ROOT_INT!(7_i32).get(); }}\n"
+            "{rust}\n{prelude}\nfn main() {{ let mut value = 0_i32; ROOT_VOID!(&raw mut value, 7_i32).get(); }}\n"
         ));
         assert!(error.contains("unsafe"), "{error}");
     }
-    rust.push_str(&format!("const EXPECTED_GUARDS: usize = {};\n", if native { 16 } else { 0 }));
+    // Only ROOT_VOID and ROOT_CAPTURE remain native calls through the guard.
+    rust.push_str(&format!("const EXPECTED_GUARDS: usize = {};\n", if native { 2 } else { 0 }));
     rust.push_str(include_str!("fixtures/inline_roots.rs"));
     let profile = frontend.profile();
     let arguments = profile.arguments.iter().map(String::as_str).collect::<Vec<_>>();

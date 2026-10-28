@@ -214,6 +214,12 @@ impl<'a> AnalysisSession<'a> {
         crate::frontend::verify_input_files(self.inputs())
     }
 
+    /// Analyze an inline function root as a guarded call to the original function, for when
+    /// its translated definition cannot be emitted.
+    pub(crate) fn analyze_inline_call(&self, name: &str) -> Option<MacroAnalysis> {
+        self.inline_roots.get(name)?.analyze_call(self.frontend, name, &self.integer_constants)
+    }
+
     /// Analyze a prepared invocation, restore original formal names, and translate preprocessing
     /// failures into structured analysis skips.
     pub fn analyze(&self, name: &str) -> MacroAnalysis {

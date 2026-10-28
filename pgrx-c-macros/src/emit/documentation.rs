@@ -17,6 +17,8 @@ use std::fmt::Write;
 
 /// How a typed inline-function adapter calls and converts.
 pub(super) const INLINE_CALL: &str = "Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.";
+/// How a translated inline function body evaluates.
+pub(super) const INLINE_BODY: &str = "Translates the original function definition. Each operand is evaluated once and converted to its parameter type using C assignment rules, the statements run in order, and the returned value is converted to the function's C return type. `.get()` extracts its native storage. Calls inside the body keep the backend thread and PostgreSQL error contracts of their guarded bindings.";
 /// How `__FILE__` and `__LINE__` translate.
 pub(super) const INVOCATION_DIAGNOSTICS: &str = "Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract.";
 /// How dependency stringification translates.
@@ -32,8 +34,9 @@ pub(super) const SAFETY: &str = "Preserve each operand's original C identity; a 
 ///
 /// Documentation shells refer to each one through the macro named here instead of
 /// repeating its text; [`documentation_shell_support`] defines those macros.
-const SHARED_PARAGRAPHS: [(&str, &str); 6] = [
+const SHARED_PARAGRAPHS: [(&str, &str); 7] = [
     ("__pgrx_c_doc_inline_call", INLINE_CALL),
+    ("__pgrx_c_doc_inline_body", INLINE_BODY),
     ("__pgrx_c_doc_invocation_diagnostics", INVOCATION_DIAGNOSTICS),
     ("__pgrx_c_doc_stringification", STRINGIFICATION),
     ("__pgrx_c_doc_caller_returns", CALLER_RETURNS),
@@ -306,8 +309,18 @@ pub(super) fn documentation_forms(
 ///
 /// Statement bodies yield `()` unless every path returns from the caller, and an
 /// empty macro yields `()`. Any other expression renders its value root as a
-/// witness; a witness that cannot be rendered never affects the real macro.
-pub(super) fn result(analysis: &MacroAnalysis, renderer: typed::Renderer<'_>) -> DocumentedResult {
+/// witness; a witness that cannot be rendered never affects the real macro. A
+/// translated inline function body has no witness yet.
+pub(super) fn result(
+    analysis: &MacroAnalysis,
+    renderer: typed::Renderer<'_>,
+    inline_body: bool,
+) -> DocumentedResult {
+    if inline_body {
+        return DocumentedResult::Untyped {
+            reason: "a translated inline function body has no type witness".into(),
+        };
+    }
     let expression = analysis.expression.as_ref().expect("emitted macros have an expression");
     if let Some(statements) = &expression.syntax.statement_body {
         return if statements.always_returns {
