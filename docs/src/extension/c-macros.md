@@ -520,10 +520,14 @@ report a type error that an ordinary build does not:
 
 - a literal `0` passed as a null pointer through an operand-dependent expression is not
   a null constant;
-- large unsuffixed or `i64`-suffixed literals there can have a different type;
-- an operand like `*pointer` read through a raw `*mut` pointer can decay to a `*const`
-  pointer instead of `*mut`;
+- a dereference of a raw `*mut` pointer, used where the C macro reads its operand's
+  storage, can decay to a `*const` pointer instead of `*mut` when it is spelled other
+  than `*pointer` or `(*pointer)`, such as `((*pointer))`, or when the macro reads
+  more than one operand's storage;
 - a generated macro passed as an operand loses its bitfield and null-constant facts;
+- a generated macro passed where the C macro assigns to, increments, takes the address
+  of, or reads a field of its operand is rejected; pass a place such as `(*pointer).field`
+  instead;
 - the internal `(@__pgrx_c_native [...])` operand form is not accepted.
 
 ## Understand refusals and runtime limits

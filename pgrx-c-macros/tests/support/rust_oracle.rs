@@ -172,12 +172,20 @@ pub fn check_rust_with_cfg(source: &str, configurations: &[String], rust_target:
 /// Require downstream type checking to reject an invalid invocation before any linking.
 #[allow(dead_code)]
 pub fn reject_rust(source: &str) -> String {
+    reject_rust_with_cfg(source, &[])
+}
+
+/// Require type checking under `support_rust_cfg`'s runtime identities to reject a program,
+/// returning the compiler's diagnostics.
+#[allow(dead_code)]
+pub fn reject_rust_with_cfg(source: &str, configurations: &[String]) -> String {
     let directory = TemporaryDirectory::new();
     let rust = directory.0.join("rejected.rs");
     fs::write(&rust, source).expect("write a rejected Rust invocation");
     let mut compiler = Command::new("rustc");
     compiler
         .args(["--edition=2024", "--emit=metadata"])
+        .args(configurations.iter().flat_map(|value| ["--cfg", value.as_str()]))
         .arg(&rust)
         .arg("-o")
         .arg(directory.0.join("rejected.rmeta"));

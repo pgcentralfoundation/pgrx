@@ -8,6 +8,8 @@
 //! every macro's documentation shell renamed `__doc_X`. Each invocation asserts that
 //! the real macro and its shell have one type. The program then runs shells with
 //! side-effecting operands and checks that they panic without evaluating them.
+//! Separate programs pin the documented cases where a shell rejects an invocation
+//! that its real macro accepts.
 //!
 //! These generated consumers use the runtime's Linux/macOS host family.
 
@@ -27,7 +29,7 @@ mod binding_symbols;
 mod rust_oracle;
 
 use pgrx_c_macros::{
-    AnalysisSession, DocumentedResult, EmissionStatus, MacroScanner, ParameterRole,
+    AnalysisSession, DocumentedResult, EmissionStatus, IntegerKind, MacroScanner, ParameterRole,
     documentation_shell_support, generate_with_bindings, inspect, pg_sys_integer_bridges,
     support_rust_cfg,
 };
@@ -74,6 +76,9 @@ const MACROS: &[(&str, Kind, &str)] = &[
     ("DOC_AND", Kind::Value, "DOC_AND!(value, flag)"),
     ("DOC_NOT", Kind::Value, "DOC_NOT!(value)"),
     ("DOC_ADD", Kind::Value, "DOC_ADD!(value, word)"),
+    // The classifier's literal descriptor and the shell's native one type literals alike.
+    ("DOC_ADD", Kind::Value, "DOC_ADD!(value, -1)"),
+    ("DOC_ADD", Kind::Value, "DOC_ADD!(value, 3000000000u32)"),
     ("DOC_ALIGN", Kind::Value, "DOC_ALIGN!(8, value)"),
     ("DOC_ALIGN8", Kind::Value, "DOC_ALIGN8!(value)"),
     ("DOC_CALLBACK", Kind::Value, "unsafe { DOC_CALLBACK!(record, value) }"),
@@ -97,11 +102,99 @@ const MACROS: &[(&str, Kind, &str)] = &[
     ("DOC_COMMA", Kind::Value, "DOC_COMMA!(value, flag)"),
     ("DOC_ADDRESS", Kind::Value, "unsafe { DOC_ADDRESS!(record) }"),
     ("DOC_INDEX", Kind::Value, "unsafe { DOC_INDEX!(pointer, 1) }"),
+    // A named pointer's dereference read as a place keeps the pointer's qualification
+    // when spelled `*pointer` or `(*pointer)`; any other place is read as `ReadOnly`.
+    ("DOC_NAME", Kind::Value, "unsafe { DOC_NAME!(*name) }"),
+    ("DOC_NAME", Kind::Value, "unsafe { DOC_NAME!((*name)) }"),
+    ("DOC_NAME", Kind::Value, "unsafe { DOC_NAME!((*holder).name) }"),
+    ("DOC_NAME_OF", Kind::Value, "unsafe { DOC_NAME_OF!(holder) }"),
+    ("DOC_SPELL_NAME", Kind::Value, "unsafe { DOC_SPELL_NAME!((*holder).name) }"),
+    ("DOC_SPELL_NAME", Kind::Value, "unsafe { DOC_SPELL_NAME!(*name) }"),
+    ("DOC_SPELL_NAME", Kind::Value, "unsafe { DOC_SPELL_NAME!((*name)) }"),
+    ("DOC_PICK", Kind::Value, "unsafe { DOC_PICK!(flag, (*holder).name, (*holder).name) }"),
+    ("DOC_SET", Kind::Value, "unsafe { DOC_SET!(*pointer, value) }"),
+    ("DOC_POSTINC", Kind::Value, "unsafe { DOC_POSTINC!(*pointer) }"),
+    ("DOC_ACCUM", Kind::Value, "unsafe { DOC_ACCUM!(*counter, *counter) }"),
+    ("DOC_CLEAR", Kind::Value, "unsafe { DOC_CLEAR!(*counter) }"),
+    ("DOC_ADDRESS_OF", Kind::Value, "unsafe { DOC_ADDRESS_OF!(*counter) }"),
+    ("DOC_BITS", Kind::Value, "unsafe { DOC_BITS!(bits) }"),
+    ("DOC_OID", Kind::Value, "DOC_OID!(word)"),
+    ("DOC_NOTHING", Kind::Value, "DOC_NOTHING!()"),
     ("DOC_EMPTY", Kind::Unit, "DOC_EMPTY!();"),
     ("DOC_SWAP", Kind::Unit, "unsafe { DOC_SWAP!(pointer, other) }"),
     ("DOC_MAYBE_RETURN", Kind::Unit, "-> CValue<CInt> { DOC_MAYBE_RETURN!(flag); CValue::new(1) }"),
     ("DOC_RETURN", Kind::Diverges, "-> CValue<CInt> { DOC_RETURN!(@__pgrx_c_statement; flag) }"),
 ];
+
+/// Invocations that a real macro accepts and its shell rejects, where the `@native`
+/// operand descriptor replaces the argument classifier.
+///
+/// These are the cases ARCHITECTURE.md §15 and the extension guide list. Each
+/// statement type-checks with the real macros in the main program, and the same
+/// statement with shells must fail with the given diagnostic. A case that starts
+/// compiling with shells means the documented list is out of date.
+const DIVERGENCES: &[(&str, &str, &str)] = &[
+    // A literal `0` passed as a null pointer to an operand-dependent spine.
+    ("literal null", "unsafe { DOC_SET!(*slot, 0) };", "E0277"),
+    // A dereference of a raw `*mut` pointer read as a place, spelled other than
+    // `*pointer` or `(*pointer)`, or in a macro that reads several operands as places.
+    (
+        "((*pointer))",
+        "let _: *mut ::core::ffi::c_char = unsafe { DOC_NAME!(((*name))) }.get();",
+        "types differ in mutability",
+    ),
+    (
+        "*(pointer)",
+        "let _: *mut ::core::ffi::c_char = unsafe { DOC_NAME!(*(name)) }.get();",
+        "types differ in mutability",
+    ),
+    (
+        "several places",
+        "let _: *mut ::core::ffi::c_char = unsafe { DOC_PICK!(flag, *name, *name) }.get();",
+        "types differ in mutability",
+    ),
+    // A nested generated macro's bitfield and null-constant facts.
+    ("nested bitfield", "let _: i32 = unsafe { DOC_ADD!(DOC_BITS!(bits), value) }.get();", "E0308"),
+    ("nested null", "unsafe { DOC_SET!(*slot, DOC_NOTHING!()) };", "E0277"),
+    // A nested generated macro where the C macro needs its operand's place.
+    ("nested place", "unsafe { DOC_SET!(DOC_FIELD!(record), value) };", "E0745"),
+    ("nested read place", "unsafe { DOC_NAME!(DOC_NAME_OF!(holder)) };", "E0745"),
+    // The internal native operand form.
+    (
+        "internal native form",
+        "DOC_ADD!((@__pgrx_c_native [value]), 1);",
+        "expected expression, found `@`",
+    ),
+];
+
+/// Parameters of the functions holding compared invocations.
+const OPERANDS: &str = "record: *mut DocRecord, varlena: *mut DocVarlena, pointer: *mut i32, other: *mut i32, name: *mut DocName, holder: *mut DocHolder, counter: *mut DocCounter, bits: *mut DocBits, slot: *mut *mut DocRecord, value: i32, word: u32, flag: i32";
+
+/// Rename every fixture macro invoked in `invocation` to its shell.
+fn shell_invocation(invocation: &str) -> String {
+    let mut shell = String::with_capacity(invocation.len());
+    let mut rest = invocation;
+    while let Some(start) = rest.find(|character: char| character.is_ascii_alphabetic()) {
+        shell.push_str(&rest[..start]);
+        rest = &rest[start..];
+        let end = rest
+            .find(|character: char| !(character.is_ascii_alphanumeric() || character == '_'))
+            .unwrap_or(rest.len());
+        let (identifier, after) = rest.split_at(end);
+        let preceded = shell
+            .ends_with(|character: char| character.is_ascii_alphanumeric() || character == '_');
+        if !preceded
+            && after.starts_with('!')
+            && MACROS.iter().any(|(name, ..)| *name == identifier)
+        {
+            shell.push_str("__doc_");
+        }
+        shell.push_str(identifier);
+        rest = after;
+    }
+    shell.push_str(rest);
+    shell
+}
 
 /// Original C definitions of the functions and global the fixture declares.
 const NATIVE: &str = r#"
@@ -135,7 +228,9 @@ fn documentation_shells_have_the_real_result_types() {
     let header =
         PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/documentation_oracle.h");
     let frontend = inspect(&scanner, &header, &arguments(), None).expect("inspect the fixture");
-    let names = MACROS.iter().map(|(name, ..)| *name).collect::<Vec<_>>();
+    let mut names = MACROS.iter().map(|(name, ..)| *name).collect::<Vec<_>>();
+    // A macro compared through several adjacent invocations is analyzed once.
+    names.dedup();
     let session = AnalysisSession::prepare(&scanner, &frontend, &names).expect("analyze");
     let bindings = bindgen::Builder::default()
         .rust_target(bindgen::RustTarget::stable(85, 0).unwrap())
@@ -158,6 +253,8 @@ fn documentation_shells_have_the_real_result_types() {
         frontend.declarations(),
         &frontend.profile().target,
     );
+    // pgrx-pg-sys registers its `Oid` newtype as the storage of C `Oid`.
+    catalog.integer_storage.insert("Oid".into(), IntegerKind::UnsignedInt);
     catalog.ffi_boundary = Some(vec!["ffi".into(), "boundary".into()]);
     let generated = generate_with_bindings(&session, &names, &catalog).unwrap();
     // pgrx-pg-sys includes these bridges with its support; they define `__pgrx_c_types`.
@@ -213,6 +310,14 @@ fn documentation_shells_have_the_real_result_types() {
         ("DOC_MAX", "select(if"),
         ("DOC_MAX", "(@native [$left])"),
         ("DOC_COMMA", "{ let _ = &$left; "),
+        ("DOC_NAME", "@read_place; (@native [$name])"),
+        ("DOC_SET", "@place; (@native [$place])"),
+        ("DOC_POSTINC", "post_modify("),
+        ("DOC_ACCUM", "modify("),
+        ("DOC_CLEAR", "null_constant("),
+        ("DOC_ADDRESS_OF", "@place; (@native [$place])"),
+        ("DOC_BITS", "Field_high"),
+        ("DOC_OID", "CIntegerStorage<"),
     ] {
         let DocumentedResult::Value { witness } = &results[name] else { unreachable!() };
         assert!(witness.contains(expected), "{name}: {witness}");
@@ -224,15 +329,19 @@ fn documentation_shells_have_the_real_result_types() {
     assert_eq!(results["DOC_EMPTY"], DocumentedResult::Unit { body: "{ }".into() });
 
     let mut comparisons = String::new();
-    for (name, _, invocation) in MACROS {
-        let shell = invocation.replace(&format!("{name}!"), &format!("__doc_{name}!"));
+    for (_, _, invocation) in MACROS {
+        let shell = shell_invocation(invocation);
         let (real, shell) = match invocation.strip_prefix("->") {
             Some(_) => (format!("||{invocation}"), format!("||{shell}")),
             None => (format!("|| {{ {invocation} }}"), format!("|| {{ {shell} }}")),
         };
         writeln!(comparisons, "    same({real}, {shell});").unwrap();
     }
-    let program = format!(
+    let mut divergences = String::new();
+    for (_, invocation, _) in DIVERGENCES {
+        writeln!(divergences, "    {invocation}").unwrap();
+    }
+    let prelude = format!(
         r#"#![allow(non_snake_case, non_camel_case_types, non_upper_case_globals, dead_code, unused_parens, unused_unsafe, unreachable_code, clippy::all)]
 #[path = {runtime:?}] pub mod __pgrx_c_macros;
 mod ffi {{ pub unsafe fn boundary<R, F: FnOnce() -> R>(call: F) -> R {{ call() }} }}
@@ -245,11 +354,22 @@ impl TransactionId {{ pub fn into_inner(self) -> u32 {{ self.0 }} pub fn from_in
 {macros}
 {shells}
 use __pgrx_c_macros::{{CInt, CValue}};
+"#,
+        runtime = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../pgrx-pg-sys/src/c_macros/support.rs")
+            .canonicalize()
+            .unwrap(),
+    );
+    let program = format!(
+        r#"{prelude}
 /// Require both closures to return one type without calling either.
 fn same<T>(_: impl FnOnce() -> T, _: impl FnOnce() -> T) {{}}
 /// Compare every invocation; nothing here runs.
-fn compare(record: *mut DocRecord, varlena: *mut DocVarlena, pointer: *mut i32, other: *mut i32, value: i32, word: u32, flag: i32) {{
+fn compare({OPERANDS}) {{
 {comparisons}}}
+/// The real macros accept every documented divergence; nothing here runs.
+fn divergences({OPERANDS}) {{
+{divergences}}}
 fn main() {{
     std::panic::set_hook(Box::new(|_| {{}}));
     let mut evaluated = 0;
@@ -262,26 +382,31 @@ fn main() {{
         __doc_DOC_SWAP!({{ evaluated += 1; &raw mut left }}, &raw mut right)
     }}));
     assert!(unit.is_err() && evaluated == 0 && (left, right) == (1, 2));
-    let _ = compare;
+    let _ = (compare, divergences);
     println!("shells match");
 }}
 "#,
-        runtime = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("../pgrx-pg-sys/src/c_macros/support.rs")
-            .canonicalize()
-            .unwrap(),
     );
     let profile = frontend.profile();
     let arguments = profile.arguments.iter().map(String::as_str).collect::<Vec<_>>();
+    let configurations = support_rust_cfg(profile).unwrap();
     let output = rust_oracle::run_rust_linked_with_cfg(
         &program,
         &profile.compiler.executable,
         &header,
         &format!("{NATIVE}\n{}", generated.support.c_source),
         &arguments,
-        &support_rust_cfg(profile).unwrap(),
+        &configurations,
     );
     assert_eq!(output, "shells match\n");
+    for (case, invocation, diagnostic) in DIVERGENCES {
+        let rejected = format!(
+            "{prelude}\nfn divergence({OPERANDS}) {{\n    {}\n}}\nfn main() {{ let _ = divergence; }}\n",
+            shell_invocation(invocation)
+        );
+        let stderr = rust_oracle::reject_rust_with_cfg(&rejected, &configurations);
+        assert!(stderr.contains(diagnostic), "{case}: expected {diagnostic}:\n{stderr}");
+    }
 }
 
 /// Check one macro's documented result against the witness rules.

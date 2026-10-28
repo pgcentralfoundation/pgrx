@@ -1664,13 +1664,19 @@ only where the `@native` descriptor replaces the classifier:
 
 - a literal `0` passed as a null pointer to an operand-dependent spine is not a
   null constant;
-- large unsuffixed and `i64`-suffixed literals there select different types;
-- a `*raw_mut` read-place operand becomes `ReadOnly`, so a decayed pointer can be
-  `*const` instead of `*mut`;
+- a dereference of a raw `*mut` pointer read as a place becomes `ReadOnly`, so a
+  decayed pointer can be `*const` instead of `*mut`, when it is spelled other
+  than `*pointer` or `(*pointer)`, such as `((*pointer))` or `*(pointer)`, or
+  when the witness reads more than one operand as a place;
 - a nested generated-macro operand loses its bitfield and null metadata;
+- a nested generated macro passed where the C macro assigns to, increments, takes
+  the address of or reads a member of its operand is rejected, because a shell's
+  value is not a place. Pass a native place expression instead;
 - `(@__pgrx_c_native [..])` does not match a shell's `$x:expr` forms.
 
-These cause docs-only type errors; shells never run.
+These cause docs-only type errors; shells never run. The documentation oracle
+compiles each case with the real macros and requires its shells to reject it, so
+this list stays accurate.
 
 The support is the source each ordinary build includes: the target guard and ABI
 assertions, the integer bridges and `__pgrx_c_types`, metadata getters with their

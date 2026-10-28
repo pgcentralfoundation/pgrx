@@ -29,6 +29,24 @@ typedef struct DocVarlena {
     char data[];
 } DocVarlena;
 
+typedef struct DocName {
+    char data[64];
+} DocName;
+
+typedef struct DocHolder {
+    DocName name;
+    DocRecord *record;
+} DocHolder;
+
+typedef struct DocCounter {
+    int v;
+} DocCounter;
+
+typedef struct DocBits {
+    unsigned int low : 4;
+    unsigned int high : 12;
+} DocBits;
+
 int doc_native(int value);
 void doc_void(int value);
 void doc_report(const char *expression, const char *file, int line);
@@ -76,6 +94,18 @@ extern int doc_global;
 #define DOC_ADDRESS(record) (&(record)->inner)
 #define DOC_INDEX(pointer, index) ((pointer)[index])
 #define DOC_EMPTY()
+#define DOC_NAME(name) ((name).data)
+#define DOC_NAME_OF(holder) ((holder)->name)
+#define DOC_SPELL_NAME(name) (DOC_REPORT_AT(name, "", 0), (name).data)
+#define DOC_PICK(flag, left, right) ((flag) ? (left).data : (right).data)
+#define DOC_SET(place, value) ((place) = (value))
+#define DOC_POSTINC(place) ((place)++)
+#define DOC_ACCUM(place, counter) ((place).v += (counter).v)
+#define DOC_CLEAR(place) ((place).v = 0)
+#define DOC_ADDRESS_OF(place) (&(place))
+#define DOC_BITS(bits) ((bits)->high)
+#define DOC_OID(x) ((Oid) (x))
+#define DOC_NOTHING() 0
 #define DOC_SWAP(left, right) \
     do { int doc_swap_tmp = *(left); *(left) = *(right); *(right) = doc_swap_tmp; } while (0)
 #define DOC_MAYBE_RETURN(condition) \
