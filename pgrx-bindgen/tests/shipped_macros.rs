@@ -502,6 +502,58 @@ fn ordinary_builds_export_generated_trees_and_docsrs_exports_the_snapshot() {
     )
     .unwrap();
 
+    // Docs builds include the committed bindings, and ordinary builds those in OUT_DIR.
+    for major in &versions {
+        let binding = format!("pub const BINDING: u32 = {major};\n");
+        fs::write(fixture.0.join(format!("src/include/pg{major}.rs")), &binding).unwrap();
+        fs::write(fixture.0.join(format!("src/include/pg{major}_oids.rs")), "").unwrap();
+        fs::write(out_dir.join(format!("pg{major}.rs")), &binding).unwrap();
+        fs::write(out_dir.join(format!("pg{major}_oids.rs")), "").unwrap();
+    }
+    let library = |major: u16, phase: &str, docsrs: bool| {
+        let archive = fixture.0.join(format!("libdocs_snapshot_{phase}.rlib"));
+        let mut command = Command::new("rustc");
+        command
+            .args(["--edition=2024", "--crate-name=docs_snapshot", "--crate-type=rlib"])
+            .arg("--cfg")
+            .arg(format!("feature=\"pg{major}\""))
+            .env("OUT_DIR", &out_dir)
+            .arg(&library_path)
+            .arg("-o")
+            .arg(&archive);
+        if docsrs {
+            command.args(["--cfg", "docsrs"]);
+        }
+        fixture.successful_output(&mut command, &format!("{phase}-library"));
+        archive
+    };
+
+    // docs.rs compiles the snapshot, which no generated tree changes. The snapshot
+    // macro is a documentation shell: it must resolve and type-check in value
+    // position, but it is never executed.
+    for major in &versions {
+        let phase = format!("docsrs-pg{major}");
+        let archive = library(*major, &phase, true);
+        let consumer = fixture.0.join(format!("{phase}.rs"));
+        fs::write(
+            &consumer,
+            "extern crate docs_snapshot as renamed;\npub fn value() -> u32 { renamed::SNAPSHOT_ADAPTER_VALUE!() }\n",
+        )
+        .unwrap();
+        fixture.successful_output(
+            Command::new("rustc")
+                .args(["--edition=2024", "--crate-name=docs_consumer"])
+                .args(["--crate-type=lib", "--emit=metadata", "--extern"])
+                .arg(format!("docs_snapshot={}", archive.display()))
+                .arg(&consumer)
+                .arg("-o")
+                .arg(fixture.0.join(format!("{phase}.rmeta"))),
+            &format!("{phase}-consumer"),
+        );
+    }
+
+    // Ordinary builds compile the generated tree in OUT_DIR, with and without the
+    // adapter modules that generated support adds.
     for with_support in [false, true] {
         let kind = if with_support { "generated" } else { "support-free" };
         let support = if with_support {
@@ -514,13 +566,10 @@ fn ordinary_builds_export_generated_trees_and_docsrs_exports_the_snapshot() {
         } else {
             "$crate::__pgrx_c_bindings::BINDING"
         };
+        let adapter_assertion =
+            if with_support { "assert_eq!(renamed::__pgrx_c_generated::ADAPTER, 12);" } else { "" };
         for major in &versions {
-            fs::write(
-                fixture.0.join(format!("src/include/pg{major}.rs")),
-                format!("pub const BINDING: u32 = {major};\n"),
-            )
-            .unwrap();
-            let macros = fixture.0.join(format!("src/include/cmacros/pg{major}"));
+            let macros = out_dir.join(format!("cmacros/pg{major}"));
             fs::create_dir_all(&macros).unwrap();
             fs::write(macros.join("mod.rs"), "mod server;\npub use server::*;\n").unwrap();
             fs::write(
@@ -528,84 +577,29 @@ fn ordinary_builds_export_generated_trees_and_docsrs_exports_the_snapshot() {
                 format!("{support}#[macro_export] macro_rules! SNAPSHOT_ADAPTER_VALUE {{ () => {{ {expression} }}; }}\npub use SNAPSHOT_ADAPTER_VALUE;\n"),
             )
             .unwrap();
-            fs::write(fixture.0.join(format!("src/include/pg{major}_oids.rs")), "").unwrap();
-            fs::copy(
-                fixture.0.join(format!("src/include/pg{major}.rs")),
-                out_dir.join(format!("pg{major}.rs")),
-            )
-            .unwrap();
-            fs::write(out_dir.join(format!("pg{major}_oids.rs")), "").unwrap();
-            let ordinary_macros = out_dir.join(format!("cmacros/pg{major}"));
-            fs::create_dir_all(&ordinary_macros).unwrap();
-            for name in ["mod.rs", "server.rs"] {
-                fs::copy(macros.join(name), ordinary_macros.join(name)).unwrap();
-            }
-        }
-        for docsrs in [false, true] {
-            for major in &versions {
-                let mode = if docsrs { "docsrs" } else { "ordinary" };
-                let phase = format!("{mode}-pg{major}-{kind}");
-                let archive = fixture.0.join(format!("libdocs_snapshot_pg{major}_{kind}.rlib"));
-                let mut command = Command::new("rustc");
-                command
-                    .args(["--edition=2024", "--crate-name=docs_snapshot", "--crate-type=rlib"])
-                    .arg("--cfg")
-                    .arg(format!("feature=\"pg{major}\""))
-                    .env("OUT_DIR", &out_dir)
-                    .arg(&library_path)
-                    .arg("-o")
-                    .arg(&archive);
-                if docsrs {
-                    command.args(["--cfg", "docsrs"]);
-                }
-                fixture.successful_output(&mut command, &format!("{phase}-library"));
-                let consumer = fixture.0.join(format!("{phase}.rs"));
-                if docsrs {
-                    // The snapshot macro is a documentation shell: it must resolve and
-                    // type-check in value position, but it is never executed.
-                    fs::write(
-                        &consumer,
-                        "extern crate docs_snapshot as renamed;\npub fn value() -> u32 { renamed::SNAPSHOT_ADAPTER_VALUE!() }\n",
-                    )
-                    .unwrap();
-                    fixture.successful_output(
-                        Command::new("rustc")
-                            .args(["--edition=2024", "--crate-name=docs_consumer"])
-                            .args(["--crate-type=lib", "--emit=metadata", "--extern"])
-                            .arg(format!("docs_snapshot={}", archive.display()))
-                            .arg(&consumer)
-                            .arg("-o")
-                            .arg(fixture.0.join(format!("{phase}.rmeta"))),
-                        &format!("{phase}-consumer"),
-                    );
-                    continue;
-                }
-                let adapter_assertion = if with_support {
-                    "assert_eq!(renamed::__pgrx_c_generated::ADAPTER, 12);"
-                } else {
-                    ""
-                };
-                fs::write(
+            let phase = format!("ordinary-pg{major}-{kind}");
+            let archive = library(*major, &phase, false);
+            let consumer = fixture.0.join(format!("{phase}.rs"));
+            fs::write(
                 &consumer,
                 format!("extern crate docs_snapshot as renamed;\nfn main() {{ {adapter_assertion} println!(\"{{}}\", renamed::SNAPSHOT_ADAPTER_VALUE!()); }}\n"),
             )
             .unwrap();
-                let executable = fixture.0.join(&phase);
-                fixture.successful_output(
-                    Command::new("rustc")
-                        .args(["--edition=2024", "--crate-name=docs_consumer", "--extern"])
-                        .arg(format!("docs_snapshot={}", archive.display()))
-                        .arg(&consumer)
-                        .arg("-o")
-                        .arg(&executable),
-                    &format!("{phase}-consumer"),
-                );
-                assert_eq!(
-                    fixture.successful_output(&mut Command::new(executable), &phase),
-                    format!("{}\n", u32::from(*major) + if with_support { 12 } else { 0 }),
-                    "actual include exports must resolve adapter paths in ordinary builds"
-                );
-            }
+            let executable = fixture.0.join(&phase);
+            fixture.successful_output(
+                Command::new("rustc")
+                    .args(["--edition=2024", "--crate-name=docs_consumer", "--extern"])
+                    .arg(format!("docs_snapshot={}", archive.display()))
+                    .arg(&consumer)
+                    .arg("-o")
+                    .arg(&executable),
+                &format!("{phase}-consumer"),
+            );
+            assert_eq!(
+                fixture.successful_output(&mut Command::new(executable), &phase),
+                format!("{}\n", u32::from(*major) + if with_support { 12 } else { 0 }),
+                "actual include exports must resolve adapter paths in ordinary builds"
+            );
         }
     }
 }
