@@ -533,8 +533,9 @@ later expansion would erase the evidence. Define probe wrappers before poisoning
 names: Clang exempts ordinary old definition tokens but checks newly pasted
 identifiers before rescanning them. Poison active macro/dynamic/probe names and
 require a unique final `#error` completion marker. Pasted builtins or fabricated
-probe names are refusals. This proof currently audits Clang 6 through 21's
-builtin families; an unaudited major refuses closed-paste support.
+probe names are refusals. This proof currently audits Clang 6 through 23's
+builtin families; an unaudited major refuses closed-paste support, so every
+root whose dependency closure pastes is skipped until that major is audited.
 
 Iterate discovered synthesized dependencies within the finite compiler-pass
 budget. Add them to the dependency graph. Reject erased operands, dynamic helper

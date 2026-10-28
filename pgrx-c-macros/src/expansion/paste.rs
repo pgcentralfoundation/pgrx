@@ -24,9 +24,11 @@ use std::path::Path;
 /// Bound the total preprocessing passes spent proving closed token pasting.
 pub(super) const MAX_CPP_RUNS: usize = 8;
 
-// RegisterBuiltinMacros in upstream Clang 6--21. Unknown compiler majors do not
-// enter this proof: a newly registered preprocessor builtin could erase its own
-// evidence or alter the expansion environment before the ordinary probe.
+// RegisterBuiltinMacros in upstream Clang 6--23; release/22.x and release/23.x
+// register exactly these names. Unknown compiler majors do not enter this proof:
+// a newly registered preprocessor builtin could erase its own evidence or alter
+// the expansion environment before the ordinary probe. Audit a new major's
+// registrations before widening `audited_builtins`.
 /// Context-dependent compiler names that paste instrumentation must guard rather than admitting as
 /// ordinary dependencies.
 const BUILTINS: &[&str] = &[
@@ -97,14 +99,15 @@ pub(super) fn prove(
     if selected.is_empty() {
         return Ok(proof);
     }
-    if !crate::frontend::version_major(&frontend.profile().compiler.version)
-        .is_some_and(|major| (6..=21).contains(&major))
-    {
+    let version = &frontend.profile().compiler.version;
+    if !audited_builtins(version) {
         reject_all(
             &mut proof,
             &selected,
             ExpansionSkipCode::TokenPaste,
-            "closed token-paste validation requires the audited Clang 6--21 preprocessor builtin set",
+            &format!(
+                "closed token-paste validation has not audited the preprocessor builtins of {version}"
+            ),
         );
         return Ok(proof);
     }
@@ -328,6 +331,11 @@ pub(super) fn prove(
         }
     }
     Ok(proof)
+}
+
+/// Admit only compilers whose complete preprocessor builtin set is [`BUILTINS`].
+fn audited_builtins(version: &str) -> bool {
+    crate::frontend::version_major(version).is_some_and(|major| (6..=23).contains(&major))
 }
 
 /// Record a proof failure for all remaining probes when ownership or budgets cannot be established.
@@ -1029,6 +1037,25 @@ mod tests {
             "/tmp/probe-1:1:1: error: unrelated\n/header.h:8:1: note:",
         );
         assert!(trapped_probes(&separated, &locations(), "fresh_").is_empty());
+    }
+
+    /// Released upstream majors whose builtin registrations were audited enter the proof;
+    /// unreleased or unparseable compilers refuse it.
+    #[test]
+    fn builtin_audit_admits_only_audited_upstream_majors() {
+        for version in [
+            "clang version 6.0.1",
+            "Ubuntu clang version 14.0.0-1ubuntu1.1",
+            "clang version 21.1.8",
+            "clang version 22.1.0",
+            "Homebrew clang version 22.1.3",
+            "Ubuntu clang version 23.1.0",
+        ] {
+            assert!(audited_builtins(version), "{version}");
+        }
+        for version in ["clang version 5.0.2", "clang version 24.0.0", "gcc (GCC) 14.2.0", ""] {
+            assert!(!audited_builtins(version), "{version}");
+        }
     }
 
     /// Checks clean guard requires every boundary once in numeric probe order.
