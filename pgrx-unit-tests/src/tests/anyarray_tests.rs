@@ -248,8 +248,20 @@ mod tests {
     /// must copy the array out of them.
     #[pg_test]
     fn test_anyarray_from_spi_outlives_connection() -> std::result::Result<(), pgrx::spi::Error> {
-        let array =
-            Spi::get_one::<AnyArray>("SELECT ARRAY[repeat('x', 40), 'y']")?.expect("array is NULL");
+        let (array, result) = Spi::connect(|client| {
+            let table = client.select("SELECT ARRAY[repeat('x', 40), 'y']", None, &[])?.first();
+            let result = table.get_datum_by_ordinal(1)?.expect("array is NULL");
+            let array = table.get_one::<AnyArray>()?.expect("array is NULL");
+            Ok::<_, pgrx::spi::Error>((array, result))
+        })?;
+        // A server without assertions does not overwrite freed memory, so reading the array
+        // would not show that it pointed into SPI's results. Check that it is a copy in
+        // TopTransactionContext, the parent of SPI's memory context, instead.
+        assert_ne!(array.datum(), result, "the array points into SPI's results");
+        // SAFETY: the Datum is not the one in SPI's results, so from_datum_in_memory_context
+        // palloc'd it; GetMemoryChunkContext reads the header of a palloc'd chunk.
+        let context = unsafe { pg_sys::GetMemoryChunkContext(array.datum().cast_mut_ptr()) };
+        assert_eq!(context, unsafe { pg_sys::TopTransactionContext });
         let expected = vec!["x".repeat(40), "y".to_owned()];
         assert_eq!(array.value::<Vec<String>>(), Ok(Some(expected.clone())));
         let elements = (&array)
