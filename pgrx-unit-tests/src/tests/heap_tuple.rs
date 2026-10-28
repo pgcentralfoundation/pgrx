@@ -1176,6 +1176,64 @@ mod tests {
         Ok(())
     }
 
+    /// `scritches` follows the variable-width `name`, so it has no cached offset and reading it
+    /// goes through `nocachegetattr`. On PG15-17 that walk caches the offset of `name` in the
+    /// `FormData_pg_attribute` that the attribute accessors read, so an attribute taken before
+    /// the read must be a copy that keeps its old `attcacheoff`. PG18 caches it in the
+    /// `CompactAttribute` instead, and PG19 caches only the offsets it computes when it builds
+    /// the descriptor, so neither writes a `FormData_pg_attribute`.
+    #[pg_test]
+    fn test_attribute_copies_survive_offset_caching() -> Result<(), spi::Error> {
+        Spi::run("CREATE TYPE CachedDog AS (age int4, name text, scritches int4)")?;
+        let tupdesc = pgrx::PgTupleDesc::for_composite_type("CachedDog").unwrap();
+        #[cfg(any(feature = "pg18", feature = "pg19"))]
+        let desc = tupdesc.as_ptr();
+        let values = [3_i32.into_datum(), "Nami".into_datum(), 7_i32.into_datum()];
+        // SAFETY: each datum is a non-NULL value of the attribute type in its position.
+        let dog = unsafe { PgHeapTuple::from_datums(tupdesc, values) }.unwrap();
+        let name = NonZeroUsize::new(2).unwrap();
+        let scritches = NonZeroUsize::new(3).unwrap();
+        // The `CompactAttribute` offset cache of `name`, which PG18 and later read instead.
+        #[cfg(any(feature = "pg18", feature = "pg19"))]
+        let name_compact_cacheoff = || {
+            // SAFETY: `dog` keeps `desc` live. PG18 and later end the descriptor with one
+            // `CompactAttribute` per attribute, and `name` is the second of three. The raw place
+            // projection reads the field without creating a reference.
+            unsafe {
+                let compact = core::ptr::addr_of!((*desc).compact_attrs)
+                    .cast::<pg_sys::CompactAttribute>()
+                    .add(1);
+                (*compact).attcacheoff
+            }
+        };
+
+        let held = dog.get_attribute_by_index(name).unwrap();
+        let listed = dog.attributes().collect::<Vec<_>>();
+        #[cfg(any(feature = "pg18", feature = "pg19"))]
+        assert_eq!(name_compact_cacheoff(), -1);
+
+        assert_eq!(dog.get_by_index::<i32>(scritches)?, Some(7));
+        let fresh = dog.get_attribute_by_index(name).unwrap();
+
+        #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+        {
+            // nocachegetattr cached `name` at offset 4, after the int4 `age`.
+            assert_eq!(fresh.attcacheoff, 4);
+            assert_eq!(held.attcacheoff, -1);
+            assert_eq!(listed[1].1.attcacheoff, -1);
+        }
+        #[cfg(any(feature = "pg18", feature = "pg19"))]
+        {
+            assert_eq!(format!("{held:?}"), format!("{fresh:?}"));
+            assert_eq!(format!("{:?}", listed[1].1), format!("{fresh:?}"));
+        }
+        #[cfg(feature = "pg18")]
+        assert_eq!(name_compact_cacheoff(), 4);
+        #[cfg(feature = "pg19")]
+        assert_eq!(name_compact_cacheoff(), -1);
+        Ok(())
+    }
+
     /// Setting a dropped attribute returns `NoSuchAttributeNumber`. Its type is InvalidOid, so
     /// the type check raised an ERROR for `&str` and accepted a tuple, whose `type_oid` is also
     /// InvalidOid.

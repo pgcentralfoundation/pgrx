@@ -495,40 +495,36 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
 
     /// Returns an iterator over the attributes in this [`PgHeapTuple`].
     ///
-    /// The return value is `(attribute_number: NonZeroUsize, attribute_info: &pg_sys::FormData_pg_attribute)`.
+    /// The return value is `(attribute_number: NonZeroUsize, attribute_info:
+    /// pg_sys::FormData_pg_attribute)`. Each `attribute_info` is a copy, as
+    /// [`PgTupleDesc::get`] returns.
     pub fn attributes(
         &self,
-    ) -> impl std::iter::Iterator<Item = (NonZeroUsize, &pg_sys::FormData_pg_attribute)> {
+    ) -> impl std::iter::Iterator<Item = (NonZeroUsize, pg_sys::FormData_pg_attribute)> {
         self.tupdesc.iter().enumerate().map(|(i, att)| (NonZeroUsize::new(i + 1).unwrap(), att))
     }
 
-    /// Get the attribute information for the specified attribute number.
+    /// Get a copy of the attribute information for the specified attribute number, as
+    /// [`PgTupleDesc::get`] returns it.
     ///
     /// Returns `None` if the attribute number is out of bounds.
     #[inline]
     pub fn get_attribute_by_index(
         &self,
         index: NonZeroUsize,
-    ) -> Option<&pg_sys::FormData_pg_attribute> {
+    ) -> Option<pg_sys::FormData_pg_attribute> {
         self.tupdesc.get(index.get() - 1)
     }
 
-    /// Get the attribute information for the specified attribute, by name.
+    /// Get the number and a copy of the attribute information for the specified attribute, by
+    /// name, as [`PgTupleDesc::get`] returns it.
     ///
     /// Returns `None` if the attribute name is not found.
     pub fn get_attribute_by_name(
         &self,
         name: &str,
-    ) -> Option<(NonZeroUsize, &pg_sys::FormData_pg_attribute)> {
-        for i in 0..self.len() {
-            let i = NonZeroUsize::new(i + 1).unwrap();
-            let att = self.get_attribute_by_index(i).unwrap();
-            if att.name() == name {
-                return Some((i, att));
-            }
-        }
-
-        None
+    ) -> Option<(NonZeroUsize, pg_sys::FormData_pg_attribute)> {
+        self.attributes().find(|(_, att)| att.name() == name)
     }
 
     /// Retrieve the value of the specified attribute, by name.
@@ -583,16 +579,13 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
         if att.is_dropped() {
             return Ok(None);
         }
-        // Copy the type out before reading the tuple: on PG15-17, nocachegetattr caches
-        // attribute offsets by writing to the descriptor's attributes, which `att` borrows.
-        let att_typoid = att.type_oid().value();
         // SAFETY: this PgHeapTuple holds a live tuple whose stored attributes have the length,
         // alignment, and pass-by-value flag of its descriptor's attributes in the same
         // positions: the tuple was formed with that descriptor or is a stored row of its row
-        // type. The lookup above bounds `attno` by the descriptor's attribute count, and `att`
-        // is not used after it. A reference that a caller holds from `attributes` or
-        // `get_attribute_by_*` is not excluded, and on PG15-17 it aliases the attcacheoff
-        // write; that is a known gap in this safe API.
+        // type. The lookup above bounds `attno` by the descriptor's attribute count.
+        // nocachegetattr can write attcacheoff into the descriptor's FormData_pg_attribute array
+        // on PG15-17 and its CompactAttribute array on PG18. PgTupleDesc only copies attributes
+        // out and safe code cannot borrow either array, so no Rust reference aliases the write.
         let datum = unsafe { heap_getattr_raw(self.tuple.as_ptr(), attno, self.tupdesc.as_ptr()) };
         let Some(datum) = datum else {
             return Ok(None);
@@ -604,15 +597,15 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
             // or a domain over one) as RECORDOID. Any other attribute keeps its own type, which
             // try_from_datum checks against `T`.
             // SAFETY: type_is_rowtype takes the OID by value and only looks it up.
-            pg_sys::RECORDOID if unsafe { pg_sys::type_is_rowtype(att_typoid) } => {
+            pg_sys::RECORDOID if unsafe { pg_sys::type_is_rowtype(att.atttypid) } => {
                 pg_sys::RECORDOID
             }
-            _ => att_typoid,
+            _ => att.atttypid,
         };
-        // SAFETY: the datum is this attribute's value, of type `att_typoid`. It lives as long as
+        // SAFETY: the datum is this attribute's value, of type `att.atttypid`. It lives as long as
         // the tuple and descriptor that `self` holds and `'tup` borrows: on PG15.0-15.4, a
         // missing value points into the descriptor. `typoid` is RECORDOID only when that type
-        // is a row type, whose values are composite Datums; otherwise it is `att_typoid`, which
+        // is a row type, whose values are composite Datums; otherwise it is `att.atttypid`, which
         // try_from_datum checks against `T` before reading the datum.
         unsafe { T::try_from_datum(datum, false, typoid) }
     }

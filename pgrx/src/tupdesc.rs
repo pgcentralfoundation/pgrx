@@ -13,6 +13,7 @@ use crate::{PgBox, PgRelation, pg_sys, regtypein, void_mut_ptr};
 use pgrx_pg_sys::PgTryBuilder;
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use std::ops::Deref;
+use std::ptr;
 
 /// This struct is passed around within the backend to describe the structure
 /// of tuples.  For tuples coming from on-disk relations, the information is
@@ -224,20 +225,25 @@ impl<'a> PgTupleDesc<'a> {
         self.len() == 0
     }
 
-    /// Get a numbered attribute.  Attribute numbers are zero-based
-    pub fn get(&self, i: usize) -> Option<&pg_sys::FormData_pg_attribute> {
+    /// Return a copy of attribute `i`, or `None` if `i` is not less than [`len`](Self::len).
+    /// Attribute numbers are zero-based.
+    ///
+    /// The copy holds the attribute's values as of this call. A reference into the descriptor
+    /// would be unsound: PostgreSQL writes to a descriptor's attributes while it is in use, as
+    /// when reading a tuple caches attribute offsets in `attcacheoff` on PostgreSQL 15 through
+    /// 17, and a relcache or typcache descriptor can be in use through other pointers.
+    pub fn get(&self, i: usize) -> Option<pg_sys::FormData_pg_attribute> {
         if i >= self.len() {
-            None
-        } else {
-            let tupdesc = self.tupdesc.as_ref().unwrap().as_ptr();
-            // SAFETY: i is in bounds, and self keeps the descriptor alive for this borrow.
-            let attr = unsafe { tupdesc_attr(tupdesc, i) };
-            // SAFETY: the address is the initialized in-bounds attribute in this descriptor.
-            Some(unsafe { &*attr })
+            return None;
         }
+        let tupdesc = self.tupdesc.as_ref().unwrap().as_ptr();
+        // SAFETY: self keeps the descriptor live, i is below its attribute count, and the read
+        // copies the initialized attribute without creating a reference to it.
+        Some(unsafe { tupdesc_attr(tupdesc, i).read() })
     }
 
-    /// Iterate over our attributes
+    /// Iterate over copies of the attributes, in order. Each is read when the iterator reaches
+    /// it, as [`get`](Self::get) reads it.
     pub fn iter(&self) -> TupleDescIterator<'_> {
         TupleDescIterator { tupdesc: self, curr: 0 }
     }
@@ -283,63 +289,69 @@ impl Drop for PgTupleDesc<'_> {
     }
 }
 
-/// Return attribute `i` of `tupdesc`, as `TupleDescAttr(tupdesc, i)` does.
-///
-/// PG15-17 define `TupleDescAttr` as the macro `(&(tupdesc)->attrs[(i)])`, which translates to
-/// pure Rust.
-///
-/// # Safety
-///
-/// `tupdesc` must be live and `i` less than its attribute count.
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-#[inline]
-pub(crate) unsafe fn tupdesc_attr(
-    tupdesc: pg_sys::TupleDesc,
-    i: usize,
-) -> *mut pg_sys::FormData_pg_attribute {
-    // SAFETY: the caller supplies a live descriptor and an index below natts, a C int.
-    unsafe { pg_sys::TupleDescAttr!(tupdesc, i as core::ffi::c_int).get() }
-}
-
-/// Return attribute `i` of `tupdesc`, as `TupleDescAttr(tupdesc, i)` does.
-///
-/// PG18 and PG19 store the `FormData_pg_attribute` array after `natts` `CompactAttribute`s.
-/// Their static inline `TupleDescAttr` returns `&TupleDescAttrAddress(tupdesc)[i]`, where
-/// `TupleDescAttrAddress(desc)` is `(char *) desc + offsetof(TupleDescData, compact_attrs) +
-/// desc->natts * sizeof(CompactAttribute)`. The header undefines that macro right after the
-/// function, so the generated `TupleDescAttr!` is a guarded native call; this per-attribute
-/// lookup computes the address in Rust instead.
-///
-/// # Safety
-///
-/// `tupdesc` must be live and `i` less than its attribute count.
+// On PG18 and PG19 the attribute array starts `natts` compact attributes past `compact_attrs`
+// in a descriptor aligned for `TupleDescData`. It is aligned for `FormData_pg_attribute` if
+// that alignment, the offset, and the compact attribute size are multiples of the attribute
+// alignment. This const item checks that in every build, including `cargo check`.
 #[cfg(any(feature = "pg18", feature = "pg19"))]
+const _: () = {
+    let align = align_of::<pg_sys::FormData_pg_attribute>();
+    assert!(align_of::<pg_sys::TupleDescData>().is_multiple_of(align));
+    assert!(core::mem::offset_of!(pg_sys::TupleDescData, compact_attrs).is_multiple_of(align));
+    assert!(size_of::<pg_sys::CompactAttribute>().is_multiple_of(align));
+};
+
+/// Return a pointer to attribute `i` of `tupdesc`: the address `TupleDescAttr(tupdesc, i)`
+/// returns.
+///
+/// PG15-17 end `TupleDescData` with the flexible array `attrs`, and define `TupleDescAttr` as
+/// the macro `(&(tupdesc)->attrs[(i)])`. PG18 and PG19 end it with `natts` `CompactAttribute`s
+/// in `compact_attrs` and store the `FormData_pg_attribute` array after them. Their static
+/// inline `TupleDescAttr` returns `&TupleDescAttrAddress(tupdesc)[i]`, where
+/// `TupleDescAttrAddress(desc)` is `(char *) desc + offsetof(TupleDescData, compact_attrs) +
+/// desc->natts * sizeof(CompactAttribute)`.
+///
+/// The generated `TupleDescAttr!` is a guarded native call on PG18 and PG19, so this computes
+/// the address in Rust for every version. The pointer is aligned for `FormData_pg_attribute`.
+/// PostgreSQL can write to the attribute while the descriptor is in use, so read fields or
+/// copy the attribute through the pointer instead of holding a reference to it.
+///
+/// # Safety
+///
+/// `tupdesc` must be live and `i` less than its attribute count.
 #[inline]
 pub(crate) unsafe fn tupdesc_attr(
     tupdesc: pg_sys::TupleDesc,
     i: usize,
 ) -> *mut pg_sys::FormData_pg_attribute {
-    // SAFETY: the caller supplies a live descriptor, whose allocation holds natts compact
-    // attributes followed by natts attributes, and an index below natts. The raw place
-    // projection keeps the descriptor's provenance for those trailing arrays.
+    // SAFETY: the caller supplies a live descriptor, allocated with room for its attribute
+    // arrays, and an index below its attribute count. The raw place projections compute
+    // addresses and read natts without creating references, and keep the descriptor's
+    // provenance over its trailing arrays.
     unsafe {
-        let natts = usize::try_from((*tupdesc).natts).expect("natts must be non-negative");
-        let attrs = core::ptr::addr_of_mut!((*tupdesc).compact_attrs)
-            .cast::<pg_sys::CompactAttribute>()
-            .add(natts)
-            .cast::<pg_sys::FormData_pg_attribute>();
-        debug_assert!(attrs.is_aligned());
+        #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+        let attrs = ptr::addr_of_mut!((*tupdesc).attrs).cast::<pg_sys::FormData_pg_attribute>();
+        #[cfg(any(feature = "pg18", feature = "pg19"))]
+        let attrs = {
+            // The const assertion before this function keeps this address aligned.
+            let natts = usize::try_from((*tupdesc).natts).expect("natts must be non-negative");
+            ptr::addr_of_mut!((*tupdesc).compact_attrs)
+                .cast::<pg_sys::CompactAttribute>()
+                .add(natts)
+                .cast::<pg_sys::FormData_pg_attribute>()
+        };
         attrs.add(i)
     }
 }
 
+/// An iterator over copies of a [`PgTupleDesc`]'s attributes, returned by [`PgTupleDesc::iter`].
 pub struct TupleDescIterator<'a> {
     tupdesc: &'a PgTupleDesc<'a>,
     curr: usize,
 }
 
-impl<'a> Iterator for TupleDescIterator<'a> {
-    type Item = &'a pg_sys::FormData_pg_attribute;
+impl Iterator for TupleDescIterator<'_> {
+    type Item = pg_sys::FormData_pg_attribute;
 
     fn next(&mut self) -> Option<Self::Item> {
         let result = self.tupdesc.get(self.curr);
@@ -366,12 +378,7 @@ impl Iterator for TupleDescDataIntoIterator<'_> {
     type Item = pg_sys::FormData_pg_attribute;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let result = match self.tupdesc.get(self.curr) {
-            Some(result) => *result,
-            None => {
-                return None;
-            }
-        };
+        let result = self.tupdesc.get(self.curr)?;
         self.curr += 1;
         Some(result)
     }

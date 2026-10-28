@@ -76,9 +76,11 @@ pub unsafe fn composite_row_type_make_tuple(
 /// pass-by-value flag, though it clears its type. `T` must be able to read the value of
 /// `attno`. The call must run on the PostgreSQL backend thread.
 ///
-/// The call can cache attribute offsets by writing `attcacheoff` in `tupdesc`'s attribute
-/// entries, so no Rust reference to those entries may be live across it. On PostgreSQL 15
-/// through 17, those entries are the attributes that [`PgTupleDesc::get`] borrows.
+/// The call can cache attribute offsets by writing `attcacheoff` into `tupdesc`'s attribute
+/// entries: its `FormData_pg_attribute`s on PostgreSQL 15 through 17, and its
+/// `CompactAttribute`s on PostgreSQL 18. No Rust reference to an entry in either array may be
+/// live across the call. [`PgTupleDesc::get`] and [`PgTupleDesc::iter`] return copies, so a
+/// caller may hold those across it.
 ///
 /// A pass-by-reference result can point into the tuple. On PostgreSQL 15.0 through 15.4, a
 /// missing value can also point into `tupdesc`, which frees it with the descriptor; later
@@ -98,7 +100,7 @@ pub unsafe fn heap_getattr<T: FromDatum, AllocatedBy: WhoAllocated>(
     let typoid = tupdesc.get(attno.get() - 1).expect("no attribute").type_oid();
     // SAFETY: the caller supplies a live tuple whose stored attributes match `tupdesc`'s in
     // length, alignment, and pass-by-value flag, and holds no reference to its attribute
-    // entries. The lookup above bounds `attno`, and its reference ends with that statement.
+    // entries. The lookup above bounds `attno` and copies the attribute it reads.
     let datum = unsafe { heap_getattr_raw(tuple.as_ptr(), attno, tupdesc.as_ptr()) }?;
     unsafe { T::from_polymorphic_datum(datum, false, typoid.value()) }
 }
@@ -117,9 +119,10 @@ pub unsafe fn heap_getattr<T: FromDatum, AllocatedBy: WhoAllocated>(
 /// length, alignment, and pass-by-value flag as the attribute in that position of the live
 /// descriptor `tupdesc`; [`heap_getattr()`] describes which stored rows qualify. `attno` must
 /// not exceed the descriptor's attribute count. The call must run on the PostgreSQL backend
-/// thread, and no Rust reference to `tupdesc`'s attribute entries may be live across it. A
-/// pass-by-reference result can point into the tuple or, on PostgreSQL 15.0 through 15.4,
-/// into `tupdesc`, and is valid only while both are.
+/// thread, and no Rust reference to `tupdesc`'s attribute entries, which [`heap_getattr()`]
+/// lists for each version, may be live across it. A pass-by-reference result can point into
+/// the tuple or, on PostgreSQL 15.0 through 15.4, into `tupdesc`, and is valid only while both
+/// are.
 #[inline]
 pub unsafe fn heap_getattr_raw(
     tuple: *mut pg_sys::HeapTupleData,
@@ -303,9 +306,10 @@ impl DatumWithTypeInfo {
 /// `tuple` must point to a live heap tuple, and each attribute it stores must have the same
 /// length, alignment, and pass-by-value flag as the attribute in that position of `tupdesc`;
 /// [`heap_getattr()`] describes which stored rows qualify. The call must run on the PostgreSQL
-/// backend thread, and no Rust reference to `tupdesc`'s attribute entries may be live across
-/// it. A pass-by-reference `datum` can point into the tuple or, on PostgreSQL 15.0 through
-/// 15.4, into `tupdesc`, and is valid only while both are.
+/// backend thread, and no Rust reference to `tupdesc`'s attribute entries, which
+/// [`heap_getattr()`] lists for each version, may be live across it. A pass-by-reference
+/// `datum` can point into the tuple or, on PostgreSQL 15.0 through 15.4, into `tupdesc`, and
+/// is valid only while both are.
 ///
 /// # Panics
 ///
@@ -323,7 +327,7 @@ pub unsafe fn heap_getattr_datum_ex(
         .expect("no attribute");
     // SAFETY: the caller supplies a live tuple whose stored attributes match `tupdesc`'s in
     // length, alignment, and pass-by-value flag, and holds no reference to its attribute
-    // entries. The lookup above bounds `attno`, and its reference ends with that statement.
+    // entries. The lookup above bounds `attno` and copies the attribute it reads.
     let datum = unsafe { heap_getattr_raw(tuple.as_ptr(), attno, tupdesc.as_ptr()) };
     let is_null = datum.is_none();
     let datum = datum.unwrap_or_else(pg_sys::Datum::null);
