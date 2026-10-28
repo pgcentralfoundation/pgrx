@@ -8,8 +8,6 @@
 //! references, and raw fields verify the public export path. All version-specific
 //! facts come from this build rather than documentation snapshots.
 
-#![cfg(any(pgrx_c_macros, docsrs))]
-
 // Exercise the public exports from a downstream crate, including a renamed import.
 use pg::__pgrx_c_macros::{CInt, CUnsignedInt, CValue};
 use pgrx_pg_sys as pg;

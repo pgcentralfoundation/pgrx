@@ -27,21 +27,16 @@ struct Report {
     postgres_major_version: u16,
     /// Whether inspection ran; any other recorded status fails deserialization.
     status: ReportStatus,
-    /// Recorded cause of an unavailable report.
-    reason: Option<String>,
-    /// Every selected candidate and its emission result; absent from unavailable reports.
-    #[serde(default)]
+    /// Every selected candidate and its emission result.
     macros: Vec<Candidate>,
 }
 
-/// Distinguish completed inspection from a build that omitted every macro.
-#[derive(serde::Deserialize, PartialEq)]
+/// Require a report from completed inspection.
+#[derive(serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
 enum ReportStatus {
     /// Inspection ran and each candidate records its own result.
     Generated,
-    /// The build published no macros and recorded why.
-    Unavailable,
 }
 
 /// Identify one selected macro and its emission result.
@@ -136,15 +131,6 @@ fn every_availability_gated_macro_is_emitted() {
     ))
     .expect("read this build's C macro report");
     assert_eq!(report.postgres_major_version, major);
-    if report.status == ReportStatus::Unavailable {
-        // Only an explicit opt-out may remove every gated test.
-        assert_eq!(
-            report.reason.as_deref(),
-            Some("disabled by PGRX_C_MACROS=0"),
-            "PG{major} C macro generation was unavailable, so every gated test was removed"
-        );
-        return;
-    }
     let mut emissions = BTreeMap::new();
     for candidate in report.macros {
         let name = candidate.analysis.name;

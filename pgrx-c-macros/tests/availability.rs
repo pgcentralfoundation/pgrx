@@ -14,7 +14,7 @@ mod rust_oracle;
 
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, EmissionStatus, MacroScanner, SkipReasonCode,
-    emit_unavailable_macro_support, generate_with_bindings, inspect,
+    generate_with_bindings, inspect,
 };
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -22,23 +22,9 @@ use std::sync::Mutex;
 /// Serialize the libclang runtime, which permits only one live owner per test process.
 static SCANNER_LOCK: Mutex<()> = Mutex::new(());
 
-/// Prove explicit unavailability needs no runtime module and does not accept malformed queries.
-#[test]
-fn unavailable_support_answers_queries_without_runtime_capabilities() {
-    let support = emit_unavailable_macro_support();
-    rust_oracle::run_rust(&format!(
-        "{support}\nfn main() {{ __pgrx_c_classify!(@if_available MISSING {{ compile_error!(\"unavailable body escaped\"); missing::function(); }}); }}"
-    ));
-    let rejection = rust_oracle::reject_rust(&format!(
-        "{support}\n__pgrx_c_classify!(@if_available); fn main() {{}}"
-    ));
-    assert!(rejection.contains("unexpected end of macro invocation"), "{rejection}");
-    assert!(!support.contains("__pgrx_c_operand"));
-    assert!(!support.contains("__pgrx_c_macros"));
-}
-
 /// Prove genuinely unsupported trapping-overflow profiles and empty selections publish no
-/// available C macros, independently of the target's supported plain-char signedness.
+/// available C macros, independently of the target's supported plain-char signedness, and
+/// that a malformed availability query is rejected.
 #[test]
 fn all_skipped_and_empty_batches_still_answer_availability_queries() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -66,6 +52,11 @@ fn all_skipped_and_empty_batches_still_answer_availability_queries() {
     let empty =
         generate_with_bindings(&session, &[] as &[&str], &BindingCatalog::default()).unwrap();
     assert!(empty.macros.is_empty());
+    let rejection = rust_oracle::reject_rust(&format!(
+        "{}\n__pgrx_c_classify!(@if_available); fn main() {{}}",
+        empty.support.rust
+    ));
+    assert!(rejection.contains("unexpected end of macro invocation"), "{rejection}");
     for generated in [refused, empty] {
         assert!(generated.support.c_source.is_empty());
         assert!(!generated.support.rust.contains("__pgrx_c_operand"));

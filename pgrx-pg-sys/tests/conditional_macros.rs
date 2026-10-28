@@ -8,7 +8,7 @@
 //! exports. These checks cover the public integration layer above the isolated
 //! C/Rust control-flow oracles.
 
-#![cfg(all(pgrx_c_macros, not(docsrs)))]
+#![cfg(not(docsrs))]
 #![deny(unsafe_op_in_unsafe_fn)]
 
 use pgrx_pg_sys as pg;

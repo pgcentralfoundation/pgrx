@@ -10,8 +10,7 @@
 //! behavior and modification times: identical builds must reuse Cargo's result
 //! and preserve unchanged generated files. Ordinary bindings retain their own argv;
 //! historical CFLAGS disagreements must refuse generated macro callers. A complete target
-//! bundle also links original native wrappers without inspecting unavailable headers, while
-//! disabling macros retains ordinary inline calls through the separate no-cshim archive.
+//! bundle also links original native wrappers without inspecting unavailable headers.
 
 #![cfg(unix)]
 
@@ -223,8 +222,7 @@ fn assert_constant_mismatch(
     );
 }
 
-/// Track historical flags, shared header changes, bundle imports, ordinary no-cshim inline calls
-/// and refused compiler lookups.
+/// Track historical flags, shared header changes, bundle imports and refused compiler lookups.
 #[test]
 #[ignore = "compiles an isolated binding build repeatedly; requires native Clang and cached dependencies"]
 fn generation_tracks_flags_optional_headers_shadowing_and_unchanged_builds() {
@@ -455,49 +453,7 @@ fn main() {
         "an isolated import cannot rewrite the exporting build's generated tree"
     );
     fs::rename(source.join("server-unavailable"), source.join("server")).unwrap();
-    // With macros disabled, the established ordinary cc path has no bindgen environment
-    // tail. Restore its default header under the server include path before linking it.
-    fs::write(source.join("server/choice.h"), "#define CHOICE 10\n").unwrap();
-    fs::write(
-        source.join("src/main.rs"),
-        r#"use macro_build_consumer as renamed;
-renamed::__pgrx_c_classify!(@if_available FROM_HEADER {
-    compile_error!("disabled generation must not expose macro roots");
-});
-renamed::__pgrx_c_classify!(@if_available native_from_header {
-    compile_error!("disabled generation must not expose inline invocation roots");
-});
-/// Link and execute the ordinary inline binding without macro support or the cshim feature.
-fn main() {
-    assert_eq!(renamed::CHOICE, 10);
-    assert_eq!(renamed::OPTIONAL, 100);
-    assert_eq!(renamed::FLAG, 0);
-    // SAFETY: This stateless original function accepts and returns C int and
-    // cannot access PostgreSQL state, raise an error, invoke callbacks or read pointers.
-    let value = unsafe { renamed::native_from_header(1) };
-    assert_eq!(value, 111);
-    println!("{value}");
-}
-"#,
-    )
-    .unwrap();
-    assert_eq!(
-        successful(
-            fixture
-                .command(&format!("{defined_flags} {shadow_flags}"), "")
-                .env("PGRX_C_MACROS", "0")
-                .output()
-                .unwrap()
-        ),
-        "111\n",
-        "macro-disabled no-cshim builds must link and call ordinary static wrappers"
-    );
-    let unavailable = fixture.report();
-    assert_eq!(unavailable["status"], "unavailable");
-    assert_eq!(unavailable["reason"], "disabled by PGRX_C_MACROS=0");
-    assert!(fixture.out_dir().join("libpgrx_c_inline_pg18.a").is_file());
     let precomputed = macro_timestamps(macros.parent().unwrap());
-    assert!(!precomputed.is_empty(), "disabled generation retains its all-unavailable classifier");
     let target_info = fixture.0.join("target-info");
     fs::create_dir(&target_info).unwrap();
     fs::write(target_info.join("pg18_raw_bindings.rs"), "pub const PRECOMPUTED: i32 = 7;\n")

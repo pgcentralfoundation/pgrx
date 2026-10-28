@@ -8,7 +8,7 @@
 //! set-returning mutations in the selected bindings. Raw test storage initializes
 //! only fields required by each macro and does not enter a PostgreSQL backend.
 
-#![cfg(all(pgrx_c_macros, not(docsrs)))]
+#![cfg(not(docsrs))]
 #![deny(unsafe_op_in_unsafe_fn)]
 
 use core::mem::MaybeUninit;

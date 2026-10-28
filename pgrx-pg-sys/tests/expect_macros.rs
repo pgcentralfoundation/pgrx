@@ -9,7 +9,7 @@
 //! weights; these integration tests check usable exported behavior. Macros with
 //! backend function or global dependencies belong in pgrx-unit-tests instead.
 
-#![cfg(all(pgrx_c_macros, not(docsrs)))]
+#![cfg(not(docsrs))]
 #![deny(unsafe_op_in_unsafe_fn)]
 
 use core::cell::Cell;

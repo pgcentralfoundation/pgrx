@@ -8,7 +8,7 @@
 //! using this build's bindings. The independent C oracle supplies the broader
 //! semantic coverage for closed paste translation.
 
-#![cfg(all(pgrx_c_macros, not(docsrs)))]
+#![cfg(not(docsrs))]
 #![deny(unsafe_op_in_unsafe_fn)]
 
 /// Reuse this build's verified compiler profile for independent original-header observations.

@@ -29,16 +29,15 @@ pub(super) struct NativeBuild<'a> {
     pub(super) cshim: Option<&'a Path>,
 }
 
-/// Compile and archive generated C access primitives with the inspected invocation profile,
-/// without publishing Cargo linkage until all macro proofs succeed. The result says
-/// whether this artifact also contains the C shim, so the caller can avoid
-/// compiling a second object containing the same PostgreSQL header definitions.
+/// Compile and archive generated C access primitives, bindgen's static wrappers and, when
+/// enabled, the C shim with the inspected invocation profile, without publishing Cargo
+/// linkage until all macro proofs succeed.
 pub(super) fn compile_macro_support(
     major: u16,
     profile: &CompilationProfile,
     source: &str,
     build: &NativeBuild<'_>,
-) -> eyre::Result<bool> {
+) -> eyre::Result<()> {
     let out_dir = build.out_dir;
     let stem = format!("pgrx_c_macros_pg{major}");
     let c_path = out_dir.join(format!("{stem}.c"));
@@ -54,12 +53,11 @@ pub(super) fn compile_macro_support(
     )?;
     super::write_content_stable(&c_path, translation_unit.as_bytes())?;
     pgrx_c_macros::compile_native_support(profile, &c_path, &object, &archive)
-        .wrap_err("could not compile and archive generated C access support")?;
-    Ok(build.cshim.is_some())
+        .wrap_err("could not compile and archive generated C access support")
 }
 
 /// Publish the previously verified native archive only once the Rust macro tree
-/// and audit report are ready, so a refused optional build cannot leak linkage.
+/// and audit report are ready.
 pub(super) fn link_macro_support(major: u16, out_dir: &Path) {
     println!("cargo:rustc-link-search=native={}", out_dir.display());
     println!("cargo:rustc-link-lib=static=pgrx_c_macros_pg{major}");
@@ -248,15 +246,13 @@ mod tests {
         let scanner = pgrx_c_macros::MacroScanner::new().unwrap();
         let frontend = pgrx_c_macros::inspect(&scanner, &header, &[], None).unwrap();
         for cshim in [None, Some(cshim.as_path())] {
-            assert!(
             compile_macro_support(
                 15,
                 frontend.profile(),
                 "int macro_read(void) { return inline_read(); }\nint *macro_global(void) { return &header_global; }\nint (*macro_function(void))(void) { return header_external; }\n",
                 &NativeBuild { out_dir: &directory.0, active: true, cshim },
             )
-            .unwrap() == cshim.is_some()
-        );
+            .unwrap();
             let main = directory.0.join("main.c");
             let shim_declarations = if cshim.is_some() {
                 "int cshim_mutate(void);"

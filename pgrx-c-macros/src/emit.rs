@@ -499,16 +499,6 @@ pub struct MacroSupportArtifact {
     pub c_source: String,
 }
 
-/// Emit only an all-unavailable classifier when authoritative C inspection cannot run.
-///
-/// Include this source in the defining crate just as normal generated support. Callers can
-/// use `__pgrx_c_classify!(@if_available NAME { ... })` uniformly, but no queried body is
-/// emitted. This requires no compiler profile, binding catalog, runtime helpers or native code.
-pub fn emit_unavailable_macro_support() -> String {
-    arguments::shared(&BTreeSet::new(), false)
-        .expect("an empty export set contains no invalid identifiers and fits the output bound")
-}
-
 /// One preparation supplies both the macros and their shared native capabilities.
 #[derive(Clone, Debug)]
 pub struct MacroGeneration {

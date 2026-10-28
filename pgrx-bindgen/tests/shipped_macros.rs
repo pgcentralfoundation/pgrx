@@ -139,40 +139,29 @@ impl Fixture {
             "{phase} tracks the diagnostic switch for Cargo invalidation"
         );
         let mut expected = BTreeSet::new();
-        match report["status"].as_str().unwrap() {
-            "generated" => {
-                let macros = report["macros"].as_array().unwrap();
-                let mut emitted = 0;
-                let mut skipped = 0;
-                for emission in macros {
-                    match emission["status"]["status"].as_str().unwrap() {
-                        "emitted" => emitted += 1,
-                        "skipped" => {
-                            skipped += 1;
-                            let name = emission["analysis"]["name"].as_str().unwrap();
-                            let reason = emission["status"]["reason"]["message"].as_str().unwrap();
-                            expected.insert(format!(
-                                "pg18: skipping macro `{name}`: {}",
-                                reason.replace(['\r', '\n'], " ")
-                            ));
-                        }
-                        status => panic!("unexpected macro status {status}"),
-                    }
+        assert_eq!(report["status"], "generated", "{phase} generates its C macros");
+        let macros = report["macros"].as_array().unwrap();
+        let mut emitted = 0;
+        let mut skipped = 0;
+        for emission in macros {
+            match emission["status"]["status"].as_str().unwrap() {
+                "emitted" => emitted += 1,
+                "skipped" => {
+                    skipped += 1;
+                    let name = emission["analysis"]["name"].as_str().unwrap();
+                    let reason = emission["status"]["reason"]["message"].as_str().unwrap();
+                    expected.insert(format!(
+                        "pg18: skipping macro `{name}`: {}",
+                        reason.replace(['\r', '\n'], " ")
+                    ));
                 }
-                expected.insert(format!(
-                    "pg18 C macros: {emitted} emitted, {skipped} skipped; report {}",
-                    out_dir.join("pg18_macro_report.json").display()
-                ));
+                status => panic!("unexpected macro status {status}"),
             }
-            "unavailable" => {
-                expected.insert(format!("pg18: {}", report["reason"].as_str().unwrap()));
-                expected.insert(format!(
-                    "pg18 C macros unavailable; report {}",
-                    out_dir.join("pg18_macro_report.json").display()
-                ));
-            }
-            status => panic!("unexpected report status {status}"),
         }
+        expected.insert(format!(
+            "pg18 C macros: {emitted} emitted, {skipped} skipped; report {}",
+            out_dir.join("pg18_macro_report.json").display()
+        ));
         let actual = build_output
             .lines()
             .filter_map(|line| line.strip_prefix("cargo:warning="))
@@ -414,7 +403,7 @@ fn docsrs_exports_generated_adapter_modules_and_accepts_support_free_snapshots()
                 let mut command = Command::new("rustc");
                 command
                     .args(["--edition=2024", "--crate-name=docs_snapshot", "--crate-type=rlib"])
-                    .args(["--cfg", "pgrx_c_macros", "--cfg"])
+                    .arg("--cfg")
                     .arg(format!("feature=\"pg{major}\""))
                     .env("OUT_DIR", &out_dir)
                     .arg(&library_path)

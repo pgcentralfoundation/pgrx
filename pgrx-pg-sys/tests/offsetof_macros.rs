@@ -7,7 +7,7 @@
 //! Public invocations use actual record types and fields, making layout and
 //! unevaluated-operand behavior observable at the downstream macro boundary.
 
-#![cfg(all(pgrx_c_macros, not(docsrs)))]
+#![cfg(not(docsrs))]
 #![deny(unsafe_op_in_unsafe_fn)]
 
 use pgrx_pg_sys as pg;

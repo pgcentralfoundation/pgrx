@@ -8,7 +8,7 @@
 //! mutation, sequencing, and C arithmetic. The tests use isolated local storage
 //! and selected-build exports, with explicit raw-access safety arguments.
 
-#![cfg(all(pgrx_c_macros, not(docsrs)))]
+#![cfg(not(docsrs))]
 #![deny(unsafe_op_in_unsafe_fn)]
 
 use core::mem::MaybeUninit;

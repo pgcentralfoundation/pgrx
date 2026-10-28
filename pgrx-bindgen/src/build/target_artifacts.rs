@@ -149,9 +149,6 @@ pub(super) fn export(
             return Err(eyre!("target artifact source exceeds its size bound"));
         }
     }
-    if !macros.inspected || macros.integrated_cshim != domain.cshim {
-        return Err(eyre!("target artifact export requires coherent inspected native support"));
-    }
     let report = validate_report(&macros.report, &domain)?;
     validate_runtime_cfg(&macros.runtime_cfg, &report.runtime_cfg)?;
     let mut files = BTreeMap::new();
@@ -266,8 +263,6 @@ pub(super) fn import(
             report,
             emitted: manifest.emitted,
             skipped: manifest.skipped,
-            inspected: true,
-            integrated_cshim: active && expected.cshim,
             runtime_cfg: manifest.runtime_cfg,
         },
     ))
@@ -696,8 +691,6 @@ mod tests {
             report,
             emitted: 3,
             skipped: 2,
-            inspected: true,
-            integrated_cshim: cshim,
             runtime_cfg: vec![
                 "pgrx_c_char_unsigned".into(),
                 "pgrx_c_size_type=\"unsigned_long\"".into(),
@@ -745,7 +738,6 @@ mod tests {
             assert_eq!(imported.report, macros.report);
             assert_eq!(imported.runtime_cfg, macros.runtime_cfg);
             assert_eq!((imported.emitted, imported.skipped), (3, 2));
-            assert_eq!(imported.integrated_cshim, cshim);
             for name in native_names(&domain) {
                 assert_eq!(
                     std::fs::read(out.join(&name)).unwrap(),
