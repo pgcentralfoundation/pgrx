@@ -554,6 +554,14 @@ impl CompilerSearch {
         self.searched_path = true;
         for root in search_roots {
             let candidate = input_path(root)?.join(path);
+            // As in execvp, a root whose search permission is denied cannot supply a driver.
+            // Its candidates can be neither fingerprinted nor watched, so they are not inputs.
+            if candidate
+                .metadata()
+                .is_err_and(|error| error.kind() == io::ErrorKind::PermissionDenied)
+            {
+                continue;
+            }
             if candidate.is_dir() {
                 self.required_directories.insert(candidate.clone());
             } else {
@@ -3883,6 +3891,39 @@ mod tests {
             assert!(!inputs.environment.contains_key("PATH"));
             assert!(inputs.executable_search_directories.is_empty());
             assert!(inputs.directories.is_empty());
+        }
+
+        /// Like a shell lookup, PATH entries that are regular files or unsearchable directories
+        /// cannot supply a driver and must not abort inspection when a later entry matches.
+        #[test]
+        fn unusable_path_entries_are_skipped_like_shell_lookup() {
+            let fixture = Fixture::new();
+            let file_root = fixture.0.join("not-a-directory");
+            fs::write(&file_root, "").unwrap();
+            let locked = fixture.0.join("locked");
+            let locked_root = locked.join("bin");
+            fs::create_dir_all(&locked_root).unwrap();
+            let chosen = fixture.0.join("chosen");
+            fs::create_dir(&chosen).unwrap();
+            let path_compiler = chosen.join("clang-21");
+            compiler(&path_compiler, 21);
+            fs::set_permissions(&locked, fs::Permissions::from_mode(0o000)).unwrap();
+            // A privileged test process can still search the locked directory.
+            let denied = fs::metadata(&locked_root)
+                .is_err_and(|error| error.kind() == io::ErrorKind::PermissionDenied);
+            let roots = [file_root.clone(), locked_root.clone(), chosen];
+            let result = select_compiler(None, None, None, 21, &roots).and_then(|selection| {
+                let executable = selection.executable.clone();
+                build_inputs(&[], "", BTreeSet::new(), &selection.search)
+                    .map(|inputs| (executable, inputs))
+            });
+            fs::set_permissions(&locked, fs::Permissions::from_mode(0o755)).unwrap();
+            let (executable, inputs) = result.unwrap();
+            assert_eq!(executable, path_compiler);
+            assert_eq!(inputs.fingerprints[&file_root.join("clang-21")], None);
+            if denied {
+                assert!(!inputs.files.contains(&locked_root.join("clang-21")));
+            }
         }
 
         /// Create a synthetic executable whose version response exercises driver preference and

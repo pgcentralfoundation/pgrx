@@ -99,7 +99,7 @@ pub(crate) fn fingerprint_files<'a>(
     for path in files {
         let identity = match path.canonicalize() {
             Ok(identity) => identity,
-            Err(error) if error.kind() == io::ErrorKind::NotFound => {
+            Err(error) if absent(&error) => {
                 fingerprints.insert(path.clone(), None);
                 continue;
             }
@@ -116,7 +116,7 @@ pub(crate) fn fingerprint_files<'a>(
         // this identity; the surrounding checks verify spellings independently.
         let mut file = match std::fs::File::open(&identity) {
             Ok(file) => file,
-            Err(error) if error.kind() == io::ErrorKind::NotFound => {
+            Err(error) if absent(&error) => {
                 fingerprints.insert(path.clone(), None);
                 continue;
             }
@@ -151,7 +151,7 @@ pub(crate) fn file_identities<'a>(
         .map(|path| {
             let identity = match path.canonicalize() {
                 Ok(identity) => Some(identity),
-                Err(error) if error.kind() == io::ErrorKind::NotFound => None,
+                Err(error) if absent(&error) => None,
                 Err(source) => {
                     return Err(FrontendError::CompilerIo { compiler: path.clone(), source });
                 }
@@ -159,6 +159,12 @@ pub(crate) fn file_identities<'a>(
             Ok((path.clone(), identity))
         })
         .collect()
+}
+
+/// A missing path and a path below a non-directory component, such as a PATH entry naming a regular
+/// file, both mean that no input exists there yet; creating one must still invalidate the profile.
+fn absent(error: &io::Error) -> bool {
+    matches!(error.kind(), io::ErrorKind::NotFound | io::ErrorKind::NotADirectory)
 }
 
 /// Preserve report digest compatibility across backend choices and streaming boundaries.

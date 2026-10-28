@@ -360,8 +360,10 @@ spaces, hashes, dollars, and line continuations have their specific encodings.
 Verification must detect more than an edited included header. A new earlier
 header in an include search directory, an executable in an earlier `PATH`
 directory, a changed working directory, or changed preprocessing environment can
-invalidate the inspection. Source-derived facts are checked around preparation
-passes and again before the combined artifact is published.
+invalidate the inspection. As in `execvp`, a `PATH` entry naming a regular file
+records an absent candidate, and an entry whose search permission is denied is
+skipped; neither aborts inspection. Source-derived facts are checked around
+preparation passes and again before the combined artifact is published.
 
 These checks are not a filesystem transaction or an immutable copy of every
 input. Callers must keep inputs stable through generation. A concurrent edit
