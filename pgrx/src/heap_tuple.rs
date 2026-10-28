@@ -575,8 +575,9 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
         // Copy the type out before reading the tuple: on PG15-17, nocachegetattr caches
         // attribute offsets by writing to the descriptor's attributes, which `att` borrows.
         let att_typoid = att.type_oid().value();
-        // SAFETY: this PgHeapTuple owns a live tuple formed with its descriptor, and the lookup
-        // above bounds `attno` by the descriptor's attribute count.
+        // SAFETY: this PgHeapTuple owns a live tuple of its descriptor's row type, formed with
+        // that descriptor or, for a stored row, an earlier one whose attributes are a prefix of
+        // it. The lookup above bounds `attno` by the descriptor's attribute count.
         let datum = unsafe { heap_getattr_raw(self.tuple.as_ptr(), attno, self.tupdesc.as_ptr()) };
         let Some(datum) = datum else {
             return Ok(None);

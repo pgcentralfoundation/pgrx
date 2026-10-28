@@ -58,14 +58,23 @@ pub unsafe fn composite_row_type_make_tuple(
 /// If the field in question has a NULL value, we return `None`.
 /// Otherwise, a `Some(T)`
 ///
+/// A row stored before `ALTER TYPE ... ADD ATTRIBUTE` or `ALTER TABLE ... ADD COLUMN` can store
+/// fewer attributes than the current descriptor has. An attribute past the stored ones reads
+/// as PostgreSQL's `getmissingattr` returns it: the missing value that `tupdesc` records for it,
+/// which `ADD COLUMN` sets for a non-volatile `DEFAULT`, or NULL when there is none.
+///
 /// System attributes, such as `ctid`, have non-positive attribute numbers and cannot be
 /// requested.
 ///
 /// # Safety
 ///
-/// `tuple` must point to a live heap tuple formed with the descriptor `tupdesc`, and the call
-/// must run on the PostgreSQL backend thread. A pass-by-reference result points into the
-/// tuple, so `T` must not outlive the tuple's memory.
+/// `tuple` must point to a live heap tuple formed with `tupdesc`, or with an earlier descriptor
+/// of the same row type whose attributes are a prefix of `tupdesc`'s, with the same types,
+/// lengths, and alignments. Adding attributes to a row type keeps its stored rows readable this
+/// way, and so does dropping one: PostgreSQL keeps a dropped attribute's position, length, and
+/// alignment, though not its type. `T` must be able to read the value stored for `attno`. The
+/// call must run on the PostgreSQL backend thread. A pass-by-reference result can point into
+/// the tuple, so `T` must not outlive the tuple's memory.
 ///
 /// # Panics
 ///
@@ -78,8 +87,8 @@ pub unsafe fn heap_getattr<T: FromDatum, AllocatedBy: WhoAllocated>(
 ) -> Option<T> {
     // PostgreSQL only asserts that `attno` is within the descriptor, so check it first.
     let typoid = tupdesc.get(attno.get() - 1).expect("no attribute").type_oid();
-    // SAFETY: the caller supplies a live tuple formed with `tupdesc`, and the descriptor
-    // lookup above bounds `attno` by its attribute count.
+    // SAFETY: the caller supplies a live tuple whose stored attributes are a prefix of
+    // `tupdesc`'s, and the descriptor lookup above bounds `attno` by its attribute count.
     let datum = unsafe { heap_getattr_raw(tuple.as_ptr(), attno, tupdesc.as_ptr()) }?;
     unsafe { T::from_polymorphic_datum(datum, false, typoid.value()) }
 }
@@ -260,13 +269,15 @@ impl DatumWithTypeInfo {
     }
 }
 
-/// Similar to [`heap_getattr`], but returns extended information about the requested attribute.
-/// `attno` is 1-based.
+/// Similar to [`heap_getattr()`], but returns extended information about the requested
+/// attribute. `attno` is 1-based.
 ///
 /// # Safety
 ///
-/// `tuple` must point to a live heap tuple formed with the descriptor `tupdesc`, and the call
-/// must run on the PostgreSQL backend thread. A pass-by-reference `datum` points into the
+/// `tuple` must point to a live heap tuple formed with `tupdesc`, or with an earlier descriptor
+/// of the same row type whose attributes are a prefix of `tupdesc`'s, with the same types,
+/// lengths, and alignments; [`heap_getattr()`] describes which stored rows qualify. The call
+/// must run on the PostgreSQL backend thread. A pass-by-reference `datum` can point into the
 /// tuple.
 ///
 /// # Panics
@@ -280,8 +291,8 @@ pub unsafe fn heap_getattr_datum_ex(
 ) -> DatumWithTypeInfo {
     // PostgreSQL only asserts that `attno` is within the descriptor, so check it first.
     let typoid = tupdesc.get(attno.get() - 1).expect("no attribute").type_oid();
-    // SAFETY: the caller supplies a live tuple formed with `tupdesc`, and the descriptor
-    // lookup above bounds `attno` by its attribute count.
+    // SAFETY: the caller supplies a live tuple whose stored attributes are a prefix of
+    // `tupdesc`'s, and the descriptor lookup above bounds `attno` by its attribute count.
     let datum = unsafe { heap_getattr_raw(tuple.as_ptr(), attno, tupdesc.as_ptr()) };
     let is_null = datum.is_none();
     let datum = datum.unwrap_or_else(pg_sys::Datum::null);

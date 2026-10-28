@@ -1037,7 +1037,8 @@ mod tests {
             let tupdesc = pgrx::PgTupleDesc::for_composite_type("GrowingDog").unwrap();
             // SAFETY: as above.
             let tuple = unsafe { pgrx::htup::composite_row_type_make_tuple(datum) };
-            // SAFETY: `tuple` is the live stored row, of the type `tupdesc` describes.
+            // SAFETY: `tuple` is the live stored row. It was formed before `age` was added, so
+            // its attributes are a prefix of the ones `tupdesc` describes.
             unsafe {
                 assert_eq!(
                     pgrx::htup::heap_getattr::<i32, _>(&tuple, scritches, &tupdesc),
@@ -1045,6 +1046,37 @@ mod tests {
                 );
                 assert_eq!(pgrx::htup::heap_getattr::<i32, _>(&tuple, age, &tupdesc), None);
             }
+            Ok(())
+        })
+    }
+
+    /// A row stored before `ALTER TYPE ... DROP ATTRIBUTE` still holds the dropped attribute,
+    /// and the descriptor keeps its length and alignment in place, so the attributes after it
+    /// read correctly.
+    #[pg_test]
+    fn test_heap_getattr_reads_row_stored_before_a_drop() -> Result<(), spi::Error> {
+        Spi::run(
+            "CREATE TYPE ShrinkingDog AS (name text, collar text, scritches int4);
+             CREATE TABLE shrinking_dogs (dog ShrinkingDog);
+             INSERT INTO shrinking_dogs VALUES (ROW('Nami', 'red', 7));
+             ALTER TYPE ShrinkingDog DROP ATTRIBUTE collar CASCADE;",
+        )?;
+        let scritches = NonZeroUsize::new(3).unwrap();
+        Spi::connect(|client| {
+            let row = client.select("SELECT dog FROM shrinking_dogs", None, &[])?.first();
+            let datum = row.get_datum_by_ordinal(1)?.expect("stored dog is not NULL");
+
+            // SAFETY: `datum` is a live ShrinkingDog composite read from the SPI tuple.
+            let dog = unsafe { PgHeapTuple::from_composite_datum(datum) };
+            assert_eq!(dog.get_by_index::<i32>(scritches)?, Some(7));
+
+            let tupdesc = pgrx::PgTupleDesc::for_composite_type("ShrinkingDog").unwrap();
+            // SAFETY: as above.
+            let tuple = unsafe { pgrx::htup::composite_row_type_make_tuple(datum) };
+            // SAFETY: `tuple` is the live stored row. It was formed before `collar` was
+            // dropped, and `tupdesc` keeps that attribute's length and alignment in place.
+            let read = unsafe { pgrx::htup::heap_getattr::<i32, _>(&tuple, scritches, &tupdesc) };
+            assert_eq!(read, Some(7));
             Ok(())
         })
     }
