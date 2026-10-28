@@ -576,6 +576,14 @@ impl<'a> Renderer<'a> {
                             }
                         }
                         ExpressionKind::Stringification { parts } => {
+                            // Analysis admits stringification only as an argument of a
+                            // direct void native call, which a witness collapses without
+                            // rendering its arguments or drops as a comma's left operand.
+                            if self.mode == RenderMode::Witness {
+                                return Err(failure(
+                                    "a type witness never renders operand stringification".into(),
+                                ));
+                            }
                             if !matches!(context, Context::Value) {
                                 return Err(skip(
                                     analysis,
@@ -593,17 +601,10 @@ impl<'a> Renderer<'a> {
                                         write!(rust, "{text:?}, ").expect("String output");
                                     }
                                     StringPart::Parameter { index } => {
-                                        let operand = self.operand(*index);
-                                        let spelling = match self.mode {
-                                            RenderMode::Macro => operand,
-                                            RenderMode::Witness => format!(
-                                                "(@original [${}] {operand})",
-                                                arguments::name(analysis, *index)
-                                            ),
-                                        };
                                         write!(
                                             rust,
-                                            "$crate::__pgrx_c_operand!(@stringify; {spelling}), "
+                                            "$crate::__pgrx_c_operand!(@stringify; {}), ",
+                                            self.operand(*index)
                                         )
                                         .expect("String output");
                                     }

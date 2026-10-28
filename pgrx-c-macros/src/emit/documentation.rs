@@ -191,7 +191,6 @@ impl MacroDocumentation {
             DocumentedResult::Value { witness } => {
                 if let Some(name) = single_read_place(witness) {
                     let native = format!("(@native [${name}])");
-                    let original = format!("(@original [${name}] ");
                     let operand = format!("${name}:expr");
                     for form in self.forms.iter().filter(|form| form.matches(&operand).count() == 1)
                     {
@@ -200,8 +199,7 @@ impl MacroDocumentation {
                             (format!("(* ${name}:ident)"), format!("(* ${name})")),
                         ] {
                             let witness = witness
-                                .replace(&native, &format!("(@deref [{spelling}] [${name}])"))
-                                .replace(&original, &format!("(@original [{spelling}] "));
+                                .replace(&native, &format!("(@deref [{spelling}] [${name}])"));
                             arms.push((
                                 form.replace(&operand, &matcher),
                                 format!("@value {witness}"),
