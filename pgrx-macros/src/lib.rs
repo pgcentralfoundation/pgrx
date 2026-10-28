@@ -511,6 +511,57 @@ pub fn extension_sql_file(input: TokenStream) -> TokenStream {
     wrapped(input).unwrap_or_else(|e: syn::Error| e.into_compile_error().into())
 }
 
+/// Name the extension that the calling crate builds, as `cargo pgrx` does: by the stem of the
+/// `.control` file next to its `Cargo.toml`.
+///
+/// Expands to a `Result<&'static CStr, &'static str>`, whose error says why there is no name.
+#[doc(hidden)]
+#[proc_macro]
+pub fn __pgrx_extension_name(_input: TokenStream) -> TokenStream {
+    let dir = match std::env::var_os("CARGO_MANIFEST_DIR") {
+        Some(dir) => std::path::PathBuf::from(dir),
+        None => return extension_name_error("CARGO_MANIFEST_DIR is not set".into()),
+    };
+    let controls = match std::fs::read_dir(&dir) {
+        Ok(entries) => entries
+            .flatten()
+            .map(|entry| entry.path())
+            .filter(|path| path.extension() == Some("control".as_ref()))
+            .collect::<Vec<_>>(),
+        Err(e) => {
+            return extension_name_error(format!("cannot read `{}`: {e}", dir.display()));
+        }
+    };
+    let [control] = controls.as_slice() else {
+        return extension_name_error(format!(
+            "expected one .control file in `{}`, found {}",
+            dir.display(),
+            controls.len()
+        ));
+    };
+    let Some(name) = control.file_stem().and_then(|stem| stem.to_str()) else {
+        return extension_name_error(format!("`{}` is not named in UTF-8", control.display()));
+    };
+    let Ok(name) = CString::new(name) else {
+        return extension_name_error(format!("`{}` has a NUL in its name", control.display()));
+    };
+    let name = proc_macro2::Literal::c_string(&name);
+    // Depend on the file, so that renaming it rebuilds the crate.
+    let track = control.to_str().map(|path| quote! { const _: &[u8] = include_bytes!(#path); });
+    quote! {{
+        #track
+        ::core::result::Result::<&'static ::core::ffi::CStr, &'static str>::Ok(#name)
+    }}
+    .into()
+}
+
+fn extension_name_error(reason: String) -> TokenStream {
+    quote! {
+        ::core::result::Result::<&'static ::core::ffi::CStr, &'static str>::Err(#reason)
+    }
+    .into()
+}
+
 /// Associated macro for `#[pg_extern]` or `#[macro@pg_operator]`.  Used to set the `SEARCH_PATH` option
 /// on the `CREATE FUNCTION` statement.
 #[proc_macro_attribute]

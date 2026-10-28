@@ -115,7 +115,8 @@ pub trait FromDatum: Sized {
     /// binary coercible to [`IntoDatum::type_oid`].
     ///
     /// [`IntoDatum::type_oid`] itself can raise an ERROR: `PgBox<T>` and `#[derive(PostgresType)]`
-    /// types look their type up by name, and no type may have that name.
+    /// types look their type up by name among the extension's types, and the extension may have no
+    /// type of that name.
     ///
     /// ## Safety
     ///

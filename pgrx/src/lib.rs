@@ -152,6 +152,21 @@ pub mod pg_magic_func_support {
 
     use crate::pg_sys;
 
+    static EXTENSION_NAME: OnceLock<Result<&'static CStr, &'static str>> = OnceLock::new();
+
+    /// Record the name of the extension this library belongs to, or why it is unknown.
+    pub fn set_extension_name(name: Result<&'static CStr, &'static str>) {
+        // PostgreSQL may call `Pg_magic_func` more than once; the name never changes.
+        let _ = EXTENSION_NAME.set(name);
+    }
+
+    /// The name that [`pg_magic_func!`](crate::pg_magic_func) recorded for this library's extension.
+    pub(crate) fn extension_name() -> Result<&'static CStr, &'static str> {
+        EXTENSION_NAME.get().copied().unwrap_or(Err(
+            "this library's `Pg_magic_func` did not record its extension; use `pg_module_magic!()`",
+        ))
+    }
+
     /// Copy metadata initialized by this installation's original C PG_MODULE_MAGIC_DATA.
     pub fn default_magic() -> pg_sys::Pg_magic_struct {
         pg_sys::__pgrx_module_magic_data()
@@ -295,6 +310,11 @@ macro_rules! pg_magic_func {
             // since Postgres calls this first, register our panic handler now
             // so we don't unwind into C / Postgres
             ::pgrx::pg_sys::panic::register_pg_guard_panic_hook();
+
+            // so `rust_regtypein` can find the types this library's extension created
+            ::pgrx::pg_magic_func_support::set_extension_name(
+                ::pgrx::pgrx_macros::__pgrx_extension_name!(),
+            );
 
             /// PostgreSQL 18 and later keep the returned pointer, so the record needs static
             /// storage. Its defaults come from the C initializer, which const code cannot read,
