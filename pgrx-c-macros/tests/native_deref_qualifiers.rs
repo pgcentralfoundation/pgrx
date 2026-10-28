@@ -196,12 +196,13 @@ fn native_raw_dereferences_preserve_qualification_owners_and_precedence() {
     fn main() {
         let mut state = DerefState { scalar: 17, values: [23, 31] };
         let pointer = &raw mut state;
-        let constant = &raw const state;
         // SAFETY: The initialized records remain live; mutable array storage is
         // accessed only through the raw mutable pointer during these operations.
         unsafe {
             let mutable: *mut i32 = DEREF_ARRAY!(((*pointer))).get();
             *mutable.add(1) = 37;
+            // Taken after the write, so the read below uses a live pointer.
+            let constant = &raw const state;
             let readonly: *const i32 = DEREF_ARRAY!(*(constant)).get();
             println!("{}\n{}\n{}", DEREF_READ!(*pointer).get(), *mutable.add(1), *readonly.add(1));
             let const_field = DerefConstState { scalar: 41, values: [43, 47] };
@@ -220,7 +221,7 @@ fn native_raw_dereferences_preserve_qualification_owners_and_precedence() {
             // parenthesized spelling does.
             let bare: *mut i32 = DEREF_ARRAY!(*pointer).get();
             *bare = 29;
-            // A const pointer taken after the write keeps every read on a live pointer.
+            // As above, the const pointer is taken after the write.
             let reread = &raw const state;
             let bare_readonly: *const i32 = DEREF_ARRAY!(*reread).get();
             println!("{}", *bare_readonly);
