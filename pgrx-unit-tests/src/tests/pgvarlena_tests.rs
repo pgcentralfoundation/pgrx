@@ -7,14 +7,56 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+use core::ffi::CStr;
+use pgrx::datum::PgVarlena;
+use pgrx::prelude::*;
+use pgrx::{PgVarlenaInOutFuncs, StringInfo};
+
+/// Too large for a one-byte varlena header, so its Datums have the four-byte header that
+/// detoasting leaves in place.
+#[derive(Copy, Clone, PostgresType)]
+#[bikeshed_postgres_type_manually_impl_from_into_datum]
+#[pgvarlena_inoutfuncs]
+pub struct PgVarlenaCounter {
+    count: i64,
+    #[allow(dead_code, reason = "only sizes the type past a one-byte header")]
+    filler: [i64; 25],
+}
+
+impl PgVarlenaInOutFuncs for PgVarlenaCounter {
+    fn input(input: &CStr) -> PgVarlena<Self> {
+        let mut counter = PgVarlena::<Self>::new();
+        counter.count = input.to_str().expect("utf-8").parse().expect("an i64");
+        counter
+    }
+
+    fn output(&self, buffer: &mut StringInfo) {
+        buffer.push_str(&self.count.to_string());
+    }
+}
+
+/// Mutate an argument in each row, after the call that read it has returned.
+#[pg_extern]
+fn pgvarlena_counter_series(
+    start: PgVarlena<PgVarlenaCounter>,
+    rows: i32,
+) -> SetOfIterator<'static, i64> {
+    let mut counter = start;
+    SetOfIterator::new((0..rows).map(move |_| {
+        counter.count += 1;
+        counter.count
+    }))
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgrx::pg_schema]
 mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_unit_tests;
 
+    use super::PgVarlenaCounter;
     use core::mem::{align_of, size_of};
-    use core::ptr;
+    use core::{ptr, slice};
     use pgrx::datum::PgVarlena;
     use pgrx::prelude::*;
 
@@ -43,6 +85,41 @@ mod tests {
 
     fn assert_aligned<T>(value: &T) {
         assert_eq!(ptr::from_ref(value).addr() % align_of::<T>(), 0, "misaligned &T");
+    }
+
+    /// Build a varlena in CurrentMemoryContext whose payload is `value` followed by `tail`.
+    unsafe fn varlena_with_tail<T: Copy>(
+        value: T,
+        tail: &[u8],
+        short_header: bool,
+    ) -> *mut pg_sys::varlena {
+        let len = size_of::<T>() + tail.len();
+        // SAFETY: palloc0 returns aligned storage for the four-byte header and the payload. The
+        // one-byte header form is only requested for payloads that fit it, and the copies fill
+        // the payload that VARDATA_ANY locates from the header just written.
+        unsafe {
+            let varlena = pg_sys::palloc0(4 + len).cast::<pg_sys::varlena>();
+            if short_header {
+                pg_sys::SET_VARSIZE_SHORT!(varlena, (1 + len) as i32).get();
+            } else {
+                pg_sys::SET_VARSIZE_4B!(varlena, (4 + len) as i32).get();
+            }
+            let data = pg_sys::VARDATA_ANY!(varlena).get().cast::<u8>();
+            ptr::copy_nonoverlapping(ptr::from_ref(&value).cast::<u8>(), data, size_of::<T>());
+            ptr::copy_nonoverlapping(tail.as_ptr(), data.add(size_of::<T>()), tail.len());
+            varlena
+        }
+    }
+
+    /// The payload bytes of a live, uncompressed varlena.
+    unsafe fn payload_bytes<'a>(varlena: *mut pg_sys::varlena) -> &'a [u8] {
+        // SAFETY: the caller passes a live inline varlena, whose header gives its payload.
+        unsafe {
+            slice::from_raw_parts(
+                pg_sys::VARDATA_ANY!(varlena).get().cast::<u8>(),
+                pg_sys::VARSIZE_ANY_EXHDR!(varlena).get() as usize,
+            )
+        }
     }
 
     /// Read the payload of a varlena that `into_pg` produced.
@@ -130,7 +207,7 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_pgvarlena_copies_borrowed_datum_on_write() {
+    fn test_pgvarlena_never_writes_to_its_datum() {
         // A four-byte-header varlena outside any PostgreSQL memory context.
         let mut storage = vec![0_u64; 1 + size_of::<Align16>() / size_of::<u64>()];
         let original = storage.as_mut_ptr().cast::<pg_sys::varlena>();
@@ -139,13 +216,13 @@ mod tests {
             pg_sys::SET_VARSIZE_4B!(original, (4 + size_of::<Align16>()) as i32).get();
         }
         // SAFETY: original is a live uncompressed varlena holding a valid Align16.
-        let mut borrowed = unsafe { PgVarlena::<Align16>::from_datum(original.into()) };
-        assert_aligned::<Align16>(&borrowed);
-        borrowed.lanes[0] = 9.0;
-        assert_aligned::<Align16>(borrowed.as_mut());
+        let mut read = unsafe { PgVarlena::<Align16>::from_datum(original.into()) };
+        assert_aligned::<Align16>(&read);
+        read.lanes[0] = 9.0;
+        assert_aligned::<Align16>(read.as_mut());
 
-        let copy = borrowed.into_pg();
-        assert_ne!(copy, original, "a mutated borrowed value needs its own varlena");
+        let copy = read.into_pg();
+        assert_ne!(copy, original, "a mutated value needs its own varlena");
         // SAFETY: both varlenas are live and hold an Align16.
         unsafe {
             assert_eq!(payload::<Align16>(copy).lanes, [9.0, 0.0, 0.0, 0.0]);
@@ -153,15 +230,75 @@ mod tests {
         }
     }
 
+    /// Payload bytes after the value survive a round trip, changed or not, whichever header
+    /// the Datum had.
     #[pg_test]
-    fn test_pgvarlena_returns_unmodified_borrowed_datum() {
-        let mut large = PgVarlena::<Large>::new();
-        large.words[5] = 5;
-        let datum = large.into_datum().unwrap();
-        // SAFETY: datum is the live varlena allocated above for a Large.
-        let read = unsafe { PgVarlena::<Large>::from_datum(datum) };
-        assert_eq!(read.words[5], 5);
-        assert_eq!(read.into_pg(), datum.cast_mut_ptr());
+    fn test_pgvarlena_keeps_payload_bytes_after_the_value() {
+        let tail = [0xa1_u8, 0xb2, 0xc3];
+        let value = Align8 { a: 1.0, b: 2.0, c: 3 };
+        for short_header in [true, false] {
+            // SAFETY: the payload is 19 bytes, which fits either header form.
+            let original = unsafe { varlena_with_tail(value, &tail, short_header) };
+
+            // SAFETY: original is a live inline varlena whose payload starts with an Align8.
+            let unchanged = unsafe { PgVarlena::<Align8>::from_datum(original.into()) }.into_pg();
+            // SAFETY: both varlenas are live and inline.
+            unsafe { assert_eq!(payload_bytes(unchanged), payload_bytes(original)) };
+
+            // SAFETY: as above.
+            let mut read = unsafe { PgVarlena::<Align8>::from_datum(original.into()) };
+            read.c = 4;
+            let changed = read.into_pg();
+            // SAFETY: into_pg returned a live inline varlena.
+            let bytes = unsafe { payload_bytes(changed) };
+            assert_eq!(&bytes[size_of::<Align8>()..], &tail, "short header: {short_header}");
+            // SAFETY: the payload starts with an Align8; the read has no alignment needs.
+            let changed_value = unsafe { bytes.as_ptr().cast::<Align8>().read_unaligned() };
+            assert_eq!(changed_value, Align8 { c: 4, ..value });
+        }
+    }
+
+    /// A value read through SPI and changed inside `Spi::connect` must survive `SPI_finish`,
+    /// which deletes the memory context that was current during the change.
+    #[pg_test]
+    fn test_pgvarlena_changed_inside_spi_connect_outlives_it() -> Result<(), spi::Error> {
+        let (dropped, kept) = Spi::connect(|client| {
+            let read = || {
+                client
+                    .select("SELECT '41'::PgVarlenaCounter", None, &[])?
+                    .first()
+                    .get_one::<PgVarlena<PgVarlenaCounter>>()
+                    .map(|counter| counter.expect("a non-NULL counter"))
+            };
+            let (mut dropped, mut kept) = (read()?, read()?);
+            dropped.count += 1;
+            kept.count += 2;
+            Ok::<_, spi::Error>((dropped, kept))
+        })?;
+        assert_eq!(dropped.count, 42);
+        drop(dropped);
+
+        let datum = kept.into_datum().expect("a Datum");
+        // Reuse and overwrite the memory of the deleted SPI procedure context.
+        assert_eq!(
+            Spi::get_one::<i64>("SELECT sum(i) FROM generate_series(1, 100) i")?,
+            Some(5050)
+        );
+        // SAFETY: into_datum allocated this varlena holding a PgVarlenaCounter.
+        let reread = unsafe { PgVarlena::<PgVarlenaCounter>::from_datum(datum) };
+        assert_eq!(reread.count, 43);
+        Ok(())
+    }
+
+    /// An SRF that changes a captured argument in each row runs those changes in the per-row
+    /// memory context, which PostgreSQL resets between rows.
+    #[pg_test]
+    fn test_pgvarlena_argument_changed_by_srf_rows() -> Result<(), spi::Error> {
+        let rows = Spi::get_one::<Vec<i64>>(
+            "SELECT array_agg(n) FROM pgvarlena_counter_series('5'::PgVarlenaCounter, 3) n",
+        )?;
+        assert_eq!(rows, Some(vec![6, 7, 8]));
+        Ok(())
     }
 
     #[pg_test(error = "varlena payload of 4 bytes cannot hold a 16-byte value")]

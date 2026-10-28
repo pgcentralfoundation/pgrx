@@ -15,20 +15,19 @@ use pgrx_sql_entity_graph::metadata::{
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
+use std::mem::{MaybeUninit, size_of};
 use std::ops::{Deref, DerefMut};
-use std::ptr::{self, NonNull};
+use std::{ptr, slice};
 
-/// Wraps a Postgres `varlena *`, presenting it as if it's a Rust type of a fixed size.
+/// A Rust type of a fixed size, stored in PostgreSQL as the payload of a `varlena`.
 ///
-/// PostgreSQL does not align a varlena's payload for `T`: the payload follows a one- or
-/// four-byte header, so it starts one or four bytes past an allocation, or wherever a tuple
-/// placed the value. `PgVarlena` therefore copies the payload into an aligned Rust allocation
-/// and lends out references to that copy only. Changes made through `DerefMut` or `AsMut` are
-/// copied back into the varlena when it is handed to PostgreSQL by [`PgVarlena::into_pg`] or
-/// [`IntoDatum`].
-///
-/// A `PgVarlena` created from a Postgres-provided `Datum` never writes to that Datum's memory.
-/// Its first mutable borrow allocates a new varlena in `CurrentMemoryContext` instead.
+/// A `PgVarlena<T>` holds its value in Rust. Reading one from a Datum copies the payload into
+/// storage aligned for `T`, because PostgreSQL places the payload one or four bytes past the
+/// varlena header without aligning it, and `Deref` and `DerefMut` lend references to that copy.
+/// The value keeps no pointer into PostgreSQL memory, so it may outlive the Datum, memory
+/// context, or SPI connection it was read from, and changing it never writes to that Datum.
+/// [`PgVarlena::into_pg`] and [`IntoDatum`] allocate a new varlena holding the value in
+/// `CurrentMemoryContext`.
 ///
 /// Generally, `PgVarlena` is meant to be used in conjunction with pgrx's `PostgresType` derive macro
 /// to provide transparent mapping of fixed-size Rust types as Postgres datums.
@@ -69,7 +68,7 @@ use std::ptr::{self, NonNull};
 ///
 /// #[pg_extern]
 /// fn do_a_thing(mut input: PgVarlena<MyType>) -> PgVarlena<MyType> {
-///     input.c += 99;  // performs a copy-on-write
+///     input.c += 99;  // changes the Rust copy; the returned Datum is a new varlena
 ///     input
 /// }
 /// ```
@@ -77,21 +76,18 @@ pub struct PgVarlena<T>
 where
     T: Copy + Sized,
 {
-    /// Aligned copy of the payload. Every `&T` and `&mut T` borrows this copy.
-    value: Box<T>,
-    /// The varlena that `into_pg` returns.
-    varlena: NonNull<pg_sys::varlena>,
-    /// This value allocated `varlena`, so it may write the payload and must free it.
-    owned: bool,
+    /// Always holds a valid `T`. `MaybeUninit` keeps every byte read from a Datum, padding
+    /// included, so an unchanged value converts back to the payload it was read from.
+    value: MaybeUninit<T>,
+    /// Payload bytes that followed the `T` in the Datum this value was read from.
+    tail: Box<[u8]>,
 }
 
 impl<T> PgVarlena<T>
 where
     T: Copy + Sized,
 {
-    /// Create a new `PgVarlena` representing a Rust type.  The backing varlena is allocated
-    /// by Postgres and initially zero'd (using `pg_sys::palloc0`).  Unless `.into_pg()` is called,
-    /// the Postgres-allocated memory will follow Rust's drop semantics.
+    /// Create a new `PgVarlena` representing a Rust type. Its value starts as all zero bytes.
     ///
     /// The initial value is all zero bytes, so `T` must accept all-zero bytes as a valid value.
     ///
@@ -113,128 +109,121 @@ where
     /// v.c = 42;
     /// ```
     pub fn new() -> Self {
-        // SAFETY: the varlena payload starts out as these same zero bytes. `T` must accept
-        // them, as documented above; nothing in the type system enforces it.
-        let value = unsafe { Box::<T>::new_zeroed().assume_init() };
-        PgVarlena { value, varlena: Self::alloc_varlena(), owned: true }
+        PgVarlena { value: MaybeUninit::zeroed(), tail: Box::default() }
     }
 
-    /// Allocate a zeroed varlena with room for a `T` in `CurrentMemoryContext`.
-    fn alloc_varlena() -> NonNull<pg_sys::varlena> {
-        let size_of = std::mem::size_of::<T>();
-
-        // palloc0 raises an ERROR for any size above MaxAllocSize, so the header writes
-        // below never see a length that overflows C `int`.
-        // SAFETY: palloc0 returns zeroed storage, aligned for any varlena header, or raises
-        // an ERROR instead of returning NULL.
-        let ptr =
-            unsafe { pg_sys::palloc0(pg_sys::VARHDRSZ as usize + size_of) as *mut pg_sys::varlena };
-
-        // SAFETY: palloc0 provides live aligned storage including the writable header
-        // prefix, with no competing borrow. The short branch checks that its encoded
-        // size fits the one-byte header; the other branch writes the four-byte header.
-        unsafe {
-            if size_of + pg_sys::VARHDRSZ_SHORT as usize <= pg_sys::VARATT_SHORT_MAX as usize {
-                // we can use the short header size
-                pg_sys::SET_VARSIZE_SHORT!(ptr, (size_of + pg_sys::VARHDRSZ_SHORT as usize) as i32)
-                    .get();
-            } else {
-                // gotta use the full 4-byte header
-                pg_sys::SET_VARSIZE_4B!(ptr, (size_of + pg_sys::VARHDRSZ as usize) as i32).get();
-            }
-        }
-
-        NonNull::new(ptr).expect("palloc0 returned NULL")
-    }
-
-    /// Construct a `PgVarlena` from a known-to-be-non-null `pg_sys::Datum`.  As
+    /// Read a `PgVarlena` from a non-null varlena `pg_sys::Datum`. As
     /// `FromDatum for PgVarlena<T> where T: Copy + Sized` is already implemented, it is unlikely
     /// that this function will need to be called directly.
     ///
-    /// The provided datum is automatically detoasted, including a packed one-byte header, and
-    /// its payload is copied into an aligned `T`. If detoasting allocated a copy, the returned
-    /// `PgVarlena` owns and frees it; otherwise it borrows `datum`.
+    /// The payload is copied into the returned value, which does not borrow `datum`. A compressed
+    /// or external value is first detoasted into a temporary copy in `CurrentMemoryContext`,
+    /// which is freed before returning. Payload bytes after the `T` are kept, and
+    /// [`PgVarlena::into_pg`] writes them back after the value.
     ///
     /// ## Safety
     ///
     /// `datum` must point to a live varlena, possibly packed, compressed, or external, whose
-    /// detoasted payload starts with the bytes of a valid `T`, such as a value that
-    /// `PgVarlena::<T>::into_pg` produced. Unless the returned value is mutated first,
-    /// [`PgVarlena::into_pg`] hands back `datum` itself, which must still be live wherever that
-    /// pointer is used.
+    /// payload starts with the bytes of a valid `T`, such as a value that
+    /// `PgVarlena::<T>::into_pg` produced. The call must run on the PostgreSQL backend thread.
     ///
     /// ## Panics
     ///
-    /// Panics if the detoasted payload is shorter than `T`.
+    /// Panics if the payload is shorter than `T`.
     pub unsafe fn from_datum(datum: pg_sys::Datum) -> Self {
-        let ptr = pg_sys::pg_detoast_datum(datum.cast_mut_ptr());
-        // SAFETY: the caller's valid varlena datum was detoasted into live storage with an
-        // initialized four-byte header whose size describes the complete allocation.
+        let ptr = datum.cast_mut_ptr::<pg_sys::varlena>();
+        // SAFETY: the caller supplies a live varlena, whose header these macros read.
+        let toasted = unsafe {
+            pg_sys::VARATT_IS_COMPRESSED!(ptr).is_true()
+                || pg_sys::VARATT_IS_EXTERNAL!(ptr).is_true()
+        };
+        if !toasted {
+            // SAFETY: a varlena that is neither compressed nor external holds its whole payload
+            // inline, and the caller promises that payload starts with a valid T.
+            return unsafe { Self::from_inline_varlena(ptr) };
+        }
+        // SAFETY: for a compressed or external varlena, pg_detoast_datum_packed returns a new
+        // plain copy allocated in CurrentMemoryContext, which only this block uses and frees.
+        unsafe {
+            let detoasted = pg_sys::pg_detoast_datum_packed(ptr);
+            let value = Self::from_inline_varlena(detoasted);
+            if detoasted != ptr {
+                pg_sys::pfree(detoasted.cast());
+            }
+            value
+        }
+    }
+
+    /// Copy the payload of a plain varlena, with a one- or four-byte header.
+    ///
+    /// # Safety
+    ///
+    /// `ptr` must point to a live varlena that is neither compressed nor external and whose
+    /// payload starts with the bytes of a valid `T`.
+    unsafe fn from_inline_varlena(ptr: *mut pg_sys::varlena) -> Self {
+        // SAFETY: the caller's live varlena header describes its inline payload.
         let (len, payload) = unsafe {
             (pg_sys::VARSIZE_ANY_EXHDR!(ptr).get() as usize, pg_sys::VARDATA_ANY!(ptr).get())
         };
-        assert!(
-            len >= std::mem::size_of::<T>(),
-            "varlena payload of {len} bytes cannot hold a {}-byte value",
-            std::mem::size_of::<T>()
-        );
+        let payload = payload.cast::<u8>().cast_const();
+        let size = size_of::<T>();
+        assert!(len >= size, "varlena payload of {len} bytes cannot hold a {size}-byte value");
 
-        let mut value = Box::<T>::new_uninit();
-        // SAFETY: the payload has at least size_of::<T>() initialized bytes, checked above, and
-        // the new Rust allocation cannot overlap it. A byte copy has no alignment requirement
-        // and keeps the payload's padding bytes. The caller promises those bytes are a valid `T`.
-        let value = unsafe {
-            ptr::copy_nonoverlapping(
-                payload.cast::<u8>(),
-                value.as_mut_ptr().cast::<u8>(),
-                std::mem::size_of::<T>(),
-            );
-            value.assume_init()
+        let mut value = MaybeUninit::<T>::uninit();
+        // SAFETY: the payload has `len >= size` initialized bytes and cannot overlap the new
+        // Rust storage. The byte copies need no alignment and keep the payload's padding bytes.
+        // The caller promises the first `size` bytes are a valid T, which establishes `value`'s
+        // invariant. The tail slice covers the remaining `len - size` payload bytes, and its
+        // pointer is non-null and aligned for u8 even when that length is zero.
+        let tail = unsafe {
+            ptr::copy_nonoverlapping(payload, value.as_mut_ptr().cast::<u8>(), size);
+            Box::from(slice::from_raw_parts(payload.add(size), len - size))
         };
-
-        PgVarlena {
-            value,
-            varlena: NonNull::new(ptr).expect("pg_detoast_datum returned NULL"),
-            // A detoasted copy is ours to free; otherwise we borrow the caller's datum.
-            owned: ptr != datum.cast_mut_ptr(),
-        }
+        PgVarlena { value, tail }
     }
 
-    /// Use when you need to pass the backing `*mut pg_sys::varlena` to a Postgres function.
+    /// Allocate a varlena holding this value in `CurrentMemoryContext`, and return it to pass to a
+    /// Postgres function. The varlena belongs to that memory context; Rust does not free it.
+    ///
+    /// The payload is the bytes of the value followed by any payload bytes that came after the
+    /// `T` in the Datum this value was read from. It gets a one-byte header when it fits one.
     ///
     /// This method is also used by the `IntoDatum for PgVarlena<T> where T: Copy + Sized`
     /// implementation.
-    pub fn into_pg(mut self) -> *mut pg_sys::varlena {
-        let ptr = self.varlena.as_ptr();
-        if self.owned {
-            // SAFETY: this value allocated `ptr` (or owns its detoasted copy), whose payload has
-            // room for a `T`, and nothing else references it. The untyped byte copy writes the
-            // aligned value, which may have changed, to the unaligned payload.
-            unsafe {
-                ptr::copy_nonoverlapping(
-                    ptr::from_ref::<T>(&self.value).cast::<u8>(),
-                    pg_sys::VARDATA_ANY!(ptr).get().cast::<u8>(),
-                    std::mem::size_of::<T>(),
-                );
+    pub fn into_pg(self) -> *mut pg_sys::varlena {
+        let size = size_of::<T>();
+        let payload_len =
+            size.checked_add(self.tail.len()).expect("varlena payload length overflows usize");
+        let total = payload_len
+            .checked_add(pg_sys::VARHDRSZ as usize)
+            .expect("varlena length overflows usize");
+
+        // palloc0 raises an ERROR for any size above MaxAllocSize, so the header lengths
+        // below fit C `int`.
+        // SAFETY: palloc0 returns zeroed storage, aligned for any varlena header, or raises
+        // an ERROR instead of returning NULL.
+        let ptr = unsafe { pg_sys::palloc0(total) }.cast::<pg_sys::varlena>();
+
+        // SAFETY: the new allocation has room for a four-byte header and `payload_len` bytes,
+        // with no other reference to it. The short branch checks that its encoded size fits
+        // the one-byte header. VARDATA_ANY reads the header just written, and the byte copies
+        // fill exactly `payload_len` bytes after it, with no alignment requirement. `value` is
+        // initialized, padding bytes aside, which an untyped copy may read.
+        unsafe {
+            if payload_len + pg_sys::VARHDRSZ_SHORT as usize <= pg_sys::VARATT_SHORT_MAX as usize {
+                pg_sys::SET_VARSIZE_SHORT!(
+                    ptr,
+                    (payload_len + pg_sys::VARHDRSZ_SHORT as usize) as i32
+                )
+                .get();
+            } else {
+                pg_sys::SET_VARSIZE_4B!(ptr, total as i32).get();
             }
-            // the varlena now belongs to the caller; don't pfree it on drop
-            self.owned = false;
+            let data = pg_sys::VARDATA_ANY!(ptr).get().cast::<u8>();
+            ptr::copy_nonoverlapping(self.value.as_ptr().cast::<u8>(), data, size);
+            ptr::copy_nonoverlapping(self.tail.as_ptr(), data.add(size), self.tail.len());
         }
         ptr
-    }
-}
-
-/// `pg_sys::pfree` a `PgVarlena` if we allocated it, instead of Postgres
-impl<T> Drop for PgVarlena<T>
-where
-    T: Copy + Sized,
-{
-    fn drop(&mut self) {
-        if self.owned {
-            // SAFETY: this value allocated the varlena with palloc, or received it from
-            // pg_detoast_datum, and has not handed it to the caller.
-            unsafe { pg_sys::pfree(self.varlena.as_ptr().cast()) }
-        }
     }
 }
 
@@ -304,7 +293,19 @@ where
     T: Copy + Sized,
 {
     fn as_ref(&self) -> &T {
-        &self.value
+        // SAFETY: `value` always holds a valid T.
+        unsafe { self.value.assume_init_ref() }
+    }
+}
+
+impl<T> AsMut<T> for PgVarlena<T>
+where
+    T: Copy + Sized,
+{
+    fn as_mut(&mut self) -> &mut T {
+        // SAFETY: `value` always holds a valid T, and safe code can store only a valid T
+        // through the returned reference.
+        unsafe { self.value.assume_init_mut() }
     }
 }
 
@@ -316,21 +317,6 @@ where
         let mut ptr = Self::new();
         *ptr = T::default();
         ptr
-    }
-}
-
-/// Does a copy-on-write if the backing varlena pointer is borrowed
-impl<T> AsMut<T> for PgVarlena<T>
-where
-    T: Copy + Sized,
-{
-    fn as_mut(&mut self) -> &mut T {
-        if !self.owned {
-            // Never write through a borrowed Datum. `into_pg` fills the new payload.
-            self.varlena = Self::alloc_varlena();
-            self.owned = true;
-        }
-        &mut self.value
     }
 }
 
@@ -356,6 +342,8 @@ where
     }
 }
 
+// The default `from_datum_in_memory_context` suffices: the value copies its payload, so it
+// does not depend on the memory context the Datum lives in.
 impl<T> FromDatum for PgVarlena<T>
 where
     T: Copy + Sized,
@@ -366,28 +354,6 @@ where
         _typoid: pg_sys::Oid,
     ) -> Option<Self> {
         if is_null { None } else { Some(PgVarlena::<T>::from_datum(datum)) }
-    }
-
-    unsafe fn from_datum_in_memory_context(
-        mut memory_context: PgMemoryContexts,
-        datum: pg_sys::Datum,
-        is_null: bool,
-        _typoid: pg_sys::Oid,
-    ) -> Option<Self> {
-        if is_null {
-            None
-        } else {
-            memory_context.switch_to(|_| {
-                // this gets the varlena Datum copied into this memory context
-                let detoasted = pg_sys::pg_detoast_datum_copy(datum.cast_mut_ptr());
-
-                // and we need to unpack it (if necessary), which will decompress it too
-                let varlena = pg_sys::pg_detoast_datum_packed(detoasted);
-
-                // and now we return it as a &str
-                Some(PgVarlena::<T>::from_datum(varlena.into()))
-            })
-        }
     }
 }
 

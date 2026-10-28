@@ -105,7 +105,7 @@ impl PgVarlenaInOutFuncs for MyType {
 
 #[pg_extern]
 fn do_a_thing(mut input: PgVarlena<MyType>) -> PgVarlena<MyType> {
-    input.c += 99;  // performs a copy-on-write on the backing varlena pointer
+    input.c += 99;  // changes the Rust copy; the returned Datum is a new varlena
     input
 }
 ```
