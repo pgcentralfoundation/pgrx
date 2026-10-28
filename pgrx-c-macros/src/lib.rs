@@ -47,7 +47,9 @@ pub use postgres::{
     postgres_function_macro_names, postgres_inline_function_names, postgres_object_macro_names,
     verify_postgres_configuration,
 };
-pub use postgres_flags::{lower_msvc_runtime_flags, postgres_clang_flags};
+pub use postgres_flags::{
+    lower_msvc_runtime_flags, postgres_clang_flags, separate_architecture_flags,
+};
 /// Own compiler profiles, preprocessing state, and declaration identities independently of Clang
 /// handles.
 mod model;

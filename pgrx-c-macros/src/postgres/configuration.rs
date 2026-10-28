@@ -70,6 +70,18 @@ pub enum ConfigurationError {
         /// Clang's effective target triple.
         target: String,
     },
+    /// The installation's recorded CFLAGS compile a macOS server for `-arch` slices that do not
+    /// include Clang's target.
+    #[error(
+        "PostgreSQL was compiled from these headers for -arch {} (CFLAGS), but Clang targets {target}",
+        compiled.join(", -arch ")
+    )]
+    Architectures {
+        /// The `-arch` values in the recorded CFLAGS.
+        compiled: Vec<String>,
+        /// Clang's effective target triple.
+        target: String,
+    },
     /// The headers or the target name no recognized machine, and the target is not the
     /// generator's host, so nothing shows that the headers were configured for the target.
     #[error(
@@ -148,11 +160,19 @@ impl fmt::Display for Disagreements<'_> {
 /// header, and is accepted unchecked. Otherwise the machine in `PG_VERSION_STR` must match the
 /// target, and one libclang parse with the inspected arguments must find every layout fact in
 /// `pg_config.h` equal to the target's. A header without a recognized machine is accepted only
-/// when the target is the generator's own host; in a build script that is Cargo's host.
+/// when the target's architecture and OS are the generator's own; in a build script that is
+/// Cargo's host.
+///
+/// `compiled_architectures` are the `-arch` values in the recorded CFLAGS of the installation
+/// whose own headers these are, or empty. A universal macOS server, such as Postgres.app, is
+/// configured once and compiles a slice for each value from the same headers, while
+/// `PG_VERSION_STR` names only the machine configure ran on. For macOS headers they replace
+/// that machine's architecture: the target's must be one of them.
 pub fn verify_postgres_configuration(
     scanner: &MacroScanner,
     frontend: &FrontendOutput,
     expected_major: u16,
+    compiled_architectures: &[String],
 ) -> Result<(), ConfigurationError> {
     let active = &frontend.environment().active;
     if !active.contains_key("PG_VERSION_NUM") {
@@ -163,6 +183,7 @@ pub fn verify_postgres_configuration(
         active.get("PG_VERSION_STR").map(|active| version_text(&active.definition.tokens));
     check_machine(
         version.as_deref(),
+        compiled_architectures,
         &target.triple,
         (std::env::consts::ARCH, std::env::consts::OS),
     )?;
@@ -207,15 +228,29 @@ fn configured_machine(version: &str) -> (&str, MachineFamily) {
 ///
 /// Every property known on both sides must be equal. Without a recognized architecture and OS
 /// on both sides, only the host's own target is accepted: native builds keep working with
-/// vendor-patched strings, while cross builds must supply evidence.
+/// vendor-patched strings, while cross builds must supply evidence. A macOS machine's
+/// architecture is replaced by the `compiled` slices when there are any.
 fn check_machine(
     version: Option<&str>,
+    compiled: &[String],
     target: &str,
     host: (&str, &str),
 ) -> Result<(), ConfigurationError> {
     let target_family = machine_family(target);
     let recorded = version.map(configured_machine);
-    if let Some((machine, family)) = recorded {
+    if let Some((machine, mut family)) = recorded {
+        if family.os == Some("macos") && !compiled.is_empty() {
+            let slice = |arch: &String| machine_family(&format!("{arch}-apple-darwin")).arch;
+            if target_family.arch.is_none()
+                || !compiled.iter().any(|arch| slice(arch) == target_family.arch)
+            {
+                return Err(ConfigurationError::Architectures {
+                    compiled: compiled.to_vec(),
+                    target: target.into(),
+                });
+            }
+            family.arch = target_family.arch;
+        }
         if known_and_different(family.arch, target_family.arch)
             || known_and_different(family.os.map(os_family), target_family.os.map(os_family))
             || known_and_different(family.libc, target_family.libc)
@@ -513,7 +548,7 @@ mod tests {
     fn check_machine_policy() {
         let host = ("aarch64", "macos");
         let debian = "PostgreSQL 18.4 on x86_64-pc-linux-gnu, compiled by gcc, 64-bit";
-        let machine = |version, target| check_machine(Some(version), target, host);
+        let machine = |version, target| check_machine(Some(version), &[], target, host);
         assert!(machine(debian, "x86_64-unknown-linux-gnu").is_ok());
         let error = machine(debian, "aarch64-unknown-linux-gnu").unwrap_err();
         assert!(
@@ -549,22 +584,83 @@ mod tests {
             Err(ConfigurationError::UnknownMachine { recorded: Some(recorded), .. })
                 if recorded == "custom-build"
         ));
-        assert!(check_machine(None, "arm64-apple-macosx26.0.0", host).is_ok());
+        assert!(check_machine(None, &[], "arm64-apple-macosx26.0.0", host).is_ok());
         assert!(matches!(
-            check_machine(None, "x86_64-apple-macosx26.0.0", host),
+            check_machine(None, &[], "x86_64-apple-macosx26.0.0", host),
             Err(ConfigurationError::UnknownMachine { recorded: None, .. })
         ));
         let legacy = "PostgreSQL 15.4, compiled by Visual C++ build , 64-bit";
         assert!(
-            check_machine(Some(legacy), "x86_64-pc-windows-msvc19.40.0", ("x86_64", "windows"))
-                .is_ok()
+            check_machine(
+                Some(legacy),
+                &[],
+                "x86_64-pc-windows-msvc19.40.0",
+                ("x86_64", "windows")
+            )
+            .is_ok()
         );
         assert!(matches!(
-            check_machine(Some(legacy), "x86_64-pc-windows-msvc19.40.0", host),
+            check_machine(Some(legacy), &[], "x86_64-pc-windows-msvc19.40.0", host),
             Err(ConfigurationError::UnknownMachine { .. })
         ));
         assert!(matches!(
-            check_machine(Some(legacy), "x86_64-unknown-linux-gnu", ("x86_64", "linux")),
+            check_machine(Some(legacy), &[], "x86_64-unknown-linux-gnu", ("x86_64", "linux")),
+            Err(ConfigurationError::Machine { .. })
+        ));
+    }
+
+    /// A universal macOS server compiles every `-arch` slice from headers whose `PG_VERSION_STR`
+    /// names only the machine configure ran on, so the slices decide the architecture.
+    #[test]
+    fn compiled_slices_replace_the_configured_macos_architecture() {
+        let host = ("aarch64", "macos");
+        let slices =
+            |names: &[&str]| names.iter().map(|name| (*name).to_owned()).collect::<Vec<_>>();
+        let universal = slices(&["arm64", "x86_64"]);
+        let apple_silicon = "PostgreSQL 18.2 (Postgres.app) on aarch64-apple-darwin23.6.0, compiled by Apple clang version 15.0.0, 64-bit";
+        let intel = "PostgreSQL 17.7 (Postgres.app) on x86_64-apple-darwin21.6.0, compiled by Apple clang version 14.0.0, 64-bit";
+        for (version, target) in [
+            (apple_silicon, "x86_64-apple-macosx27.0.0"),
+            (apple_silicon, "arm64-apple-macosx27.0.0"),
+            (intel, "arm64-apple-macosx27.0.0"),
+            (intel, "x86_64-apple-macosx27.0.0"),
+        ] {
+            assert!(check_machine(Some(version), &universal, target, host).is_ok(), "{target}");
+        }
+        // A single slice built on another machine describes only that slice.
+        let error = check_machine(
+            Some(apple_silicon),
+            &slices(&["x86_64"]),
+            "arm64-apple-macosx27.0.0",
+            host,
+        )
+        .unwrap_err();
+        assert!(
+            matches!(&error, ConfigurationError::Architectures { compiled, target }
+                if compiled == &slices(&["x86_64"]) && target == "arm64-apple-macosx27.0.0"),
+            "{error:?}"
+        );
+        assert_eq!(
+            error.to_string(),
+            "PostgreSQL was compiled from these headers for -arch x86_64 (CFLAGS), but Clang targets arm64-apple-macosx27.0.0"
+        );
+        assert!(matches!(
+            check_machine(
+                Some(apple_silicon),
+                &slices(&["x86_64h"]),
+                "x86_64-apple-macosx27.0.0",
+                host
+            ),
+            Err(ConfigurationError::Architectures { .. })
+        ));
+        // Slices describe only macOS servers; other machines keep their own architecture.
+        let debian = "PostgreSQL 18.4 on x86_64-pc-linux-gnu, compiled by gcc, 64-bit";
+        assert!(matches!(
+            check_machine(Some(debian), &universal, "aarch64-unknown-linux-gnu", host),
+            Err(ConfigurationError::Machine { .. })
+        ));
+        assert!(matches!(
+            check_machine(Some(apple_silicon), &universal, "aarch64-unknown-linux-gnu", host),
             Err(ConfigurationError::Machine { .. })
         ));
     }

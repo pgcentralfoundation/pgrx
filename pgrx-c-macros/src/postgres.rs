@@ -11,7 +11,7 @@
 
 use crate::{
     ActiveProvenance, Error, FrontendError, FrontendOutput, MacroDefinition, MacroInventory,
-    MacroKind, MacroScanner, SystemIncludes, postgres_clang_flags,
+    MacroKind, MacroScanner, SystemIncludes, postgres_clang_flags, separate_architecture_flags,
 };
 use pgrx_pg_config::{PgConfig, Pgrx};
 use sha2::{Digest, Sha256};
@@ -129,7 +129,8 @@ impl PostgresConfig {
     /// Explicit arguments follow the recorded flags, so callers can supply the target and
     /// overrides used by a binding generator. Missing historical metadata, including
     /// unrecorded MSVC flags, selects the installed headers and explicit binding arguments;
-    /// it never claims to recover absent server build flags. Discovery through [`Self::scan`]
+    /// it never claims to recover absent server build flags. Recorded `-arch` slice selections
+    /// are left out; see [`separate_architecture_flags`]. Discovery through [`Self::scan`]
     /// retains its existing preprocessing-only behavior.
     pub fn inspect(
         &self,
@@ -138,13 +139,8 @@ impl PostgresConfig {
         extra_clang_args: &[String],
         compiler: Option<&Path>,
     ) -> Result<FrontendOutput, PostgresError> {
-        let mut arguments = Vec::new();
-        if let Some(cflags) = self.pg_config.optional_cflags()? {
-            let cflags = cflags.to_str().ok_or(PostgresError::InvalidCFlags)?;
-            arguments.extend(postgres_clang_flags(cflags, cfg!(target_env = "msvc")).map_err(
-                |error| FrontendError::Arguments(format!("PostgreSQL CFLAGS: {error}")),
-            )?);
-        }
+        let mut arguments =
+            self.recorded_cflags()?.map(separate_architecture_flags).unwrap_or_default().0;
         // PostgreSQL's COMPILE.c applies CFLAGS before CPPFLAGS. Preserve that
         // precedence before the same include defaults and explicit overrides as bindgen.
         arguments.extend_from_slice(&self.clang_args);
@@ -186,8 +182,13 @@ impl PostgresConfig {
             compiler,
             configured_compiler.as_deref(),
         )?;
-        verify_postgres_configuration(scanner, &inspected, self.major_version)
-            .map_err(PostgresError::TargetConfiguration)?;
+        verify_postgres_configuration(
+            scanner,
+            &inspected,
+            self.major_version,
+            &self.compiled_architectures()?,
+        )
+        .map_err(PostgresError::TargetConfiguration)?;
         if let Some(pg_config) = self.pg_config.path() {
             inspected.profile.inputs.files.push(pg_config);
         }
@@ -257,6 +258,33 @@ impl PostgresConfig {
     ) -> Result<SystemIncludes, PostgresError> {
         let configured_compiler = self.configured_compiler(compiler)?;
         Ok(crate::frontend::system_includes(arguments, compiler, configured_compiler.as_deref())?)
+    }
+
+    /// The installation's decoded CFLAGS, or `None` when it recorded none.
+    fn recorded_cflags(&self) -> Result<Option<Vec<String>>, PostgresError> {
+        let Some(cflags) = self.pg_config.optional_cflags()? else { return Ok(None) };
+        let cflags = cflags.to_str().ok_or(PostgresError::InvalidCFlags)?;
+        Ok(Some(
+            postgres_clang_flags(cflags, cfg!(target_env = "msvc"))
+                .map_err(|error| FrontendError::Arguments(format!("PostgreSQL CFLAGS: {error}")))?,
+        ))
+    }
+
+    /// The `-arch` values of the installation's recorded CFLAGS: the macOS slices it compiled
+    /// from its own server headers. Empty when another server header root owns the inspected
+    /// macros, because the flags then describe headers that were not inspected.
+    fn compiled_architectures(&self) -> Result<Vec<String>, PostgresError> {
+        let own_headers = match (
+            std::fs::canonicalize(&self.server_include_dir),
+            std::fs::canonicalize(self.pg_config.includedir_server()?),
+        ) {
+            (Ok(inspected), Ok(installed)) => inspected == installed,
+            _ => false,
+        };
+        let Some(cflags) = self.recorded_cflags()?.filter(|_| own_headers) else {
+            return Ok(Vec::new());
+        };
+        Ok(separate_architecture_flags(cflags).1.into_iter().skip(1).step_by(2).collect())
     }
 
     /// The `CLANG` that configure recorded, consulted only when neither the caller nor

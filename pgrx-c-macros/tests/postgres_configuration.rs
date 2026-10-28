@@ -34,7 +34,7 @@ fn verify(
     let arguments = [format!("--target={target}"), format!("-I{}", server.display())];
     let frontend = inspect(scanner, &fixtures().join("postgres.h"), &arguments, None)
         .unwrap_or_else(|error| panic!("inspect {} for {target}: {error}", server.display()));
-    verify_postgres_configuration(scanner, &frontend, major)
+    verify_postgres_configuration(scanner, &frontend, major, &[])
 }
 
 /// A server root holding a fixture `pg_config.h` with textual edits applied.
@@ -224,4 +224,92 @@ fn postgres_config_inspection_verifies_the_target_configuration() {
     let frontend = postgres.inspect_with_arguments(&scanner, &header, &arguments, None).unwrap();
     let owned = postgres_object_macro_names(&frontend, postgres.server_include_dir()).unwrap();
     assert!(owned.iter().any(|name| name == "PG_VERSION_STR"), "{owned:?}");
+}
+
+/// A universal macOS installation, such as Postgres.app, records `-arch arm64 -arch x86_64` in
+/// CFLAGS and names only the machine configure ran on. Inspection leaves the slices out of the
+/// profile and accepts its own headers for either slice, but not for another machine, and not
+/// once another server root owns the inspected macros.
+#[cfg(unix)]
+#[test]
+fn universal_macos_installations_describe_each_compiled_slice() {
+    use pgrx_c_macros::PostgresConfig;
+    use std::os::unix::fs::PermissionsExt;
+
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let server = edited(
+        "x86_64_linux",
+        &[(
+            "(Ubuntu 18.6-1.pgdg24.04+2) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+            "(Postgres.app) on aarch64-apple-darwin23.6.0, compiled by Apple clang version 15.0.0",
+        )],
+    );
+    let directory = tempfile::tempdir().unwrap();
+    let pg_config = |cflags: &str| {
+        let executable = directory.path().join(format!("pg_config{}", cflags.len()));
+        std::fs::write(
+            &executable,
+            format!(
+                "#!/bin/sh\n\
+                 case \"$1\" in\n\
+                 --version) echo 'PostgreSQL 18.6' ;;\n\
+                 --includedir-server) echo '{}' ;;\n\
+                 --cflags) echo '{cflags}' ;;\n\
+                 --cppflags|--configure) echo '' ;;\n\
+                 *) exit 1 ;;\n\
+                 esac\n",
+                server.path().display()
+            ),
+        )
+        .unwrap();
+        std::fs::set_permissions(&executable, std::fs::Permissions::from_mode(0o700)).unwrap();
+        PostgresConfig::from_pg_config(pgrx_pg_config::PgConfig::new_with_defaults(executable))
+            .unwrap()
+    };
+    let header = fixtures().join("postgres.h");
+    let target = |triple: &str| vec![format!("--target={triple}")];
+    let universal = pg_config("-fwrapv -Os -mmacosx-version-min=10.15 -arch arm64 -arch x86_64");
+    for triple in ["x86_64-apple-darwin", "arm64-apple-darwin"] {
+        let frontend = universal
+            .inspect(&scanner, Some(&header), &target(triple), None)
+            .unwrap_or_else(|error| panic!("{triple}: {error}"));
+        let arguments = &frontend.profile().arguments;
+        assert!(!arguments.iter().any(|argument| argument == "-arch"), "{arguments:?}");
+        assert!(arguments.iter().any(|argument| argument == "-fwrapv"), "{arguments:?}");
+    }
+    let error = universal
+        .inspect(&scanner, Some(&header), &target("aarch64-unknown-linux-gnu"), None)
+        .unwrap_err();
+    assert!(
+        matches!(error, PostgresError::TargetConfiguration(ConfigurationError::Machine { .. })),
+        "{error:?}"
+    );
+
+    let x86_64_only = pg_config("-fwrapv -arch x86_64");
+    let error = x86_64_only
+        .inspect(&scanner, Some(&header), &target("arm64-apple-darwin"), None)
+        .unwrap_err();
+    assert!(
+        matches!(
+            &error,
+            PostgresError::TargetConfiguration(ConfigurationError::Architectures { compiled, .. })
+                if compiled == &["x86_64"]
+        ),
+        "{error:?}"
+    );
+
+    // The recorded slices describe the installation's headers, not an overriding root's.
+    let copy = tempfile::tempdir().unwrap();
+    std::fs::copy(server.path().join("pg_config.h"), copy.path().join("pg_config.h")).unwrap();
+    let mut arguments = target("x86_64-apple-darwin");
+    arguments.push(format!("-I{}", copy.path().display()));
+    let error = universal
+        .with_server_include_dir(copy.path().into())
+        .inspect_with_arguments(&scanner, &header, &arguments, None)
+        .unwrap_err();
+    assert!(
+        matches!(error, PostgresError::TargetConfiguration(ConfigurationError::Machine { .. })),
+        "{error:?}"
+    );
 }

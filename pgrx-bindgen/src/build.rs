@@ -381,7 +381,7 @@ fn generate_bindings(
         let dropped = if macros.cflags_dropped.is_empty() {
             String::new()
         } else {
-            format!("; dropped host CFLAGS {:?}", macros.cflags_dropped)
+            format!("; dropped recorded CFLAGS {:?}", macros.cflags_dropped)
         };
         println!(
             "cargo:warning=pg{major_version} C macros: {} emitted, {} skipped{dropped}; report {}",
@@ -1346,7 +1346,7 @@ struct MacroOutput {
     emitted: usize,
     /// Rejected candidates counted without treating unsupported syntax as build failure.
     skipped: usize,
-    /// Host CFLAGS this build left out of the macro profile, for the Cargo summary.
+    /// Recorded CFLAGS this build left out of the macro profile, for the Cargo summary.
     cflags_dropped: Vec<String>,
     /// Verified scalar identity choices for the active defining runtime.
     runtime_cfg: Vec<String>,
@@ -1364,7 +1364,8 @@ struct MacroReport<'a> {
     /// verified header, target and caller invocation define macro semantics;
     /// the report makes no claim about unrecorded server build options.
     cflags_recorded: bool,
-    /// Recorded host CFLAGS left out because a host `pg_config` described a cross target.
+    /// Recorded CFLAGS left out of the profile: a host `pg_config`'s flags that do not
+    /// describe a cross target, and `-arch` slice selections that Cargo's target replaces.
     cflags_dropped: &'a [String],
     /// Verified compiler invocation, target, and semantic flags used for this generation.
     profile: &'a CompilationProfile,
@@ -1958,7 +1959,7 @@ const POSTGRES_FUNCTIONAL_CFLAGS: [&str; 3] =
 struct MacroCflags {
     /// Flags applied to macro inspection and native compilation, in recorded order.
     applied: Vec<String>,
-    /// Host flags left out of a cross target's profile, in recorded order.
+    /// Flags left out of the profile, in recorded order.
     dropped: Vec<String>,
     /// Whether the installation recorded CFLAGS at all.
     recorded: bool,
@@ -1980,7 +1981,8 @@ fn macro_cflags(
 
 /// A `pg_config` program describes the machine it runs on, so in a cross build its codegen and
 /// ISA flags describe the host server rather than the target. Keep only PostgreSQL's functional
-/// flags there. AS_ENV metadata and native builds describe the target and apply in full.
+/// flags there. AS_ENV metadata and native builds describe the target and apply in full, except
+/// for `-arch` slice selections: Cargo's target selects the slice of a universal macOS build.
 fn scope_macro_cflags(
     flags: Option<&str>,
     host_program: bool,
@@ -1994,7 +1996,7 @@ fn scope_macro_cflags(
     let (applied, dropped) = if host_program && lookup("HOST") != lookup("TARGET") {
         flags.into_iter().partition(|flag| POSTGRES_FUNCTIONAL_CFLAGS.contains(&flag.as_str()))
     } else {
-        (flags, Vec::new())
+        pgrx_c_macros::separate_architecture_flags(flags)
     };
     Ok(MacroCflags { applied, dropped, recorded: true })
 }
@@ -2435,6 +2437,39 @@ macro_rules! EXAMPLE {
         for absent in [None, Some(""), Some("not recorded")] {
             assert_eq!(scope_macro_cflags(absent, true, cross).unwrap(), MacroCflags::default());
         }
+    }
+
+    /// Postgres.app records `-arch arm64 -arch x86_64`, which Clang cannot preprocess. Cargo's
+    /// target selects the slice instead, natively and in cross builds alike.
+    #[test]
+    fn macro_cflags_leave_universal_slices_to_the_target() {
+        let recorded = "-fwrapv -Os -mmacosx-version-min=10.15 -arch arm64 -arch x86_64";
+        let environment = |target: &'static str| {
+            move |name: &str| match name {
+                "HOST" => Some("aarch64-apple-darwin".to_owned()),
+                "TARGET" => Some(target.to_owned()),
+                "CARGO_CFG_TARGET_OS" => Some("macos".to_owned()),
+                _ => None,
+            }
+        };
+        let slices = ["-arch", "arm64", "-arch", "x86_64"];
+        for host_program in [true, false] {
+            let native = scope_macro_cflags(
+                Some(recorded),
+                host_program,
+                environment("aarch64-apple-darwin"),
+            )
+            .unwrap();
+            assert_eq!(native.applied, ["-fwrapv", "-Os", "-mmacosx-version-min=10.15"]);
+            assert_eq!(native.dropped, slices);
+        }
+        let cross =
+            scope_macro_cflags(Some(recorded), true, environment("x86_64-apple-darwin")).unwrap();
+        assert_eq!(cross.applied, ["-fwrapv"]);
+        assert_eq!(
+            cross.dropped,
+            ["-Os", "-mmacosx-version-min=10.15", "-arch", "arm64", "-arch", "x86_64"]
+        );
     }
 
     /// Checks that explicit targets and cargo target spellings are preserved.

@@ -41,6 +41,28 @@ pub fn postgres_clang_flags(flags: &str, msvc: bool) -> Result<Vec<String>, Fron
     Ok(translated)
 }
 
+/// Separate Darwin `-arch <architecture>` slice selections from decoded recorded flags.
+///
+/// Returns the remaining flags and the removed pairs, each in recorded order. A universal macOS
+/// installation such as Postgres.app is configured once with `-arch arm64 -arch x86_64`, and
+/// every slice is compiled from the same headers. Clang cannot preprocess for two slices at
+/// once, and a single `-arch` would override the inspected target, so the target replaces
+/// these selections; [`verify_postgres_configuration`](crate::verify_postgres_configuration)
+/// keeps them as evidence of the machines the headers were compiled for. A trailing `-arch`
+/// without a value is left for Clang to reject.
+pub fn separate_architecture_flags(flags: Vec<String>) -> (Vec<String>, Vec<String>) {
+    let mut remaining = Vec::with_capacity(flags.len());
+    let mut architectures = Vec::new();
+    let mut flags = flags.into_iter().peekable();
+    while let Some(flag) = flags.next() {
+        match flags.next_if(|_| flag == "-arch") {
+            Some(architecture) => architectures.extend([flag, architecture]),
+            None => remaining.push(flag),
+        }
+    }
+    (remaining, architectures)
+}
+
 /// Translate one CL option, spelled with its `/` or `-` prefix, to GNU-style Clang arguments.
 ///
 /// A preprocessing option without an attached operand consumes the next argument. This is the
@@ -349,6 +371,34 @@ mod tests {
                 assert!(postgres_clang_flags(missing, msvc).unwrap().is_empty());
             }
         }
+    }
+
+    /// Postgres.app's universal CFLAGS lose their `-arch` pairs, and only those, in order.
+    #[test]
+    fn architecture_flags_are_separated_in_recorded_order() {
+        let flags = postgres_clang_flags(
+            "-Wall -fwrapv -Os -mmacosx-version-min=10.15 -arch arm64 -arch x86_64 -Xarch_x86_64 -msse4.2",
+            false,
+        )
+        .unwrap();
+        assert_eq!(
+            separate_architecture_flags(flags),
+            (
+                [
+                    "-Wall",
+                    "-fwrapv",
+                    "-Os",
+                    "-mmacosx-version-min=10.15",
+                    "-Xarch_x86_64",
+                    "-msse4.2"
+                ]
+                .map(String::from)
+                .to_vec(),
+                ["-arch", "arm64", "-arch", "x86_64"].map(String::from).to_vec(),
+            )
+        );
+        let trailing = vec!["-fwrapv".to_owned(), "-arch".to_owned()];
+        assert_eq!(separate_architecture_flags(trailing.clone()), (trailing, Vec::new()));
     }
 
     /// Preserve Windows path separators, quoted spaces, escaped quotes, and empty operands.
