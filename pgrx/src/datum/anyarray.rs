@@ -16,8 +16,11 @@ use std::iter::FusedIterator;
 ///
 /// An `AnyArray` holds an array value and the type PostgreSQL resolved for it. Read the value
 /// with [`AnyArray::value`], which checks that the Rust type can read that type. Iterating over
-/// `&AnyArray` yields each element as an [`AnyElement`], which points into the array or into an
-/// untoasted copy of it that the iteration allocates in `CurrentMemoryContext`.
+/// `&AnyArray` yields each element as an [`AnyElement`], which points into the array.
+///
+/// The handle holds the array untoasted. When it is made from a compressed, out-of-line, or
+/// short-header array, as PostgreSQL passes a value read from a table, it detoasts the array once
+/// into `CurrentMemoryContext`, and that copy stays allocated until the context is reset.
 ///
 /// The handle does not borrow the memory that holds the array, which may be freed once the call
 /// that received the handle returns. [SPI](crate::spi) copies an `AnyArray` that a query returns
@@ -58,9 +61,8 @@ impl AnyArray {
     /// reads, and it accepts an array of a composite type or of anonymous records as
     /// `Array<PgHeapTuple>`.
     ///
-    /// A `T` that borrows, such as `Array<'a, U>`, points into the array's memory or into a
-    /// detoasted copy in `CurrentMemoryContext`. Do not keep it after that memory is freed; see
-    /// [`AnyArray`].
+    /// A `T` that borrows, such as `Array<'a, U>`, points into the array that the handle holds.
+    /// Do not keep it after that memory is freed; see [`AnyArray`].
     ///
     /// # Errors
     ///
@@ -115,13 +117,26 @@ impl FromDatum for AnyArray {
         )
     }
 
+    /// Detoasts the array into `CurrentMemoryContext` unless it is already untoasted with a
+    /// 4-byte header, so that iteration reads it in place however often it runs.
     #[inline]
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
         is_null: bool,
         typoid: pg_sys::Oid,
     ) -> Option<AnyArray> {
-        if is_null { None } else { Some(AnyArray { datum, typoid }) }
+        if is_null {
+            return None;
+        }
+        let datum = match NonNull::new(datum.cast_mut_ptr::<pg_sys::varlena>()) {
+            // SAFETY: the caller passes a live array value. pg_detoast_datum returns an untoasted
+            // array with a 4-byte header unchanged, and otherwise pallocs such a copy in
+            // CurrentMemoryContext.
+            Some(array) => pg_sys::Datum::from(unsafe { pg_sys::pg_detoast_datum(array.as_ptr()) }),
+            // There is nothing to detoast; reading the handle treats a null pointer as no array.
+            None => datum,
+        };
+        Some(AnyArray { datum, typoid })
     }
 
     /// Copies the array into `memory_context`, detoasting it, so that the handle stays valid
@@ -173,26 +188,21 @@ where
     type IntoIter = AnyArrayIterator<'a>;
 
     fn into_iter(self) -> Self::IntoIter {
-        // Each AnyElement points into the array's data and can outlive this iterator. An Array
-        // frees a detoasted copy that it made itself when it drops, so detoast here instead: the
-        // Array then reads the copy without owning it, and the copy stays allocated in
-        // CurrentMemoryContext.
-        let datum = match NonNull::new(self.datum.cast_mut_ptr::<pg_sys::varlena>()) {
-            // SAFETY: the handle holds an array value, which must still be live; see the type
-            // documentation. pg_detoast_datum returns an untoasted array with a 4-byte header
-            // unchanged, and otherwise pallocs such a copy in CurrentMemoryContext.
-            Some(array) => pg_sys::Datum::from(unsafe { pg_sys::pg_detoast_datum(array.as_ptr()) }),
-            // Array reads a null pointer as no array, so the iterator yields nothing.
-            None => self.datum,
-        };
-        // SAFETY: `datum` is the handle's array or an untoasted copy of it, so Array does not
-        // copy it again, and Array takes the element layout from the array header.
-        // get_base_element_type takes the OID by value, looks through a domain over an array
-        // type, and returns InvalidOid for an OID that names no array type.
+        // SAFETY: both constructors leave the handle holding an untoasted array with a 4-byte
+        // header, or a null pointer, which Array reads as no array. The array must still be live;
+        // see the type documentation. Array then reads it in place without owning it, so each
+        // AnyElement, which points into the array's data, stays valid after this iterator drops.
+        // Array takes the element layout from the array header. get_base_element_type takes the
+        // OID by value, looks through a domain over an array type, and returns InvalidOid for an
+        // OID that names no array type.
         unsafe {
             AnyArrayIterator {
-                inner: Array::<pg_sys::Datum>::from_polymorphic_datum(datum, false, self.typoid)
-                    .map(|a| a.into_iter()),
+                inner: Array::<pg_sys::Datum>::from_polymorphic_datum(
+                    self.datum,
+                    false,
+                    self.typoid,
+                )
+                .map(|a| a.into_iter()),
                 typelem: pg_sys::get_base_element_type(self.typoid),
             }
         }

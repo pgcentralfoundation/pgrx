@@ -49,6 +49,13 @@ fn anyarray_first_element(array: AnyArray) -> Option<AnyElement> {
     (&array).into_iter().next().flatten()
 }
 
+/// Do two passes over the array yield the same first element, rather than one from a new copy?
+#[pg_extern]
+fn anyarray_passes_share_elements(array: AnyArray) -> bool {
+    let first = || (&array).into_iter().next().flatten().expect("first element").datum();
+    first() == first()
+}
+
 /// Formats a checked read, or `incompatible` if the array's type does not match.
 fn describe<T: Debug>(result: Result<Option<T>, TryFromDatumError>) -> String {
     match result {
@@ -157,6 +164,14 @@ mod tests {
                 "SELECT anyarray_first_element(a) FROM tests.anyarray_stored WHERE id = 1"
             )?,
             Some("hello".to_owned())
+        );
+        // The handle detoasts the array once, so another pass allocates no new copy.
+        assert_eq!(
+            Spi::get_one::<Vec<bool>>(
+                "SELECT array_agg(anyarray_passes_share_elements(a) ORDER BY id)
+                    FROM tests.anyarray_stored"
+            )?,
+            Some(vec![true, true])
         );
         Ok(())
     }
