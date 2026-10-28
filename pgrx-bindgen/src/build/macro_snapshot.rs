@@ -583,6 +583,11 @@ pub(super) fn snapshot_files(
         "// The generated C macros of every supported PostgreSQL version, reduced to their\n\
          // documented interface: typed shells and the Rust support each build generates.\n",
     );
+    // Release scripts run Cargo quietly, which hides build-script warnings; the
+    // committed counts keep untyped shells visible in the release diff.
+    for version in versions {
+        writeln!(index, "// {}", version.report()).expect("String output");
+    }
     index.push_str(&pgrx_c_macros::documentation_shell_support());
     write_classifier(&mut index, versions, all);
     for version in versions {
@@ -1031,6 +1036,11 @@ mod tests {
         }
         for major in [16, 18] {
             assert!(index.contains(&format!("#[cfg(feature = \"pg{major}\")]\n::core::compile_error!(\"the C macro documentation snapshot does not include pg{major};")));
+        }
+        for major in [15, 17] {
+            assert!(index.contains(&format!(
+                "\n// pg{major} documentation shells: 0 value, 0 unit, 0 diverging, 0 untyped\n"
+            )));
         }
         assert_eq!(index.matches("compile_error!").count(), 2);
         syn::parse_file(index).unwrap();

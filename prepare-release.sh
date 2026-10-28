@@ -34,8 +34,9 @@ else
     cargo install --path cargo-pgrx --locked || exit $?
     cargo pgrx init || exit $?
 
-    # exit early if the script fails 
-    ./update-versions.sh "${NEW_VERSION}" || exit $?
+    # exit early if the script fails, including when the C macro documentation
+    # snapshot would miss a supported PostgreSQL version
+    PGRX_PG_SYS_RELEASE_REQUIRE_ALL_VERSIONS=1 ./update-versions.sh "${NEW_VERSION}" || exit $?
 
     # format the code -- sometimes the bindgen bindings files are wonky
     cargo fmt --all

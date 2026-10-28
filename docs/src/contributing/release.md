@@ -1,3 +1,8 @@
+Run `prepare-release.sh` on `x86_64-unknown-linux-gnu`, the docs.rs target in
+`pgrx-pg-sys/Cargo.toml`. It regenerates the committed bindings and the C macro
+documentation snapshot for that target, and it fails unless every supported
+PostgreSQL version is configured.
+
 ```shell
 PGRX_HOME=/tmp/pgrx-release ./prepare-release.sh NEW_VERSION_NUMBER
 ```

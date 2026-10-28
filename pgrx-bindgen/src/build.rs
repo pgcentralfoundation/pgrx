@@ -231,6 +231,14 @@ pub fn main() -> eyre::Result<()> {
             );
         }
     }
+    if is_for_release() {
+        let configured = pg_configs.iter().map(|(major, _)| *major).collect::<Vec<_>>();
+        if let Some(major) = unconfigured_active_version(&configured, env_tracked) {
+            return Err(eyre!(
+                "release generation configures {configured:?} from PGRX_HOME, but this build compiles the active feature pg{major}; configure pg{major} as well; nothing was published"
+            ));
+        }
+    }
 
     let releases = std::thread::scope(|scope| {
         // This is pretty much either always 1 (normally) or 5 (for releases),
@@ -259,7 +267,9 @@ pub fn main() -> eyre::Result<()> {
         results.into_iter().collect::<eyre::Result<Vec<_>>>()
     })?;
     if is_for_release() {
-        publish_release(releases.into_iter().flatten().collect(), &build_paths.src_dir)?;
+        let require_all = env_tracked(RELEASE_REQUIRE_ALL_VERSIONS).as_deref() == Some("1");
+        let releases = releases.into_iter().flatten().collect();
+        publish_release(releases, &build_paths.src_dir, require_all, &rustfmt_path())?;
     }
     Ok(())
 }
@@ -361,22 +371,22 @@ fn generate_bindings(
     .to_string();
     let oids = format_builtin_oid_impl(oids).to_string();
 
+    let rustfmt = rustfmt_path();
     let bindings_file = build_paths.out_dir.join(format!("pg{major_version}.rs"));
-    write_rs_file(&bindings, &bindings_file, is_for_release).wrap_err_with(|| {
+    write_rs_file(&bindings, &bindings_file, is_for_release, &rustfmt).wrap_err_with(|| {
         format!(
             "Unable to write bindings file for pg{major_version} to `{}`",
             bindings_file.display()
         )
     })?;
     let oids_file = build_paths.out_dir.join(format!("pg{major_version}_oids.rs"));
-    write_rs_file(&oids, &oids_file, is_for_release).wrap_err_with(|| {
+    write_rs_file(&oids, &oids_file, is_for_release, &rustfmt).wrap_err_with(|| {
         format!("Unable to write oids file for pg{major_version} to `{}`", oids_file.display())
     })?;
 
     write_macro_files(
-        &macros.files,
+        &macros.files.sources,
         &build_paths.out_dir.join(format!("cmacros/pg{major_version}")),
-        false,
     )?;
     remove_legacy_macro_file(&build_paths.out_dir, major_version)?;
     let report = build_paths.out_dir.join(format!("pg{major_version}_macro_report.json"));
@@ -453,12 +463,39 @@ fn check_documented_target(manifest: &str, target: &str) -> eyre::Result<()> {
     Ok(())
 }
 
+/// Name an active `pgNN` feature whose version release generation does not configure.
+///
+/// Release generation configures the versions in PGRX_HOME instead of the active
+/// feature's, yet this build still compiles that feature's bindings and native support,
+/// which only a configured version produces. Checking first keeps such a run from
+/// failing after it publishes.
+fn unconfigured_active_version(
+    configured: &[u16],
+    lookup: impl Fn(&str) -> Option<String>,
+) -> Option<u16> {
+    SUPPORTED_VERSIONS().iter().map(|version| version.major).find(|major| {
+        lookup(&format!("CARGO_FEATURE_PG{major}")).is_some() && !configured.contains(major)
+    })
+}
+
+/// The switch that makes release generation fail unless it covers every supported
+/// PostgreSQL version. `prepare-release.sh` sets it.
+const RELEASE_REQUIRE_ALL_VERSIONS: &str = "PGRX_PG_SYS_RELEASE_REQUIRE_ALL_VERSIONS";
+
 /// Publish every version's bindings and the docs.rs macro snapshot to `src_dir`.
 ///
-/// The snapshot is merged and verified before anything is written, so a failure
-/// leaves `src_dir` unchanged. Supported versions that the run does not configure are
-/// left out of the snapshot, which then fails docs builds of those versions.
-fn publish_release(releases: Vec<ReleaseVersion>, src_dir: &Path) -> eyre::Result<()> {
+/// The snapshot is merged and verified, and every file is formatted in a staging
+/// directory beside `src_dir`, before anything in `src_dir` changes, so a failure up to
+/// then leaves it unchanged. Publication then rewrites only changed files; an I/O error
+/// while doing so can leave `src_dir` partly rewritten. A supported version that the run
+/// does not configure is left out of the snapshot, which then fails docs builds of that
+/// version; with `require_all`, such a run fails instead.
+fn publish_release(
+    releases: Vec<ReleaseVersion>,
+    src_dir: &Path,
+    require_all: bool,
+    rustfmt: &Path,
+) -> eyre::Result<()> {
     if releases.is_empty() {
         return Err(eyre!(
             "release generation configured no supported PostgreSQL version; nothing was published"
@@ -471,26 +508,44 @@ fn publish_release(releases: Vec<ReleaseVersion>, src_dir: &Path) -> eyre::Resul
         })
         .unzip();
     let supported = SUPPORTED_VERSIONS().iter().map(|version| version.major).collect::<Vec<_>>();
-    let files = macro_snapshot::snapshot_files(&snapshots, &supported)?;
-    let snapshot_dir = src_dir.join("cmacros/snapshot");
-    write_macro_files(&files, &snapshot_dir, true)?;
-    for (major, bindings, oids) in &releases {
-        write_rs_file(bindings, &src_dir.join(format!("pg{major}.rs")), true)
-            .wrap_err_with(|| format!("Unable to publish bindings for pg{major}"))?;
-        write_rs_file(oids, &src_dir.join(format!("pg{major}_oids.rs")), true)
-            .wrap_err_with(|| format!("Unable to publish oids for pg{major}"))?;
-        remove_legacy_macro_file(src_dir, *major)?;
-    }
     let covered = snapshots.iter().map(SnapshotVersion::major).collect::<BTreeSet<_>>();
     let missing = supported
         .iter()
         .filter(|major| !covered.contains(major))
         .map(|major| format!("pg{major}"))
         .collect::<Vec<_>>();
+    let covered = covered.iter().map(|major| format!("pg{major}")).collect::<Vec<_>>().join(", ");
+    if require_all && !missing.is_empty() {
+        return Err(eyre!(
+            "the C macro documentation snapshot would cover only {covered}; configure {} as well, or unset {RELEASE_REQUIRE_ALL_VERSIONS} for a partial snapshot that must not be committed; nothing was published",
+            missing.join(", ")
+        ));
+    }
+    let files = macro_snapshot::snapshot_files(&snapshots, &supported)?;
+    let staging = MacroFormattingDirectory::new(src_dir)?;
+    let snapshot = format_documentation(&files, &staging.0.join("snapshot"), rustfmt)?;
+    let mut bindings = Vec::with_capacity(2 * releases.len());
+    for (major, release_bindings, oids) in &releases {
+        for (name, source) in
+            [(format!("pg{major}.rs"), release_bindings), (format!("pg{major}_oids.rs"), oids)]
+        {
+            let staged = staging.0.join(&name);
+            write_rs_file(source, &staged, true, rustfmt)
+                .wrap_err_with(|| format!("Unable to format {name} for publication"))?;
+            bindings.push((src_dir.join(name), fs::read(&staged)?));
+        }
+    }
+    let snapshot_dir = src_dir.join("cmacros/snapshot");
+    write_macro_files(&snapshot, &snapshot_dir)?;
+    for (path, content) in &bindings {
+        write_content_stable(path, content)?;
+    }
+    for (major, ..) in &releases {
+        remove_legacy_macro_file(src_dir, *major)?;
+    }
     if !missing.is_empty() {
         println!(
-            "cargo:warning=C macro documentation snapshot covers only {}; it omits {}, so do not commit it",
-            covered.iter().map(|major| format!("pg{major}")).collect::<Vec<_>>().join(", "),
+            "cargo:warning=C macro documentation snapshot covers only {covered}; it omits {}, so do not commit it",
             missing.join(", ")
         );
     }
@@ -549,47 +604,51 @@ impl BuildPaths {
     }
 }
 
-/// Publish the macro tree with stable writes, then remove only stale Rust leaves owned by this
-/// version. The documentation snapshot is staged and formatted first because it is checked in.
-fn write_macro_files(
+/// Format the documentation snapshot's files in `staging` and return their final bytes.
+///
+/// The snapshot is checked in, so it is formatted before publication: formatting after
+/// the stable writes would rewrite identical files on every regeneration. Formatting
+/// is optional; without rustfmt the generator's layout is kept.
+fn format_documentation(
     files: &MacroFiles,
+    staging: &Path,
+    rustfmt: &Path,
+) -> eyre::Result<BTreeMap<PathBuf, Vec<u8>>> {
+    let mut paths = Vec::with_capacity(files.sources.len());
+    for (relative, source) in &files.sources {
+        let path = staging.join(relative);
+        if let Some(parent) = path.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        fs::write(&path, source)?;
+        paths.push(path);
+    }
+    format_macro_files(&paths, rustfmt)?;
+    files
+        .sources
+        .keys()
+        .map(|relative| Ok((relative.clone(), fs::read(staging.join(relative))?)))
+        .collect()
+}
+
+/// Publish a macro tree with stable writes, then remove only stale Rust leaves owned by
+/// this directory.
+///
+/// OUT_DIR trees are compiler input that nobody edits, and the generator already lays
+/// out macro bodies, so they are published unformatted. Rustfmt over their tens of
+/// megabytes cost seconds per build-script run and made the bytes depend on any
+/// rustfmt.toml above the target directory.
+fn write_macro_files<S: AsRef<[u8]>>(
+    sources: &BTreeMap<PathBuf, S>,
     directory: &Path,
-    documentation: bool,
 ) -> eyre::Result<()> {
     fs::create_dir_all(directory)?;
-    let publish = |relative: &Path, content: &[u8]| -> eyre::Result<()> {
+    for (relative, content) in sources {
         let path = directory.join(relative);
         if let Some(parent) = path.parent() {
             fs::create_dir_all(parent)?;
         }
-        write_content_stable(&path, content)
-    };
-    if documentation {
-        let staging = MacroFormattingDirectory::new(directory)?;
-        let mut paths = Vec::with_capacity(files.sources.len());
-        for (relative, source) in &files.sources {
-            let path = staging.0.join(relative);
-            if let Some(parent) = path.parent() {
-                fs::create_dir_all(parent)?;
-            }
-            fs::write(&path, source)?;
-            paths.push(path);
-        }
-        let rustfmt = env_tracked("RUSTFMT").unwrap_or_else(|| "rustfmt".into());
-        format_macro_files(&paths, Path::new(&rustfmt))?;
-        for relative in files.sources.keys() {
-            // Compare the final representation: formatting after the stable write
-            // would rewrite identical artifacts on every regeneration.
-            publish(relative, &fs::read(staging.0.join(relative))?)?;
-        }
-    } else {
-        // OUT_DIR trees are compiler input that nobody edits, and the generator
-        // already lays out macro bodies. Rustfmt over their tens of megabytes
-        // cost seconds per build-script run and made the bytes depend on any
-        // rustfmt.toml above the target directory.
-        for (relative, source) in &files.sources {
-            publish(relative, source.as_bytes())?;
-        }
+        write_content_stable(&path, content.as_ref())?;
     }
     // This version directory contains generated Rust only. Retain other files
     // and versions, and remove empty directories after their stale leaves.
@@ -599,7 +658,7 @@ fn write_macro_files(
         let relative = path.strip_prefix(directory)?;
         if entry.file_type().is_file()
             && path.extension().is_some_and(|extension| extension == "rs")
-            && !files.sources.contains_key(relative)
+            && !sources.contains_key(relative)
         {
             fs::remove_file(path)?;
         } else if entry.file_type().is_dir()
@@ -736,7 +795,12 @@ fn remove_legacy_macro_file(directory: &Path, major_version: u16) -> eyre::Resul
 
 /// Write formatted binding source and release documentation snapshots using the
 /// repository edition; modular C macro publication uses its separate stable tree writer.
-fn write_rs_file(contents: &str, file_path: &Path, is_for_release: bool) -> eyre::Result<()> {
+fn write_rs_file(
+    contents: &str,
+    file_path: &Path,
+    is_for_release: bool,
+    rustfmt: &Path,
+) -> eyre::Result<()> {
     use std::io::Write;
     let mut file = fs::File::create(file_path)?;
     write!(file, "/* Automatically generated by bindgen. Do not hand-edit.")?;
@@ -753,7 +817,12 @@ fn write_rs_file(contents: &str, file_path: &Path, is_for_release: bool) -> eyre
         write!(file, " */")
     }?;
     write!(file, "{contents}")?;
-    rust_fmt(file_path, "2024")
+    rust_fmt(file_path, "2024", rustfmt)
+}
+
+/// The formatter for generated Rust, honoring `RUSTFMT`.
+fn rustfmt_path() -> PathBuf {
+    env_tracked("RUSTFMT").unwrap_or_else(|| "rustfmt".into()).into()
 }
 
 /// Given a token stream representing a file, apply a series of transformations to munge
@@ -2342,10 +2411,7 @@ fn rewrite_c_abi_to_c_unwind(file: &mut syn::File) {
 
 /// Format generated binding source under the requested edition and report formatter
 /// diagnostics through Cargo; macro leaves use their stricter staged writer instead.
-fn rust_fmt(path: &Path, edition: &str) -> eyre::Result<()> {
-    // We shouldn't hit this path in a case where we care about it, but... just
-    // in case we probably should respect RUSTFMT.
-    let rustfmt = env_tracked("RUSTFMT").unwrap_or_else(|| "rustfmt".into());
+fn rust_fmt(path: &Path, edition: &str, rustfmt: &Path) -> eyre::Result<()> {
     let mut command = Command::new(rustfmt);
     command.arg(path).args(["--edition", edition]).current_dir(".");
 
@@ -2758,12 +2824,25 @@ mod macro_build_tests {
         check_documented_target(include_str!("../../pgrx-pg-sys/Cargo.toml"), linux).unwrap();
     }
 
-    /// A release is merged and verified before anything is written to `src/include`.
+    /// Release generation needs the active feature's version among those it configures.
+    #[test]
+    fn release_requires_the_active_version() {
+        let active = |major: &'static str| {
+            move |name: &str| (name == format!("CARGO_FEATURE_PG{major}")).then(String::new)
+        };
+        assert_eq!(unconfigured_active_version(&[15, 16], active("16")), None);
+        assert_eq!(unconfigured_active_version(&[15, 16], active("17")), Some(17));
+        assert_eq!(unconfigured_active_version(&[], |_| None), None);
+    }
+
+    /// A release is merged, verified and formatted before anything is written to
+    /// `src/include`, and a run that must cover every version fails before writing.
     #[test]
     fn releases_publish_only_after_the_snapshot_verifies() {
         let directory = TemporaryDirectory::new();
         let src = directory.0.join("src/include");
         fs::create_dir_all(&src).unwrap();
+        let rustfmt = Path::new("rustfmt");
         let release = |major: u16, support: &str| {
             let mut snapshot =
                 SnapshotVersion::new(major, &[], Path::new("/not/used"), support.into()).unwrap();
@@ -2778,16 +2857,39 @@ mod macro_build_tests {
         let error = publish_release(
             vec![release(15, "pub mod m {}\n"), release(16, "#[doc(hidden)]\npub mod m {}\n")],
             &src,
+            false,
+            rustfmt,
         )
         .unwrap_err()
         .to_string();
         assert_eq!(error, "pg15 and pg16 declare support module m differently");
         assert_eq!(fs::read_dir(&src).unwrap().count(), 0, "a failed release publishes nothing");
-        assert!(publish_release(Vec::new(), &src).is_err());
+        assert!(publish_release(Vec::new(), &src, false, rustfmt).is_err());
         assert_eq!(fs::read_dir(&src).unwrap().count(), 0);
+        // Binding formatting fails only after the snapshot was staged.
+        let error = publish_release(
+            vec![release(15, "pub mod m {}\n")],
+            &src,
+            false,
+            &directory.0.join("missing-rustfmt"),
+        )
+        .unwrap_err();
+        assert!(format!("{error:#}").contains("Unable to format pg15.rs"), "{error:#}");
+        assert_eq!(fs::read_dir(&src).unwrap().count(), 0, "a failed release publishes nothing");
+        assert_eq!(fs::read_dir(directory.0.join("src")).unwrap().count(), 1, "staging is removed");
 
-        // A run that configures only pg15 publishes a snapshot that rejects pg16 docs builds.
-        publish_release(vec![release(15, "pub mod m {}\n")], &src).unwrap();
+        // A run that configures only pg15 fails when it must cover every version, and
+        // otherwise publishes a snapshot that rejects docs builds of the others.
+        let partial = || vec![release(15, "pub mod m {}\n")];
+        let error = publish_release(partial(), &src, true, rustfmt).unwrap_err().to_string();
+        assert!(
+            error.starts_with(
+                "the C macro documentation snapshot would cover only pg15; configure pg16,"
+            ),
+            "{error}"
+        );
+        assert_eq!(fs::read_dir(&src).unwrap().count(), 0, "a partial release publishes nothing");
+        publish_release(partial(), &src, false, rustfmt).unwrap();
         for file in ["pg15.rs", "pg15_oids.rs"] {
             assert!(src.join(file).is_file(), "{file}");
         }
@@ -2824,7 +2926,7 @@ mod macro_build_tests {
                 (PathBuf::from("c.rs"), "pub const PROFILE: u32 = 18;\n".into()),
             ]),
         };
-        write_macro_files(&files, &version, false).unwrap();
+        write_macro_files(&files.sources, &version).unwrap();
         let leaf = version.join("c.rs");
         let old = UNIX_EPOCH + Duration::from_secs(1);
         fs::File::options().write(true).open(&leaf).unwrap().set_modified(old).unwrap();
@@ -2834,14 +2936,13 @@ mod macro_build_tests {
         let other_version = directory.0.join("cmacros/pg17/mod.rs");
         fs::create_dir_all(other_version.parent().unwrap()).unwrap();
         fs::write(&other_version, "other version").unwrap();
-        write_macro_files(&files, &version, false).unwrap();
+        write_macro_files(&files.sources, &version).unwrap();
         assert_eq!(fs::metadata(&leaf).unwrap().modified().unwrap(), old);
         assert!(!version.join("obsolete").exists());
         assert_eq!(fs::read_to_string(version.join("notes.txt")).unwrap(), "keep non-Rust files");
         assert_eq!(fs::read_to_string(other_version).unwrap(), "other version");
-        let index_only =
-            MacroFiles { sources: BTreeMap::from([(PathBuf::from("mod.rs"), String::new())]) };
-        write_macro_files(&index_only, &version, false).unwrap();
+        let index_only = BTreeMap::from([(PathBuf::from("mod.rs"), String::new())]);
+        write_macro_files(&index_only, &version).unwrap();
         assert!(!leaf.exists(), "a smaller generation removes previous macros");
         assert!(version.join("mod.rs").exists(), "an empty module still loads");
     }
@@ -2861,7 +2962,17 @@ mod macro_build_tests {
         };
         for documentation in [false, true] {
             let version = directory.0.join(if documentation { "snapshot" } else { "normal" });
-            write_macro_files(&files, &version, documentation).unwrap();
+            let publish = || {
+                if documentation {
+                    let staging = MacroFormattingDirectory::new(&version).unwrap();
+                    let formatted =
+                        format_documentation(&files, &staging.0, Path::new("rustfmt")).unwrap();
+                    write_macro_files(&formatted, &version).unwrap();
+                } else {
+                    write_macro_files(&files.sources, &version).unwrap();
+                }
+            };
+            publish();
             let leaf = fs::read_to_string(version.join("c.rs")).unwrap();
             if documentation {
                 assert!(leaf.contains("pub fn example(value: u32) -> u32 {"));
@@ -2880,7 +2991,7 @@ mod macro_build_tests {
                     .set_modified(old)
                     .unwrap();
             }
-            write_macro_files(&files, &version, documentation).unwrap();
+            publish();
             for relative in files.sources.keys() {
                 assert_eq!(fs::metadata(version.join(relative)).unwrap().modified().unwrap(), old);
             }

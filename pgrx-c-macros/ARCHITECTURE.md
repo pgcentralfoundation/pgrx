@@ -1720,17 +1720,23 @@ Release generation keeps the committed bindings and snapshot coherent:
   bindings, and the snapshot root asserts each version's id, so a snapshot
   generated with different bindings fails docs builds. The id covers only the
   bindings: two runs that produce the same bindings but different macros pass it.
-- Every version is generated into `OUT_DIR` first. The snapshot is merged and
-  verified before anything in `src/include` is written, so a failure leaves the
-  committed tree unchanged.
+- The run requires the active `pgNN` feature's version among those it
+  configures before generating, and every version is generated into `OUT_DIR`
+  first. The snapshot is merged and verified, and it and the bindings are
+  formatted in a staging directory beside `src/include`, before anything there
+  changes, so a failure up to then leaves the committed tree unchanged.
+  Publication rewrites only changed files; an I/O error while publishing can
+  leave the tree partly rewritten.
 - Every version is inspected from its headers. A version imported with
   `PGRX_TARGET_INFO_PATH_PGNN` fails the run, since a target bundle carries no
   macro documentation.
-- A run that configures only some supported versions still publishes. Its
-  snapshot gates a `compile_error!` to each missing version, and a warning says
-  not to commit it. Every run reports the snapshot's bytes and file count, and
-  each version's count of value, unit, diverging and untyped shells, naming up to
-  20 untyped ones.
+- A run that configures only some supported versions still publishes unless
+  `PGRX_PG_SYS_RELEASE_REQUIRE_ALL_VERSIONS=1`, which `prepare-release.sh` sets,
+  makes it fail first. A partial snapshot gates a `compile_error!` to each missing
+  version, and a warning says not to commit it. The snapshot root records each
+  version's count of value, unit, diverging and untyped shells, naming up to 20
+  untyped ones. Every run also reports those counts and the snapshot's bytes and
+  file count as Cargo warnings, which the release scripts' `cargo -q` hides.
 - `tools/docsrs-typecheck.sh` type-checks pgrx-pg-sys's docs build of each
   version against the committed tree and keeps the packaged crate within 5 MiB.
   A pgrx-bindgen unit test keeps the snapshot within 24 MiB raw.

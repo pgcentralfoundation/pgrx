@@ -223,11 +223,13 @@ builds. Shells panic if run. Shells and support items shared by several versions
 written once behind `cfg(any(feature = ...))`. Only `docsrs` builds use the snapshot;
 normal builds regenerate macros for their own C profile.
 Release generation must run on the single docs.rs target in pgrx-pg-sys's
-`[package.metadata.docs.rs] targets`, and it verifies the merged snapshot before writing
-anything to `src/include`. Each `pgNN.rs` records a generation id that the snapshot
-asserts, so commit the bindings and the snapshot from the same run, with every supported
-version configured. `tools/docsrs-typecheck.sh` type-checks the committed tree's docs
-build for each version and checks the packaged crate size.
+`[package.metadata.docs.rs] targets`, and it verifies and formats the merged snapshot
+and bindings before writing anything to `src/include`. Each `pgNN.rs` records a
+generation id that the snapshot asserts, so commit the bindings and the snapshot from
+the same run, with every supported version configured;
+`PGRX_PG_SYS_RELEASE_REQUIRE_ALL_VERSIONS=1` makes a run that misses one fail.
+`tools/docsrs-typecheck.sh` type-checks the committed tree's docs build for each
+version and checks the packaged crate size.
 
 Ordinary bindgen retains its established target, CPPFLAGS and server include
 directories. Its system include directories come from the Clang driver that

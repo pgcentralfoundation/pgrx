@@ -791,6 +791,27 @@ fn main() {
             "{phase} changes diagnostics without changing generated Rust"
         );
     }
+    // A release that must cover every supported version refuses this pg18-only
+    // configuration before publishing anything.
+    let refused = fixture
+        .command()
+        .env("PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE", "1")
+        .env("PGRX_PG_SYS_RELEASE_REQUIRE_ALL_VERSIONS", "1")
+        .output()
+        .unwrap();
+    assert!(!refused.status.success(), "a partial release must fail when all are required");
+    assert!(
+        String::from_utf8_lossy(&refused.stderr).contains(
+            "the C macro documentation snapshot would cover only pg18; configure pg15, pg16, pg17, pg19 as well"
+        ),
+        "{}",
+        String::from_utf8_lossy(&refused.stderr)
+    );
+    assert_eq!(
+        fs::read_to_string(snapshot.join("mod.rs")).unwrap(),
+        "// ordinary builds must preserve this snapshot\n"
+    );
+    assert!(!fixture.0.join("src/include/pg18.rs").exists());
     fixture.run(
         fixture
             .command()
@@ -857,6 +878,8 @@ fn main() {
         assert!(shipped_source.contains(support), "snapshot lacks {support}");
     }
     assert_eq!(shipped_source.matches("macro_rules! __pgrx_c_classify {").count(), 1);
+    // `cargo -q` hides the report warnings, so the snapshot root records the counts.
+    assert!(shipped[Path::new("mod.rs")].contains("\n// pg18 documentation shells: "));
     for implementation in ["@__pgrx_emit_", "__pgrx_c_args_", "env!(\"OUT_DIR\")"] {
         assert!(!shipped_source.contains(implementation), "snapshot contains {implementation}");
     }
