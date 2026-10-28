@@ -168,10 +168,11 @@ fn every_availability_gated_macro_is_emitted() {
     );
 }
 
-/// Windows CI tests PostgreSQL 15 and 17, where every instr_time gate is compiled out: their
-/// tests compare Unix timing representations. Collecting them there would fail the guard
-/// although no test disappears, because PostgreSQL 15's WIN32 MILLISEC and MICROSEC use
-/// floating-point literals that the generator refuses. Every other configuration keeps them.
+/// Windows builds of PostgreSQL 15-18 compile out every instr_time gate, because their tests
+/// compare Unix timing representations. Collecting them there would fail the guard although no
+/// test disappears: PostgreSQL 15's WIN32 MILLISEC and MICROSEC use floating-point literals
+/// that the generator refuses, and Windows CI tests PostgreSQL 15 and 17. Windows PostgreSQL 19
+/// and every non-Windows build keep them.
 #[test]
 fn gates_compiled_out_by_cfg_are_not_collected() {
     let time = ["INSTR_TIME_GET_DOUBLE", "INSTR_TIME_GET_MILLISEC", "INSTR_TIME_GET_MICROSEC"];
