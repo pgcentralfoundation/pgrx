@@ -104,7 +104,7 @@ pub(crate) fn fingerprint_files<'a>(
                 continue;
             }
             Err(source) => {
-                return Err(FrontendError::CompilerIo { compiler: path.clone(), source });
+                return Err(FrontendError::FileIo { path: path.clone(), source });
             }
         };
         if let Some(fingerprint) = identities.get(&identity) {
@@ -121,14 +121,14 @@ pub(crate) fn fingerprint_files<'a>(
                 continue;
             }
             Err(source) => {
-                return Err(FrontendError::CompilerIo { compiler: path.clone(), source });
+                return Err(FrontendError::FileIo { path: path.clone(), source });
             }
         };
         let mut digest = FileDigest::new();
         loop {
             let length = file
                 .read(&mut buffer)
-                .map_err(|source| FrontendError::CompilerIo { compiler: path.clone(), source })?;
+                .map_err(|source| FrontendError::FileIo { path: path.clone(), source })?;
             if length == 0 {
                 break;
             }
@@ -153,7 +153,7 @@ pub(crate) fn file_identities<'a>(
                 Ok(identity) => Some(identity),
                 Err(error) if absent(&error) => None,
                 Err(source) => {
-                    return Err(FrontendError::CompilerIo { compiler: path.clone(), source });
+                    return Err(FrontendError::FileIo { path: path.clone(), source });
                 }
             };
             Ok((path.clone(), identity))
@@ -191,5 +191,23 @@ mod tests {
             }
             assert_eq!(digest.finish(), hexadecimal(sha2::Sha256::digest(&bytes).as_ref()));
         }
+    }
+
+    /// A file that cannot be read names the file; no tool ran, so the error must not say one
+    /// could not be run.
+    #[test]
+    fn unreadable_inputs_name_the_file_rather_than_a_tool() {
+        let directory = tempfile::tempdir().unwrap();
+        let input = directory.path().to_path_buf();
+        let error = fingerprint_files([&input]).unwrap_err();
+        assert!(
+            matches!(&error, FrontendError::FileIo { path, .. } if *path == input),
+            "{error:?}"
+        );
+        let message = error.to_string();
+        assert!(
+            message.starts_with(&format!("could not access {}: ", input.display())),
+            "{message}"
+        );
     }
 }

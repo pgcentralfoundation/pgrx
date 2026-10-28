@@ -76,14 +76,14 @@ pub fn probe_integer_object_constants(
     let directory = ProbeDirectory::new()?;
     let mut original = Vec::new();
     std::fs::File::open(&frontend.profile().header)
-        .map_err(|source| FrontendError::CompilerIo {
-            compiler: frontend.profile().header.clone(),
+        .map_err(|source| FrontendError::FileIo {
+            path: frontend.profile().header.clone(),
             source,
         })?
         .take(u64::try_from(limits.source_bytes).unwrap_or(u64::MAX).saturating_add(1))
         .read_to_end(&mut original)
-        .map_err(|source| FrontendError::CompilerIo {
-            compiler: frontend.profile().header.clone(),
+        .map_err(|source| FrontendError::FileIo {
+            path: frontend.profile().header.clone(),
             source,
         })?;
     if original.len().saturating_add(2) > limits.source_bytes || names.len() > limits.macros {
@@ -200,14 +200,14 @@ pub(crate) fn retain_integer_constants(
     let mut rejected = BTreeMap::<String, String>::new();
     let mut original = Vec::new();
     std::fs::File::open(&frontend.profile().header)
-        .map_err(|source| FrontendError::CompilerIo {
-            compiler: frontend.profile().header.clone(),
+        .map_err(|source| FrontendError::FileIo {
+            path: frontend.profile().header.clone(),
             source,
         })?
         .take(u64::try_from(limits.source_bytes).unwrap_or(u64::MAX).saturating_add(1))
         .read_to_end(&mut original)
-        .map_err(|source| FrontendError::CompilerIo {
-            compiler: frontend.profile().header.clone(),
+        .map_err(|source| FrontendError::FileIo {
+            path: frontend.profile().header.clone(),
             source,
         })?;
     if original.len().saturating_add(2) > limits.source_bytes || names.len() > limits.macros {
@@ -453,7 +453,7 @@ fn probe_arguments(
 ) -> Result<Vec<String>, FrontendError> {
     let path = directory.join("constants.c");
     std::fs::write(&path, source)
-        .map_err(|source| FrontendError::CompilerIo { compiler: path.clone(), source })?;
+        .map_err(|source| FrontendError::FileIo { path: path.clone(), source })?;
     let overlay = overlay(directory, &frontend.profile().header, &path)?;
     // Probe isolation attributes every owned error in one failed pass; Clang's
     // default error limit would hide all but the first few failing probes.

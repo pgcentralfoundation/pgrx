@@ -178,7 +178,7 @@ pub(super) fn prove(
             };
             let path = directory.join(format!("paste-{mode}.c"));
             std::fs::write(&path, source)
-                .map_err(|source| FrontendError::CompilerIo { compiler: path.clone(), source })?;
+                .map_err(|source| FrontendError::FileIo { path: path.clone(), source })?;
             let overlay = overlay(directory, &frontend.profile().header, &path)?;
             let mut arguments =
                 crate::frontend::normalized_arguments(&frontend.profile().arguments);

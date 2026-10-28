@@ -256,12 +256,13 @@ pub(crate) fn prepare_inner_with_objects(
     let mut dependencies = Dependencies { frontend, nodes: HashMap::new(), tokens: 0, limits };
     let names = names.iter().map(|name| name.as_ref().to_owned()).collect::<BTreeSet<_>>();
     let file = std::fs::File::open(&frontend.profile().header).map_err(|source| {
-        FrontendError::CompilerIo { compiler: frontend.profile().header.clone(), source }
+        FrontendError::FileIo { path: frontend.profile().header.clone(), source }
     })?;
     let read_limit = u64::try_from(limits.source_bytes).unwrap_or(u64::MAX).saturating_add(1);
     let mut original = Vec::new();
-    file.take(read_limit).read_to_end(&mut original).map_err(|source| {
-        FrontendError::CompilerIo { compiler: frontend.profile().header.clone(), source }
+    file.take(read_limit).read_to_end(&mut original).map_err(|source| FrontendError::FileIo {
+        path: frontend.profile().header.clone(),
+        source,
     })?;
     if original.len().checked_add(2).is_none_or(|bytes| bytes > limits.source_bytes) {
         for name in names {
@@ -843,7 +844,7 @@ fn preprocess_prepared<'a>(
             locations.insert(tag, index);
         }
         std::fs::write(&path, source)
-            .map_err(|source| FrontendError::CompilerIo { compiler: path.clone(), source })?;
+            .map_err(|source| FrontendError::FileIo { path: path.clone(), source })?;
         runs += 1;
         match crate::frontend::preprocess(
             &frontend.profile().compiler.executable,
@@ -923,7 +924,7 @@ fn verify_original_environment(
     let mut guarded = original.to_vec();
     guarded.extend_from_slice(b"\n\n");
     std::fs::write(&header, guarded)
-        .map_err(|source| FrontendError::CompilerIo { compiler: header.clone(), source })?;
+        .map_err(|source| FrontendError::FileIo { path: header.clone(), source })?;
     let overlay = overlay(directory, &frontend.profile().header, &header)?;
     let mut arguments = frontend.profile().arguments.clone();
     arguments.extend([
@@ -968,7 +969,7 @@ fn verify_original_environment(
         ));
     }
     let dependency_text = std::fs::read_to_string(&dependencies)
-        .map_err(|source| FrontendError::CompilerIo { compiler: dependencies.clone(), source })?;
+        .map_err(|source| FrontendError::FileIo { path: dependencies.clone(), source })?;
     let files = inputs.files.iter().cloned().collect::<BTreeSet<_>>();
     for file in crate::frontend::parse_dependencies(&dependency_text)? {
         if file.starts_with(directory) {
@@ -976,7 +977,7 @@ fn verify_original_environment(
         }
         let identity = file
             .canonicalize()
-            .map_err(|source| FrontendError::CompilerIo { compiler: file.clone(), source })?;
+            .map_err(|source| FrontendError::FileIo { path: file.clone(), source })?;
         if !files.contains(&file) || !files.contains(&identity) {
             return Err(FrontendError::Environment(format!(
                 "a new header dependency appeared after inspection: {} ({})",
@@ -1493,7 +1494,7 @@ impl ProbeDirectory {
                 Ok(()) => return Ok(Self(directory)),
                 Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => continue,
                 Err(source) => {
-                    return Err(FrontendError::CompilerIo { compiler: directory, source });
+                    return Err(FrontendError::FileIo { path: directory, source });
                 }
             }
         }
@@ -1522,6 +1523,6 @@ fn overlay(directory: &Path, header: &Path, external: &Path) -> Result<PathBuf, 
         FrontendError::Output(format!("could not encode original-header overlay: {error}"))
     })?;
     std::fs::write(&path, bytes)
-        .map_err(|source| FrontendError::CompilerIo { compiler: path.clone(), source })?;
+        .map_err(|source| FrontendError::FileIo { path: path.clone(), source })?;
     Ok(path)
 }

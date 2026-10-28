@@ -124,6 +124,14 @@ pub enum FrontendError {
         /// The underlying I/O or parsing failure retained for actionable diagnostics.
         source: io::Error,
     },
+    /// An input, probe or witness file could not be created, read, written or resolved.
+    #[error("could not access {}: {source}", path.display())]
+    FileIo {
+        /// The file or directory at which the filesystem operation failed.
+        path: PathBuf,
+        /// The underlying filesystem failure retained for actionable diagnostics.
+        source: io::Error,
+    },
     /// Generated native source or staged artifacts could not be accessed reliably.
     #[error("native support I/O at {}: {source}", path.display())]
     NativeIo {
@@ -278,7 +286,7 @@ fn inspect_selected(
     let witness = tempfile::Builder::new()
         .prefix("pgrx-c-macros-includes-")
         .tempfile()
-        .map_err(|source| FrontendError::CompilerIo { compiler: compiler.clone(), source })?;
+        .map_err(|source| FrontendError::FileIo { path: std::env::temp_dir(), source })?;
     // Unlike -H, this compiler callback includes headers processed in the
     // predefines stage, including -include and -imacros roots. Its output goes
     // to an owned file so diagnostics cannot be mistaken for physical paths.
@@ -302,7 +310,7 @@ fn inspect_selected(
     let mut witnessed = Vec::new();
     std::fs::File::open(witness.path())
         .and_then(|file| file.take(OUTPUT_LIMIT + 1).read_to_end(&mut witnessed))
-        .map_err(|source| FrontendError::CompilerIo { compiler: compiler.clone(), source })?;
+        .map_err(|source| FrontendError::FileIo { path: witness.path().into(), source })?;
     if witnessed.len() as u64 > OUTPUT_LIMIT {
         return Err(FrontendError::OutputLimit(compiler));
     }
@@ -406,8 +414,7 @@ fn prove_snapshot_facts(
 /// Resolve a filesystem identity for comparison and rebuild tracking without reusing it as include
 /// lookup spelling.
 fn absolute_path(path: &Path) -> Result<PathBuf, FrontendError> {
-    path.canonicalize()
-        .map_err(|source| FrontendError::CompilerIo { compiler: path.into(), source })
+    path.canonicalize().map_err(|source| FrontendError::FileIo { path: path.into(), source })
 }
 
 /// Make an input spelling absolute while retaining symlink-sensitive include lookup behavior.
@@ -417,7 +424,7 @@ fn input_path(path: &Path) -> Result<PathBuf, FrontendError> {
     } else {
         std::env::current_dir()
             .map(|directory| directory.join(path))
-            .map_err(|source| FrontendError::CompilerIo { compiler: path.into(), source })
+            .map_err(|source| FrontendError::FileIo { path: path.into(), source })
     }
 }
 
@@ -2265,7 +2272,7 @@ fn build_inputs(
                 path.to_owned()
             } else {
                 std::env::current_dir()
-                    .map_err(|source| FrontendError::CompilerIo { compiler: path.into(), source })?
+                    .map_err(|source| FrontendError::FileIo { path: path.into(), source })?
                     .join(path)
             };
             // Keep absent search roots: creating them can change include resolution.
@@ -2627,7 +2634,7 @@ fn run_compiler_with_input(
                     break Err(FrontendError::OutputLimit(compiler.into()));
                 }
                 Ok(_) => {}
-                Err(error) => break Err(failure(error)),
+                Err(source) => break Err(FrontendError::FileIo { path: witness.into(), source }),
             }
         }
         while let Ok((is_stdout, result)) = receiver.try_recv() {
@@ -3990,7 +3997,7 @@ mod tests {
             assert!(
                 matches!(
                     &result,
-                    Err(FrontendError::CompilerIo { compiler, .. }) if compiler.starts_with(&root)
+                    Err(FrontendError::FileIo { path, .. }) if path.starts_with(&root)
                 ),
                 "{:?}",
                 result.err()

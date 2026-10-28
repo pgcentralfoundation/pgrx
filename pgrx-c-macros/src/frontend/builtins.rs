@@ -467,7 +467,7 @@ impl ProbeFiles {
     /// Create owned builtin probe files and retain original header bytes for overlay verification.
     fn new(frontend: &FrontendOutput) -> Result<Self, FrontendError> {
         let header = &frontend.profile().header;
-        let io_error = |source| FrontendError::CompilerIo { compiler: header.clone(), source };
+        let io_error = |source| FrontendError::FileIo { path: header.clone(), source };
         let mut original = Vec::new();
         fs::File::open(header)
             .map_err(io_error)?
@@ -509,7 +509,7 @@ impl ProbeFiles {
     /// Replace the owned probe source contents between bounded witness phases.
     fn write(&self, source: &str) -> Result<(), FrontendError> {
         fs::write(&self.source, source)
-            .map_err(|source| FrontendError::CompilerIo { compiler: self.source.clone(), source })
+            .map_err(|source| FrontendError::FileIo { path: self.source.clone(), source })
     }
 
     /// Construct the driver arguments that apply the owned overlay to the original header context.
