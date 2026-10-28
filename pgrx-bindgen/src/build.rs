@@ -1829,8 +1829,19 @@ fn add_derives(bind: bindgen::Builder) -> bindgen::Builder {
 }
 
 fn target_env_tracked(s: &str) -> Option<String> {
-    let target = env_tracked("TARGET").unwrap();
-    env_tracked(&format!("{s}_{target}")).or_else(|| env_tracked(s))
+    target_env_lookup(s, env_tracked)
+}
+
+/// Prefer the variable suffixed with Cargo's TARGET, then the underscore spelling that shells
+/// can export, then the unsuffixed variable.
+fn target_env_lookup(s: &str, lookup: impl Fn(&str) -> Option<String>) -> Option<String> {
+    let target = lookup("TARGET").expect("Cargo sets TARGET for every build script");
+    let underscored = target.replace('-', "_");
+    lookup(&format!("{s}_{target}"))
+        .or_else(|| {
+            (underscored != target).then(|| lookup(&format!("{s}_{underscored}"))).flatten()
+        })
+        .or_else(|| lookup(s))
 }
 
 fn find_include(
@@ -2263,6 +2274,30 @@ macro_rules! EXAMPLE {
             ["-I'unterminated"],
             "bindgen preserves malformed quoting as one argument"
         );
+    }
+
+    /// Target-scoped PGRX variables accept the hyphenated Cargo spelling first, then the
+    /// underscore spelling a shell can export, then the unsuffixed name.
+    #[test]
+    fn target_env_tracked_accepts_underscore_target_spelling() {
+        let mut values = BTreeMap::from([
+            ("TARGET", "aarch64-unknown-linux-gnu"),
+            ("PGRX_INCLUDEDIR_SERVER", "/host/server"),
+            ("PGRX_INCLUDEDIR_SERVER_aarch64_unknown_linux_gnu", "/underscored/server"),
+            ("PGRX_INCLUDEDIR_SERVER_aarch64-unknown-linux-gnu", "/hyphenated/server"),
+        ]);
+        let resolve = |values: &BTreeMap<&str, &str>| {
+            target_env_lookup("PGRX_INCLUDEDIR_SERVER", |name| {
+                values.get(name).map(|value| (*value).to_owned())
+            })
+        };
+        assert_eq!(resolve(&values).as_deref(), Some("/hyphenated/server"));
+        values.remove("PGRX_INCLUDEDIR_SERVER_aarch64-unknown-linux-gnu");
+        assert_eq!(resolve(&values).as_deref(), Some("/underscored/server"));
+        values.remove("PGRX_INCLUDEDIR_SERVER_aarch64_unknown_linux_gnu");
+        assert_eq!(resolve(&values).as_deref(), Some("/host/server"));
+        values.remove("PGRX_INCLUDEDIR_SERVER");
+        assert_eq!(resolve(&values), None);
     }
 
     /// Meson-built MSVC PostgreSQL records CL warning switches in CFLAGS. The build inspection
