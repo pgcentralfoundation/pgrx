@@ -20,6 +20,10 @@ use std::fmt::Write as _;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
+/// Verify that server headers were configured for the inspected C target.
+mod configuration;
+pub use configuration::{ConfigurationError, LayoutDisagreement, verify_postgres_configuration};
+
 /// PostgreSQL function macros and the other definitions needed to interpret them.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PostgresInventory {
@@ -85,6 +89,16 @@ impl PostgresConfig {
             clang_args.push(format!("-I{path}"));
         }
         Ok(Self { pg_config, major_version, server_include_dir, clang_args })
+    }
+
+    /// Take macro ownership from another server header root, such as a binding generator's
+    /// target-specific override of the installation's include directory.
+    ///
+    /// Only the ownership root changes. [`Self::clang_args`] still includes the installation's
+    /// server directory, so a caller supplies the overriding include path itself, as a binding
+    /// generator does through [`Self::inspect_with_arguments`].
+    pub fn with_server_include_dir(self, server_include_dir: PathBuf) -> Self {
+        Self { server_include_dir, ..self }
     }
 
     /// The selected configuration, including the actual server version and pg_config path.
@@ -154,6 +168,9 @@ impl PostgresConfig {
     /// preserving the CL driver's final runtime choice and user define/undefine precedence.
     /// The frontend may append an explicit compiler resource directory; use the returned profile's
     /// arguments when parsing the bindings so both tools see the same environment.
+    ///
+    /// Inspected PostgreSQL headers must have been configured for the inspected target; see
+    /// [`verify_postgres_configuration`].
     pub fn inspect_with_arguments(
         &self,
         scanner: &MacroScanner,
@@ -180,6 +197,7 @@ impl PostgresConfig {
             compiler,
             configured_compiler.as_deref(),
         )?;
+        verify_postgres_configuration(scanner, &inspected, self.major_version)?;
         if let Some(pg_config) = self.pg_config.path() {
             inspected.profile.inputs.files.push(pg_config);
         }
@@ -495,6 +513,13 @@ pub enum PostgresError {
     /// Recorded PostgreSQL compiler flags could not be decoded safely.
     #[error("PostgreSQL CFLAGS must be UTF-8")]
     InvalidCFlags,
+    /// The inspected headers were configured for another machine, ABI or major version.
+    #[error("PostgreSQL headers do not describe the inspected C target: {0}")]
+    TargetConfiguration(
+        /// The disagreement between the headers and the target.
+        #[from]
+        ConfigurationError,
+    ),
     /// Compiler inspection or a required probe failed.
     #[error(transparent)]
     Frontend(

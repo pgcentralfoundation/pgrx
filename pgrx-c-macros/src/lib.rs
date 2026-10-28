@@ -43,8 +43,9 @@ mod postgres;
 /// Decode recorded GNU or MSVC build options before inspecting C semantics.
 mod postgres_flags;
 pub use postgres::{
-    PostgresConfig, PostgresError, PostgresInventory, postgres_function_macro_names,
-    postgres_inline_function_names, postgres_object_macro_names,
+    ConfigurationError, LayoutDisagreement, PostgresConfig, PostgresError, PostgresInventory,
+    postgres_function_macro_names, postgres_inline_function_names, postgres_object_macro_names,
+    verify_postgres_configuration,
 };
 pub use postgres_flags::{lower_msvc_runtime_flags, postgres_clang_flags};
 /// Own compiler profiles, preprocessing state, and declaration identities independently of Clang

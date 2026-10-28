@@ -198,6 +198,20 @@ There are two different inspection paths:
 - `inspect` establishes a compiler profile, final macro state, declaration
   catalog, target facts, inputs, and dependency graph for translation.
 
+`PostgresConfig::inspect` and `inspect_with_arguments` then require the server
+headers to describe the inspected target, through
+[`verify_postgres_configuration`](src/postgres/configuration.rs). Headers that
+define `PG_VERSION_NUM` must name a machine in `PG_VERSION_STR` whose
+architecture, OS, C library and ARM float ABI match Clang's triple. An
+unrecognized machine is accepted only when the target is the generator's own
+host. One libclang parse of the inspected header then compares the
+`pg_config.h` sizes, member-offset alignments, `MAXIMUM_ALIGNOF`, byte order,
+64-bit integer flags and major version with the target compiler, and reports
+every disagreement. The machine check is the only evidence for ISA-dependent
+declaration shapes such as `pg_popcount32`; the layout check separates ABIs
+that share a machine name. Headers without `PG_VERSION_NUM`, such as synthetic
+fixtures, are not checked.
+
 ### Compiler agreement
 
 Select a Clang executable compatible with the loaded libclang. Explicit hints,
@@ -1390,7 +1404,8 @@ CLI commands retain their own requested output and stderr diagnostics.
 
 1. Resolve configurations and active Cargo major.
 2. Inspect optional macros with recorded CFLAGS plus the established binding
-   target, CPPFLAGS, include settings and environment overrides.
+   target, CPPFLAGS, include settings and environment overrides, and verify
+   that the server configuration describes that target.
 3. Select PostgreSQL function macros, owned variable-dependent object roots and
    every compiler-proven server-owned static inline definition; prepare these
    explicit root kinds in one session. Canonical physical definition ownership
@@ -1645,6 +1660,7 @@ generate(version, extra_arguments):
         return
     arguments = recorded_arguments_then_overrides(installation, extra_arguments)
     frontend = inspect_matching_driver_and_libclang(wrapper(version), arguments)
+    verify_server_configuration_describes_target(frontend, version)
     track_cargo_inputs(frontend.inputs)
     macros = final_active_postgres_function_macro_names(frontend)
     objects = owned_variable_dependent_object_roots(frontend)
@@ -1877,7 +1893,7 @@ generalized; do not add a macro-name exception.
 
 | Area | Implementation |
 | --- | --- |
-| Installation and CLI | [`src/postgres.rs`](src/postgres.rs), [`src/main.rs`](src/main.rs). |
+| Installation and CLI | [`src/postgres.rs`](src/postgres.rs), [`configuration.rs`](src/postgres/configuration.rs), [`src/main.rs`](src/main.rs). |
 | Discovery and source spans | [`src/lib.rs`](src/lib.rs). |
 | Owned C model | [`src/model.rs`](src/model.rs). |
 | Compiler/profile/input agreement | [`src/frontend.rs`](src/frontend.rs), [`src/frontend/`](src/frontend/). |
