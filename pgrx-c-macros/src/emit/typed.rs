@@ -1137,7 +1137,10 @@ impl<'a> Renderer<'a> {
                                 Err(reason.clone())
                             } else if let Some(adapter) = self.adapters.and_then(|adapters| {
                                 // An identity-only adapter has no call wrapper, so a call
-                                // must not resolve to it.
+                                // must not resolve to it. Demand planning already marks
+                                // every function a renderable root calls, fallback call
+                                // roots included, so this only guards a call that planning
+                                // did not see.
                                 adapters
                                     .functions
                                     .bindings
