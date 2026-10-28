@@ -9,6 +9,8 @@
 //! while `cargo test` still passes. This test collects every gated name from the pg-sys
 //! integration tests and the pgrx-unit-tests backend tests, then requires this build's macro
 //! report to show it as emitted unless a listed profile difference explains its absence.
+//! A gate that this build compiles out, through a file-level `#![cfg]` or a `#[cfg]` written
+//! directly on the gate, wraps no test here and is not collected.
 
 #![cfg(not(docsrs))]
 
@@ -139,7 +141,7 @@ fn every_availability_gated_macro_is_emitted() {
             "PG{major} report lists {name} more than once"
         );
     }
-    let gated = gated_names();
+    let gated = gated_names(&Build { major, target_os: std::env::consts::OS });
     let mut assertions = None;
     let mut missing = Vec::new();
     for (name, files) in &gated {
@@ -166,8 +168,49 @@ fn every_availability_gated_macro_is_emitted() {
     );
 }
 
-/// Map each macro name used by an availability gate to the test files that use it.
-fn gated_names() -> BTreeMap<String, Vec<PathBuf>> {
+/// Windows CI tests PostgreSQL 15 and 17, where every instr_time gate is compiled out: their
+/// tests compare Unix timing representations. Collecting them there would fail the guard
+/// although no test disappears, because PostgreSQL 15's WIN32 MILLISEC and MICROSEC use
+/// floating-point literals that the generator refuses. Every other configuration keeps them.
+#[test]
+fn gates_compiled_out_by_cfg_are_not_collected() {
+    let time = ["INSTR_TIME_GET_DOUBLE", "INSTR_TIME_GET_MILLISEC", "INSTR_TIME_GET_MICROSEC"];
+    for major in 15..=19 {
+        for target_os in ["linux", "macos", "windows"] {
+            let gated = gated_names(&Build { major, target_os });
+            for name in time {
+                let expected = target_os != "windows" || major == 19;
+                assert_eq!(gated.contains_key(name), expected, "{name} on {target_os} PG{major}");
+            }
+            // generated_c_macro_tests.rs is compiled out on Windows by its file-level cfg.
+            assert_eq!(
+                gated.contains_key("pgstat_count_heap_scan"),
+                target_os != "windows",
+                "{target_os} PG{major}"
+            );
+        }
+    }
+}
+
+/// A predicate the guard does not model fails instead of silently keeping or dropping a gate.
+#[test]
+#[should_panic(expected = "cannot evaluate cfg predicate")]
+fn unknown_gate_cfgs_fail() {
+    cfg_holds("feature = \"cshim\"", &Build { major: 18, target_os: "linux" });
+}
+
+/// The configuration that decides which gates compile: the `pg<major>` feature and the target
+/// operating system, spelled as Rust's `target_os` cfg spells it.
+struct Build {
+    /// Selected PostgreSQL major version.
+    major: u16,
+    /// Target operating system.
+    target_os: &'static str,
+}
+
+/// Map each macro name used by an availability gate that `build` compiles to the test files
+/// that use it.
+fn gated_names(build: &Build) -> BTreeMap<String, Vec<PathBuf>> {
     let workspace = Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap();
     let mut gated = BTreeMap::<String, Vec<PathBuf>>::new();
     for root in ["pgrx-pg-sys/tests", "pgrx-unit-tests/src/tests"] {
@@ -176,13 +219,16 @@ fn gated_names() -> BTreeMap<String, Vec<PathBuf>> {
         let mut gates = 0;
         for file in files {
             let source = std::fs::read_to_string(&file).expect("read gated test source");
-            // These test modules never compile on Windows, so their gates remove nothing there.
-            if cfg!(windows) && source.contains("#![cfg(not(target_os = \"windows\"))]") {
+            let gates_in_file = gate_names(&source);
+            gates += gates_in_file.len();
+            if !file_cfgs(&source).all(|predicate| cfg_holds(predicate, build)) {
                 continue;
             }
             let relative = file.strip_prefix(workspace).unwrap().to_owned();
-            for name in gate_names(&source) {
-                gates += 1;
+            for (name, line_start) in gates_in_file {
+                if !gate_cfgs(&source[..line_start]).all(|predicate| cfg_holds(predicate, build)) {
+                    continue;
+                }
                 let users = gated.entry(name.to_owned()).or_default();
                 if !users.contains(&relative) {
                     users.push(relative.clone());
@@ -207,8 +253,9 @@ fn collect_sources(directory: &Path, files: &mut Vec<PathBuf>) {
     }
 }
 
-/// Return the macro names gated by classifier availability arms and `if_c_macro!` invocations.
-fn gate_names(source: &str) -> Vec<&str> {
+/// Return each macro name gated by a classifier availability arm or an `if_c_macro!`
+/// invocation, with the offset of the line that starts the gate.
+fn gate_names(source: &str) -> Vec<(&str, usize)> {
     let mut names = Vec::new();
     for (marker, delimited) in [("@if_available", false), ("if_c_macro!", true)] {
         for (index, _) in source.match_indices(marker) {
@@ -223,11 +270,87 @@ fn gate_names(source: &str) -> Vec<&str> {
                 .find(|character: char| !(character.is_ascii_alphanumeric() || character == '_'))
                 .unwrap_or(rest.len());
             if end != 0 && rest[end..].trim_start().starts_with('{') {
-                names.push(&rest[..end]);
+                let line_start = source[..index].rfind('\n').map_or(0, |newline| newline + 1);
+                names.push((&rest[..end], line_start));
             }
         }
     }
     names
+}
+
+/// Return the predicates of the `#![cfg(...)]` attributes among the comments and inner
+/// attributes that open a source file.
+fn file_cfgs(source: &str) -> impl Iterator<Item = &str> {
+    source
+        .lines()
+        .map(str::trim)
+        .take_while(|line| line.is_empty() || line.starts_with("//") || line.starts_with("#!["))
+        .filter_map(|line| line.strip_prefix("#![cfg(")?.strip_suffix(")]"))
+}
+
+/// Return the predicates of the single-line `#[cfg(...)]` attributes directly above a gate,
+/// given the source before the gate's line. A cfg spelled any other way is not seen, so the
+/// gate stays collected and the guard can only become stricter.
+fn gate_cfgs(before: &str) -> impl Iterator<Item = &str> {
+    before
+        .lines()
+        .rev()
+        .map(str::trim)
+        .take_while(|line| line.starts_with("#[") || line.starts_with("//"))
+        .filter_map(|line| line.strip_prefix("#[cfg(")?.strip_suffix(")]"))
+}
+
+/// Evaluate a `cfg` predicate for `build`. Only the predicates that these tests use are
+/// understood; any other fails the test, so a new kind of exclusion cannot drop a gate unseen.
+fn cfg_holds(predicate: &str, build: &Build) -> bool {
+    let predicate = predicate.trim();
+    if let Some(predicates) = cfg_arguments(predicate, "all") {
+        return predicates.iter().all(|predicate| cfg_holds(predicate, build));
+    }
+    if let Some(predicates) = cfg_arguments(predicate, "any") {
+        return predicates.iter().any(|predicate| cfg_holds(predicate, build));
+    }
+    if let Some([predicate]) = cfg_arguments(predicate, "not").as_deref() {
+        return !cfg_holds(predicate, build);
+    }
+    let value = |key: &str| {
+        let (name, value) = predicate.split_once('=')?;
+        (name.trim() == key).then(|| value.trim().strip_prefix('"')?.strip_suffix('"')).flatten()
+    };
+    if let Some(target_os) = value("target_os") {
+        return target_os == build.target_os;
+    }
+    if let Some(major) =
+        value("feature").and_then(|feature| feature.strip_prefix("pg")?.parse::<u16>().ok())
+    {
+        return build.major == major;
+    }
+    match predicate {
+        // This guard compiles only without docsrs.
+        "docsrs" => false,
+        _ => panic!("availability gates cannot evaluate cfg predicate {predicate:?}"),
+    }
+}
+
+/// Split `name(first, second, ...)` into its top-level predicates.
+fn cfg_arguments<'a>(predicate: &'a str, name: &str) -> Option<Vec<&'a str>> {
+    let inner = predicate.strip_prefix(name)?.trim_start().strip_prefix('(')?.strip_suffix(')')?;
+    let mut arguments = Vec::new();
+    let (mut depth, mut start) = (0_usize, 0);
+    for (index, character) in inner.char_indices() {
+        match character {
+            '(' => depth += 1,
+            ')' => depth -= 1,
+            ',' if depth == 0 => {
+                arguments.push(inner[start..index].trim());
+                start = index + 1;
+            }
+            _ => {}
+        }
+    }
+    arguments.push(inner[start..].trim());
+    arguments.retain(|argument| !argument.is_empty());
+    Some(arguments)
 }
 
 /// Report whether this build's original C profile defines USE_ASSERT_CHECKING.

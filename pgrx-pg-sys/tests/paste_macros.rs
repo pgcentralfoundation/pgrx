@@ -474,9 +474,12 @@ fn time_value(ticks: i64) -> pg::instr_time {
     }
 }
 
+// The cfgs stay outside each gate so that macro_availability.rs can tell which gates compile.
+// Windows PostgreSQL 15-18 compiles none of them: PostgreSQL 15's WIN32 MILLISEC and MICROSEC
+// use floating-point literals that the generator refuses.
+#[cfg(all(not(feature = "pg19"), not(target_os = "windows")))]
 pg::__pgrx_c_classify! { @if_available INSTR_TIME_GET_DOUBLE {
 /// Checks that generated time seconds matches original C floating bits.
-#[cfg(all(not(feature="pg19"),not(target_os="windows")))]
 #[test]
 fn generated_time_seconds_matches_original_c_floating_bits() {
     for case in &original_results().time_double {
@@ -490,14 +493,16 @@ fn generated_time_seconds_matches_original_c_floating_bits() {
         assert_eq!(calls.get(),case.evaluations,"ticks={}",case.input);
     }
 }
+} }
 
+#[cfg(feature = "pg19")]
+pg::__pgrx_c_classify! { @if_available INSTR_TIME_GET_DOUBLE {
 /// # Safety
 /// The caller is in the permitted PostgreSQL backend thread, with timing
 /// initialized for its selected clock source. time is fully initialized and
 /// contains a valid tick representation for that clock, with conversion
 /// arithmetic valid under the original pg_ticks_to_ns contract. The PG19
 /// expansion invokes that helper through its guarded native adapter.
-#[cfg(feature="pg19")]
 #[allow(dead_code)]
 unsafe fn time_seconds_in_backend(time:pg::instr_time)->f64 {
     // SAFETY: the caller establishes backend, timing and record preconditions.
@@ -505,9 +510,9 @@ unsafe fn time_seconds_in_backend(time:pg::instr_time)->f64 {
 }
 } }
 
+#[cfg(all(not(feature = "pg19"), not(target_os = "windows")))]
 pg::__pgrx_c_classify! { @if_available INSTR_TIME_GET_MILLISEC {
 /// Checks that generated time milliseconds matches original C floating bits.
-#[cfg(all(not(feature="pg19"),not(target_os="windows")))]
 #[test]
 fn generated_time_milliseconds_matches_original_c_floating_bits() {
     for case in &original_results().time_millisec {
@@ -520,13 +525,15 @@ fn generated_time_milliseconds_matches_original_c_floating_bits() {
         assert_eq!(calls.get(),case.evaluations,"ticks={}",case.input);
     }
 }
+} }
 
+#[cfg(feature = "pg19")]
+pg::__pgrx_c_classify! { @if_available INSTR_TIME_GET_MILLISEC {
 /// # Safety
 /// The caller is in the permitted PostgreSQL backend thread with timing
 /// initialized for its selected clock source. time is initialized, contains a
 /// valid tick representation for that clock, and permits the conversion
 /// arithmetic required by the original pg_ticks_to_ns contract.
-#[cfg(feature="pg19")]
 #[allow(dead_code)]
 unsafe fn time_milliseconds_in_backend(time:pg::instr_time)->f64 {
     // SAFETY: the caller establishes the guarded timing adapter's preconditions.
@@ -534,9 +541,9 @@ unsafe fn time_milliseconds_in_backend(time:pg::instr_time)->f64 {
 }
 } }
 
+#[cfg(all(not(feature = "pg19"), not(target_os = "windows")))]
 pg::__pgrx_c_classify! { @if_available INSTR_TIME_GET_MICROSEC {
 /// Checks that generated time microseconds matches original C integer conversion.
-#[cfg(all(not(feature="pg19"),not(target_os="windows")))]
 #[test]
 fn generated_time_microseconds_matches_original_c_integer_conversion() {
     for case in &original_results().time_microsec {
@@ -552,13 +559,15 @@ fn generated_time_microseconds_matches_original_c_integer_conversion() {
         assert_eq!(calls.get(),case.evaluations,"ticks={}",case.input);
     }
 }
+} }
 
+#[cfg(feature = "pg19")]
+pg::__pgrx_c_classify! { @if_available INSTR_TIME_GET_MICROSEC {
 /// # Safety
 /// The caller is in the permitted PostgreSQL backend thread with timing
 /// initialized for its selected clock source. time is initialized, contains a
 /// valid tick representation for that clock, and permits the conversion
 /// arithmetic required by the original pg_ticks_to_ns contract.
-#[cfg(feature="pg19")]
 #[allow(dead_code)]
 unsafe fn time_microseconds_in_backend(time:pg::instr_time)->i64 {
     // SAFETY: the caller establishes the guarded timing adapter's preconditions.
