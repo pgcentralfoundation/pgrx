@@ -847,17 +847,9 @@ fn generated_adapters(
         &requests.functions,
         &requests.callbacks,
     )?;
-    // Later adapter passes see the signatures of both callback passes, the final pass
-    // taking precedence. Rendering sees only the final pass.
-    let mut callback_markers = preliminary.markers;
-    callback_markers.extend(callbacks.markers.clone());
-    let mut callback_unavailable = preliminary.unsupported;
-    callback_unavailable.extend(callbacks.unsupported.clone());
-    let generated = types::GeneratedTypes {
-        callbacks: &callback_markers,
-        callback_unavailable: &callback_unavailable,
-        ..types::GeneratedTypes::NONE
-    };
+    // Only the second pass's signatures are emitted. A thunk can make a type's witnesses
+    // disagree, so a first-pass marker must not reach a later adapter.
+    let generated = callbacks.types();
     let mut required_types = requests.types.values().cloned().collect::<Vec<_>>();
     required_types.extend(callbacks.required_types.iter().cloned());
     let mut enum_requests = enumerations::EnumRequests {

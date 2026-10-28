@@ -14,3 +14,12 @@ typedef int (*FallbackRankFunction)(FallbackShade);
 #define FALLBACK_ADDRESS() ((FallbackRankFunction) &FALLBACK_RANK)
 typedef enum FallbackColor { FALLBACK_RED = 1, FALLBACK_BLUE = 2 } FallbackColor;
 static inline int FALLBACK_COLOR_USE(int value) { return value + FALLBACK_BLUE; }
+/* An external function whose C type only it and the thunks for native calls below
+ * witness, with different Rust ABIs. */
+int FallbackDouble(int value) { return value * 2; }
+#define FALLBACK_DOUBLE_ADDRESS() (&FallbackDouble)
+/* Its translation falls back to the native call. */
+static inline int FALLBACK_NEXT(int value) { return FALLBACK_HELPER(value) + 1; }
+/* A macro calls this function natively. */
+static inline int FallbackPlain(int value) { return value + 1; }
+#define FALLBACK_PLAIN_CALL(value) FallbackPlain(value)

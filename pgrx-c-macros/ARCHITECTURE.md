@@ -1231,7 +1231,11 @@ provisional identity/storage markers so nested callback prototypes can be
 reconciled, then validate candidates and propagate failed nested dependencies
 through a reverse queue before emitting final call capabilities. Provisional
 markers are internal reconciliation evidence, not permission to call an
-unvalidated prototype.
+unvalidated prototype. Callbacks are reconciled again after native call thunks
+are generated, since a thunk's C-unwind function type is another witness. Only
+the second pass's signatures are emitted, so address getters, fields and enums
+use its markers alone: a type whose witnesses then disagree has no signature,
+and its function's address is refused.
 
 Physical function-pointer implementations share selected ABI/arity families,
 without a fixed arity ceiling, but nominal C identities do not merge merely

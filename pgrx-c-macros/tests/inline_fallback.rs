@@ -28,6 +28,7 @@ use pgrx_c_macros::{
     IntegerBindingRepresentation, IntegerValue, MacroScanner, SkipReasonCode,
     emit_batch_with_bindings, generate_with_bindings, inspect,
 };
+use std::fmt::Write;
 use std::path::PathBuf;
 
 /// Preserve the production OID classification boundary in the shared fixture collector.
@@ -57,6 +58,7 @@ fn inspect_fixture(scanner: &MacroScanner) -> (FrontendOutput, String) {
         .header(header().to_str().unwrap())
         .clang_args(&frontend.profile().arguments)
         .allowlist_type("Fallback.*")
+        .allowlist_function("FallbackDouble")
         .layout_tests(false)
         .generate_comments(false)
         .formatter(bindgen::Formatter::None)
@@ -88,6 +90,7 @@ fn fallback_calls_keep_their_support_and_report_why() {
     let scanner = MacroScanner::new().expect("libclang must be available");
     fallback_calls_keep_their_generated_support(&scanner);
     binding_disagreements_are_reported_for_fallback_calls(&scanner);
+    addresses_use_the_signatures_the_support_defines(&scanner);
 }
 
 /// A fallback call root keeps the native support it calls, whichever other roots demanded
@@ -208,5 +211,78 @@ fn binding_disagreements_are_reported_for_fallback_calls(scanner: &MacroScanner)
             assert!(reason.message.contains("FALLBACK_BLUE"), "{reason:?}");
             assert_eq!(report["fallback"]["code"], "binding_value_mismatch");
         }
+    }
+}
+
+/// A native call adds a thunk that witnesses the C function type with the C-unwind ABI,
+/// while bindgen declares an external function of that type with the C ABI. The
+/// conflicting witnesses leave the type without a callback signature, so the external
+/// function's address is refused rather than named by a signature the support does not
+/// define. The call comes from a translation that falls back or from a macro.
+fn addresses_use_the_signatures_the_support_defines(scanner: &MacroScanner) {
+    let (frontend, bindings) = inspect_fixture(scanner);
+    let support = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../pgrx-pg-sys/src/c_macros/support.rs")
+        .canonicalize()
+        .unwrap();
+    let profile = frontend.profile();
+    let arguments = profile.arguments.iter().map(String::as_str).collect::<Vec<_>>();
+    for (caller, title) in [
+        ("FALLBACK_NEXT", "Typed call adapter for C inline function FALLBACK_NEXT"),
+        ("FALLBACK_PLAIN_CALL", "C macro FALLBACK_PLAIN_CALL"),
+    ] {
+        let names = ["FALLBACK_DOUBLE_ADDRESS", caller];
+        let session = AnalysisSession::prepare_with_inline_functions(
+            scanner,
+            &frontend,
+            &[] as &[String],
+            &[] as &[String],
+            &names,
+        )
+        .expect("prepare roots");
+        let catalog = catalog(&session, &frontend, &bindings);
+        let generated = generate_with_bindings(&session, &names, &catalog).unwrap();
+        let mut rust = format!(
+            "#![deny(unsafe_op_in_unsafe_fn)]\n#![allow(non_snake_case,non_camel_case_types,non_upper_case_globals,unused_parens,dead_code)]\n#[path={support:?}] pub mod __pgrx_c_macros;\n{bindings}\n{}\n",
+            generated.support.rust
+        );
+        for emission in &generated.macros {
+            match (emission.analysis.name.as_str(), &emission.status) {
+                (name, EmissionStatus::Emitted { rust: definition, .. }) if name == caller => {
+                    assert!(definition.contains(title), "{caller}");
+                    rust.push_str(definition);
+                }
+                ("FALLBACK_DOUBLE_ADDRESS", EmissionStatus::Skipped { reason }) => {
+                    assert!(reason.message.contains("FallbackDouble"), "{reason:?}");
+                }
+                _ => panic!("unexpected emission: {emission:?}"),
+            }
+        }
+        write!(
+            rust,
+            "mod ffi {{ pub unsafe fn pg_guard_ffi_boundary<T, F: FnOnce() -> T>(call: F) -> T {{ call() }} }}\n\
+             fn main() {{\n\
+             // SAFETY: The function reads only its by-value argument.\n\
+             println!(\"call\\t{{}}\", unsafe {{ {caller}!(2_i32).get() }});\n\
+             }}\n"
+        )
+        .unwrap();
+        let actual = rust_oracle::run_rust_linked(
+            &rust,
+            &profile.compiler.executable,
+            &header(),
+            &generated.support.c_source,
+            &arguments,
+        );
+        let expected = oracle::run_c(
+            &profile.compiler.executable,
+            &header(),
+            &format!(
+                "#include <stdio.h>\nint main(void) {{ printf(\"call\\t%d\\n\", {caller}(2)); }}\n"
+            ),
+            &arguments,
+            true,
+        );
+        assert_eq!(actual, expected, "{caller}");
     }
 }
