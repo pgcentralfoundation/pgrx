@@ -8,7 +8,7 @@ Note that guide is fairly preliminary and does not cover many cases, most notabl
 
 1. This does not (yet) cover cross compiling with `cargo pgrx` (planned). Note that this means this documentation may only be useful to a small set of users.
 
-2. Direct generation needs a C compiler, headers and import libraries for the target. A complete target bundle includes its native inline and macro adapters, plus the optional `cshim` when the producer enabled that feature. Producer and consumer must select the same `cshim` feature.
+2. Generating bindings on the build host needs a Clang driver and `llvm-ar` matching `libclang`, the target's C library headers, and PostgreSQL server headers configured for the target. A complete target bundle needs none of these: it includes its native inline and macro adapters, plus the C shim when the producer enabled the `cshim` feature. Producer and consumer must select the same `cshim` feature.
 
 3. This guide is assuming that you are cross compiling between `x86_64-unknown-linux-gnu` and `aarch64-unknown-linux-gnu` (either direction works).
 
@@ -18,16 +18,205 @@ Note that guide is fairly preliminary and does not cover many cases, most notabl
 
     Other cases are encouraged to investigate Docker, QEMU, and so on -- it's honestly probably the easier path for a lot of cases.
 
-C macro generation inspects the target's PostgreSQL headers with its compiler flags
-and ABI. You can generate this support with a matching target C toolchain, or
-import a complete bundle produced by that toolchain. Raw Rust bindings alone and
-documentation snapshots do not supply the target's macro or native semantics.
+## PostgreSQL headers and metadata for the target
+
+`pgrx-pg-sys` generates its Rust bindings and C macros from PostgreSQL's server
+headers, and compiles a small native support archive for the target. Every
+build does this, and a failure stops the build. A cross build therefore needs:
+
+- server headers configured for the target, from the same PostgreSQL build as
+  the server that will load the extension;
+- PostgreSQL metadata for those headers: the version, CPPFLAGS, CFLAGS, the
+  `--configure` output and the library directory;
+- a Clang driver and `llvm-ar` that match the `libclang` bindgen loads, as
+  described in [Clang, LLVM and system headers](#clang-llvm-and-system-headers).
+
+There are three supported ways to provide the headers and metadata. Raw Rust
+bindings alone and documentation snapshots do not supply the target's macro or
+native semantics.
+
+### Host `pg_config` with target headers
+
+Keep the host installation's `pg_config`, from `cargo pgrx init` or
+`PGRX_PG_CONFIG_PATH`, and name the target's server headers in a variable
+suffixed with Cargo's target triple:
+
+```sh
+export PGRX_INCLUDEDIR_SERVER_PG18_aarch64_unknown_linux_gnu="$HOME/pg-arm64/usr/include/postgresql/18/server"
+cargo build --target aarch64-unknown-linux-gnu --release
+```
+
+The suffix can be spelled as Cargo spells the target,
+`aarch64-unknown-linux-gnu`, or with underscores, which shells can export.
+`env` and Cargo's `[env]` table accept either spelling. pgrx uses the first of
+these variables that is set, trying the hyphenated suffix before the underscored
+one, and otherwise `pg_config --includedir-server`:
+
+1. `PGRX_INCLUDEDIR_SERVER_PG18_<target>`
+2. `PGRX_INCLUDEDIR_SERVER_PG18`
+3. `PGRX_INCLUDEDIR_SERVER_<target>`
+4. `PGRX_INCLUDEDIR_SERVER`
+
+The target-suffixed names apply only to builds for that target, so a host build
+in the same Cargo invocation keeps the host's headers. The selected directory
+also owns the generated macros: pgrx translates the macros defined in that tree.
+
+The host `pg_config` still supplies the version, CPPFLAGS, the `--configure`
+output and the library directory. Its CFLAGS describe the host's server, so when
+Cargo's host and target differ pgrx applies only PostgreSQL's functional flags:
+`-fno-strict-aliasing`, `-fwrapv` and `-fexcess-precision=standard`. The other
+flags, such as `-O2`, `-fcf-protection` or `-mno-omit-leaf-frame-pointer`, are
+host code generation and instruction set options. The build lists them under
+`cflags_dropped` in `OUT_DIR/pg18_macro_report.json`, and `PGRX_MACRO_DEBUG=1`
+prints them. CPPFLAGS still apply in full. If the host and target run different
+distributions, check that host values such as `-D_GNU_SOURCE` or
+`-I/usr/include/libxml2` also suit the target.
+
+pgrx cannot tell a `pg_config` program for the target, run under emulation or
+replicated by a shell script, from a host one. It applies only the functional
+CFLAGS from such a program too. Use the next path to apply a target's full CFLAGS.
+
+### PostgreSQL metadata in the environment
+
+Set `PGRX_PG_CONFIG_AS_ENV=true` and describe the target's installation with
+`PGRX_PG_CONFIG_*` variables. Take the values from `pg_config` on a machine that
+runs the deployed server, except the header directory, which must exist on the
+build host:
+
+| Variable | Value |
+| --- | --- |
+| `PGRX_PG_CONFIG_VERSION` | `pg_config --version`, for example `PostgreSQL 18.1` |
+| `PGRX_PG_CONFIG_INCLUDEDIR-SERVER` | where the target's server headers are on the build host |
+| `PGRX_PG_CONFIG_CPPFLAGS` | `pg_config --cppflags` |
+| `PGRX_PG_CONFIG_CFLAGS` | `pg_config --cflags` |
+| `PGRX_PG_CONFIG_CONFIGURE` | `pg_config --configure`; it must be set, but may be empty |
+| `PGRX_PG_CONFIG_LIBDIR` | `pg_config --libdir` |
+
+pgrx then runs no `pg_config` program and applies every CFLAGS value. Shells
+cannot export `PGRX_PG_CONFIG_INCLUDEDIR-SERVER` because of its hyphen, so set
+the variables with `env`:
+
+```sh
+env PGRX_PG_CONFIG_AS_ENV=true \
+    PGRX_PG_CONFIG_VERSION="PostgreSQL 18.1" \
+    "PGRX_PG_CONFIG_INCLUDEDIR-SERVER=$HOME/pg-arm64/usr/include/postgresql/18/server" \
+    PGRX_PG_CONFIG_CPPFLAGS="$target_cppflags" \
+    PGRX_PG_CONFIG_CFLAGS="$target_cflags" \
+    PGRX_PG_CONFIG_CONFIGURE="$target_configure" \
+    PGRX_PG_CONFIG_LIBDIR=/usr/lib/aarch64-linux-gnu \
+    cargo build --target aarch64-unknown-linux-gnu --release
+```
+
+These variables are not target-scoped. Every build of `pgrx-pg-sys` in that
+Cargo invocation uses them, and the version must match the selected `pgNN`
+feature. Without `PGRX_PG_CONFIG_CFLAGS`, the report records
+`cflags_recorded: false` and the profile lacks PostgreSQL's `-fwrapv`. Generated
+macros then treat signed overflow as undefined, as C does by default, instead of
+wrapping as PostgreSQL's own build does, and can differ from a native build.
+Supply the target's CFLAGS.
+
+### A complete target bundle
+
+A bundle produced on the target machine, or by a cross build that used one of
+the paths above, contains the bindings, the generated macros and the native
+archive. Importing it needs no Clang and no server headers, but still needs the
+target's PostgreSQL configuration. See
+[Import a complete target bundle](#import-a-complete-target-bundle).
+
+### What pgrx verifies
+
+Before generating anything, pgrx compares the server headers with the Clang
+target and refuses headers that do not describe it:
+
+- **Machine.** `PG_VERSION_STR` in `pg_config.h` names the machine configure or
+  meson built for, such as `on x86_64-pc-linux-gnu` or `on aarch64-darwin`. Its
+  architecture, operating system, C library and ARM float ABI must match the
+  Clang target. A machine that pgrx does not recognize is accepted only when the
+  target is the build host itself.
+- **Layout.** One parse with the target compiler compares the sizes, alignments,
+  `MAXIMUM_ALIGNOF`, byte order and 64-bit integer flags recorded in
+  `pg_config.h` with the target, and `PG_MAJORVERSION_NUM` with the selected
+  `pgNN` feature. The error lists every disagreement.
+
+Both checks are needed. x86_64 and aarch64 Linux share every layout fact, so
+x86_64 headers pass the layout check for an aarch64 target and fail the machine
+check. x86_64 headers pass the machine check for the x32 target
+`x86_64-unknown-linux-gnux32` and fail the layout check.
+
+Headers configured for another machine are refused even when every layout fact
+agrees. `pg_config.h` records configure's results for one machine, and other
+headers choose declaration shapes from them. PostgreSQL 15 to 18, built for
+x86_64 with a run-time check for the POPCNT instruction, declare `pg_popcount32`
+in `port/pg_bitutils.h` as a pointer to a function. An aarch64 server exports a
+function of that name instead. Rust bindings generated from the x86_64 headers
+would load that function's first instructions as a pointer and call the result.
+The layout check cannot see this kind of difference, so the machine check is the
+only evidence against it. A refused build reports, for example:
+
+```text
+PostgreSQL headers do not describe the inspected C target: pg_config.h was configured for x86_64-pc-linux-gnu (PG_VERSION_STR), but Clang targets aarch64-unknown-linux-gnu
+```
+
+The error also names the PostgreSQL version, the server header directory, the
+metadata source, and the variables that select target headers, target metadata
+or a bundle.
+
+The checks do not prove that the headers came from the deployed server. These
+remain trusted:
+
+- the minor version and the packaging of the headers;
+- instruction set options the server's build chose within one architecture,
+  such as `USE_SVE_POPCNT_WITH_RUNTIME_CHECK`, which changes how PostgreSQL 18
+  and later declare `pg_popcount_optimized` on aarch64, or the `USE_AVX512_*`
+  options on x86_64;
+- C library feature macros (`HAVE_*`) within one C library family;
+- build options such as `BLCKSZ`, `NAMEDATALEN` and `USE_ASSERT_CHECKING`;
+- the host's CPPFLAGS, when a host `pg_config` supplies the metadata.
+
+Dropping host CFLAGS also means the native support archive is compiled without
+the server's optimization and hardening flags. Take the headers from the same
+PostgreSQL build as the server that will load the extension.
+
+### Clang, LLVM and system headers
+
+The `pgrx-pg-sys` build script runs Clang itself for header inspection and for
+its native support archive, rather than through the `cc` crate.
+
+- **Driver.** Its major version must match `libclang`. pgrx uses `CLANG_PATH`
+  when it is set; otherwise it uses the first match among the `CLANG` recorded
+  by `pg_config --configure`, the `clang` installed with `libclang`, and
+  `clang-<major>` or `clang` on `PATH`.
+- **Target arguments.** pgrx passes `--target=<Cargo target>` unless the
+  arguments already name a target, followed by
+  `BINDGEN_EXTRA_CLANG_ARGS_<target>` or, if that is unset,
+  `BINDGEN_EXTRA_CLANG_ARGS`. The target suffix can be hyphenated or
+  underscored. The same arguments reach bindgen, header inspection, include
+  path detection and native compilation. Use them to name the target's sysroot
+  (`--sysroot=...`), or its headers and GCC installation (`-isystem` and
+  `-ccc-gcc-name`), when Clang cannot find them.
+- **System headers.** pgrx asks the same Clang driver for its system include
+  directories with those target arguments, without their `-I` options, so system
+  headers come from the target's search list rather than the host's.
+- **Archiver.** pgrx uses `llvm-ar` beside the driver, `llvm-ar-<major>` beside
+  a `clang-<major>` driver, or `llvm-ar` beside the driver's resolved path, such
+  as Debian's `/usr/lib/llvm-<major>/bin`. On Debian, install the `llvm-<major>`
+  package that matches `clang-<major>`. Without an LLVM archiver pgrx uses the
+  system `ar`, which may write an archive without a symbol index for another
+  machine's objects. The link can then fail.
+- **`cc` variables.** `CC_<target>`, `AR_<target>`, `CXX_<target>` and
+  `CROSS_COMPILE` do not affect `pgrx-pg-sys`'s native support. Other crates
+  that compile C with the `cc` crate still read them.
+
+The `cshim` feature needs nothing extra. The same Clang compiles the C shim into
+the native support archive with the arguments above.
 
 ## Import a complete target bundle
 
-Build `pgrx-pg-sys` on the target machine, or with the target headers and C
-cross compiler configured below. Use the same pgrx release as the consuming
-extension; development builds must also use the same source revision. Set
+Build `pgrx-pg-sys` on the target machine, or with target headers and the Clang
+toolchain configured as in
+[PostgreSQL headers and metadata for the target](#postgresql-headers-and-metadata-for-the-target).
+Use the same pgrx release as the consuming extension; development builds must
+also use the same source revision. Set
 `PGRX_PG_SYS_EXTRA_TARGET_INFO_PATH` to a dedicated directory for the selected
 PostgreSQL major and Cargo target. For example, on an aarch64 Linux build host:
 
@@ -82,9 +271,9 @@ An additional caveat (one that is unrelated to the document's completeness) is t
 ## Getting PostgreSQL headers for the target
 [getting-headers]: #getting-postgresql-headers-for-the-target
 
-To generate the bindings for `pgrx-pg-sys` we need the PostgreSQL headers. Unfortunately, a few of these headers get generated when Postgres is compiled and contain non-portable information, which means that we can't just use the headers for the version of postgres you have installed. You need to get the server headers from a build PostgreSQL done for the cross-compile target. The version of PostgreSQL *must* match.
+To generate the bindings for `pgrx-pg-sys` we need the PostgreSQL headers. Unfortunately, a few of these headers get generated when Postgres is compiled and contain non-portable information, which means that we can't just use the headers for the version of postgres you have installed. pgrx refuses headers configured for another machine (see [What pgrx verifies](#what-pgrx-verifies)). You need to get the server headers from a build PostgreSQL done for the cross-compile target. The version of PostgreSQL *must* match.
 
-*Caveat: It is _critically important_ that you ensure the headers you get are for the correct version of Postgres. Failure to do so will _probably not_ be detected at build time, and will almost certainly result in an extension that fails _terribly_ at runtime. Do not mess this up!*
+*Caveat: pgrx refuses headers for another major version or another machine, but it cannot detect a different minor version or different configure options. Such a mismatch will _probably not_ be detected at build time, and can result in an extension that fails _terribly_ at runtime. Make sure the headers come from the server you deploy.*
 
 To minimize the chance for compatibility issues: The headers should be produced by a PostgreSQL build as close as possible to the one which will actually use the cross-compiled extension. That means they should be built with the same configuration flags, and ideally for the same Linux distribution (yes, really[^distro]). You probably also need to try to ensure that glibc and linux kernel versions match what you use for the cross-compile toolchain in the next step (an exact match would be ideal, but it is difficult on anything other than Debian).
 
@@ -107,15 +296,11 @@ Anyway, there are a few ways you can go about getting these headers. This is not
 
 3. If you know that you're planning on using Postgres installed from a package repository, you can grab the headers from there. This is a good option if you're cross-compiling an extension on the same version of the same Linux distribution, and intend to use the same package repositories to install Postgres in both cases.
 
-    For example, on Debian something like `apt download postgresql-server-dev-$VERSION:arm64` (note that Debian uses `arm64` for `aarch64` targets, and `amd64` for `x86_64` targets) will produce a `postgresql-server-dev-$VERSION_..._arm64.deb` file in the current working directory, and extracting the headers from it (while out of scope of this guide) is hopefully straightforward. This requires that your distribution package binaries your chosen target architecture (`arm64` in the example above), which is not guaranteed (while Debian itself is quite solid about providing binaries for a several architectures, this is not true for every apt-based distribution).
+    For example, on Debian something like `apt download postgresql-server-dev-$VERSION:arm64` (note that Debian uses `arm64` for `aarch64` targets, and `amd64` for `x86_64` targets) will produce a `postgresql-server-dev-$VERSION_..._arm64.deb` file in the current working directory. `dpkg-deb -x` extracts it, and the headers are under `usr/include/postgresql/$VERSION/server`. This requires that your distribution package binaries your chosen target architecture (`arm64` in the example above), which is not guaranteed (while Debian itself is quite solid about providing binaries for a several architectures, this is not true for every apt-based distribution). [The Debian steps](#the-steps) fetch the package from the PostgreSQL apt repository (PGDG) instead, which needs no foreign architecture configured in apt.
 
     Similarly, the incantation on Fedora is something like `dnf download --forcearch aarch64 postgresql-server-devel`, which puts an a `.rpm` in the current working directory. RPM is somewhat more involved to extract (use `rpm2cpio` and `cpio` in conjunction), but entirely possible. Be very aware about the Postgres version these headers come from, since Fedora (for example) does not seem to have packages for multiple versions of PostgreSQL.
 
 And so on, that should give you ideas.
-
-Some dubious advice: In practice, it's possible that small differences (using a different distro's package, or using PG that was configured slightly differently) will not matter much for your extension. In some cases, it's even possible that using headers which were configured for a different architecture is won't cause issues for you -- it may even be the right choice in some situations (for example, if production builds aren't cross compiled, so the mismatch only exists during development I'd be included to say it's only a problem if it causes one).
-
-That said, you should be well-aware of the risk when deviating from this, and I would try to get it right for anything you're going to use in production.
 
 ## Getting a cross-compilation toolchain
 [get-toolchain]: #getting-a-cross-compilation-toolchain
@@ -151,7 +336,7 @@ And a few other aspects which are less critical (if you get the tools on Debian 
 
 On the steps on Debian-family are as follows:
 
-1. Set up everything you'd need to perform non-cross builds.
+1. Set up everything you'd need to perform non-cross builds, including Clang, LLVM and `libclang` from one LLVM release: `sudo apt install clang llvm libclang-dev`.
 
 2. Install a Rust toolchain for the target:
     - *`target=aarch64`*: `rustup target add aarch64-unknown-linux-gnu`.
@@ -161,28 +346,63 @@ On the steps on Debian-family are as follows:
     - *`target=aarch64`*: `sudo apt install crossbuild-essential-arm64`.
     - *`target=x86_64`*: `sudo apt install crossbuild-essential-amd64`.
 
-4. Set some relevant environment vars:
+4. Install the host's PostgreSQL in the version your servers run, from the [PostgreSQL apt repository (PGDG)](https://wiki.postgresql.org/wiki/Apt), and select its `pg_config`:
+
+    ```sh
+    sudo apt install postgresql-18 postgresql-server-dev-18
+    cargo pgrx init --pg18 /usr/lib/postgresql/18/bin/pg_config
+    ```
+
+    Setting `PGRX_PG_CONFIG_PATH=/usr/lib/postgresql/18/bin/pg_config` instead of running `cargo pgrx init` also works.
+
+5. Fetch the target's `postgresql-server-dev` package from PGDG and extract it. This reads PGDG's package index for the target architecture directly, so apt needs no foreign architecture. Use the package version of the server that will load the extension; this example uses the version installed on the build host:
+
+    ```sh
+    pg=18
+    arch=arm64    # Debian's name for aarch64; use amd64 for x86_64
+    version="$(dpkg-query -W -f='${Version}' "postgresql-server-dev-$pg")"
+    repo=https://apt.postgresql.org/pub/repos/apt
+    index="$repo/dists/$(lsb_release -cs)-pgdg/main/binary-$arch/Packages.gz"
+    deb="$(curl -fsSL "$index" | gunzip | awk -v p="postgresql-server-dev-$pg" -v v="$version" '
+        $1 == "Package:" { name = $2 }
+        $1 == "Version:" { ver = $2 }
+        $1 == "Filename:" && name == p && ver == v { print $2; exit }')"
+    if [ -n "$deb" ]; then
+        curl -fsSL -o "/tmp/postgresql-server-dev-$pg-$arch.deb" "$repo/$deb" &&
+            dpkg-deb -x "/tmp/postgresql-server-dev-$pg-$arch.deb" "$HOME/pg-$arch"
+    else
+        echo "$index lists no postgresql-server-dev-$pg $version"
+    fi
+    ```
+
+    The headers are then in `$HOME/pg-arm64/usr/include/postgresql/18/server`. The index lists only current versions; PGDG keeps older ones in its archive repository, `apt-archive.postgresql.org`. Beta versions are published in a component named after the major version, the `19` in `deb https://apt.postgresql.org/pub/repos/apt noble-pgdg main 19`, so replace `main` in the index URL with that component.
+
+6. Set some relevant environment vars:
     - *`target=aarch64`*: `export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc`.
     - *`target=x86_64 `*: `export CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER=x86_64-linux-gnu-gcc`.
 
     Note: It's also possible to set these in your `.cargo/config.toml`, but note that they're distribution-specific (and on other distros, potentially machine-specific), so I would recommend against checking them into version control.
     ```toml
     # Replace `<arch>` with the target arch.
-    [target.<arch>-linux-gnu-gcc]
+    [target.<arch>-unknown-linux-gnu]
     linker = "<arch>-linux-gnu-gcc"
     ```
 
-5. Build your extension.
+    Point Clang at the target's C library headers. `-isystem` adds the headers that `crossbuild-essential-<arch>` installs, and `-ccc-gcc-name` names the cross GCC for the Clang driver. pgrx passes these arguments to bindgen, header inspection, include path detection and native compilation:
+    - *`target=aarch64`*: `export BINDGEN_EXTRA_CLANG_ARGS_aarch64_unknown_linux_gnu="--target=aarch64-unknown-linux-gnu -isystem /usr/aarch64-linux-gnu/include/ -ccc-gcc-name aarch64-linux-gnu-gcc"`.
+    - *`target=x86_64`*: `export BINDGEN_EXTRA_CLANG_ARGS_x86_64_unknown_linux_gnu="--target=x86_64-unknown-linux-gnu -isystem /usr/x86_64-linux-gnu/include/ -ccc-gcc-name x86_64-linux-gnu-gcc"`.
+
+    Select the target's server headers from step 5:
+    - *`target=aarch64`*: `export PGRX_INCLUDEDIR_SERVER_PG18_aarch64_unknown_linux_gnu="$HOME/pg-arm64/usr/include/postgresql/18/server"`.
+    - *`target=x86_64`*: `export PGRX_INCLUDEDIR_SERVER_PG18_x86_64_unknown_linux_gnu="$HOME/pg-amd64/usr/include/postgresql/18/server"`.
+
+7. Build your extension.
     - *`target=aarch64`*: `cargo build --target=aarch64-unknown-linux-gnu --release`.
     - *`target=x86_64 `*: `cargo build --target=x86_64-unknown-linux-gnu --release`.
 
 This will produce a `.so` in `./target/<target>/release/lib$yourext.so`, which you can use.
 
-> *TODO: this seems like it is not quite complete -- we may need things like this (when targeting `aarch64` from `x86_64`)? Needs some slightly further investigation for _why_, though, since most of this should be auto-detected (notably the target and isystem paths...)*
->
-> ```sh
-> export BINDGEN_EXTRA_CLANG_ARGS_aarch64-unknown-linux-gnu="-target aarch64-unknown-linux-gnu -isystem /usr/aarch64-linux-gnu/include/ -ccc-gcc-name aarch64-linux-gnu-gcc"
-> ```
+If the build stops because the headers do not describe the target, check that `PGRX_INCLUDEDIR_SERVER_PG18_<target>` names the extracted headers and that they came from the target architecture's package.
 
 # Other Distributions
 
@@ -231,15 +451,16 @@ Anyway, set
 
 - `CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=$toolchain_dir/bin/aarch64-linux-gnu-gcc`
 - `BINDGEN_EXTRA_CLANG_ARGS_aarch64-unknown-linux-gnu=--sysroot=\"$sysroot_dir\"`
+- `PGRX_INCLUDEDIR_SERVER_PG18_aarch64-unknown-linux-gnu` to the target's server headers, for example ones extracted from the target's `postgresql-server-devel` package (see [Getting PostgreSQL headers for the target](#getting-postgresql-headers-for-the-target))
 
-You may also need:
+Shells can export these with underscores in the target name instead, such as `BINDGEN_EXTRA_CLANG_ARGS_aarch64_unknown_linux_gnu`. The header override goes with a host `pg_config` of the same PostgreSQL major, from `cargo pgrx init` or `PGRX_PG_CONFIG_PATH`; alternatively, describe the target as in [PostgreSQL metadata in the environment](#postgresql-metadata-in-the-environment).
+
+The toolchain supplies the linker and sysroot. `pgrx-pg-sys` also needs Clang, `llvm-ar` and `libclang` from one LLVM release, installed on the build host: it inspects the headers and compiles its native support archive, including the C shim when the `cshim` feature is enabled, with that Clang. pgrx adds `--target=aarch64-unknown-linux-gnu`, and the `--sysroot` above makes Clang use the toolchain's C library headers. See [Clang, LLVM and system headers](#clang-llvm-and-system-headers).
+
+Other crates in your build that compile C or C++ with the `cc` crate may also need these; `pgrx-pg-sys`'s native support does not use them:
 - `CC_aarch64_unknown_linux_gnu=$toolchain_dir/bin/aarch64-linux-gnu-gcc`
 - `AR_aarch64_unknown_linux_gnu=$toolchain_dir/bin/aarch64-linux-gnu-ar`
 - `CXX_aarch64_unknown_linux_gnu=$toolchain_dir/bin/aarch64-linux-gnu-g++`
 - `LD_aarch64_unknown_linux_gnu=$toolchain_dir/bin/aarch64-linux-gnu-ld`
 
-And sometimes you may need to add `$toolchain_dir/bin` to path and set `CROSS_COMPILE=aarch64-linux-gnu-` can help. Sadly, this can break things depending on what's in your toolchain's path, or if you have a tool which doesn't check if it's actually a cross-compile before looking at the `CROSS_COMPILE` var.
-
-TODO(thom): that's sometimes enough to complete a build but this is very WIP.
-
-TODO(thom): flags to make the cshim build.
+For those crates, adding `$toolchain_dir/bin` to `PATH` and setting `CROSS_COMPILE=aarch64-linux-gnu-` can sometimes help. Sadly, this can break things depending on what's in your toolchain's path, or if you have a tool which doesn't check if it's actually a cross-compile before looking at the `CROSS_COMPILE` var.

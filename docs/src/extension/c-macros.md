@@ -505,7 +505,7 @@ The checked-in `pgrx-pg-sys/src/include/cmacros/` files are documentation snapsh
 made with the release-generation installation and target. Their source includes
 target guards; they may describe a different platform from your computer. Use
 your build's `OUT_DIR` bindings, macros, and report when
-checking actual platform values or diagnosing an unavailable macro.
+checking actual platform values or diagnosing a missing macro.
 
 ## Understand refusals and runtime limits
 
@@ -516,10 +516,15 @@ signedness and byte order. This includes unsigned-char Linux AArch64 and
 Windows. The compiler proves integer ranks, alignment, and relevant native
 calling conventions separately; an unmodeled ABI option still causes a refusal.
 
-Binding generation continues if macro inspection or native compilation is
-unavailable. `PGRX_C_MACROS=0` explicitly disables generation. Macro availability
-also varies with version and headers; use the public availability wrapper to
-include optional items before Rust resolves missing macro names:
+Every `pgrx-pg-sys` build generates its C macros unless it imports a complete
+target bundle. If Clang cannot be found, the headers do not describe the target,
+inspection fails, or the native support archive does not compile, the build
+stops. The error names the PostgreSQL version, the target, the server headers,
+the source of the PostgreSQL metadata and the cause.
+
+Individual macros can still be skipped, and the set of macros varies with the
+PostgreSQL version and headers. Use the public availability wrapper to compile
+an item only when its macro exists, before Rust resolves the macro name:
 
 ```rust
 pgrx::if_c_macro! { CHECK_FOR_INTERRUPTS {
@@ -533,25 +538,44 @@ pgrx::if_c_macro! { CHECK_FOR_INTERRUPTS {
 }}
 ```
 
-Direct generation needs a GNU-style Clang executable compatible with the loaded
-`libclang`; the same inspected profile compiles native accessors and inline
-wrappers. Windows/MSVC additionally needs LLVM's `llvm-lib` or `llvm-ar --format=coff` and the target's
-headers and libraries. Unix uses an adjacent `llvm-ar` or a compatible local
-`ar`.
+Generation needs a GNU-style Clang driver whose major version matches the loaded
+`libclang`, and the target's C library headers. The same inspected profile
+compiles native accessors, inline wrappers and, with the `cshim` feature, the C
+shim into one archive. The archiver comes from the driver's LLVM release:
+`llvm-ar` beside the driver, `llvm-ar-<major>` beside a `clang-<major>` driver,
+or `llvm-ar` beside the driver's resolved path, such as Debian's
+`/usr/lib/llvm-<major>/bin`. Windows targets prefer an adjacent `llvm-lib` and
+otherwise use `llvm-ar --format=coff`. Without an LLVM archiver, other targets
+use the system `ar`, which may not index objects built for another machine.
 
-The CLI and optional binding-build inspection decode recorded CFLAGS before
-CPPFLAGS; ordinary bindgen retains its established CPPFLAGS invocation. GNU
+The CLI and the binding build decode recorded CFLAGS before CPPFLAGS; ordinary
+bindgen retains its established CPPFLAGS invocation. GNU
 flags retain shell quoting; MSVC flags preserve Windows quoting and
 backslashes and translate only known options. Unknown semantic options fail.
 Stock MSVC `pg_config` may report `not recorded`; that exact value contributes
 no flags. The inspected profile then describes the installed headers and
 explicit binding arguments, without recovering absent server build settings.
 
-Cross builds can import a
+Before generating anything, pgrx checks that the server headers were configured
+for the Clang target. The machine named in `PG_VERSION_STR` must match the
+target's architecture, operating system, C library and ARM float ABI, and the
+sizes, alignments, byte order and major version in `pg_config.h` must match the
+target compiler and the selected `pgNN` feature. Headers configured for another
+machine are refused, even when every layout fact agrees: x86_64 and aarch64
+Linux headers declare some PostgreSQL symbols with different shapes.
+
+A cross build therefore needs server headers configured for the target. Select
+them with `PGRX_INCLUDEDIR_SERVER_PGNN_<target>` and keep the host's `pg_config`,
+describe the target with `PGRX_PG_CONFIG_AS_ENV`, or import a
 [complete target bundle](build/cross-compile.md#import-a-complete-target-bundle)
-through `PGRX_TARGET_INFO_PATH_PGNN`. Raw bindings alone and checked-in
-documentation snapshots cannot substitute for the target's inspected macro and
-native support.
+through `PGRX_TARGET_INFO_PATH_PGNN`. When Cargo's host and target differ, a
+`pg_config` program contributes only PostgreSQL's functional CFLAGS
+(`-fno-strict-aliasing`, `-fwrapv` and `-fexcess-precision=standard`); the report
+lists the rest under `cflags_dropped`. See
+[the cross-compilation guide](build/cross-compile.md#postgresql-headers-and-metadata-for-the-target)
+for each path, the checks, and what remains trusted. Raw bindings alone and
+checked-in documentation snapshots cannot substitute for the target's inspected
+macro and native support.
 
 Unsupported grammar, unproved types or access rules, preprocessing constructs,
 and exhausted bounds produce skips rather than guessed code. If bindgen and

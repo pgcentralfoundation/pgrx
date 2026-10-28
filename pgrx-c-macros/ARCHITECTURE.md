@@ -185,6 +185,8 @@ cannot become ordinary scalars just because canonicalization erased the attribut
 positional version after a CLI subcommand accepts forms such as `pg18` and `18`.
 Configuration includes `PGRX_HOME/config.toml` and the `PGRX_PG_CONFIG_PATH`
 override. `pg_config` supplies the server include root and recorded C arguments.
+A binding generator that includes a different server tree, such as a target's
+headers, moves macro ownership to it with `PostgresConfig::with_server_include_dir`.
 The default input is the corresponding canonical pgrx wrapper, embedded in the
 crate and materialized under PGRX_HOME independently of the source checkout.
 Optional caller arguments follow the recorded settings; their order matters.
@@ -1333,10 +1335,10 @@ translation unit:
 Some PostgreSQL implementation headers define external functions and have no
 include guard. Two objects, or a second header inclusion in one object, can
 redefine them. Combining the sources preserves shared external function/global
-identity without renaming those definitions. The build returns whether cshim was
-integrated. Without cshim, the same active version archive still contains native
-inline wrappers, required primitives and metadata. Do not infer integration from
-an old file's existence.
+identity without renaming those definitions. The `cshim` feature adds the shim
+to that translation unit, which is the only place it is compiled. Without cshim,
+the same active version archive still contains native inline wrappers, required
+primitives and metadata.
 
 ## 14. Dependency failures and reports
 
@@ -1390,8 +1392,7 @@ do not force clients to classify English message fragments.
 A candidate is not a success. `MacroEmission::status` is either emitted source
 with its contract or a skip. Shared adapter failures or incoherent compiler
 inputs can fail the library generation call as a whole before a new report is
-returned. The optional binding-build integration records such failures as
-unavailable macro support and publishes its availability classifier. Every
+returned. The binding build turns such a failure into a build error. Every
 completed generation writes its JSON report. Cargo warnings are an independent
 output policy: unset or
 `PGRX_MACRO_DEBUG=0` keeps macro-generation diagnostics quiet, while exactly
@@ -1408,8 +1409,9 @@ CLI commands retain their own requested output and stderr diagnostics.
 
 `pgrx-bindgen/src/build.rs` orchestrates the production path:
 
-1. Resolve configurations and active Cargo major.
-2. Inspect optional macros with recorded CFLAGS plus the established binding
+1. Resolve configurations, the active Cargo major and the server header root;
+   scope a host `pg_config`'s CFLAGS for cross builds.
+2. Inspect macros with the recorded CFLAGS plus the established binding
    target, CPPFLAGS, include settings and environment overrides, and verify
    that the server configuration describes that target.
 3. Select PostgreSQL function macros, owned variable-dependent object roots and
@@ -1427,38 +1429,45 @@ CLI commands retain their own requested output and stderr diagnostics.
 7. Call `generate_with_bindings`; append shared Rust support and independently
    proved immutable C metadata bridges.
 8. Compile native static-inline wrappers, required macro primitives and metadata
-   for the active major, integrating optional cshim, then verify inputs again.
+   for the active major, with the C shim when `cshim` is enabled, then verify
+   inputs again.
 9. Apply the existing foreign-function guards and binding rewrites, render the
    macro tree, reports, bindings, and OIDs, and publish fresh artifacts.
 
-If an optional step fails, keep already generated ordinary bindings (or generate
-them with the established invocation), write an unavailable macro report and
-classifier, and compile the ordinary C shim when enabled. No native macro
-linkage is published on that path. Unsupported target families and
-`PGRX_C_MACROS=0` skip inspection altogether. Compiler inspection is still
-required for a successful macro artifact; fallback never guesses C semantics.
-Cargo caches the unavailable result like any other build-script output, so a
-refusal needs the same invalidation as a generated tree. Once compiler lookup
-examines a candidate, an inspection failure, including a failed lookup, is
-`FrontendError::WithInputs` unless the lookup's own inputs cannot be recorded.
-It carries the lookup's candidates, directories and environment, or the
-profile's complete inputs once inspection has recorded them, and the build
-tracks them before publishing the refusal. A successful inspection's inputs are
-tracked before the later optional phases run, so a refusal from those phases is
-invalidated by the same changes as a generated tree.
+Every step is required for each generated version. A failure at any step,
+including compiler lookup, configuration verification, an unsupported runtime
+profile, the pg-sys integer bridges and native compilation, is a build error.
+In steps 2 to 8, its context names the PostgreSQL major, the Cargo target, the
+server header root and the metadata source (a `pg_config` path or
+`PGRX_PG_CONFIG_AS_ENV`). A configuration refusal also names the variables that
+supply target headers, target metadata or a complete bundle. A failure in steps
+1 to 8 publishes no macro tree, report or native linkage for that version, and
+nothing guesses C semantics in its place. Per-macro skips are not failures;
+they remain in the report.
 
-The following refusals carry no inputs. Only the build's fixed environment and
-file directives invalidate them. Correcting a cause those directives do not
-cover, such as `CPATH`, leaves the refusal cached until a tracked input changes
-or `cargo clean -p pgrx-pg-sys` runs.
+The build tracks a successful inspection's inputs immediately after inspection,
+so later phases and later builds are invalidated by the same changes as the
+generated tree. It does not track the inputs of a failed inspection, because
+Cargo always reruns a build script that failed. Once compiler lookup has examined
+a candidate, the library still reports a failure as `FrontendError::WithInputs`,
+with the lookup's candidates, directories and environment or the profile's
+complete inputs, for callers that cache refusals.
 
-- Refusals raised before the lookup, such as rejected arguments or an
-  unloadable or unrecognized libclang.
-- Failures while recording the lookup's own inputs: a recorded compiler
-  environment variable such as `CPATH` that is not UTF-8, a working directory
-  that cannot be determined, or a lookup candidate that cannot be examined or
-  changes while it is fingerprinted.
-- Failures while recording PostgreSQL configuration inputs after inspection.
+The server header root is the value of `PGRX_INCLUDEDIR_SERVER` or one of its
+version- and target-specific variants when set, and otherwise
+`pg_config --includedir-server`. It supplies bindgen's allowlist and include
+path, and `PostgresConfig::with_server_include_dir` makes it the owner of
+generated macros, objects and inline functions. A `pg_config` program reports
+the flags of the server built for its own machine. When the metadata comes from
+such a program and Cargo's `HOST` and `TARGET` differ, only PostgreSQL's
+functional CFLAGS (`-fno-strict-aliasing`, `-fwrapv` and
+`-fexcess-precision=standard`) reach the macro profile, in recorded order. The
+report lists the others under `cflags_dropped`. Native builds and
+`PGRX_PG_CONFIG_AS_ENV` metadata keep every recorded flag. System include
+directories come from the inspected Clang driver queried with the target
+arguments, so a cross build searches the target's directories rather than the
+host's. Either way, the verification in section 5 decides whether the headers
+describe the target.
 
 The loaded libclang wrapper permits one live runtime owner in a process. The
 build serializes scanner/bindgen inspection around that ownership constraint,
@@ -1595,10 +1604,8 @@ contains OUT_DIR. The environment values that named such a candidate remain
 tracked instead. An absent include search directory is still tracked through
 its nearest existing ancestor.
 
-Unavailable inspection paths produce an explicit unavailable report and a
-compilable macro index whose classifier answers every availability query as absent.
-Every normal artifact also includes the classifier, even when every candidate was
-skipped or the successful macros take no value operands. Operand adapters are
+Every artifact includes the availability classifier, even when every candidate
+was skipped or the successful macros take no value operands. Operand adapters are
 retained only when successful macros need them; availability needs no C ABI facts.
 The discovery library's ability to inspect some targets does not imply that the
 current runtime supports their ABI. The runtime gate checks the integer table,
@@ -1621,7 +1628,7 @@ defines the macro profile, and the audit report records `cflags_recorded: false`
 Real subprocess errors and malformed flags are errors, not absent metadata.
 Windows recorded flags use Microsoft quote/backslash rules and a bounded MSVC
 option translation; Unix flags use shell quoting. Ordinary bindgen retains its
-established CPPFLAGS invocation independently of this optional inspection.
+established CPPFLAGS invocation independently of macro inspection.
 
 ### Complete cross-target artifacts
 
@@ -1664,13 +1671,15 @@ generate(version, extra_arguments):
         publish_with_existing_binding_guards(raw, macros)
         link_verified_archive_if_active(native)
         return
-    arguments = recorded_arguments_then_overrides(installation, extra_arguments)
+    server_root = include_override_or_installation_root(installation, version, target)
+    cflags = recorded_cflags_scoped_to_target(installation, host, target)
+    arguments = cflags_then_cppflags_then_overrides(installation, cflags, server_root, extra_arguments)
     frontend = inspect_matching_driver_and_libclang(wrapper(version), arguments)
     verify_server_configuration_describes_target(frontend, version)
     track_cargo_inputs(frontend.inputs)
-    macros = final_active_postgres_function_macro_names(frontend)
-    objects = owned_variable_dependent_object_roots(frontend)
-    inlines = owned_compiler_proven_static_inline_names(frontend)
+    macros = final_active_postgres_function_macro_names(frontend, server_root)
+    objects = owned_variable_dependent_object_roots(frontend, server_root)
+    inlines = owned_compiler_proven_static_inline_names(frontend, server_root)
     session = prepare_with_inline_functions(frontend, macros, objects, inlines)
     names = union_of_prepared_root_names_with_active_macro_precedence(session)
 
@@ -1699,7 +1708,7 @@ generate(version, extra_arguments):
     support.rust += metadata.rust
     support.c_source += metadata.c_source
     if active_major(version):
-        compile_fresh_archive_with_inline_wrappers_and_optional_cshim(frontend, support)
+        compile_fresh_archive_with_inline_wrappers_and_enabled_cshim(frontend, support)
     verify_session_inputs_again(session)
     files = organize_by_header_provenance(support.rust, emissions)
     final_rust = apply_existing_guards_and_binding_rewrites(fresh_rust)
@@ -1709,8 +1718,8 @@ generate(version, extra_arguments):
     export_complete_target_bundle_if_requested(fresh_rust, files, record, native)
 ```
 
-The real build also has the optional unavailable paths described above,
-per-macro refusals, coherent bundle imports and stable writes. The core
+The real build also has the failure contexts described above, per-macro
+refusals, coherent bundle imports and stable writes. The core
 library can inspect an arbitrary C wrapper, analyze selected roots, or
 emit standalone macros without pgrx integration. `emit_support_with_bindings`
 must return an error if native C support is required; callers that need it use
@@ -1923,17 +1932,29 @@ For commands, user-facing invocation details, and the library's public surface,
 also read the [crate README](README.md) and item documentation. The algorithms
 and phase contracts above explain why those APIs are ordered as they are.
 
-## Optional integration and stable identities
+## Integration and stable identities
 
 Ordinary bindgen generation uses pgrx's existing CPPFLAGS, target includes, and
 bindgen environment arguments independently of macro generation. The macro
 frontend additionally observes the installation's recorded CFLAGS, and checks
 its C declarations against that fresh binding catalog. Rust type storage is
-never repaired to make an incompatible C profile appear supported. Failed
-inspection or native compilation publishes an unavailable report and classifier,
-with no macro definitions or native linkage. `PGRX_C_MACROS=0` skips this optional
-work; `PGRX_MACRO_DEBUG=1` enables its Cargo diagnostics. Cross builds require
-target PostgreSQL metadata, rather than importing the host's recorded CFLAGS.
+never repaired to make an incompatible C profile appear supported. Generation
+is required: failed inspection, verification or native compilation fails the
+build with no macro definitions or native linkage. `PGRX_MACRO_DEBUG=1` enables
+its Cargo diagnostics.
+
+Cross builds need server headers configured for the target. The configuration
+check in section 5 refuses headers whose `PG_VERSION_STR` names another machine
+or whose `pg_config.h` layout facts disagree with the target compiler. A host
+`pg_config` still supplies the version, CPPFLAGS, the configure output and the
+library directory, but only PostgreSQL's functional CFLAGS; target-specific
+`PGRX_INCLUDEDIR_SERVER` variables select the target headers. Metadata in
+`PGRX_PG_CONFIG_AS_ENV` describes the target directly and keeps every CFLAGS
+value. The checks cannot see ISA options the server's build chose within one
+architecture, such as SVE or AVX-512 popcount dispatch, libc feature macros
+within one C library family, build options such as `BLCKSZ`, or host CPPFLAGS
+that still apply in a cross build. Those remain trusted, so the headers must
+come from the deployed server's build.
 
 Input content fingerprints determine when compiler facts expire. Generated
 helper names instead hash semantic target representations, callable signatures,

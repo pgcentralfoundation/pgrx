@@ -220,10 +220,11 @@ Generate release snapshots alongside matching PostgreSQL bindings on the
 selected release target. Their values and layouts describe that target, not the
 build host of a later user.
 
-Ordinary bindgen and the fallback C shim retain their established target,
-CPPFLAGS and include settings. Optional macro inspection additionally observes
-recorded CFLAGS before CPPFLAGS, with bindgen's environment overrides at the
-end, and reconciles those C facts with the fresh bindings' actual storage.
+Ordinary bindgen retains its established target, CPPFLAGS and include settings.
+Macro inspection additionally observes recorded CFLAGS before CPPFLAGS, with
+bindgen's environment overrides at the end, and reconciles those C facts with
+the fresh bindings' actual storage. The native support archive, including the C
+shim when the `cshim` feature is enabled, is compiled with that inspected profile.
 Successful macros require unchanged compiler/header inputs around binding
 and native generation. Cargo tracks consumed headers, search directories,
 configuration, compiler/library files and relevant environment values. Compiler
@@ -244,9 +245,8 @@ storage bridge preserves its bytes. Raw `i8` and `u8` inputs retain the separate
 signed-char and unsigned-char identities, so a plain-char operand requires an
 explicit `CValue<CChar>` or `Pointer<CChar, _>` tag.
 Recorded MSVC flags use Windows quoting and explicit Clang translations; unknown
-options fail rather than disappearing. Optional inspection or native-generation
-failures record unavailable macros; unsupported individual macros retain
-structured skips.
+options fail rather than disappearing. Inspection or native-generation failures
+stop the binding build; unsupported individual macros retain structured skips.
 The decoder retains runtime choices until `lower_msvc_runtime_flags` sees the
 combined flags: the last `/MD[d]` or `/MT[d]` choice determines the runtime
 predefines and native COFF library directives. User define/undefine overrides
@@ -285,9 +285,9 @@ Unset the variable or set `PGRX_MACRO_DEBUG=0` for normal quiet builds; only the
 exact value `1` enables these warnings. Cargo tracks the variable, so changing it
 reruns the binding build. Every completed generation writes
 `pgN_macro_report.json` in `OUT_DIR`, retaining skip reasons and available
-compiler facts regardless of the switch. Ordinary binding errors still fail
-the build; optional inspection or native-generation failures record unavailable
-macros without publishing guessed code or linkage. This switch
+compiler facts regardless of the switch. Binding, inspection, configuration
+and native-generation errors fail the build without publishing guessed code or
+linkage, and a failed generation writes no new report. This switch
 controls the binding build's diagnostics; explicit CLI `analyze` and `emit`
 commands continue to print their requested output and skip reasons.
 
@@ -674,27 +674,60 @@ Tests wrapped in `if_c_macro!` or the classifier's availability arm disappear
 when their macro is not emitted. The `pgrx-pg-sys` `macro_availability` test
 therefore requires each name gated in `pgrx-pg-sys/tests` and
 `pgrx-unit-tests/src/tests` to be emitted, apart from the version and
-assertion-profile differences it lists. It also fails on an unavailable macro
-report unless `PGRX_C_MACROS=0` disabled generation.
+assertion-profile differences it lists. Its report must also record a completed
+generation.
 
-## Optional generation in extension builds
+## Generation in extension builds
 
-`pgrx-pg-sys` generates ordinary bindings independently of macro inspection.
-A missing matching Clang driver, refused profile, or failed native support build
-produces an unavailable macro report and an empty availability map, while
-ordinary binding generation continues. Set `PGRX_C_MACROS=0` to disable this
-optional work. `PGRX_MACRO_DEBUG=1` enables refusal warnings; normal builds stay
-quiet. The CLI inspection and analysis commands still report their own errors.
+`pgrx-pg-sys` cannot compile without its generated macros, so every build of the
+active `pgNN` feature generates them. A missing matching Clang driver, server
+headers configured for another machine, a refused profile or a failed native
+support build stops the build. The error names the PostgreSQL version, the
+Cargo target, the server headers, the source of the PostgreSQL metadata (a
+`pg_config` path or `PGRX_PG_CONFIG_AS_ENV`) and the cause. Unsupported
+individual macros remain structured skips in the report. `PGRX_MACRO_DEBUG=1`
+prints the generation summary and each skip; normal builds stay quiet. docs.rs
+builds skip generation and use the shipped snapshots, and a complete target
+bundle imported through `PGRX_TARGET_INFO_PATH_PGNN` supplies its verified
+generated files instead.
+
+`PostgresConfig::inspect` and `inspect_with_arguments` check that the server
+headers describe the inspected target, so the binding build and the CLI refuse
+the same headers. When the headers define `PG_VERSION_NUM`, the machine named in
+`PG_VERSION_STR` must match Clang's architecture, OS, C library and ARM float
+ABI. An unrecognized machine is accepted only when the target is the
+generator's own host. One libclang parse then compares the `pg_config.h` sizes,
+member-offset alignments, `MAXIMUM_ALIGNOF`, byte order, 64-bit integer flags
+and major version with the target compiler, and reports every disagreement. A
+refusal is `PostgresError::TargetConfiguration`, which wraps a
+`ConfigurationError`. The binding build adds a remedy naming
+`PGRX_INCLUDEDIR_SERVER_PGNN_<target>`, `PGRX_PG_CONFIG_AS_ENV` and
+`PGRX_TARGET_INFO_PATH_PGNN`.
+
+The binding build takes the server header root from `PGRX_INCLUDEDIR_SERVER`
+and its version- and target-specific variants when one is set, and otherwise
+from `pg_config --includedir-server`. That root selects bindgen's allowlist and,
+through `PostgresConfig::with_server_include_dir`, owns the generated macros.
+
+A `pg_config` program describes the machine it runs on. When Cargo's `HOST` and
+`TARGET` differ, the binding build therefore applies only PostgreSQL's
+functional CFLAGS from it: `-fno-strict-aliasing`, `-fwrapv` and
+`-fexcess-precision=standard`, in recorded order. The report lists the other
+recorded flags under `cflags_dropped`, and the `PGRX_MACRO_DEBUG=1` summary
+prints them. Native builds and `PGRX_PG_CONFIG_AS_ENV` metadata apply every
+recorded flag, as does the CLI.
 
 The runtime checks the selected compiler's LP64, LLP64, or ILP32 representation,
 including plain-char signedness, C long width, and the distinct ranks of `size_t`
 and pointer differences. This includes unsigned-char Linux AArch64 and Windows
-LLP64; both byte orders are admitted when the C and Rust target agree. Cross
-compilation needs target PostgreSQL metadata through `PGRX_PG_CONFIG_AS_ENV`;
-a host installation's CFLAGS are not target evidence.
+LLP64; both byte orders are admitted when the C and Rust target agree. See the
+[cross-compilation guide](../docs/src/extension/build/cross-compile.md#postgresql-headers-and-metadata-for-the-target)
+for supplying target headers and metadata.
 
-Some installations do not record historical CFLAGS. In that case, the selected
-headers, target, and current compiler invocation define the macro profile. The
-build report records `cflags_recorded: false`; it does not infer the server's
-unrecorded build options. Recorded flags use the host platform's quoting rules,
-with reviewed MSVC options translated to equivalent Clang options on Windows.
+Some installations do not record historical CFLAGS, and `PGRX_PG_CONFIG_AS_ENV`
+metadata may omit `PGRX_PG_CONFIG_CFLAGS`. In that case, the selected headers,
+target, and current compiler invocation define the macro profile. The build
+report records `cflags_recorded: false`; it does not infer the server's
+unrecorded build options, including `-fwrapv`. Recorded flags use the host
+platform's quoting rules, with reviewed MSVC options translated to equivalent
+Clang options on Windows.

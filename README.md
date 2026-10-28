@@ -81,9 +81,11 @@ It is currently expected to work on other "Unix" OS with possible small changes,
 
 The generated C macro runtime admits compiler-verified LP64, LLP64, and ILP32
 profiles with either byte order, subject to a recognized Rust architecture, OS,
-and ABI guard. Cross builds can inspect matching target headers or import a
-complete target bundle with its generated macro and native support. See
+and ABI guard. See
 [target limits](docs/src/extension/c-macros.md#understand-refusals-and-runtime-limits).
+A cross build needs PostgreSQL server headers configured for the target, or a
+complete target bundle; pgrx refuses headers configured for another machine. See
+[Cross-compiling](#cross-compiling).
 
 Plain C `char` follows the inspected compiler's signedness, independently of
 Rust's native `core::ffi::c_char` alias. Generated bridges verify its one-byte
@@ -93,14 +95,16 @@ identities.
 
 - A Rust toolchain: `rustc`, `cargo`, and `rustfmt`. The recommended way to get these is from https://rustup.rs †
 - `git`
-- `libclang` 11 or greater (for bindgen)
-   - Debian-likes: `apt install libclang-dev` or `apt install clang`
-   - RHEL-likes: `yum install clang`
+- `libclang` 11 or greater, plus a `clang` driver and LLVM archiver from the same LLVM release
+   - Debian-likes: `apt install clang llvm libclang-dev`
+   - RHEL-likes: `yum install clang llvm`
    - Windows: download installers from https://github.com/llvm/llvm-project/releases
+   - `pgrx-pg-sys` uses the driver to check the C macro profile against the PostgreSQL headers and to compile its native support archive, including the `cshim` feature. Its major version must match `libclang`. pgrx uses `CLANG_PATH` when it is set; otherwise it uses the first match among the `CLANG` recorded by `pg_config --configure`, the `clang` installed with `libclang`, and `clang-<major>` or `clang` on `PATH`.
+   - The archiver is the `llvm-ar` that belongs to that driver, or `llvm-lib` for Windows targets. pgrx also finds Debian's `llvm-ar-<major>` and `/usr/lib/llvm-<major>/bin/llvm-ar`. Without one, builds for Unix targets use the system `ar`, which works for native builds but may not index objects built for another target.
+   - A failure to generate the C macros stops the build with an error that names the cause.
 - C compiler
-   - Linux and macOS: the generator's SHA-256 backend needs a host C compiler; optional C macro generation additionally needs a Clang executable compatible with the loaded `libclang`; ordinary bindings still build if macro inspection is unavailable, and `PGRX_C_MACROS=0` disables it explicitly; the `cshim` feature needs a target C compiler
-   - Windows: MSVC or Clang
-   - Generated macro native support: a compatible GNU-style Clang driver and target headers/libraries; Unix uses adjacent `llvm-ar` or a compatible local `ar`, while Windows/MSVC uses LLVM's `llvm-lib` or `llvm-ar --format=coff`
+   - Linux and macOS: a host C compiler, which builds the generator's SHA-256 backend
+   - Windows: MSVC, which Rust's MSVC targets need for linking
 - [PostgreSQL's build dependencies](https://wiki.postgresql.org/wiki/Compile_and_Install_from_source_code) ‡
    - Debian-likes: `sudo apt-get install build-essential libreadline-dev zlib1g-dev flex bison libxml2-dev libxslt-dev libssl-dev libxml2-utils xsltproc ccache pkg-config`
    - RHEL-likes: `sudo yum install -y bison-devel readline-devel zlib-devel openssl-devel wget ccache && sudo yum groupinstall -y 'Development Tools'`
@@ -228,19 +232,25 @@ For more details on how to manage pgrx extensions see [Managing pgrx extensions]
 So far, cross-compiling extensions with pgrx has only been demonstrated under [nix](https://nixos.org/).
 Proper support in nixpkgs is still in flux, so watch this space.
 
-In order to cross-compile outside of nix, you will need two ingredients:
+In order to cross-compile outside of nix, you will need these ingredients:
 
 1) A sysroot for the cross architecture, with rust configured to invoke the linker with flags to link against this sysroot.
-2) A `pg_config` program that provides values associated with postgres compiled for the desired cross architecture.
-   This can be achieved by either emulating pg_config with qemu-user or similar, or replicating pg_config with a shell script.
+2) PostgreSQL server headers configured for the target, from the same build as the server that will load the extension.
+3) PostgreSQL metadata to go with those headers. Either keep the host's `pg_config` and select the target headers with
+   `PGRX_INCLUDEDIR_SERVER_PG<NN>_<target>`, or describe the target with `PGRX_PG_CONFIG_AS_ENV`.
+   A `pg_config` program for the target also works, either emulated with qemu-user or similar, or replicated with a shell script.
+4) The `clang` driver and `llvm-ar` described under [System Requirements](#system-requirements).
+   `BINDGEN_EXTRA_CLANG_ARGS_<target>` passes the target's sysroot to them when Clang cannot find it.
 
-The target headers, compiler flags, and Clang target must also agree during C
-macro inspection. Precomputed raw bindings alone do not provide the macro
-profile or native adapters needed by pgrx; import a
-[complete target bundle](docs/src/extension/build/cross-compile.md#import-a-complete-target-bundle)
-when generating on the target machine instead.
+pgrx checks that the server headers were configured for the target and refuses
+them otherwise. A
+[complete target bundle](docs/src/extension/build/cross-compile.md#import-a-complete-target-bundle),
+built on the target machine or by a cross build that passed those checks, can
+replace items 2 and 4. Raw bindings alone cannot. The
+[cross-compilation guide](docs/src/extension/build/cross-compile.md#postgresql-headers-and-metadata-for-the-target)
+describes each path and what pgrx verifies.
 
-Then, modify the standard build process in the following ways:
+When building with a `pg_config` program, modify the standard build process in the following ways:
 
 1) Pass `--no-run` to `cargo pgrx init`, since we cannot run postgres for the cross machine.
 2) Pass one of the `--pgXX` flags to `cargo pgrx init` with the aforementioned `pg_config`.
