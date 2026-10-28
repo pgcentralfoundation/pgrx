@@ -315,8 +315,13 @@ fn main() {{
     );
 }
 
-/// Verify each configured installation's real varlena macros retain the native failing branch
-/// under assertion-enabled headers, even when the installation itself omits assertions.
+/// Verify each configured installation's real varlena macros match the original C, including
+/// the native failing branch under assertion-enabled headers.
+///
+/// `-DUSE_ASSERT_CHECKING` enables assertions in installations configured without them, because
+/// configure leaves the setting commented out in `pg_config.h`. Meson writes an active
+/// `#undef USE_ASSERT_CHECKING` instead, which overrides the command line, so meson-built
+/// installations such as PostgreSQL 17 for Windows compare the unasserted branch.
 #[test]
 fn postgres_varlena_assertions_match_original_headers() {
     let installations = installed::configured();
@@ -338,6 +343,7 @@ fn postgres_varlena_assertions_match_original_headers() {
             arguments
         };
         let frontend = installed::inspect(&scanner, &postgres, &arguments);
+        let asserted = frontend.environment().active.contains_key("USE_ASSERT_CHECKING");
         let defined =
             frontend.inventory().macros.iter().any(|definition| definition.name == "VARTAG_SIZE");
         // PG19 replaced these varlena macros with static inline functions.
@@ -417,8 +423,9 @@ int main(void) {{
         printf("size\t%lu\t%u\n", size, evaluations);
     }}
     assertion_site(__FILE__, __LINE__ + 1);
-    (void)VARTAG_SIZE(assertion_argument(0));
-    return 1;
+    unsigned long invalid = VARTAG_SIZE(assertion_argument(0));
+    printf("unasserted\t%lu\t%u\n", invalid, evaluations);
+    return 0;
 }}
 "#
         );
@@ -435,8 +442,9 @@ unsafe extern "C" {{
 fn main() {{
     // SAFETY: The fixture functions have these exact fixed C prototypes and
     // only borrow static filename storage or increment a process-local counter.
-    // Valid tags produce sizes; the final invalid tag exits in native C, so no
-    // Rust destructor or unwinding state is required across that failure.
+    // Valid tags produce sizes. With assertions, the final invalid tag exits in
+    // native C, so no Rust destructor or unwinding state is required across
+    // that failure.
     unsafe {{
         for tag in [1_i32, 2, 3, 18] {{
             assertion_site(core::ptr::null(), 0);
@@ -444,7 +452,8 @@ fn main() {{
             println!("size\t{{}}\t{{}}", size.get(), assertion_evaluations());
         }}
         assertion_site(concat!(file!(), "\0").as_ptr().cast(), (line!() + 1) as i32);
-        let _ = VARTAG_SIZE!(assertion_argument(0_i32));
+        let invalid = VARTAG_SIZE!(assertion_argument(0_i32));
+        println!("unasserted\t{{}}\t{{}}", invalid.get(), assertion_evaluations());
     }}
 }}
 "#
@@ -460,6 +469,11 @@ fn main() {{
             &arguments,
         );
         assert_eq!(original.lines().count(), 5, "PG{major} assertion corpus completeness");
+        assert_eq!(
+            original.lines().last().is_some_and(|line| line.starts_with("failure\t")),
+            asserted,
+            "PG{major} invalid tag must fail exactly when assertions are active"
+        );
         assert_eq!(
             generated, original,
             "PG{major} native assertion must preserve condition, source site and operand counts"
