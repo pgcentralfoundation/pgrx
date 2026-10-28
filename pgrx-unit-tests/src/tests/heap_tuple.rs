@@ -1055,7 +1055,7 @@ mod tests {
     /// A row stored before `ALTER TYPE ... DROP ATTRIBUTE` still holds the dropped attribute,
     /// and the descriptor keeps its length, alignment, and pass-by-value flag, so the
     /// attributes after it read correctly. `heap_getattr_datum_ex` reads the dropped attribute
-    /// itself without looking up its cleared type.
+    /// itself without looking up its cleared type, and `get_by_index` reads it as NULL.
     #[pg_test]
     fn test_heap_getattr_reads_row_stored_before_a_drop() -> Result<(), spi::Error> {
         Spi::run(
@@ -1097,6 +1097,11 @@ mod tests {
             assert!(!collar.is_null);
             assert_eq!(collar.typoid, PgOid::Invalid);
             assert_eq!((collar.typlen, collar.typbyval), (-1, false));
+            // get_by_index reads it as NULL. Checking `T` against InvalidOid raised an ERROR,
+            // whether or not `T` reads records.
+            assert_eq!(dog.get_by_index::<String>(dropped)?, None);
+            let as_row = dog.get_by_index::<PgHeapTuple<'_, AllocatedByRust>>(dropped);
+            assert!(matches!(as_row, Ok(None)), "{:?}", as_row.as_ref().err());
             assert_eq!((scritches.typlen, scritches.typbyval), (4, true));
             // SAFETY: `scritches` is the non-NULL int4 attribute of the live stored row.
             assert_eq!(unsafe { scritches.into_value::<i32>() }, 7);

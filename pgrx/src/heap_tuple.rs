@@ -556,6 +556,9 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
     ///
     /// Attribute numbers start at 1, not 0.
     ///
+    /// A dropped attribute reads as `None`, as SQL field selection reads it, even in a row stored
+    /// before the drop that still holds a value.
+    ///
     /// ## Errors
     /// - return [`TryFromDatumError::NoSuchAttributeNumber`] if the attribute does not exist
     /// - return [`TryFromDatumError::IncompatibleTypes`] if the Rust type of the `value` is not
@@ -572,6 +575,11 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
             // it's an attribute number outside the bounds of the tuple descriptor
             return Err(TryFromDatumError::NoSuchAttributeNumber(attno));
         };
+        // PostgreSQL sets a dropped attribute's type to InvalidOid, so a value that a row stored
+        // before the drop still holds cannot be checked against `T`.
+        if att.is_dropped() {
+            return Ok(None);
+        }
         // Copy the type out before reading the tuple: on PG15-17, nocachegetattr caches
         // attribute offsets by writing to the descriptor's attributes, which `att` borrows.
         let att_typoid = att.type_oid().value();
@@ -592,8 +600,7 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
             // A `T` that reads records reads a row-type attribute (a record, a composite type,
             // or a domain over one) as RECORDOID. Any other attribute keeps its own type, which
             // try_from_datum checks against `T`.
-            // SAFETY: type_is_rowtype takes the OID by value and only looks it up; an OID with
-            // no type, such as a dropped attribute's, is not a row type.
+            // SAFETY: type_is_rowtype takes the OID by value and only looks it up.
             pg_sys::RECORDOID if unsafe { pg_sys::type_is_rowtype(att_typoid) } => {
                 pg_sys::RECORDOID
             }
