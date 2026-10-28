@@ -247,6 +247,103 @@ impl TargetFacts {
     }
 }
 
+/// The machine a target triple names: architecture, operating system, C library and ARM float ABI.
+///
+/// Architecture and OS use Rust's `target_arch` and `target_os` spellings. `None` means the triple
+/// does not name that property in a recognized spelling; it is never a guess.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) struct MachineFamily {
+    /// Rust `target_arch` spelling.
+    pub(crate) arch: Option<&'static str>,
+    /// Rust `target_os` spelling.
+    pub(crate) os: Option<&'static str>,
+    /// The C library named by the environment component.
+    pub(crate) libc: Option<Libc>,
+    /// `true` for an `eabihf` environment and `false` for `eabi`.
+    pub(crate) hard_float: Option<bool>,
+}
+
+/// A C library whose name appears in a triple's environment component.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum Libc {
+    /// glibc, spelled `gnu*`.
+    Gnu,
+    /// musl, spelled `musl*`.
+    Musl,
+}
+
+/// Classify a Clang, autoconf (`config.guess`) or meson machine triple.
+///
+/// Clang spells macOS `arm64-apple-macosx15.0.0`, autoconf `aarch64-apple-darwin25.6.0` and
+/// meson `aarch64-darwin`; all three name the same machine.
+pub(crate) fn machine_family(triple: &str) -> MachineFamily {
+    let mut components = triple.split('-');
+    let arch = match components.next().unwrap_or_default() {
+        "x86_64" | "amd64" => Some("x86_64"),
+        "x86" | "i386" | "i486" | "i586" | "i686" => Some("x86"),
+        "aarch64" | "aarch64_be" | "arm64" | "arm64e" => Some("aarch64"),
+        "powerpc" | "powerpcle" | "ppc" => Some("powerpc"),
+        "powerpc64" | "powerpc64le" | "ppc64" | "ppc64le" => Some("powerpc64"),
+        "mips" | "mipsel" => Some("mips"),
+        "mips64" | "mips64el" => Some("mips64"),
+        "s390x" => Some("s390x"),
+        "sparc" => Some("sparc"),
+        "sparcv9" | "sparc64" => Some("sparc64"),
+        "loongarch64" => Some("loongarch64"),
+        name if name.starts_with("arm") || name.starts_with("thumb") => Some("arm"),
+        name if name.starts_with("riscv32") => Some("riscv32"),
+        name if name.starts_with("riscv64") => Some("riscv64"),
+        _ => None,
+    };
+    let components = components.collect::<Vec<_>>();
+    let os = if components.iter().any(|part| part.starts_with("android")) {
+        Some("android")
+    } else if components.iter().any(|part| matches!(*part, "windows" | "win32" | "mingw32")) {
+        Some("windows")
+    } else if components.iter().any(|part| part.starts_with("darwin") || part.starts_with("macos"))
+    {
+        Some("macos")
+    } else if components.iter().any(|part| part.starts_with("sunos")) {
+        Some("solaris")
+    } else {
+        [
+            "linux",
+            "freebsd",
+            "netbsd",
+            "openbsd",
+            "dragonfly",
+            "illumos",
+            "solaris",
+            "haiku",
+            "hurd",
+            "aix",
+            "fuchsia",
+            "redox",
+        ]
+        .into_iter()
+        .find(|os| components.iter().any(|part| part.starts_with(os)))
+    };
+    let libc = components.iter().find_map(|part| {
+        if part.starts_with("gnu") {
+            Some(Libc::Gnu)
+        } else if part.starts_with("musl") {
+            Some(Libc::Musl)
+        } else {
+            None
+        }
+    });
+    let hard_float = components.iter().find_map(|part| {
+        if part.ends_with("eabihf") {
+            Some(true)
+        } else if part.ends_with("eabi") {
+            Some(false)
+        } else {
+            None
+        }
+    });
+    MachineFamily { arch, os, libc, hard_float }
+}
+
 /// Recognize the Windows target spellings whose native objects require COFF conventions.
 /// This controls code generation and archive tools; it does not admit a runtime ABI profile.
 pub(crate) fn is_windows_triple(triple: &str) -> bool {
@@ -829,4 +926,59 @@ pub enum IntegerValue {
         /// The exact unsigned constant retained without host-width narrowing.
         u64,
     ),
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Clang's effective triples classify to Rust's architecture and OS names, together with
+    /// the C library and ARM float ABI that distinguish otherwise equal machines.
+    #[test]
+    fn machine_family_classifies_clang_triples() {
+        let family = |arch, os, libc, hard_float| MachineFamily {
+            arch: Some(arch),
+            os: Some(os),
+            libc,
+            hard_float,
+        };
+        for (triple, expected) in [
+            ("arm64-apple-macosx15.0.0", family("aarch64", "macos", None, None)),
+            ("arm64e-apple-darwin", family("aarch64", "macos", None, None)),
+            ("x86_64-pc-windows-msvc19.40.0", family("x86_64", "windows", None, None)),
+            ("x86_64-w64-windows-gnu", family("x86_64", "windows", Some(Libc::Gnu), None)),
+            ("aarch64-unknown-linux-gnu", family("aarch64", "linux", Some(Libc::Gnu), None)),
+            ("i686-unknown-linux-gnu", family("x86", "linux", Some(Libc::Gnu), None)),
+            ("x86_64-unknown-linux-musl", family("x86_64", "linux", Some(Libc::Musl), None)),
+            ("armv7-unknown-linux-gnueabihf", family("arm", "linux", Some(Libc::Gnu), Some(true))),
+            ("arm-unknown-linux-gnueabi", family("arm", "linux", Some(Libc::Gnu), Some(false))),
+            ("powerpc64le-unknown-linux-gnu", family("powerpc64", "linux", Some(Libc::Gnu), None)),
+            ("x86_64-unknown-illumos", family("x86_64", "illumos", None, None)),
+        ] {
+            assert_eq!(machine_family(triple), expected, "{triple}");
+        }
+    }
+
+    /// Autoconf and meson spell some machines differently from Clang; each spelling must reach
+    /// the family Clang reports for the same machine.
+    #[test]
+    fn machine_family_accepts_autoconf_and_meson_spellings() {
+        for (triple, arch, os) in [
+            ("amd64-portbld-freebsd14.1", "x86_64", "freebsd"),
+            ("x86-pc-windows", "x86", "windows"),
+            ("ppc-unknown-linux-gnu", "powerpc", "linux"),
+            ("ppc64-linux", "powerpc64", "linux"),
+            ("ppc64le-linux", "powerpc64", "linux"),
+            ("aarch64-darwin", "aarch64", "macos"),
+            ("x86_64-unknown-darwin", "x86_64", "macos"),
+            ("x86_64-windows", "x86_64", "windows"),
+            ("sparc-sun-sunos5.11", "sparc", "solaris"),
+        ] {
+            let family = machine_family(triple);
+            assert_eq!((family.arch, family.os), (Some(arch), Some(os)), "{triple}");
+        }
+        let unknown = machine_family("vax-dec-ultrix");
+        assert_eq!((unknown.arch, unknown.os), (None, None));
+        assert_eq!(machine_family("aarch64-apple-ios").os, None);
+    }
 }

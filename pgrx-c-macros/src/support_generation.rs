@@ -410,55 +410,11 @@ pub fn pg_sys_integer_bridges(frontend: &FrontendOutput) -> Result<String, Suppo
 fn rust_target(
     profile: &CompilationProfile,
 ) -> Result<(&'static str, &'static str), SupportProfileError> {
-    let triple = &profile.target.triple;
-    let mut components = triple.split('-');
-    let component = components.next().unwrap_or_default();
-    let arch = match component {
-        "x86_64" => "x86_64",
-        "i386" | "i486" | "i586" | "i686" => "x86",
-        "aarch64" | "aarch64_be" | "arm64" => "aarch64",
-        "powerpc" | "powerpcle" => "powerpc",
-        "powerpc64" | "powerpc64le" => "powerpc64",
-        "mips" | "mipsel" => "mips",
-        "mips64" | "mips64el" => "mips64",
-        "s390x" => "s390x",
-        "sparc" => "sparc",
-        "sparcv9" | "sparc64" => "sparc64",
-        "loongarch64" => "loongarch64",
-        name if name.starts_with("arm") || name.starts_with("thumb") => "arm",
-        name if name.starts_with("riscv32") => "riscv32",
-        name if name.starts_with("riscv64") => "riscv64",
-        _ => return Err(SupportProfileError::TargetFamily(triple.clone())),
-    };
-    let components = components.collect::<Vec<_>>();
-    let os = if components.iter().any(|os| os.starts_with("android")) {
-        "android"
-    } else if components.iter().any(|os| matches!(*os, "windows" | "win32" | "mingw32")) {
-        "windows"
-    } else if components.first() == Some(&"apple")
-        && components.get(1).is_some_and(|os| os.starts_with("darwin") || os.starts_with("macos"))
-    {
-        "macos"
-    } else {
-        [
-            "linux",
-            "freebsd",
-            "netbsd",
-            "openbsd",
-            "dragonfly",
-            "illumos",
-            "solaris",
-            "haiku",
-            "hurd",
-            "aix",
-            "fuchsia",
-            "redox",
-        ]
-        .into_iter()
-        .find(|os| components.iter().any(|component| component.starts_with(os)))
-        .ok_or_else(|| SupportProfileError::TargetFamily(triple.clone()))?
-    };
-    Ok((arch, os))
+    let family = crate::model::machine_family(&profile.target.triple);
+    family
+        .arch
+        .zip(family.os)
+        .ok_or_else(|| SupportProfileError::TargetFamily(profile.target.triple.clone()))
 }
 
 /// Exercise this phase’s semantic boundaries with owned fixtures.
