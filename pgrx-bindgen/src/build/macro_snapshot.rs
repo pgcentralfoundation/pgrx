@@ -42,7 +42,8 @@ pub(super) struct SnapshotVersion {
     macros: BTreeMap<(PathBuf, String), MacroDocumentation>,
     /// The Rust support this version's ordinary build includes with its macros.
     support: String,
-    /// The release generation id, also written to this version's bindings.
+    /// The id of the bindings generated with this version's macros, also written to
+    /// those bindings.
     generation: String,
 }
 
@@ -75,7 +76,7 @@ impl SnapshotVersion {
         Ok(Self { major, macros, support, generation: String::new() })
     }
 
-    /// Record the release generation that produced this version's bindings.
+    /// Record the id of the bindings generated with this version's macros.
     pub(super) fn generated_by(&mut self, generation: String) {
         self.generation = generation;
     }
@@ -588,7 +589,7 @@ pub(super) fn snapshot_files(
         let major = version.major;
         write!(
             index,
-            "{}const _: () = ::core::assert!(\n    ::core::matches!(crate::__pgrx_c_bindings::__PGRX_GENERATION.as_bytes(), b{:?}),\n    \"the documentation snapshot and src/include/pg{major}.rs come from different release generations; regenerate them together\"\n);\n",
+            "{}const _: () = ::core::assert!(\n    ::core::matches!(crate::__pgrx_c_bindings::__PGRX_GENERATION.as_bytes(), b{:?}),\n    \"the documentation snapshot was generated with bindings other than src/include/pg{major}.rs; regenerate them together\"\n);\n",
             cfg_attribute(&BTreeSet::from([major]), &BTreeSet::new()),
             version.generation,
         )

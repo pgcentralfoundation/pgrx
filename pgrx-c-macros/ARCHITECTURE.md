@@ -1717,8 +1717,9 @@ Release generation keeps the committed bindings and snapshot coherent:
   `[package.metadata.docs.rs] targets`, `x86_64-unknown-linux-gnu`, and refuses
   any other target.
 - Each `pgNN.rs` ends with `__PGRX_GENERATION`, the SHA-256 of its rewritten
-  bindings, and the snapshot root asserts each version's id, so a snapshot and
-  bindings from different runs fail docs builds.
+  bindings, and the snapshot root asserts each version's id, so a snapshot
+  generated with different bindings fails docs builds. The id covers only the
+  bindings: two runs that produce the same bindings but different macros pass it.
 - Every version is generated into `OUT_DIR` first. The snapshot is merged and
   verified before anything in `src/include` is written, so a failure leaves the
   committed tree unchanged.

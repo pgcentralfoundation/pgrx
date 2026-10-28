@@ -347,8 +347,8 @@ fn generate_bindings(
     let oids = extract_oids(&bindgen_output);
     let rewritten_items = rewrite_items(bindgen_output, &oids)
         .wrap_err_with(|| format!("failed to rewrite items for pg{major_version}"))?;
-    // The documentation snapshot asserts this id, so docs builds reject bindings and
-    // a snapshot from different release generations. Equal bindings give equal ids.
+    // The documentation snapshot asserts this id, so docs builds reject a snapshot
+    // generated with different bindings. Equal bindings give equal ids.
     let generation = target_artifacts::sha256(rewritten_items.to_string().as_bytes());
     let bindings = quote! {
         use crate as pg_sys;
