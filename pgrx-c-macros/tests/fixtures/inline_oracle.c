@@ -19,6 +19,14 @@ int main(void)
     unsigned long long bits = 0;
     memcpy(&bits, &floating, sizeof(floating));
     printf("double\t%016llx\t%u\n", bits, inline_oracle_count());
+    double const_double = INLINE_CONST_DOUBLE(3.0);
+    memcpy(&bits, &const_double, sizeof(const_double));
+    printf("const_double\t%016llx\t%u\n", bits, inline_oracle_count());
+    float first = 2.5f;
+    float first_float = INLINE_FIRST_FLOAT(&first);
+    unsigned int float_bits = 0;
+    memcpy(&float_bits, &first_float, sizeof(first_float));
+    printf("first_float\t%08x\t%u\n", float_bits, inline_oracle_count());
     unsigned int write = INLINE_WRITE(&value, 65537u);
     printf("write\t%u\t%u\n", write, inline_oracle_count());
     INLINE_VOID(&value);

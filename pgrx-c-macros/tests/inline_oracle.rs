@@ -52,6 +52,8 @@ const NAMES: &[&str] = &[
     "INLINE_SIGNED",
     "INLINE_BOOL",
     "INLINE_DOUBLE",
+    "INLINE_CONST_DOUBLE",
+    "INLINE_FIRST_FLOAT",
     "INLINE_WRITE",
     "INLINE_VOID",
     "INLINE_POINTER",

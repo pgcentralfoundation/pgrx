@@ -74,6 +74,17 @@ fn main() {
             inline_oracle_count()
         );
         println!(
+            "const_double\t{:016x}\t{}",
+            INLINE_CONST_DOUBLE!(3.0_f64).get().to_bits(),
+            inline_oracle_count()
+        );
+        let first = 2.5_f32;
+        println!(
+            "first_float\t{:08x}\t{}",
+            INLINE_FIRST_FLOAT!(&raw const first).get().to_bits(),
+            inline_oracle_count()
+        );
+        println!(
             "write\t{}\t{}",
             INLINE_WRITE!(&raw mut value, 65537_u32).get(),
             inline_oracle_count()
@@ -119,18 +130,18 @@ fn main() {
         );
         let restored = core::ptr::with_exposed_provenance_mut::<i32>(returned as usize);
         assert_eq!(*restored, value);
-        assert_eq!(ffi::CALLS.load(std::sync::atomic::Ordering::SeqCst), 13);
+        assert_eq!(ffi::CALLS.load(std::sync::atomic::Ordering::SeqCst), 15);
         assert!(!ffi::INSIDE.load(std::sync::atomic::Ordering::SeqCst));
         println!("existing\t{}\t{}", INLINE_EXISTING!(9_i32).get(), inline_oracle_count());
         // This fixture's existing binding calls C directly. Generated record
         // primitives each enter the boundary once.
-        assert_eq!(ffi::CALLS.load(std::sync::atomic::Ordering::SeqCst), 13);
+        assert_eq!(ffi::CALLS.load(std::sync::atomic::Ordering::SeqCst), 15);
         let partial = INLINE_RECORD!(23).get();
         // SAFETY: C initializes member, but deliberately leaves validity
         // uninitialized. Project only member through the live raw storage.
         let member = core::ptr::addr_of!((*partial.as_ptr()).member).read();
         println!("partial_record\t{member}\t{}", inline_oracle_count());
         println!("partial_member\t{}\t{}", INLINE_RECORD_MEMBER!(31).get(), inline_oracle_count());
-        assert_eq!(ffi::CALLS.load(std::sync::atomic::Ordering::SeqCst), 15);
+        assert_eq!(ffi::CALLS.load(std::sync::atomic::Ordering::SeqCst), 17);
     }
 }

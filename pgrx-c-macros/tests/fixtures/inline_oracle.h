@@ -26,6 +26,16 @@ static inline double inline_double(double value)
     ++inline_calls;
     return value * 0.5;
 }
+static inline double inline_const_double(const double value)
+{
+    ++inline_calls;
+    return value * 0.25;
+}
+static inline float inline_first_float(const float *where)
+{
+    ++inline_calls;
+    return *where;
+}
 static inline unsigned short inline_write(int *where, unsigned short value)
 {
     ++inline_calls;
@@ -78,6 +88,8 @@ static inline InlineRecord inline_record(int value)
 #define INLINE_SIGNED(value) (inline_signed)((value))
 #define INLINE_BOOL(value) inline_bool((value))
 #define INLINE_DOUBLE(value) inline_double((value))
+#define INLINE_CONST_DOUBLE(value) inline_const_double((value))
+#define INLINE_FIRST_FLOAT(where) inline_first_float((where))
 #define INLINE_WRITE(where, value) inline_write((where), (value))
 #define INLINE_VOID(where) inline_void((where))
 #define INLINE_POINTER(where) inline_pointer((where))

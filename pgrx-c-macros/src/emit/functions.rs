@@ -463,7 +463,7 @@ fn abi_storage(
             RustBindingType::Integer { signed: integer.signed, bits: integer.bits }
         }
         TypeCategory::Floating => RustBindingType::Float {
-            bits: match ty.canonical_spelling.as_str() {
+            bits: match super::types::unqualified_spelling(ty) {
                 "float" => 32,
                 "double" => 64,
                 _ => return Err("inline extended float has no native Rust ABI storage".into()),

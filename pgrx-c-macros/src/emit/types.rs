@@ -803,7 +803,9 @@ impl<'a> Lowering<'a> {
                 if usage == TypeUse::Value {
                     self.target.supports_float_values()?;
                 }
-                let (name, storage) = match ty.canonical_spelling.as_str() {
+                // Clang spells a qualified object or parameter "const double".
+                // resolve_for_use wraps volatility; const leaves the value unchanged.
+                let (name, storage) = match unqualified_spelling(ty) {
                     "float" => ("CFloat", "f32"),
                     "double" => ("CDouble", "f64"),
                     _ => {
@@ -1175,6 +1177,12 @@ fn path_key(path: &[String]) -> String {
 
 /// Remove only top-level qualifier prefixes when identifying the nominal C enum declaration.
 pub(super) fn enum_key(ty: &TypeInfo) -> String {
+    unqualified_spelling(ty).to_owned()
+}
+
+/// Strip top-level qualifier prefixes from a canonical spelling. The qualifiers stay
+/// in the type's own flags, and a pointer's qualifiers follow its `*` instead.
+pub(super) fn unqualified_spelling(ty: &TypeInfo) -> &str {
     let mut spelling = ty.canonical_spelling.as_str();
     while let Some(rest) = ["const ", "volatile ", "restrict "]
         .iter()
@@ -1182,7 +1190,7 @@ pub(super) fn enum_key(ty: &TypeInfo) -> String {
     {
         spelling = rest;
     }
-    spelling.to_owned()
+    spelling
 }
 
 /// Ignore formatting whitespace when comparing already-rendered native storage spellings.
@@ -1234,6 +1242,43 @@ mod tests {
         assert!(lowering.resolve_object_query(&ty).unwrap().marker.ends_with("::CDouble"));
         let incompatible = TypeInfo { size: Some(4), ..ty };
         assert!(lowering.resolve_object_query(&incompatible).is_err());
+    }
+
+    /// Clang keeps qualifiers in canonical spellings such as "const double". They
+    /// must not turn binary32 or binary64 into an unrepresentable extended type.
+    #[test]
+    fn qualified_floats_keep_their_native_representation() {
+        let _lock = crate::SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        let scanner = crate::MacroScanner::new().unwrap();
+        let header =
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/input_types.h");
+        let frontend = crate::inspect(&scanner, &header, &[], None).unwrap();
+        let bindings = BindingCatalog::default();
+        let lowering =
+            Lowering::new(frontend.declarations(), &bindings, &frontend.profile().target);
+        let floating = |spelling: &str, size| TypeInfo {
+            spelling: spelling.into(),
+            canonical_spelling: spelling.into(),
+            category: TypeCategory::Floating,
+            size: Some(size),
+            alignment: Some(size),
+            is_const: spelling.contains("const"),
+            is_volatile: spelling.contains("volatile"),
+        };
+        for (spelling, size, marker, storage) in [
+            ("const double", 8, "::CDouble", "f64"),
+            ("volatile float", 4, "::CFloat>", "f32"),
+            ("const volatile double", 8, "::CDouble>", "f64"),
+        ] {
+            let lowered = lowering.resolve(&floating(spelling, size)).unwrap();
+            assert!(lowered.marker.ends_with(marker), "{spelling}: {}", lowered.marker);
+            assert_eq!(lowered.marker.contains("CVolatile<"), spelling.contains("volatile"));
+            assert_eq!(lowered.storage, storage, "{spelling}");
+        }
+        let Err(extended) = lowering.resolve(&floating("const long double", 16)) else {
+            panic!("long double has no matching Rust representation")
+        };
+        assert!(extended.contains("extended floating type"), "{extended}");
     }
 
     /// Admit only byte-compatible plain-char storage when compiler flags change
