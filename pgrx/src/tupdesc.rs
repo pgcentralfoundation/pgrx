@@ -8,12 +8,12 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Provides a safe wrapper around Postgres' `pg_sys::TupleDescData` struct
-use crate::{PgBox, PgRelation, pg_sys, regtypein, void_mut_ptr};
+use crate::{PgRelation, pg_sys, regtypein, void_mut_ptr};
 
 use pgrx_pg_sys::PgTryBuilder;
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
-use std::ops::Deref;
-use std::ptr;
+use std::mem::ManuallyDrop;
+use std::ptr::{self, NonNull};
 
 /// This struct is passed around within the backend to describe the structure
 /// of tuples.  For tuples coming from on-disk relations, the information is
@@ -46,8 +46,18 @@ use std::ptr;
 /// always have tdrefcount >= 0.
 ///
 /// PGRX's safe wrapper takes care of properly freeing or decrementing reference counts
+///
+/// `PgTupleDesc` does not hand out references to the `pg_sys::TupleDescData` it wraps.
+/// PostgreSQL changes the reference count of a relcache or typcache descriptor whenever code
+/// takes or releases a reference to it, which can happen in any call into PostgreSQL while a
+/// `PgTupleDesc` for it exists, so holding a Rust reference across such a call would be
+/// undefined behavior. Read the header with [`len`](Self::len), [`oid`](Self::oid),
+/// [`typmod`](Self::typmod), [`refcount`](Self::refcount) and
+/// [`constraints`](Self::constraints), which each read the current value of one field, and
+/// pass [`as_ptr`](Self::as_ptr) to PostgreSQL.
 pub struct PgTupleDesc<'a> {
-    tupdesc: Option<PgBox<pg_sys::TupleDescData>>,
+    /// Points to a live descriptor for as long as this value exists.
+    tupdesc: NonNull<pg_sys::TupleDescData>,
     parent: Option<&'a PgRelation>,
     need_release: bool,
     need_pfree: bool,
@@ -65,12 +75,7 @@ impl<'a> PgTupleDesc<'a> {
     /// This method is unsafe as we cannot validate that the provided `pg_sys::TupleDesc` is valid
     /// or requires reference counting.
     pub unsafe fn from_pg<'b>(ptr: pg_sys::TupleDesc) -> PgTupleDesc<'b> {
-        PgTupleDesc {
-            tupdesc: Some(PgBox::from_pg(ptr)),
-            parent: None,
-            need_release: true,
-            need_pfree: false,
-        }
+        PgTupleDesc { tupdesc: non_null(ptr), parent: None, need_release: true, need_pfree: false }
     }
 
     /// Wrap a Postgres-provided `pg_sys::TupleDescData`.
@@ -82,12 +87,7 @@ impl<'a> PgTupleDesc<'a> {
     ///
     /// This method is unsafe as we cannot validate that the provided `pg_sys::TupleDesc` is valid
     pub unsafe fn from_pg_unchecked<'b>(ptr: pg_sys::TupleDesc) -> PgTupleDesc<'b> {
-        PgTupleDesc {
-            tupdesc: Some(PgBox::from_pg(ptr)),
-            parent: None,
-            need_release: false,
-            need_pfree: false,
-        }
+        PgTupleDesc { tupdesc: non_null(ptr), parent: None, need_release: false, need_pfree: false }
     }
 
     /// Wrap a copy of a `pg_sys::TupleDesc`.  This form is not reference counted and the copy is
@@ -102,7 +102,7 @@ impl<'a> PgTupleDesc<'a> {
     pub unsafe fn from_pg_copy<'b>(ptr: pg_sys::TupleDesc) -> PgTupleDesc<'b> {
         PgTupleDesc {
             // SAFETY:  pg_sys::CreateTupleDescCopyConstr will be returning a valid pointer
-            tupdesc: Some(PgBox::from_pg(pg_sys::CreateTupleDescCopyConstr(ptr))),
+            tupdesc: non_null(unsafe { pg_sys::CreateTupleDescCopyConstr(ptr) }),
             parent: None,
             need_release: false,
             need_pfree: true,
@@ -134,21 +134,14 @@ impl<'a> PgTupleDesc<'a> {
     /// This method is unsafe as we cannot validate that the provided `pg_sys::TupleDesc` is valid
     /// or is actually a copy that requires a `pfree()` on Drop.
     pub unsafe fn from_pg_is_copy<'b>(ptr: pg_sys::TupleDesc) -> PgTupleDesc<'b> {
-        PgTupleDesc {
-            tupdesc: Some(PgBox::from_pg(ptr)),
-            parent: None,
-            need_release: false,
-            need_pfree: true,
-        }
+        PgTupleDesc { tupdesc: non_null(ptr), parent: None, need_release: false, need_pfree: true }
     }
 
     /// wrap the `pg_sys::TupleDesc` contained by the specified `PgRelation`
     pub fn from_relation(parent: &PgRelation) -> PgTupleDesc<'_> {
         PgTupleDesc {
             // SAFETY: parent keeps this initialized relation descriptor alive for the returned borrow.
-            tupdesc: Some(unsafe {
-                PgBox::from_pg(pg_sys::RelationGetDescr!(parent.as_ptr()).get())
-            }),
+            tupdesc: non_null(unsafe { pg_sys::RelationGetDescr!(parent.as_ptr()).get() }),
             parent: Some(parent),
             need_release: false,
             need_pfree: false,
@@ -205,19 +198,54 @@ impl<'a> PgTupleDesc<'a> {
         self.parent
     }
 
+    /// Return the descriptor pointer to pass to PostgreSQL. This `PgTupleDesc` still owns the
+    /// descriptor, so do not use the pointer after it drops.
+    ///
+    /// Read through the pointer instead of creating a reference to `pg_sys::TupleDescData`
+    /// from it, because PostgreSQL can change the descriptor during calls into it, as
+    /// described on [`PgTupleDesc`].
+    pub fn as_ptr(&self) -> pg_sys::TupleDesc {
+        self.tupdesc.as_ptr()
+    }
+
     /// What is the pg_type oid of this TupleDesc?
     pub fn oid(&self) -> pg_sys::Oid {
-        self.tupdesc.as_ref().unwrap().tdtypeid
+        // SAFETY: self keeps the descriptor live, and the place read copies the field without
+        // creating a reference to the descriptor.
+        unsafe { (*self.as_ptr()).tdtypeid }
     }
 
     /// What is the typemod of this TupleDesc?
     pub fn typmod(&self) -> i32 {
-        self.tupdesc.as_ref().unwrap().tdtypmod
+        // SAFETY: as in `oid`.
+        unsafe { (*self.as_ptr()).tdtypmod }
     }
 
     /// How many attributes do we have?
     pub fn len(&self) -> usize {
-        self.tupdesc.as_ref().unwrap().natts as usize
+        // SAFETY: as in `oid`.
+        let natts = unsafe { (*self.as_ptr()).natts };
+        usize::try_from(natts).expect("natts must be non-negative")
+    }
+
+    /// The descriptor's reference count, or `None` if it is not reference counted.
+    ///
+    /// Relcache and typcache descriptors are reference counted, and PostgreSQL changes the
+    /// count when code takes or releases a reference, including while this `PgTupleDesc`
+    /// exists. Each call reads the current value. A copy, such as one from
+    /// [`for_composite_type`](Self::for_composite_type) or [`clone`](Clone::clone), is not
+    /// reference counted.
+    pub fn refcount(&self) -> Option<u32> {
+        // SAFETY: as in `oid`.
+        let refcount = unsafe { (*self.as_ptr()).tdrefcount };
+        u32::try_from(refcount).ok()
+    }
+
+    /// Return a pointer to the descriptor's constraints, defaults and missing attribute values,
+    /// or null if it has none. They belong to the descriptor.
+    pub fn constraints(&self) -> *mut pg_sys::TupleConstr {
+        // SAFETY: as in `oid`.
+        unsafe { (*self.as_ptr()).constr }
     }
 
     /// Do we have attributes?
@@ -236,10 +264,9 @@ impl<'a> PgTupleDesc<'a> {
         if i >= self.len() {
             return None;
         }
-        let tupdesc = self.tupdesc.as_ref().unwrap().as_ptr();
         // SAFETY: self keeps the descriptor live, i is below its attribute count, and the read
         // copies the initialized attribute without creating a reference to it.
-        Some(unsafe { tupdesc_attr(tupdesc, i).read() })
+        Some(unsafe { tupdesc_attr(self.as_ptr(), i).read() })
     }
 
     /// Iterate over copies of the attributes, in order. Each is read when the iterator reaches
@@ -250,41 +277,35 @@ impl<'a> PgTupleDesc<'a> {
 
     /// Convert this [PgTupleDesc] into a pointer for passing into Postgres.  You are responsible
     /// for releasing or freeing the returned [pg_sys::TupleDescData] pointer.
-    pub fn into_pg(mut self) -> *mut pg_sys::TupleDescData {
-        self.tupdesc.take().unwrap().into_pg()
+    pub fn into_pg(self) -> *mut pg_sys::TupleDescData {
+        ManuallyDrop::new(self).as_ptr()
     }
 }
 
-impl Deref for PgTupleDesc<'_> {
-    type Target = PgBox<pg_sys::TupleDescData>;
-
-    fn deref(&self) -> &Self::Target {
-        self.tupdesc.as_ref().unwrap()
-    }
+/// Wrap a descriptor pointer, panicking on null, which no constructor accepts.
+fn non_null(tupdesc: pg_sys::TupleDesc) -> NonNull<pg_sys::TupleDescData> {
+    NonNull::new(tupdesc).expect("tuple descriptor pointer must not be null")
 }
 
 impl Clone for PgTupleDesc<'_> {
     fn clone(&self) -> Self {
-        let tupdesc = self.tupdesc.as_ref().expect("PgTupleDesc.tupdesc was None");
-        // SAFETY: We assume the previous tupdesc is valid and
+        // SAFETY: self keeps its descriptor live, and
         // pg_sys::CreateTupleDescCopyConstr gives us a fresh copy with reference counters set to -1 (disabled).
         // This will force the pfree() approach upon drop
-        let tupdesc =
-            unsafe { PgBox::from_pg(pg_sys::CreateTupleDescCopyConstr(tupdesc.as_ptr())) };
-        Self { tupdesc: Some(tupdesc), parent: self.parent, need_release: false, need_pfree: true }
+        let tupdesc = non_null(unsafe { pg_sys::CreateTupleDescCopyConstr(self.as_ptr()) });
+        Self { tupdesc, parent: self.parent, need_release: false, need_pfree: true }
     }
 }
 
 impl Drop for PgTupleDesc<'_> {
     fn drop(&mut self) {
-        if self.tupdesc.is_some() {
-            let tupdesc = self.tupdesc.take().unwrap();
-            if self.need_release {
-                // SAFETY: This owner holds the descriptor reference released by this branch.
-                unsafe { pg_sys::ReleaseTupleDesc!(tupdesc.as_ptr()) }
-            } else if self.need_pfree {
-                unsafe { pg_sys::pfree(tupdesc.as_ptr() as void_mut_ptr) }
-            }
+        let tupdesc = self.as_ptr();
+        if self.need_release {
+            // SAFETY: This owner holds the descriptor reference released by this branch.
+            unsafe { pg_sys::ReleaseTupleDesc!(tupdesc) }
+        } else if self.need_pfree {
+            // SAFETY: This owner holds the palloc'd copy freed by this branch.
+            unsafe { pg_sys::pfree(tupdesc as void_mut_ptr) }
         }
     }
 }
