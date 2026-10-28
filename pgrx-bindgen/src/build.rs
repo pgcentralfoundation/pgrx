@@ -1666,6 +1666,10 @@ fn generate_macros(
     let pgrx_c_macros::MacroGeneration { macros: emissions, support } =
         generate_with_bindings(&session, &names, &symbols).map_err(|message| eyre!(message))?;
     let metadata = metadata_support::generate(&frontend, &symbols)?;
+    // The snapshot ships the support this build includes with its macros, except that
+    // the native metadata getters, which docs builds never link, have fixed link names.
+    let documented = is_for_release()
+        .then(|| format!("{source}{}{}", metadata.documentation_rust(), support.rust));
     source.push_str(&metadata.rust);
     source.push_str(&support.rust);
     // Metadata support always contains C, so the active version always builds
@@ -1702,17 +1706,11 @@ fn generate_macros(
             }
         }
     }
-    // The snapshot ships exactly the support this build includes with its macros.
-    let snapshot = if is_for_release() {
-        Some(SnapshotVersion::new(
-            major_version,
-            &emissions,
-            postgres.server_include_dir(),
-            source.clone(),
-        )?)
-    } else {
-        None
-    };
+    let snapshot = documented
+        .map(|support| {
+            SnapshotVersion::new(major_version, &emissions, postgres.server_include_dir(), support)
+        })
+        .transpose()?;
     let files = MacroFiles::new(source, &emissions, postgres.server_include_dir())?;
     let report = serde_json::to_vec_pretty(&MacroReport {
         postgres_major_version: major_version,

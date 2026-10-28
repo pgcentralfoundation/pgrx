@@ -24,6 +24,24 @@ pub(super) struct MetadataSupport {
     pub(super) rust: String,
     /// Original C metadata declarations and pure getters, without another header include.
     pub(super) c_source: String,
+    /// The installation-specific part of the native getters' link names.
+    link_suffix: String,
+}
+
+/// Derive the Rust that the documentation snapshot ships.
+impl MetadataSupport {
+    /// `rust` with link names that do not depend on the installation.
+    ///
+    /// The link-name suffix hashes this installation's compilation profile, which
+    /// records absolute paths and environment values. Documentation builds never link
+    /// these getters, so the snapshot names them with a fixed suffix and stays unchanged
+    /// when only the checkout, home directory or toolchain differs.
+    pub(super) fn documentation_rust(&self) -> String {
+        self.rust.replace(
+            &format!("pgrx_metadata_{}_", self.link_suffix),
+            "pgrx_metadata_documentation_",
+        )
+    }
 }
 
 /// Generate metadata only after proving aggregate validity recursively against both catalogues.
@@ -127,7 +145,7 @@ pub fn __pgrx_function_info_v1() -> &'static {finfo_type} {{
     unsafe {{ &*__pgrx_metadata_native::pg_finfo_pgrx_metadata_function_v1() }}
 }}
 ")?;
-    Ok(MetadataSupport { rust: proof.rust, c_source: proof.c_source })
+    Ok(MetadataSupport { rust: proof.rust, c_source: proof.c_source, link_suffix: suffix })
 }
 
 /// Accumulate layout assertions while proving only unrestricted initialized storage families.

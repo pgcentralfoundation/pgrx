@@ -884,6 +884,35 @@ fn main() {
         assert!(release_output.contains(report), "release reports {report}");
     }
 
+    // Metadata getters' link names hash the installation's recorded paths and
+    // environment, but the snapshot's are fixed: a release run that records another
+    // home directory renames the ordinary build's getters and leaves the snapshot alone.
+    let metadata_links = |tree: &BTreeMap<PathBuf, String>| {
+        tree.values()
+            .flat_map(|source| source.lines())
+            .filter(|line| line.contains("link_name") && line.contains("pgrx_metadata_"))
+            .map(|line| line.trim().to_owned())
+            .collect::<BTreeSet<_>>()
+    };
+    assert_eq!(
+        metadata_links(&shipped),
+        BTreeSet::from([
+            "#[link_name = \"pg_finfo_pgrx_metadata_documentation_function_v1\"]".to_owned(),
+            "#[link_name = \"pgrx_metadata_documentation_magic_get\"]".to_owned(),
+        ])
+    );
+    fixture.run(
+        fixture
+            .command()
+            .env("PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE", "1")
+            .env("USERPROFILE", fixture.0.join("another-home")),
+        "release-another-home",
+    );
+    let renamed = rust_tree(&generated_root);
+    assert_eq!(metadata_links(&renamed).len(), 2);
+    assert!(metadata_links(&renamed).is_disjoint(&metadata_links(&generated)));
+    assert_eq!(rust_tree(&snapshot), shipped, "the snapshot depends on the installation");
+
     // The same annotations type-check against the real macros here and against the
     // snapshot below, so the shells have the real macros' result types.
     fixture.successful_output(&mut fixture.dependent("check"), "dependent-ordinary");
