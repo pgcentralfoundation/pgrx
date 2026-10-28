@@ -28,6 +28,9 @@ int context_count(void);
 #define CTX_LAZY(condition, left, right) ((condition) ? (left) : (right))
 #define CTX_REPEAT(value) ((value) + (value))
 #define CTX_ATOMIC(value) (value + 1)
+/* Delegates to CTX_ATOMIC with a composite argument, whose descriptor carries the checks of
+ * this macro's own operands. */
+#define CTX_OUTER(value) CTX_ATOMIC((value) * 2)
 #define CTX_TYPE(type, value) ((type)(value))
 #define CTX_TYPE_PROVEN(type, value) ((void) sizeof(type *), ((type)(value)))
 #define CTX_IGNORE(unused)

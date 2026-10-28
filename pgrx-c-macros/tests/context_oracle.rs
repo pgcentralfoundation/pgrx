@@ -61,6 +61,7 @@ const SUPPORTED: &[&str] = &[
     "CTX_LAZY",
     "CTX_REPEAT",
     "CTX_ATOMIC",
+    "CTX_OUTER",
     "CTX_TYPE_PROVEN",
     "CTX_IGNORE",
 ];
@@ -294,6 +295,9 @@ fn invalid_c_lvalue_contexts_and_unsafe_obligations_are_rejected() {
         "CTX_SIZE!(dangerous())",
         "CTX_SIZE!(CTX_IDENTITY!(*scalar))",
         "CTX_SIZE!(CTX_FIELD!(dangerous_pointer()))",
+        // Only the delegated operand's checks expose these tokens.
+        "CTX_SIZE!(CTX_OUTER!(dangerous()))",
+        "CTX_SIZE!(CTX_OUTER!(*scalar))",
     ] {
         let error = rust_oracle::reject_rust(&format!(
             "{rust}\nunsafe fn dangerous() -> i32 {{ 7 }}\nunsafe fn dangerous_pointer() -> *mut ContextRecord {{ core::ptr::null_mut() }}\nfn main() {{ let scalar = core::ptr::null::<i32>(); let _ = {invocation}; }}\n"
@@ -317,14 +321,14 @@ fn main() {{
     let scalar = core::ptr::null::<i32>();
     // SAFETY: All operands occur only in generated dead size witnesses; no
     // pointer is read and neither panic-producing call can execute.
-    unsafe {{ println!("{{}} {{}} {{}} {{}}", CTX_SIZE!(*scalar).get(), CTX_SIZE!(dangerous()).get(), CTX_SIZE!(CTX_IDENTITY!(*scalar)).get(), CTX_SIZE!(CTX_FIELD!(dangerous_pointer())).get()); }}
+    unsafe {{ println!("{{}} {{}} {{}} {{}} {{}}", CTX_SIZE!(*scalar).get(), CTX_SIZE!(dangerous()).get(), CTX_SIZE!(CTX_IDENTITY!(*scalar)).get(), CTX_SIZE!(CTX_FIELD!(dangerous_pointer())).get(), CTX_SIZE!(CTX_OUTER!(dangerous())).get()); }}
 }}
 "#,
     ));
     let expected = oracle::run_c(
         &profile.compiler.executable,
         &header(),
-        "#include <stdio.h>\nint dangerous(void); ContextRecord *dangerous_pointer(void); int main(void) { int *scalar=0; printf(\"%zu %zu %zu %zu\\n\", CTX_SIZE(*scalar), CTX_SIZE(dangerous()), CTX_SIZE(CTX_IDENTITY(*scalar)), CTX_SIZE(CTX_FIELD(dangerous_pointer()))); }\n",
+        "#include <stdio.h>\nint dangerous(void); ContextRecord *dangerous_pointer(void); int main(void) { int *scalar=0; printf(\"%zu %zu %zu %zu %zu\\n\", CTX_SIZE(*scalar), CTX_SIZE(dangerous()), CTX_SIZE(CTX_IDENTITY(*scalar)), CTX_SIZE(CTX_FIELD(dangerous_pointer())), CTX_SIZE(CTX_OUTER(dangerous()))); }\n",
         &arguments,
         true,
     );
