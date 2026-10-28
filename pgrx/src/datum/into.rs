@@ -469,6 +469,10 @@ mod tests {
     use crate::FromDatum;
 
     /// `CharGetDatum` widens plain C `char`, whose signedness the build inspected.
+    ///
+    /// Only the host's signedness runs. Where `char` is signed, sign extension of the raw
+    /// `i8` gives the same bits, so the zero-extending branch is checked only by running this
+    /// test on an unsigned-`char` target such as Linux AArch64.
     #[test]
     fn char_datum_follows_c_char_signedness() {
         let unsigned_char = pg_sys::__pgrx_c_macros::CCharRepr::MIN == 0;
