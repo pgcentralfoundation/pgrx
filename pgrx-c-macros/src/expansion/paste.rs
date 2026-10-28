@@ -180,7 +180,8 @@ pub(super) fn prove(
             std::fs::write(&path, source)
                 .map_err(|source| FrontendError::CompilerIo { compiler: path.clone(), source })?;
             let overlay = overlay(directory, &frontend.profile().header, &path)?;
-            let mut arguments = normalized_arguments(&frontend.profile().arguments);
+            let mut arguments =
+                crate::frontend::normalized_arguments(&frontend.profile().arguments);
             arguments.extend([
                 "-ivfsoverlay".into(),
                 overlay
@@ -362,25 +363,6 @@ fn reject_all(
         proof.rejected.entry(index).or_insert_with(|| (code, message.to_owned()));
         proof.dependencies.remove(&index);
     }
-}
-
-/// Keep diagnostic ownership independent of user diagnostic-display flags.
-pub(super) fn normalized_arguments(arguments: &[String]) -> Vec<String> {
-    let mut arguments = arguments.to_vec();
-    arguments.extend(
-        [
-            "-ferror-limit=0",
-            "-fmacro-backtrace-limit=0",
-            "-fno-color-diagnostics",
-            "-fdiagnostics-format=clang",
-            "-fcaret-diagnostics",
-            "-fshow-column",
-            "-fshow-source-location",
-            "-fmessage-length=0",
-        ]
-        .map(str::to_owned),
-    );
-    arguments
 }
 
 /// Construct bounded paste instrumentation while preserving original object/function invocation

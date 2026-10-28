@@ -457,7 +457,7 @@ fn probe_arguments(
     let overlay = overlay(directory, &frontend.profile().header, &path)?;
     // Probe isolation attributes every owned error in one failed pass; Clang's
     // default error limit would hide all but the first few failing probes.
-    let mut arguments = super::paste::normalized_arguments(&frontend.profile().arguments);
+    let mut arguments = crate::frontend::normalized_arguments(&frontend.profile().arguments);
     arguments.extend([
         "-ivfsoverlay".into(),
         overlay

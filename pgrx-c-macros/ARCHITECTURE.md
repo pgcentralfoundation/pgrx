@@ -297,8 +297,13 @@ cannot be inferred from a declaration's name or broad type category:
    accept the witness source. For volatile access, compare LLVM load/store units
    for the original field, an alignment-one `may_alias` record alias, and the
    containing-record path before admitting the unaligned volatile variant.
-   Isolate individually rejected fields by bounded batch bisection; do not
-   substitute a neighboring field's facts.
+   Give each field's witnesses their own `#line` file and run the driver
+   without an error limit. A failed pass drops the fields that own an error and
+   retries the rest. Only failures without an owner bisect, within the 128-run
+   budget: libclang-only failures, and diagnostics over the output budget, which
+   halving the batch reduces. Admit facts only from a clean pass, and never
+   substitute a neighboring field's facts. Fields still unvisited when the
+   budget runs out receive no facts.
 3. **Reviewed builtins.** Consider referenced `__builtin_bswap16`,
    `__builtin_bswap32`, `__builtin_bswap64`, and `__builtin_expect` only. Reject
    shadowed names and forged proof operations. A typed call establishes
@@ -559,6 +564,12 @@ Select maximal pure integer subtrees bottom-up to avoid copying overlapping
 source quadratically. Require enum-initializer integer constant expressions
 under `-Werror=integer-overflow`; compare libclang enum results with independent
 driver LLVM constant globals. Only their agreement grants zero metadata.
+Isolate failures as for bitfields: each candidate's witnesses carry their own
+`#line` file, a failed batch drops the candidates that own a driver error and
+retries, and only failures without an owner bisect within the 64-run budget,
+including libclang-only failures and oversized diagnostics. Only a clean pass
+grants zero metadata; candidates still unvisited when the budget runs out stay
+unproved.
 Record the proved `NodeId` values in the session. Do not assign null-constant
 identity to an arbitrary native argument, loaded variable, or integer result.
 

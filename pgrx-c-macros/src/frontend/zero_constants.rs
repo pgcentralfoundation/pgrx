@@ -10,11 +10,10 @@
 //! session into emission; native loads, caller operands, and side effects do not acquire this
 //! source-level identity by numerical coincidence.
 
-use super::{FrontendError, driver_arguments, run_compiler_with_input};
+use super::{FrontendError, driver_arguments, failure_owners, run_compiler_with_input};
 use crate::{AnalysisSession, ExpressionKind, MacroScanner, NodeId, TypeCategory, TypeExpression};
 use clang::{EntityKind, EntityVisitResult};
 use std::collections::{BTreeMap, BTreeSet};
-use std::fmt::Write;
 
 /// Bound declaration or expression candidates before constructing a compiler proof batch.
 const MAX_CANDIDATES: usize = 16_384;
@@ -190,7 +189,7 @@ pub(crate) fn probe(
     let mut start = 0;
     let mut bytes = 0usize;
     for (index, candidate) in candidates.iter().enumerate() {
-        let next = candidate.expression.len().saturating_add(80);
+        let next = witness(index, &candidate.expression).len();
         if bytes.saturating_add(next) > MAX_SOURCE_BYTES / 2 && index > start {
             pending.push((start, index));
             start = index;
@@ -201,38 +200,57 @@ pub(crate) fn probe(
     if start < candidates.len() {
         pending.push((start, candidates.len()));
     }
+    let mut failed = BTreeSet::new();
     let mut runs = 0;
     while let Some((start, end)) = pending.pop() {
+        let selected = (start..end).filter(|index| !failed.contains(index)).collect::<Vec<_>>();
+        if selected.is_empty() {
+            continue;
+        }
         runs += 1;
         if runs > MAX_PROBE_RUNS {
             // Missing optional witnesses cannot admit null-pointer conversions.
             // Keep proven identities and leave the remaining expressions unproved.
             break;
         }
-        let source = source(session, &candidates[start..end])?;
+        let source = source(session, &candidates, &selected)?;
         match collect(scanner, session, &source) {
             Ok(zeros) => {
                 for index in zeros {
-                    let candidate = &candidates[start + index];
+                    let candidate = &candidates[index];
                     result
                         .entry(candidate.macro_name.clone())
                         .or_default()
                         .extend(candidate.nodes.iter().copied());
                 }
             }
-            Err(
-                FrontendError::CompilerFailed { .. }
-                | FrontendError::Discovery(crate::Error::Diagnostics(_)),
-            ) => {
-                if end - start > 1 {
-                    let middle = start + (end - start) / 2;
+            Err(error) => {
+                // Remove the candidates whose own witnesses failed and require a
+                // clean pass for the rest, so failing siblings cannot exhaust the
+                // run budget before valid candidates are visited. Only a clean
+                // pass admits results; bisect when no failure has an owner.
+                let owned = failure_owners(error, PROBE_FILE, &selected)?;
+                if !owned.is_empty() {
+                    failed.extend(owned);
+                    pending.push((start, end));
+                } else if selected.len() > 1 {
+                    let middle = selected[selected.len() / 2];
                     pending.extend([(start, middle), (middle, end)]);
                 }
             }
-            Err(error) => return Err(error),
         }
     }
     Ok(result)
+}
+
+/// Name the presumed file of one candidate's witnesses so driver errors identify their owner.
+const PROBE_FILE: &str = "__pgrx_integer_zero_probe_";
+
+/// Write one candidate's libclang and driver witnesses under its own `#line` probe file.
+fn witness(index: usize, expression: &str) -> String {
+    format!(
+        "#line 1 \"{PROBE_FILE}{index}\"\nenum {{ __pgrx_integer_zero_{index} = (({expression}) == 0) }};\nconst int __pgrx_integer_zero_driver_{index} = __pgrx_integer_zero_{index};\n"
+    )
 }
 
 /// Generate bounded zero-constant witnesses without evaluating macro arguments or stored native
@@ -240,16 +258,12 @@ pub(crate) fn probe(
 fn source(
     session: &AnalysisSession<'_>,
     candidates: &[Candidate],
+    selected: &[usize],
 ) -> Result<String, FrontendError> {
     let header = super::c_header_path(&session.frontend().profile().header)?;
     let mut source = format!("#include \"{header}\"\n");
-    for (index, candidate) in candidates.iter().enumerate() {
-        writeln!(
-            source,
-            "enum {{ __pgrx_integer_zero_{index} = (({}) == 0) }};\nconst int __pgrx_integer_zero_driver_{index} = __pgrx_integer_zero_{index};",
-            candidate.expression
-        )
-        .expect("String output");
+    for &index in selected {
+        source.push_str(&witness(index, &candidates[index].expression));
         if source.len() > MAX_SOURCE_BYTES {
             return Err(FrontendError::Output(
                 "integer ICE proof exceeds its 1 MiB source budget".into(),
@@ -268,7 +282,7 @@ fn collect(
 ) -> Result<BTreeSet<usize>, FrontendError> {
     let profile = session.frontend().profile();
     let mut arguments = driver_arguments(
-        &profile.arguments,
+        &super::normalized_arguments(&profile.arguments),
         &["-S", "-emit-llvm", "-O1", "-o", "-", "-Werror=integer-overflow"],
         None,
     );

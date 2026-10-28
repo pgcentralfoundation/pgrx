@@ -784,7 +784,7 @@ fn preprocess_prepared<'a>(
     let mut pending = (0..prepared.len()).collect::<BTreeSet<_>>();
     let path = directory.join("expansion.c");
     let overlay = overlay(directory, &frontend.profile().header, &path)?;
-    let mut arguments = paste::normalized_arguments(&frontend.profile().arguments);
+    let mut arguments = crate::frontend::normalized_arguments(&frontend.profile().arguments);
     arguments.extend([
         "-ivfsoverlay".into(),
         overlay

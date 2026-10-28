@@ -599,6 +599,51 @@ impl CompilerSearch {
     }
 }
 
+/// Keep diagnostic ownership independent of user diagnostic-display flags.
+pub(crate) fn normalized_arguments(arguments: &[String]) -> Vec<String> {
+    let mut arguments = arguments.to_vec();
+    arguments.extend(
+        [
+            "-ferror-limit=0",
+            "-fmacro-backtrace-limit=0",
+            "-fno-color-diagnostics",
+            "-fdiagnostics-format=clang",
+            "-fcaret-diagnostics",
+            "-fshow-column",
+            "-fshow-source-location",
+            "-fmessage-length=0",
+        ]
+        .map(str::to_owned),
+    );
+    arguments
+}
+
+/// Classify a failed batch of optional probe candidates whose witnesses carry
+/// `#line 1 "{file}{index}"` presumed files. Returns the sorted `selected` candidates that own a
+/// driver error; requires [`normalized_arguments`] so no error limit hides an owner. An empty set
+/// means no failure has an owner and the caller bisects: libclang-only failures, and diagnostics
+/// over the output budget, which no error limit bounds but halving the batch reduces. Other
+/// errors are returned, including the time limit, since bisecting it could spend the whole run
+/// budget at a minute per run.
+fn failure_owners(
+    error: FrontendError,
+    file: &str,
+    selected: &[usize],
+) -> Result<BTreeSet<usize>, FrontendError> {
+    match error {
+        FrontendError::CompilerFailed { diagnostics, .. } => Ok(diagnostics
+            .lines()
+            .filter(|line| line.contains(": error: ") || line.contains(": fatal error: "))
+            .filter_map(|line| line.strip_prefix(file)?.split_once(':')?.0.parse().ok())
+            .filter(|index| selected.binary_search(index).is_ok())
+            .collect()),
+        FrontendError::OutputLimit(_) | FrontendError::Discovery(crate::Error::Diagnostics(_)) => {
+            Ok(BTreeSet::new())
+        }
+        error => Err(error),
+    }
+}
+
 /// Build a C-mode invocation from recorded flags and phase-specific options without changing the
 /// inspected input profile.
 pub(crate) fn driver_arguments(
@@ -3188,6 +3233,28 @@ mod tests {
             assert!(profile.inputs.fingerprints[&dependency].is_some());
             assert!(profile.inputs.fingerprints[&dependency.canonicalize().unwrap()].is_some());
         }
+    }
+
+    /// Optional probe batches drop the selected candidates that own a driver error and bisect
+    /// failures without an owner, including oversized diagnostics. A time limit still propagates.
+    #[cfg(unix)]
+    #[test]
+    fn optional_probe_failures_without_owners_bisect() {
+        use std::os::unix::process::ExitStatusExt;
+        let owners = |error| failure_owners(error, "__probe_", &[1, 3]);
+        let failed = FrontendError::CompilerFailed {
+            compiler: "clang".into(),
+            status: ExitStatus::from_raw(1 << 8),
+            diagnostics: "__probe_3:1:9: error: owned\n__probe_2:1:9: error: unselected\n\
+                          __probe_1:1:9: warning: not an error\n"
+                .into(),
+        };
+        assert_eq!(owners(failed).unwrap(), BTreeSet::from([3]));
+        assert!(owners(FrontendError::OutputLimit("clang".into())).unwrap().is_empty());
+        assert!(matches!(
+            owners(FrontendError::Timeout("clang".into())),
+            Err(FrontendError::Timeout(_))
+        ));
     }
 
     /// Stop a still-running writer when its witness exceeds the shared output budget.

@@ -562,8 +562,8 @@ fn header_availability_tracks_symlink_identity_and_rejects_changed_inputs() {
     assert!(mutation.contains("changed after inspection"), "{mutation}");
 }
 
-/// Optional ICE isolation may exhaust its finite budget without invalidating established macros
-/// or inventing zero identities for expressions whose C arithmetic overflows.
+/// Failing ICE witnesses must neither exhaust the finite isolation budget before valid siblings are
+/// visited nor invent zero identities for expressions whose C arithmetic overflows.
 #[test]
 fn optional_integer_zero_probe_budget_preserves_proved_facts() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -576,14 +576,20 @@ fn optional_integer_zero_probe_budget_preserves_proved_facts() {
         source.push_str(&format!("#define {name}(value) (2147483647 + 1)\n"));
         names.push(name);
     }
-    source.push_str("#define Z_VALID_ZERO(value) (1 - 1)\n");
-    names.push("Z_VALID_ZERO".into());
+    // Candidates follow name order, and bisection visits the last range first,
+    // so the first valid name is the one an exhausted budget leaves unproved.
+    for name in ["A_VALID_ZERO", "Z_VALID_ZERO"] {
+        source.push_str(&format!("#define {name}(value) (1 - 1)\n"));
+        names.push(name.into());
+    }
     std::fs::write(&header, source).unwrap();
     let scanner = MacroScanner::new().unwrap();
     let frontend = inspect(&scanner, &header, &[], None).unwrap();
     let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
-    let valid = session.analyze("Z_VALID_ZERO");
-    assert!(!valid.expression.unwrap().integer_zero_constants.is_empty());
+    for name in ["A_VALID_ZERO", "Z_VALID_ZERO"] {
+        let valid = session.analyze(name);
+        assert!(!valid.expression.unwrap().integer_zero_constants.is_empty(), "{name}");
+    }
     for name in &names[..100] {
         assert!(session.analyze(name).expression.unwrap().integer_zero_constants.is_empty());
     }
@@ -635,14 +641,16 @@ fn native_helpers_do_not_require_postgres_coverage_runtime() {
 }
 
 /// Anonymous enum bitfields have no usable standalone type spelling for writable witnesses.
-/// Exhausting their isolation budget must retain ordinary macro and independently proved field
-/// support instead of rejecting the entire inspected header.
+/// Their failures must neither exhaust the isolation budget before valid siblings are visited nor
+/// reject ordinary macro and independently proved field support in the inspected header.
 #[test]
 fn optional_bitfield_probe_budget_preserves_proved_fields() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let directory = Directory::new();
     let header = directory.0.join("bitfield-budget.h");
-    let mut source = String::from("struct FrontBudget {\n");
+    // Candidates follow declaration order, and bisection visits the last range
+    // first, so the leading valid field is the one an exhausted budget loses.
+    let mut source = String::from("struct FrontBudget {\nunsigned int leading : 1;\n");
     for index in 0..100 {
         source.push_str(&format!("enum {{ BUDGET_ONE_{index} = 1 }} flag_{index} : 1;\n"));
     }
@@ -650,13 +658,48 @@ fn optional_bitfield_probe_budget_preserves_proved_fields() {
     std::fs::write(&header, source).unwrap();
     let scanner = MacroScanner::new().unwrap();
     let frontend = inspect(&scanner, &header, &[], None).unwrap();
-    assert!(frontend.declarations().bitfields.contains_key("struct FrontBudget::proven"));
-    assert!(!frontend.declarations().bitfields.contains_key("struct FrontBudget::flag_0"));
+    assert_eq!(
+        frontend.declarations().bitfields.keys().collect::<Vec<_>>(),
+        ["struct FrontBudget::leading", "struct FrontBudget::proven"]
+    );
     let session = AnalysisSession::prepare(&scanner, &frontend, &["BUDGET_PLAIN"]).unwrap();
     assert!(matches!(
         pgrx_c_macros::emit(&session, "BUDGET_PLAIN").status,
         pgrx_c_macros::EmissionStatus::Emitted { .. }
     ));
+}
+
+/// Without an error limit, failing bitfield witnesses can print more diagnostics than the captured
+/// output budget. That failure has no owner, so isolation must bisect it rather than reject the
+/// inspected header and the independently proved fields.
+#[test]
+fn oversized_bitfield_diagnostics_preserve_proved_fields() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = Directory::new();
+    // Every failing witness prints the full backtrace of its field's macro
+    // chain, and each note names the header. The long name keeps the whole
+    // batch above the 16 MiB budget and each half below it, whatever the
+    // temporary directory's length, so the test needs only one bisection.
+    let header = directory.0.join(format!("{}.h", "h".repeat(200)));
+    let mut source = String::from("struct NoisyBudget {\nunsigned int leading : 1;\n");
+    for index in 0..64 {
+        source.push_str(&format!("unsigned int shadowed_{index} : 1;\n"));
+    }
+    source.push_str("unsigned int proven : 1;\n};\n");
+    for index in 0..64 {
+        source.push_str(&format!("#define shadowed_{index} NOISY_0\n"));
+    }
+    for depth in 0..120 {
+        source.push_str(&format!("#define NOISY_{depth} NOISY_{}\n", depth + 1));
+    }
+    source.push_str("#define NOISY_120 0\n");
+    std::fs::write(&header, source).unwrap();
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    assert_eq!(
+        frontend.declarations().bitfields.keys().collect::<Vec<_>>(),
+        ["struct NoisyBudget::leading", "struct NoisyBudget::proven"]
+    );
 }
 
 /// Cross-generated native helpers must be real COFF archives that a Windows linker can consume,

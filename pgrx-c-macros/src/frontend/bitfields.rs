@@ -10,10 +10,10 @@
 //! before admitting volatile capabilities. Failed candidates are isolated rather than assigning
 //! unchecked facts to unrelated fields.
 
-use super::{FrontendError, driver_arguments, run_compiler_with_input, type_info};
+use super::{FrontendError, driver_arguments, failure_owners, run_compiler_with_input, type_info};
 use crate::{BitfieldFacts, FrontendOutput, MacroScanner, TypeInfo};
 use clang::{EntityKind, EntityVisitResult};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Write;
 
 /// Bound bitfield candidate collection before allocating the compiler probe batch.
@@ -93,9 +93,11 @@ pub(super) fn probe(
     }
     let mut result = BTreeMap::new();
     let mut pending = vec![(0, candidates.len())];
+    let mut failed = BTreeSet::new();
     let mut runs = 0;
     while let Some((start, end)) = pending.pop() {
-        if start == end {
+        let selected = (start..end).filter(|index| !failed.contains(index)).collect::<Vec<_>>();
+        if selected.is_empty() {
             continue;
         }
         runs += 1;
@@ -104,11 +106,12 @@ pub(super) fn probe(
             // independently proved fields instead of failing unrelated macros.
             break;
         }
-        let source = source(frontend, &candidates[start..end])?;
+        let source = source(frontend, &candidates, &selected)?;
         match collect(scanner, frontend, &source) {
             Ok(types) => {
                 let access = volatile_units(frontend, &source)?;
-                for (index, candidate) in candidates[start..end].iter().enumerate() {
+                for &index in &selected {
+                    let candidate = &candidates[index];
                     let Some(promoted) = types.get(&format!("__pgrx_bitfield_{index}_promoted"))
                     else {
                         continue;
@@ -135,16 +138,20 @@ pub(super) fn probe(
                     );
                 }
             }
-            Err(
-                FrontendError::CompilerFailed { .. }
-                | FrontendError::Discovery(crate::Error::Diagnostics(_)),
-            ) => {
-                if end - start > 1 {
-                    let middle = start + (end - start) / 2;
+            Err(error) => {
+                // Remove the fields whose own witnesses failed, such as anonymous
+                // enum fields without a writable type spelling, and require a clean
+                // pass for the rest. Only a clean pass admits facts; bisect when no
+                // failure has an owner.
+                let owned = failure_owners(error, PROBE_FILE, &selected)?;
+                if !owned.is_empty() {
+                    failed.extend(owned);
+                    pending.push((start, end));
+                } else if selected.len() > 1 {
+                    let middle = selected[selected.len() / 2];
                     pending.extend([(start, middle), (middle, end)]);
                 }
             }
-            Err(error) => return Err(error),
         }
     }
     Ok(result)
@@ -170,12 +177,22 @@ fn identifier(value: &str) -> bool {
         && bytes.all(|byte| byte == b'_' || byte.is_ascii_alphanumeric())
 }
 
+/// Name the presumed file of one candidate's witnesses so driver errors identify their owner.
+const PROBE_FILE: &str = "__pgrx_bitfield_probe_";
+
 /// Generate bounded type and access witnesses for original, unaligned, and enclosing-record bitfield
-/// expressions.
-fn source(frontend: &FrontendOutput, candidates: &[Candidate]) -> Result<String, FrontendError> {
+/// expressions. Each selected candidate keeps its global index in witness names and its own
+/// `#line` probe file.
+fn source(
+    frontend: &FrontendOutput,
+    candidates: &[Candidate],
+    selected: &[usize],
+) -> Result<String, FrontendError> {
     let quoted = super::c_header_path(&frontend.profile().header)?;
     let mut source = format!("#include \"{quoted}\"\n");
-    for (index, candidate) in candidates.iter().enumerate() {
+    for &index in selected {
+        let candidate = &candidates[index];
+        writeln!(source, "#line 1 \"{PROBE_FILE}{index}\"").expect("String output");
         let place = format!("(({} *)0)->{}", candidate.record_type, candidate.field);
         writeln!(source, "typedef __typeof__(+({place})) __pgrx_bitfield_{index}_promoted;")
             .expect("String output");
@@ -287,7 +304,11 @@ fn collect(
     source: &str,
 ) -> Result<BTreeMap<String, TypeInfo>, FrontendError> {
     let profile = frontend.profile();
-    let mut arguments = driver_arguments(&profile.arguments, &["-fsyntax-only"], None);
+    let mut arguments = driver_arguments(
+        &super::normalized_arguments(&profile.arguments),
+        &["-fsyntax-only"],
+        None,
+    );
     arguments.push("-".into());
     run_compiler_with_input(
         &profile.compiler.executable,
