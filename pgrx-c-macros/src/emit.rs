@@ -211,6 +211,10 @@ pub struct MacroEmission {
     pub analysis: MacroAnalysis,
     /// Lowering result under the binding catalog and C profile used for this generation.
     pub status: EmissionStatus,
+    /// Why a static inline function's translated definition was not emitted, when the
+    /// emitted macro calls the original function instead.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fallback: Option<SkipReason>,
 }
 
 /// Either reviewable Rust source or a structured explanation of why lowering was rejected.
@@ -281,20 +285,18 @@ fn emit_with_lowering<'a>(
 ) -> MacroEmission {
     let mut analysis = session.analyze(name);
     let mut lowered = lower(session, &analysis, bindings, adapters, lowering);
+    let mut fallback = None;
     // A translated inline function that cannot be rendered is still callable through
-    // its guarded native binding.
-    if lowered.is_err()
-        && session.inline_definition(name).is_some()
-        && analysis
-            .expression
-            .as_ref()
-            .is_some_and(|expression| expression.syntax.statement_body.is_some())
+    // its guarded native binding. The report keeps the reason the translation failed.
+    if let Err(reason) = &lowered
+        && translated_inline(session, &analysis)
         && let Some(call) = session.analyze_inline_call(name)
     {
-        let fallback = lower(session, &call, bindings, adapters, lowering);
-        if fallback.is_ok() {
+        let call_lowered = lower(session, &call, bindings, adapters, lowering);
+        if call_lowered.is_ok() {
+            fallback = Some(reason.clone());
             analysis = call;
-            lowered = fallback;
+            lowered = call_lowered;
         }
     }
     let status = match lowered {
@@ -305,7 +307,7 @@ fn emit_with_lowering<'a>(
         },
         Err(reason) => EmissionStatus::Skipped { reason },
     };
-    MacroEmission { analysis, status }
+    MacroEmission { analysis, status, fallback }
 }
 
 /// Check bindings and render one analyzed root.
@@ -466,12 +468,14 @@ fn emit_prepared_batch(
                     MacroEmission {
                         analysis: emission.analysis.clone(),
                         status: EmissionStatus::Skipped { reason },
+                        fallback: None,
                     }
                 } else if roots.contains_key(name) {
                     let reason = roots[name].clone();
                     MacroEmission {
                         analysis: emission.analysis.clone(),
                         status: EmissionStatus::Skipped { reason },
+                        fallback: None,
                     }
                 } else {
                     emit_with_lowering(session, name, available, adapters, &mut available_lowering)
@@ -504,6 +508,7 @@ fn emit_prepared_batch(
                         &late[&impact.root],
                     ),
                 };
+                emission.fallback = None;
             }
         }
         emissions

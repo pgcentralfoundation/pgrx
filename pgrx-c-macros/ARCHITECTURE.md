@@ -482,7 +482,8 @@ are then initialized from the bound values. In a value-returning function every
 path must return, and `return` breaks out of a labeled block, converted to the
 result type; a void body has no `return` and evaluates to `()`. Rust hygiene keeps
 caller tokens from seeing the locals, so no local-name guard applies. A body the
-analyzer or renderer refuses falls back to the call root. Demand planning covers
+analyzer or renderer refuses falls back to the call root. A renderer refusal is
+kept as the emission's `fallback` reason in the report. Demand planning covers
 the call root of every translated function, since rendering may fall back to it;
 the final support is planned from the roots actually emitted.
 

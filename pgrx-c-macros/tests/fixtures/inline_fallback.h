@@ -12,3 +12,5 @@ static inline int FALLBACK_RANK(FallbackShade shade) { return FALLBACK_HELPER((i
 typedef int (*FallbackRankFunction)(FallbackShade);
 /* Uses only FALLBACK_RANK's address. */
 #define FALLBACK_ADDRESS() ((FallbackRankFunction) &FALLBACK_RANK)
+typedef enum FallbackColor { FALLBACK_RED = 1, FALLBACK_BLUE = 2 } FallbackColor;
+static inline int FALLBACK_COLOR_USE(int value) { return value + FALLBACK_BLUE; }

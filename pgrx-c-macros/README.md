@@ -195,7 +195,9 @@ changing `.get()` or the original C identity. Native calls retain generated FFI
 guards and require the original function's unsafe caller contract.
 
 `emit` writes Rust source to stdout and skip reasons to stderr. JSON output contains
-the compilation profile, analysis, source, and structured skips. Emitted source
+the compilation profile, analysis, source, and structured skips. An inline function
+whose translation could not be rendered, for example because bindgen and Clang
+disagree about a constant it uses, records that reason as `fallback`. Emitted source
 uses `$crate::__pgrx_c_macros`, provided by `pgrx-pg-sys`, and includes a target guard.
 Each generated macro's `///` doc comments include its source location and full unexpanded
 C macro definition in a fenced `text` block. As in `list` output, whitespace is normalized

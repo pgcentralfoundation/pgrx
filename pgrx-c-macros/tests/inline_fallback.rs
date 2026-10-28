@@ -2,7 +2,8 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
 //! A translated inline function that cannot be rendered calls the original function
-//! instead. The generated support must provide that call.
+//! instead. The generated support must provide that call, and the report must say why
+//! the translation was not used.
 
 #![cfg(all(
     target_pointer_width = "64",
@@ -23,8 +24,9 @@ mod oracle;
 mod rust_oracle;
 
 use pgrx_c_macros::{
-    AnalysisSession, BindingCatalog, EmissionStatus, FrontendOutput, MacroScanner,
-    generate_with_bindings, inspect,
+    AnalysisSession, BindingCatalog, EmissionStatus, FrontendOutput, IntegerBinding,
+    IntegerBindingRepresentation, IntegerValue, MacroScanner, SkipReasonCode,
+    emit_batch_with_bindings, generate_with_bindings, inspect,
 };
 use std::path::PathBuf;
 
@@ -36,7 +38,8 @@ fn is_builtin_oid(name: &str) -> bool {
 }
 
 /// Inline functions and macros the fixture can select.
-const NAMES: &[&str] = &["FALLBACK_RANK", "FALLBACK_REFUSED", "FALLBACK_ADDRESS"];
+const NAMES: &[&str] =
+    &["FALLBACK_RANK", "FALLBACK_REFUSED", "FALLBACK_ADDRESS", "FALLBACK_COLOR_USE"];
 
 /// The fixture header.
 fn header() -> PathBuf {
@@ -79,14 +82,20 @@ fn catalog(
     catalog
 }
 
+/// Check both fallbacks with the one Clang instance a process may hold.
+#[test]
+fn fallback_calls_keep_their_support_and_report_why() {
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    fallback_calls_keep_their_generated_support(&scanner);
+    binding_disagreements_are_reported_for_fallback_calls(&scanner);
+}
+
 /// A fallback call root keeps the native support it calls, whichever other roots demanded
 /// that support first: a caller refused while rendering, or a use of only the address.
-#[test]
-fn fallback_calls_keep_their_generated_support() {
-    let scanner = MacroScanner::new().expect("libclang must be available");
-    let (frontend, bindings) = inspect_fixture(&scanner);
+fn fallback_calls_keep_their_generated_support(scanner: &MacroScanner) {
+    let (frontend, bindings) = inspect_fixture(scanner);
     let session = AnalysisSession::prepare_with_inline_functions(
-        &scanner,
+        scanner,
         &frontend,
         &[] as &[String],
         &[] as &[String],
@@ -123,6 +132,8 @@ fn fallback_calls_keep_their_generated_support() {
                 (_, EmissionStatus::Emitted { rust: definition, .. }) => {
                     if name == "FALLBACK_RANK" {
                         assert!(definition.contains("Typed call adapter for C inline function"));
+                        let reason = emission.fallback.as_ref().expect("translation refusal");
+                        assert!(reason.message.contains("FALLBACK_HELPER"), "{reason:?}");
                     }
                     rust.push_str(definition);
                 }
@@ -153,4 +164,49 @@ fn fallback_calls_keep_their_generated_support() {
         assert_eq!(generated, expected, "{other}");
     }
     session.verify_inputs().expect("original profile stayed unchanged");
+}
+
+/// A bindgen and Clang disagreement keeps the translation from being emitted. The
+/// emission calls the original function, and its report names the disagreement.
+fn binding_disagreements_are_reported_for_fallback_calls(scanner: &MacroScanner) {
+    let (frontend, bindings) = inspect_fixture(scanner);
+    let names = ["FALLBACK_COLOR_USE"];
+    let session = AnalysisSession::prepare_with_inline_functions(
+        scanner,
+        &frontend,
+        &[] as &[String],
+        &[] as &[String],
+        &names,
+    )
+    .expect("prepare roots");
+    let mut catalog = catalog(&session, &frontend, &bindings);
+    let blue = &frontend.declarations().integer_constants["FALLBACK_BLUE"];
+    for value in [blue.value, IntegerValue::Signed(3)] {
+        catalog.integer_constants.insert(
+            "FALLBACK_BLUE".into(),
+            IntegerBinding {
+                path: vec!["FALLBACK_BLUE".into()],
+                value,
+                representation: IntegerBindingRepresentation::Primitive,
+            },
+        );
+        let [emission] = &emit_batch_with_bindings(&session, &names, &catalog).unwrap()[..] else {
+            panic!("one emission");
+        };
+        let EmissionStatus::Emitted { rust, .. } = &emission.status else {
+            panic!("{emission:?}");
+        };
+        let report = serde_json::to_value(emission).unwrap();
+        if value == blue.value {
+            assert!(rust.contains("Translates the original function definition"));
+            assert!(emission.fallback.is_none());
+            assert!(report.get("fallback").is_none());
+        } else {
+            assert!(rust.contains("Typed call adapter for C inline function"));
+            let reason = emission.fallback.as_ref().expect("translation refusal");
+            assert_eq!(reason.code, SkipReasonCode::BindingValueMismatch);
+            assert!(reason.message.contains("FALLBACK_BLUE"), "{reason:?}");
+            assert_eq!(report["fallback"]["code"], "binding_value_mismatch");
+        }
+    }
 }
