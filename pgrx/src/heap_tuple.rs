@@ -337,7 +337,8 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByRust> {
     /// Attribute numbers start at 1, not 0.
     ///
     /// ## Errors
-    /// - return [TryFromDatumError::NoSuchAttributeNumber] if the attribute does not exist
+    /// - return [TryFromDatumError::NoSuchAttributeNumber] if the attribute does not exist or
+    ///   has been dropped
     /// - return [TryFromDatumError::IncompatibleTypes] if the Rust type of the `value` is not
     ///   compatible with the attribute's Postgres type
     pub fn set_by_index<T: IntoDatum>(
@@ -346,7 +347,9 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByRust> {
         value: T,
     ) -> Result<(), TryFromDatumError> {
         unsafe {
-            match self.get_attribute_by_index(attno) {
+            // A dropped attribute's type is InvalidOid. The checks below raise an ERROR for it,
+            // or accept a `T` whose `type_oid` is also InvalidOid.
+            match self.get_attribute_by_index(attno).filter(|att| !att.is_dropped()) {
                 None => return Err(TryFromDatumError::NoSuchAttributeNumber(attno)),
                 Some(att) => {
                     // if the attribute's type is an array and our incoming value is a composite

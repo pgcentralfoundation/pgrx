@@ -1175,4 +1175,21 @@ mod tests {
         }
         Ok(())
     }
+
+    /// Setting a dropped attribute returns `NoSuchAttributeNumber`. Its type is InvalidOid, so
+    /// the type check raised an ERROR for `&str` and accepted a tuple, whose `type_oid` is also
+    /// InvalidOid.
+    #[pg_test]
+    fn test_set_by_index_rejects_dropped_attribute() -> Result<(), spi::Error> {
+        Spi::run(
+            "CREATE TYPE CollarlessDog AS (name text, collar text, scritches int4);
+             ALTER TYPE CollarlessDog DROP ATTRIBUTE collar;",
+        )?;
+        let mut dog = PgHeapTuple::new_composite_type("CollarlessDog").unwrap();
+        let collar = NonZeroUsize::new(2).unwrap();
+        let rejected = Err(TryFromDatumError::NoSuchAttributeNumber(collar));
+        assert_eq!(dog.set_by_index(collar, "red"), rejected);
+        assert_eq!(dog.set_by_index(collar, (Some(1), Some(2))), rejected);
+        Ok(())
+    }
 }
