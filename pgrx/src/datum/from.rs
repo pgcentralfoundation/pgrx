@@ -47,13 +47,15 @@ pub trait FromDatum: Sized {
     /// Should a type OID be fetched when calling `from_datum`?
     const GET_TYPOID: bool = false;
 
-    /// Does `from_polymorphic_datum` return a value that points into the Datum's memory but has
-    /// no lifetime that keeps that memory alive?
+    /// Can safe code read the Datum's memory through the value that `from_polymorphic_datum`
+    /// returns, although the value has no lifetime that keeps that memory alive?
     ///
     /// Code that can free the Datum's memory while the value lives reads such a type with
-    /// [`FromDatum::from_datum_in_memory_context`], which must then return a copy.
+    /// [`FromDatum::from_datum_in_memory_context`], which must then return a value that does not
+    /// read the Datum's memory, such as a copy.
     /// [`PgHeapTuple::get_by_index`](crate::heap_tuple::PgHeapTuple::get_by_index) does, because
-    /// a tuple frees its memory when it drops or when an attribute is set.
+    /// a tuple frees its memory when it drops or when an attribute is set. A raw
+    /// [`pg_sys::Datum`] leaves this `false`, because only `unsafe` code can dereference it.
     const POINTS_INTO_DATUM: bool = false;
 
     /// ## Safety

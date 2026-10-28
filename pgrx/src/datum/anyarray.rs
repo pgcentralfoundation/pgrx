@@ -106,6 +106,8 @@ impl AnyArray {
 
 impl FromDatum for AnyArray {
     const GET_TYPOID: bool = true;
+    // `value` reads the Datum's memory, and `from_datum_in_memory_context` copies it.
+    const POINTS_INTO_DATUM: bool = true;
 
     /// You should **never** call this function to make this type; it will unconditionally panic.
     /// For polymorphic types such as this one, you must use [`FromDatum::from_polymorphic_datum`]

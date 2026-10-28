@@ -26,12 +26,18 @@ use core::ffi::CStr;
 /// a good way to constrain lifetimes correctly without forcing from-Datum types to go through a
 /// wrapper type bound by the lifetime of the Datum. And what would you use as the bound, hmm?
 ///
-/// If `As<'src>` does not name `'src`, `unbox` must return a value that does not point into the
-/// Datum's memory. `Vec<T>` and `Array::into_iter` keep such values after they free the array
-/// they unboxed them from. [`PgHeapTuple::get_by_index`] relies on the same bound but reads
-/// through [`FromDatum`], so such a type's `from_polymorphic_datum` must not return a value that
-/// points into the Datum either, unless the type sets [`FromDatum::POINTS_INTO_DATUM`] and its
-/// `from_datum_in_memory_context` returns a copy.
+/// If `As<'src>` does not name `'src`, safe code must not be able to read the Datum's memory
+/// through the value that `unbox` returns, because `Vec<T>` and `Array::into_iter` keep such
+/// values after they free the array they unboxed them from. A raw [`pg_sys::Datum`] meets this,
+/// because only `unsafe` code can dereference it, and `PgBox<T>` meets it by unboxing a copy.
+/// [`PgHeapTuple::get_by_index`] relies on the same rule but reads through [`FromDatum`], so the
+/// value that such a type's `from_polymorphic_datum` returns must meet it too, unless the type
+/// sets [`FromDatum::POINTS_INTO_DATUM`] and its `from_datum_in_memory_context` returns a value
+/// that does not read the Datum's memory.
+///
+/// `unbox` must be sound for every value of a type that [`UnboxDatum::can_unbox`] accepts and
+/// that the caller's type comparison matched to `Self`. Override `can_unbox` to reject the types
+/// whose values `unbox` cannot read.
 pub unsafe trait UnboxDatum {
     // TODO: Currently, this doesn't actually get used to identify all the cases where the Datum
     // is actually a pointer type. However, it has been noted that Postgres does yield nullptr
