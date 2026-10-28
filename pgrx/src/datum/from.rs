@@ -99,6 +99,15 @@ pub trait FromDatum: Sized {
     /// a `Result` around an `Option`, as a Datum can be null.  It's intended to be used in
     /// situations where the caller needs to know whether the type conversion succeeded or failed.
     ///
+    /// ## Errors
+    ///
+    /// Returns [`TryFromDatumError::IncompatibleTypes`] if `type_oid` is InvalidOid, or if
+    /// [`IntoDatum::is_compatible_with`] rejects `type_oid` and it either names no type or is not
+    /// binary coercible to [`IntoDatum::type_oid`].
+    ///
+    /// [`IntoDatum::type_oid`] itself can raise an ERROR: `PgBox<T>` and `#[derive(PostgresType)]`
+    /// types look their type up by name, and no type may have that name.
+    ///
     /// ## Safety
     ///
     /// Same caveats as `FromDatum::from_datum(...)`
@@ -124,6 +133,14 @@ pub trait FromDatum: Sized {
     }
 
     /// A version of `try_from_datum` that switches to the given context to convert from Datum
+    ///
+    /// ## Errors
+    ///
+    /// The same as [`FromDatum::try_from_datum`].
+    ///
+    /// ## Safety
+    ///
+    /// Same caveats as `FromDatum::from_datum(...)`
     #[inline]
     unsafe fn try_from_datum_in_memory_context(
         memory_context: PgMemoryContexts,
@@ -147,16 +164,38 @@ pub trait FromDatum: Sized {
     }
 }
 
+/// Can `T` read a value of type `type_oid`? Returns false, without raising an ERROR, for
+/// InvalidOid and for an OID that names no type.
 fn is_binary_coercible<T: IntoDatum>(type_oid: pg_sys::Oid) -> bool {
-    T::is_compatible_with(type_oid) || unsafe { pg_sys::IsBinaryCoercible(type_oid, T::type_oid()) }
+    // InvalidOid names no type, but it equals `T::type_oid()` when T's type does not exist, as
+    // for `Array<Array<i32>>` (int4[] has no array type), and IsBinaryCoercible accepts it for
+    // `anyelement`.
+    if type_oid == pg_sys::Oid::INVALID {
+        return false;
+    }
+    T::is_compatible_with(type_oid)
+        // SAFETY: both functions take the OIDs by value and only look them up. get_typtype
+        // returns '\0' for an OID with no pg_type row, for which IsBinaryCoercible would raise
+        // an ERROR.
+        || unsafe {
+            pg_sys::get_typtype(type_oid) != 0 && pg_sys::IsBinaryCoercible(type_oid, T::type_oid())
+        }
 }
 
-/// Retrieves a Postgres type name given its Oid
+/// Retrieves a Postgres type name given its Oid: `-` for InvalidOid and `???` for an OID that
+/// names no type.
 pub(crate) fn lookup_type_name(oid: pg_sys::Oid) -> String {
+    // The bindings type the flag as u32. format_type_extended takes bits16 before PG19 and
+    // uint16 since; both are u16.
+    const ALLOW_INVALID: u16 = {
+        assert!(pg_sys::FORMAT_TYPE_ALLOW_INVALID <= u16::MAX as u32);
+        pg_sys::FORMAT_TYPE_ALLOW_INVALID as u16
+    };
     unsafe {
-        // SAFETY: nothing to concern ourselves with other than just calling into Postgres FFI
-        // and Postgres will raise an ERROR if we pass it an invalid Oid, so it'll never return a null
-        let cstr_name = pg_sys::format_type_extended(oid, -1, 0);
+        // SAFETY: format_type_extended takes the OID by value. FORMAT_TYPE_ALLOW_INVALID makes
+        // it name an invalid or unknown OID instead of raising an ERROR, and without
+        // FORMAT_TYPE_INVALID_AS_NULL it always returns a palloc'd C string, never null.
+        let cstr_name = pg_sys::format_type_extended(oid, -1, ALLOW_INVALID);
         let cstr = CStr::from_ptr(cstr_name);
         let typname = cstr.to_string_lossy().to_string();
         pg_sys::pfree(cstr_name as _); // don't leak the palloc'd cstr_name

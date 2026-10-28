@@ -347,8 +347,8 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByRust> {
         value: T,
     ) -> Result<(), TryFromDatumError> {
         unsafe {
-            // A dropped attribute's type is InvalidOid. The checks below raise an ERROR for it,
-            // or accept a `T` whose `type_oid` is also InvalidOid.
+            // A dropped attribute's type is InvalidOid, which the checks below would accept for a
+            // `T` whose `type_oid` is also InvalidOid, such as `Array<Array<i32>>`.
             match self.get_attribute_by_index(attno).filter(|att| !att.is_dropped()) {
                 None => return Err(TryFromDatumError::NoSuchAttributeNumber(attno)),
                 Some(att) => {
@@ -448,13 +448,12 @@ impl<'mcx, AllocatedBy: WhoAllocated> IntoDatum for PgHeapTuple<'mcx, AllocatedB
     }
 
     fn is_compatible_with(other: pg_sys::Oid) -> bool {
-        fn is_composite(oid: pg_sys::Oid) -> bool {
-            unsafe {
-                let entry = pg_sys::lookup_type_cache(oid, pg_sys::TYPECACHE_TUPDESC as _);
-                (*entry).typtype as i8 == pg_sys::RELKIND_COMPOSITE_TYPE as i8
+        // SAFETY: get_typtype takes the OID by value and only looks it up. It returns '\0' for an
+        // OID that names no type, where lookup_type_cache would raise an ERROR.
+        Self::type_oid() == other
+            || unsafe {
+                pg_sys::get_typtype(other) == pg_sys::TYPTYPE_COMPOSITE as core::ffi::c_char
             }
-        }
-        Self::type_oid() == other || is_composite(other)
     }
 }
 
