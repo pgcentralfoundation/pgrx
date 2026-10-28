@@ -1281,6 +1281,12 @@ archives the object, and then publishes it. A failed compiler or archiver must
 not reuse an old object as success. Object/archive publication is not a single
 transaction; an error can occur after the object was replaced.
 
+The archiver comes from the inspected Clang's LLVM release: an adjacent
+`llvm-lib` for Windows targets, then an adjacent `llvm-ar`, then `llvm-ar-<major>`
+beside a `clang-<major>` driver, then `llvm-ar` beside the driver's resolved path,
+as in Debian's `/usr/lib/llvm-<major>/bin`. Only then does it fall back to
+`llvm-ar` on `PATH` for Windows targets or the system `ar` otherwise.
+
 Preprocess the generated translation unit first with the original inspected
 arguments into an owned staged `.i` file. Compile that already-preprocessed input
 with `-x cpp-output`, so backend options cannot change header branches such as
