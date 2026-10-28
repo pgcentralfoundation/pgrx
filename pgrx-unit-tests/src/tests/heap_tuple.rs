@@ -925,13 +925,21 @@ mod tests {
             let unpacked_len =
                 unsafe { pg_sys::VARSIZE_ANY!(tuple.t_data.cast::<pg_sys::varlena>()).get() };
             assert_eq!(tuple.t_len as usize, unpacked_len as usize);
-            let name = pgrx::htup::heap_getattr::<String, _>(
-                &tuple,
-                NonZeroUsize::new(1).unwrap(),
-                &tupdesc,
-            );
-            let scritches =
-                pgrx::htup::heap_getattr::<i32, _>(&tuple, NonZeroUsize::new(2).unwrap(), &tupdesc);
+            // SAFETY: `tuple` is the live Dog row that `tupdesc` describes.
+            let (name, scritches) = unsafe {
+                (
+                    pgrx::htup::heap_getattr::<String, _>(
+                        &tuple,
+                        NonZeroUsize::new(1).unwrap(),
+                        &tupdesc,
+                    ),
+                    pgrx::htup::heap_getattr::<i32, _>(
+                        &tuple,
+                        NonZeroUsize::new(2).unwrap(),
+                        &tupdesc,
+                    ),
+                )
+            };
             assert_eq!(name.as_deref(), Some("Nami"));
             assert_eq!(scritches, Some(7));
             Ok(())
@@ -942,10 +950,13 @@ mod tests {
     fn test_htup_heap_getattr_rejects_attno_past_tupdesc() {
         let (tupdesc, tuple) = scritched_dog();
         let scritches = NonZeroUsize::new(2).unwrap();
-        assert_eq!(pgrx::htup::heap_getattr::<i32, _>(&tuple, scritches, &tupdesc), Some(3));
+        // SAFETY: `tuple` is the live Dog row that `tupdesc` describes.
+        let read = unsafe { pgrx::htup::heap_getattr::<i32, _>(&tuple, scritches, &tupdesc) };
+        assert_eq!(read, Some(3));
 
         let past_end = NonZeroUsize::new(3).unwrap();
-        let _ = pgrx::htup::heap_getattr::<i32, _>(&tuple, past_end, &tupdesc);
+        // SAFETY: as above; the attribute number is checked against `tupdesc`.
+        let _ = unsafe { pgrx::htup::heap_getattr::<i32, _>(&tuple, past_end, &tupdesc) };
     }
 
     #[pg_test(error = "no attribute")]
@@ -954,11 +965,13 @@ mod tests {
         // SAFETY: `tuple` owns this HeapTupleData and outlives the borrowed view.
         let borrowed = unsafe { pgrx::PgBox::<pg_sys::HeapTupleData>::from_pg(tuple.as_ptr()) };
         let scritches = NonZeroUsize::new(2).unwrap();
-        let attr = pgrx::htup::heap_getattr_datum_ex(&borrowed, scritches, &tupdesc);
+        // SAFETY: `borrowed` views the live Dog row that `tupdesc` describes.
+        let attr = unsafe { pgrx::htup::heap_getattr_datum_ex(&borrowed, scritches, &tupdesc) };
         assert_eq!(attr.into_value::<i32>(), 3);
 
         let past_end = NonZeroUsize::new(3).unwrap();
-        let _ = pgrx::htup::heap_getattr_datum_ex(&borrowed, past_end, &tupdesc);
+        // SAFETY: as above; the attribute number is checked against `tupdesc`.
+        let _ = unsafe { pgrx::htup::heap_getattr_datum_ex(&borrowed, past_end, &tupdesc) };
     }
 
     /// Read a by-value attribute of each width, plus a varlena, from tuples with and without a
@@ -1018,8 +1031,14 @@ mod tests {
             let tupdesc = pgrx::PgTupleDesc::for_composite_type("GrowingDog").unwrap();
             // SAFETY: as above.
             let tuple = unsafe { pgrx::htup::composite_row_type_make_tuple(datum) };
-            assert_eq!(pgrx::htup::heap_getattr::<i32, _>(&tuple, scritches, &tupdesc), Some(7));
-            assert_eq!(pgrx::htup::heap_getattr::<i32, _>(&tuple, age, &tupdesc), None);
+            // SAFETY: `tuple` is the live stored row, of the type `tupdesc` describes.
+            unsafe {
+                assert_eq!(
+                    pgrx::htup::heap_getattr::<i32, _>(&tuple, scritches, &tupdesc),
+                    Some(7)
+                );
+                assert_eq!(pgrx::htup::heap_getattr::<i32, _>(&tuple, age, &tupdesc), None);
+            }
             Ok(())
         })
     }

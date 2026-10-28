@@ -53,31 +53,33 @@ pub unsafe fn composite_row_type_make_tuple(
     tuple
 }
 
-/// Extract an attribute of a heap tuple and return it as Rust type.
-/// This works for either system or user attributes.  The given `attnum`
-/// is properly range-checked.
+/// Extract user attribute `attno` (1-based) of a heap tuple and return it as Rust type.
 ///
 /// If the field in question has a NULL value, we return `None`.
 /// Otherwise, a `Some(T)`
 ///
-/// 'tup' is the pointer to the heap tuple.  'attnum' is the attribute
-/// number of the column (field) caller wants.  'tupleDesc' is a
-/// pointer to the structure describing the row and all its fields.
+/// System attributes, such as `ctid`, have non-positive attribute numbers and cannot be
+/// requested.
 ///
-/// `attno` is 1-based
+/// # Safety
+///
+/// `tuple` must point to a live heap tuple formed with the descriptor `tupdesc`, and the call
+/// must run on the PostgreSQL backend thread. A pass-by-reference result points into the
+/// tuple, so `T` must not outlive the tuple's memory.
+///
+/// # Panics
+///
+/// Panics with "no attribute" if `attno` exceeds the descriptor's attribute count.
 #[inline]
-pub fn heap_getattr<T: FromDatum, AllocatedBy: WhoAllocated>(
+pub unsafe fn heap_getattr<T: FromDatum, AllocatedBy: WhoAllocated>(
     tuple: &PgBox<pg_sys::HeapTupleData, AllocatedBy>,
     attno: NonZeroUsize,
     tupdesc: &PgTupleDesc,
 ) -> Option<T> {
     // PostgreSQL only asserts that `attno` is within the descriptor, so check it first.
     let typoid = tupdesc.get(attno.get() - 1).expect("no attribute").type_oid();
-    // SAFETY: not established. The lookup above bounds `attno`, and its reference ends with that
-    // statement. This safe function cannot check the rest of heap_getattr_raw's contract or the
-    // result's lifetime: `tuple` can be null or store attributes that `tupdesc` does not
-    // describe, a caller can hold a reference to `tupdesc`'s attribute entries across the call,
-    // and a by-reference `T` can outlive the tuple.
+    // SAFETY: the caller supplies a live tuple formed with `tupdesc`, and the descriptor
+    // lookup above bounds `attno` by its attribute count.
     let datum = unsafe { heap_getattr_raw(tuple.as_ptr(), attno, tupdesc.as_ptr()) }?;
     unsafe { T::from_polymorphic_datum(datum, false, typoid.value()) }
 }
@@ -258,20 +260,28 @@ impl DatumWithTypeInfo {
     }
 }
 
-/// Similar to `heap_getattr()`, but returns extended information about the requested attribute
-/// `attno` is 1-based
+/// Similar to [`heap_getattr`], but returns extended information about the requested attribute.
+/// `attno` is 1-based.
+///
+/// # Safety
+///
+/// `tuple` must point to a live heap tuple formed with the descriptor `tupdesc`, and the call
+/// must run on the PostgreSQL backend thread. A pass-by-reference `datum` points into the
+/// tuple.
+///
+/// # Panics
+///
+/// Panics with "no attribute" if `attno` exceeds the descriptor's attribute count.
 #[inline]
-pub fn heap_getattr_datum_ex(
+pub unsafe fn heap_getattr_datum_ex(
     tuple: &PgBox<pg_sys::HeapTupleData>,
     attno: NonZeroUsize,
     tupdesc: &PgTupleDesc,
 ) -> DatumWithTypeInfo {
     // PostgreSQL only asserts that `attno` is within the descriptor, so check it first.
     let typoid = tupdesc.get(attno.get() - 1).expect("no attribute").type_oid();
-    // SAFETY: not established. The lookup above bounds `attno`, and its reference ends with that
-    // statement. This safe function cannot check the rest of heap_getattr_raw's contract:
-    // `tuple` can be null or store attributes that `tupdesc` does not describe, and a caller can
-    // hold a reference to `tupdesc`'s attribute entries across the call.
+    // SAFETY: the caller supplies a live tuple formed with `tupdesc`, and the descriptor
+    // lookup above bounds `attno` by its attribute count.
     let datum = unsafe { heap_getattr_raw(tuple.as_ptr(), attno, tupdesc.as_ptr()) };
     let is_null = datum.is_none();
     let datum = datum.unwrap_or_else(pg_sys::Datum::null);
