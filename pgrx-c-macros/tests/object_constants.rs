@@ -77,7 +77,9 @@ fn bad_object_siblings_do_not_starve_verified_integer_constants() {
     let mut rejected_names = Vec::new();
     // These sort before every valid name. Original header parsing succeeds,
     // but invoking their independent constant witnesses must fail separately.
-    for index in 0..40 {
+    // Clang's default error limit would attribute only about ten failures per
+    // attempt, so 400 of them exceed the 32-attempt isolation budget.
+    for index in 0..200 {
         let name = format!("A_MALFORMED_{index:03}");
         writeln!(source, "#define {name} (1 + )").unwrap();
         rejected_names.push(name);

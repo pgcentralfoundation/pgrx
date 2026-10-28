@@ -455,7 +455,9 @@ fn probe_arguments(
     std::fs::write(&path, source)
         .map_err(|source| FrontendError::CompilerIo { compiler: path.clone(), source })?;
     let overlay = overlay(directory, &frontend.profile().header, &path)?;
-    let mut arguments = frontend.profile().arguments.clone();
+    // Probe isolation attributes every owned error in one failed pass; Clang's
+    // default error limit would hide all but the first few failing probes.
+    let mut arguments = super::paste::normalized_arguments(&frontend.profile().arguments);
     arguments.extend([
         "-ivfsoverlay".into(),
         overlay

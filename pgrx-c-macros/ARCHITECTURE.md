@@ -494,8 +494,9 @@ The retention recipe is deliberately stricter than general expression support:
    on changed inputs or real I/O failure, fail the session.
 
 Numeric equality alone does not prove this transformation: masking can change
-rescan, token pasting, or C precedence. Optional typed batches bisect failures
-within a 32-attempt isolation bound.
+rescan, token pasting, or C precedence. Optional typed batches run without
+Clang's error limit, remove every failure attributed to its own probe, and
+bisect only unattributed failures, all within a 32-attempt isolation bound.
 
 ### Integer bindings omitted by bindgen
 
