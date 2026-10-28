@@ -290,10 +290,9 @@ pub(crate) fn prepare_inner_with_objects(
     }
     let directory = ProbeDirectory::new()?;
     let prefix = namespace(frontend);
-    let mut source_bytes = original.len();
-    // Separate a possible final splice/comment, and enforce the validation
-    // diagnostic after any header pragmas under MS compatibility modes too.
-    source_bytes = source_bytes.saturating_add(PROBE_PRAGMAS.len());
+    // Admit invocations against the exact source the authoritative pass builds,
+    // which refuses every pending probe if this accounting falls short.
+    let mut source_bytes = original.len().saturating_add(authoritative_prologue(&prefix).len());
     let mut prepared = Vec::new();
     for name in names {
         let Some((active_name, active)) = frontend.environment().active.get_key_value(&name) else {
@@ -760,6 +759,16 @@ fn constant_marker(prefix: &str, index: usize) -> String {
     format!("{prefix}c{index}")
 }
 
+/// Source the authoritative pass places between the original main file and its invocations.
+///
+/// The pragmas separate a possible final splice/comment and enforce the validation diagnostic
+/// after any header pragmas under MS compatibility modes too. The preamble preserves invocation
+/// diagnostics as symbolic nodes: redefinition is confined to this verified probe, after the
+/// original header, and generated code supplies the Rust invocation's filename and line instead.
+fn authoritative_prologue(prefix: &str) -> String {
+    format!("{PROBE_PRAGMAS}{}", invocation_diagnostic_preamble(prefix))
+}
+
 /// Remove only uniquely attributed failures, then require a clean compiler pass.
 /// Each retry rebuilds the original main file, so a rejected invocation cannot
 /// alter the macro environment for the accepted batch.
@@ -802,11 +811,7 @@ fn preprocess_prepared<'a>(
             return Ok(None);
         }
         let mut source = original.to_vec();
-        source.extend_from_slice(PROBE_PRAGMAS.as_bytes());
-        // Preserve invocation diagnostics as symbolic nodes. Redefinition is
-        // confined to this verified probe, after the original header; generated
-        // code supplies the Rust invocation's filename and line instead.
-        source.extend_from_slice(invocation_diagnostic_preamble(&namespace(frontend)).as_bytes());
+        source.extend_from_slice(authoritative_prologue(&namespace(frontend)).as_bytes());
         let mut locations = BTreeMap::new();
         for &index in &pending {
             let item = &prepared[index];

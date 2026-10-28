@@ -365,6 +365,42 @@ fn expansion_budgets_and_compiler_rejection_are_structured_skips() {
     assert_skip(&batch, "EXP_BAD_ARITY", ExpansionSkipCode::CompilerRejected);
 }
 
+/// Checks that an over-budget batch skips only the invocations that do not fit, so the
+/// preparation budget must account for every byte the authoritative pass adds.
+#[test]
+fn source_budget_skips_only_invocations_that_do_not_fit() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = Directory::new();
+    let header = directory.0.join("budget.h");
+    std::fs::write(&header, "#define F(x) (x)\n#define G(x) (x)\n").unwrap();
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    let prepare = |source_bytes| {
+        let limits = ExpansionLimits { source_bytes, ..ExpansionLimits::default() };
+        prepare_expansions_with_limits(&scanner, &frontend, &["F", "G"], limits).unwrap()
+    };
+    let both = |batch: &ExpansionBatch| {
+        ["F", "G"]
+            .iter()
+            .all(|name| matches!(batch.results[*name], ExpansionResult::Expanded { .. }))
+    };
+    // Probe sizes depend on the temporary directory, so search for the smallest
+    // budget that holds both invocations instead of predicting it.
+    let (mut low, mut high) = (0, 64 * 1024);
+    assert!(both(&prepare(high)));
+    while low + 1 < high {
+        let middle = low + (high - low) / 2;
+        if both(&prepare(middle)) {
+            high = middle;
+        } else {
+            low = middle;
+        }
+    }
+    let batch = prepare(high - 1);
+    assert_eq!(expanded(&batch, "F").occurrences.len(), 1);
+    assert_skip(&batch, "G", ExpansionSkipCode::BudgetExceeded);
+}
+
 /// Reject unsafe pastes and probe collisions without rejecting fully erased stringification.
 #[test]
 fn closed_pastes_reject_erased_operands_dynamic_helpers_and_probe_collisions() {
