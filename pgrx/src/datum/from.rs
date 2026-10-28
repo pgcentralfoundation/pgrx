@@ -94,7 +94,10 @@ pub trait FromDatum: Sized {
     ///
     /// ## Safety
     ///
-    /// Same caveats as `FromDatum::from_datum(...)`
+    /// Same caveats as `FromDatum::from_datum(...)`. The returned value may point into
+    /// `memory_context`, as a `&str` does, so the context must stay live while the value is used.
+    /// [`PgMemoryContexts::Transient`] and [`PgMemoryContexts::Owned`] contexts are deleted before
+    /// this returns. Pass them only for a type that copies its value out, such as `String`.
     unsafe fn from_datum_in_memory_context(
         mut memory_context: PgMemoryContexts,
         datum: pg_sys::Datum,
@@ -150,7 +153,8 @@ pub trait FromDatum: Sized {
     ///
     /// ## Safety
     ///
-    /// Same caveats as `FromDatum::from_datum(...)`
+    /// Same caveats as [`FromDatum::from_datum_in_memory_context`], including how long
+    /// `memory_context` must stay live.
     #[inline]
     unsafe fn try_from_datum_in_memory_context(
         memory_context: PgMemoryContexts,
