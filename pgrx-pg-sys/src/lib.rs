@@ -7,12 +7,7 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-#![allow(clippy::missing_safety_doc)]
-// sorry, Jubilee
-// Rust currently diagnoses absolute calls to macro_export definitions loaded
-// through include!, including their hygienic $crate helper calls. Generated
-// macros are intentionally used inside pg-sys as well as by downstream crates.
-#![allow(macro_expanded_macro_exports_accessed_by_absolute_paths)]
+#![allow(clippy::missing_safety_doc)] // sorry, Jubilee
 
 #[cfg(
     // no features at all will cause problems

@@ -1456,6 +1456,13 @@ documentation snapshot. `#[macro_export]` defines crate-root macro identifiers;
 header modules reexport those identifiers, their parent modules collect them, and
 `pgrx/src/lib.rs` uses `pub use pg_sys::cmacros::*`. Thus callers can use
 `pgrx::MACRO_NAME!` without caring which header module owns its definition.
+Because the OUT_DIR tree is loaded with `include!`, these exports are
+macro-expanded inside pgrx-pg-sys. Code in that crate must not name them by an
+absolute path: Rust rejects that as a future incompatibility
+([rust-lang/rust#52234](https://github.com/rust-lang/rust/issues/52234)), and an
+allowance does not suppress the report shown to every downstream build. This
+includes `use crate::NAME` for a function that shares its name with a generated
+macro. Downstream crates are unaffected.
 
 Production binding paths start at `$crate::__pgrx_c_bindings`, a public hidden
 namespace that reexports only the selected generated binding module. Collect
