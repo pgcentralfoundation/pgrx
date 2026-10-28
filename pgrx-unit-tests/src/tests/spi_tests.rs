@@ -24,6 +24,35 @@ mod tests {
         Spi::connect(|client| client.select("THIS IS NOT A VALID QUERY", None, &[]).map(|_| ()))
     }
 
+    #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
+    #[pg_test]
+    fn test_spi_merge_returning() -> Result<(), spi::Error> {
+        Spi::run(
+            "CREATE TABLE merge_target (id int PRIMARY KEY, v int);
+             INSERT INTO merge_target VALUES (1, 10), (2, 20);",
+        )?;
+        let changed = Spi::connect_mut(|client| {
+            let table = client.update(
+                "MERGE INTO merge_target t USING (VALUES (2, 21), (3, 30)) AS s(id, v)
+                 ON t.id = s.id
+                 WHEN MATCHED THEN UPDATE SET v = s.v
+                 WHEN NOT MATCHED THEN INSERT VALUES (s.id, s.v)
+                 RETURNING t.id, t.v",
+                None,
+                &[],
+            )?;
+            let mut changed = Vec::new();
+            for row in table {
+                changed.push((row.get::<i32>(1)?.unwrap(), row.get::<i32>(2)?.unwrap()));
+            }
+            Ok::<_, spi::Error>(changed)
+        })?;
+        let mut changed = changed;
+        changed.sort_unstable();
+        assert_eq!(changed, vec![(2, 21), (3, 30)]);
+        Ok(())
+    }
+
     #[pg_test]
     fn test_spi_can_nest() -> Result<(), spi::Error> {
         Spi::connect(|_| {

@@ -51,6 +51,9 @@ pub enum SpiOkCodes {
     TdRegister = pg_sys::SPI_OK_TD_REGISTER as i32,
     /// Added in Postgres 15
     Merge = pg_sys::SPI_OK_MERGE as i32,
+    /// `MERGE ... RETURNING`, added in Postgres 17
+    #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
+    MergeReturning = pg_sys::SPI_OK_MERGE_RETURNING as i32,
 }
 
 /// These match the Postgres `#define`d constants prefixed `SPI_ERROR_*` that you can find in `pg_sys`.
@@ -165,6 +168,8 @@ impl TryFrom<libc::c_int> for SpiOkCodes {
             value if value == pg_sys::SPI_OK_REL_UNREGISTER as i32 => Ok(Self::RelUnregister),
             value if value == pg_sys::SPI_OK_TD_REGISTER as i32 => Ok(Self::TdRegister),
             value if value == pg_sys::SPI_OK_MERGE as i32 => Ok(Self::Merge),
+            #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
+            value if value == pg_sys::SPI_OK_MERGE_RETURNING as i32 => Ok(Self::MergeReturning),
             _ => Err(Err(UnknownVariant)),
         }
     }
