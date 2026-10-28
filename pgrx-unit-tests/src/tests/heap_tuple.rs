@@ -595,7 +595,13 @@ mod tests {
     use pgrx::datum::TryFromDatumError;
     use pgrx::heap_tuple::PgHeapTupleError;
     use pgrx::prelude::*;
+    use serde::{Deserialize, Serialize};
     use std::num::NonZeroUsize;
+
+    /// Created in the `tests` schema, which is not on `search_path`, so the name lookup in its
+    /// `IntoDatum::type_oid` raises an ERROR.
+    #[derive(Debug, PostgresType, Serialize, Deserialize)]
+    pub struct OffSearchPath;
 
     #[pg_test]
     fn test_gets_name_field() {
@@ -1041,5 +1047,22 @@ mod tests {
             }
             Ok(())
         })
+    }
+
+    /// Reading a NULL attribute returns `Ok(None)` without asking `T` for its type OID, which
+    /// can raise an ERROR.
+    #[pg_test]
+    fn test_get_by_index_reads_null_without_type_lookup() -> Result<(), spi::Error> {
+        Spi::run("CREATE TYPE HoldsOffSearchPath AS (v tests.OffSearchPath)")?;
+        let lookup_fails = Spi::get_one::<bool>("SELECT to_regtype('OffSearchPath') IS NULL")?;
+        assert_eq!(lookup_fails, Some(true));
+
+        let row = Spi::get_one::<PgHeapTuple<'_, AllocatedByRust>>(
+            "SELECT ROW(NULL)::HoldsOffSearchPath",
+        )?
+        .expect("the row is not NULL");
+        let read = row.get_by_index::<OffSearchPath>(NonZeroUsize::new(1).unwrap());
+        assert!(matches!(read, Ok(None)), "{read:?}");
+        Ok(())
     }
 }
