@@ -47,7 +47,8 @@ pub(super) fn helper(prefix: &str, role: &str, parts: &[&str]) -> String {
 /// spelling. Punctuation becomes a two-character code starting with `0`; any other
 /// identifier is `0x` plus hex bytes and any other character is `0u` plus hex bytes.
 /// Directories in anonymous type locations are dropped up to PostgreSQL's `server`
-/// include root, so the result does not depend on where headers are installed.
+/// include root, so the result does not depend on where headers are installed or on
+/// the host's path separator.
 pub(super) fn type_spelling(spelling: &str) -> String {
     let spelling = strip_location_directories(spelling);
     let mut tokens = Vec::new();
@@ -124,25 +125,46 @@ fn push_hex(output: &mut String, text: &str) {
 ///
 /// Clang spells anonymous types with their absolute source location. Keep the path
 /// below PostgreSQL's `server` include directory when present, otherwise the
-/// filename, so names stay the same across installation prefixes.
+/// filename, so names stay the same across installation prefixes and hosts. Windows
+/// paths separate directories with `\`, or with both separators where Clang joins an
+/// include directory and an included name, so either separator ends a directory and
+/// the kept path is written with `/`. The location ends at the first `)` after a
+/// `:LINE:COLUMN`, since a directory such as `Program Files (x86)` can contain one.
 fn strip_location_directories(spelling: &str) -> String {
     let mut output = String::with_capacity(spelling.len());
     let mut rest = spelling;
     while let Some(at) = rest.find(" at ") {
         let (before, after) = rest.split_at(at + 4);
         output.push_str(before);
-        let end = after.find(')').unwrap_or(after.len());
-        let location = &after[..end];
-        let relative = location
-            .rfind("/server/")
-            .map(|index| &location[index + "/server/".len()..])
-            .or_else(|| location.rfind(['/', '\\']).map(|index| &location[index + 1..]))
-            .unwrap_or(location);
-        output.push_str(relative);
+        let end = after
+            .match_indices(')')
+            .map(|(index, _)| index)
+            .find(|&index| ends_with_line_and_column(&after[..index]))
+            .or_else(|| after.find(')'))
+            .unwrap_or(after.len());
+        let parts = after[..end].split(['/', '\\']).collect::<Vec<_>>();
+        let (filename, directories) = parts.split_last().expect("split yields a part");
+        let kept = match directories.iter().rposition(|directory| *directory == "server") {
+            Some(server) => &parts[server + 1..],
+            None => std::slice::from_ref(filename),
+        };
+        output.push_str(&kept.join("/"));
         rest = &after[end..];
     }
     output.push_str(rest);
     output
+}
+
+/// Whether `location` ends with `:LINE:COLUMN` after a path.
+fn ends_with_line_and_column(location: &str) -> bool {
+    let mut parts = location.rsplitn(3, ':');
+    let numbers = [parts.next(), parts.next()];
+    parts.next().is_some()
+        && numbers.iter().all(|number| {
+            number.is_some_and(|number| {
+                !number.is_empty() && number.bytes().all(|byte| byte.is_ascii_digit())
+            })
+        })
 }
 
 /// Regression tests for readable, collision-free generated support names.
@@ -190,6 +212,28 @@ mod tests {
         assert_eq!(
             type_spelling("struct (anonymous at /usr/include/x86_64-linux-gnu/bits/types.h:3:1)"),
             type_spelling("struct (anonymous at /other/bits/types.h:3:1)")
+        );
+    }
+
+    /// Checks that Windows separators, alone or mixed with `/`, and parentheses in
+    /// directories give the names that the same header gives on other hosts.
+    #[test]
+    fn anonymous_type_locations_do_not_depend_on_the_host() {
+        let unix = "enum (unnamed at /usr/include/postgresql/18/server/utils/rel.h:12:5)";
+        assert_eq!(strip_location_directories(unix), "enum (unnamed at utils/rel.h:12:5)");
+        for windows in [
+            r"enum (unnamed at C:\PostgreSQL\18\include\server\utils\rel.h:12:5)",
+            r"enum (unnamed at C:\PostgreSQL\18\include\server\utils/rel.h:12:5)",
+            r"enum (unnamed at C:\Program Files (x86)\PostgreSQL\include\server\utils\rel.h:12:5)",
+        ] {
+            assert_eq!(strip_location_directories(windows), strip_location_directories(unix));
+            assert_eq!(type_spelling(windows), type_spelling(unix));
+        }
+        assert_eq!(
+            strip_location_directories(
+                r"void (struct (unnamed at C:\Program Files (x86)\include\types.h:3:1) *, struct (unnamed at /x/server/a.h:1:2) *)"
+            ),
+            "void (struct (unnamed at types.h:3:1) *, struct (unnamed at a.h:1:2) *)"
         );
     }
 }

@@ -2201,9 +2201,9 @@ and multi-part names join plain C identifiers with `__`. A part that is not a
 plain identifier, or a type token other than an identifier or number, is
 encoded behind a leading digit, so one generated name identifies exactly one
 combination of parts. Anonymous C type locations keep only the path below
-PostgreSQL's `server` include directory, or the filename, so installation
-prefixes do not change names. Unrelated header changes therefore leave every
-other generated name unchanged.
+PostgreSQL's `server` include directory, or the filename, written with `/`, so
+installation prefixes and the host's path separator do not change names.
+Unrelated header changes therefore leave every other generated name unchanged.
 
 The CLI embeds packaged copies of the canonical wrapper headers. A default
 wrapper is published atomically under PGRX_HOME in a directory keyed by its
