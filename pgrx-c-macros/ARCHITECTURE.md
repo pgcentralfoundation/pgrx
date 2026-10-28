@@ -595,8 +595,11 @@ could be either a cast type or a parenthesized value/callee, collect independent
 evidence for its type role and reparse. Do not decide that `(T)(x)` is a cast
 merely because choosing that interpretation makes generation possible.
 Bound pointer/qualifier declarators rather than accepting arbitrary textual
-types. `offsetof` keeps a record designator and ordered field path; offsets do
-not require loading those fields. Reparse once after gathering type-hole evidence
+types: a concrete cast, size, or alignment type is names and `*` layers, and only
+`const` or `volatile` may follow a star. Array and function declarators, such as
+`char *[4]`, are refused rather than measured as one pointer. `offsetof` keeps a
+record designator and ordered field path; offsets do not require loading those
+fields. Reparse once after gathering type-hole evidence
 across the complete arena. Bare GNU alignment of `T` alone does not prove that
 `T` is a type; pointer/qualified forms, established sizeof-type and offset forms
 provide stronger evidence.

@@ -1161,15 +1161,20 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
     }
 
     // Only a flat, catalog-recognized concrete type is a cast. Parenthesized expressions
-    // stay expressions; a macro parameter is never guessed to be a typedef.
+    // stay expressions; a macro parameter is never guessed to be a typedef. Like a local
+    // declaration, the type is names and pointer layers; array and function declarators
+    // change the measured object and are never folded into a pointer spelling.
     /// Recognize concrete cast syntax only with independent catalog evidence for the named type.
     fn cast_type(&self) -> Option<(usize, String)> {
         let mut end = self.position + 1;
         while let Some(lexeme) = self.tokens.get(end) {
             match lexeme.token.spelling.as_str() {
                 ")" => break,
-                "(" | "{" | "}" | ";" | "," => return None,
-                _ => end += 1,
+                "*" => end += 1,
+                _ if matches!(lexeme.token.kind, TokenKind::Identifier | TokenKind::Keyword) => {
+                    end += 1
+                }
+                _ => return None,
             }
         }
         if self.tokens.get(end)?.token.spelling != ")" || end == self.position + 1 {
@@ -2124,6 +2129,19 @@ mod tests {
         )
         .unwrap();
         assert!(matches!(expression.nodes[expression.root].kind, ExpressionKind::Cast { .. }));
+    }
+
+    /// A catalog that admits any spelling still cannot widen the flat declarator grammar.
+    #[test]
+    fn concrete_type_operands_never_contain_array_declarators() {
+        for body in [
+            vec!["sizeof", "(", "char", "*", "[", "4", "]", ")"],
+            vec!["_Alignof", "(", "char", "*", "[", "4", "]", ")"],
+            vec!["(", "char", "*", "[", "4", "]", ")", "x"],
+        ] {
+            let parsed = parse_expression(&tokens(&body), &["x".into()], |_| true);
+            assert!(parsed.is_err(), "{body:?}: {parsed:?}");
+        }
     }
 
     /// Checks explicit pointer and const size operands preserve type holes and qualifiers.

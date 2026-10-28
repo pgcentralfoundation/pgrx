@@ -1848,7 +1848,12 @@ pub(crate) fn resolve_type_info(
             is_volatile: name.split_whitespace().any(|word| word == "volatile"),
         });
     }
-    if let Some((pointee, _)) = name.rsplit_once('*') {
+    if let Some((pointee, qualifiers)) = name.rsplit_once('*') {
+        // Only this layer's qualifiers may follow its star. An array or named
+        // declarator there would make the spelling something other than one pointer.
+        if !qualifiers.split_whitespace().all(|word| matches!(word, "const" | "volatile")) {
+            return None;
+        }
         resolve_type_info(pointee.trim(), catalog, target)?;
         return Some(TypeInfo {
             spelling: name.into(),
@@ -1856,8 +1861,8 @@ pub(crate) fn resolve_type_info(
             category: TypeCategory::Pointer,
             size: Some(u64::from(target.pointer_bits / target.char_bits)),
             alignment: None,
-            is_const: name.rsplit_once('*')?.1.split_whitespace().any(|word| word == "const"),
-            is_volatile: name.rsplit_once('*')?.1.split_whitespace().any(|word| word == "volatile"),
+            is_const: qualifiers.split_whitespace().any(|word| word == "const"),
+            is_volatile: qualifiers.split_whitespace().any(|word| word == "volatile"),
         });
     }
     None
@@ -2435,6 +2440,34 @@ mod tests {
         assert_eq!(qualified.canonical_spelling, pointer_alias.canonical_spelling);
         let outer = resolve_type_info("volatile ConstPointer *", &catalog, &target).unwrap();
         assert!(!outer.is_const && !outer.is_volatile);
+    }
+
+    /// An array or named declarator after the last star is not one pointer.
+    #[test]
+    fn pointer_declarators_admit_only_qualifiers_after_their_star() {
+        let target = target(64);
+        let catalog = DeclarationCatalog::default();
+        for spelling in [
+            "char * [ 4 ]",
+            "char * const [ 4 ]",
+            "int * garbage",
+            "int * const garbage",
+            "int * restrict",
+            "int * * [ 2 ]",
+        ] {
+            assert_eq!(resolve_type_info(spelling, &catalog, &target), None, "{spelling}");
+        }
+        for body in [
+            vec!["(", "(", "x", ")", "*", "sizeof", "(", "char", "*", "[", "4", "]", ")", ")"],
+            vec!["(", "(", "x", ")", "*", "_Alignof", "(", "char", "*", "[", "4", "]", ")", ")"],
+            vec!["(", "(", "x", ")", "+", "sizeof", "(", "char", "*", "x2", ")", ")"],
+            vec!["(", "(", "char", "*", "[", "4", "]", ")", "(", "x", ")", ")"],
+        ] {
+            assert!(
+                matches!(analyze(&frontend(&body), "F").status, AnalysisStatus::Skipped { .. }),
+                "{body:?}"
+            );
+        }
     }
 
     /// Resolve qualified void leaves without a coincidental declaration, preserving each pointer layer.
