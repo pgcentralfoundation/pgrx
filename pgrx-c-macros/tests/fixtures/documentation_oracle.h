@@ -47,6 +47,11 @@ typedef struct DocBits {
     unsigned int high : 12;
 } DocBits;
 
+typedef struct DocKeyword {
+    int type;
+    int plain;
+} DocKeyword;
+
 int doc_native(int value);
 void doc_void(int value);
 void doc_report(const char *expression, const char *file, int line);
@@ -77,6 +82,7 @@ extern int doc_global;
 #define DOC_GLOBAL() (doc_global + 1)
 #define DOC_OFFSET(field) offsetof(DocRecord, field)
 #define DOC_OFFSET_INNER() offsetof(DocRecord, inner.count)
+#define DOC_OFFSET_KEYWORD(field) offsetof(DocKeyword, field)
 #define DOC_SIZEOF(value) (sizeof(value))
 #define DOC_SIZEOF_TYPE() (sizeof(DocRecord))
 #define DOC_SIZEOF_PARAMETER(type) (sizeof(type *))
@@ -106,6 +112,8 @@ extern int doc_global;
 #define DOC_BITS(bits) ((bits)->high)
 #define DOC_OID(x) ((Oid) (x))
 #define DOC_NOTHING() 0
+#define DOC_IGNORE(ignored) ((void) 0)
+#define DOC_IGNORE_FIRST(ignored, value) (value)
 #define DOC_SWAP(left, right) \
     do { int doc_swap_tmp = *(left); *(left) = *(right); *(right) = doc_swap_tmp; } while (0)
 #define DOC_MAYBE_RETURN(condition) \

@@ -528,6 +528,8 @@ report a type error that an ordinary build does not:
 - a generated macro passed where the C macro assigns to, increments, takes the address
   of, or reads a field of its operand is rejected; pass a place such as `(*pointer).field`
   instead;
+- an argument that the C macro ignores or only turns into a string must be a Rust
+  expression when another argument follows it;
 - the internal `(@__pgrx_c_native [...])` operand form is not accepted.
 
 ## Understand refusals and runtime limits

@@ -240,7 +240,11 @@ pub(super) fn comment(title: &str, location: Option<&str>, body: &str) -> String
 /// Invocation matchers matching the public arms of the generated macro.
 ///
 /// Required boundary markers and the explicit return-type form are shown as in
-/// the generated macro; ordinary operands are shown as expressions.
+/// the generated macro. Type, identifier and member designator operands use the
+/// generated normalizer's fragments. An argument that the real macro never parses,
+/// because it is unused or only stringified, accepts any tokens when it is last. A
+/// token repetition before a comma would make the matcher ambiguous, so such an
+/// argument followed by another is shown as an expression, as other operands are.
 pub(super) fn documentation_forms(
     analysis: &MacroAnalysis,
     returning: bool,
@@ -248,19 +252,36 @@ pub(super) fn documentation_forms(
     explicit_boundary: bool,
 ) -> Vec<String> {
     let mut operands = String::new();
+    let mut trailing_comma = !analysis.parameters.is_empty();
     for (index, parameter) in analysis.parameters.iter().enumerate() {
         if index != 0 {
             operands.push_str(", ");
         }
-        let fragment = match parameter.roles.as_slice() {
-            [ParameterRole::Type] => "ty",
-            [ParameterRole::Identifier] => "ident",
-            _ => "expr",
-        };
-        write!(operands, "${}:{fragment}", arguments::name(analysis, index))
-            .expect("String output");
+        let name = arguments::name(analysis, index);
+        let roles = parameter.roles.as_slice();
+        let unparsed = !roles.is_empty()
+            && roles
+                .iter()
+                .all(|role| matches!(role, ParameterRole::Unused | ParameterRole::Spelling));
+        if unparsed && index + 1 == analysis.parameters.len() {
+            // The real normalizer takes up to its comma, or none for an unused argument.
+            // The repetition also takes a trailing comma. No block or witness names
+            // this operand, so binding it inside a repetition is safe.
+            let repetition = if roles == [ParameterRole::Unused] { '*' } else { '+' };
+            write!(operands, "$(${name}:tt){repetition}").expect("String output");
+            trailing_comma = false;
+        } else if roles == [ParameterRole::Type] {
+            write!(operands, "${name}:ty").expect("String output");
+        } else if roles.contains(&ParameterRole::Identifier) {
+            write!(operands, "${name}:ident").expect("String output");
+        } else if roles == [ParameterRole::FieldDesignator] {
+            // Witnesses never name a designator: `offsetof` always collapses.
+            write!(operands, "$(${name}:ident).+").expect("String output");
+        } else {
+            write!(operands, "${name}:expr").expect("String output");
+        }
     }
-    if !analysis.parameters.is_empty() {
+    if trailing_comma {
         operands.push_str(" $(,)?");
     }
     let boundary = if statement_boundary {

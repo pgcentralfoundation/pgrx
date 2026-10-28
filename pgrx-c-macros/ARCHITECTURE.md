@@ -1620,8 +1620,12 @@ same result types, trait impls, markers, bridges, callback aliases and metadata
 getters as ordinary builds.
 
 A shell keeps its macro's generated documentation and has one arm per accepted
-invocation form, after the dereference arms described below. Every arm expands to
-the hidden `__pgrx_c_documentation_shell!` with the macro's `DocumentedResult`:
+invocation form, after the dereference arms described below. A form matches type,
+identifier and member designator operands with the argument normalizer's
+fragments. An argument the real macro never parses, because it is unused or only
+stringified, takes any tokens when it is last, as the normalizer does; otherwise,
+like every evaluated operand, it is an `expr`. Every arm expands to the hidden
+`__pgrx_c_documentation_shell!` with the macro's `DocumentedResult`:
 
 - An expression macro passes a witness of its value arm's type. The witness is
   the value arm rendered by the same `typed::Renderer`, except that each value
@@ -1660,7 +1664,8 @@ versions where only the typedef's rank changes.
 A shell can accept more than its real macro: collapsed operands' trait bounds are
 not checked, local-name guards are absent, and dropped operands are only borrowed.
 It can reject an invocation that its real macro accepts, or give it another type,
-only where the `@native` descriptor replaces the classifier:
+only where its `expr` fragments and the `@native` descriptor replace the argument
+normalizer and classifier:
 
 - a literal `0` passed as a null pointer to an operand-dependent spine is not a
   null constant;
@@ -1672,6 +1677,9 @@ only where the `@native` descriptor replaces the classifier:
 - a nested generated macro passed where the C macro assigns to, increments, takes
   the address of or reads a member of its operand is rejected, because a shell's
   value is not a place. Pass a native place expression instead;
+- an unused or only stringified argument followed by another argument must be an
+  expression, because a token repetition before a comma would make the matcher
+  ambiguous;
 - `(@__pgrx_c_native [..])` does not match a shell's `$x:expr` forms.
 
 These cause docs-only type errors; shells never run. The documentation oracle

@@ -87,6 +87,8 @@ const MACROS: &[(&str, Kind, &str)] = &[
     ("DOC_GLOBAL", Kind::Value, "unsafe { DOC_GLOBAL!() }"),
     ("DOC_OFFSET", Kind::Value, "DOC_OFFSET!(inner.count)"),
     ("DOC_OFFSET_INNER", Kind::Value, "DOC_OFFSET_INNER!()"),
+    // A member designator is an identifier path, so a Rust keyword names a member.
+    ("DOC_OFFSET_KEYWORD", Kind::Value, "DOC_OFFSET_KEYWORD!(type)"),
     ("DOC_SIZEOF", Kind::Value, "DOC_SIZEOF!(value)"),
     ("DOC_SIZEOF_TYPE", Kind::Value, "DOC_SIZEOF_TYPE!()"),
     ("DOC_SIZEOF_PARAMETER", Kind::Value, "DOC_SIZEOF_PARAMETER!(DocRecord)"),
@@ -97,6 +99,8 @@ const MACROS: &[(&str, Kind, &str)] = &[
     ("DOC_LINE", Kind::Value, "DOC_LINE!()"),
     ("DOC_STRING", Kind::Value, "DOC_STRING!()"),
     ("DOC_REPORT", Kind::Value, "unsafe { DOC_REPORT!(value + 1) }"),
+    // An argument that is only stringified is spelled, not evaluated.
+    ("DOC_REPORT", Kind::Value, "unsafe { DOC_REPORT!(record->value) }"),
     ("DOC_ASSIGN", Kind::Value, "unsafe { DOC_ASSIGN!(pointer, value) }"),
     ("DOC_INCREMENT", Kind::Value, "unsafe { DOC_INCREMENT!(pointer) }"),
     ("DOC_COMMA", Kind::Value, "DOC_COMMA!(value, flag)"),
@@ -126,14 +130,19 @@ const MACROS: &[(&str, Kind, &str)] = &[
     ("DOC_BITS", Kind::Value, "unsafe { DOC_BITS!(bits) }"),
     ("DOC_OID", Kind::Value, "DOC_OID!(word)"),
     ("DOC_NOTHING", Kind::Value, "DOC_NOTHING!()"),
+    // An unused argument may be empty or any tokens, as the C macro ignores it.
+    ("DOC_IGNORE", Kind::Value, "DOC_IGNORE!()"),
+    ("DOC_IGNORE", Kind::Value, "DOC_IGNORE!(record->value)"),
+    ("DOC_IGNORE_FIRST", Kind::Value, "DOC_IGNORE_FIRST!(record, value)"),
     ("DOC_EMPTY", Kind::Unit, "DOC_EMPTY!();"),
     ("DOC_SWAP", Kind::Unit, "unsafe { DOC_SWAP!(pointer, other) }"),
     ("DOC_MAYBE_RETURN", Kind::Unit, "-> CValue<CInt> { DOC_MAYBE_RETURN!(flag); CValue::new(1) }"),
     ("DOC_RETURN", Kind::Diverges, "-> CValue<CInt> { DOC_RETURN!(@__pgrx_c_statement; flag) }"),
 ];
 
-/// Invocations that a real macro accepts and its shell rejects, where the `@native`
-/// operand descriptor replaces the argument classifier.
+/// Invocations that a real macro accepts and its shell rejects, where the shell's
+/// `expr` fragments and `@native` operand descriptor replace the argument normalizer
+/// and classifier.
 ///
 /// These are the cases ARCHITECTURE.md §15 and the extension guide list. Each
 /// statement type-checks with the real macros in the main program, and the same
@@ -167,6 +176,12 @@ const DIVERGENCES: &[(&str, &str, &str)] = &[
     ("nested increment", "unsafe { DOC_POSTINC!(DOC_FIELD!(record)) };", "E0745"),
     ("nested address", "unsafe { DOC_ADDRESS_OF!(DOC_FIELD!(record)) };", "E0745"),
     ("nested read place", "unsafe { DOC_NAME!(DOC_NAME_OF!(holder)) };", "E0745"),
+    // An unused or only stringified argument followed by another must be an expression.
+    (
+        "unparsed argument",
+        "DOC_IGNORE_FIRST!(record->value, value);",
+        "`->` is not valid syntax for field accesses",
+    ),
     // The internal native operand form.
     (
         "internal native form",
