@@ -29,6 +29,9 @@ pub(super) struct FunctionAdapters {
     pub c_source: String,
     /// Macro-facing binding replacements indexed by the original C function name.
     pub bindings: BTreeMap<String, FunctionBinding>,
+    /// Bindings without a generated call wrapper. They witness the native storage of a
+    /// function whose address is used, and must not be called.
+    pub identities: BTreeSet<String>,
     /// Linkage and prototype failures retained for dependent lowering diagnostics.
     pub unsupported: BTreeMap<String, String>,
 }
@@ -50,6 +53,7 @@ pub(super) fn generate(
         rust: String::new(),
         c_source: String::new(),
         bindings: BTreeMap::new(),
+        identities: BTreeSet::new(),
         unsupported: BTreeMap::new(),
     };
     for name in used_functions {
@@ -72,6 +76,9 @@ pub(super) fn generate(
             Ok((rust, c_source, binding)) => {
                 result.rust.push_str(&rust);
                 result.c_source.push_str(&c_source);
+                if !called_functions.contains(name) {
+                    result.identities.insert(name.clone());
+                }
                 result.bindings.insert(name.clone(), binding);
                 if result.rust.len() + result.c_source.len() > OUTPUT_LIMIT {
                     return Err("generated inline adapters exceed the source budget".into());

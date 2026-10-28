@@ -52,9 +52,10 @@ pub(super) struct Requests {
 ///
 /// Unknown caller operands keep the relevant family open; known operator and
 /// prototype facts narrow it without prescribing one concrete invocation type.
-pub(super) fn plan(
+/// The analyses are every root the batch may render, including fallback call roots.
+pub(super) fn plan<'s>(
     session: &AnalysisSession<'_>,
-    names: &[impl AsRef<str>],
+    analyses: impl IntoIterator<Item = &'s MacroAnalysis>,
     bindings: &BindingCatalog,
 ) -> Requests {
     let frontend = session.frontend();
@@ -80,10 +81,9 @@ pub(super) fn plan(
         }
     }
     let mut open_records = false;
-    for name in names {
-        let analysis = session.analyze(name.as_ref());
+    for analysis in analyses {
         if !matches!(analysis.status, AnalysisStatus::Candidate)
-            || super::binding_mismatch(session, &analysis, bindings).is_some()
+            || super::binding_mismatch(session, analysis, bindings).is_some()
         {
             continue;
         }
@@ -110,15 +110,15 @@ pub(super) fn plan(
         // so the declared type needs support even when no other node names it. A
         // translated inline function also lowers its result, and its parameters as
         // locals, without a call that would request their types.
-        let result = super::translated_inline(session, &analysis)
+        let result = super::translated_inline(session, analysis)
             .then(|| &frontend.declarations().function_signatures[&analysis.name].signature.result);
         for ty in
             result.into_iter().chain(locals.values()).filter(|ty| ty.category != TypeCategory::Void)
         {
             requests.types.insert(ty.canonical_spelling.clone(), ty.clone());
         }
-        let objects = typed::declared_objects(frontend, &analysis, &lowering, &locals);
-        let constraints = Constraints::new(frontend, &analysis, &objects, &records, &compatibility);
+        let objects = typed::declared_objects(frontend, analysis, &lowering, &locals);
+        let constraints = Constraints::new(frontend, analysis, &objects, &records, &compatibility);
         let mut callees = BTreeSet::new();
         for node in &expression.syntax.nodes {
             if let ExpressionKind::Call { callee, .. } = node.kind {

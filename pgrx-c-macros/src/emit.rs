@@ -355,7 +355,7 @@ pub fn emit_batch_with_bindings(
     names: &[impl AsRef<str>],
     bindings: &BindingCatalog,
 ) -> Result<Vec<MacroEmission>, String> {
-    let requests = demands::plan(session, names, bindings);
+    let requests = demands::plan(session, &renderable(session, names), bindings);
     let adapters = generated_adapters(session, &requests, bindings)?;
     Ok(emit_prepared_batch(session, names, bindings, Some(&adapters)))
 }
@@ -534,6 +534,23 @@ fn emit_prepared_batch(
     }
 }
 
+/// Analyses a batch can render for these roots, for demand planning.
+///
+/// A translated inline function that cannot be rendered falls back to its native call
+/// root, so its plan covers that call root as well as the translated body.
+fn renderable(session: &AnalysisSession<'_>, names: &[impl AsRef<str>]) -> Vec<MacroAnalysis> {
+    let mut analyses = Vec::with_capacity(names.len());
+    for name in names {
+        let analysis = session.analyze(name.as_ref());
+        let call = translated_inline(session, &analysis)
+            .then(|| session.analyze_inline_call(name.as_ref()))
+            .flatten();
+        analyses.push(analysis);
+        analyses.extend(call);
+    }
+    analyses
+}
+
 /// Whether an analysis translates a static inline function's own definition.
 fn translated_inline(session: &AnalysisSession<'_>, analysis: &MacroAnalysis) -> bool {
     session.inline_definition(&analysis.name).is_some()
@@ -671,15 +688,19 @@ pub fn generate_with_bindings(
     names: &[impl AsRef<str>],
     bindings: &BindingCatalog,
 ) -> Result<MacroGeneration, String> {
-    let requests = demands::plan(session, names, bindings);
+    let requests = demands::plan(session, &renderable(session, names), bindings);
     let mut adapters = generated_adapters(session, &requests, bindings)?;
     let macros = emit_prepared_batch(session, names, bindings, Some(&adapters));
-    let admitted = macros
-        .iter()
-        .filter(|emission| matches!(emission.status, EmissionStatus::Emitted { .. }))
-        .map(|emission| emission.analysis.name.as_str())
-        .collect::<Vec<_>>();
-    let final_requests = demands::plan(session, &admitted, bindings);
+    // Plan the support from the analyses actually emitted: a translated inline function
+    // may have fallen back to its call root.
+    let final_requests = demands::plan(
+        session,
+        macros
+            .iter()
+            .filter(|emission| matches!(emission.status, EmissionStatus::Emitted { .. }))
+            .map(|emission| &emission.analysis),
+        bindings,
+    );
     if final_requests != requests {
         // Rejected roots cannot retain support that no emitted macro can use.
         // Marker identities depend on C/ABI facts, not the requested root set.

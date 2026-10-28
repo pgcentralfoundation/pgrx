@@ -1074,10 +1074,15 @@ impl<'a> Renderer<'a> {
                                 .and_then(|adapters| adapters.functions.unsupported.get(name))
                             {
                                 Err(reason.clone())
-                            } else if let Some(adapter) = self
-                                .adapters
-                                .and_then(|adapters| adapters.functions.bindings.get(name))
-                            {
+                            } else if let Some(adapter) = self.adapters.and_then(|adapters| {
+                                // An identity-only adapter has no call wrapper, so a call
+                                // must not resolve to it.
+                                adapters
+                                    .functions
+                                    .bindings
+                                    .get(name)
+                                    .filter(|_| !adapters.functions.identities.contains(name))
+                            }) {
                                 Ok(adapter)
                             } else if let Some(ty) = super::functions::native_transport(declared)
                             {
