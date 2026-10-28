@@ -1111,11 +1111,17 @@ impl<'a> Renderer<'a> {
                                 )
                             };
                             let path = rust_path(&binding.path).map_err(failure)?;
-                            let parameters = parameters
+                            // Resolve the last parameter first, as the arguments are
+                            // scheduled, so the first reported failure is unchanged.
+                            let arguments = arguments
                                 .iter()
+                                .zip(parameters)
                                 .zip(&binding.parameters)
-                                .map(|(c_parameter, rust_parameter)| {
-                                    lowering.resolve_with_storage(c_parameter, rust_parameter)
+                                .rev()
+                                .map(|((argument, c_parameter), rust_parameter)| {
+                                    lowering
+                                        .resolve_with_storage(c_parameter, rust_parameter)
+                                        .map(|lowered| (*argument, lowered))
                                 })
                                 .collect::<Result<Vec<_>, _>>()
                                 .map_err(failure)?;
@@ -1143,10 +1149,10 @@ impl<'a> Renderer<'a> {
                             }
                             write!(rust, "{path}(").expect("String output");
                             tasks.push(text(")"));
-                            for (argument, lowered) in arguments.iter().zip(&parameters).rev() {
+                            for (argument, lowered) in arguments {
                                 tasks.push(text(", "));
                                 tasks.push(text("))"));
-                                tasks.push(value(*argument));
+                                tasks.push(value(argument));
                                 tasks.push(Task::Text(format!("<{} as {EXPRESSION}::CType>::into_storage({EXPRESSION}::implicit::<{}, _>(", lowered.marker, lowered.marker)));
                             }
                         }
