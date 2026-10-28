@@ -37,14 +37,22 @@ PostgreSQL sometimes changes a macro into a static inline function. The
 generator keeps the `NAME!(...)` interface available in both cases, so callers
 do not need version checks merely because the C name became a function. For
 example, `VARDATA_ANY!(ptr).get()` works across PG15–19. When a function's body
-uses only constructs the generator supports, and any macros it uses are
-unchanged by the rest of the headers, the generated macro translates that body
-to Rust, as it would a macro's. Otherwise it calls the original C function
+uses only constructs the generator supports, and no macro it uses is defined
+again later in the headers, even identically, the generated macro translates that
+body to Rust, as it would a macro's. Otherwise it calls the original C function
 through the checked native binding. Generated macros that call a translated
 function run its translation too. Either way, temporaries created by the
 arguments, such as the `CString` behind an `as_ptr()` argument, stay alive until
 the function returns, as in a call. Native wrappers are built even when the
 public `cshim` feature is disabled.
+
+Which bodies are translated depends on the PostgreSQL build and on the libclang
+that inspects it, not only on the PostgreSQL version. For example, `Assert` in
+an `--enable-cassert` build reports its file and line, so a body that uses it
+keeps the native call. A call that needs no `unsafe` with one installation can
+therefore need it with another. When one call must build against several
+installations, keep its `unsafe` block and allow `unused_unsafe`, as [the
+`DatumGetInt32` example](#choose-the-c-identity-of-an-input) does.
 
 A function parameter applies C's assignment rules, which are stricter than the
 explicit casts inside many macros. Pass each operand with the parameter's C
