@@ -1369,11 +1369,7 @@ __pgrx_c_offset_indexed = __builtin_offsetof(struct __pgrx_c_offset_probe, neste
                 .or_else(|| argument.strip_prefix("-U").map(|value| (false, value))),
         };
         if let Some((defined, value)) = operation {
-            let name = value
-                .split(|character: char| !character.is_ascii_alphanumeric() && character != '_')
-                .next()
-                .unwrap_or_default();
-            overrides.insert(name, defined);
+            overrides.insert(macro_option_name(defined, value)?, defined);
         }
     }
     expected.retain(|name, _| overrides.get(name) != Some(&false));
@@ -2746,7 +2742,7 @@ fn normalize_arguments(arguments: &[String]) -> Result<Vec<String>, FrontendErro
                     "{argument} forwards an unsupported preprocessor action {option}"
                 )));
             };
-            validate_fact_override(&definition[2..])?;
+            validate_fact_override(definition.starts_with("-D"), &definition[2..])?;
             normalized.push(definition);
         }
     }
@@ -2793,7 +2789,7 @@ fn validate_arguments(arguments: &[String]) -> Result<(), FrontendError> {
             match arguments.next() {
                 Some(value) if !value.contains('\0') => {
                     if argument == "-D" || argument == "-U" {
-                        validate_fact_override(value)?;
+                        validate_fact_override(argument == "-D", value)?;
                     }
                     continue;
                 }
@@ -2804,8 +2800,10 @@ fn validate_arguments(arguments: &[String]) -> Result<(), FrontendError> {
                 }
             }
         }
-        if let Some(value) = argument.strip_prefix("-D").or_else(|| argument.strip_prefix("-U")) {
-            validate_fact_override(value)?;
+        if let Some(value) = argument.strip_prefix("-D") {
+            validate_fact_override(true, value)?;
+        } else if let Some(value) = argument.strip_prefix("-U") {
+            validate_fact_override(false, value)?;
         }
         if !argument.starts_with('-') || argument == "-" {
             return Err(FrontendError::Arguments(format!(
@@ -2847,6 +2845,9 @@ fn validate_arguments(arguments: &[String]) -> Result<(), FrontendError> {
             || argument.starts_with("-Xpreprocessor")
             || argument == "--config"
             || argument.starts_with("--config=")
+            // Clang's long -D/-U aliases would bypass the protected macro-name checks.
+            || argument.starts_with("--define-macro")
+            || argument.starts_with("--undefine-macro")
         {
             return Err(FrontendError::Arguments(format!(
                 "{argument} is unsupported for reproducible analysis"
@@ -2856,12 +2857,33 @@ fn validate_arguments(arguments: &[String]) -> Result<(), FrontendError> {
     Ok(())
 }
 
+/// Read the macro name from a -D (`define`) or -U operand.
+///
+/// Clang writes the operand into its predefines buffer as `#define`/`#undef` text without trimming
+/// the name, so leading whitespace still names a macro and a line break adds another directive.
+/// Require an identifier at the start, followed only by the end, `=` or a `-D` parameter list, and
+/// refuse line breaks anywhere so every definition is exactly the one this name describes.
+fn macro_option_name(define: bool, value: &str) -> Result<&str, FrontendError> {
+    let end = value
+        .find(|character: char| !character.is_ascii_alphanumeric() && character != '_')
+        .unwrap_or(value.len());
+    let (name, rest) = value.split_at(end);
+    if name.is_empty()
+        || name.starts_with(|character: char| character.is_ascii_digit())
+        || !(rest.is_empty() || (define && (rest.starts_with('=') || rest.starts_with('('))))
+        || value.contains(['\n', '\r'])
+    {
+        let (option, form) = if define { ("-D", "definition") } else { ("-U", "name") };
+        return Err(FrontendError::Arguments(format!(
+            "{option} operand {value:?} is not a single-line macro {form}"
+        )));
+    }
+    Ok(name)
+}
+
 /// Prevent -D/-U options from forging protected target macros that serve as semantic witnesses.
-fn validate_fact_override(value: &str) -> Result<(), FrontendError> {
-    let name = value
-        .split(|character: char| !character.is_ascii_alphanumeric() && character != '_')
-        .next()
-        .unwrap_or_default();
+fn validate_fact_override(define: bool, value: &str) -> Result<(), FrontendError> {
+    let name = macro_option_name(define, value)?;
     let protected = matches!(
         name,
         "__CHAR_BIT__"
@@ -4019,6 +4041,46 @@ mod tests {
             "-UUSER_FLAG".into(),
             "-funsigned-char".into(),
             "-std=c11".into(),
+        ])
+        .unwrap();
+    }
+
+    /// Clang copies -D/-U operands into its predefines buffer without trimming the name, so
+    /// leading whitespace, a line break, or an alias spelling must not bypass protected facts.
+    #[test]
+    fn protected_fact_overrides_require_plain_macro_names() {
+        for arguments in [
+            vec!["-D __ARM_PCS_VFP=1"],
+            vec!["-D", " __ARM_PCS_VFP=1"],
+            vec!["-D\t__BYTE_ORDER__=__ORDER_BIG_ENDIAN__"],
+            vec!["-U __ARM_PCS"],
+            vec!["-DX\n#define __ARM_PCS_VFP=1"],
+            vec!["-UX\n#define __ARM_PCS_VFP 1"],
+            vec!["-DF(a\n#define __ARM_PCS_VFP 1\n)=1"],
+            vec!["-DY=1\r#define Z 2"],
+            vec!["-D", ""],
+            vec!["-D1X=2"],
+            vec!["-UNAME=1"],
+            vec!["--define-macro=__ARM_PCS_VFP=1"],
+            vec!["--define-macro", "__ARM_PCS_VFP=1"],
+            vec!["--undefine-macro=__ARM_PCS"],
+            vec!["--undefine-macro", "__ARM_PCS"],
+        ] {
+            let arguments = arguments.into_iter().map(str::to_owned).collect::<Vec<_>>();
+            assert!(
+                matches!(validate_arguments(&arguments), Err(FrontendError::Arguments(_))),
+                "{arguments:?}"
+            );
+        }
+        for forwarded in ["-Wp,-D __ARM_PCS_VFP=1", "-Wp,-D, _CALL_ELF=2"] {
+            assert!(prepare_arguments(&[forwarded.to_owned()]).is_err(), "{forwarded}");
+        }
+        validate_arguments(&[
+            "-DF(x)=((x) + 1)".into(),
+            "-DVALUE=a b".into(),
+            "-D_FORTIFY_SOURCE=2".into(),
+            "-D".into(),
+            "SEPARATE".into(),
         ])
         .unwrap();
     }

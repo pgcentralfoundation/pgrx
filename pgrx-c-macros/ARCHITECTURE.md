@@ -213,7 +213,10 @@ fundamental typedef sizes, alignments, signedness, and expression result identit
 through libclang and driver `_Static_assert` witnesses. Function-pointer layout
 is a separate witness from object-pointer layout. Optional `offsetof` probes
 must not hide a failed required fundamental witness. Protect proof operations
-and fundamental fact macros against caller forgery.
+and fundamental fact macros against caller forgery. Clang copies `-D`/`-U`
+operands into its predefines text untrimmed, so an operand must begin with the
+macro name and contain no line break; the long `--define-macro` and
+`--undefine-macro` aliases are refused.
 The macro-dump pass also writes an owned `-header-include-file` witness with
 system headers enabled. Clang's complete inclusion callback records forced
 `-include` and `-imacros` roots as well as ordinary includes; its `-H` display
