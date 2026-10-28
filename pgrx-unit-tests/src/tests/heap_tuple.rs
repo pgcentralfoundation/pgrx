@@ -897,8 +897,45 @@ mod tests {
         let tupdesc = pgrx::PgTupleDesc::for_composite_type("Dog").unwrap();
         let mut dog = PgHeapTuple::new_composite_type("Dog").unwrap();
         dog.set_by_name("scritches", 3_i32).unwrap();
-        let tuple = pgrx::htup::composite_row_type_make_tuple(dog.into_composite_datum().unwrap());
+        // SAFETY: into_composite_datum returns a live Dog composite datum.
+        let tuple = unsafe {
+            pgrx::htup::composite_row_type_make_tuple(dog.into_composite_datum().unwrap())
+        };
         (tupdesc, tuple)
+    }
+
+    #[pg_test]
+    fn test_composite_row_type_make_tuple_unpacks_short_header() -> Result<(), spi::Error> {
+        Spi::run(
+            "CREATE TABLE stored_dogs (dog Dog); INSERT INTO stored_dogs VALUES (ROW('Nami', 7));",
+        )?;
+        let tupdesc = pgrx::PgTupleDesc::for_composite_type("Dog").unwrap();
+        Spi::connect(|client| {
+            let row = client.select("SELECT dog FROM stored_dogs", None, &[])?.first();
+            let datum = row.get_datum_by_ordinal(1)?.expect("stored dog is not NULL");
+            // SAFETY: the SPI tuple holding this datum stays live inside the closure.
+            let short_header =
+                unsafe { pg_sys::VARATT_IS_1B!(datum.cast_mut_ptr::<pg_sys::varlena>()).is_true() };
+            // A composite this small is stored with a one-byte varlena header.
+            assert!(short_header, "the stored composite should be packed");
+
+            // SAFETY: `datum` is a live Dog composite datum read from the SPI tuple.
+            let tuple = unsafe { pgrx::htup::composite_row_type_make_tuple(datum) };
+            // SAFETY: the detoasted copy has an ordinary four-byte header.
+            let unpacked_len =
+                unsafe { pg_sys::VARSIZE_ANY!(tuple.t_data.cast::<pg_sys::varlena>()).get() };
+            assert_eq!(tuple.t_len as usize, unpacked_len as usize);
+            let name = pgrx::htup::heap_getattr::<String, _>(
+                &tuple,
+                NonZeroUsize::new(1).unwrap(),
+                &tupdesc,
+            );
+            let scritches =
+                pgrx::htup::heap_getattr::<i32, _>(&tuple, NonZeroUsize::new(2).unwrap(), &tupdesc);
+            assert_eq!(name.as_deref(), Some("Nami"));
+            assert_eq!(scritches, Some(7));
+            Ok(())
+        })
     }
 
     #[pg_test(error = "no attribute")]
@@ -977,6 +1014,12 @@ mod tests {
             assert_eq!(dog.len(), 3);
             assert_eq!(dog.get_by_index::<i32>(scritches)?, Some(7));
             assert_eq!(dog.get_by_index::<i32>(age)?, None);
+
+            let tupdesc = pgrx::PgTupleDesc::for_composite_type("GrowingDog").unwrap();
+            // SAFETY: as above.
+            let tuple = unsafe { pgrx::htup::composite_row_type_make_tuple(datum) };
+            assert_eq!(pgrx::htup::heap_getattr::<i32, _>(&tuple, scritches, &tupdesc), Some(7));
+            assert_eq!(pgrx::htup::heap_getattr::<i32, _>(&tuple, age, &tupdesc), None);
             Ok(())
         })
     }

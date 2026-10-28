@@ -15,24 +15,38 @@ use std::num::NonZeroUsize;
 /// Given a `pg_sys::Datum` representing a composite row type, return a boxed `HeapTupleData`,
 /// which can be used by the various `heap_getattr` methods
 ///
-/// ## Safety
+/// Like PostgreSQL's `DatumGetHeapTupleHeader`, this fully detoasts `row`, so a
+/// packed, compressed, or external composite is first copied into an ordinary
+/// value allocated in `CurrentMemoryContext`.
 ///
-/// This function is safe, but if `row` is a null `HeapTupleHeader` pointer, it will `panic!()`
+/// # Safety
+///
+/// `row` must be a composite (row type) Datum: a pointer to a live varlena whose
+/// detoasted payload is a `HeapTupleHeader` datum. The call must run on the
+/// PostgreSQL backend thread. The returned tuple points into `row`, or into its
+/// detoasted copy, so it is valid only while that memory is.
+///
+/// # Panics
+///
+/// Panics if `row` is a NULL pointer.
 #[inline]
-pub fn composite_row_type_make_tuple(
+pub unsafe fn composite_row_type_make_tuple(
     row: pg_sys::Datum,
 ) -> PgBox<pg_sys::HeapTupleData, AllocatedByRust> {
     // Detoasting reads the varlena header, so reject NULL before it can be dereferenced.
     if row.is_null() {
         panic!("Attempt to dereference a null HeapTupleHeader");
     }
+    // SAFETY: the caller supplies a live composite varlena. pg_detoast_datum,
+    // unlike pg_detoast_datum_packed, also converts a one-byte header to the
+    // four-byte form that HeapTupleHeaderGetDatumLength reads.
     let htup_header =
-        unsafe { pg_sys::pg_detoast_datum_packed(row.cast_mut_ptr()) } as pg_sys::HeapTupleHeader;
+        unsafe { pg_sys::pg_detoast_datum(row.cast_mut_ptr()) } as pg_sys::HeapTupleHeader;
+    // SAFETY: alloc0 returns zeroed, aligned storage for the plain C struct.
     let mut tuple = unsafe { PgBox::<pg_sys::HeapTupleData>::alloc0() };
 
-    // SAFETY: not established. HeapTupleHeaderGetDatumLength reads a four-byte varlena header,
-    // but this safe function accepts any Datum, and pg_detoast_datum_packed leaves the one-byte
-    // header of a short stored composite in place.
+    // SAFETY: the detoasted value is a live composite datum with a four-byte
+    // varlena header, which is the header HeapTupleHeaderGetDatumLength reads.
     tuple.t_len = unsafe { pg_sys::HeapTupleHeaderGetDatumLength!(htup_header).get() };
     tuple.t_data = htup_header;
 
