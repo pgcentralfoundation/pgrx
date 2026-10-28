@@ -23,15 +23,24 @@ with its original PostgreSQL name and extract the result at the Rust boundary:
 | `pgrx::set_varsize(ptr, len)` | `pgrx::SET_VARSIZE!(ptr, len)` |
 | `check_for_interrupts!()` | `pgrx::CHECK_FOR_INTERRUPTS!()` |
 
-Keep the caller's length checks, resource lifetimes, backend-thread restrictions,
-and unsafe blocks. For example, `VARSIZE_ANY!` reads raw storage, and
+Keep the caller's length checks, resource lifetimes, and backend-thread
+restrictions. For example, `VARSIZE_ANY!` reads raw storage, and
 `CHECK_FOR_INTERRUPTS!` accesses backend state and can raise a PostgreSQL error.
+A generated macro that reads storage or backend state needs an `unsafe` block
+even where the helper it replaces was safe. In particular, `check_for_interrupts!()`
+and `pg_sys::elog::interrupt_pending()` were safe, while `CHECK_FOR_INTERRUPTS!`
+and `INTERRUPTS_PENDING_CONDITION!` are not. On Windows,
+`INTERRUPTS_PENDING_CONDITION!` also dispatches queued signals through
+`pgwin32_dispatch_queued_signals`, where `interrupt_pending()` only read
+`InterruptPending`.
+
 Statement macros yield `()`, so they do not need `.get()`. Return macros return
 from the enclosing Rust function or closure; replace the complete return site.
 
 The old `pgrx::is_a` helper accepted NULL. Preserve that short-circuit before
-loading a tag with `nodeTag!`; a generated C field access requires valid storage.
-Application-level ownership and error adapters retain their Rust contracts.
+loading a tag with `nodeTag!`, or call `PgNode::is_a` on a reference; a generated
+C field access requires valid storage. Application-level ownership and error
+adapters retain their Rust contracts.
 
 PostgreSQL sometimes changes a macro into a static inline function. The
 generator keeps the `NAME!(...)` interface available in both cases, so callers
@@ -54,6 +63,15 @@ therefore need it with another. When one call must build against several
 installations, keep its `unsafe` block and allow `unused_unsafe`, as [the
 `DatumGetInt32` example](#choose-the-c-identity-of-an-input) does.
 
+Every native call goes through pgrx's FFI guard, which checks the thread and
+calls `sigsetjmp` each time. Where PostgreSQL defines a static inline function,
+`pg_sys::NAME(...)` is now that guarded binding rather than a Rust port. For
+example, `pg_sys::MemoryContextSwitchTo` and `pg_sys::heap_getattr` used to be
+Rust and are now guarded native calls. `MemoryContextSwitchTo!` translates to
+Rust on PG15–19. Whether another macro does depends on the version, the build and
+libclang; the build's generated documentation and `pgNN_macro_report.json` say
+whether it translates the body or calls the native function.
+
 A function parameter applies C's assignment rules, which are stricter than the
 explicit casts inside many macros. Pass each operand with the parameter's C
 type. In particular, tag a bindgen `char *` such as `pg_sys::Page` with
@@ -69,26 +87,59 @@ function adapter evaluates each argument once, while a C macro keeps its
 original argument repetition. Generated docs distinguish the two and show the
 original definition. Genuine signature changes can still require caller changes.
 
+Generated macros are runtime code. The removed `const fn` ports
+`pg_sys::TYPEALIGN` and `pg_sys::MAXALIGN` have no `const` replacement; in a
+constant, compute the alignment in Rust, for example
+`len.next_multiple_of(pg_sys::MAXIMUM_ALIGNOF as usize)`.
+
 ### Other removed helpers
 
 Other Rust ports of PostgreSQL macros and inline functions were removed as well.
-Call the generated macro with the PostgreSQL name instead:
+Call the generated macro with the PostgreSQL name instead. Several removed
+helpers checked their input. The generated replacements follow the C, which
+checks nothing or checks only in assert-enabled builds, so make the check
+yourself where the input is not already known to be valid.
 
-| Removed | Generated replacement |
-| --- | --- |
-| `pg_sys::rt_fetch`, `pg_sys::planner_rt_fetch` | `rt_fetch!`, `planner_rt_fetch!` |
-| PG15 page and buffer ports, such as `pg_sys::PageGetItem`, `BufferGetPage`, and `BufferIsValid` | The macro with the same name |
-| `pg_sys::PageGetSpecialPointer` on PG15, PG18, and PG19 | `PageGetSpecialPointer!` |
-| `pg_sys::IndexBuildHeapScan` | `table_index_build_scan!`, with `allow_sync` and `progress` set to true |
-| `pgrx::srf_is_first_call`, `srf_first_call_init`, `srf_per_call_setup`, `srf_return_next`, `srf_return_done` | `SRF_IS_FIRSTCALL!`, `SRF_FIRSTCALL_INIT!`, `SRF_PERCALL_SETUP!`, `SRF_RETURN_NEXT!`, `SRF_RETURN_DONE!` |
-| `pgrx::pg_arg_is_null`, `pg_getarg_datum_raw`, `pg_get_collation`, `pg_return_null`, `pg_return_void` | `PG_ARGISNULL!`, `PG_GETARG_DATUM!`, `PG_GET_COLLATION!`, `PG_RETURN_NULL!`, `PG_RETURN_VOID!` |
-| `pg_sys::elog::interrupt_pending()` | `INTERRUPTS_PENDING_CONDITION!().get() != 0` |
-| `pgrx::release_tupdesc(tupdesc)` | `ReleaseTupleDesc!(tupdesc)` |
+| Removed | Generated replacement | Check the removed helper made |
+| --- | --- | --- |
+| The other `pgrx` varlena helpers: `set_varsize_4b`, `set_varsize_1b`, `set_varsize_short`, `varsize`, `varsize_4b`, `varsize_1b`, `varsize_any_exhdr`, `varsize_external`, `vardata_1b`, `vardata_4b`, `vardata_4b_c`, `vardata_1b_e`, `varatt_is_1b`, `varatt_is_1b_e`, `varatt_is_4b`, `varatt_is_4b_u`, `varatt_is_4b_c`, `varatt_not_pad_byte`, `vartag_1b_e`, `vartag_external`, `vartag_is_expanded`, `vartag_size` | The upper-case macro, such as `VARSIZE_ANY_EXHDR!` | `vartag_size` panicked on an unknown tag; `VARTAG_SIZE!` returns 0 |
+| `pgrx::pg_arg_is_null`, `pg_getarg_datum`, `pg_getarg_datum_raw` | `PG_ARGISNULL!(n, fcinfo)`, `PG_GETARG_DATUM!(n, fcinfo)`, or the checked `pgrx::fcinfo::pg_get_nullable_datum(fcinfo, n)` | Non-NULL `fcinfo` and `n < nargs` |
+| `pgrx::pg_get_collation`, `pg_return_null`, `pg_return_void` | `PG_GET_COLLATION!`, `PG_RETURN_NULL!`, `PG_RETURN_VOID!` | `pg_get_collation` and `pg_return_null` required a non-NULL `fcinfo` |
+| `pgrx::srf_is_first_call`, `srf_first_call_init`, `srf_per_call_setup`, `srf_return_next`, `srf_return_done` | `SRF_IS_FIRSTCALL!`, `SRF_FIRSTCALL_INIT!`, `SRF_PERCALL_SETUP!`, `SRF_RETURN_NEXT!`, `SRF_RETURN_DONE!` | None |
+| `FcInfo::srf_is_initialized`, `init_multi_func_call`, `srf_return_next`, `srf_return_done` | The same macros, given `FcInfo::as_mut_ptr()` | None |
+| `RetAbi::finish_call_fcinfo` | None. pgrx never called it; remove overrides | — |
+| `pgrx::htup::heap_tuple_header_get_datum_length`, `heap_tuple_get_datum`, `heap_tuple_header_get_type_id`, `heap_tuple_header_get_typmod` | `HeapTupleHeaderGetDatumLength!`, `HeapTupleGetDatum!`, `HeapTupleHeaderGetTypeId!`, `HeapTupleHeaderGetTypMod!` | Non-NULL header |
+| `pgrx::itemptr::item_pointer_get_block_number`, `item_pointer_get_offset_number` | `ItemPointerGetBlockNumber!`, `ItemPointerGetOffsetNumber!` | Asserted a valid item pointer in every build |
+| `pgrx::itemptr::item_pointer_get_block_number_no_check`, `item_pointer_get_offset_number_no_check`, `item_pointer_set_all`, `item_pointer_is_valid` | `ItemPointerGetBlockNumberNoCheck!`, `ItemPointerGetOffsetNumberNoCheck!`, `ItemPointerSet!`, `ItemPointerIsValid!`; or the safe `item_pointer_get_both`, `u64_to_item_pointer`, and `new_item_pointer` | None |
+| `pgrx::trigger_support::called_as_trigger`, `trigger_fired_by_insert` and the other `trigger_fired_*` helpers | `CALLED_AS_TRIGGER!`, `TRIGGER_FIRED_BY_INSERT!`, and so on | `called_as_trigger` required a non-NULL `fcinfo` |
+| `pgrx::nodes::is_a` | `nodeTag!` or `PgNode::is_a` | Accepted NULL |
+| `pgrx::tupdesc::release_tupdesc(tupdesc)` | `ReleaseTupleDesc!(tupdesc)` | None |
+| `pg_sys::rt_fetch`, `pg_sys::planner_rt_fetch` | `rt_fetch!`, `planner_rt_fetch!` | Panicked on a non-pointer list or an index out of bounds |
+| PG15 page and buffer ports, such as `pg_sys::PageGetItem`, `BufferGetPage`, `BufferGetPageSize`, and `BufferIsValid`; `pg_sys::BufferGetBlock` and `BufferIsLocal` | The macro with the same name | `BufferIsValid` and `BufferGetPageSize` asserted a valid buffer |
+| `pg_sys::PageIsValid` | `PageIsValid!` on PG15; PostgreSQL 16 removed the macro, so test `!page.is_null()` | None |
+| `pg_sys::PageGetSpecialPointer` on PG15, PG18, and PG19; `pg_sys::PageValidateSpecialPointer` | `PageGetSpecialPointer!`, `PageValidateSpecialPointer!` | Asserted a valid page and special pointer |
+| `pg_sys::GETSTRUCT`, `pg_sys::heap_tuple_get_struct::<T>(htup)` | `GETSTRUCT!(htup).get().cast::<T>()` | `heap_tuple_get_struct` returned NULL for a NULL tuple |
+| `pg_sys::GetMemoryChunkContext` on PG15, `pg_sys::MemoryContextIsValid` | The guarded `pg_sys::GetMemoryChunkContext` binding, `MemoryContextIsValid!` | PG15's port asserted a non-NULL, MAXALIGNed pointer and a valid context |
+| `pg_sys::heap_getattr` and the `pg_sys::htup` module: `HeapTupleHeaderIsHeapOnly`, `HeapTupleHeaderIsHotUpdated`, `HeapTupleHeaderXminInvalid`, `HeapTupleHeaderFrozen`, `HeapTupleGetRawCommandId`, `HeapTupleHeaderGetRawXmin`, `HeapTupleHeaderGetXmin`, `HeapTupleHeaderGetNatts`, `HeapTupleNoNulls` | `heap_getattr!` or the guarded `pg_sys::heap_getattr` binding; the macro with the same name, except `HeapTupleHeaderXminFrozen!` and `HeapTupleHeaderGetRawCommandId!` | `heap_getattr` panicked on an attribute number past the descriptor when the tuple had no NULLs |
+| `pg_sys::type_is_array`, `TransactionIdIsNormal`, and PG19's `TransactionIdPrecedes`, `TransactionIdPrecedesOrEquals`, `TransactionIdFollows`, `TransactionIdFollowsOrEquals` | The macro with the same name; the PG19 comparisons also remain guarded bindings | None |
+| `pg_sys::IndexBuildHeapScan` | `table_index_build_scan!`, with `allow_sync` and `progress` set to true | Non-NULL relation and table access method |
+| `pg_sys::elog::interrupt_pending()` | `INTERRUPTS_PENDING_CONDITION!().get() != 0` | None |
 
 C macros that read an implicit `fcinfo` variable take it as their last argument,
-as in `PG_ARGISNULL!(n, fcinfo)`. The removed `rt_fetch`, `BufferIsValid`, and
-`PageGetSpecialPointer` ports panicked on an invalid index, buffer, or page.
-PostgreSQL checks those only in assert-enabled builds, so validate them first.
+as in `PG_ARGISNULL!(n, fcinfo)`. `PG_GETARG_DATUM!(..).get()` is an integer, so
+`pg_sys::Datum::from(PG_GETARG_DATUM!(..).get() as usize)` is not a pointer that
+Rust may read through. Use `pg_get_nullable_datum`, which keeps the argument's
+pointer, for a pass-by-reference argument.
+
+PostgreSQL 16 turned the tree walkers and mutators into macros that cast their
+callback. On PG16 and later, `pg_sys::expression_tree_walker`,
+`pg_sys::expression_tree_mutator`, and the other walkers and mutators exist only
+as generated macros. The removed pgrx wrappers existed for the walkers on PG16
+and later and for `expression_tree_mutator` on PG18 and PG19. Call the `_impl`
+function the macros expand to, such as `pg_sys::expression_tree_walker_impl`, or
+the macro with the callback wrapper shown
+[below](#keep-postgresql-calls-on-the-backend-thread). PG15 keeps the functions,
+so code that supports both needs a `cfg` split.
 
 ### Changed constants and version-specific items
 
@@ -98,12 +149,20 @@ PostgreSQL checks those only in assert-enabled builds, so validate them first.
 `FirstNormalTransactionId`, and `MaxTransactionId` are now `u32`; use the
 matching `pg_sys::TransactionId` constants, such as `TransactionId::FIRST_NORMAL`.
 `pg_sys::VARHDRSZ` is now C `int` (`i32`) instead of `usize`, so convert it
-explicitly where you need a size.
+explicitly where you need a size. `pg_sys::SizeOfPageHeaderData` is now a
+`usize` constant rather than a `const fn`; drop the call parentheses.
 
 `pg_sys::get_pg_version_string()` is not available on MSVC builds for PG15 and
 PG16, where bindgen cannot read `PG_VERSION_STR`. The removed fallback returned
 a synthesized string. `PgSqlErrorCode::ERRCODE_SNAPSHOT_TOO_OLD` exists only for
 PG15 and PG16, because later PostgreSQL headers no longer define it.
+`pgrx::pg_magic_func_support::default_magic` is no longer a `const fn`.
+
+### Other API changes
+
+`IntoDatum for i8` widens SQL `"char"` the way PostgreSQL's `CharGetDatum` does.
+On targets where C `char` is unsigned, such as Linux AArch64, `(-1_i8).into_datum()`
+now holds `0xFF` instead of all one bits. `FromDatum for i8` reads both as `-1`.
 
 ## Call an expression macro
 
