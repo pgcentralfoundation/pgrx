@@ -1744,8 +1744,6 @@ fn clang_target(target: &str) -> String {
 /// Publish the verified file, directory, and environment dependencies that must invalidate
 /// generated C macros.
 fn emit_macro_rerun_inputs(inputs: &BuildInputs, out_dir: &Path) -> eyre::Result<()> {
-    // Environment first: when a path cannot be tracked safely, the resulting
-    // refusal still reruns after PATH or another lookup variable changes.
     for name in inputs.environment.keys() {
         if name.contains(['\n', '\r']) {
             return Err(eyre!("invalid Cargo environment dependency name"));

@@ -235,11 +235,11 @@ pub(crate) fn inspect_with_compiler_hint(
     let libclang_version = clang::get_version();
     let CompilerSelection { executable, search } =
         find_compiler(preferred_compiler, configured_compiler, &libclang_version)?;
-    // Builds cache a failed inspection like any other result. From here on a
-    // failure carries what it examined, so the changes that would invalidate a
-    // successful profile also retry the failure: the lookup until the profile's
-    // inputs are recorded, then those inputs. A failure to record the lookup
-    // itself has nothing to carry and is returned alone.
+    // From here on a failure carries what it examined, so a caller that caches
+    // the failure can retry it after the changes that would invalidate a
+    // successful profile: the lookup until the profile's inputs are recorded,
+    // then those inputs. A failure to record the lookup itself has nothing to
+    // carry and is returned alone.
     let mut frontend = inspect_selected(
         scanner,
         requested_header,
@@ -669,8 +669,9 @@ impl CompilerSearch {
         }
     }
 
-    /// Attach this lookup to a failure that followed it. A build caches the failure, so creating
-    /// or replacing an examined candidate, or changing PATH when it was searched, must retry it.
+    /// Attach this lookup to a failure that followed it. A caller that caches the failure must
+    /// retry it after an examined candidate is created or replaced, or after PATH changes when
+    /// it was searched.
     /// If the lookup itself cannot be recorded, report that failure as a successful inspection
     /// would.
     fn track(&self, error: FrontendError) -> FrontendError {
@@ -4027,8 +4028,8 @@ printf '%s\n' '#include "..." search starts here:' ' /fake/quoted' \
     '#include <...> search starts here:' " /fake/${target:-host}/include" \
     ' /fake/Frameworks (framework directory)' 'End of search list.' >&2"#;
 
-        /// A refused lookup retains the candidates it examined. Builds cache the refusal, so the
-        /// later creation of a missing compiler must remain observable.
+        /// A refused lookup retains the candidates it examined, so a caller that caches the
+        /// refusal can observe the later creation of a missing compiler.
         #[test]
         fn refused_lookups_retain_their_examined_candidates() {
             let fixture = Fixture::new();
@@ -4074,8 +4075,8 @@ printf '%s\n' '#include "..." search starts here:' ' /fake/quoted' \
             assert!(inputs.environment.contains_key("PATH"), "PATH selected the compiler");
         }
 
-        /// Inspection failures after selection retain the lookup. Builds cache the failure, so
-        /// repairing or replacing the selected compiler must remain observable.
+        /// Inspection failures after selection retain the lookup, so a caller that caches the
+        /// failure can observe the repair or replacement of the selected compiler.
         #[test]
         fn failures_after_selection_retain_the_selected_compiler() {
             let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
