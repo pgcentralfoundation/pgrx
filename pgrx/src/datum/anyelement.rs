@@ -17,8 +17,9 @@ use crate::{FromDatum, IntoDatum, pg_sys};
 ///
 /// The handle does not borrow the memory that holds a pass-by-reference value: the arguments of
 /// the call that received it, the array that [`AnyArray`](crate::AnyArray) iteration read it
-/// from, or the result of the SPI query that returned it. That memory may be freed once the call
-/// returns or the SPI connection closes, so a handle from
+/// from or that array's untoasted copy in `CurrentMemoryContext`, or the result of the SPI query
+/// that returned it. That memory may be freed once the call returns, the memory context is reset,
+/// or the SPI connection closes, so a handle from
 /// [`Spi::get_one`](crate::spi::Spi::get_one) already refers to freed memory. `AnyElement` is
 /// `Copy` and `'static`, and the compiler does not stop it, or a borrowed value read from it,
 /// from outliving that memory. Use both only while that memory is live, and read into a type

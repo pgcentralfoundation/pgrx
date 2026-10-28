@@ -10,7 +10,7 @@
 use pgrx::datum::TryFromDatumError;
 use pgrx::fn_call::{Arg, fn_call};
 use pgrx::prelude::*;
-use pgrx::{AllocatedByRust, AnyArray, Array, Json, direct_function_call};
+use pgrx::{AllocatedByRust, AnyArray, AnyElement, Array, Json, direct_function_call};
 use std::fmt::Debug;
 use std::num::NonZeroUsize;
 
@@ -28,6 +28,25 @@ fn anyarray_iter_arg(array: AnyArray) -> Json {
     }
     unsafe { direct_function_call::<Json>(pg_sys::array_to_json, &[vec.into_datum()]) }
         .expect("conversion to json returned null")
+}
+
+/// Reads each element after the iteration that yielded it has ended.
+#[pg_extern]
+fn anyarray_read_elements_after_iteration(array: AnyArray) -> Vec<String> {
+    let elements: Vec<Option<AnyElement>> = (&array).into_iter().collect();
+    elements
+        .iter()
+        .map(|element| {
+            let element = element.expect("element is NULL");
+            element.value::<String>().expect("element is text").expect("element is NULL")
+        })
+        .collect()
+}
+
+/// Returns the first element after the iteration that yielded it has ended.
+#[pg_extern]
+fn anyarray_first_element(array: AnyArray) -> Option<AnyElement> {
+    (&array).into_iter().next().flatten()
 }
 
 /// Formats a checked read, or `incompatible` if the array's type does not match.
@@ -113,6 +132,32 @@ mod tests {
             Spi::get_one::<Json>("SELECT anyarray_iter_arg(ARRAY[1::integer,2,3]::integer[]);")?
                 .expect("datum was null");
         assert_eq!(json.0, json! {[1,2,3]});
+        Ok(())
+    }
+
+    /// A short array read from a table has a 1-byte header, and a long one may be compressed, so
+    /// iteration reads a detoasted copy. The elements point into that copy.
+    #[pg_test]
+    fn test_anyarray_elements_outlive_iterator() -> std::result::Result<(), pgrx::spi::Error> {
+        Spi::run("CREATE TABLE tests.anyarray_stored (id int, a text[])")?;
+        Spi::run(
+            "INSERT INTO tests.anyarray_stored VALUES
+                (1, ARRAY['hello', 'world']),
+                (2, ARRAY[repeat('x', 10000), 'y'])",
+        )?;
+        let read = |id: i32| {
+            Spi::get_one::<Vec<String>>(&format!(
+                "SELECT anyarray_read_elements_after_iteration(a) FROM tests.anyarray_stored WHERE id = {id}"
+            ))
+        };
+        assert_eq!(read(1)?, Some(vec!["hello".to_owned(), "world".to_owned()]));
+        assert_eq!(read(2)?, Some(vec!["x".repeat(10000), "y".to_owned()]));
+        assert_eq!(
+            Spi::get_one::<String>(
+                "SELECT anyarray_first_element(a) FROM tests.anyarray_stored WHERE id = 1"
+            )?,
+            Some("hello".to_owned())
+        );
         Ok(())
     }
 

@@ -9,20 +9,23 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use super::{ArrayIntoIterator, TryFromDatumError};
 use crate::{AnyElement, Array, FromDatum, IntoDatum, pg_sys};
+use core::ptr::NonNull;
 use std::iter::FusedIterator;
 
 /// The [`anyarray` polymorphic pseudo-type][anyarray].
 ///
 /// An `AnyArray` holds an array value and the type PostgreSQL resolved for it. Read the value
-/// with [`AnyArray::value`], which checks that the Rust type can read that type.
+/// with [`AnyArray::value`], which checks that the Rust type can read that type. Iterating over
+/// `&AnyArray` yields each element as an [`AnyElement`], which points into the array or into an
+/// untoasted copy of it that the iteration allocates in `CurrentMemoryContext`.
 ///
 /// The handle does not borrow the memory that holds the array: the arguments of the call that
 /// received it, or the result of the SPI query that returned it. That memory may be freed once
 /// the call returns or the SPI connection closes, so a handle from
 /// [`Spi::get_one`](crate::spi::Spi::get_one) already refers to freed memory. `AnyArray` is
-/// `Copy` and `'static`, and the compiler does not stop it, or a borrowed value read from it,
-/// from outliving that memory. Use both only while that memory is live, and read into a type
-/// that owns its data, such as `Vec<i32>` or `Vec<String>`, to keep a value longer.
+/// `Copy` and `'static`, and the compiler does not stop it, its elements, or a borrowed value
+/// read from them, from outliving that memory. Use them only while that memory is live, and read
+/// into a type that owns its data, such as `Vec<i32>` or `Vec<String>`, to keep a value longer.
 ///
 // rustdoc doesn't directly support a warning block: https://github.com/rust-lang/rust/issues/73935
 /// **Warning**: Calling [`FromDatum::from_datum`] with this type will unconditionally panic. Call
@@ -143,15 +146,27 @@ where
     type IntoIter = AnyArrayIterator<'a>;
 
     fn into_iter(self) -> Self::IntoIter {
+        // Each AnyElement points into the array's data and can outlive this iterator. An Array
+        // frees a detoasted copy that it made itself when it drops, so detoast here instead: the
+        // Array then reads the copy without owning it, and the copy stays allocated in
+        // CurrentMemoryContext.
+        let datum = match NonNull::new(self.datum.cast_mut_ptr::<pg_sys::varlena>()) {
+            // SAFETY: the handle holds an array value, which must still be live; see the type
+            // documentation. pg_detoast_datum returns an untoasted array with a 4-byte header
+            // unchanged, and otherwise pallocs such a copy in CurrentMemoryContext.
+            Some(array) => pg_sys::Datum::from(unsafe { pg_sys::pg_detoast_datum(array.as_ptr()) }),
+            // Array reads a null pointer as no array, so the iterator yields nothing.
+            None => self.datum,
+        };
+        // SAFETY: `datum` is the handle's array or an untoasted copy of it, so Array does not
+        // copy it again, and Array takes the element layout from the array header.
+        // get_element_type takes the OID by value and returns InvalidOid for an OID that names no
+        // array type.
         unsafe {
             AnyArrayIterator {
-                inner: Array::<pg_sys::Datum>::from_polymorphic_datum(
-                    self.datum(),
-                    false,
-                    self.oid(),
-                )
-                .map(|a| a.into_iter()),
-                typelem: pg_sys::get_element_type(self.oid()),
+                inner: Array::<pg_sys::Datum>::from_polymorphic_datum(datum, false, self.typoid)
+                    .map(|a| a.into_iter()),
+                typelem: pg_sys::get_element_type(self.typoid),
             }
         }
     }
@@ -168,6 +183,9 @@ impl<'a> Iterator for AnyArrayIterator<'a> {
     fn next(&mut self) -> Option<Self::Item> {
         self.inner.as_mut().and_then(|i| {
             i.next().map(|d| match d {
+                // SAFETY: `d` is a non-NULL element of the array, so its type is `typelem` unless
+                // that is InvalidOid. A pass-by-reference element points into the array that
+                // `into_iter` read, which does not belong to this iterator.
                 Some(d) => unsafe { AnyElement::from_polymorphic_datum(d, false, self.typelem) },
                 None => None,
             })
