@@ -70,11 +70,13 @@ enum Emission {
     },
 }
 
-/// Machine-readable skip cause recorded by the generator.
+/// Skip cause recorded by the generator.
 #[derive(serde::Deserialize)]
 struct SkipReason {
     /// Stable snake_case skip code.
     code: String,
+    /// The generator's explanation, printed so a failure on a remote runner names its cause.
+    message: String,
 }
 
 /// A known profile difference under which a gated macro may be missing from this build.
@@ -145,11 +147,12 @@ fn every_availability_gated_macro_is_emitted() {
     let mut assertions = None;
     let mut missing = Vec::new();
     for (name, files) in &gated {
-        let skip = match emissions.get(name) {
+        let reason = match emissions.get(name) {
             Some(Emission::Emitted) => continue,
-            Some(Emission::Skipped { reason }) => Some(reason.code.as_str()),
+            Some(Emission::Skipped { reason }) => Some(reason),
             None => None,
         };
+        let skip = reason.map(|reason| reason.code.as_str());
         let allowed = ALLOWANCES.iter().any(|allowance| {
             allowance.name == name
                 && allowance.majors.contains(&major)
@@ -158,7 +161,10 @@ fn every_availability_gated_macro_is_emitted() {
                     || *assertions.get_or_insert_with(assertions_enabled))
         });
         if !allowed {
-            missing.push(format!("{name} ({}) in {files:?}", skip.unwrap_or("not in report")));
+            let cause = reason.map_or("not in report".into(), |reason| {
+                format!("{}: {}", reason.code, reason.message)
+            });
+            missing.push(format!("{name} ({cause}) in {files:?}"));
         }
     }
     assert!(
