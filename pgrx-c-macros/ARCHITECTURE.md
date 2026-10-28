@@ -1990,12 +1990,13 @@ or whose `pg_config.h` layout facts disagree with the target compiler. A host
 library directory, but only PostgreSQL's functional CFLAGS; target-specific
 `PGRX_INCLUDEDIR_SERVER` variables select the target headers. Metadata in
 `PGRX_PG_CONFIG_AS_ENV` describes the target directly and keeps every CFLAGS
-value. The checks cannot see ISA options the server's build chose within one
-architecture, such as SVE or AVX-512 popcount dispatch, the C library or ARM
-float ABI when `PG_VERSION_STR` does not name them, libc feature macros within
-one C library family, build options such as `BLCKSZ`, or host CPPFLAGS that
-still apply in a cross build. Those remain trusted, so the headers must
-come from the deployed server's build.
+value except Darwin `-arch` selections, which the report lists under
+`cflags_dropped`. The checks cannot see ISA options the server's build chose
+within one architecture, such as SVE or AVX-512 popcount dispatch, the C
+library or ARM float ABI when `PG_VERSION_STR` does not name them, libc feature
+macros within one C library family, build options such as `BLCKSZ`, or host
+CPPFLAGS that still apply in a cross build. Those remain trusted, so the
+headers must come from the deployed server's build.
 
 Input content fingerprints determine when compiler facts expire. Generated
 helper names instead hash semantic target representations, callable signatures,

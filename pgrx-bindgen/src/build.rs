@@ -2462,7 +2462,8 @@ macro_rules! EXAMPLE {
 
     /// A `pg_config` program reports the host server's flags. A cross build keeps only
     /// PostgreSQL's functional flags from it, in recorded order, so host ISA options such as
-    /// `-fcf-protection` never reach the target; native builds and AS_ENV keep every flag.
+    /// `-fcf-protection` never reach the target. Native builds and AS_ENV keep every flag but
+    /// Darwin `-arch` selections, which the next test covers.
     #[test]
     fn macro_cflags_scope_host_metadata_in_cross_builds() {
         let recorded = "-O2 -fno-strict-aliasing -fcf-protection -fwrapv \

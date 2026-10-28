@@ -91,7 +91,9 @@ build host:
 | `PGRX_PG_CONFIG_CFLAGS` | `pg_config --cflags` |
 | `PGRX_PG_CONFIG_LIBDIR` | `pg_config --libdir` |
 
-pgrx then runs no `pg_config` program and applies every CFLAGS value. The
+pgrx then runs no `pg_config` program and applies every CFLAGS value except
+Darwin `-arch` selections, which the report lists under `cflags_dropped` (see
+macOS slices below). The
 `--configure` output is not needed: only a `pg_config` program's `CLANG` entry
 is used, as a hint for the Clang driver. Shells
 cannot export `PGRX_PG_CONFIG_INCLUDEDIR-SERVER` because of its hyphen, so set
@@ -206,8 +208,9 @@ header inspection and for its native support archive, rather than through the
   by a `pg_config` program's `--configure` output, the `clang` installed with
   `libclang`, and `clang-<major>` or `clang` on `PATH`.
 - **Configuration files.** Clang 16 and later load default configuration
-  files named for the target, and some distributions install them, such as
-  Gentoo's `/etc/clang/<major>/x86_64-unknown-linux-gnu-clang.cfg`. Their
+  files: `<triple>-clang.cfg` for the target or, without one, `<triple>.cfg`
+  together with `clang.cfg`, which applies to every target. Some distributions
+  install them; Gentoo, for example, installs `clang.cfg`. Their
   options would apply to the driver but appear in no recorded profile, so pgrx
   refuses a driver that reports `Configuration file:`. Set
   `CLANG_NO_DEFAULT_CONFIG=1`, or add `--no-default-config` to

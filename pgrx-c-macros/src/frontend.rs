@@ -2806,8 +2806,9 @@ pub(crate) fn version_major(version: &str) -> Option<u32> {
 /// Reject automatically loaded driver configuration whose unrecorded flags would defeat reproducible
 /// analysis.
 ///
-/// Clang 16 and later load default configuration files named for the target triple, which some
-/// distributions install (Gentoo's `/etc/clang/<major>/x86_64-unknown-linux-gnu-clang.cfg`).
+/// Clang 16 and later load default configuration files: `<triple>-<driver>.cfg` or, without one,
+/// `<triple>.cfg` together with a driver-mode file such as `clang.cfg`, which applies to every
+/// target. Some distributions install them; Gentoo, for example, installs `clang.cfg`.
 /// `CLANG_NO_DEFAULT_CONFIG=1` or `--no-default-config` turns them off for the driver and
 /// libclang alike, so the refusal names both.
 pub(crate) fn validate_driver_configuration(verbose: &str) -> Result<(), FrontendError> {
