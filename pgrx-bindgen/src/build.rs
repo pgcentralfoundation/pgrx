@@ -1191,40 +1191,6 @@ fn run_bindgen(
     let postgres = macro_postgres_config(pg_config, &pg_target_includes[0])?;
     let explicit_clang = env_tracked("CLANG_PATH").map(PathBuf::from);
     let environment_arguments = bindgen_environment_arguments(env_tracked);
-    // Bindgen's own include detection asks whichever clang clang-sys finds, which need not
-    // match the loaded libclang; PostgreSQL 16's `#include <emmintrin.h>` then reaches builtin
-    // headers of another Clang release. Ask the driver macro inspection selects instead, for
-    // the Cargo target, and give its search list to bindgen and inspection alike.
-    let system_includes = if target_env_tracked("PGRX_BINDGEN_NO_DETECT_INCLUDES").is_some() {
-        None
-    } else {
-        let includes = postgres
-            .system_includes(
-                &scanner,
-                &include_search_arguments(target, &environment_arguments),
-                explicit_clang.as_deref(),
-            )
-            .wrap_err("could not detect the Clang driver's include directories for the target")?;
-        eprintln!(
-            "Clang include directories from {}: {:?}",
-            includes.compiler.display(),
-            includes.directories
-        );
-        Some(includes)
-    };
-    let mut binder = bindgen::Builder::default();
-    binder = add_blocklists(binder, major_version);
-    binder = add_allowlists(binder, pg_target_includes.iter().map(|x| x.as_str()));
-    binder = add_derives(binder);
-    let out_path = PathBuf::from(std::env::var("OUT_DIR").unwrap());
-    let mut arguments =
-        system_includes.as_ref().map(system_include_arguments).transpose()?.unwrap_or_default();
-    arguments.extend(extra_bindgen_clang_args(pg_config)?);
-    arguments.extend(pg_target_includes.iter().map(|include| format!("-I{include}")));
-    // Make bindgen's otherwise implicit Cargo target explicit for both inspections.
-    if !has_explicit_clang_target(arguments.iter().chain(&environment_arguments)) {
-        arguments.insert(0, format!("--target={}", clang_target(target)));
-    }
     let cflags = macro_cflags(pg_config, env_tracked)?;
     let mut macro_arguments = cflags.applied.clone();
     // Ordinary bindings deliberately omit MSVC CPPFLAGS. The separate
@@ -1233,6 +1199,46 @@ fn run_bindgen(
         let flags = pg_config.cppflags()?;
         let flags = flags.to_str().ok_or_else(|| eyre!("PostgreSQL CPPFLAGS are not UTF-8"))?;
         macro_arguments.extend(recorded_macro_flags(flags, env_tracked)?.unwrap_or_default());
+    }
+    let cppflags = extra_bindgen_clang_args(pg_config)?;
+    // Bindgen's own include detection asks whichever clang clang-sys finds, which need not
+    // match the loaded libclang; PostgreSQL 16's `#include <emmintrin.h>` then reaches builtin
+    // headers of another Clang release. Ask the driver macro inspection selects instead, with
+    // the profile's own target, sysroot and toolchain arguments, such as the `-isysroot` that
+    // macOS records in CPPFLAGS, and give its search list to bindgen and inspection alike.
+    let include_detection = if target_env_tracked("PGRX_BINDGEN_NO_DETECT_INCLUDES").is_some() {
+        None
+    } else {
+        let profile = [&macro_arguments[..], &cppflags, &environment_arguments].concat();
+        let arguments = include_search_arguments(target, &profile);
+        let includes = postgres
+            .system_includes(&scanner, &arguments, explicit_clang.as_deref())
+            .wrap_err("could not detect the Clang driver's include directories for the target")?;
+        eprintln!(
+            "Clang include directories from {}: {:?}",
+            includes.compiler.display(),
+            includes.directories
+        );
+        Some(IncludeDetection {
+            include_arguments: system_include_arguments(&includes)?,
+            compiler: includes.compiler,
+            arguments,
+        })
+    };
+    let mut binder = bindgen::Builder::default();
+    binder = add_blocklists(binder, major_version);
+    binder = add_allowlists(binder, pg_target_includes.iter().map(|x| x.as_str()));
+    binder = add_derives(binder);
+    let out_path = PathBuf::from(std::env::var("OUT_DIR").unwrap());
+    let mut arguments = include_detection
+        .as_ref()
+        .map(|detection| detection.include_arguments.clone())
+        .unwrap_or_default();
+    arguments.extend(cppflags);
+    arguments.extend(pg_target_includes.iter().map(|include| format!("-I{include}")));
+    // Make bindgen's otherwise implicit Cargo target explicit for both inspections.
+    if !has_explicit_clang_target(arguments.iter().chain(&environment_arguments)) {
+        arguments.insert(0, format!("--target={}", clang_target(target)));
     }
     macro_arguments.extend_from_slice(&arguments);
     let enum_names = Rc::new(RefCell::new(BTreeMap::new()));
@@ -1276,7 +1282,7 @@ fn run_bindgen(
         macro_arguments,
         &environment_arguments,
         explicit_clang.as_deref(),
-        system_includes.as_ref().map(|includes| includes.compiler.as_path()),
+        include_detection.as_ref(),
         native,
         &cflags,
         target,
@@ -1292,8 +1298,22 @@ fn macro_postgres_config(pg_config: &PgConfig, server_root: &str) -> eyre::Resul
         .with_server_include_dir(server_root.into()))
 }
 
-/// Search the driver's system directories ahead of every other include directory, in the
-/// driver's order and with each directory's kind, so libclang finds the same headers.
+/// The Clang driver query that chose the system include directories of bindgen and inspection.
+#[derive(Debug, Serialize)]
+struct IncludeDetection {
+    /// The queried driver, which macro inspection must also select.
+    compiler: PathBuf,
+    /// The target, sysroot and toolchain arguments of the query: the profile without its
+    /// include directories.
+    arguments: Vec<String>,
+    /// The driver's search list as bindgen and inspection receive it.
+    include_arguments: Vec<String>,
+}
+
+/// Pass the driver's system directories as system directories, in the driver's order and with
+/// each directory's kind, so libclang finds the same headers. As for the driver, `-I`
+/// directories such as the server's are searched first, and libclang ignores a repeated
+/// directory it already searches.
 fn system_include_arguments(includes: &SystemIncludes) -> eyre::Result<Vec<String>> {
     includes
         .directories
@@ -1302,7 +1322,7 @@ fn system_include_arguments(includes: &SystemIncludes) -> eyre::Result<Vec<Strin
             let path = path
                 .to_str()
                 .ok_or_else(|| eyre!("Clang include directory {} is not UTF-8", path.display()))?;
-            Ok(if *framework { format!("-iframework{path}") } else { format!("-I{path}") })
+            Ok(if *framework { format!("-iframework{path}") } else { format!("-isystem{path}") })
         })
         .collect()
 }
@@ -1367,6 +1387,9 @@ struct MacroReport<'a> {
     /// Recorded CFLAGS left out of the profile: a host `pg_config`'s flags that do not
     /// describe a cross target, and `-arch` slice selections that Cargo's target replaces.
     cflags_dropped: &'a [String],
+    /// The driver query behind the profile's system include directories; absent when
+    /// `PGRX_BINDGEN_NO_DETECT_INCLUDES` skips it.
+    include_detection: Option<&'a IncludeDetection>,
     /// Verified compiler invocation, target, and semantic flags used for this generation.
     profile: &'a CompilationProfile,
     /// Header, compiler, search-root, and environment dependencies needed to invalidate output.
@@ -1393,7 +1416,7 @@ fn generate_macros(
     binder_arguments: Vec<String>,
     environment_arguments: &[String],
     preferred_clang: Option<&Path>,
-    include_driver: Option<&Path>,
+    include_detection: Option<&IncludeDetection>,
     native: NativeBuild<'_>,
     cflags: &MacroCflags,
     target: &str,
@@ -1417,7 +1440,10 @@ fn generate_macros(
     let frontend = postgres
         .inspect_with_arguments(scanner, header, &effective_arguments, preferred_clang)
         .map_err(|error| inspection_error(error, major_version, target))?;
-    require_include_driver(include_driver, &frontend.profile().compiler.executable)?;
+    require_include_driver(
+        include_detection.map(|detection| detection.compiler.as_path()),
+        &frontend.profile().compiler.executable,
+    )?;
     emit_macro_rerun_inputs(&frontend.profile().inputs, native.out_dir)?;
     let mut names = postgres_function_macro_names(&frontend, postgres.server_include_dir())?;
     let owned_objects = postgres_object_macro_names(&frontend, postgres.server_include_dir())?
@@ -1615,6 +1641,7 @@ fn generate_macros(
         status: "generated",
         cflags_recorded: cflags.recorded,
         cflags_dropped: &cflags.dropped,
+        include_detection,
         profile: frontend.profile(),
         inputs: session.inputs(),
         diagnostics: &frontend.inventory().diagnostics,
@@ -1660,14 +1687,15 @@ fn has_explicit_clang_target<'a>(arguments: impl Iterator<Item = &'a String>) ->
     false
 }
 
-/// Select the arguments that make Clang report the target's system search paths: Cargo's
-/// target unless one is explicit, plus the environment's sysroot and toolchain arguments.
-/// Include directories are removed with bindgen 0.72's own detection filter, so they are
-/// not reported back as system paths.
-fn include_search_arguments(target: &str, environment_arguments: &[String]) -> Vec<String> {
-    let mut arguments = Vec::with_capacity(environment_arguments.len() + 1);
+/// Select the arguments that make Clang report the profile's system search paths: Cargo's
+/// target unless one is explicit, plus the profile's recorded flags, CPPFLAGS and environment
+/// arguments, whose sysroot and toolchain options choose the list. Include directories are
+/// removed with bindgen 0.72's own detection filter, so they are not reported back as system
+/// paths.
+fn include_search_arguments(target: &str, profile_arguments: &[String]) -> Vec<String> {
+    let mut arguments = Vec::with_capacity(profile_arguments.len() + 1);
     let mut include_value = false;
-    for argument in environment_arguments {
+    for argument in profile_arguments {
         if std::mem::take(&mut include_value) {
             continue;
         }
@@ -2531,10 +2559,11 @@ macro_rules! EXAMPLE {
         }
     }
 
-    /// The driver's search list precedes other include directories in its own order, and
-    /// framework directories stay framework directories.
+    /// The driver's search list stays a list of system directories in its own order, searched
+    /// after the server's `-I` directories as the driver searches them, and framework
+    /// directories stay framework directories.
     #[test]
-    fn system_includes_become_ordered_include_arguments() {
+    fn system_includes_become_ordered_system_include_arguments() {
         let includes = SystemIncludes {
             compiler: "/usr/bin/clang-14".into(),
             directories: vec![
@@ -2555,8 +2584,8 @@ macro_rules! EXAMPLE {
         assert_eq!(
             system_include_arguments(&includes).unwrap(),
             [
-                "-I/usr/lib/llvm-14/lib/clang/14/include",
-                "-I/usr/include/aarch64-linux-gnu",
+                "-isystem/usr/lib/llvm-14/lib/clang/14/include",
+                "-isystem/usr/include/aarch64-linux-gnu",
                 "-iframework/System/Library/Frameworks",
             ]
         );
