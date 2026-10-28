@@ -93,7 +93,11 @@ impl TestConfig {
             .env_remove("PGRX_C_MACROS_TEST_CONFIGURE")
             .env_remove("PGRX_PG_CONFIG_PATH")
             .env_remove("PGRX_PG_CONFIG_AS_ENV")
-            .env_remove("PG_CONFIG");
+            .env_remove("PG_CONFIG")
+            // Assertions read plain help and diagnostic text, so inherited color forcing must
+            // not add ANSI escapes.
+            .env_remove("CLICOLOR_FORCE")
+            .env("NO_COLOR", "1");
         command
     }
 }
