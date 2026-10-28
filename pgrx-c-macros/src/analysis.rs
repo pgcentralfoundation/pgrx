@@ -739,8 +739,14 @@ pub(crate) fn analyze_active_with_constants(
         if let ExpressionKind::SizeOfTypeParameter { parameter, .. }
         | ExpressionKind::AlignOfTypeParameter { parameter, .. } = node.kind
         {
+            // Accumulate like every other use. Children precede parents in the
+            // arena, so replacing the roles would hide an earlier value or member
+            // use from the emitter's mixed-role refusal.
             let parameter = &mut result.parameters[parameter];
-            parameter.roles = vec![ParameterRole::Type];
+            parameter.roles.retain(|role| *role != ParameterRole::Unknown);
+            if !parameter.roles.contains(&ParameterRole::Type) {
+                parameter.roles.push(ParameterRole::Type);
+            }
             for usage in &mut parameter.uses {
                 if usage.tokens.start >= node.tokens.start && usage.tokens.end <= node.tokens.end {
                     usage.grouped = true;

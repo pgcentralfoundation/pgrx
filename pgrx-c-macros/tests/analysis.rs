@@ -449,6 +449,53 @@ _Static_assert(_Generic(ANALYSIS_ALIGN_APPLICATION(analysis_callback,7), int: 1,
     assert!(checked.is_empty());
 }
 
+/// A formal measured as a type and also used as a value or member name is refused in either
+/// source order, rather than emitted as a type fragment in an operand position.
+#[test]
+fn type_measurements_keep_earlier_operand_roles_of_the_same_formal() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let header = fixture("analysis_type_roles.h");
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    let cases = [
+        ("ROLE_VALUE_THEN_ALIGN", 0, ParameterRole::Value),
+        ("ROLE_ALIGN_THEN_VALUE", 0, ParameterRole::Value),
+        ("ROLE_MEMBER_THEN_SIZE", 1, ParameterRole::Identifier),
+        ("ROLE_SIZE_THEN_MEMBER", 1, ParameterRole::Identifier),
+    ];
+    let names = cases.iter().map(|(name, ..)| *name).collect::<Vec<_>>();
+    let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
+    for (name, parameter, operand_role) in cases {
+        let analysis = session.analyze(name);
+        assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{name}: {analysis:?}");
+        let roles = &analysis.parameters[parameter].roles;
+        assert!(
+            roles.contains(&ParameterRole::Type) && roles.contains(&operand_role),
+            "{name}: {roles:?}"
+        );
+        let EmissionStatus::Skipped { reason } = emit(&session, name).status else {
+            panic!("{name}: a type fragment cannot fill an operand hole");
+        };
+        assert_eq!(reason.code, SkipReasonCode::UnsupportedType, "{name}: {reason:?}");
+        assert!(reason.message.contains("incompatible type and operand roles"), "{reason:?}");
+    }
+    let checked = oracle::run_c(
+        &frontend.profile().compiler.executable,
+        &header,
+        r#"
+long role_value = 10;
+struct RoleRecord role_record = { 3 };
+_Static_assert(sizeof(ROLE_VALUE_THEN_ALIGN(role_value)) == sizeof(unsigned long), "GNU alignment of a value");
+_Static_assert(sizeof(ROLE_ALIGN_THEN_VALUE(role_value)) == sizeof(unsigned long), "GNU alignment of a value");
+_Static_assert(sizeof(ROLE_MEMBER_THEN_SIZE(&role_record, RoleField)) == sizeof(unsigned long), "a member and a typedef can share a name");
+_Static_assert(sizeof(ROLE_SIZE_THEN_MEMBER(&role_record, RoleField)) == sizeof(unsigned long), "a member and a typedef can share a name");
+"#,
+        &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        false,
+    );
+    assert!(checked.is_empty());
+}
+
 /// Checks that ungrouped parameter uses require atomic arguments without changing the C body.
 #[test]
 fn ungrouped_parameter_uses_require_atomic_arguments_without_changing_the_c_body() {
