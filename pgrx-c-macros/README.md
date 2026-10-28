@@ -383,8 +383,10 @@ The typed expression support also covers:
   pastes that depend on caller operands and discover synthesized dependencies
   before rescanning can hide them. Empty-side pastes that preserve an operand
   unchanged are supported. The validation currently recognizes upstream Clang
-  versions 6 through 23 and fails closed on unfamiliar diagnostics. With any
-  other Clang version, every macro that reaches a paste is skipped.
+  versions 6 through 23 and Apple clang versions 11 through 21, and fails closed
+  on unfamiliar diagnostics. Of the Apple releases, only Apple clang 21's
+  builtins were enumerated. With any other Clang version, every macro that
+  reaches a paste is skipped.
 - C enums whose compatible integer representation is established by Clang,
   including values without a named Rust enum variant.
 - `float` and `double` where the compiler profile establishes the modeled IEEE

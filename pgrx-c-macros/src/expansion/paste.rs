@@ -24,8 +24,14 @@ use std::path::Path;
 /// Bound the total preprocessing passes spent proving closed token pasting.
 pub(super) const MAX_CPP_RUNS: usize = 8;
 
-// RegisterBuiltinMacros in upstream Clang 6--23; release/22.x and release/23.x
-// register exactly these names. Unknown compiler majors do not enter this proof:
+// Upstream RegisterBuiltinMacros in Clang 6--23 registers only these names;
+// release/22.x and release/23.x register all of them except
+// __has_target_variant. Apple clang 21 registers that set plus
+// __has_target_variant, found by an #ifdef probe of every identifier in its
+// driver. Apple's public llvm-project branches never register that name, so
+// their source cannot stand in for the probe. Apple clang 11--20 were not
+// enumerated; they are admitted on the assumption that __has_target_variant is
+// their only Apple-only builtin. Unknown compiler majors do not enter this proof:
 // a newly registered preprocessor builtin could erase its own evidence or alter
 // the expansion environment before the ordinary probe. Audit a new major's
 // registrations before widening `audited_builtins`.
@@ -56,6 +62,7 @@ const BUILTINS: &[&str] = &[
     "__has_feature",
     "__has_include",
     "__has_include_next",
+    "__has_target_variant",
     "__has_warning",
     "__identifier",
     "__is_identifier",
@@ -333,9 +340,15 @@ pub(super) fn prove(
     Ok(proof)
 }
 
-/// Admit only compilers whose complete preprocessor builtin set is [`BUILTINS`].
+/// Admit only compilers whose preprocessor builtins are all in [`BUILTINS`].
+///
+/// Apple numbers clang independently of upstream LLVM and registers builtins upstream lacks,
+/// so its product majors have their own range. Only Apple clang 21 was enumerated; the
+/// [`BUILTINS`] comment states what each range rests on. Apple releases before clang 11 report
+/// "Apple LLVM version" and never parse.
 fn audited_builtins(version: &str) -> bool {
-    crate::frontend::version_major(version).is_some_and(|major| (6..=23).contains(&major))
+    let audited = if version.starts_with("Apple ") { 11..=21 } else { 6..=23 };
+    crate::frontend::version_major(version).is_some_and(|major| audited.contains(&major))
 }
 
 /// Record a proof failure for all remaining probes when ownership or budgets cannot be established.
@@ -1039,10 +1052,10 @@ mod tests {
         assert!(trapped_probes(&separated, &locations(), "fresh_").is_empty());
     }
 
-    /// Released upstream majors whose builtin registrations were audited enter the proof;
-    /// unreleased or unparseable compilers refuse it.
+    /// Audited upstream majors and the admitted Apple clang range enter the proof; unreleased,
+    /// pre-11 Apple, or unparseable compilers refuse it.
     #[test]
-    fn builtin_audit_admits_only_audited_upstream_majors() {
+    fn builtin_audit_admits_only_listed_compiler_majors() {
         for version in [
             "clang version 6.0.1",
             "Ubuntu clang version 14.0.0-1ubuntu1.1",
@@ -1050,10 +1063,20 @@ mod tests {
             "clang version 22.1.0",
             "Homebrew clang version 22.1.3",
             "Ubuntu clang version 23.1.0",
+            "Apple clang version 11.0.0 (clang-1100.0.33.8)",
+            "Apple clang version 17.0.0 (clang-1700.0.13.5)",
+            "Apple clang version 21.0.0 (clang-2100.3.34.2)",
         ] {
             assert!(audited_builtins(version), "{version}");
         }
-        for version in ["clang version 5.0.2", "clang version 24.0.0", "gcc (GCC) 14.2.0", ""] {
+        for version in [
+            "clang version 5.0.2",
+            "clang version 24.0.0",
+            "Apple clang version 22.0.0 (clang-2200.0.0.1)",
+            "Apple LLVM version 10.0.0 (clang-1000.11.45.5)",
+            "gcc (GCC) 14.2.0",
+            "",
+        ] {
             assert!(!audited_builtins(version), "{version}");
         }
     }

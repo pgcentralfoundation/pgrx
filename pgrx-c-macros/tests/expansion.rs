@@ -393,6 +393,7 @@ int __paste_native(int);
 #define P_HIDDEN_LINE(x) CAT(__LI,NE__)
 #define P_HIDDEN_PRAGMA(x) PRESCAN(CAT(_Pr,agma)("GCC poison P_CLOSED"))
 #define P_HIDDEN_QUERY(x) PRESCAN(CAT(__has_in,clude)("never-created.h"))
+#define P_HIDDEN_VARIANT(x) (CAT(__ha,s_target_variant)() + (x))
 #define P_UNKNOWN(x) CAT(__builtin_,constant_p)(x)
 #define P_SYNTH_STRING(x) PRESCAN(CAT(P_STR,ING)(x))
 #define P_SYNTH_VARIADIC(x) PRESCAN(CAT(P_VARI,ADIC)(x))
@@ -416,6 +417,7 @@ int __paste_native(int);
         "P_HIDDEN_LINE",
         "P_HIDDEN_PRAGMA",
         "P_HIDDEN_QUERY",
+        "P_HIDDEN_VARIANT",
         "P_UNKNOWN",
         "P_SYNTH_VARIADIC",
         "P_FORGED_PARAMETER",
@@ -473,6 +475,8 @@ int __paste_native(int);
             assert!(!reason.message.is_empty());
             assert!(!reason.spans.is_empty());
         }
+        // Apple clang 21 registers this query builtin; upstream Clang does not.
+        assert_skip(&batch, "P_HIDDEN_VARIANT", ExpansionSkipCode::DynamicBuiltin);
         assert_skip(&batch, "P_SYNTH_VARIADIC", ExpansionSkipCode::Variadic);
         let ExpansionResult::Skipped { reason } = &batch.results["P_SYNTH_VARIADIC"] else {
             unreachable!()

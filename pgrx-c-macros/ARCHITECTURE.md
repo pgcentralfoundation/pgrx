@@ -533,9 +533,14 @@ later expansion would erase the evidence. Define probe wrappers before poisoning
 names: Clang exempts ordinary old definition tokens but checks newly pasted
 identifiers before rescanning them. Poison active macro/dynamic/probe names and
 require a unique final `#error` completion marker. Pasted builtins or fabricated
-probe names are refusals. This proof currently audits Clang 6 through 23's
-builtin families; an unaudited major refuses closed-paste support, so every
-root whose dependency closure pastes is skipped until that major is audited.
+probe names are refusals. Upstream Clang 6 through 23 registers only trapped
+builtins; Clang 22 and 23 register all of them except `__has_target_variant`.
+Apple numbers clang independently and adds builtins upstream lacks. Enumerating
+Apple clang 21 found one addition, `__has_target_variant`. Apple clang 11
+through 20 are admitted unverified, on the assumption that this is their only
+Apple-only builtin; earlier Apple releases report "Apple LLVM version" and are
+refused. Any other major refuses closed-paste support, so every root whose
+dependency closure pastes is skipped until that major is audited.
 
 Iterate discovered synthesized dependencies within the finite compiler-pass
 budget. Add them to the dependency graph. Reject erased operands, dynamic helper
