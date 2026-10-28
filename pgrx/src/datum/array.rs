@@ -1062,9 +1062,11 @@ where
 #[inline]
 /// Converts an iterator into an array datum
 fn array_datum_from_iter<T: IntoDatum>(elements: impl Iterator<Item = T>) -> Option<pg_sys::Datum> {
+    // For a `#[derive(PostgresType)]` type, `type_oid` is a catalog lookup, so look it up once.
+    let element_type = T::type_oid();
     let mut state = unsafe {
         pg_sys::initArrayResult(
-            T::type_oid(),
+            element_type,
             PgMemoryContexts::CurrentMemoryContext.value(),
             // All elements use the same memory context
             false,
@@ -1079,7 +1081,7 @@ fn array_datum_from_iter<T: IntoDatum>(elements: impl Iterator<Item = T>) -> Opt
                 state,
                 datum.unwrap_or(0.into()),
                 isnull,
-                T::type_oid(),
+                element_type,
                 PgMemoryContexts::CurrentMemoryContext.value(),
             );
         }
@@ -1111,11 +1113,6 @@ where
         self.get(0)
             .and_then(|v| v.composite_type_oid().map(|oid| unsafe { pg_sys::get_array_type(oid) }))
     }
-
-    #[inline]
-    fn is_compatible_with(other: pg_sys::Oid) -> bool {
-        Self::type_oid() == other || other == unsafe { pg_sys::get_array_type(T::type_oid()) }
-    }
 }
 
 impl<'a, T> IntoDatum for &'a [T]
@@ -1128,11 +1125,6 @@ where
 
     fn type_oid() -> pg_sys::Oid {
         unsafe { pg_sys::get_array_type(T::type_oid()) }
-    }
-
-    #[inline]
-    fn is_compatible_with(other: pg_sys::Oid) -> bool {
-        Self::type_oid() == other || other == unsafe { pg_sys::get_array_type(T::type_oid()) }
     }
 }
 
