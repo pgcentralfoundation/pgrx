@@ -585,12 +585,14 @@ mod casper {
             ptr: *const u8,
         ) -> Option<T::As<'arr>> {
             // This branch is optimized away (because `N` is constant).
+            // Widen the value as PostgreSQL's fetch_att does, so the Datum equals one read from a
+            // tuple: CharGetDatum widens a C char with that type's signedness, and
+            // Int16GetDatum and Int32GetDatum sign-extend. Readers that accept a narrower type,
+            // such as i64 for int4, read a negative value correctly only from that form.
             let datum = match N {
-                // for match with `Datum`, read through that directly to
-                // preserve provenance (may not be relevant but doesn't hurt).
-                1 => pg_sys::Datum::from(byval_read::<u8>(ptr)),
-                2 => pg_sys::Datum::from(byval_read::<u16>(ptr)),
-                4 => pg_sys::Datum::from(byval_read::<u32>(ptr)),
+                1 => pg_sys::Datum::from(byval_read::<pg_sys::__pgrx_c_macros::CCharRepr>(ptr)),
+                2 => pg_sys::Datum::from(byval_read::<i16>(ptr)),
+                4 => pg_sys::Datum::from(byval_read::<i32>(ptr)),
                 8 => pg_sys::Datum::from(byval_read::<u64>(ptr)),
                 _ => unreachable!("`N` must be 1, 2, 4, or 8 (got {N})"),
             };

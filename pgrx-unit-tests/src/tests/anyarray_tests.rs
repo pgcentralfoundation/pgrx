@@ -115,7 +115,7 @@ mod tests {
 
     use pgrx::datum::TryFromDatumError;
     use pgrx::prelude::*;
-    use pgrx::{AnyArray, Json};
+    use pgrx::{AnyArray, AnyElement, Json};
     use serde_json::*;
 
     #[pg_test]
@@ -158,6 +158,40 @@ mod tests {
             )?,
             Some("hello".to_owned())
         );
+        Ok(())
+    }
+
+    /// PostgreSQL widens a 1-, 2-, or 4-byte value it reads from a tuple into a Datum as
+    /// `fetch_att` does: it sign-extends `int2` and `int4`, and widens `"char"` as C `char`. Array
+    /// elements must match, because readers such as `value::<i64>()` accept the narrower types.
+    #[pg_test]
+    fn test_anyarray_elements_widen_like_tuple_values() -> std::result::Result<(), pgrx::spi::Error>
+    {
+        for (array_sql, value_sql) in [
+            ("ARRAY[-1]::int2[]", "(-1)::int2"),
+            ("ARRAY[-1]::int4[]", "(-1)::int4"),
+            (r#"ARRAY['\377']::"char"[]"#, r#"'\377'::"char""#),
+        ] {
+            let array = Spi::get_one::<AnyArray>(&format!("SELECT {array_sql}"))?.expect("NULL");
+            let element = (&array).into_iter().next().flatten().expect("NULL element");
+            let value = Spi::get_one::<AnyElement>(&format!("SELECT {value_sql}"))?.expect("NULL");
+            assert_eq!(element.datum(), value.datum(), "{value_sql}");
+            assert_eq!(element.value::<i64>(), value.value::<i64>(), "{value_sql}");
+        }
+        let int2 = Spi::get_one::<AnyArray>("SELECT ARRAY[-1, 2]::int2[]")?.expect("NULL array");
+        let int4 = Spi::get_one::<AnyArray>("SELECT ARRAY[-1, 2]::int4[]")?.expect("NULL array");
+        for element in &int2 {
+            let element = element.expect("NULL element");
+            assert_eq!(element.value::<i32>()?, element.value::<i16>()?.map(i32::from));
+            assert_eq!(element.value::<i64>()?, element.value::<i16>()?.map(i64::from));
+        }
+        for element in &int4 {
+            let element = element.expect("NULL element");
+            assert_eq!(element.value::<i64>()?, element.value::<i32>()?.map(i64::from));
+        }
+        let chars = Spi::get_one::<AnyArray>(r#"SELECT ARRAY['\377']::"char"[]"#)?.expect("NULL");
+        let element = (&chars).into_iter().next().flatten().expect("NULL element");
+        assert_eq!(element.value::<i8>()?, Some(-1));
         Ok(())
     }
 
