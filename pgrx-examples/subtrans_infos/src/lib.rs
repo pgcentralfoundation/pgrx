@@ -9,10 +9,11 @@ type TransactionId = pg_sys::TransactionId;
 
 /// RAII wrapper for PostgreSQL LWLock to ensure proper release
 ///
-/// This guard acquires a shared lock and releases it when dropped, including while pgrx
-/// unwinds a PostgreSQL ERROR. `errfinish` has reset `InterruptHoldoffCount` to zero by then,
-/// so that release fails `LWLockRelease`'s `RESUME_INTERRUPTS` assertion on assert-enabled
-/// servers.
+/// This guard acquires a shared lock and releases it when dropped, including while a Rust
+/// panic unwinds. A PostgreSQL ERROR is different: `errfinish` resets
+/// `InterruptHoldoffCount` to zero before pgrx turns the error into an unwinding panic, and
+/// `LWLockRelease` would then fail its `RESUME_INTERRUPTS` assertion. The guard leaves the
+/// lock to transaction abort's `LWLockReleaseAll` in that case, as pgrx's own lock guards do.
 struct PgLwLockGuard {
     lock: *mut pg_sys::LWLock,
 }
@@ -40,11 +41,13 @@ impl PgLwLockGuard {
 impl Drop for PgLwLockGuard {
     fn drop(&mut self) {
         // SAFETY: new_shared acquired this live lock for this guard on the backend thread,
-        // and this releases that acquisition once. While a PostgreSQL ERROR unwinds, the
-        // release fails an assertion on assert-enabled servers, as the type's documentation
-        // describes.
+        // which is the only thread that reads InterruptHoldoffCount. LWLockAcquire holds
+        // interrupts, so the count stays positive while the lock is held unless a
+        // PostgreSQL ERROR reset it; transaction abort then releases the lock instead.
         unsafe {
-            pg_sys::LWLockRelease(self.lock);
+            if pg_sys::InterruptHoldoffCount > 0 {
+                pg_sys::LWLockRelease(self.lock);
+            }
         }
     }
 }
