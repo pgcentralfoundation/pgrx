@@ -670,6 +670,13 @@ cargo test -p pgrx-bindgen --test macro_build -- --ignored
 cargo test -p pgrx-bindgen --test shipped_macros -- --ignored
 ```
 
+Tests wrapped in `if_c_macro!` or the classifier's availability arm disappear
+when their macro is not emitted. The `pgrx-pg-sys` `macro_availability` test
+therefore requires each name gated in `pgrx-pg-sys/tests` and
+`pgrx-unit-tests/src/tests` to be emitted, apart from the version and
+assertion-profile differences it lists. It also fails on an unavailable macro
+report unless `PGRX_C_MACROS=0` disabled generation.
+
 ## Optional generation in extension builds
 
 `pgrx-pg-sys` generates ordinary bindings independently of macro inspection.
