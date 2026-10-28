@@ -30,10 +30,9 @@ pub struct PgRelation {
 }
 
 impl PgRelation {
-    /// Wrap a Postgres-provided `pg_sys::Relation`.
+    /// Wrap a Postgres-provided `pg_sys::Relation` without taking a reference to it.
     ///
-    /// It is assumed that Postgres will later `RelationClose()` the provided relation pointer.
-    /// As such, it is not closed when this instance is dropped
+    /// This instance does not close the relation when it drops; whoever opened it closes it.
     ///
     /// ## Safety
     ///
@@ -255,7 +254,10 @@ impl PgRelation {
     /// use pgrx::{PgRelation, pg_sys};
     /// # let example_pg_class_oid = |i| pg_sys::Oid::from(i);
     /// let oid = example_pg_class_oid(42); // a valid pg_class "oid" value
-    /// let relation = unsafe { PgRelation::from_pg(pg_sys::RelationIdGetRelation(oid) ) };
+    /// // SAFETY: AccessShareLock is enough to read the relation's descriptor. `relation` holds
+    /// // the lock and a relcache reference, and releases both when it drops.
+    /// let relation =
+    ///     unsafe { PgRelation::with_lock(oid, pg_sys::AccessShareLock as pg_sys::LOCKMODE) };
     /// let tupdesc = relation.tuple_desc();
     ///
     /// // assert that the tuple descriptor has 12 attributes

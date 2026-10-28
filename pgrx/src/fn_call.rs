@@ -24,10 +24,17 @@ use crate::{
 /// Augments types that can be used as [`fn_call`] arguments.  This is only implemented for the
 /// [`Arg`] enum.
 pub unsafe trait FnCallArg: Sealed {
-    /// Represent `&self` as a [`pg_sys::Datum`].  This is likely to clone
+    /// Represent `&self` as the [`pg_sys::Datum`] for argument `argnum` of `pg_proc`, or `None`
+    /// for a NULL.  An [`Arg::Value`] converts a clone of its value, [`Arg::Null`] returns
+    /// `None`, and [`Arg::Default`] evaluates the parameter's `DEFAULT`.  This does not check
+    /// the value's type against the parameter.
+    ///
+    /// [`fn_call`] calls this only for an [`Arg::Value`], after it checks the value's type.  It
+    /// passes NULLs and `DEFAULT`s without calling this.
     fn as_datum(&self, pg_proc: &PgProc, argnum: usize) -> Result<Option<pg_sys::Datum>>;
 
-    /// The Postgres type OID of `&self`
+    /// The Postgres type OID of the `T` in `Arg<T>`, whichever variant `&self` is.  [`fn_call`]
+    /// selects the function by these types.
     fn type_oid(&self) -> pg_sys::Oid;
 
     /// `&self` with the value of an [`Arg::Value`] replaced by its Postgres type OID
@@ -91,7 +98,7 @@ pub enum FnCallError {
     #[error("Can only dynamically call plain functions")]
     UnsupportedFunctionType,
 
-    #[error("Functions with OUT/IN_OUT/TABLE arguments are not supported")]
+    #[error("Functions with OUT/IN_OUT/TABLE/VARIADIC arguments are not supported")]
     UnsupportedArgumentModes,
 
     #[error("Functions with argument or return types of `internal` are not supported")]
@@ -200,9 +207,16 @@ pub type Result<T> = std::result::Result<T, FnCallError>;
 ///
 /// # Limitations
 ///
-/// Currently, [`fn_call`] does not support:
-///     - Functions that `RETURNS SET OF $type` or `RETURNS TABLE(...)`
-///     - Functions with `IN_OUT` or `OUT` arguments
+/// [`fn_call`] calls only plain functions whose parameters are all `IN` parameters.  It returns
+/// [`FnCallError::UnsupportedFunctionType`] for a procedure, aggregate, or window function, and
+/// [`FnCallError::UnsupportedArgumentModes`] for a function with an `OUT`, `INOUT`, or `VARIADIC`
+/// parameter, which includes every function that `RETURNS TABLE(...)`.
+///
+/// It does not support other set-returning functions, those that `RETURNS SETOF`, but it does not
+/// check for them either.  It calls one without the `ReturnSetInfo` that a set-returning function
+/// needs, and PostgreSQL's and pgrx's set-returning functions then raise the ERROR "set-valued
+/// function called in context that cannot accept a set".  [`fn_call`] does not catch that ERROR,
+/// as described above, so it does not return an [`FnCallError`].
 ///
 /// # Examples
 ///
