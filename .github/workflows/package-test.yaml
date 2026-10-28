@@ -113,3 +113,18 @@ jobs:
 
       - name: Verify docs.rs build path
         run: ./tools/docsrs-check.sh
+
+  docsrs:
+    name: docs.rs type-check
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: "v1-pgrx--docsrs-typecheck"
+
+      # docs.rs builds need neither PostgreSQL nor libclang. This checks every supported
+      # version against the committed bindings and C macro snapshot on docs.rs's target.
+      - name: Type-check the docs.rs builds of pgrx-pg-sys and pgrx
+        run: ./tools/docsrs-typecheck.sh

@@ -1754,8 +1754,9 @@ Release generation keeps the committed bindings and snapshot coherent:
   for each `pgNN` feature of pgrx-pg-sys against the committed tree, and keeps the
   packaged pgrx-pg-sys within 5 MiB.
   Like `tools/docsrs-check.sh`, it builds for the docs.rs target, so another host
-  needs that target's standard library and a C compiler for it. A pgrx-bindgen
-  unit test keeps the snapshot within 24 MiB raw.
+  needs that target's standard library and a C compiler for it. CI runs it on
+  x86_64 Linux for every pull request. A pgrx-bindgen unit test keeps the
+  snapshot within 24 MiB raw.
 
 `pgrx-pg-sys/src/include.rs` exposes the `cmacros` selector in
 `src/include/cmacros/mod.rs`, which includes the selected `OUT_DIR` tree or, for
