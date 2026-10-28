@@ -2608,10 +2608,11 @@ fn native_archive_command(
     Ok((archiver, arguments))
 }
 
-/// Find the llvm-ar of the selected Clang's LLVM release: beside the driver, then as
-/// `llvm-ar-<major>` beside a `clang-<major>` driver, then beside the driver's resolved path.
+/// Find the llvm-ar of the selected Clang's LLVM release: as `llvm-ar-<major>` beside a
+/// `clang-<major>` driver, then beside the driver, then beside the driver's resolved path.
 /// Debian installs `/usr/bin/clang-14` and `/usr/bin/llvm-ar-14` as links into
-/// `/usr/lib/llvm-14/bin`, which holds the unversioned names.
+/// `/usr/lib/llvm-14/bin`, which holds the unversioned names, while `/usr/bin/llvm-ar` belongs
+/// to the distribution's default LLVM release.
 fn llvm_archiver(compiler: &Path) -> Option<PathBuf> {
     let suffix = std::env::consts::EXE_SUFFIX;
     let adjacent = compiler.with_file_name(format!("llvm-ar{suffix}"));
@@ -2624,7 +2625,7 @@ fn llvm_archiver(compiler: &Path) -> Option<PathBuf> {
         .canonicalize()
         .ok()
         .map(|compiler| compiler.with_file_name(format!("llvm-ar{suffix}")));
-    [Some(adjacent), versioned, resolved].into_iter().flatten().find(|archiver| archiver.is_file())
+    [versioned, Some(adjacent), resolved].into_iter().flatten().find(|archiver| archiver.is_file())
 }
 
 /// Resolve output identities, including absent filenames, to reject source/object/archive aliasing.
@@ -3404,7 +3405,7 @@ mod tests {
 
     /// A Debian `clang-14` driver archives with its own release's llvm-ar, which is installed
     /// as `llvm-ar-14` beside it and as `llvm-ar` beside its resolved path, rather than with a
-    /// system ar that cannot index foreign objects.
+    /// system ar that cannot index foreign objects or the default release's `/usr/bin/llvm-ar`.
     #[cfg(unix)]
     #[test]
     fn native_archiver_follows_debian_llvm_layouts() {
@@ -3426,10 +3427,10 @@ mod tests {
         tool(llvm_bin.join("llvm-ar"));
         let resolved = compiler.canonicalize().unwrap().with_file_name("llvm-ar");
         assert_eq!(archiver(), resolved);
-        let versioned = tool(usr_bin.join("llvm-ar-14"));
-        assert_eq!(archiver(), versioned);
         let adjacent = tool(usr_bin.join("llvm-ar"));
         assert_eq!(archiver(), adjacent);
+        let versioned = tool(usr_bin.join("llvm-ar-14"));
+        assert_eq!(archiver(), versioned, "the default release's llvm-ar must not win");
         // Windows targets use the same llvm-ar in COFF mode when no llvm-lib is adjacent.
         std::fs::remove_file(&adjacent).unwrap();
         let (selected, arguments) =
