@@ -499,6 +499,38 @@ _Static_assert(sizeof(ROLE_ALIGN_SUBTRACT(long, role_value)) == sizeof(unsigned 
     assert!(checked.is_empty());
 }
 
+/// A `restrict`-qualified pointer still measures and casts as one pointer, while an array of
+/// pointers is refused rather than measured as one.
+#[test]
+fn concrete_type_operands_keep_restrict_pointers_and_refuse_pointer_arrays() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let header = fixture("analysis_declarators.h");
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    let restricted =
+        ["DECLARATOR_RESTRICT_SIZE", "DECLARATOR_GNU_RESTRICT_SIZE", "DECLARATOR_RESTRICT_CAST"];
+    let names = restricted.into_iter().chain(["DECLARATOR_POINTER_ARRAY_SIZE"]).collect::<Vec<_>>();
+    let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
+    for name in restricted {
+        let emission = emit(&session, name);
+        assert!(matches!(emission.status, EmissionStatus::Emitted { .. }), "{name}: {emission:?}");
+    }
+    let analysis = session.analyze("DECLARATOR_POINTER_ARRAY_SIZE");
+    assert!(matches!(analysis.status, AnalysisStatus::Skipped { .. }), "{analysis:?}");
+    let checked = oracle::run_c(
+        &frontend.profile().compiler.executable,
+        &header,
+        r#"
+_Static_assert(DECLARATOR_RESTRICT_SIZE(3) == 3 * sizeof(char *), "restrict keeps one pointer");
+_Static_assert(DECLARATOR_GNU_RESTRICT_SIZE(3) == 3 * sizeof(char *), "restrict keeps one pointer");
+_Static_assert(DECLARATOR_POINTER_ARRAY_SIZE(1) == 4 * sizeof(char *), "an array is not one pointer");
+"#,
+        &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        false,
+    );
+    assert!(checked.is_empty(), "{checked}");
+}
+
 /// Checks that ungrouped parameter uses require atomic arguments without changing the C body.
 #[test]
 fn ungrouped_parameter_uses_require_atomic_arguments_without_changing_the_c_body() {

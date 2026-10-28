@@ -1857,7 +1857,13 @@ pub(crate) fn resolve_type_info(
     if let Some((pointee, qualifiers)) = name.rsplit_once('*') {
         // Only this layer's qualifiers may follow its star. An array or named
         // declarator there would make the spelling something other than one pointer.
-        if !qualifiers.split_whitespace().all(|word| matches!(word, "const" | "volatile")) {
+        // `restrict` is accepted unrecorded in each spelling (PostgreSQL's pg_config.h
+        // maps `pg_restrict` and `restrict` to `__restrict`): it changes neither size
+        // nor alignment, a cast result drops it, and the generated Rust never relies
+        // on its aliasing promise.
+        if !qualifiers.split_whitespace().all(|word| {
+            matches!(word, "const" | "volatile" | "restrict" | "__restrict" | "__restrict__")
+        }) {
             return None;
         }
         resolve_type_info(pointee.trim(), catalog, target)?;
@@ -2448,20 +2454,40 @@ mod tests {
         assert!(!outer.is_const && !outer.is_volatile);
     }
 
-    /// An array or named declarator after the last star is not one pointer.
+    /// An array or named declarator after the last star is not one pointer, while a
+    /// `restrict`-qualified pointer still measures as one.
     #[test]
     fn pointer_declarators_admit_only_qualifiers_after_their_star() {
         let target = target(64);
         let catalog = DeclarationCatalog::default();
+        for (spelling, is_const, is_volatile) in [
+            ("char * restrict", false, false),
+            ("char * __restrict", false, false),
+            ("char * __restrict__ const", true, false),
+            ("int * restrict * volatile", false, true),
+        ] {
+            let ty = resolve_type_info(spelling, &catalog, &target).expect(spelling);
+            assert_eq!(ty.category, TypeCategory::Pointer, "{spelling}");
+            assert_eq!(ty.size, Some(8), "{spelling}");
+            assert_eq!((ty.is_const, ty.is_volatile), (is_const, is_volatile), "{spelling}");
+        }
         for spelling in [
             "char * [ 4 ]",
             "char * const [ 4 ]",
+            "char * restrict [ 4 ]",
             "int * garbage",
             "int * const garbage",
-            "int * restrict",
             "int * * [ 2 ]",
+            "int restrict",
         ] {
             assert_eq!(resolve_type_info(spelling, &catalog, &target), None, "{spelling}");
+        }
+        for body in [
+            vec!["(", "(", "x", ")", "*", "sizeof", "(", "char", "*", "restrict", ")", ")"],
+            vec!["(", "*", "(", "char", "*", "restrict", ")", "(", "x", ")", ")"],
+        ] {
+            let status = analyze(&frontend(&body), "F").status;
+            assert!(matches!(status, AnalysisStatus::Candidate), "{body:?}: {status:?}");
         }
         for body in [
             vec!["(", "(", "x", ")", "*", "sizeof", "(", "char", "*", "[", "4", "]", ")", ")"],

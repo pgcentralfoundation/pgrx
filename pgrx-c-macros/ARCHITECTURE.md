@@ -596,8 +596,11 @@ evidence for its type role and reparse. Do not decide that `(T)(x)` is a cast
 merely because choosing that interpretation makes generation possible.
 Bound pointer/qualifier declarators rather than accepting arbitrary textual
 types: a concrete cast, size, or alignment type is names and `*` layers, and only
-`const` or `volatile` may follow a star. Array and function declarators, such as
-`char *[4]`, are refused rather than measured as one pointer. `offsetof` keeps a
+`const`, `volatile`, or `restrict` (also spelled `__restrict` or `__restrict__`)
+may follow a star. `restrict` is not recorded: it changes neither size nor
+alignment, a cast result drops it, and generated Rust never relies on its
+aliasing promise. Array and function declarators, such as `char *[4]`, are
+refused rather than measured as one pointer. `offsetof` keeps a
 record designator and ordered field path; offsets do not require loading those
 fields. Whenever the arena holds type-hole evidence, reparse once after gathering
 it, so `(T) - 1` is a cast wherever `sizeof(T *)` appears. Bare GNU alignment of
