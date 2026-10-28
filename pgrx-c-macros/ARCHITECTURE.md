@@ -1466,12 +1466,17 @@ header modules reexport those identifiers, their parent modules collect them, an
 `pgrx/src/lib.rs` uses `pub use pg_sys::cmacros::*`. Thus callers can use
 `pgrx::MACRO_NAME!` without caring which header module owns its definition.
 Because the OUT_DIR tree is loaded with `include!`, these exports are
-macro-expanded inside pgrx-pg-sys. Code in that crate must not name them by an
-absolute path: Rust rejects that as a future incompatibility
-([rust-lang/rust#52234](https://github.com/rust-lang/rust/issues/52234)), and an
-allowance does not suppress the report shown to every downstream build. This
-includes `use crate::NAME` for a function that shares its name with a generated
-macro. Downstream crates are unaffected.
+macro-expanded inside pgrx-pg-sys, and Rust rejects any absolute path to them
+from that crate as a future incompatibility
+([rust-lang/rust#52234](https://github.com/rust-lang/rust/issues/52234)). An
+allowance does not suppress the report shown to every downstream build.
+Generated transcribers reach their helpers through such paths, for example
+`$crate::__pgrx_c_operand!` and `$crate::__pgrx_c_args_NAME!`, so pgrx-pg-sys
+must not invoke or import a generated macro at all. Even a textual invocation is
+rejected once its expansion reaches a helper, and `use crate::NAME` for a
+function that shares its name with a generated macro imports that macro too.
+In-crate use would need non-exported macros reached by module paths along the
+whole helper chain. Downstream crates are unaffected.
 
 Production binding paths start at `$crate::__pgrx_c_bindings`, a public hidden
 namespace that reexports only the selected generated binding module. Collect
