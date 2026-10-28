@@ -24,7 +24,7 @@ mod oracle;
 mod rust_oracle;
 
 use pgrx_c_macros::{
-    AnalysisSession, EmissionStatus, MacroScanner, emit_batch_with_bindings,
+    AnalysisSession, BindingCatalog, EmissionStatus, MacroScanner, emit_batch_with_bindings,
     emit_support_artifact_with_bindings, inspect,
 };
 use std::path::PathBuf;
@@ -317,7 +317,8 @@ BODY_POP\n",
 
 /// A header need not be UTF-8 and may hold a NUL byte. A definition keeps its body when
 /// only another part of its header, here a comment, has a Latin-1 byte. A definition with
-/// one in its own text keeps neither text nor body, since its text is retained as a string.
+/// one in its own text keeps its native call, documented with the text converted lossily,
+/// but no body, since libclang spells its tokens lossily.
 #[test]
 fn latin1_header_keeps_utf8_definitions() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -341,7 +342,32 @@ static inline int BODY_LATIN_INSIDE(int value) { return value; /* na\xefve */ }\
     assert!(plain.source.is_some_and(|source| source.ends_with("BODY_LATIN_OFFSET; }")));
     assert!(plain.body.is_some());
     let inside = definition("BODY_LATIN_INSIDE");
-    assert!(inside.source.is_none() && inside.body.is_none());
+    assert!(inside.source.is_some_and(|source| source.contains("na\u{fffd}ve")));
+    assert!(inside.body.is_none());
+    let names = ["BODY_LATIN_PLAIN", "BODY_LATIN_INSIDE"];
+    let session = AnalysisSession::prepare_with_inline_functions(
+        &scanner,
+        &frontend,
+        &[] as &[String],
+        &[] as &[String],
+        &names,
+    )
+    .expect("prepare inline roots");
+    let catalog = BindingCatalog {
+        ffi_boundary: Some(vec!["ffi".into(), "pg_guard_ffi_boundary".into()]),
+        ..BindingCatalog::default()
+    };
+    for emission in emit_batch_with_bindings(&session, &names, &catalog).unwrap() {
+        let name = emission.analysis.name.clone();
+        let EmissionStatus::Emitted { rust: definition, .. } = emission.status else {
+            panic!("root {name} must emit: {emission:?}");
+        };
+        assert_eq!(
+            definition.contains("Translates the original function definition"),
+            name == "BODY_LATIN_PLAIN",
+            "{name}"
+        );
+    }
 }
 
 /// Clang names a header it finds through a relative include directory by a path relative to

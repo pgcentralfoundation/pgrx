@@ -20,6 +20,7 @@ use crate::{
 };
 use clang::source::File;
 use clang::{Entity, EntityKind, EntityVisitResult, Index, Linkage, StorageClass, TypeKind};
+use std::borrow::Cow;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::path::{Path, PathBuf};
 
@@ -261,9 +262,9 @@ fn popped_names(
 /// Read physical original source once per header and retain only bounded definition text.
 ///
 /// A header's bytes are read from its file, which need not be UTF-8 and may contain NUL
-/// bytes. Definition text is retained only when it is UTF-8: it is kept as a string, and
-/// libclang spells the body's tokens lossily, which could change a literal. Without that
-/// text, the function gets neither a body nor a native call adapter.
+/// bytes. Definition text that is not UTF-8 is retained lossily, to document the native
+/// call adapter. libclang also spells the body's tokens lossily, which could change a
+/// literal, so such a definition has no body.
 ///
 /// Headers are cached by Clang's file identity, so a definition is read from the file Clang
 /// parsed however its span spells that file's path.
@@ -285,14 +286,18 @@ fn source<'tu>(
     } else {
         None
     };
-    let source = contents
+    let text = contents
         .and_then(|contents| {
             contents.get(usize::try_from(start.offset).ok()?..usize::try_from(end.offset).ok()?)
         })
-        .and_then(|text| std::str::from_utf8(text).ok())
+        .map(String::from_utf8_lossy);
+    let exact = matches!(text, Some(Cow::Borrowed(_)));
+    // Replacement characters can make the text longer than its bytes.
+    let source = text
+        .filter(|text| text.len() <= MAX_DEFINITION_BYTES && text.len() <= *remaining)
         .map(|text| {
-            *remaining -= size;
-            text.to_owned()
+            *remaining -= text.len();
+            text.into_owned()
         });
     Some(InlineFunctionDefinition {
         provenance,
@@ -303,7 +308,7 @@ fn source<'tu>(
             .map(|parameter| parameter.get_name().filter(|name| !name.is_empty()))
             .collect(),
         body: contents
-            .filter(|_| source.is_some())
+            .filter(|_| exact && source.is_some())
             .and_then(|contents| body_tokens(definition, file, contents, history)),
         source,
     })

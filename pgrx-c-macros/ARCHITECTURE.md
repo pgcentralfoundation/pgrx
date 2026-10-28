@@ -313,8 +313,9 @@ cannot be inferred from a declaration's name or broad type category:
    does not establish that the included definition is available. Retain physical
    source spans and original formals from that same parse, and bounded
    definition text from the header's file, read once per physical source rather
-   than once per function. A header need not be UTF-8, but definition text that
-   is not leaves the function without an adapter. The body's tokens are also
+   than once per function. A header need not be UTF-8. Definition text that is
+   not is documented lossily, and since libclang spells tokens lossily, the
+   function keeps only its native call. The body's tokens are also
    retained without conditional directives and the branches they skipped. A
    directive extends to the end of its logical line, after line splices and
    comments, including a closing directive at the end of a skipped range. Token
