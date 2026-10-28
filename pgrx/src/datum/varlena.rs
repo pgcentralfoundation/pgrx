@@ -15,22 +15,36 @@ use pgrx_sql_entity_graph::metadata::{
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
-use std::mem::{MaybeUninit, size_of};
+use std::mem::size_of;
 use std::ops::{Deref, DerefMut};
 use std::{ptr, slice};
 
 /// A Rust type of a fixed size, stored in PostgreSQL as the payload of a `varlena`.
 ///
-/// A `PgVarlena<T>` holds its value in Rust. Reading one from a Datum copies the payload into
-/// storage aligned for `T`, because PostgreSQL places the payload one or four bytes past the
-/// varlena header without aligning it, and `Deref` and `DerefMut` lend references to that copy.
-/// The value keeps no pointer into PostgreSQL memory, so it may outlive the Datum, memory
-/// context, or SPI connection it was read from, and changing it never writes to that Datum.
-/// [`PgVarlena::into_pg`] and [`IntoDatum`] allocate a new varlena holding the value in
+/// A `PgVarlena<T>` holds its value in Rust. Reading one from a Datum copies the payload into a
+/// Rust heap allocation aligned for `T`, because PostgreSQL places the payload one or four bytes
+/// past the varlena header without aligning it, and `Deref` and `DerefMut` lend references to
+/// that copy. The value keeps no pointer into PostgreSQL memory, so it may outlive the Datum,
+/// memory context, or SPI connection it was read from, and changing it never writes to that
+/// Datum. [`PgVarlena::into_pg`] and [`IntoDatum`] allocate a new varlena holding the value in
 /// `CurrentMemoryContext`.
 ///
 /// Generally, `PgVarlena` is meant to be used in conjunction with pgrx's `PostgresType` derive macro
 /// to provide transparent mapping of fixed-size Rust types as Postgres datums.
+///
+/// ## Padding
+///
+/// The payload holds every byte of the value, padding bytes included, as they are. A value read
+/// from a Datum keeps the padding bytes it was read with. A value built in Rust has unspecified
+/// padding: [`PgVarlena::new`], `PgVarlena::from`, `Default`, and assigning a whole `T` through
+/// `DerefMut` (`*v = T { .. }`) copy a typed `T`, which can leave any bytes, such as stale stack
+/// contents, in its padding. PostgreSQL writes those bytes to disk and WAL, and comparisons of
+/// stored bytes, such as `record_image_eq` (`*=`) and `REFRESH MATERIALIZED VIEW CONCURRENTLY`,
+/// then treat equal values as different.
+///
+/// For a type whose stored bytes matter, use a `#[repr(C)]` type without padding, adding
+/// explicit padding fields where alignment would leave gaps. Otherwise start from
+/// [`PgVarlena::new_zeroed`] and write the fields one at a time.
 ///
 /// ## Example
 ///
@@ -75,9 +89,10 @@ pub struct PgVarlena<T>
 where
     T: Copy + Sized,
 {
-    /// Always holds a valid `T`. `MaybeUninit` keeps every byte read from a Datum, padding
-    /// included, so an unchanged value converts back to the payload it was read from.
-    value: MaybeUninit<T>,
+    /// Boxed because a typed move of `T` need not keep padding bytes. Moving a `PgVarlena` moves
+    /// only this pointer, so the value's padding bytes change only when a typed value is
+    /// written over them through `DerefMut`.
+    value: Box<T>,
     /// Payload bytes that followed the `T` in the Datum this value was read from.
     tail: Box<[u8]>,
 }
@@ -88,6 +103,9 @@ where
 {
     /// Create a new `PgVarlena` holding `T::default()`. For a type without a `Default`
     /// implementation, build the value and convert it with `PgVarlena::from` instead.
+    ///
+    /// The value's padding bytes are unspecified, and [`into_pg`](PgVarlena::into_pg) stores them
+    /// as they are; see [Padding](PgVarlena#padding).
     ///
     /// ## Example
     ///
@@ -113,8 +131,32 @@ where
         Self::from(T::default())
     }
 
-    /// Create a new `PgVarlena` whose value is all zero bytes, as `PgVarlena::new` did before
-    /// it required `T: Default`.
+    /// Create a new `PgVarlena` whose value is all zero bytes, padding included, as
+    /// `PgVarlena::new` did before it required `T: Default`.
+    ///
+    /// This is how to store zero padding for a type that has padding. Writing a field through
+    /// `DerefMut`, such as `v.a = 1`, changes only that field's bytes, so the padding stays zero
+    /// in the payload that [`into_pg`](PgVarlena::into_pg) stores. Assigning a whole `T`, such as
+    /// `*v = T { .. }`, or a field whose own type has padding, copies a typed value and leaves
+    /// that padding unspecified; see [Padding](PgVarlena#padding).
+    ///
+    /// ## Example
+    ///
+    /// ```rust,no_run
+    /// use pgrx::prelude::*;
+    ///
+    /// #[derive(Copy, Clone)]
+    /// #[repr(C)]
+    /// struct Reading {
+    ///     id: u64,
+    ///     flag: u8, // followed by 7 padding bytes
+    /// }
+    ///
+    /// // SAFETY: all-zero bytes are a valid Reading.
+    /// let mut v = unsafe { PgVarlena::<Reading>::new_zeroed() };
+    /// v.id = 7;
+    /// v.flag = 1;
+    /// ```
     ///
     /// ## Safety
     ///
@@ -123,7 +165,9 @@ where
     /// references, `NonZero` integers, function pointers, or an enum without a zero
     /// discriminant, among others.
     pub unsafe fn new_zeroed() -> Self {
-        PgVarlena { value: MaybeUninit::zeroed(), tail: Box::default() }
+        // SAFETY: the caller promises that all-zero bytes are a valid T.
+        let value = unsafe { Box::<T>::new_zeroed().assume_init() };
+        PgVarlena { value, tail: Box::default() }
     }
 
     /// Read a `PgVarlena` from a non-null varlena `pg_sys::Datum`. As
@@ -183,15 +227,15 @@ where
         let size = size_of::<T>();
         assert!(len >= size, "varlena payload of {len} bytes cannot hold a {size}-byte value");
 
-        let mut value = MaybeUninit::<T>::uninit();
+        let mut value = Box::<T>::new_uninit();
         // SAFETY: the payload has `len >= size` initialized bytes and cannot overlap the new
-        // Rust storage. The byte copies need no alignment and keep the payload's padding bytes.
-        // The caller promises the first `size` bytes are a valid T, which establishes `value`'s
-        // invariant. The tail slice covers the remaining `len - size` payload bytes, and its
+        // Rust allocation. The byte copies need no alignment and keep the payload's padding bytes.
+        // The caller promises the first `size` bytes are a valid T, so `value` holds one after
+        // the copy. The tail slice covers the remaining `len - size` payload bytes, and its
         // pointer is non-null and aligned for u8 even when that length is zero.
-        let tail = unsafe {
+        let (value, tail) = unsafe {
             ptr::copy_nonoverlapping(payload, value.as_mut_ptr().cast::<u8>(), size);
-            Box::from(slice::from_raw_parts(payload.add(size), len - size))
+            (value.assume_init(), Box::from(slice::from_raw_parts(payload.add(size), len - size)))
         };
         PgVarlena { value, tail }
     }
@@ -199,8 +243,10 @@ where
     /// Allocate a varlena holding this value in `CurrentMemoryContext`, and return it to pass to a
     /// Postgres function. The varlena belongs to that memory context; Rust does not free it.
     ///
-    /// The payload is the bytes of the value followed by any payload bytes that came after the
-    /// `T` in the Datum this value was read from. It gets a one-byte header when it fits one.
+    /// The payload is the bytes of the value, padding bytes included, followed by any payload
+    /// bytes that came after the `T` in the Datum this value was read from. It gets a one-byte
+    /// header when it fits one. Padding of a value built in Rust is unspecified; see
+    /// [Padding](PgVarlena#padding).
     ///
     /// This method is also used by the `IntoDatum for PgVarlena<T> where T: Copy + Sized`
     /// implementation.
@@ -222,7 +268,8 @@ where
         // with no other reference to it. The short branch checks that its encoded size fits
         // the one-byte header. VARDATA_ANY reads the header just written, and the byte copies
         // fill exactly `payload_len` bytes after it, with no alignment requirement. `value` is
-        // initialized, padding bytes aside, which an untyped copy may read.
+        // a valid T, initialized except perhaps for padding bytes, which an untyped copy may
+        // read.
         unsafe {
             if payload_len + pg_sys::VARHDRSZ_SHORT as usize <= pg_sys::VARATT_SHORT_MAX as usize {
                 pg_sys::SET_VARSIZE_SHORT!(
@@ -234,7 +281,7 @@ where
                 pg_sys::SET_VARSIZE_4B!(ptr, total as i32).get();
             }
             let data = pg_sys::VARDATA_ANY!(ptr).get().cast::<u8>();
-            ptr::copy_nonoverlapping(self.value.as_ptr().cast::<u8>(), data, size);
+            ptr::copy_nonoverlapping(ptr::from_ref::<T>(&self.value).cast::<u8>(), data, size);
             ptr::copy_nonoverlapping(self.tail.as_ptr(), data.add(size), self.tail.len());
         }
         ptr
@@ -307,8 +354,7 @@ where
     T: Copy + Sized,
 {
     fn as_ref(&self) -> &T {
-        // SAFETY: `value` always holds a valid T.
-        unsafe { self.value.assume_init_ref() }
+        &self.value
     }
 }
 
@@ -317,9 +363,7 @@ where
     T: Copy + Sized,
 {
     fn as_mut(&mut self) -> &mut T {
-        // SAFETY: `value` always holds a valid T, and safe code can store only a valid T
-        // through the returned reference.
-        unsafe { self.value.assume_init_mut() }
+        &mut self.value
     }
 }
 
@@ -327,6 +371,8 @@ impl<T> Default for PgVarlena<T>
 where
     T: Default + Copy,
 {
+    /// Create a `PgVarlena` holding `T::default()`, as [`PgVarlena::new`] does. Its padding
+    /// bytes are unspecified; see [Padding](PgVarlena#padding).
     fn default() -> Self {
         Self::new()
     }
@@ -336,8 +382,10 @@ impl<T> From<T> for PgVarlena<T>
 where
     T: Copy + Sized,
 {
+    /// Wrap `value`. A typed `T` carries only its fields, so the padding bytes stored for it
+    /// are unspecified; see [Padding](PgVarlena#padding).
     fn from(value: T) -> Self {
-        PgVarlena { value: MaybeUninit::new(value), tail: Box::default() }
+        PgVarlena { value: Box::new(value), tail: Box::default() }
     }
 }
 
@@ -445,7 +493,9 @@ where
 #[cfg(test)]
 mod tests {
     use super::PgVarlena;
+    use core::mem::size_of;
     use core::num::NonZeroU32;
+    use core::{ptr, slice};
 
     #[test]
     fn constructors_hold_valid_values() {
@@ -455,5 +505,49 @@ mod tests {
         assert_eq!(*PgVarlena::<(u8, i64)>::new(), (0, 0));
         // SAFETY: all-zero bytes are a valid [u32; 4].
         assert_eq!(*unsafe { PgVarlena::<[u32; 4]>::new_zeroed() }, [0; 4]);
+    }
+
+    /// Fill part of the stack with nonzero bytes, so that padding lost to a typed copy does
+    /// not happen to read as zero.
+    #[inline(never)]
+    fn dirty_stack() {
+        core::hint::black_box([0xa5_u8; 4096]);
+    }
+
+    /// A value started with `new_zeroed` keeps zero padding through field writes and moves, in
+    /// the bytes that `into_pg` copies into the varlena.
+    #[test]
+    fn new_zeroed_keeps_padding_zero_through_field_writes() {
+        /// One field byte, three padding bytes, then four field bytes. Rust may pass it by
+        /// value as two scalars, which drops the padding bytes.
+        #[derive(Copy, Clone)]
+        #[repr(C)]
+        struct Padded {
+            a: u8,
+            b: u32,
+        }
+
+        #[inline(never)]
+        fn build() -> PgVarlena<Padded> {
+            // SAFETY: all-zero bytes are a valid Padded.
+            let mut v = unsafe { PgVarlena::<Padded>::new_zeroed() };
+            v.a = 0xa1;
+            v.b = 0xb2c3_d4e5;
+            v
+        }
+
+        dirty_stack();
+        let v = core::hint::black_box(build());
+        // SAFETY: new_zeroed initialized every byte of the value, the field writes changed
+        // only field bytes, and moving a PgVarlena does not copy the value as a Padded.
+        let bytes = unsafe {
+            slice::from_raw_parts(
+                ptr::from_ref::<Padded>(&v.value).cast::<u8>(),
+                size_of::<Padded>(),
+            )
+        };
+        assert_eq!(bytes[0], 0xa1);
+        assert_eq!(bytes[1..4], [0; 3], "padding bytes");
+        assert_eq!(bytes[4..], 0xb2c3_d4e5_u32.to_ne_bytes());
     }
 }
