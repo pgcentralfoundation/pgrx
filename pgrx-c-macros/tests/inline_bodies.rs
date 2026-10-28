@@ -54,7 +54,7 @@ const TRANSLATED: &[&str] = &[
     "BODY_RECURSIVE",
     // Its argument temporaries outlive the body.
     "BODY_MARK",
-    // A sizeof in the callee checks arguments from translated and macro callers.
+    // A callee with a sizeof, which translated and macro callers pass only values.
     "BODY_SIZED",
     "BODY_SIZED_CALLER",
     // The directives' comment and spliced line belong to them, not to the body.
@@ -218,9 +218,8 @@ fn translated_bodies_match_their_original_definitions() {
             _ => {}
         }
         // A translated body evaluates its arguments outside generated `unsafe`, so only the
-        // arm used by a caller's own size witness checks them. Its size witnesses, and the
-        // operands it passes to translated callees, carry no checks that a chain of
-        // translated calls would multiply.
+        // arm used by a caller's own size witness checks them. Its size witnesses carry no
+        // checks that a chain of translated calls would multiply.
         if TRANSLATED.contains(&name.as_str()) {
             assert_eq!(
                 compact.matches("@check_safety").count(),
@@ -228,6 +227,14 @@ fn translated_bodies_match_their_original_definitions() {
                 "{name}"
             );
         }
+        // An operand of a translated call is only a value: expanding any other part of it,
+        // checks included, is an error, whether a translation or a macro makes the call.
+        let operands = compact.matches("(@compiled").count();
+        assert_eq!(
+            definition.matches("a translated C function argument is only a value").count(),
+            4 * operands,
+            "{name}"
+        );
         // A translated body's documentation witness borrows every argument and names the
         // marker of its declared result, or is `()` for a void function. A translated call
         // collapses to its result like a native call, so no witness names another macro's

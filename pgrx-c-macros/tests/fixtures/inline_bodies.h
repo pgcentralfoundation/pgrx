@@ -79,7 +79,7 @@ static inline void BODY_MARK(int *out, const int *witness)
 {
 	*out = 7;
 }
-/* A translated callee whose sizeof checks its argument's safety. */
+/* A translated callee with a sizeof, which checks no argument. */
 static inline int BODY_SIZED(int value)
 {
 	int local = value;

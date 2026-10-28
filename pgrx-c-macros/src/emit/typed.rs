@@ -1276,12 +1276,12 @@ impl<'a> Renderer<'a> {
                                             .into(),
                                     ));
                                 }
-                                // The translation evaluates each argument once and converts it
-                                // to its parameter type, as the call does, using only its value.
-                                // A sizeof in the callee expands each argument's own checks,
-                                // which a translated caller does not need.
+                                // The translation evaluates each argument once in its match
+                                // scrutinee and converts it to its parameter type, as the call
+                                // does. It expands only the argument's value: its body holds
+                                // no argument tokens for checks to cover, so expanding any
+                                // other alternative, the checks included, is an error.
                                 const VALUE_ONLY: &str = "::core::compile_error!(\"a translated C function argument is only a value\")";
-                                let checks = self.caller_checks();
                                 if let Some(result) = &result {
                                     write!(rust, "{EXPRESSION}::implicit::<{}, _>(", result.marker)
                                         .expect("String output");
@@ -1292,7 +1292,7 @@ impl<'a> Renderer<'a> {
                                 tasks.push(text(")"));
                                 for argument in arguments.iter().rev() {
                                     tasks.push(Task::Text(format!(
-                                        "] [{VALUE_ONLY}] [{VALUE_ONLY}] [{VALUE_ONLY}] [{checks}]), "
+                                        "] [{VALUE_ONLY}] [{VALUE_ONLY}] [{VALUE_ONLY}] [{VALUE_ONLY}]), "
                                     )));
                                     tasks.push(value(*argument));
                                     tasks.push(text("(@compiled ["));
