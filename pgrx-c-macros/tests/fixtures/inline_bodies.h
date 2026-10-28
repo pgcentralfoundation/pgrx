@@ -68,3 +68,23 @@ static inline int BODY_SIZED(int value)
 }
 static inline int BODY_SIZED_CALLER(int value) { return BODY_SIZED(value + 1); }
 #define BODY_SIZED_MACRO(value) BODY_SIZED(value)
+/* The comment continues the directive, which is `#if 2 - 1`. */
+static inline int BODY_DIRECTIVE_COMMENT(int value)
+{
+	return (value
+#if 2 /* the condition continues
+	   on the next line */ - 1
+#endif
+		);
+}
+/* A spliced line continues the directive that closes a skipped group. Clang warns
+ * about its extra tokens. */
+static inline int BODY_DIRECTIVE_SPLICE(int value)
+{
+	return (value
+#if 0
+		* 100
+#endif \
+		- 1
+		);
+}

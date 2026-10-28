@@ -210,11 +210,11 @@ fn source<'tu>(
 
 /// Recover the tokens the preprocessor read for a definition's body, without its braces.
 ///
-/// Conditional directives and the text they skipped are removed; any other directive makes
-/// the body unavailable. Every remaining token must belong to one of the compiler's
-/// statements or be a `;` between them, so a statement that ends inside a macro argument
-/// cannot leave a fragment behind. The tokens must expand at the end of the translation
-/// unit as they did in the definition.
+/// Conditional directives, through the end of their logical lines, and the text they
+/// skipped are removed; any other directive makes the body unavailable. Every remaining
+/// token must belong to one of the compiler's statements or be a `;` between them, so a
+/// statement that ends inside a macro argument cannot leave a fragment behind. The tokens
+/// must expand at the end of the translation unit as they did in the definition.
 fn body_tokens<'tu>(
     definition: Entity<'tu>,
     file: File<'tu>,
@@ -243,40 +243,48 @@ fn body_tokens<'tu>(
         .collect::<Vec<_>>();
     let contents = file.get_contents()?;
     let mut active = Vec::new();
-    let mut directive_line = None;
+    // Tokens before this offset belong to the last directive. A skipped range ends with
+    // the directive that closes it, not with that directive's logical line.
+    let mut directive_end = 0;
     for (index, token) in inner.iter().enumerate() {
         let location = located(token.get_location())?;
+        let offset = usize::try_from(location.offset).ok()?;
+        if offset < directive_end {
+            continue;
+        }
         let skipped = skipped.iter().any(|range| range.contains(&location.offset));
         let spelling = token.get_spelling();
-        if spelling == "#" {
-            directive_line = Some(location.line);
-            // A directive other than a conditional, or one continued onto another line,
-            // changes or hides preprocessing state inside the body.
-            let name = inner.get(index + 1).map(|next| next.get_spelling());
-            let line_end =
-                contents[location.offset as usize..].find('\n').unwrap_or(contents.len());
-            let continued =
-                contents[location.offset as usize..][..line_end].trim_end().ends_with('\\');
-            if !skipped
-                && (continued
-                    || !name.as_deref().is_some_and(|name| {
-                        matches!(
-                            name,
-                            "if" | "ifdef"
-                                | "ifndef"
-                                | "elif"
-                                | "elifdef"
-                                | "elifndef"
-                                | "else"
-                                | "endif"
-                        )
-                    }))
-            {
+        if matches!(spelling.as_str(), "#" | "%:") {
+            // A conditional directive only selects tokens. Any other directive, or a `#`
+            // this check cannot place at the start of a line, changes or hides
+            // preprocessing state inside the body.
+            directive_end = logical_line_end(contents.as_bytes(), offset)?;
+            let name = inner
+                .get(index + 1)
+                .filter(|next| {
+                    located(next.get_location())
+                        .is_some_and(|next| (next.offset as usize) < directive_end)
+                })
+                .map(|next| next.get_spelling());
+            let conditional = starts_line(contents.as_bytes(), offset)
+                && name.as_deref().is_some_and(|name| {
+                    matches!(
+                        name,
+                        "if" | "ifdef"
+                            | "ifndef"
+                            | "elif"
+                            | "elifdef"
+                            | "elifndef"
+                            | "else"
+                            | "endif"
+                    )
+                });
+            if !skipped && !conditional {
                 return None;
             }
             continue;
         }
-        if directive_line == Some(location.line) || skipped {
+        if skipped {
             continue;
         }
         let kind = match token.get_kind() {
@@ -313,6 +321,82 @@ fn body_tokens<'tu>(
         return None;
     }
     Some(active.into_iter().map(|(_, token)| token).collect())
+}
+
+/// Whether only blanks separate `offset` from the start of its logical line.
+fn starts_line(contents: &[u8], offset: usize) -> bool {
+    let before = contents[..offset].trim_ascii_end();
+    let blanks = &contents[before.len()..offset];
+    let mut newlines = blanks.iter().filter(|&&byte| byte == b'\n');
+    if newlines.next().is_none() {
+        return before.is_empty();
+    }
+    // A backslash before the first newline splices it away.
+    !before.ends_with(b"\\") || newlines.next().is_some()
+}
+
+/// The offset of the newline that ends the logical line containing `start`, or the end
+/// of the file.
+///
+/// Translation phases 2 and 3 run before directives: a backslash-newline joins lines, and
+/// a comment, which can span lines, is one space. Clang also splices a backslash followed
+/// by blanks and a newline. A literal ends at its closing quote or at the end of the line.
+/// An unterminated comment has no end.
+fn logical_line_end(contents: &[u8], start: usize) -> Option<usize> {
+    let mut at = start;
+    // The bytes from `start` and their offsets, without line splices.
+    let mut bytes = std::iter::from_fn(|| {
+        loop {
+            let byte = *contents.get(at)?;
+            if byte == b'\\' {
+                let blanks = contents[at + 1..]
+                    .iter()
+                    .take_while(|&&byte| matches!(byte, b' ' | b'\t' | b'\x0b' | b'\x0c' | b'\r'))
+                    .count();
+                if contents.get(at + 1 + blanks) == Some(&b'\n') {
+                    at += blanks + 2;
+                    continue;
+                }
+            }
+            at += 1;
+            return Some((at - 1, byte));
+        }
+    })
+    .peekable();
+    while let Some((offset, byte)) = bytes.next() {
+        match byte {
+            b'\n' => return Some(offset),
+            b'/' if bytes.next_if(|&(_, next)| next == b'*').is_some() => {
+                let mut star = false;
+                loop {
+                    let (_, byte) = bytes.next()?;
+                    if star && byte == b'/' {
+                        break;
+                    }
+                    star = byte == b'*';
+                }
+            }
+            b'/' if bytes.next_if(|&(_, next)| next == b'/').is_some() => {
+                return Some(
+                    bytes.find(|&(_, byte)| byte == b'\n').map_or(contents.len(), |(end, _)| end),
+                );
+            }
+            b'"' | b'\'' => {
+                while let Some((end, next)) = bytes.next() {
+                    match next {
+                        b'\n' => return Some(end),
+                        b'\\' => {
+                            bytes.next();
+                        }
+                        quote if quote == byte => break,
+                        _ => {}
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+    Some(contents.len())
 }
 
 /// Preprocessing history of the definition parse, in translation-unit order.

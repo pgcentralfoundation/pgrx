@@ -52,6 +52,9 @@ const TRANSLATED: &[&str] = &[
     // A sizeof in the callee checks arguments from translated and macro callers.
     "BODY_SIZED",
     "BODY_SIZED_CALLER",
+    // The directives' comment and spliced line belong to them, not to the body.
+    "BODY_DIRECTIVE_COMMENT",
+    "BODY_DIRECTIVE_SPLICE",
 ];
 
 /// Macros that call translated inline functions.

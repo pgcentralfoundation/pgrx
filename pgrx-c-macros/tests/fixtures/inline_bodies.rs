@@ -73,6 +73,11 @@ fn main() {
             BODY_SIZED_CALLER!(1_i32).get(),
             BODY_SIZED_MACRO!(3_i32).get()
         );
+        println!(
+            "directive\t{}\t{}",
+            BODY_DIRECTIVE_COMMENT!(10_i32).get(),
+            BODY_DIRECTIVE_SPLICE!(10_i32).get()
+        );
     }
     assert_eq!(ffi::CALLS.load(std::sync::atomic::Ordering::SeqCst), EXPECTED_GUARDS);
 }

@@ -313,17 +313,20 @@ cannot be inferred from a declaration's name or broad type category:
    does not establish that the included definition is available. Retain physical
    source spans, original formals and bounded definition text from that same
    parse. Header contents are copied once per physical source, rather than once
-   per function. The body's tokens are also retained without the text of
-   conditional directives and the branches they skipped. Any other directive, or
-   a token outside the compiler's statements other than `;`, leaves no body. A
-   token that names a macro must have a top-level expansion record at that
-   position; that macro, and every macro its replacement list names, must have
-   its last definition before the expansion and still be active at the end of the
-   unit. Undefinitions are not recorded, so this is what proves the end-of-unit
-   expansion identical. A macro name without a record is admitted only inside the
-   arguments of such an expanded function-like invocation, which dropped or
-   stringified it, and only when it is unchanged since that invocation. Token pasting and invocation-dependent builtins such as
-   `__LINE__` leave no body.
+   per function. The body's tokens are also retained without conditional
+   directives and the branches they skipped. A directive extends to the end of
+   its logical line, after line splices and comments, including a closing
+   directive at the end of a skipped range. Any other directive, a `#` that does
+   not start a line, or a token outside the compiler's statements other than `;`,
+   leaves no body. A token that names a macro must have a top-level expansion
+   record at that position; that macro, and every macro its replacement list
+   names, must have its last definition before the expansion and still be active
+   at the end of the unit. Undefinitions are not recorded, so this is what proves
+   the end-of-unit expansion identical. A macro name without a record is admitted
+   only inside the arguments of such an expanded function-like invocation, which
+   dropped or stringified it, and only when it is unchanged since that invocation.
+   Token pasting and invocation-dependent builtins such as `__LINE__` leave no
+   body.
 2. **Bitfield operations.** For each named bitfield whose containing record has
    a usable C spelling, probe unary-plus promotion, assignment-result type and
    promotion, and postfix-result type and
