@@ -11,6 +11,7 @@
 use pgrx_pg_sys::PgTryBuilder;
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use pgrx_pg_sys::ffi::pg_guard_ffi_boundary;
+use std::ffi::c_int;
 use std::panic::AssertUnwindSafe;
 
 use crate::memcx;
@@ -28,6 +29,9 @@ pub unsafe trait FnCallArg: Sealed {
 
     /// The Postgres type OID of `&self`
     fn type_oid(&self) -> pg_sys::Oid;
+
+    /// `&self` with the value of an [`Arg::Value`] replaced by its Postgres type OID
+    fn value_type(&self) -> Arg<pg_sys::Oid>;
 }
 
 /// The kinds of [`fn_call`] arguments.  
@@ -49,7 +53,7 @@ unsafe impl<T: IntoDatum + Clone> FnCallArg for Arg<T> {
         match self {
             Arg::Null => Ok(None),
             Arg::Value(v) => Ok(Clone::clone(v).into_datum()),
-            Arg::Default => create_default_value(pg_proc, argnum),
+            Arg::Default => Ok(create_default_value(pg_proc, argnum)?.map(|(datum, _)| datum)),
         }
     }
 
@@ -57,11 +61,21 @@ unsafe impl<T: IntoDatum + Clone> FnCallArg for Arg<T> {
     fn type_oid(&self) -> pg_sys::Oid {
         T::type_oid()
     }
+
+    #[inline]
+    fn value_type(&self) -> Arg<pg_sys::Oid> {
+        match self {
+            Arg::Null => Arg::Null,
+            Arg::Default => Arg::Default,
+            Arg::Value(_) => Arg::Value(T::type_oid()),
+        }
+    }
 }
 
 /// [`FnCallError`]s represent the set of conditions that could case [`fn_call()`] to fail in a
 /// user-recoverable manner.
 #[derive(thiserror::Error, Debug, Clone, Eq, PartialEq)]
+#[non_exhaustive]
 pub enum FnCallError {
     #[error("Invalid identifier: `{0}`")]
     InvalidIdentifier(String),
@@ -87,6 +101,14 @@ pub enum FnCallError {
         "The requested return type OID `{0:?}` is not compatible with the actual return type OID `{1:?}`"
     )]
     IncompatibleReturnType(pg_sys::Oid, pg_sys::Oid),
+
+    /// The zero-based argument number, the type OID of the value passed for it, and the type OID
+    /// of its parameter.  A value for a polymorphic parameter can match that type and still conflict
+    /// with the other values, as the "Argument types" section of [`fn_call`] describes.
+    #[error(
+        "Argument #{0} has type OID `{1:?}`, which is not compatible with the parameter type OID `{2:?}`"
+    )]
+    IncompatibleArgumentType(usize, pg_sys::Oid, pg_sys::Oid),
 
     #[error("Function call has more arguments than are supported")]
     TooManyArguments,
@@ -125,6 +147,38 @@ pub type Result<T> = std::result::Result<T, FnCallError>;
 /// Arguments with `DEFAULT` clauses always appear as the last function arguments.  If you want the
 /// default value as defined by the function, either use [`Arg::Default`] or elide the default
 /// arguments entirely -- [`fn_call`] will automatically fill them in.
+///
+/// # Argument types
+///
+/// [`fn_call`] passes each value to the function as it is, without the casts that PostgreSQL
+/// would add.  Before it converts any [`Arg::Value`], it checks the type of each value against the
+/// parameter's type.  The type of an [`Arg::Value`] is `T`'s [`IntoDatum::type_oid`], and the type
+/// of a `DEFAULT`, from [`Arg::Default`] or an omitted argument, is the one PostgreSQL stored it
+/// with:
+///
+/// - The value matches a parameter of the same type, or of a type it is binary coercible to, such
+///   as `varchar` to `text` or a domain to its base type.  It does not match a parameter that
+///   needs a cast, such as an `i32` for a `bigint` parameter or an `int4` for a domain over `int4`.
+/// - Values for polymorphic parameters must be consistent as PostgreSQL defines it.  The values
+///   for the `anycompatible` family must have the same type, or element or range type, instead of
+///   one that PostgreSQL would cast to a common type.
+/// - PostgreSQL stores the default of a polymorphic parameter with its own type, such as `int4` for
+///   `anycompatible DEFAULT 1`, so it must be consistent with the other values too.  A default
+///   written as an untyped literal, such as `anyelement DEFAULT 'x'`, has type `unknown` and
+///   matches no polymorphic parameter.
+/// - A value of a polymorphic type, such as an [`AnyArray`](crate::AnyArray), matches a
+///   polymorphic parameter only of the same type, and only when no other value is passed to a
+///   polymorphic parameter.
+/// - A parameter of type `"any"` accepts a value of any type.  The function cannot learn that type,
+///   because [`fn_call`] passes no call expression.  PostgreSQL's own `"any"` functions then raise
+///   an ERROR, return NULL, or return a meaningless result: `pg_column_size` raises an ERROR,
+///   `pg_collation_for` returns NULL, and `pg_typeof` returns `InvalidOid`.
+/// - A value whose type is `InvalidOid`, as for a Rust tuple, or an OID that names no type matches
+///   no parameter.
+///
+/// A mismatch returns [`FnCallError::IncompatibleArgumentType`].  [`Arg::Null`] and a `DEFAULT`
+/// that is NULL pass no value, so their types are not checked.  The `T` of [`Arg::Null`] and
+/// [`Arg::Default`] only selects the function.
 ///
 /// # Returns
 ///
@@ -211,6 +265,7 @@ pub fn fn_call_with_collation<R: FromDatum + IntoDatum>(
     // lookup the function's pg_proc entry and do some validation
     let pg_proc = PgProc::new(func_oid).ok_or(FnCallError::UndefinedFunction)?;
     let retoid = pg_proc.prorettype();
+    let argtypes = pg_proc.proargtypes();
 
     //
     // do some validation to catch the cases we don't/can't directly call
@@ -224,8 +279,7 @@ pub fn fn_call_with_collation<R: FromDatum + IntoDatum>(
         // Right now we only know how to support arguments with the IN mode.  Perhaps in the
         // future we can support IN_OUT and TABLE return types
         return Err(FnCallError::UnsupportedArgumentModes);
-    } else if retoid == pg_sys::INTERNALOID || pg_proc.proargtypes().contains(&pg_sys::INTERNALOID)
-    {
+    } else if retoid == pg_sys::INTERNALOID || argtypes.contains(&pg_sys::INTERNALOID) {
         // No idea what to do with the INTERNAL type.  Generally it's just a raw pointer but pgrx
         // has no way to express that with `IntoDatum`.  And passing around raw pointers seem
         // unsafe enough that if someone needs to do that, they probably have the ability to
@@ -236,14 +290,34 @@ pub fn fn_call_with_collation<R: FromDatum + IntoDatum>(
         return Err(FnCallError::IncompatibleReturnType(R::type_oid(), retoid));
     }
 
-    // we're likely going to be able to call the function, so convert our arguments into Datums,
-    // filling in any DEFAULT arguments at the end
+    if args.len() > argtypes.len() {
+        return Err(FnCallError::TooManyArguments);
+    }
+
+    // fill in the DEFAULT arguments, including any at the end
+    let passed = (0..argtypes.len())
+        .map(|argnum| match args.get(argnum).map(|&arg| (arg, arg.value_type())) {
+            Some((arg, Arg::Value(oid))) => Ok(PassedArg::Value(arg, oid)),
+            Some((_, Arg::Null)) => Ok(PassedArg::Datum(None)),
+            Some((_, Arg::Default)) | None => {
+                create_default_value(&pg_proc, argnum).map(PassedArg::Datum)
+            }
+        })
+        .collect::<Result<Vec<_>>>()?;
+
+    // the function reads each argument as its parameter's type, so check that before converting
+    // any Arg::Value
+    check_argument_types(&argtypes, &passed)?;
+
+    // we're likely going to be able to call the function, so convert our arguments into Datums
     let mut null = false;
-    let arg_datums = args
-        .iter()
+    let arg_datums = passed
+        .into_iter()
         .enumerate()
-        .map(|(i, a)| a.as_datum(&pg_proc, i))
-        .chain((args.len()..pg_proc.pronargs()).map(|i| create_default_value(&pg_proc, i)))
+        .map(|(argnum, arg)| match arg {
+            PassedArg::Value(value, _) => value.as_datum(&pg_proc, argnum),
+            PassedArg::Datum(value) => Ok(value.map(|(datum, _)| datum)),
+        })
         .map(|datum| {
             null |= matches!(datum, Ok(None));
             datum
@@ -331,6 +405,126 @@ pub fn fn_call_with_collation<R: FromDatum + IntoDatum>(
     }
 }
 
+/// An argument as [`fn_call`] passes it to the function
+enum PassedArg<'a> {
+    /// An [`Arg::Value`] of the given type, converted to a Datum after the type check
+    Value(&'a dyn FnCallArg, pg_sys::Oid),
+    /// A NULL, or the Datum and type of a `DEFAULT` value
+    Datum(Option<(pg_sys::Datum, pg_sys::Oid)>),
+}
+
+impl PassedArg<'_> {
+    /// The type of the value passed, or `None` for a NULL
+    fn value_type(&self) -> Option<pg_sys::Oid> {
+        match *self {
+            PassedArg::Value(_, oid) | PassedArg::Datum(Some((_, oid))) => Some(oid),
+            PassedArg::Datum(None) => None,
+        }
+    }
+}
+
+/// Checks the type of each value in `args`, one per parameter, against `params`, the function's
+/// parameter types, as the "Argument types" section of [`fn_call`] describes.
+///
+/// `lookup_fn` can return a function found by name alone, whose parameters may be of any type.
+fn check_argument_types(params: &[pg_sys::Oid], args: &[PassedArg]) -> Result<()> {
+    debug_assert_eq!(params.len(), args.len());
+
+    // (argument number, value type, parameter type) for each value of a polymorphic parameter
+    let mut polymorphic = Vec::new();
+    for (argnum, (arg, &param)) in args.iter().zip(params).enumerate() {
+        let Some(value) = arg.value_type() else {
+            continue;
+        };
+        if is_polymorphic(param) {
+            polymorphic.push((argnum, value, param));
+        } else if value != param
+            // SAFETY: IsBinaryCoercible takes the OIDs by value and looks them up.  `value` names
+            // a type, and `param` came from pg_proc
+            && !(names_a_type(value) && unsafe { pg_sys::IsBinaryCoercible(value, param) })
+        {
+            return Err(FnCallError::IncompatibleArgumentType(argnum, value, param));
+        }
+    }
+    let Some(&last) = polymorphic.last() else {
+        return Ok(());
+    };
+
+    // check_generic_type_consistency accepts an UNKNOWNOID value for any polymorphic parameter,
+    // and a polymorphic value, such as an `anyarray`, without comparing its element type to the
+    // other values
+    for &(argnum, value, param) in &polymorphic {
+        if value == pg_sys::UNKNOWNOID
+            || !names_a_type(value)
+            || is_polymorphic(value) && (value != param || polymorphic.len() > 1)
+        {
+            return Err(FnCallError::IncompatibleArgumentType(argnum, value, param));
+        }
+    }
+
+    // The value types, and UNKNOWNOID for the other arguments, which
+    // check_generic_type_consistency skips as it skips an untyped NULL literal
+    let mut values = vec![pg_sys::UNKNOWNOID; params.len()];
+    for &(argnum, value, _) in &polymorphic {
+        values[argnum] = value;
+    }
+    // `params` with each `anycompatible` type replaced by its `anyelement` counterpart, which
+    // requires the same type instead of a common one, and every other type by InvalidOid, which
+    // check_generic_type_consistency ignores
+    let uncast_params = params.iter().map(|&param| without_common_type(param)).collect::<Vec<_>>();
+    // whether the first `nargs` arguments are consistent
+    let consistent = |nargs: usize| {
+        let nargs = c_int::try_from(nargs).expect("pronargs is an int2");
+        // SAFETY: each array holds the function's pronargs OIDs, at least `nargs`, and PostgreSQL
+        // limits pronargs to FUNC_MAX_ARGS, the length of an array that
+        // check_generic_type_consistency fills.  Every OID in `values` names a type, and `params`
+        // and `uncast_params` hold types from pg_proc, polymorphic types, or InvalidOid, which
+        // check_generic_type_consistency ignores
+        unsafe {
+            pg_sys::check_generic_type_consistency(values.as_ptr(), params.as_ptr(), nargs)
+                && pg_sys::check_generic_type_consistency(
+                    values.as_ptr(),
+                    uncast_params.as_ptr(),
+                    nargs,
+                )
+        }
+    };
+    if consistent(params.len()) {
+        return Ok(());
+    }
+
+    // Name the first value that conflicts with those before it.  A parameter after the last value
+    // can also make the values inconsistent, as an `anyenum` parameter passed NULL requires the
+    // `anyelement` values to be enums, so name the last value then.
+    let (argnum, value, param) =
+        polymorphic.into_iter().find(|&(argnum, ..)| !consistent(argnum + 1)).unwrap_or(last);
+    Err(FnCallError::IncompatibleArgumentType(argnum, value, param))
+}
+
+fn is_polymorphic(oid: pg_sys::Oid) -> bool {
+    pg_sys::IsPolymorphicType!(oid).is_true()
+}
+
+/// Whether `oid` names a type.  IsBinaryCoercible and check_generic_type_consistency raise an
+/// ERROR for an OID that does not.
+fn names_a_type(oid: pg_sys::Oid) -> bool {
+    // SAFETY: get_typtype takes the OID by value and returns '\0' for an OID that names no type
+    unsafe { pg_sys::get_typtype(oid) != 0 }
+}
+
+/// The `anyelement`-family counterpart of an `anycompatible`-family type, or InvalidOid for any
+/// other type
+fn without_common_type(param: pg_sys::Oid) -> pg_sys::Oid {
+    match param {
+        pg_sys::ANYCOMPATIBLEOID => pg_sys::ANYELEMENTOID,
+        pg_sys::ANYCOMPATIBLEARRAYOID => pg_sys::ANYARRAYOID,
+        pg_sys::ANYCOMPATIBLENONARRAYOID => pg_sys::ANYNONARRAYOID,
+        pg_sys::ANYCOMPATIBLERANGEOID => pg_sys::ANYRANGEOID,
+        pg_sys::ANYCOMPATIBLEMULTIRANGEOID => pg_sys::ANYMULTIRANGEOID,
+        _ => pg_sys::Oid::INVALID,
+    }
+}
+
 fn lookup_fn(fname: &str, args: &[&dyn FnCallArg]) -> Result<pg_sys::Oid> {
     // ask Postgres to find the function.  This will look for the possibly-qualified named
     // function following the normal SEARCH_PATH rules, ensuring its argument type Oids
@@ -367,8 +561,9 @@ fn lookup_fn(fname: &str, args: &[&dyn FnCallArg]) -> Result<pg_sys::Oid> {
             );
 
             if fnoid == pg_sys::Oid::INVALID {
-                // if that didn't find a function, maybe we've got some defaults in there, so do a lookup
-                // where Postgres will consider that
+                // if that didn't find a function, maybe we've got some defaults in there, or
+                // polymorphic parameters.  A `nargs` of -1 finds a function by its name alone,
+                // whatever its parameters, so `check_argument_types` checks them later
                 fnoid = pg_sys::LookupFuncName(
                     parts_list.as_mut_ptr(),
                     -1,
@@ -422,11 +617,16 @@ fn parse_sql_ident(ident: &str) -> Result<Array<'_, &str>> {
 /// things.  Given the argument number, [`create_default_value`] determines which argument from the
 /// list of DEFAULTed arguments is being requested.
 ///
+/// Returns the value's Datum and type, or `None` if it is NULL.
+///
 /// # Errors
 ///
 /// - [`FnCallError::NotDefaultArgument`] if the specified `argnum` does not have a `DEFAULT` clause
 /// - [`FnCallError::DefaultNotConstantExpression`] if the `DEFAULT` clause is one we cannot evaluate
-fn create_default_value(pg_proc: &PgProc, argnum: usize) -> Result<Option<pg_sys::Datum>> {
+fn create_default_value(
+    pg_proc: &PgProc,
+    argnum: usize,
+) -> Result<Option<(pg_sys::Datum, pg_sys::Oid)>> {
     let non_default_args_cnt = pg_proc.pronargs() - pg_proc.pronargdefaults();
     if argnum < non_default_args_cnt {
         return Err(FnCallError::NotDefaultArgument(argnum));
@@ -459,7 +659,11 @@ fn create_default_value(pg_proc: &PgProc, argnum: usize) -> Result<Option<pg_sys
             let con: *mut pg_sys::Const = evaluated.cast();
             let con_ref = &*con;
 
-            if con_ref.constisnull { Ok(None) } else { Ok(Some(con_ref.constvalue)) }
+            if con_ref.constisnull {
+                Ok(None)
+            } else {
+                Ok(Some((con_ref.constvalue, con_ref.consttype)))
+            }
         } else {
             // NB:  I am not sure this case could ever happen in the context of a function argument
             // `DEFAULT` clause, but if it does, we should let the caller know.  I don't know what
