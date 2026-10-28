@@ -217,6 +217,9 @@ unsafe fn attribute_fetch_info(tupdesc: pg_sys::TupleDesc, index: usize) -> (i32
 /// an 8-byte value as a whole Datum (PG19 spells that `Int64GetDatum`). PG16-19 raise
 /// "unsupported byval length" for any other length, and PG15 asserts.
 ///
+/// The 8-byte value is loaded as a `Datum`, not rebuilt from an integer, so a pointer stored
+/// by value, such as an `internal` attribute, keeps its provenance.
+///
 /// # Safety
 ///
 /// `value` must point to an initialized attribute of `attlen` bytes inside a live tuple.
@@ -233,9 +236,7 @@ unsafe fn fetch_att(value: *mut u8, attbyval: bool, attlen: i16) -> pg_sys::Datu
             1 => pg_sys::Datum::from(value.cast::<pg_sys::__pgrx_c_macros::CCharRepr>().read()),
             2 => pg_sys::Datum::from(value.cast::<i16>().read_unaligned()),
             4 => pg_sys::Datum::from(value.cast::<i32>().read_unaligned()),
-            8 if size_of::<pg_sys::Datum>() == 8 => {
-                pg_sys::Datum::from(value.cast::<u64>().read_unaligned() as usize)
-            }
+            8 if size_of::<pg_sys::Datum>() == 8 => value.cast::<pg_sys::Datum>().read_unaligned(),
             _ => panic!("unsupported byval length: {attlen}"),
         }
     }
