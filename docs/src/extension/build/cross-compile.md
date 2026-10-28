@@ -157,9 +157,12 @@ only evidence against it. A refused build reports, for example:
 PostgreSQL headers do not describe the inspected C target: pg_config.h was configured for x86_64-pc-linux-gnu (PG_VERSION_STR), but Clang targets aarch64-unknown-linux-gnu
 ```
 
-The error also names the PostgreSQL version, the server header directory, the
-metadata source, and the variables that select target headers, target metadata
-or a bundle.
+The error chain also names the PostgreSQL version, the Cargo target, the server
+header directory and the metadata source, and gives the remedies:
+
+```text
+these server headers do not describe aarch64-unknown-linux-gnu; set PGRX_INCLUDEDIR_SERVER_PG18_aarch64-unknown-linux-gnu (or PGRX_INCLUDEDIR_SERVER_PG18_aarch64_unknown_linux_gnu) to PostgreSQL 18 server headers configured for aarch64-unknown-linux-gnu, describe the target with PGRX_PG_CONFIG_AS_ENV, or import a target bundle with PGRX_TARGET_INFO_PATH_PG18
+```
 
 The checks do not prove that the headers came from the deployed server. These
 remain trusted:
@@ -179,8 +182,9 @@ PostgreSQL build as the server that will load the extension.
 
 ### Clang, LLVM and system headers
 
-The `pgrx-pg-sys` build script runs Clang itself for header inspection and for
-its native support archive, rather than through the `cc` crate.
+The `pgrx-pg-sys` build script runs Clang itself to find system headers, for
+header inspection and for its native support archive, rather than through the
+`cc` crate.
 
 - **Driver.** Its major version must match `libclang`. pgrx uses `CLANG_PATH`
   when it is set; otherwise it uses the first match among the `CLANG` recorded
@@ -196,7 +200,9 @@ its native support archive, rather than through the `cc` crate.
   `-ccc-gcc-name`), when Clang cannot find them.
 - **System headers.** pgrx asks the same Clang driver for its system include
   directories with those target arguments, without their `-I` options, so system
-  headers come from the target's search list rather than the host's.
+  headers come from the target's search list rather than the host's. Bindgen and
+  header inspection both search those directories first, and the build fails if
+  inspection then selects a different driver.
 - **Archiver.** pgrx uses `llvm-ar` beside the driver, `llvm-ar-<major>` beside
   a `clang-<major>` driver, or `llvm-ar` beside the driver's resolved path, such
   as Debian's `/usr/lib/llvm-<major>/bin`. On Debian, install the `llvm-<major>`

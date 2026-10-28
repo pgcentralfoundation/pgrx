@@ -220,7 +220,11 @@ Generate release snapshots alongside matching PostgreSQL bindings on the
 selected release target. Their values and layouts describe that target, not the
 build host of a later user.
 
-Ordinary bindgen retains its established target, CPPFLAGS and include settings.
+Ordinary bindgen retains its established target, CPPFLAGS and server include
+directories. Its system include directories come from the Clang driver that
+macro inspection selects: `PostgresConfig::system_includes` asks that driver for
+its `#include <...>` search list under the target arguments, and bindgen and
+inspection both search the result ahead of every other include directory.
 Macro inspection additionally observes recorded CFLAGS before CPPFLAGS, with
 bindgen's environment overrides at the end, and reconciles those C facts with
 the fresh bindings' actual storage. The native support archive, including the C
@@ -670,6 +674,13 @@ cargo test -p pgrx-bindgen --test macro_build -- --ignored
 cargo test -p pgrx-bindgen --test shipped_macros -- --ignored
 ```
 
+The `macro_build` harness also cross-compiles for a target chosen from the
+host: `x86_64-apple-darwin` on Apple silicon, `aarch64-apple-darwin` on x86_64
+macOS, `aarch64-unknown-linux-gnu` on x86_64 Linux and
+`x86_64-unknown-linux-gnu` on aarch64 Linux. Install that target's standard
+library with `rustup target add`; the test fails and names the command when it
+is missing.
+
 Tests wrapped in `if_c_macro!` or the classifier's availability arm disappear
 when their macro is not emitted. The `pgrx-pg-sys` `macro_availability` test
 therefore requires each name gated in `pgrx-pg-sys/tests` and
@@ -701,8 +712,8 @@ member-offset alignments, `MAXIMUM_ALIGNOF`, byte order, 64-bit integer flags
 and major version with the target compiler, and reports every disagreement. A
 refusal is `PostgresError::TargetConfiguration`, which wraps a
 `ConfigurationError`. The binding build adds a remedy naming
-`PGRX_INCLUDEDIR_SERVER_PGNN_<target>`, `PGRX_PG_CONFIG_AS_ENV` and
-`PGRX_TARGET_INFO_PATH_PGNN`.
+`PGRX_INCLUDEDIR_SERVER_PGNN_<target>` in both target spellings,
+`PGRX_PG_CONFIG_AS_ENV` and `PGRX_TARGET_INFO_PATH_PGNN`.
 
 The binding build takes the server header root from `PGRX_INCLUDEDIR_SERVER`
 and its version- and target-specific variants when one is set, and otherwise
@@ -728,6 +739,7 @@ Some installations do not record historical CFLAGS, and `PGRX_PG_CONFIG_AS_ENV`
 metadata may omit `PGRX_PG_CONFIG_CFLAGS`. In that case, the selected headers,
 target, and current compiler invocation define the macro profile. The build
 report records `cflags_recorded: false`; it does not infer the server's
-unrecorded build options, including `-fwrapv`. Recorded flags use the host
-platform's quoting rules, with reviewed MSVC options translated to equivalent
-Clang options on Windows.
+unrecorded build options, including `-fwrapv`. The binding build splits
+recorded flags with the Cargo target's quoting rules and translates reviewed
+MSVC options to equivalent Clang options for MSVC targets.
+`PostgresConfig::inspect`, and so the CLI, use the host platform's rules.

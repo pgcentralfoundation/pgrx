@@ -1411,17 +1411,21 @@ CLI commands retain their own requested output and stderr diagnostics.
 
 1. Resolve configurations, the active Cargo major and the server header root;
    scope a host `pg_config`'s CFLAGS for cross builds.
-2. Inspect macros with the recorded CFLAGS plus the established binding
-   target, CPPFLAGS, include settings and environment overrides, and verify
-   that the server configuration describes that target.
+2. Ask the Clang driver that inspection selects for the target's system include
+   directories. Inspect macros with the recorded CFLAGS plus the binding target,
+   those directories, CPPFLAGS, the server include directories and environment
+   overrides; verify that the server configuration describes that target and
+   that inspection selected the same driver.
 3. Select PostgreSQL function macros, owned variable-dependent object roots and
    every compiler-proven server-owned static inline definition; prepare these
    explicit root kinds in one session. Canonical physical definition ownership
    excludes external headers, including symlink and `..` aliases. Ordinary macro
    inventory/list output remains definitions only.
 4. Establish target guards and pgrx opaque integer bridges.
-5. Run bindgen with its established CPPFLAGS/include/target invocation; verify
-   that the inspected inputs stayed unchanged, then parse its fresh output.
+5. Run bindgen with the same target, system include directories and server
+   include directories, its established CPPFLAGS invocation, and without its own
+   include detection; verify that the inspected inputs stayed unchanged, then
+   parse its fresh output.
 6. Prove and add missing owned integer object constants without overwriting
    existing bindings. Normalize the parsed copy's C foreign/callback ABI to the
    final binding storage's `C-unwind` ABI, then collect the actual `BindingCatalog` and its FFI
@@ -1463,11 +1467,21 @@ such a program and Cargo's `HOST` and `TARGET` differ, only PostgreSQL's
 functional CFLAGS (`-fno-strict-aliasing`, `-fwrapv` and
 `-fexcess-precision=standard`) reach the macro profile, in recorded order. The
 report lists the others under `cflags_dropped`. Native builds and
-`PGRX_PG_CONFIG_AS_ENV` metadata keep every recorded flag. System include
-directories come from the inspected Clang driver queried with the target
-arguments, so a cross build searches the target's directories rather than the
-host's. Either way, the verification in section 5 decides whether the headers
-describe the target.
+`PGRX_PG_CONFIG_AS_ENV` metadata keep every recorded flag. Either way, the
+verification in section 5 decides whether the headers describe the target.
+
+`PostgresConfig::system_includes` selects the driver through the same lookup as
+inspection and refuses one whose major version differs from libclang's. Its
+arguments are `BINDGEN_EXTRA_CLANG_ARGS` without their `-I` options, preceded by
+Cargo's target unless those arguments name one. It preprocesses an empty input
+with them and `-E -v`, and returns the driver's `#include <...>` search list.
+The build passes those directories, framework directories as `-iframework`,
+ahead of every other include argument to both bindgen and inspection. A cross
+build therefore searches the target's directories rather than the host's, and
+libclang finds builtin headers from a driver of its own major version.
+Inspection must then select the same driver, or the build fails.
+`PGRX_BINDGEN_NO_DETECT_INCLUDES` skips the query; bindgen's own include
+detection stays off.
 
 The loaded libclang wrapper permits one live runtime owner in a process. The
 build serializes scanner/bindgen inspection around that ownership constraint,
@@ -1673,9 +1687,12 @@ generate(version, extra_arguments):
         return
     server_root = include_override_or_installation_root(installation, version, target)
     cflags = recorded_cflags_scoped_to_target(installation, host, target)
-    arguments = cflags_then_cppflags_then_overrides(installation, cflags, server_root, extra_arguments)
+    system_includes = matching_driver_search_list(target, extra_arguments_without_includes)
+    binding_arguments = target_then_system_includes_cppflags_server_root(installation, system_includes, server_root)
+    arguments = cflags_then_binding_arguments_then_overrides(cflags, binding_arguments, extra_arguments)
     frontend = inspect_matching_driver_and_libclang(wrapper(version), arguments)
     verify_server_configuration_describes_target(frontend, version)
+    require_same_driver(frontend, system_includes)
     track_cargo_inputs(frontend.inputs)
     macros = final_active_postgres_function_macro_names(frontend, server_root)
     objects = owned_variable_dependent_object_roots(frontend, server_root)
@@ -1684,7 +1701,7 @@ generate(version, extra_arguments):
     names = union_of_prepared_root_names_with_active_macro_precedence(session)
 
     target_guard_and_integer_bridges = validate_runtime_profile(frontend)
-    fresh_rust = run_bindgen_using_existing_cppflags_includes_target_environment(installation)
+    fresh_rust = run_bindgen_without_include_detection(binding_arguments, extra_arguments)
     verify_session_inputs_again(session)
     binding_ast = parse_fresh_bindings(fresh_rust)
     constants = prove_missing_owned_integer_objects(frontend, binding_ast)
@@ -1873,6 +1890,9 @@ cargo test -p pgrx --test c_macros --no-default-features --features pg18,cshim
 cargo test -p pgrx-pg-sys --lib --no-default-features --features pg18,cshim
 ```
 
+The `macro_build` harness also needs the standard library of the cross target
+it picks for the host, as the [crate README](README.md#validation) lists.
+
 Documentation snapshots require their own release/docs.rs validation. Their
 existence is not a substitute for current-platform generation. Tests demonstrate
 specific properties; neither successful emission nor a finite oracle sample
@@ -1934,10 +1954,12 @@ and phase contracts above explain why those APIs are ordered as they are.
 
 ## Integration and stable identities
 
-Ordinary bindgen generation uses pgrx's existing CPPFLAGS, target includes, and
-bindgen environment arguments independently of macro generation. The macro
-frontend additionally observes the installation's recorded CFLAGS, and checks
-its C declarations against that fresh binding catalog. Rust type storage is
+Bindgen and the macro frontend share the target, server include directories and
+bindgen environment arguments, and both search the system include directories
+reported by the Clang driver that macro inspection selects. Bindgen keeps its
+established CPPFLAGS invocation. The macro frontend additionally observes the
+installation's recorded CFLAGS, and checks its C declarations against that
+fresh binding catalog. Rust type storage is
 never repaired to make an incompatible C profile appear supported. Generation
 is required: failed inspection, verification or native compilation fails the
 build with no macro definitions or native linkage. `PGRX_MACRO_DEBUG=1` enables
