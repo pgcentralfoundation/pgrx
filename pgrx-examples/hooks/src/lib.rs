@@ -30,8 +30,10 @@ fn only_superusers_can_truncate(pstmt: PgBox<pg_sys::PlannedStmt>) {
     if pstmt.utilityStmt.is_null()
         // SAFETY: a non-null utilityStmt belongs to the live PlannedStmt and
         // starts with an initialized NodeTag. Only its tag field is loaded.
-        || unsafe { pg_sys::nodeTag!(pstmt.utilityStmt).get() }
-            != pg_sys::NodeTag::T_TruncateStmt as u32
+        // The tag's integer type follows the C enum's compatible type, which
+        // differs between targets (unsigned on Unix, int on MSVC), so widen both sides.
+        || i64::from(unsafe { pg_sys::nodeTag!(pstmt.utilityStmt).get() })
+            != pg_sys::NodeTag::T_TruncateStmt as i64
     {
         return ();
     }

@@ -348,7 +348,9 @@ let node = storage.as_mut_ptr();
 // Neither operation creates a reference or materializes a complete Node.
 unsafe {
     pgrx::NodeSetTag!(node, pg_sys::NodeTag::T_Invalid);
-    assert_eq!(pgrx::nodeTag!(node).get(), 0_u32);
+    // The tag's integer type follows the C enum's compatible type, which differs
+    // between targets, so compare it with an untyped literal (T_Invalid is 0).
+    assert_eq!(pgrx::nodeTag!(node).get(), 0);
 }
 ```
 
