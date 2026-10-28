@@ -30,7 +30,9 @@ pub fn composite_row_type_make_tuple(
         unsafe { pg_sys::pg_detoast_datum_packed(row.cast_mut_ptr()) } as pg_sys::HeapTupleHeader;
     let mut tuple = unsafe { PgBox::<pg_sys::HeapTupleData>::alloc0() };
 
-    // SAFETY: The detoasted composite has a HeapTupleHeader datum header.
+    // SAFETY: not established. HeapTupleHeaderGetDatumLength reads a four-byte varlena header,
+    // but this safe function accepts any Datum, and pg_detoast_datum_packed leaves the one-byte
+    // header of a short stored composite in place.
     tuple.t_len = unsafe { pg_sys::HeapTupleHeaderGetDatumLength!(htup_header).get() };
     tuple.t_data = htup_header;
 
@@ -58,32 +60,41 @@ pub fn heap_getattr<T: FromDatum, AllocatedBy: WhoAllocated>(
     // PostgreSQL only asserts that `attno` is within the descriptor, so check it first.
     let typoid = tupdesc.get(attno.get() - 1).expect("no attribute").type_oid();
     let mut is_null = false;
-    // SAFETY: the PgBox and PgTupleDesc keep the tuple and its descriptor live, and the
-    // descriptor lookup above bounds `attno` by its attribute count.
+    // SAFETY: not established. The lookup above bounds `attno`, and its reference ends with that
+    // statement. This safe function cannot check the rest of heap_getattr_inline's contract or
+    // the result's lifetime: `tuple` can be null or store attributes that `tupdesc` does not
+    // describe, a caller can hold a reference to `tupdesc`'s attribute entries across the call,
+    // and a by-reference `T` can outlive the tuple.
     let datum =
         unsafe { heap_getattr_inline(tuple.as_ptr(), attno, tupdesc.as_ptr(), &mut is_null) };
 
     if is_null { None } else { unsafe { T::from_polymorphic_datum(datum, false, typoid.value()) } }
 }
 
-/// Extract an attribute of a heap tuple and return it as a Datum.
-/// This works for either system or user attributes.  The given `attnum`
-/// is properly range-checked.
+/// Extract user attribute `attno` (1-based) of a heap tuple and return it as a Datum.
 ///
 /// If the field in question has a NULL value, we return `None`.
 /// Otherwise, a `Some(pg_sys::Datum)`
 ///
-/// 'tup' is the pointer to the heap tuple.  'attnum' is the attribute
-/// number of the column (field) caller wants.  'tupleDesc' is a
-/// pointer to the structure describing the row and all its fields.
-///
-/// `attno` is 1-based
+/// System attributes, such as `ctid`, have non-positive attribute numbers and cannot be
+/// requested. Unlike [`heap_getattr()`], this does not check `attno` against the descriptor.
 ///
 /// ## Safety
 ///
-/// This function is unsafe as it cannot validate that the provided pointers are valid.
-/// `tuple` must point to a live heap tuple formed with the live descriptor `tupdesc`, and
-/// `attno` must not exceed the descriptor's attribute count.
+/// `tuple` must point to a live heap tuple, and each attribute it stores must have the same
+/// length, alignment, and pass-by-value flag as the attribute in that position of the live
+/// descriptor `tupdesc`, which can describe more attributes than the tuple stores. A tuple
+/// formed with `tupdesc` qualifies. So does a stored row of the same row type after attributes
+/// are added or dropped, because PostgreSQL keeps a dropped attribute's length, alignment, and
+/// pass-by-value flag, though it clears its type. `attno` must not exceed the descriptor's
+/// attribute count. The call must run on the PostgreSQL backend thread.
+///
+/// The call can cache attribute offsets by writing `attcacheoff` in `tupdesc`'s attribute
+/// entries, so no Rust reference to those entries may be live across it. On PostgreSQL 15
+/// through 17, those entries are the attributes that [`PgTupleDesc::get`] borrows.
+///
+/// A pass-by-reference result can point into the tuple or, on PostgreSQL 15.0 through 15.4,
+/// into `tupdesc`, and is valid only while both are.
 #[inline]
 pub unsafe fn heap_getattr_raw(
     tuple: *mut pg_sys::HeapTupleData,
@@ -133,9 +144,11 @@ pub unsafe fn heap_getattr_raw(
 ///
 /// # Safety
 ///
-/// `tuple` must point to a live heap tuple formed with the live descriptor `tupdesc`, and
-/// `attno` must not exceed the descriptor's attribute count. A by-reference result points
-/// into the tuple's data.
+/// `tuple` must point to a live heap tuple, and each attribute it stores must have the same
+/// length, alignment, and pass-by-value flag as the attribute in that position of the live
+/// descriptor `tupdesc`. `attno` must not exceed the descriptor's attribute count. No Rust
+/// reference to `tupdesc`'s attribute entries may be live across the call. A by-reference
+/// result can point into the tuple or, on PostgreSQL 15.0 through 15.4, into `tupdesc`.
 #[inline]
 unsafe fn heap_getattr_inline(
     tuple: *mut pg_sys::HeapTupleData,
@@ -146,7 +159,8 @@ unsafe fn heap_getattr_inline(
     let index = attno.get() - 1;
     // tupdesc->natts is a C int, which bounds attno.
     let attnum = attno.get() as core::ffi::c_int;
-    // SAFETY: the caller supplies a live tuple and its descriptor, with attno in range.
+    // SAFETY: the caller supplies a live tuple, a live descriptor whose attributes match the
+    // stored ones in length, alignment, and pass-by-value flag, and an in-range attno.
     unsafe {
         let t_data = (*tuple).t_data;
         if attno.get() > pg_sys::HeapTupleHeaderGetNatts!(t_data).get() as usize {
@@ -269,8 +283,10 @@ pub fn heap_getattr_datum_ex(
     // PostgreSQL only asserts that `attno` is within the descriptor, so check it first.
     let typoid = tupdesc.get(attno.get() - 1).expect("no attribute").type_oid();
     let mut is_null = false;
-    // SAFETY: the PgBox and PgTupleDesc keep the tuple and its descriptor live, and the
-    // descriptor lookup above bounds `attno` by its attribute count.
+    // SAFETY: not established. The lookup above bounds `attno`, and its reference ends with that
+    // statement. This safe function cannot check the rest of heap_getattr_inline's contract:
+    // `tuple` can be null or store attributes that `tupdesc` does not describe, and a caller can
+    // hold a reference to `tupdesc`'s attribute entries across the call.
     let datum =
         unsafe { heap_getattr_inline(tuple.as_ptr(), attno, tupdesc.as_ptr(), &mut is_null) };
 
