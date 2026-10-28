@@ -300,7 +300,8 @@ unsafe impl<I: EnumIdentity, K: CInteger, R: EnumStorage<I, K>, Q: Qualifier> Re
         unsafe { read_enum::<I, K, R>(place.address, place.access) }
     }
 }
-// SAFETY: Volatile qualification is preserved in the supplied place metadata.
+// SAFETY: The read adds the marker's static volatility to the place metadata,
+// which can describe only inherited access, as after array decay.
 /// Provide declared object-to-value conversion without introducing a whole-record validity requirement.
 unsafe impl<I: EnumIdentity, K: CInteger, R: EnumStorage<I, K>, Q: Qualifier> ReadObject<Q>
     for CVolatile<CEnumObject<I, K, R>>
@@ -316,7 +317,7 @@ unsafe impl<I: EnumIdentity, K: CInteger, R: EnumStorage<I, K>, Q: Qualifier> Re
     /// whole `R` enum value is required or materialized by this read.
     unsafe fn read_object(place: Place<Self, Q>) -> CValue<CEnum<I, K>> {
         // SAFETY: The caller establishes the volatile object's readable contract.
-        unsafe { read_enum::<I, K, R>(place.address, place.access) }
+        unsafe { read_enum::<I, K, R>(place.address, Access { volatile: true, ..place.access }) }
     }
 }
 // SAFETY: Only ReadWrite places implement this capability. Integer writes retain
@@ -341,7 +342,8 @@ unsafe impl<I: EnumIdentity, K: CInteger, R: EnumStorage<I, K>> WritePlace
         value
     }
 }
-// SAFETY: Same raw integer write contract, with inherited volatile access.
+// SAFETY: Same raw integer write contract, adding the marker's static
+// volatility to the place metadata.
 /// Expose assignment only for this admitted writable destination family.
 unsafe impl<I: EnumIdentity, K: CInteger, R: EnumStorage<I, K>> WritePlace
     for Place<CVolatile<CEnumObject<I, K, R>>>
@@ -358,7 +360,7 @@ unsafe impl<I: EnumIdentity, K: CInteger, R: EnumStorage<I, K>> WritePlace
     /// are forbidden until storage again forms a valid `R`.
     unsafe fn store(self, value: CValue<CEnum<I, K>>) -> CValue<CEnum<I, K>> {
         // SAFETY: The caller establishes writable volatile raw enum storage.
-        unsafe { write_enum(self.address, self.access, value) }
+        unsafe { write_enum(self.address, Access { volatile: true, ..self.access }, value) }
         value
     }
 }

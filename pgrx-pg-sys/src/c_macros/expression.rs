@@ -4260,6 +4260,45 @@ mod tests {
         assert_eq!(storage, 7, "rejected stores must not change the object");
     }
 
+    /// Nominal C enum whose compatible integer type is `unsigned int`.
+    #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+    struct Color;
+    /// Keep this runtime family within crate-owned C capability registration.
+    impl sealed::Sealed for Color {}
+    /// Register the fixture as a compiler-established enum declaration.
+    impl EnumIdentity for Color {}
+    /// Store the fixture enum in its compatible `unsigned int` representation.
+    impl enumeration::NumericEnum for Color {
+        /// Exact integer kind registered by the compiler for this nominal enum identity.
+        type Compatible = CUnsignedInt;
+    }
+
+    /// Prove a volatile enum element keeps volatile access after array decay
+    /// copies the unqualified array's metadata, as volatile scalar elements do.
+    #[test]
+    fn static_volatile_enum_qualification_survives_array_decay() {
+        type VolatileColor = CVolatile<CEnumObject<Color, CUnsignedInt, u32>>;
+        let mut storage = [7_u32; 4];
+        let array = place::<CArray<VolatileColor, 4>>(&raw mut storage)
+            .with_access(Access { volatile: false, unaligned: true });
+        // SAFETY: Decay reads no element of the live array allocation.
+        let element = index(unsafe { load(array) }, input(1_i32));
+        let read = std::panic::catch_unwind(|| {
+            // SAFETY: The live initialized element has valid alignment and bounds.
+            // Metadata requests unsupported volatile/unaligned access, which must
+            // be refused before dereferencing the allocation.
+            let _ = unsafe { load(element) };
+        });
+        assert!(read.is_err(), "static volatility must reject an unaligned enum read");
+        let write = std::panic::catch_unwind(|| {
+            // SAFETY: The same exclusively writable element remains live. The
+            // unsupported access combination must be refused before mutation.
+            let _ = unsafe { assign(element, input(13_u32)) };
+        });
+        assert!(write.is_err(), "static volatility must reject an unaligned enum write");
+        assert_eq!(storage, [7; 4], "rejected stores must not change the array");
+    }
+
     /// Register one exact native callback signature for call, address, and null-pointer tests.
     #[derive(Clone, Copy)]
     struct IncrementSignature;
