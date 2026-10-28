@@ -78,7 +78,12 @@ fn main() {
             BODY_DIRECTIVE_COMMENT!(10_i32).get(),
             BODY_DIRECTIVE_SPLICE!(10_i32).get()
         );
-        println!("pushed\t{}", BODY_PUSHED!(2_i32).get());
+        println!(
+            "pushed\t{}\t{}\t{}",
+            BODY_PUSHED!(2_i32).get(),
+            BODY_POPPED!(1_i32).get(),
+            BODY_HIDDEN!(2_i32).get()
+        );
         println!("transitive\t{}", BODY_TRANSITIVE_USE!(1_i32).get());
         println!("dropped later\t{}", BODY_DROPPED_LATER!(1_i32).get());
         println!("argument late\t{}", BODY_ARGUMENT_LATE!(1_i32).get());

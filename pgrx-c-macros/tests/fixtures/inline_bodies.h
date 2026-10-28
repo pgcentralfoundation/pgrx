@@ -94,6 +94,27 @@ static inline int BODY_DIRECTIVE_SPLICE(int value)
 #define BODY_PUSHED_SCALE 1000
 static inline int BODY_PUSHED(int value) { return value * BODY_PUSHED_SCALE; }
 #pragma pop_macro("BODY_PUSHED_SCALE")
+/* The name a macro's replacement uses is undefined at the definition, then popped. */
+#define BODY_POPPED_VALUE 1000
+#pragma push_macro("BODY_POPPED_VALUE")
+#undef BODY_POPPED_VALUE
+typedef enum BodyPoppedEnum { BODY_POPPED_VALUE = 5 } BodyPoppedEnum;
+#define BODY_POPPED_SCALE BODY_POPPED_VALUE
+static inline int BODY_POPPED(int value) { return value + BODY_POPPED_SCALE; }
+#pragma pop_macro("BODY_POPPED_VALUE")
+/* Pasting forms the names of these pop pragmas, which their text therefore lacks. The
+ * body uses a pushed definition that is neither the last one nor active at the end. */
+#define BODY_PRAGMA(text) _Pragma(#text)
+#define BODY_PRAGMA_EXPANDED(text) BODY_PRAGMA(text)
+#define BODY_JOIN(left, right) left##right
+#define BODY_HIDDEN_SCALE 1
+#pragma push_macro("BODY_HIDDEN_SCALE")
+#define BODY_HIDDEN_SCALE 1000
+#pragma push_macro("BODY_HIDDEN_SCALE")
+#define BODY_HIDDEN_SCALE 1
+BODY_PRAGMA_EXPANDED(BODY_JOIN(pop_, macro)("BODY_HIDDEN_SCALE"))
+static inline int BODY_HIDDEN(int value) { return value * BODY_HIDDEN_SCALE; }
+BODY_PRAGMA_EXPANDED(BODY_JOIN(pop_, macro)("BODY_HIDDEN_SCALE"))
 #define BODY_INNER 1
 #define BODY_OUTER BODY_INNER
 static inline int BODY_TRANSITIVE_USE(int value) { return value + BODY_OUTER; }

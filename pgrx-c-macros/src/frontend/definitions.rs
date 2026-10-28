@@ -88,7 +88,10 @@ pub(super) fn prove(
         active: &frontend.environment().active,
         last_definition: HashMap::new(),
         expansions: HashMap::new(),
+        popped: None,
     };
+    let mut files = HashSet::new();
+    files.extend(unit.get_file(&profile.header));
     let mut admitted = Vec::new();
     let mut seen = BTreeSet::new();
     // libclang visits the whole preprocessing record, in translation-unit order, before
@@ -97,6 +100,10 @@ pub(super) fn prove(
     unit.get_entity().visit_children(|entity, _| {
         position += 1;
         match entity.get_kind() {
+            EntityKind::InclusionDirective => {
+                files.extend(entity.get_file());
+                return EntityVisitResult::Continue;
+            }
             EntityKind::MacroDefinition => {
                 if let Some(name) = entity.get_name() {
                     let location = entity.get_location().and_then(|at| {
@@ -172,8 +179,9 @@ pub(super) fn prove(
         }
         EntityVisitResult::Continue
     });
+    history.popped = popped_names(files.iter().map(|file| file.get_path()));
     let mut definitions = BTreeMap::new();
-    let mut files = BTreeMap::new();
+    let mut sources = BTreeMap::new();
     let mut remaining = MAX_SOURCE_BYTES;
     // Clang names a file found through a relative search path relative to the
     // process working directory, which inspection recorded with the profile.
@@ -186,10 +194,41 @@ pub(super) fn prove(
         ));
     }
     for (name, definition) in admitted {
-        let source = source(definition, &directory, &mut files, &mut remaining, &history);
+        let source = source(definition, &directory, &mut sources, &mut remaining, &history);
         definitions.insert(name, source);
     }
     Ok(definitions)
+}
+
+/// The names that `pop_macro` pragmas in these files restore, or `None` when a file cannot
+/// be read or a pragma's operand is not a plain string literal.
+///
+/// libclang records neither pragma, so the files' text is searched, including text the
+/// preprocessor skipped, comments and `_Pragma` strings. A pragma whose name is formed
+/// by token pasting cannot be seen.
+fn popped_names(files: impl IntoIterator<Item = PathBuf>) -> Option<HashSet<String>> {
+    const POP: &[u8] = b"pop_macro";
+    let mut names = HashSet::new();
+    for file in files {
+        let text = std::fs::read(file).ok()?;
+        let mut rest = text.as_slice();
+        while let Some(at) = rest.windows(POP.len()).position(|window| window == POP) {
+            rest = &rest[at + POP.len()..];
+            // `("NAME")`, or `(\"NAME\")` inside a `_Pragma` string.
+            let operand = rest.trim_ascii_start().strip_prefix(b"(")?.trim_ascii_start();
+            let operand = operand.strip_prefix(b"\\").unwrap_or(operand).strip_prefix(b"\"")?;
+            let length = operand
+                .iter()
+                .take_while(|&&byte| byte.is_ascii_alphanumeric() || byte == b'_')
+                .count();
+            let after = &operand[length..];
+            if length == 0 || !after.strip_prefix(b"\\").unwrap_or(after).starts_with(b"\"") {
+                return None;
+            }
+            names.insert(String::from_utf8_lossy(&operand[..length]).into_owned());
+        }
+    }
+    Some(names)
 }
 
 /// Copy physical original source once per header and retain only bounded definition text.
@@ -456,6 +495,8 @@ struct MacroHistory<'tu, 'a> {
     /// Each top-level macro expansion in the first entry of its file, by file and offset of
     /// its name, with the location of the definition it used.
     expansions: HashMap<File<'tu>, HashMap<u32, Recorded<'tu>>>,
+    /// Names a `pop_macro` pragma can restore, or `None` for every name.
+    popped: Option<HashSet<String>>,
 }
 
 /// A preprocessing record's position in the translation unit and a macro definition's
@@ -512,7 +553,8 @@ impl<'tu> MacroHistory<'tu, '_> {
                 Some(expansion) => {
                     let position = expansion.position;
                     // `unchanged` ties the active definition to the last one recorded; the
-                    // expansion must have used that same definition.
+                    // expansion must have used that same definition, which a pop formed by
+                    // token pasting could otherwise make differ.
                     if !self.unchanged(name, position, &mut HashSet::new())
                         || expansion.location.is_none()
                         || expansion.location != self.last_definition[name].location
@@ -540,12 +582,17 @@ impl<'tu> MacroHistory<'tu, '_> {
     ///
     /// Undefinitions are not recorded. A macro whose active definition at the end is its
     /// last recorded definition, made before `position`, had that definition at `position`
-    /// too. Pushed and popped definitions are not recorded either, so the active definition
-    /// must be that last definition by location. Token pasting can form names this check
-    /// cannot see.
+    /// too: undefining it later would leave it undefined or redefined at the end. Only a
+    /// `pop_macro` pragma can restore a definition without recording one, so a name that
+    /// a pop can restore is refused. Push and pop pragmas are not recorded, so the active
+    /// definition must also be that last definition by location. Token pasting can form
+    /// names this check cannot see.
     fn unchanged(&self, name: &str, position: usize, visited: &mut HashSet<String>) -> bool {
         if !visited.insert(name.to_owned()) {
             return true;
+        }
+        if self.popped.as_ref().is_none_or(|popped| popped.contains(name)) {
+            return false;
         }
         let (Some(last), Some(active)) = (self.last_definition.get(name), self.active.get(name))
         else {
@@ -595,5 +642,33 @@ impl<'tu> MacroHistory<'tu, '_> {
             !(self.last_definition.contains_key(spelling) || self.active.contains_key(spelling))
                 || self.unchanged(spelling, position, visited)
         })
+    }
+}
+
+/// Check the pop pragma search on raw source text.
+#[cfg(test)]
+mod tests {
+    use super::popped_names;
+
+    /// Pop pragmas name what they restore, also inside `_Pragma`; any other mention of
+    /// the pragma name leaves every name unproved.
+    #[test]
+    fn pop_pragmas_name_restored_macros() {
+        let directory = tempfile::tempdir().unwrap();
+        let file = |name: &str, text: &str| {
+            let path = directory.path().join(name);
+            std::fs::write(&path, text).unwrap();
+            path
+        };
+        let pragmas = file(
+            "pragmas.h",
+            "#pragma pop_macro(\"A\")\n#pragma pop_macro ( \"B_1\" )\n_Pragma(\"pop_macro(\\\"C\\\")\")\n",
+        );
+        let plain = file("plain.h", "#pragma push_macro(\"D\")\n");
+        let names = popped_names([pragmas.clone(), plain]).unwrap();
+        assert_eq!(names, ["A", "B_1", "C"].map(String::from).into());
+        let comment = file("comment.h", "/* see pop_macro */\n");
+        assert_eq!(popped_names([pragmas.clone(), comment]), None);
+        assert_eq!(popped_names([pragmas, directory.path().join("missing.h")]), None);
     }
 }

@@ -319,15 +319,21 @@ cannot be inferred from a declaration's name or broad type category:
    directive at the end of a skipped range. Token spellings are compared without
    their line splices, which libclang keeps. Any other directive, a `#` that does
    not start a line, a token outside the compiler's statements other than `;`, a
-   trigraph, or a carriage return outside a CR-LF line end leaves no body. A token that names a macro must have a top-level expansion
-   record at that position; that macro, and every macro its replacement list
-   names, must have its last definition before the expansion and still be active
-   at the end of the unit. Undefinitions are not recorded, so this is what proves
-   the end-of-unit expansion identical. Push and pop pragmas are not recorded
-   either, so the active definition must be that last definition, by location,
-   and the expansion must have used it. A macro name without a record is admitted
-   only inside the arguments of such an expanded function-like invocation, which
-   dropped or stringified it, and only when it is unchanged since that invocation.
+   trigraph, or a carriage return outside a CR-LF line end leaves no body. A
+   token that names a macro must have a top-level expansion record at that
+   position; that macro, and every macro its replacement list names, must have
+   its last definition before the expansion and still be active at the end of
+   the unit. Undefinitions are not recorded, so this is what proves the
+   end-of-unit expansion identical, unless a `pop_macro` pragma restored a
+   definition that was undefined or replaced at the body. libclang records no
+   pragmas, so the text of every file in the unit is searched: a name that a pop
+   pragma names leaves no body, and a pop whose operand is not a plain string
+   leaves no bodies at all. A pop whose name token pasting forms has no such
+   text, so the active definition must also be that last definition, by
+   location, and a name the body expands must have used it. A macro name without
+   a record is admitted only inside the arguments of such an expanded
+   function-like invocation, which dropped or stringified it, and only when it
+   is unchanged since that invocation.
    Token pasting and invocation-dependent builtins such as `__LINE__` leave no
    body. A file and offset name a place in the file's first entry, and libclang
    reports skipped ranges for that entry only. Expansion records from a later
