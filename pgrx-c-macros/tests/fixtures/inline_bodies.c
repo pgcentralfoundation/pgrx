@@ -27,6 +27,9 @@ int main(void)
     printf("sized\t%d\t%d\t%d\n", BODY_SIZED(1), BODY_SIZED_CALLER(1), BODY_SIZED_MACRO(3));
     printf("directive\t%d\t%d\n", BODY_DIRECTIVE_COMMENT(10), BODY_DIRECTIVE_SPLICE(10));
     printf("pushed\t%d\n", BODY_PUSHED(2));
+    printf("transitive\t%d\n", BODY_TRANSITIVE_USE(1));
+    printf("dropped later\t%d\n", BODY_DROPPED_LATER(1));
+    printf("argument late\t%d\n", BODY_ARGUMENT_LATE(1));
     printf("template\t%d\t%d\t%d\t%d\n", BODY_FIRST_VALUE(), BODY_SECOND_VALUE(),
            BODY_FIRST_BRANCH(10), BODY_SECOND_BRANCH(10));
 }

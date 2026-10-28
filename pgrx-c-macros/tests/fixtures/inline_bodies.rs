@@ -79,6 +79,9 @@ fn main() {
             BODY_DIRECTIVE_SPLICE!(10_i32).get()
         );
         println!("pushed\t{}", BODY_PUSHED!(2_i32).get());
+        println!("transitive\t{}", BODY_TRANSITIVE_USE!(1_i32).get());
+        println!("dropped later\t{}", BODY_DROPPED_LATER!(1_i32).get());
+        println!("argument late\t{}", BODY_ARGUMENT_LATE!(1_i32).get());
         println!(
             "template\t{}\t{}\t{}\t{}",
             BODY_FIRST_VALUE!().get(),

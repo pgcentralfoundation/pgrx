@@ -76,6 +76,13 @@ const NATIVE: &[&str] = &[
     "BODY_MACRO_ARG",
     // A popped definition, not the last one, is active at the end.
     "BODY_PUSHED",
+    // A macro reached through another macro is redefined after the function.
+    "BODY_TRANSITIVE_USE",
+    // A macro in an argument dropped by the invocation is redefined after the function.
+    // The proof does not consider how the invocation uses its arguments.
+    "BODY_DROPPED_LATER",
+    // An argument's enum constant later becomes a macro.
+    "BODY_ARGUMENT_LATE",
     // Their header is entered twice, with different macros and conditionals.
     "BODY_FIRST_VALUE",
     "BODY_SECOND_VALUE",
@@ -164,7 +171,7 @@ fn translated_bodies_match_their_original_definitions() {
     assert!(error.contains("unsafe"), "{error}");
     // BODY_EARLY is called twice; each other native root, and the native self-call inside
     // the translated BODY_RECURSIVE, once.
-    rust.push_str("const EXPECTED_GUARDS: usize = 13;\n");
+    rust.push_str("const EXPECTED_GUARDS: usize = 16;\n");
     rust.push_str("fn pure() -> i32 { BODY_MACRO!(1_i32).get() + BODY_CALLER!(1_i32).get() }\n");
     rust.push_str(include_str!("fixtures/inline_bodies.rs"));
     let profile = frontend.profile();

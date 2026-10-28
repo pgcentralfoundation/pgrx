@@ -94,6 +94,18 @@ static inline int BODY_DIRECTIVE_SPLICE(int value)
 #define BODY_PUSHED_SCALE 1000
 static inline int BODY_PUSHED(int value) { return value * BODY_PUSHED_SCALE; }
 #pragma pop_macro("BODY_PUSHED_SCALE")
+#define BODY_INNER 1
+#define BODY_OUTER BODY_INNER
+static inline int BODY_TRANSITIVE_USE(int value) { return value + BODY_OUTER; }
+#undef BODY_INNER
+#define BODY_INNER 2
+#define BODY_DROPPED_NAME 1
+static inline int BODY_DROPPED_LATER(int value) { return value + BODY_DROP(BODY_DROPPED_NAME); }
+#undef BODY_DROPPED_NAME
+#define BODY_DROPPED_NAME 2
+enum { BODY_ARGUMENT = 5 };
+static inline int BODY_ARGUMENT_LATE(int value) { return BODY_ID(BODY_ARGUMENT) + value; }
+#define BODY_ARGUMENT 7
 #define BODY_TEMPLATE_VALUE_NAME BODY_FIRST_VALUE
 #define BODY_TEMPLATE_BRANCH_NAME BODY_FIRST_BRANCH
 #define BODY_TEMPLATE_VALUE 1
