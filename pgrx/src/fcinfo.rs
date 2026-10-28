@@ -119,9 +119,10 @@ pub unsafe fn pg_get_nullable_datum(
     let _nullptr_check = ptr::NonNull::new(fcinfo).expect("fcinfo pointer must be non-null");
     // SAFETY: the caller provides an initialized fcinfo followed by its nargs
     // initialized arguments, and `num < nargs` keeps the read inside them.
-    // Copying the NullableDatum keeps the provenance of a pass-by-reference
-    // argument. Rebuilding it from the integer `PG_GETARG_DATUM!(..).get()`
-    // would not, and FromDatum implementations dereference that pointer.
+    // Copying the NullableDatum keeps a pass-by-reference argument's pointer,
+    // which FromDatum implementations dereference, with its own provenance.
+    // Rebuilding it from the integer `PG_GETARG_DATUM!(..).get()` would rely on
+    // exposed provenance instead.
     unsafe {
         let nargs =
             usize::try_from((*fcinfo).nargs).expect("fcinfo argument count must be non-negative");
@@ -322,6 +323,12 @@ mod tests {
         }
     }
 
+    /// Pins that the argument's pointer is returned and readable. A native run cannot tell
+    /// whether the copy kept the pointer's own provenance or took exposed provenance through
+    /// an integer round trip. Miri can with `-Zmiri-strict-provenance`, which rejects the
+    /// integer-to-pointer conversion. Select a configured version's feature, as in
+    /// `MIRIFLAGS=-Zmiri-strict-provenance cargo +nightly miri test -p pgrx
+    /// --no-default-features --features pg18 --lib fcinfo`.
     #[test]
     fn nullable_datum_returns_the_argument_pointer() {
         let target = 0x5a5a_5a5a_u64;

@@ -424,8 +424,8 @@ macro_rules! impl_table_iter {
                 unsafe {
                     let fcx = deref_fcx(fcinfo);
                     let heap_tuple = ret.into_heap_tuple((*fcx).tuple_desc);
-                    // C return conversion keeps the tuple pointer's provenance;
-                    // `Datum::from(.get() as usize)` would rebuild it from an integer.
+                    // C return conversion rebuilds the tuple pointer with the provenance
+                    // that HeapTupleGetDatum! exposed, as `Datum::from(.get() as usize)` does.
                     pg_sys::__pgrx_c_macros::expression_result::return_value::<pg_sys::Datum, _>(
                         pg_sys::HeapTupleGetDatum!(heap_tuple).into_value(),
                     )

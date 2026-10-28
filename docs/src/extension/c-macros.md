@@ -126,10 +126,12 @@ yourself where the input is not already known to be valid.
 | `pg_sys::elog::interrupt_pending()` | `INTERRUPTS_PENDING_CONDITION!().get() != 0` | None |
 
 C macros that read an implicit `fcinfo` variable take it as their last argument,
-as in `PG_ARGISNULL!(n, fcinfo)`. `PG_GETARG_DATUM!(..).get()` is an integer, so
-`pg_sys::Datum::from(PG_GETARG_DATUM!(..).get() as usize)` is not a pointer that
-Rust may read through. Use `pg_get_nullable_datum`, which keeps the argument's
-pointer, for a pass-by-reference argument.
+as in `PG_ARGISNULL!(n, fcinfo)`. The `.get()` of a macro that yields a C `Datum`,
+such as `PG_GETARG_DATUM!` or `HeapTupleGetDatum!`, is an integer that exposes the
+pointer's provenance. `pg_sys::Datum::from(..get() as usize)` takes that
+provenance back, as a C cast from `Datum` to a pointer does, so Rust may read
+through the result. For a function argument, `pg_get_nullable_datum` also checks
+the argument index and returns the pointer without the integer round trip.
 
 PostgreSQL 16 turned the tree walkers and mutators into macros that cast their
 callback. On PG16 and later, `pg_sys::expression_tree_walker`,
@@ -163,6 +165,13 @@ PG15 and PG16, because later PostgreSQL headers no longer define it.
 `IntoDatum for i8` widens SQL `"char"` the way PostgreSQL's `CharGetDatum` does.
 On targets where C `char` is unsigned, such as Linux AArch64, `(-1_i8).into_datum()`
 now holds `0xFF` instead of all one bits. `FromDatum for i8` reads both as `-1`.
+
+`pg_sys::Datum`'s integer conversions now follow Rust's exposed-provenance
+rules. `Datum::value()` and `usize::from(datum)` expose a pointer's provenance,
+and `Datum::from` an integer uses `core::ptr::with_exposed_provenance_mut`, so a
+pointer Datum that goes through an integer may be dereferenced again. Before,
+the rebuilt Datum had no provenance. With 32-bit pointers, `Datum::from` a `u64`
+or `i64` still pallocs a copy of the value and returns a pointer to it.
 
 ## Call an expression macro
 
