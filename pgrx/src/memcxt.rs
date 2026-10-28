@@ -185,7 +185,7 @@ impl Drop for OwnedMemoryContext {
         if unsafe { ptr::eq(pg_sys::CurrentMemoryContext, self.owned) } {
             // SAFETY: The remembered predecessor must outlive this owned context.
             // Switch away before deleting the current allocation context.
-            unsafe { pg_sys::MemoryContextSwitchTo(self.previous) };
+            unsafe { pg_sys::MemoryContextSwitchTo!(self.previous).get() };
         }
         // SAFETY: This wrapper owns the live PostgreSQL context and releases it once.
         unsafe { pg_sys::MemoryContextDelete(self.owned) };
@@ -291,7 +291,7 @@ impl PgMemoryContexts {
 
         // SAFETY: The caller guarantees the target context is live. Bookkeeping
         // above retains the predecessor before changing the allocation context.
-        unsafe { pg_sys::MemoryContextSwitchTo(self.value()) };
+        unsafe { pg_sys::MemoryContextSwitchTo!(self.value()).get() };
 
         PgMemoryContexts::For(old_context)
     }
@@ -606,11 +606,11 @@ impl PgMemoryContexts {
         f: F,
     ) -> R {
         // SAFETY: The caller establishes backend-thread access and a live target.
-        let prev_context = unsafe { pg_sys::MemoryContextSwitchTo(context) };
+        let prev_context = unsafe { pg_sys::MemoryContextSwitchTo!(context).get() };
 
         let result = f(&mut PgMemoryContexts::For(context));
         // SAFETY: The caller keeps the remembered context live through `f`.
-        unsafe { pg_sys::MemoryContextSwitchTo(prev_context) };
+        unsafe { pg_sys::MemoryContextSwitchTo!(prev_context).get() };
 
         result
     }

@@ -65,10 +65,10 @@ impl<'mcx> MemCx<'mcx> {
     pub unsafe fn exec_in<T>(&self, f: impl FnOnce() -> T) -> T {
         // SAFETY: This borrowed context is live, and the caller promises that
         // execution can finish normally on the backend thread.
-        let remembered = unsafe { pg_sys::MemoryContextSwitchTo(self.ptr.as_ptr()) };
+        let remembered = unsafe { pg_sys::MemoryContextSwitchTo!(self.ptr.as_ptr()).get() };
         let res = f();
         // SAFETY: The previous current context remains live through `f`.
-        unsafe { pg_sys::MemoryContextSwitchTo(remembered) };
+        unsafe { pg_sys::MemoryContextSwitchTo!(remembered).get() };
         res
     }
 }
