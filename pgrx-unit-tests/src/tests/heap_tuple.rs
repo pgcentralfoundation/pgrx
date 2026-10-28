@@ -1038,7 +1038,8 @@ mod tests {
             // SAFETY: as above.
             let tuple = unsafe { pgrx::htup::composite_row_type_make_tuple(datum) };
             // SAFETY: `tuple` is the live stored row. It was formed before `age` was added, so
-            // its attributes are a prefix of the ones `tupdesc` describes.
+            // each attribute it stores has the length, alignment, and pass-by-value flag of
+            // the attribute in that position of `tupdesc`.
             unsafe {
                 assert_eq!(
                     pgrx::htup::heap_getattr::<i32, _>(&tuple, scritches, &tupdesc),
@@ -1051,8 +1052,8 @@ mod tests {
     }
 
     /// A row stored before `ALTER TYPE ... DROP ATTRIBUTE` still holds the dropped attribute,
-    /// and the descriptor keeps its length and alignment in place, so the attributes after it
-    /// read correctly.
+    /// and the descriptor keeps its length, alignment, and pass-by-value flag, so the
+    /// attributes after it read correctly.
     #[pg_test]
     fn test_heap_getattr_reads_row_stored_before_a_drop() -> Result<(), spi::Error> {
         Spi::run(
@@ -1074,7 +1075,9 @@ mod tests {
             // SAFETY: as above.
             let tuple = unsafe { pgrx::htup::composite_row_type_make_tuple(datum) };
             // SAFETY: `tuple` is the live stored row. It was formed before `collar` was
-            // dropped, and `tupdesc` keeps that attribute's length and alignment in place.
+            // dropped, and `tupdesc` keeps that attribute's length, alignment, and
+            // pass-by-value flag, though not its type, so each stored attribute matches the
+            // attribute in that position of `tupdesc`.
             let read = unsafe { pgrx::htup::heap_getattr::<i32, _>(&tuple, scritches, &tupdesc) };
             assert_eq!(read, Some(7));
             Ok(())

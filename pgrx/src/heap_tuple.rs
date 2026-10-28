@@ -575,9 +575,13 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
         // Copy the type out before reading the tuple: on PG15-17, nocachegetattr caches
         // attribute offsets by writing to the descriptor's attributes, which `att` borrows.
         let att_typoid = att.type_oid().value();
-        // SAFETY: this PgHeapTuple owns a live tuple of its descriptor's row type, formed with
-        // that descriptor or, for a stored row, an earlier one whose attributes are a prefix of
-        // it. The lookup above bounds `attno` by the descriptor's attribute count.
+        // SAFETY: this PgHeapTuple holds a live tuple whose stored attributes have the length,
+        // alignment, and pass-by-value flag of its descriptor's attributes in the same
+        // positions: the tuple was formed with that descriptor or is a stored row of its row
+        // type. The lookup above bounds `attno` by the descriptor's attribute count, and `att`
+        // is not used after it. A reference that a caller holds from `attributes` or
+        // `get_attribute_by_*` is not excluded, and on PG15-17 it aliases the attcacheoff
+        // write; that is a known gap in this safe API.
         let datum = unsafe { heap_getattr_raw(self.tuple.as_ptr(), attno, self.tupdesc.as_ptr()) };
         let Some(datum) = datum else {
             return Ok(None);
@@ -588,8 +592,11 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
             record @ pg_sys::RECORDOID => record,
             _ => att_typoid,
         };
-        // SAFETY: the datum is this attribute's value, of type `typoid`, and lives as long as
-        // the tuple that `'tup` borrows.
+        // SAFETY: the datum is this attribute's value, of type `att_typoid`. It lives as long as
+        // the tuple and descriptor that `self` holds and `'tup` borrows: on PG15.0-15.4, a
+        // missing value points into the descriptor. When `T` reads records, `typoid` is
+        // RECORDOID, so try_from_datum does not check `att_typoid`, and a non-composite
+        // attribute reaches the composite reader; that is a known gap in this safe API.
         unsafe { T::try_from_datum(datum, false, typoid) }
     }
 }
