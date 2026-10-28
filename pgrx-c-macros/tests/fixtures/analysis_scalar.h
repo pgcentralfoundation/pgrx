@@ -31,6 +31,7 @@ extern int analysis_function(int value);
 #define ANALYSIS_PROVEN_TYPE_PARAMETER(type, value) ((void) sizeof(type *), ((type) (value)))
 #define ANALYSIS_FORMAL_CALL(fn, value) ((fn)(value))
 #define ANALYSIS_ALIGN_APPLICATION(formal, value) (_Alignof(formal), (formal)(value))
+#define ANALYSIS_UPDATE_APPLICATION(type, fn, value) ((type) ++ (fn)(value)[0] + sizeof(type *))
 #define ANALYSIS_COMMA(left, right) ((left), (right))
 #define ANALYSIS_FLOAT(value) ((value) + 1.5)
 #define ANALYSIS_CHAR(value) ((value) + 'a')

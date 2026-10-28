@@ -603,7 +603,9 @@ aliasing promise. Array and function declarators, such as `char *[4]`, are
 refused rather than measured as one pointer. `offsetof` keeps a
 record designator and ordered field path; offsets do not require loading those
 fields. Whenever the arena holds type-hole evidence, reparse once after gathering
-it, so `(T) - 1` is a cast wherever `sizeof(T *)` appears. Bare GNU alignment of
+it, so `(T) - 1` is a cast wherever `sizeof(T *)` appears. An application that
+only the reparse exposes, such as `(U)(x)` after `(T) ++`, still needs its own
+evidence. Bare GNU alignment of
 `T` alone does not prove that `T` is a type; it admits `sizeof(T)` as a type
 operand but never makes `(T)` a cast. Pointer/qualified forms, established
 sizeof-type and offset forms provide stronger evidence.

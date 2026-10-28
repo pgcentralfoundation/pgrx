@@ -374,7 +374,12 @@ fn type_argument_casts_retain_deferred_types_and_concrete_pointer_casts_use_comp
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let scanner = MacroScanner::new().expect("libclang must be available");
     let scalar = inspect(&scanner, &fixture("analysis_scalar.h"), &[], None).unwrap();
-    for name in ["ANALYSIS_TYPE_PARAMETER", "ANALYSIS_FORMAL_CALL", "ANALYSIS_ALIGN_APPLICATION"] {
+    for name in [
+        "ANALYSIS_TYPE_PARAMETER",
+        "ANALYSIS_FORMAL_CALL",
+        "ANALYSIS_ALIGN_APPLICATION",
+        "ANALYSIS_UPDATE_APPLICATION",
+    ] {
         let analysis = analyze(&scalar, name);
         assert_skip(&analysis, SkipReasonCode::TypeParameter);
         let AnalysisStatus::Skipped { reason } = analysis.status else {
@@ -398,6 +403,8 @@ _Static_assert(_Generic(ANALYSIS_FORMAL_CALL(unsigned char,257), unsigned char: 
 _Static_assert(_Generic(ANALYSIS_FORMAL_CALL(analysis_function,7), int: 1, default: 0), "a callback-shaped formal can call a function");
 _Static_assert(_Generic(ANALYSIS_ALIGN_APPLICATION(unsigned char,257), unsigned char: 1, default: 0), "bare alignment permits a cast type family");
 _Static_assert(_Generic(ANALYSIS_ALIGN_APPLICATION(analysis_callback,7), int: 1, default: 0), "GNU alignment permits the same replacement to call a function pointer value");
+extern long *analysis_pointer_function(long);
+_Static_assert(sizeof(ANALYSIS_UPDATE_APPLICATION(long, analysis_pointer_function, 1)) > 0, "a formal applied after a cast update can call a function");
 "#,
             &scalar.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
             false,

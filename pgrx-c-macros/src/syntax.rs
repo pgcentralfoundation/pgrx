@@ -672,24 +672,7 @@ fn parse(
             _ => None,
         })
         .collect();
-    if let Some(&index) = parser
-        .ambiguous_casts
-        .iter()
-        .filter(|&&index| {
-            let ExpressionKind::TypeParameterCast { parameter, .. } = parser.nodes[index].kind
-            else {
-                unreachable!("only provisional formal casts enter the ambiguity set")
-            };
-            !parser.type_parameters.contains(&parameter)
-        })
-        .min()
-    {
-        return Err(SyntaxError {
-            kind: SyntaxErrorKind::TypeParameter,
-            tokens: parser.nodes[index].tokens,
-            message: "parenthesized macro parameter may be a C cast type or callable value; its role is not established".into(),
-        });
-    }
+    parser.refuse_unproven_casts()?;
     // GNU alignment also accepts expressions, so bare alignment cannot prove
     // that an ambiguous application is a cast. Its existing admitted type
     // family can still resolve sizeof operands after that ambiguity check.
@@ -711,6 +694,11 @@ fn parse(
         if parser.position != parser.tokens.len() {
             return Err(parser.unexpected());
         }
+        // The reparse can expose an application the first pass never saw. After
+        // `(T) ++`, the first pass reads a postfix update and then `(U)` as call
+        // arguments; the second reads a prefix update of `(U)(x)`. Hold the new
+        // arena to the same first-pass evidence.
+        parser.refuse_unproven_casts()?;
     }
     Ok(Expression { nodes: parser.nodes, root, statement_body })
 }
@@ -1282,6 +1270,30 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
             _ => (SyntaxErrorKind::InvalidExpression, "not a complete supported C expression"),
         };
         self.error(kind, format!("{message}: {spelling:?}"))
+    }
+
+    /// Refuse the first provisional formal cast whose formal lacks independent type evidence.
+    fn refuse_unproven_casts(&self) -> Result<(), SyntaxError> {
+        let unproven = self
+            .ambiguous_casts
+            .iter()
+            .copied()
+            .filter(|&index| {
+                let ExpressionKind::TypeParameterCast { parameter, .. } = self.nodes[index].kind
+                else {
+                    unreachable!("only provisional formal casts enter the ambiguity set")
+                };
+                !self.type_parameters.contains(&parameter)
+            })
+            .min();
+        match unproven {
+            Some(index) => Err(SyntaxError {
+                kind: SyntaxErrorKind::TypeParameter,
+                tokens: self.nodes[index].tokens,
+                message: "parenthesized macro parameter may be a C cast type or callable value; its role is not established".into(),
+            }),
+            None => Ok(()),
+        }
     }
 
     /// Attach an error category and original replacement-token range to a parser refusal.
@@ -2111,8 +2123,8 @@ mod tests {
         );
     }
 
-    /// Once a formal is proven to be a type, `(t)` before a unary-capable operator is a cast in
-    /// either source order, as it is in C.
+    /// Once a formal is proven to be a type, `(t)` before `+ - * &` is a cast in either source
+    /// order, as it is in C.
     #[test]
     fn independent_type_uses_resolve_formal_operator_casts_in_either_source_order() {
         for proof in [
@@ -2150,6 +2162,34 @@ mod tests {
                     );
                 }
             }
+        }
+    }
+
+    /// Reading `(t) ++` as a cast moves `(u)(x)` out of the first pass's call arguments. The
+    /// reparsed application still needs its own evidence, because `u` can be a function.
+    #[test]
+    fn reparsed_update_operands_keep_formal_applications_ambiguous() {
+        for body in [
+            vec![
+                "(", "t", ")", "++", "(", "u", ")", "(", "x", ")", "[", "0", "]", ",", "sizeof",
+                "(", "t", "*", ")",
+            ],
+            vec![
+                "(", "t", ")", "--", "(", "u", ")", "(", "x", ")", ",", "sizeof", "(", "t", "*",
+                ")",
+            ],
+            // A sizeof expression operand reaches the same reparse.
+            vec![
+                "sizeof", "(", "(", "t", ")", "++", "(", "u", ")", "(", "x", ")", "[", "0", "]",
+                ")", ",", "sizeof", "(", "t", "*", ")",
+            ],
+        ] {
+            let parsed =
+                parse_expression(&tokens(&body), &["t".into(), "u".into(), "x".into()], |_| false);
+            assert!(
+                matches!(parsed, Err(SyntaxError { kind: SyntaxErrorKind::TypeParameter, .. })),
+                "{body:?}: {parsed:?}"
+            );
         }
     }
 
