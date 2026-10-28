@@ -1783,22 +1783,15 @@ fn macro_watch_directories(
     }
     let mut watched = BTreeSet::new();
     for directory in &inputs.directories {
-        watch_input_directory(&mut watched, directory, &out_dirs)?;
+        if directory.is_dir() {
+            watch_input_directory(&mut watched, directory, &out_dirs)?;
+        } else {
+            watch_absent_input(&mut watched, directory, &out_dirs)?;
+        }
     }
     for file in &inputs.files {
         if matches!(inputs.fingerprints.get(file), Some(None)) {
-            let parent = file
-                .parent()
-                .ok_or_else(|| eyre!("absent C macro input {} has no parent", file.display()))?;
-            // Cargo marks a missing file perpetually dirty. Watch its parent so
-            // creation still invalidates the inspected profile. Do not climb past
-            // a missing parent: absent PATH roots and libclang-adjacent bin
-            // directories would otherwise watch $HOME, /usr/lib or / recursively,
-            // or overlap OUT_DIR. PATH, CLANG_PATH and LIBCLANG_PATH remain
-            // tracked environment inputs for the lookups that named them.
-            if parent.is_dir() {
-                watch_input_directory(&mut watched, parent, &out_dirs)?;
-            }
+            watch_absent_input(&mut watched, file, &out_dirs)?;
         }
     }
     for directory in &inputs.executable_search_directories {
@@ -1835,8 +1828,36 @@ fn watch_input_directory(
     Ok(())
 }
 
-/// Find an existing parent to watch when an optional include or compiler-search directory has
-/// not yet been created.
+/// Watch the parent of an absent file or search directory so that creating it invalidates the
+/// inspected profile; Cargo would mark the missing path itself perpetually dirty.
+///
+/// Do not climb past a missing parent: the nearest existing ancestor of an absent `PATH` or `-I`
+/// root can be `$HOME`, `/usr/lib` or `/`, which Cargo would scan recursively. Do not watch a
+/// parent that contains OUT_DIR either, as a project below `$HOME` would then invalidate its own
+/// output. The environment values and arguments that named the input remain tracked. An absent
+/// input inside OUT_DIR is still refused by [`watch_input_directory`].
+fn watch_absent_input(
+    watched: &mut BTreeSet<PathBuf>,
+    absent: &Path,
+    out_dirs: &[PathBuf],
+) -> eyre::Result<()> {
+    let Some(parent) = absent.parent().filter(|parent| parent.is_dir()) else {
+        return Ok(());
+    };
+    let identity = parent.canonicalize().wrap_err_with(|| {
+        format!("could not resolve C macro input directory {}", parent.display())
+    })?;
+    let contains_output = |path: &Path| {
+        out_dirs.iter().any(|out_dir| out_dir.starts_with(path) && out_dir.as_path() != path)
+    };
+    if contains_output(parent) || contains_output(&identity) {
+        return Ok(());
+    }
+    watch_input_directory(watched, parent, out_dirs)
+}
+
+/// Find an existing parent to watch when a legacy compiler-search directory has not yet been
+/// created.
 fn existing_directory_ancestor(directory: &Path) -> eyre::Result<PathBuf> {
     directory.ancestors().find(|ancestor| ancestor.is_dir()).map(Path::to_owned).ok_or_else(|| {
         eyre!("no existing ancestor for C macro input directory {}", directory.display())
@@ -2997,7 +3018,8 @@ macro_rules! EXAMPLE {
     /// Compiler lookup records every absent PATH and libclang-adjacent candidate. A candidate
     /// under a missing directory must not escalate to a broad existing ancestor: that would
     /// refuse a project below `$HOME` because the ancestor contains OUT_DIR, or watch `$HOME`
-    /// or `/usr/lib` recursively on every build.
+    /// or `/usr/lib` recursively on every build. An existing parent that contains OUT_DIR is
+    /// not watched either.
     #[test]
     fn absent_candidates_under_missing_directories_do_not_watch_ancestors() {
         let directory = TemporaryDirectory::new();
@@ -3008,11 +3030,18 @@ macro_rules! EXAMPLE {
         fs::create_dir_all(&library_dir).unwrap();
         let path_candidate = home.join("go/bin/clang-18");
         let adjacent_candidate = library_dir.join("bin/clang");
+        // A PATH root such as `.` names the project, whose existing directory contains OUT_DIR.
+        let project_candidate = home.join("extension/clang-18");
         let inputs = BuildInputs {
-            files: vec![path_candidate.clone(), adjacent_candidate.clone()],
+            files: vec![
+                path_candidate.clone(),
+                adjacent_candidate.clone(),
+                project_candidate.clone(),
+            ],
             fingerprints: BTreeMap::from([
                 (path_candidate.clone(), None),
                 (adjacent_candidate.clone(), None),
+                (project_candidate, None),
             ]),
             ..BuildInputs::default()
         };
@@ -3028,7 +3057,10 @@ macro_rules! EXAMPLE {
         assert!(!watched.contains(&home));
     }
 
-    /// Checks that missing search directories watch creation without tracking cargo outputs.
+    /// A missing search directory is watched through its parent when that parent exists, so its
+    /// creation invalidates the profile. Like an absent file, it never escalates to a broader
+    /// ancestor: a missing `-I$HOME/...` root would otherwise refuse a project below `$HOME`,
+    /// whose OUT_DIR that ancestor contains, or make Cargo scan `$HOME` on every build.
     #[test]
     fn missing_search_directories_watch_creation_without_tracking_cargo_outputs() {
         let directory = TemporaryDirectory::new();
@@ -3040,8 +3072,14 @@ macro_rules! EXAMPLE {
         fs::create_dir_all(&external_bin).unwrap();
         let custom_bin = directory.0.join("target/debug/custom-clang/bin");
         fs::create_dir_all(&custom_bin).unwrap();
+        let optional = headers.join("optional");
         let inputs = BuildInputs {
-            directories: vec![headers.join("optional/missing")],
+            directories: vec![
+                headers.join("missing"),
+                optional.join("missing"),
+                directory.0.join("include"),
+                directory.0.join("removed-prefix/include"),
+            ],
             executable_search_directories: vec![external_bin.clone(), custom_bin.clone()],
             ..BuildInputs::default()
         };
@@ -3050,9 +3088,20 @@ macro_rules! EXAMPLE {
         assert!(watched.contains(&headers.canonicalize().unwrap()));
         assert!(watched.contains(&external_bin));
         assert!(watched.contains(&custom_bin), "custom Cargo-target descendants are still inputs");
+        assert!(
+            watched.iter().all(|path| !out_dir.starts_with(path)),
+            "no ancestor of OUT_DIR is an input: {watched:?}"
+        );
+        fs::create_dir(&optional).unwrap();
+        let watched = macro_watch_directories(&inputs, &out_dir).unwrap();
+        assert!(watched.contains(&optional), "an existing parent detects the root's creation");
         let unsafe_inputs =
             BuildInputs { directories: vec![out_dir.clone()], ..BuildInputs::default() };
         let error = macro_watch_directories(&unsafe_inputs, &out_dir).unwrap_err().to_string();
+        assert!(error.contains("overlaps this build's OUT_DIR"));
+        let missing_output =
+            BuildInputs { directories: vec![out_dir.join("include")], ..BuildInputs::default() };
+        let error = macro_watch_directories(&missing_output, &out_dir).unwrap_err().to_string();
         assert!(error.contains("overlaps this build's OUT_DIR"));
         let unsafe_search = BuildInputs {
             executable_search_directories: vec![directory.0.join("missing-toolchain/bin")],

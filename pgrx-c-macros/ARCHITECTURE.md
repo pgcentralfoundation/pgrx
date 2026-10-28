@@ -1627,13 +1627,14 @@ reuse facts solely because the major-version number is unchanged.
 There is no persistent disk cache of semantic analysis results. Cargo avoids
 rerunning an unchanged build script; sessions reuse their immutable phase facts,
 indexes, and batched observations. Stable writes compare final bytes on a
-rerun. Track an absent file through its parent directory so a missing file
-does not make every build dirty and its later creation is still detected. Do
-not climb past a missing parent: the nearest existing ancestor of an absent
-`PATH` root can be `$HOME` or `/`, which Cargo would scan recursively or which
-contains OUT_DIR. The environment values that named such a candidate remain
-tracked instead. An absent include search directory is still tracked through
-its nearest existing ancestor.
+rerun. Track an absent file or include search directory through its parent
+directory so a missing path does not make every build dirty and its later
+creation is still detected. Do not climb past a missing parent: the nearest
+existing ancestor of an absent `PATH` or `-I` root can be `$HOME` or `/`, which
+Cargo would scan recursively. Do not watch a parent that contains OUT_DIR
+either, which would make a project below `$HOME` invalidate its own output; an
+absent input inside OUT_DIR is still refused. The environment values and
+arguments that named such an input remain tracked instead.
 
 Every artifact includes the availability classifier, even when every candidate
 was skipped or the successful macros take no value operands. Operand adapters are
