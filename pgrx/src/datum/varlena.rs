@@ -30,8 +30,17 @@ impl Clone for PallocdVarlena {
     fn clone(&self) -> Self {
         let len = self.len;
 
-        // SAFETY:  we know that `self.ptr` is valid as the only way we could have gotten one
-        // is internally via Postgres
+        // A borrowed varlena can point into a tuple, which stores it at its type's alignment
+        // rather than as a palloc chunk. GetMemoryChunkContext reads the header before a
+        // MAXALIGNed chunk, so reject a pointer that cannot be one instead of reading a header
+        // that is not there.
+        assert!(
+            self.ptr.addr().is_multiple_of(pg_sys::MAXIMUM_ALIGNOF as usize),
+            "cannot find the memory context of a varlena that is not MAXALIGNed"
+        );
+
+        // SAFETY: not established. GetMemoryChunkContext requires a palloc chunk, and a
+        // MAXALIGNed varlena borrowed from a tuple passes the check above without being one.
         let ptr = unsafe {
             PgMemoryContexts::of(self.ptr as void_mut_ptr)
                 .expect("could not determine owning memory context")
