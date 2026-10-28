@@ -100,6 +100,10 @@ pub struct BindingCatalog {
     /// Generated field capabilities, populated by batch lowering from both catalogs.
     #[serde(skip)]
     pub field_capabilities: BTreeMap<String, String>,
+    /// Rejected member projections keyed `record::member`. A member marker is shared by
+    /// name across records, so a known owner must report its own rejection instead.
+    #[serde(skip)]
+    pub field_unavailable: BTreeMap<String, String>,
     /// Offset-only field metadata, independent of load or projection support.
     #[serde(skip)]
     pub offset_capabilities: BTreeMap<String, Option<String>>,
@@ -313,6 +317,7 @@ fn register_adapters(capabilities: &mut BindingCatalog, adapters: &GeneratedAdap
     capabilities.enum_unavailable.extend(adapters.enumerations.unsupported.clone());
     capabilities.function_addresses.extend(adapters.addresses.bindings.clone());
     capabilities.field_capabilities.extend(adapters.fields.markers.clone());
+    capabilities.field_unavailable.extend(adapters.fields.unsupported.clone());
     capabilities.offset_capabilities.extend(adapters.fields.offsets.clone());
     capabilities.offset_unavailable.extend(adapters.fields.offset_unsupported.clone());
     capabilities.functions.extend(adapters.functions.bindings.clone());

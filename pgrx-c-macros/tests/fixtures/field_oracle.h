@@ -10,3 +10,5 @@
 #define READ_ARRAY(p) ((p)->array[1])
 #define SIZE_ARRAY(p) (sizeof((p)->array))
 #define ADDRESS_COUNT(p) (&(p)->count)
+#define READ_PACKED_SIGNAL(p) (((struct VolatilePacked *)(p))->signal)
+#define READ_ALIGNED_SIGNAL(p) (((struct Volatile *)(p))->signal)

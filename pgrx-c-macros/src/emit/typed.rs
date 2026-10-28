@@ -219,6 +219,30 @@ impl<'a> Renderer<'a> {
         Ok(())
     }
 
+    /// Select a named member's marker, reporting a known owner's own rejection first.
+    ///
+    /// Markers are shared by member name across records. When analysis establishes
+    /// the owner, another record's accepted member of the same name cannot stand in
+    /// for this record's rejected projection, which has no capability impl.
+    fn field_marker(&self, base: NodeId, indirect: bool, field: &str) -> Result<String, String> {
+        let owner = self.objects[base].as_ref().and_then(|ty| {
+            if indirect { self.lowering.pointer_pointee(ty).ok() } else { Some(ty.clone()) }
+        });
+        if let Some(owner) = owner.filter(|ty| ty.category == TypeCategory::Record)
+            && let Some(reason) = self
+                .bindings
+                .field_unavailable
+                .get(&format!("{}::{field}", owner.canonical_spelling))
+        {
+            return Err(format!("{field}: {reason}"));
+        }
+        self.bindings
+            .field_capabilities
+            .get(field)
+            .cloned()
+            .ok_or_else(|| format!("{field}: no compiler-checked field adapter is available"))
+    }
+
     /// Preserve each requested context lazily at a recovered macro-call boundary.
     pub(super) fn delegated_argument(&self, root: NodeId, rust: &mut String) {
         let expression = self.analysis.expression.as_ref().expect("candidate expression");
@@ -368,13 +392,18 @@ impl<'a> Renderer<'a> {
                             {
                                 return Err(failure("sizeof a function designator requires a separately verified compiler extension".into()));
                             }
-                            if let ExpressionKind::Member { base, field, field_parameter, .. } =
+                            if let ExpressionKind::Member { base, field, field_parameter, indirect } =
                                 &node.kind
                                 && !self.places[index]
                             {
                                 let marker = match field_parameter {
-                                    Some(parameter) => format!("$crate::__pgrx_c_field_marker!(${})", arguments::name(analysis, *parameter)),
-                                    None => bindings.field_capabilities.get(field).cloned().ok_or_else(|| failure(format!("{field}: no compiler-checked field adapter is available")))?,
+                                    Some(parameter) => format!(
+                                        "$crate::__pgrx_c_field_marker!(${})",
+                                        arguments::name(analysis, *parameter)
+                                    ),
+                                    None => self
+                                        .field_marker(*base, *indirect, field)
+                                        .map_err(failure)?,
                                 };
                                 let checks = arguments::render_safety_checks(analysis);
                                 write!(rust, "{EXPRESSION}::record::size_of_member_type::<{marker}, _>(if false {{ {checks} ::core::option::Option::Some(unsafe {{ ").expect("String output");
@@ -705,8 +734,20 @@ impl<'a> Renderer<'a> {
                         }
                         ExpressionKind::Member { base, field, field_parameter, indirect } => {
                             let marker = match field_parameter {
-                                Some(parameter) => format!("$crate::__pgrx_c_field_marker!(${})", arguments::name(analysis, *parameter)),
-                                None => bindings.field_capabilities.get(field).cloned().ok_or_else(|| skip(analysis, SkipReasonCode::PointerOperation, format!("{field}: no compiler-checked field adapter is available"), Some(node.tokens)))?,
+                                Some(parameter) => format!(
+                                    "$crate::__pgrx_c_field_marker!(${})",
+                                    arguments::name(analysis, *parameter)
+                                ),
+                                None => self.field_marker(*base, *indirect, field).map_err(
+                                    |message| {
+                                        skip(
+                                            analysis,
+                                            SkipReasonCode::PointerOperation,
+                                            message,
+                                            Some(node.tokens),
+                                        )
+                                    },
+                                )?,
                             };
                             let direct_place = self.places[*base];
                             if !*indirect && !direct_place && matches!(context, Context::Value) {

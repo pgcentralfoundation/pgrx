@@ -1174,6 +1174,9 @@ operations selected from validated access facts. Never construct a reference
 to a packed field to get its address. Offset-only capabilities are independent
 from projection and load capabilities. Flexible array and anonymous-member
 relationships require structural validation, not name-based guesses.
+Member markers are shared by name, so a rejected projection is recorded under its
+`record::member` key. When analysis knows the owner record, emission reports that
+rejection instead of borrowing the marker another record's accepted member supplies.
 
 Generate a bitfield capability with this sequence:
 

@@ -29,7 +29,7 @@ mod rust_oracle;
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, BitfieldBinding, EmissionStatus, FieldBinding, MacroScanner,
     RecordBinding, RecordKind, RustBindingType, emit_batch_with_bindings,
-    emit_support_with_bindings, inspect,
+    emit_support_with_bindings, generate_with_bindings, inspect,
 };
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -357,6 +357,49 @@ int main(void) {
         expected,
         "public emission must preserve original C field conversions and evaluation counts"
     );
+}
+
+/// Checks that a rejected member of a known record keeps its own reason.
+///
+/// Field markers are named by member, so `struct Volatile::signal` would otherwise
+/// lend its marker to the rejected unaligned volatile `struct VolatilePacked::signal`.
+#[test]
+fn rejected_member_of_a_known_record_keeps_its_rejection_reason() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let header = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/field_oracle.h");
+    let arguments = arguments();
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let frontend = inspect(&scanner, &header, &arguments, None).unwrap();
+    let names = ["READ_PACKED_SIGNAL", "READ_ALIGNED_SIGNAL"];
+    let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
+    let rust_bindings = bindgen::Builder::default()
+        .header(header.to_str().unwrap())
+        .clang_args(&arguments)
+        .allowlist_type("Volatile|VolatilePacked")
+        .derive_default(false)
+        .layout_tests(false)
+        .generate()
+        .unwrap()
+        .to_string();
+    let bindings = catalog(&rust_bindings);
+    for selected in [&names[..], &names[..1]] {
+        let generated = generate_with_bindings(&session, selected, &bindings).unwrap();
+        for emission in generated.macros {
+            match (emission.analysis.name.as_str(), emission.status) {
+                ("READ_ALIGNED_SIGNAL", EmissionStatus::Emitted { .. }) => {}
+                ("READ_PACKED_SIGNAL", EmissionStatus::Skipped { reason }) => assert!(
+                    reason.message.contains("unaligned volatile field access"),
+                    "the record's own rejection must explain the skip: {reason:?}"
+                ),
+                (name, EmissionStatus::Emitted { .. }) => {
+                    panic!("{name} must be refused with its record's own reason")
+                }
+                (name, EmissionStatus::Skipped { reason }) => {
+                    panic!("{name} must emit: {reason:?}")
+                }
+            }
+        }
+    }
 }
 
 /// Checks that generated bitfield accessors match original C with uninitialized neighbor bits.
