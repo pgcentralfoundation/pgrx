@@ -36,97 +36,111 @@ pub fn postgres_clang_flags(flags: &str, msvc: bool) -> Result<Vec<String>, Fron
     let mut arguments = arguments.iter();
     let mut translated = Vec::new();
     while let Some(argument) = arguments.next() {
-        let Some(option) = argument.strip_prefix('/').or_else(|| argument.strip_prefix('-')) else {
-            return Err(unsupported_msvc_flag(argument));
-        };
-        if let Some((prefix, output)) = [("FI", "-include"), ("D", "-D"), ("U", "-U"), ("I", "-I")]
-            .into_iter()
-            .find(|(prefix, _)| option.starts_with(prefix))
-        {
-            let attached = &option[prefix.len()..];
-            let value = if attached.is_empty() {
-                arguments.next().map(String::as_str).unwrap_or_default()
-            } else {
-                attached
-            };
-            if value.is_empty() {
-                return Err(FrontendError::Arguments(format!(
-                    "recorded MSVC option {argument:?} requires an operand"
-                )));
-            }
-            if output == "-include" {
-                translated.extend([output.into(), value.into()]);
-            } else {
-                // Attached Clang operands retain filenames/definitions verbatim
-                // and cannot become additional driver options.
-                translated.push(format!("{output}{value}"));
-            }
-            continue;
-        }
-        let mapped: &[&str] = match option {
-            "MD" => &["-fms-runtime-lib=dll"],
-            "MDd" => &["-fms-runtime-lib=dll_dbg"],
-            "MT" => &["-fms-runtime-lib=static"],
-            "MTd" => &["-fms-runtime-lib=static_dbg"],
-            "J" => &["-funsigned-char"],
-            "Zp" | "Zp1" => &["-fpack-struct=1"],
-            "Zp2" => &["-fpack-struct=2"],
-            "Zp4" => &["-fpack-struct=4"],
-            "Zp8" => &["-fpack-struct=8"],
-            "Zp16" => &["-fpack-struct=16"],
-            "Od" => &["-O0"],
-            "O1" => &["-Os", "-fomit-frame-pointer", "-ffunction-sections"],
-            "O2" => &["-O3", "-fomit-frame-pointer", "-ffunction-sections"],
-            "Ox" => &["-O3", "-fomit-frame-pointer"],
-            "Os" => &["-Os"],
-            "Ot" => &["-O3"],
-            "Ob0" => &["-fno-inline"],
-            "Ob1" => &["-finline-hint-functions"],
-            "Ob2" | "Ob3" => &["-finline-functions"],
-            "Oi" => &["-fbuiltin"],
-            "Oi-" => &["-fno-builtin"],
-            "Oy" => &["-fomit-frame-pointer"],
-            "Oy-" => &["-fno-omit-frame-pointer"],
-            "Gy" => &["-ffunction-sections"],
-            "Gy-" => &["-fno-function-sections"],
-            "GS" => &["-fstack-protector-strong"],
-            "GS-" => &["-fno-stack-protector"],
-            // Clang's MSVC driver implements disabled string pooling by making
-            // literals writable. Preserve that mode for the profile to refuse.
-            "GF" => &["-fno-writable-strings"],
-            "GF-" => &["-fwritable-strings"],
-            "Zi" | "Z7" => &["-gcodeview"],
-            "TC" => &["-x", "c"],
-            "std:c11" => &["-std=c11"],
-            "std:c17" => &["-std=c17"],
-            // Warning levels, severity, diagnostic format, and the startup
-            // banner change reports only, not preprocessing or C semantics.
-            "W0"
-            | "W1"
-            | "W2"
-            | "W3"
-            | "W4"
-            | "Wall"
-            | "WX"
-            | "WX-"
-            | "w"
-            | "nologo"
-            | "diagnostics:caret"
-            | "diagnostics:column"
-            | "diagnostics:classic" => &[],
-            _ if ["wd", "we", "wo"].into_iter().any(|prefix| {
-                option.strip_prefix(prefix).is_some_and(|number| {
-                    !number.is_empty() && number.bytes().all(|byte| byte.is_ascii_digit())
-                })
-            }) =>
-            {
-                &[]
-            }
-            _ => return Err(unsupported_msvc_flag(argument)),
-        };
-        translated.extend(mapped.iter().map(|argument| (*argument).to_owned()));
+        translate_msvc_option(argument, &mut arguments, &mut translated)?;
     }
     Ok(translated)
+}
+
+/// Translate one CL option, spelled with its `/` or `-` prefix, to GNU-style Clang arguments.
+///
+/// A preprocessing option without an attached operand consumes the next argument. This is the
+/// only reviewed CL table: recorded fragments and raw CL switches in an explicit inspection argv
+/// both use it, so one option cannot select different C modes through different entry points.
+pub(crate) fn translate_msvc_option<'a>(
+    argument: &str,
+    operands: &mut impl Iterator<Item = &'a String>,
+    translated: &mut Vec<String>,
+) -> Result<(), FrontendError> {
+    let Some(option) = argument.strip_prefix('/').or_else(|| argument.strip_prefix('-')) else {
+        return Err(unsupported_msvc_flag(argument));
+    };
+    if let Some((prefix, output)) = [("FI", "-include"), ("D", "-D"), ("U", "-U"), ("I", "-I")]
+        .into_iter()
+        .find(|(prefix, _)| option.starts_with(prefix))
+    {
+        let attached = &option[prefix.len()..];
+        let value = if attached.is_empty() {
+            operands.next().map(String::as_str).unwrap_or_default()
+        } else {
+            attached
+        };
+        if value.is_empty() {
+            return Err(FrontendError::Arguments(format!(
+                "MSVC option {argument:?} requires an operand"
+            )));
+        }
+        if output == "-include" {
+            translated.extend([output.into(), value.into()]);
+        } else {
+            // Attached Clang operands retain filenames/definitions verbatim
+            // and cannot become additional driver options.
+            translated.push(format!("{output}{value}"));
+        }
+        return Ok(());
+    }
+    let mapped: &[&str] = match option {
+        "MD" => &["-fms-runtime-lib=dll"],
+        "MDd" => &["-fms-runtime-lib=dll_dbg"],
+        "MT" => &["-fms-runtime-lib=static"],
+        "MTd" => &["-fms-runtime-lib=static_dbg"],
+        "J" => &["-funsigned-char"],
+        "Zp" | "Zp1" => &["-fpack-struct=1"],
+        "Zp2" => &["-fpack-struct=2"],
+        "Zp4" => &["-fpack-struct=4"],
+        "Zp8" => &["-fpack-struct=8"],
+        "Zp16" => &["-fpack-struct=16"],
+        "Od" => &["-O0"],
+        "O1" => &["-Os", "-fomit-frame-pointer", "-ffunction-sections"],
+        "O2" => &["-O3", "-fomit-frame-pointer", "-ffunction-sections"],
+        "Ox" => &["-O3", "-fomit-frame-pointer"],
+        "Os" => &["-Os"],
+        "Ot" => &["-O3"],
+        "Ob0" => &["-fno-inline"],
+        "Ob1" => &["-finline-hint-functions"],
+        "Ob2" | "Ob3" => &["-finline-functions"],
+        "Oi" => &["-fbuiltin"],
+        "Oi-" => &["-fno-builtin"],
+        "Oy" => &["-fomit-frame-pointer"],
+        "Oy-" => &["-fno-omit-frame-pointer"],
+        "Gy" => &["-ffunction-sections"],
+        "Gy-" => &["-fno-function-sections"],
+        "GS" => &["-fstack-protector-strong"],
+        "GS-" => &["-fno-stack-protector"],
+        // Clang's MSVC driver implements disabled string pooling by making
+        // literals writable. Preserve that mode for the profile to refuse.
+        "GF" => &["-fno-writable-strings"],
+        "GF-" => &["-fwritable-strings"],
+        "Zi" | "Z7" => &["-gcodeview"],
+        "TC" => &["-x", "c"],
+        "std:c11" => &["-std=c11"],
+        "std:c17" => &["-std=c17"],
+        // Warning levels, severity, diagnostic format, and the startup
+        // banner change reports only, not preprocessing or C semantics.
+        "W0"
+        | "W1"
+        | "W2"
+        | "W3"
+        | "W4"
+        | "Wall"
+        | "WX"
+        | "WX-"
+        | "w"
+        | "nologo"
+        | "diagnostics:caret"
+        | "diagnostics:column"
+        | "diagnostics:classic" => &[],
+        _ if ["wd", "we", "wo"].into_iter().any(|prefix| {
+            option.strip_prefix(prefix).is_some_and(|number| {
+                !number.is_empty() && number.bytes().all(|byte| byte.is_ascii_digit())
+            })
+        }) =>
+        {
+            &[]
+        }
+        _ => return Err(unsupported_msvc_flag(argument)),
+    };
+    translated.extend(mapped.iter().map(|argument| (*argument).to_owned()));
+    Ok(())
 }
 
 /// Lower explicit CRT choices for the GNU-style driver on a selected MSVC target.
@@ -298,7 +312,7 @@ fn runtime_companion_has_no_operand(argument: &str) -> bool {
 /// Explain a refused option without silently discarding an unknown compiler mode.
 fn unsupported_msvc_flag(argument: &str) -> FrontendError {
     FrontendError::Arguments(format!(
-        "recorded MSVC option {argument:?} has no verified GNU-style Clang translation"
+        "MSVC option {argument:?} has no verified GNU-style Clang translation"
     ))
 }
 

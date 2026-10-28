@@ -2689,8 +2689,9 @@ pub(crate) fn prepare_arguments(arguments: &[String]) -> Result<Vec<String>, Fro
 }
 
 /// Normalize the narrowly supported preprocessor forwarding forms used by packaged PostgreSQL.
-/// Every forwarded definition still passes the protected target-fact checks; other preprocessor
-/// actions remain refused rather than silently changing the inspected inputs.
+/// Raw CL switches on a Windows profile use the reviewed recorded-flag translation. Every forwarded
+/// definition still passes the protected target-fact checks; other preprocessor actions remain
+/// refused rather than silently changing the inspected inputs.
 fn normalize_arguments(arguments: &[String]) -> Result<Vec<String>, FrontendError> {
     let mut normalized = Vec::with_capacity(arguments.len());
     let windows = cfg!(windows)
@@ -2709,43 +2710,13 @@ fn normalize_arguments(arguments: &[String]) -> Result<Vec<String>, FrontendErro
             }
             continue;
         }
+        // GNU-style options keep their Clang meaning; only slash spellings are CL switches here.
         if windows && argument.starts_with('/') {
-            if let Some((operation, value)) = ["/D", "/U", "/I"]
-                .into_iter()
-                .find_map(|prefix| argument.strip_prefix(prefix).map(|value| (prefix, value)))
-            {
-                let value = if value.is_empty() {
-                    arguments
-                        .next()
-                        .ok_or_else(|| {
-                            FrontendError::Arguments(format!("{operation} requires a value"))
-                        })?
-                        .as_str()
-                } else {
-                    value
-                };
-                normalized.push(format!("-{}{value}", &operation[1..]));
-                continue;
-            }
-            let translated = match argument.as_str() {
-                "/nologo" | "/TC" => None,
-                "/O1" => Some("-Os"),
-                "/O2" => Some("-O2"),
-                "/Od" => Some("-O0"),
-                "/J" => Some("-funsigned-char"),
-                "/MD" => Some("-fms-runtime-lib=dll"),
-                "/MDd" => Some("-fms-runtime-lib=dll_dbg"),
-                "/MT" => Some("-fms-runtime-lib=static"),
-                "/MTd" => Some("-fms-runtime-lib=static_dbg"),
-                "/std:c11" => Some("-std=c11"),
-                "/std:c17" => Some("-std=c17"),
-                _ => {
-                    return Err(FrontendError::Arguments(format!(
-                        "{argument} is an unmodeled MSVC compiler option"
-                    )));
-                }
-            };
-            normalized.extend(translated.map(str::to_owned));
+            crate::postgres_flags::translate_msvc_option(
+                argument,
+                &mut arguments,
+                &mut normalized,
+            )?;
             continue;
         }
         let Some(forwarded) = argument.strip_prefix("-Wp,") else {
@@ -2963,10 +2934,14 @@ mod tests {
                 "-DNAME=73",
                 "-UOLD",
                 r"-IC:\Program Files\Postgres\include",
-                "-O2",
+                "-O3",
+                "-fomit-frame-pointer",
+                "-ffunction-sections",
                 "-funsigned-char",
                 "-fms-runtime-lib=dll",
                 "-std=c17",
+                "-x",
+                "c",
                 "-I",
                 "/Data/include"
             ]
@@ -2989,6 +2964,20 @@ mod tests {
             )
             .is_err()
         );
+    }
+
+    /// Meson-built MSVC PostgreSQL records warning switches such as `/wd4018` in CFLAGS. Raw CL
+    /// switches must use the same reviewed table as recorded flags instead of a narrower copy.
+    #[test]
+    fn raw_msvc_switches_use_the_recorded_flag_translation() {
+        let recorded = r"/wd4018 /wd4244 /W3 /O2 /Zi /DWIN32 /I C:\pg\include /nologo";
+        let raw = std::iter::once("--target=x86_64-pc-windows-msvc".to_owned())
+            .chain(crate::split_recorded_cflags(recorded, true).unwrap().unwrap())
+            .collect::<Vec<_>>();
+        let mut expected = vec!["--target=x86_64-pc-windows-msvc".to_owned()];
+        expected.extend(crate::postgres_clang_flags(recorded, true).unwrap());
+        assert_eq!(normalize_arguments(&raw).unwrap(), expected);
+        validate_arguments(&expected).unwrap();
     }
 
     /// Raw CL runtime controls fold after base normalization, preserving forwarded user overrides

@@ -709,6 +709,9 @@ fn recorded_windows_controls_match_original_clang_cl_c_observations() {
         "/J",
         "/MD",
         "/std:c17",
+        // Meson-built MSVC PostgreSQL records warning controls in CFLAGS.
+        "/W3",
+        "/wd4018",
     ]
     .map(str::to_owned);
     let frontend = inspect(&scanner, &header, &arguments, None).unwrap();

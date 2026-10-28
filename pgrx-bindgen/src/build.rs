@@ -1295,7 +1295,7 @@ fn run_bindgen(
                 let flags =
                     flags.to_str().ok_or_else(|| eyre!("PostgreSQL CPPFLAGS are not UTF-8"))?;
                 macro_arguments
-                    .extend(pgrx_c_macros::split_recorded_cflags(flags, true)?.unwrap_or_default());
+                    .extend(recorded_macro_flags(flags, env_tracked)?.unwrap_or_default());
             }
             macro_arguments.extend_from_slice(&arguments);
             generate_macros(
@@ -2064,12 +2064,28 @@ fn postgres_cflags(pg_config: &PgConfig) -> eyre::Result<(Vec<String>, bool)> {
         return Ok((Vec::new(), false));
     };
     let flags = flags.to_str().ok_or_else(|| eyre!("PostgreSQL CFLAGS are not UTF-8"))?;
-    let windows = env_tracked("CARGO_CFG_TARGET_OS").as_deref() == Some("windows");
-    let flags = pgrx_c_macros::split_recorded_cflags(flags, windows)?;
-    Ok(match flags {
+    Ok(match recorded_macro_flags(flags, env_tracked)? {
         Some(flags) => (flags, true),
         None => (Vec::new(), false),
     })
+}
+
+/// Decode one recorded CFLAGS or CPPFLAGS fragment for the macro profile; `None` means the
+/// installation did not record flags. MSVC fragments contain CL switches such as meson's
+/// `/wd4018`. Translate them with the reviewed table the CLI also uses, so both inspections see
+/// the same GNU-style Clang arguments.
+fn recorded_macro_flags(
+    flags: &str,
+    lookup: impl Fn(&str) -> Option<String>,
+) -> eyre::Result<Option<Vec<String>>> {
+    let windows = lookup("CARGO_CFG_TARGET_OS").as_deref() == Some("windows");
+    let Some(arguments) = pgrx_c_macros::split_recorded_cflags(flags, windows)? else {
+        return Ok(None);
+    };
+    if lookup("CARGO_CFG_TARGET_ENV").as_deref() == Some("msvc") {
+        return Ok(Some(pgrx_c_macros::postgres_clang_flags(flags, true)?));
+    }
+    Ok(Some(arguments))
 }
 
 /// Preserve the established ordinary binding arguments independently of optional macro
@@ -2396,6 +2412,30 @@ macro_rules! EXAMPLE {
             resolve(&values),
             ["-I'unterminated"],
             "bindgen preserves malformed quoting as one argument"
+        );
+    }
+
+    /// Meson-built MSVC PostgreSQL records CL warning switches in CFLAGS. The build inspection
+    /// decodes them with the CLI's reviewed translation instead of passing raw CL switches on.
+    #[test]
+    fn recorded_msvc_macro_flags_use_the_reviewed_cl_translation() {
+        let target = |os: &'static str, env: &'static str| {
+            move |name: &str| match name {
+                "CARGO_CFG_TARGET_OS" => Some(os.to_owned()),
+                "CARGO_CFG_TARGET_ENV" => Some(env.to_owned()),
+                _ => None,
+            }
+        };
+        let recorded = "-O2 /W3 /wd4018 /wd4244 /DWIN32";
+        let decoded = recorded_macro_flags(recorded, target("windows", "msvc")).unwrap().unwrap();
+        assert_eq!(decoded, ["-O3", "-fomit-frame-pointer", "-ffunction-sections", "-DWIN32"]);
+        assert_eq!(decoded, pgrx_c_macros::postgres_clang_flags(recorded, true).unwrap());
+        assert_eq!(recorded_macro_flags("/W3", target("windows", "msvc")).unwrap(), Some(vec![]));
+        assert_eq!(recorded_macro_flags("not recorded", target("windows", "msvc")).unwrap(), None);
+        assert!(recorded_macro_flags("/unknown", target("windows", "msvc")).is_err());
+        assert_eq!(
+            recorded_macro_flags("-I'/a b' -O2", target("linux", "gnu")).unwrap().unwrap(),
+            ["-I/a b", "-O2"]
         );
     }
 

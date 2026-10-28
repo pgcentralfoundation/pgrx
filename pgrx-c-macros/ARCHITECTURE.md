@@ -240,9 +240,11 @@ settings. Classify known semantic flags explicitly. Unknown semantic settings
 remain visible in `unsupported_options`; generation must not guess their effect.
 Recorded MSVC fragments use Windows argument quoting rather than POSIX shell
 escaping. Translate only reviewed options to GNU-style Clang semantics; refuse
-unknown options instead of dropping a potentially relevant mode. This supports
-a checked x86_64 Windows/MSVC LLP64 family, not arbitrary Windows compilers or
-proof of backend execution on that platform.
+unknown options instead of dropping a potentially relevant mode. The CLI and
+build integration decode recorded fragments with the same function, and raw
+slash-spelled CL switches in an explicit Windows argv use the same table. This
+supports a checked x86_64 Windows/MSVC LLP64 family, not arbitrary Windows
+compilers or proof of backend execution on that platform.
 
 Runtime options are ordered intermediate markers until the complete MSVC argv
 has been assembled. `lower_msvc_runtime_flags` selects its final `/MD[d]` or
