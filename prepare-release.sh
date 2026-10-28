@@ -44,6 +44,9 @@ else
     # sanity check the diffs, but not Cargo.lock files cuz ugh
     # git diff -- . ':(exclude)Cargo.lock'
 
+    # the C macro documentation snapshot can gain files, which `commit -a` skips
+    git add -A pgrx-pg-sys/src/include || exit $?
+
     # send it all to github
     git commit -a -m "Update version to ${NEW_VERSION}" || exit $?
     git push --set-upstream origin "prepare-${NEW_VERSION}" || exit $?
