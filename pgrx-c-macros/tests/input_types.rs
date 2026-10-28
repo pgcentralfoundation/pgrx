@@ -304,6 +304,11 @@ fn cross_target_profiles_preserve_c_integer_ranks_sizes_and_pointer_differences(
             )
             .is_empty()
         );
+        // Rustup ships no standard library for this tier-3 target, so the
+        // Rust type check below could never run; only its C facts are checked.
+        if target == "i686-unknown-openbsd" {
+            continue;
+        }
         rust.push_str(&format!(
             "use __pgrx_c_macros::*;\n\
              const _: () = assert!(core::mem::size_of::<<CLong as CInteger>::Repr>() == {long_bytes});\n\
