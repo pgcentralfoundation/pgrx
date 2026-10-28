@@ -12,9 +12,13 @@ use walkdir::{DirEntry, WalkDir};
 /// This will pull in builtin headers, but rust-bindgen uses a $CLANG_PATH lookup from clang-sys
 /// which is not guaranteed to find the clang that uses the $LIBCLANG_PATH that bindgen intends.
 ///
+/// `target_arguments` select the Cargo target, sysroot and toolchain when asking that clang
+/// for its search paths. Without them a cross build would receive the host's system headers.
+///
 /// Returns the set of paths to include.
 pub(crate) fn detect_include_paths_for(
     preferred_clang: Option<&std::path::Path>,
+    target_arguments: &[String],
 ) -> (bool, Vec<PathBuf>) {
     if target_env_tracked("PGRX_BINDGEN_NO_DETECT_INCLUDES").is_some() {
         return (false, vec![]);
@@ -39,7 +43,7 @@ pub(crate) fn detect_include_paths_for(
     // Unfortunately, the responses from clang-sys include clangs from far-off paths,
     // so we can only use clangs that match bindgen's libclang major version.
     if let Some(ClangSys { path, version: Some(v), c_search_paths, .. }) =
-        ClangSys::find(preferred_clang, &[])
+        ClangSys::find(preferred_clang, target_arguments)
         && Some(&*path) == preferred_clang
         && v.Major as u32 == clang_major
     {

@@ -1173,7 +1173,11 @@ fn run_bindgen(
     eprintln!("Preferred Clang = {preferred_clang:?}");
     let pg_target_includes = pg_target_includes(major_version, pg_config)?;
     eprintln!("pg_target_includes = {pg_target_includes:?}");
-    let (autodetect, includes) = clang::detect_include_paths_for(preferred_clang);
+    let environment_arguments = bindgen_environment_arguments(env_tracked);
+    let (autodetect, includes) = clang::detect_include_paths_for(
+        preferred_clang,
+        &include_search_arguments(&target, &environment_arguments),
+    );
     let mut binder = bindgen::Builder::default();
     binder = add_blocklists(binder, major_version);
     binder = add_allowlists(binder, pg_target_includes.iter().map(|x| x.as_str()));
@@ -1190,7 +1194,6 @@ fn run_bindgen(
     }
     arguments.extend(extra_bindgen_clang_args(pg_config)?);
     arguments.extend(pg_target_includes.iter().map(|include| format!("-I{include}")));
-    let environment_arguments = bindgen_environment_arguments(env_tracked);
     // Make bindgen's otherwise implicit Cargo target explicit for both inspections.
     if !has_explicit_clang_target(arguments.iter().chain(&environment_arguments)) {
         arguments.insert(0, format!("--target={}", clang_target(&target)));
@@ -1573,6 +1576,29 @@ fn has_explicit_clang_target<'a>(arguments: impl Iterator<Item = &'a String>) ->
         }
     }
     false
+}
+
+/// Select the arguments that make Clang report the target's system search paths: Cargo's
+/// target unless one is explicit, plus the environment's sysroot and toolchain arguments.
+/// Include directories are removed with bindgen 0.72's own detection filter, so they are
+/// not reported back as system paths.
+fn include_search_arguments(target: &str, environment_arguments: &[String]) -> Vec<String> {
+    let mut arguments = Vec::with_capacity(environment_arguments.len() + 1);
+    let mut include_value = false;
+    for argument in environment_arguments {
+        if std::mem::take(&mut include_value) {
+            continue;
+        }
+        if argument == "-I" || argument == "--include-directory" {
+            include_value = true;
+        } else if !argument.starts_with("-I") && !argument.starts_with("--include-directory=") {
+            arguments.push(argument.clone());
+        }
+    }
+    if !has_explicit_clang_target(arguments.iter()) {
+        arguments.insert(0, format!("--target={}", clang_target(target)));
+    }
+    arguments
 }
 
 // Bindgen applies these target spelling conversions before giving Cargo's target
@@ -2227,6 +2253,48 @@ macro_rules! EXAMPLE {
         }
         let missing = ["-target".to_owned()];
         assert!(!has_explicit_clang_target(missing.iter()));
+    }
+
+    /// Include detection receives the target, sysroot and toolchain arguments, but no include
+    /// directory, in either spelling, that Clang would echo back as a system search path.
+    #[test]
+    fn include_search_arguments_match_bindgen_filter() {
+        let arguments = |values: &[&str]| -> Vec<String> {
+            values.iter().map(|&value| value.to_owned()).collect()
+        };
+        let environment = arguments(&[
+            "--sysroot=/sysroots/aarch64",
+            "-I",
+            "/separate/include",
+            "-I/joined/include",
+            "--include-directory",
+            "/long/include",
+            "--include-directory=/long/joined",
+            "-isystem",
+            "/target/include",
+            "-ccc-gcc-name",
+            "aarch64-linux-gnu-gcc",
+        ]);
+        assert_eq!(
+            include_search_arguments("aarch64-unknown-linux-gnu", &environment),
+            arguments(&[
+                "--target=aarch64-unknown-linux-gnu",
+                "--sysroot=/sysroots/aarch64",
+                "-isystem",
+                "/target/include",
+                "-ccc-gcc-name",
+                "aarch64-linux-gnu-gcc",
+            ])
+        );
+        assert_eq!(
+            include_search_arguments("aarch64-apple-darwin", &[]),
+            ["--target=arm64-apple-darwin"],
+            "Cargo's target uses bindgen's Clang spelling"
+        );
+        for explicit in [&["--target=armv7-unknown-linux-gnueabihf"][..], &["-target", "armv7"]] {
+            let explicit = arguments(explicit);
+            assert_eq!(include_search_arguments("aarch64-unknown-linux-gnu", &explicit), explicit);
+        }
     }
 
     /// Checks that unchanged generated artifacts keep their modification time.
