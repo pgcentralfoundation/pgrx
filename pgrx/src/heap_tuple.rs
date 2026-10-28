@@ -562,6 +562,10 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
     /// A `PgBox<T>` is a copy of the attribute's first `size_of::<T>()` bytes in
     /// `CurrentMemoryContext`, because the tuple frees its memory when it drops or when an
     /// attribute is set. A `T` that borrows, such as `&'tup str`, keeps the tuple borrowed.
+    /// Such a `T` can also point into a copy that reading allocates in `CurrentMemoryContext`,
+    /// as `&str` does for a compressed or out-of-line value, and `'tup` does not keep that copy
+    /// alive. Do not use it after that context is reset or deleted, for example after returning
+    /// it out of `Spi::connect`.
     ///
     /// ## Errors
     /// - return [`TryFromDatumError::NoSuchAttributeNumber`] if the attribute does not exist
@@ -610,6 +614,9 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
         // SAFETY: the datum is this attribute's value, of type `att.atttypid`. It lives as long as
         // the tuple and descriptor that `self` holds and `'tup` borrows: on PG15.0-15.4, a
         // missing value points into the descriptor. A `T` that names `'tup` keeps them borrowed.
+        // This does not cover a copy that the conversion allocates in CurrentMemoryContext, such
+        // as a detoasted `&str`: `'tup` does not bound that context, so a borrowed `T` can
+        // outlive the copy it points into. That is a known gap, documented on this method.
         // Any other `T` must not point into the datum, as UnboxDatum's safety section requires,
         // unless it sets POINTS_INTO_DATUM, and then from_datum_in_memory_context copies it into
         // CurrentMemoryContext. `typoid` is RECORDOID only when that type is a row type, whose

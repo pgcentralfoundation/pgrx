@@ -84,8 +84,10 @@ pub unsafe fn composite_row_type_make_tuple(
 ///
 /// A pass-by-reference result can point into the tuple. On PostgreSQL 15.0 through 15.4, a
 /// missing value can also point into `tupdesc`, which frees it with the descriptor; later
-/// releases return a copy that lasts until the backend exits. `T` must not outlive the tuple's
-/// memory or the descriptor.
+/// releases return a copy that lasts until the backend exits. A `T` that borrows can also point
+/// into a copy that reading allocates in `CurrentMemoryContext` at the call, as `&str` does for
+/// a compressed or out-of-line value. `T` must not outlive the tuple's memory, the descriptor,
+/// or that context.
 ///
 /// # Panics
 ///
@@ -276,8 +278,10 @@ impl DatumWithTypeInfo {
     /// Unless `is_null` is true, `datum` must be a valid value of type `typoid`, and `T` must be
     /// able to read it. A pass-by-reference value must still be live: one that
     /// [`heap_getattr_datum_ex()`] returned can point into the tuple or, on PostgreSQL 15.0
-    /// through 15.4, into its descriptor, and is valid only while both are. `T` must not
-    /// outlive that memory. The call must run on the PostgreSQL backend thread.
+    /// through 15.4, into its descriptor, and is valid only while both are. A `T` that borrows
+    /// can also point into a copy that reading allocates in `CurrentMemoryContext` at the call,
+    /// as `&str` does for a compressed or out-of-line value. `T` must not outlive that memory or
+    /// that context. The call must run on the PostgreSQL backend thread.
     ///
     /// # Panics
     ///
