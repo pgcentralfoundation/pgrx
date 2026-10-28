@@ -178,6 +178,25 @@ fn compiler_catalog_retains_type_edges_signatures_and_record_layout() {
     assert!(anonymous.is_anonymous);
     assert!(catalog.records[&anonymous.ty.canonical_spelling].is_anonymous);
     assert_eq!(catalog.records[&anonymous.ty.canonical_spelling].kind, RecordKind::Union);
+    // Only C11 anonymous members are anonymous. A named member, a pointer, or an array of an
+    // unnamed record type declares that record inline but is an ordinary named field.
+    let named = &catalog.records["union FrontNamedMembers"];
+    assert_eq!(
+        named.fields.iter().map(|field| field.name.as_deref()).collect::<Vec<_>>(),
+        [Some("four_byte"), Some("compressed")]
+    );
+    assert!(named.fields.iter().all(|field| !field.is_anonymous));
+    let mixed = &catalog.records["struct FrontMixedMembers"];
+    assert_eq!(
+        mixed.fields.iter().map(|field| field.name.as_deref()).collect::<Vec<_>>(),
+        [Some("tag"), None, Some("pointer_member"), Some("array_member")]
+    );
+    let anonymous = mixed.fields.iter().find(|field| field.is_anonymous).unwrap();
+    let union = &catalog.records[&anonymous.ty.canonical_spelling];
+    assert_eq!(
+        union.fields.iter().map(|field| field.name.as_deref()).collect::<Vec<_>>(),
+        [Some("named"), Some("other")]
+    );
     assert_eq!(catalog.records["struct FrontIncomplete"].size, None);
     assert!(catalog.records["struct FrontIncomplete"].fields.is_empty());
 

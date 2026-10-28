@@ -214,8 +214,17 @@ impl<'tu> Collector<'_, 'tu> {
         };
         let identity =
             declaration.get_usr().map(|usr| usr.0).unwrap_or_else(|| spelling.to_owned());
+        let children = declaration.get_children();
+        // A field whose type is an unnamed record defines that record inline. Since libclang 9,
+        // `is_anonymous` is true for every unnamed record, so only one that no field names is a
+        // C11 anonymous member.
+        let named_records = children
+            .iter()
+            .filter(|child| child.get_kind() == EntityKind::FieldDecl)
+            .filter_map(|field| field.get_type().and_then(inline_record))
+            .collect::<Vec<_>>();
         let mut fields = Vec::new();
-        for field in declaration.get_children() {
+        for field in children {
             if field.get_kind() == EntityKind::FieldDecl {
                 let Some(field_type) = field.get_type() else { continue };
                 self.pending.push(field_type);
@@ -230,6 +239,7 @@ impl<'tu> Collector<'_, 'tu> {
                 });
             } else if matches!(field.get_kind(), EntityKind::StructDecl | EntityKind::UnionDecl)
                 && field.is_anonymous()
+                && !named_records.contains(&field.get_canonical_entity())
             {
                 // libclang hides the implicit FieldDecl of a C11 anonymous member.
                 // Recover its placement from compiler offsets of promoted member names.
@@ -290,6 +300,22 @@ fn anonymous_offset(owner: Type<'_>, member: Type<'_>) -> Option<u64> {
         let inner = member.get_offsetof(&name).ok()?;
         outer.checked_sub(inner).map(|offset| offset as u64)
     })
+}
+
+/// The canonical declaration of the record a field type names through pointers and arrays.
+fn inline_record(mut ty: Type<'_>) -> Option<Entity<'_>> {
+    for _ in 0..64 {
+        ty = match ty.get_kind() {
+            TypeKind::Elaborated => ty.get_elaborated_type()?,
+            TypeKind::Pointer => ty.get_pointee_type()?,
+            TypeKind::ConstantArray | TypeKind::IncompleteArray | TypeKind::VariableArray => {
+                ty.get_element_type()?
+            }
+            TypeKind::Record => return Some(ty.get_declaration()?.get_canonical_entity()),
+            _ => return None,
+        };
+    }
+    None
 }
 
 /// Follow only typedef and elaborated wrappers, preserving attributes and aliases on nested

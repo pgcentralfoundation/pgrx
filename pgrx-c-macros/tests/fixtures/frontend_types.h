@@ -38,6 +38,22 @@ extern FrontCallbackPointer front_callback;
 extern FrontArray front_array;
 extern FrontIncompleteArray front_incomplete_array;
 
+/* Named members of unnamed record types, as in PostgreSQL's varattrib_4b, are ordinary fields. */
+union FrontNamedMembers {
+    struct { unsigned int header; unsigned int info; } four_byte;
+    struct { unsigned int header; char data[1]; } compressed;
+};
+
+struct FrontMixedMembers {
+    int tag;
+    union { struct { int inner; } named; int other; };
+    struct { int a; } *pointer_member;
+    struct { int b; } array_member[2];
+};
+
+extern union FrontNamedMembers front_named_members;
+extern struct FrontMixedMembers front_mixed_members;
+
 struct __attribute__((packed)) FrontPacked {
     unsigned char tag;
     unsigned int value;
