@@ -1365,6 +1365,12 @@ classifier, and compile the ordinary C shim when enabled. No native macro
 linkage is published on that path. Unsupported target families and
 `PGRX_C_MACROS=0` skip inspection altogether. Compiler inspection is still
 required for a successful macro artifact; fallback never guesses C semantics.
+Cargo caches the unavailable result like any other build-script output, so a
+refusal must remain invalidated by what it examined. `CompilerUnavailable`
+carries the candidates and environment of the failed compiler lookup, and the
+build tracks them before publishing the refusal. A successful inspection's
+inputs are tracked before the later optional phases run, so a refusal from those
+phases is invalidated by the same changes as a generated tree.
 
 The loaded libclang wrapper permits one live runtime owner in a process. The
 build serializes scanner/bindgen inspection around that ownership constraint,
@@ -1554,6 +1560,7 @@ generate(version, extra_arguments):
         return
     arguments = recorded_arguments_then_overrides(installation, extra_arguments)
     frontend = inspect_matching_driver_and_libclang(wrapper(version), arguments)
+    track_cargo_inputs(frontend.inputs)
     macros = final_active_postgres_function_macro_names(frontend)
     objects = owned_variable_dependent_object_roots(frontend)
     inlines = owned_compiler_proven_static_inline_names(frontend)
@@ -1593,7 +1600,6 @@ generate(version, extra_arguments):
     publish_verified_native_linkage_if_present(support)
     format_stage_and_publish(files, final_rust, record)
     export_complete_target_bundle_if_requested(fresh_rust, files, record, native)
-    track_cargo_inputs(session.inputs)
 ```
 
 The real build also has the optional unavailable paths described above,

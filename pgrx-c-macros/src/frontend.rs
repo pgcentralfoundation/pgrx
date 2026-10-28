@@ -155,11 +155,15 @@ pub enum FrontendError {
         PathBuf,
     ),
     /// No acceptable executable could be selected for the loaded libclang release.
-    #[error("could not find a compatible Clang executable: {0}")]
-    CompilerUnavailable(
+    #[error("could not find a compatible Clang executable: {reason}")]
+    CompilerUnavailable {
         /// The missing or incompatible compiler selection detail.
-        String,
-    ),
+        reason: String,
+        /// Candidates, directories and environment values the lookup examined. A caller that
+        /// caches this refusal must track them, so installing a compatible compiler or changing
+        /// its lookup environment invalidates the refusal.
+        inputs: Box<BuildInputs>,
+    },
     /// Compiler paths, inputs, or effective semantics disagreed with the recorded inspection.
     #[error("incompatible compiler environment: {0}")]
     Environment(
@@ -218,7 +222,7 @@ pub(crate) fn inspect_with_compiler_hint(
     let version = run_compiler(&compiler, &["--version".into()])?.stdout;
     let version = version.lines().next().unwrap_or_default().to_owned();
     if version_major(&version) != version_major(&libclang_version) {
-        return Err(FrontendError::Environment(format!(
+        return Err(search.unavailable(format!(
             "{} is {version}; the loaded library is {libclang_version}",
             compiler.display()
         )));
@@ -425,11 +429,11 @@ fn find_compiler(
 ) -> Result<CompilerSelection, FrontendError> {
     let explicit =
         preferred.map(PathBuf::from).or_else(|| std::env::var_os("CLANG_PATH").map(PathBuf::from));
-    let major = version_major(library_version).ok_or_else(|| {
-        FrontendError::CompilerUnavailable(format!(
-            "unrecognized libclang version {library_version}"
-        ))
-    })?;
+    let major =
+        version_major(library_version).ok_or_else(|| FrontendError::CompilerUnavailable {
+            reason: format!("unrecognized libclang version {library_version}"),
+            inputs: Box::default(),
+        })?;
     let adjacent =
         clang_sys::get_library().and_then(|library| {
             library.path().parent().and_then(Path::parent).map(|prefix| {
@@ -453,10 +457,10 @@ fn select_compiler(
 ) -> Result<CompilerSelection, FrontendError> {
     let mut search = CompilerSearch::default();
     if let Some(explicit) = explicit {
-        let executable = search
-            .resolve(explicit, search_roots)?
-            .ok_or_else(|| FrontendError::CompilerUnavailable(explicit.display().to_string()))?;
-        return Ok(CompilerSelection { executable, search });
+        return match search.resolve(explicit, search_roots)? {
+            Some(executable) => Ok(CompilerSelection { executable, search }),
+            None => Err(search.unavailable(explicit.display().to_string())),
+        };
     }
     let names = [
         format!("clang-{major}{}", std::env::consts::EXE_SUFFIX),
@@ -470,9 +474,7 @@ fn select_compiler(
             return Ok(CompilerSelection { executable, search });
         }
     }
-    Err(FrontendError::CompilerUnavailable(format!(
-        "no executable matches libclang major {major}; set CLANG_PATH"
-    )))
+    Err(search.unavailable(format!("no executable matches libclang major {major}; set CLANG_PATH")))
 }
 
 /// Record executable spelling, identity, and lookup roots during driver preference resolution.
@@ -520,6 +522,16 @@ impl CompilerSearch {
         self.files.insert(path.to_owned());
         if let Ok(identity) = path.canonicalize() {
             self.files.insert(identity);
+        }
+    }
+
+    /// Refuse selection together with the lookup that produced the refusal. A build caches the
+    /// refusal, so creating or replacing an examined candidate must still invalidate it. If the
+    /// lookup itself cannot be recorded, report that failure as a successful inspection would.
+    fn unavailable(self, reason: String) -> FrontendError {
+        match build_inputs(&[], "", BTreeSet::new(), self) {
+            Ok(inputs) => FrontendError::CompilerUnavailable { reason, inputs: Box::new(inputs) },
+            Err(error) => error,
         }
     }
 }
@@ -3640,8 +3652,46 @@ mod tests {
             let missing = fixture.0.join("missing-explicit-clang");
             assert!(matches!(
                 select_compiler(Some(&missing), Some(hint), Some(&adjacent), 21, &roots),
-                Err(FrontendError::CompilerUnavailable(_))
+                Err(FrontendError::CompilerUnavailable { .. })
             ));
+        }
+
+        /// A refused lookup retains the candidates it examined. Builds cache the refusal, so the
+        /// later creation of a missing compiler must remain observable.
+        #[test]
+        fn refused_lookups_retain_their_examined_candidates() {
+            let fixture = Fixture::new();
+            let adjacent = fixture.0.join("runtime/bin/clang");
+            fs::create_dir_all(adjacent.parent().unwrap()).unwrap();
+            let roots = [fixture.0.join("first/bin"), fixture.0.join("second/bin")];
+            for root in &roots {
+                fs::create_dir_all(root).unwrap();
+            }
+            let rejected = roots[1].join("clang");
+            compiler(&rejected, 19);
+            let Err(FrontendError::CompilerUnavailable { inputs, .. }) =
+                select_compiler(None, None, Some(&adjacent), 21, &roots)
+            else {
+                panic!("no candidate matches libclang 21");
+            };
+            let missing = roots[1].join("clang-21");
+            assert_eq!(inputs.fingerprints[&adjacent], None);
+            assert_eq!(inputs.fingerprints[&roots[0].join("clang-21")], None);
+            assert_eq!(inputs.fingerprints[&missing], None);
+            assert!(inputs.fingerprints[&rejected].is_some(), "rejected tools are inputs too");
+            assert!(inputs.environment.contains_key("PATH"));
+
+            let Err(FrontendError::CompilerUnavailable { inputs, .. }) =
+                select_compiler(Some(&missing), None, Some(&adjacent), 21, &roots)
+            else {
+                panic!("a missing explicit compiler is unavailable");
+            };
+            assert_eq!(inputs.fingerprints[&missing], None);
+            assert!(!inputs.environment.contains_key("PATH"), "absolute hints skip PATH");
+
+            compiler(&missing, 21);
+            let selection = select_compiler(None, None, Some(&adjacent), 21, &roots).unwrap();
+            assert_eq!(selection.executable, missing);
         }
 
         /// Checks replacing a direct directory hint keeps it distinct from path lookups.

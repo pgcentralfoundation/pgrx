@@ -222,7 +222,8 @@ fn assert_constant_mismatch(
     );
 }
 
-/// Track historical flags, shared header changes, bundle imports, and ordinary no-cshim inline calls.
+/// Track historical flags, shared header changes, bundle imports, ordinary no-cshim inline calls
+/// and refused compiler lookups.
 #[test]
 #[ignore = "compiles an isolated binding build repeatedly; requires native Clang and cached dependencies"]
 fn generation_tracks_flags_optional_headers_shadowing_and_unchanged_builds() {
@@ -404,6 +405,7 @@ fn main() {
         "shared bindgen environment overrides must apply once after historical flags"
     );
     let report = fixture.report();
+    let compiler = PathBuf::from(report["profile"]["compiler"]["executable"].as_str().unwrap());
     let arguments = report["profile"]["arguments"].as_array().unwrap();
     assert_eq!(arguments.iter().filter(|argument| *argument == "-DFLAG=2000").count(), 1);
     assert!(
@@ -511,5 +513,28 @@ fn main() {
         macro_timestamps(macros.parent().unwrap()),
         precomputed,
         "failed raw-only imports cannot replace the previously published macro availability tree"
+    );
+
+    // Cargo caches a refused compiler lookup like any other build-script result. Installing
+    // the requested compiler changes no tracked variable, but must still rerun generation.
+    let compiler_bin = fixture.0.join("compiler-bin");
+    fs::create_dir(&compiler_bin).unwrap();
+    let requested = compiler_bin.join("clang");
+    let lookup =
+        || fixture.command(&flags, &include_flags).env("CLANG_PATH", &requested).output().unwrap();
+    fs::write(source.join("src/main.rs"), "fn main() { println!(\"lookup\"); }\n").unwrap();
+    assert_eq!(successful(lookup()), "lookup\n");
+    let refused = fixture.report();
+    assert_eq!(refused["status"], "unavailable");
+    assert!(
+        refused["reason"].as_str().unwrap().contains("compatible Clang executable"),
+        "{refused}"
+    );
+    std::os::unix::fs::symlink(&compiler, &requested).unwrap();
+    assert_eq!(successful(lookup()), "lookup\n");
+    assert_eq!(
+        fixture.report()["status"],
+        "generated",
+        "creating the requested compiler must rerun the refused generation"
     );
 }

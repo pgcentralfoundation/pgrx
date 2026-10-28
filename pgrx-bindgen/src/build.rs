@@ -13,9 +13,10 @@ use bindgen::callbacks::{DeriveTrait, EnumVariantValue, ImplementsTrait, MacroPa
 use eyre::{WrapErr, eyre};
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, BuildInputs, CompilationProfile, Diagnostic, EmissionStatus,
-    IntegerConstant, MacroEmission, MacroScanner, PostgresConfig, generate_with_bindings,
-    lower_msvc_runtime_flags, pg_sys_integer_bridges, postgres_function_macro_names,
-    postgres_inline_function_names, postgres_object_macro_names, probe_integer_object_constants,
+    FrontendError, IntegerConstant, MacroEmission, MacroScanner, PostgresConfig, PostgresError,
+    generate_with_bindings, lower_msvc_runtime_flags, pg_sys_integer_bridges,
+    postgres_function_macro_names, postgres_inline_function_names, postgres_object_macro_names,
+    probe_integer_object_constants,
 };
 use pgrx_pg_config::{PgConfig, PgMinorVersion, PgVersion, Pgrx, SUPPORTED_VERSIONS};
 use quote::{ToTokens, quote};
@@ -1424,9 +1425,29 @@ fn generate_macros(
     }
     let mut effective_arguments = binder_arguments.clone();
     effective_arguments.extend_from_slice(environment_arguments);
-    let frontend = postgres
-        .inspect_with_arguments(&scanner, header, &effective_arguments, preferred_clang)
-        .wrap_err("could not establish the binding generator's C macro compilation profile")?;
+    // Cargo caches an unavailable macro tree like any other output. Track the
+    // inputs behind a refusal before returning it, and track a successful
+    // inspection before later optional phases can refuse.
+    let frontend = match postgres.inspect_with_arguments(
+        &scanner,
+        header,
+        &effective_arguments,
+        preferred_clang,
+    ) {
+        Ok(frontend) => frontend,
+        Err(error) => {
+            if let PostgresError::Frontend(FrontendError::CompilerUnavailable { inputs, .. }) =
+                &error
+            {
+                emit_macro_rerun_inputs(inputs, native.out_dir)
+                    .wrap_err_with(|| error.to_string())?;
+            }
+            return Err(error).wrap_err(
+                "could not establish the binding generator's C macro compilation profile",
+            );
+        }
+    };
+    emit_macro_rerun_inputs(&frontend.profile().inputs, native.out_dir)?;
     let mut names = postgres_function_macro_names(&frontend, postgres.server_include_dir())?;
     let owned_objects = postgres_object_macro_names(&frontend, postgres.server_include_dir())?
         .into_iter()
@@ -1477,7 +1498,6 @@ fn generate_macros(
     )?;
     names.extend(object_names);
     names.extend(inline_names);
-    emit_macro_rerun_inputs(session.inputs(), native.out_dir)?;
     let mut source = String::new();
     let integer_bridge_unavailable = match pg_sys_integer_bridges(&frontend) {
         Ok(bridges) => {
@@ -1756,15 +1776,17 @@ fn clang_target(target: &str) -> String {
 /// Publish the verified file, directory, and environment dependencies that must invalidate
 /// generated C macros.
 fn emit_macro_rerun_inputs(inputs: &BuildInputs, out_dir: &Path) -> eyre::Result<()> {
-    for path in macro_rerun_paths(inputs, out_dir)? {
-        cargo_input_path(&path)?;
-        println!("cargo:rerun-if-changed={}", path.display());
-    }
+    // Environment first: when a path cannot be tracked safely, the resulting
+    // refusal still reruns after PATH or another lookup variable changes.
     for name in inputs.environment.keys() {
         if name.contains(['\n', '\r']) {
             return Err(eyre!("invalid Cargo environment dependency name"));
         }
         println!("cargo:rerun-if-env-changed={name}");
+    }
+    for path in macro_rerun_paths(inputs, out_dir)? {
+        cargo_input_path(&path)?;
+        println!("cargo:rerun-if-changed={}", path.display());
     }
     Ok(())
 }
