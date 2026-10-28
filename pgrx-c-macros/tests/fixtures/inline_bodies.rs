@@ -16,6 +16,29 @@ mod ffi {
     }
 }
 
+use std::sync::atomic::{AtomicI32, Ordering::SeqCst};
+
+/// What BODY_MARK has written through its first argument.
+static MARK: AtomicI32 = AtomicI32::new(0);
+/// MARK when the Witness passed as BODY_MARK's second argument was dropped.
+static SEEN: AtomicI32 = AtomicI32::new(-1);
+
+/// An argument temporary that records MARK when it is dropped.
+struct Witness(i32);
+
+impl Witness {
+    /// Point at the witness's value, as `&(int){0}` does in C.
+    fn as_ptr(&self) -> *const i32 {
+        &raw const self.0
+    }
+}
+
+impl Drop for Witness {
+    fn drop(&mut self) {
+        SEEN.store(MARK.load(SeqCst), SeqCst);
+    }
+}
+
 /// Print the same lines as the C oracle through the generated macros.
 fn main() {
     let mut value = 0_i32;
@@ -40,6 +63,10 @@ fn main() {
         println!("redefined\t{}", BODY_REDEFINED_USE!(1_i32).get());
         println!("line\t{}", BODY_LINE!().get());
         println!("argument\t{}", BODY_MACRO_ARG!(13_i32).get());
+        // A C call keeps `&(int){0}` alive while the body runs, so MARK is already 7 when
+        // the Witness is dropped.
+        BODY_MARK!(MARK.as_ptr(), Witness(0).as_ptr()).get();
+        println!("mark\t{}", SEEN.load(SeqCst));
     }
     assert_eq!(ffi::CALLS.load(std::sync::atomic::Ordering::SeqCst), EXPECTED_GUARDS);
 }

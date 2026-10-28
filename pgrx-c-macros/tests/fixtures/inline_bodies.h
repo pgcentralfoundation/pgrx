@@ -54,3 +54,8 @@ static inline int BODY_REDEFINED_USE(int value) { return value + BODY_REDEFINED;
 static inline int BODY_LINE(void) { return __LINE__; }
 #define BODY_ID(value) value
 static inline int BODY_MACRO_ARG(int value) { return BODY_ID(value); }
+/* The argument temporaries must still be alive when the body runs, as in a call. */
+static inline void BODY_MARK(int *out, const int *witness)
+{
+	*out = 7;
+}

@@ -1086,24 +1086,9 @@ fn render(
             InlineResult::Void => None,
             InlineResult::Value(marker) => Some(marker.as_str()),
         };
-        let body = statements::render(
-            session,
-            analysis,
-            bindings,
-            &renderer,
-            statements::Returns::Inline(marker),
-        )?;
-        // A value-returning body returns on every path, so its block always breaks with a
-        // value. A void body has no return statement and evaluates to `()`.
-        if marker.is_some() { format!("'{INLINE_LABEL}: {body}") } else { body }
+        statements::render_inline(session, analysis, &renderer, marker)?
     } else if statement_body.is_some() {
-        statements::render(
-            session,
-            analysis,
-            bindings,
-            &renderer,
-            statements::Returns::Caller(None),
-        )?
+        statements::render(session, analysis, bindings, &renderer, None)?
     } else if empty {
         String::new()
     } else {
@@ -1304,13 +1289,8 @@ fn render(
         let boundary_prefix = if statement_boundary { "@__pgrx_c_statement; " } else { "" };
         if returning {
             let return_marker = arguments::return_marker(analysis);
-            let explicit = statements::render(
-                session,
-                analysis,
-                bindings,
-                &renderer,
-                statements::Returns::Caller(Some(&return_marker)),
-            )?;
+            let explicit =
+                statements::render(session, analysis, bindings, &renderer, Some(&return_marker))?;
             writeln!(
                 &mut rust,
                 "(@__pgrx_emit_return_as; ${return_marker}:ty, {matcher}) => {{ {explicit} }};"
@@ -1444,9 +1424,6 @@ fn render(
     };
     Ok((rust, documentation))
 }
-
-/// Label of the block holding a translated inline function body; `return` breaks out of it.
-const INLINE_LABEL: &str = "__pgrx_c_inline";
 
 /// The C result of a translated inline function body.
 enum InlineResult {

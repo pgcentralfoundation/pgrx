@@ -47,6 +47,8 @@ const TRANSLATED: &[&str] = &[
     "BODY_LEAF",
     "BODY_CALLER",
     "BODY_RECURSIVE",
+    // Its argument temporaries outlive the body.
+    "BODY_MARK",
 ];
 
 /// Inline functions that stay native calls, each for a reason the fixture names.

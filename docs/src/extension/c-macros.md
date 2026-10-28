@@ -41,7 +41,9 @@ uses only constructs the generator supports, and any macros it uses are
 unchanged by the rest of the headers, the generated macro translates that body
 to Rust, as it would a macro's. Otherwise it calls the original C function
 through the checked native binding. Generated macros that call a translated
-function run its translation too. Native wrappers are built even when the
+function run its translation too. Either way, temporaries created by the
+arguments, such as the `CString` behind an `as_ptr()` argument, stay alive until
+the function returns, as in a call. Native wrappers are built even when the
 public `cshim` feature is disabled.
 
 A function parameter applies C's assignment rules, which are stricter than the

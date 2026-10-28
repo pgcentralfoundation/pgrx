@@ -9,13 +9,14 @@
 //! Delegation is limited to proved whole-body wrappers, and a token guard rejects
 //! arguments whose local-name capture would differ under Rust macro hygiene.
 
-use super::{BindingCatalog, INLINE_LABEL, SUPPORT, macro_identifier, typed, write_fallback};
-use crate::{AnalysisSession, MacroAnalysis, SkipReason, SkipReasonCode, syntax::Statement};
+use super::{BindingCatalog, SUPPORT, macro_identifier, typed, write_fallback};
+use crate::syntax::{ExpressionKind, Statement};
+use crate::{AnalysisSession, MacroAnalysis, SkipReason, SkipReasonCode};
 use std::fmt::Write;
 
 /// What a C `return` statement does in the lowered body.
 #[derive(Clone, Copy)]
-pub(super) enum Returns<'a> {
+enum Returns<'a> {
     /// Exit the Rust function or closure that invoked the macro, converting to the
     /// explicit C marker when one is given.
     Caller(Option<&'a str>),
@@ -34,31 +35,16 @@ pub(super) fn render(
     analysis: &MacroAnalysis,
     bindings: &BindingCatalog,
     renderer: &typed::Renderer<'_>,
-    returns: Returns<'_>,
+    explicit_marker: Option<&str>,
 ) -> Result<String, SkipReason> {
     let expression = analysis.expression.as_ref().expect("candidate statement expression");
     let body = expression.syntax.statement_body.as_ref().expect("statement body");
-    if matches!(returns, Returns::Inline(None)) && body.return_tokens.is_some() {
-        return Err(super::skip(
-            analysis,
-            SkipReasonCode::Statement,
-            "a translated void function cannot return",
-            body.return_tokens,
-        ));
-    }
     let mut rust = String::from("{ ");
-    if let Some(crate::ExpansionResult::Expanded { expansion }) =
-        session.expansions().results.get(&analysis.name)
-    {
-        for fallback in &expansion.constant_fallbacks {
-            write_fallback(&mut rust, &fallback.name, &fallback.reason);
-        }
-    }
+    write_constant_fallbacks(session, analysis, &mut rust);
     // Root-only expression matching cannot establish equivalence of local
     // declarations or ordered side effects. Preserve only complete simple-return
     // wrappers until statement-aware delegation proves the entire body.
-    if let Returns::Caller(explicit_marker) = returns
-        && let Ok(Some(delegation)) = crate::delegation::direct_delegation(session, analysis)
+    if let Ok(Some(delegation)) = crate::delegation::direct_delegation(session, analysis)
         && bindings.macros.contains(&delegation.callee)
         && let Some(callee) = macro_identifier(&delegation.callee)
     {
@@ -74,18 +60,121 @@ pub(super) fn render(
         rust.push_str(") }");
         return Ok(rust);
     }
+    write_dependency_fallbacks(analysis, &mut rust);
+    render_statements(&body.statements, renderer, Returns::Caller(explicit_marker), &mut rust)?;
+    rust.push('}');
+    Ok(rust)
+}
+
+/// Lower a translated inline function body as one expression of its C result type.
+///
+/// The body begins with one declaration per parameter, initialized from its argument.
+/// All arguments are evaluated first, left to right, in one `match` scrutinee, and the
+/// parameters are then initialized from the bound values. As in a C call, every argument
+/// is evaluated before the body runs, and Rust keeps the arguments' temporaries alive
+/// until the match ends, after the body. A value-returning body is a labeled block that
+/// each `return` breaks with the value converted to `marker`; a void body has no return
+/// and evaluates to `()`.
+pub(super) fn render_inline(
+    session: &AnalysisSession<'_>,
+    analysis: &MacroAnalysis,
+    renderer: &typed::Renderer<'_>,
+    marker: Option<&str>,
+) -> Result<String, SkipReason> {
+    let expression = analysis.expression.as_ref().expect("candidate statement expression");
+    let body = expression.syntax.statement_body.as_ref().expect("statement body");
+    let refuse = |message: &str, tokens| {
+        Err(super::skip(analysis, SkipReasonCode::Statement, message, tokens))
+    };
+    if marker.is_none() && body.return_tokens.is_some() {
+        return refuse("a translated void function cannot return", body.return_tokens);
+    }
+    let count = analysis.parameters.len();
+    let Some((parameters, statements)) = body.statements.split_at_checked(count) else {
+        return refuse("a translated function body lacks its parameter declarations", None);
+    };
+    let mut rust = String::new();
+    if count != 0 {
+        rust.push_str("match (");
+    }
+    for (index, parameter) in parameters.iter().enumerate() {
+        let Statement::Declaration { initializer: Some(initializer), tokens, .. } = parameter
+        else {
+            return refuse("a translated function parameter is not a declaration", None);
+        };
+        let mut argument = *initializer;
+        while let ExpressionKind::Group { operand } = expression.syntax.nodes[argument].kind {
+            argument = operand;
+        }
+        if !matches!(expression.syntax.nodes[argument].kind, ExpressionKind::Parameter { index: hole } if hole == index)
+        {
+            return refuse(
+                "a translated function parameter is not initialized from its argument",
+                Some(*tokens),
+            );
+        }
+        renderer.render(*initializer, typed::Context::Value, &mut rust)?;
+        rust.push_str(", ");
+    }
+    if count != 0 {
+        rust.push_str(") { (");
+        for index in 0..count {
+            write!(rust, "{ARGUMENT}{index}, ").expect("String output");
+        }
+        rust.push_str(") => ");
+    }
+    if marker.is_some() {
+        write!(rust, "'{INLINE_LABEL}: ").expect("String output");
+    }
+    rust.push_str("{ ");
+    write_constant_fallbacks(session, analysis, &mut rust);
+    write_dependency_fallbacks(analysis, &mut rust);
+    for (index, parameter) in parameters.iter().enumerate() {
+        let Statement::Declaration { name, .. } = parameter else {
+            unreachable!("parameter declarations were checked above")
+        };
+        let argument = format!("{ARGUMENT}{index}");
+        renderer.declare_local(name, Some(typed::Initializer::Evaluated(&argument)), &mut rust)?;
+    }
+    render_statements(statements, renderer, Returns::Inline(marker), &mut rust)?;
+    rust.push('}');
+    if count != 0 {
+        rust.push_str(" }");
+    }
+    Ok(rust)
+}
+
+/// Label of the block holding a translated inline function body; `return` breaks out of it.
+const INLINE_LABEL: &str = "__pgrx_c_inline";
+/// Prefix of the bindings holding a translated inline function's evaluated arguments.
+const ARGUMENT: &str = "__pgrx_c_argument";
+
+/// Explain object macros that the compiler folded instead of keeping as named constants.
+fn write_constant_fallbacks(
+    session: &AnalysisSession<'_>,
+    analysis: &MacroAnalysis,
+    rust: &mut String,
+) {
+    if let Some(crate::ExpansionResult::Expanded { expansion }) =
+        session.expansions().results.get(&analysis.name)
+    {
+        for fallback in &expansion.constant_fallbacks {
+            write_fallback(rust, &fallback.name, &fallback.reason);
+        }
+    }
+}
+
+/// Explain why function-like dependencies are expanded instead of called.
+fn write_dependency_fallbacks(analysis: &MacroAnalysis, rust: &mut String) {
     for dependency in &analysis.dependencies {
         if dependency.kind == crate::MacroKind::FunctionLike {
             write_fallback(
-                &mut rust,
+                rust,
                 &dependency.name,
                 "preserving the complete statement body and its order has not been proved equivalent to C substitution",
             );
         }
     }
-    render_statements(&body.statements, renderer, returns, &mut rust)?;
-    rust.push('}');
-    Ok(rust)
 }
 
 /// Emit declarations, expressions, blocks, branches, and returns in original statement order.
@@ -97,9 +186,11 @@ fn render_statements(
 ) -> Result<(), SkipReason> {
     for statement in statements {
         match statement {
-            Statement::Declaration { name, initializer, .. } => {
-                renderer.declare_local(name, *initializer, rust)?
-            }
+            Statement::Declaration { name, initializer, .. } => renderer.declare_local(
+                name,
+                initializer.map(typed::Initializer::Expression),
+                rust,
+            )?,
             Statement::Expression { expression, .. } => {
                 renderer.render(*expression, typed::Context::Discard, rust)?;
                 rust.push_str("; ");

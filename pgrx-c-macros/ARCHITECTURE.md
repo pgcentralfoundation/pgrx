@@ -464,12 +464,15 @@ initialized from its hole, so arguments are evaluated once and converted as in a
 call, and parameters share the body's outer scope as in C. A root that names
 macros is expanded like a macro invocation, after the original header, without
 retaining object macros as binding constants. When the analyzer admits the root
-with exactly the function's parameters, the body is emitted as an expression. In
-a value-returning function every path must return, and `return` breaks out of a
-labeled block, converted to the result type; a void body has no `return` and
-evaluates to `()`. Rust hygiene keeps caller tokens from seeing the locals, so no
-local-name guard applies. A body the analyzer or renderer refuses falls back to
-the call root.
+with exactly the function's parameters, the body is emitted as an expression:
+`match (arguments...) { (bound...) => body }`. All arguments are evaluated, left
+to right, before the body runs, and Rust keeps their temporaries alive until the
+match ends, as a call keeps them until its statement ends. The parameter locals
+are then initialized from the bound values. In a value-returning function every
+path must return, and `return` breaks out of a labeled block, converted to the
+result type; a void body has no `return` and evaluates to `()`. Rust hygiene keeps
+caller tokens from seeing the locals, so no local-name guard applies. A body the
+analyzer or renderer refuses falls back to the call root.
 
 A generated call to a translated function expands its macro with compiled value
 operands instead of calling the native binding. Functions that reach themselves

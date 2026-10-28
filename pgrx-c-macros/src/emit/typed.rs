@@ -64,6 +64,15 @@ enum RenderMode {
     Witness,
 }
 
+/// The value a declared local starts with.
+#[derive(Clone, Copy)]
+pub(super) enum Initializer<'a> {
+    /// A C initializer expression, evaluated at the declaration.
+    Expression(NodeId),
+    /// A Rust binding holding a value the macro already evaluated.
+    Evaluated(&'a str),
+}
+
 /// Compiler-established statement local with a hygienic Rust index and reconciled storage.
 struct Local {
     /// Unique generated local name index, separate from the source C identifier.
@@ -244,7 +253,7 @@ impl<'a> Renderer<'a> {
     pub(super) fn declare_local(
         &self,
         name: &str,
-        initializer: Option<NodeId>,
+        initializer: Option<Initializer<'_>>,
         rust: &mut String,
     ) -> Result<(), SkipReason> {
         let local = self.locals.get(name).ok_or_else(|| {
@@ -266,7 +275,10 @@ impl<'a> Renderer<'a> {
         .expect("String output");
         if let Some(initializer) = initializer {
             rust.push_str("let __pgrx_c_initializer = ");
-            self.render(initializer, Context::Value, rust)?;
+            match initializer {
+                Initializer::Expression(node) => self.render(node, Context::Value, rust)?,
+                Initializer::Evaluated(binding) => rust.push_str(binding),
+            }
             write!(rust, "; /* SAFETY: this raw place addresses the new, aligned local slot; initialization writes without reading its previous bytes or creating a reference. */ #[allow(unused_unsafe)] unsafe {{ {EXPRESSION}::assign({EXPRESSION}::place::<{}>(::core::ptr::addr_of_mut!(__pgrx_c_local{}).cast::<{}>()), __pgrx_c_initializer); }} ", lowered.marker, local.index, lowered.storage).expect("String output");
         }
         Ok(())

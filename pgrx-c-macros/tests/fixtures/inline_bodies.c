@@ -21,4 +21,7 @@ int main(void)
     printf("redefined\t%d\n", BODY_REDEFINED_USE(1));
     printf("line\t%d\n", BODY_LINE());
     printf("argument\t%d\n", BODY_MACRO_ARG(13));
+    int mark = 0;
+    BODY_MARK(&mark, &(int){0});
+    printf("mark\t%d\n", mark);
 }
