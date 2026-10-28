@@ -132,6 +132,14 @@ pub(super) fn prove(
     poisoned.extend(
         (0..frontend.environment().active.len()).map(|index| super::constant_marker(prefix, index)),
     );
+    let mut poison = Vec::new();
+    if let Err(message) = append_poison_pragmas(&poisoned, |chunk| {
+        poison.extend_from_slice(chunk);
+        Ok(())
+    }) {
+        reject_all(&mut proof, &selected, ExpansionSkipCode::BudgetExceeded, &message);
+        return Ok(proof);
+    }
 
     'modes: for braced in [true, false] {
         let mode = if braced { "braced" } else { "plain" };
@@ -163,7 +171,7 @@ pub(super) fn prove(
                 prefix,
                 prepared,
                 &selected,
-                &poisoned,
+                &poison,
                 &locations,
                 braced,
                 completion_path,
@@ -367,19 +375,24 @@ fn reject_all(
 
 /// Construct bounded paste instrumentation while preserving original object/function invocation
 /// shapes.
+///
+/// `limit` bounds everything except the poison table. The table names every active macro and a
+/// constant marker for each, so it grows with the inspected environment, mostly its system
+/// headers, rather than with the batch. Inspection already bounded that environment.
 #[allow(clippy::too_many_arguments)]
 fn source(
     original: &[u8],
     prefix: &str,
     prepared: &[Prepared<'_>],
     selected: &BTreeSet<usize>,
-    poisoned: &BTreeSet<String>,
+    poison: &[u8],
     locations: &BTreeMap<String, usize>,
     braced: bool,
     completion_path: &str,
     completion: &str,
     limit: usize,
 ) -> Result<Vec<u8>, String> {
+    let limit = if braced { limit } else { limit.saturating_add(poison.len()) };
     let mut source = Vec::new();
     let mut append = |bytes: &[u8]| -> Result<(), String> {
         if source.len().saturating_add(bytes.len()) > limit {
@@ -423,10 +436,9 @@ fn source(
             .as_bytes(),
         )?;
     }
-    // Instrumentation warnings are scoped off; chunked pragmas retain every
-    // name without spending the source budget on one directive per identifier.
+    // Instrumentation warnings are scoped off.
     if !braced {
-        append_poison_pragmas(poisoned, &mut append)?;
+        append(poison)?;
     }
     append(b"#pragma clang diagnostic pop\n")?;
     let tags = locations.iter().map(|(tag, &index)| (index, tag)).collect::<BTreeMap<_, _>>();
@@ -1095,22 +1107,23 @@ mod tests {
         let function = definition(MacroKind::FunctionLike);
         let prepared = vec![item(&object, 0), item(&function, 1)];
         let selected = BTreeSet::from([0, 1]);
-        let poisoned = BTreeSet::from(["ROOT".into(), "fresh_parameter_0".into()]);
-        for braced in [true, false] {
-            let bytes = source(
+        let poison = b"#pragma GCC poison ROOT fresh_parameter_0 \n";
+        let render = |braced, limit| {
+            source(
                 b"original_header\n",
                 "fresh_",
                 &prepared,
                 &selected,
-                &poisoned,
+                poison,
                 &locations(),
                 braced,
                 "/tmp/complete",
                 "DONE",
-                usize::MAX,
+                limit,
             )
-            .unwrap();
-            let text = String::from_utf8(bytes).unwrap();
+        };
+        for braced in [true, false] {
+            let text = String::from_utf8(render(braced, usize::MAX).unwrap()).unwrap();
             assert!(text.contains("#define fresh_paste_wrapper_0 ROOT\n"));
             assert!(!text.contains("#define fresh_paste_wrapper_0 ROOT("));
             assert!(text.contains(if braced {
@@ -1125,21 +1138,10 @@ mod tests {
             assert_eq!(text.contains("#pragma GCC poison ROOT"), !braced);
             assert_eq!(text.contains("#error DONE"), !braced);
             assert_eq!(text.contains("fresh_begin_0\n"), braced);
-            assert!(
-                source(
-                    b"original_header\n",
-                    "fresh_",
-                    &prepared,
-                    &selected,
-                    &poisoned,
-                    &locations(),
-                    braced,
-                    "/tmp/complete",
-                    "DONE",
-                    text.len() - 1,
-                )
-                .is_err()
-            );
+            // The poison table is outside the budget, which bounds the remaining bytes.
+            let budgeted = if braced { text.len() } else { text.len() - poison.len() };
+            assert!(render(braced, budgeted).is_ok());
+            assert!(render(braced, budgeted - 1).is_err());
         }
     }
 }

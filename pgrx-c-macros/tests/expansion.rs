@@ -463,6 +463,13 @@ int __paste_native(int);
     for arguments in [
         vec!["-std=c17".into()],
         vec!["-std=c17".into(), "-fms-extensions".into(), "-Wno-everything".into()],
+        // Clang's default for MSVC targets, which can soften preprocessor errors.
+        vec![
+            "-std=c17".into(),
+            "-fms-compatibility".into(),
+            "-fms-extensions".into(),
+            "-Wno-everything".into(),
+        ],
         vec!["-std=c17".into(), "-Werror".into()],
         vec!["-std=c17".into(), "-pedantic-errors".into()],
     ] {
@@ -522,6 +529,54 @@ int __paste_native(int);
         assert_eq!(frontend.inventory(), &original);
         assert!(!frontend.environment().active.keys().any(|name| name.contains("paste_forbidden")));
     }
+}
+
+/// The paste proof poisons every active macro name, so its source grows with the environment.
+/// Windows SDK headers add enough macros that a fixed source budget refused every closed paste
+/// in PostgreSQL's Windows headers. Here the names alone exceed that budget, yet the proof still
+/// applies its whole poison table: it finds a synthesized macro and rejects a forged constant
+/// marker whose name sorts after every filler.
+#[test]
+fn closed_paste_proof_poisons_environments_larger_than_the_source_budget() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = Directory::new();
+    let header = directory.0.join("environment.h");
+    let fillers = 48_000;
+    let last = format!("ENVIRONMENT_FILLER_{}", fillers - 1);
+    // Like system headers, the environment is included rather than part of the main file,
+    // which counts against the source budget.
+    let environment = (0..fillers)
+        .map(|index| format!("#define ENVIRONMENT_FILLER_{index} 7\n"))
+        .collect::<String>();
+    std::fs::write(directory.0.join("fillers.h"), environment).unwrap();
+    let definitions = format!(
+        r#"
+#include "fillers.h"
+#define CAT(a,b) a##b
+#define CAT3(a,b,c) a##b##c
+#define DROP(x) 0
+#define PRESCAN(x) DROP(x)
+#define P_CLOSED(x) ((x)+CAT(0xFF,U))
+#define P_SYNTHESIZED(x) ((x)+CAT(ENVIRONMENT_FILLER_,{}))
+#define P_FORGED_CONSTANT(x) PRESCAN(CAT3(__pgrx_,c_expand_0_,c{fillers}))
+"#,
+        fillers - 1
+    );
+    std::fs::write(&header, definitions).unwrap();
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &header, &["-std=c17".into()], None).unwrap();
+    let names = frontend.environment().active.keys().map(|name| name.len() + 1).sum::<usize>();
+    assert!(names > ExpansionLimits::default().source_bytes, "{names} name bytes");
+    let batch = prepare_expansions(
+        &scanner,
+        &frontend,
+        &["P_CLOSED", "P_SYNTHESIZED", "P_FORGED_CONSTANT"],
+    )
+    .unwrap();
+    assert!(body(expanded(&batch, "P_CLOSED")).contains(&"0xFFU"));
+    let synthesized = expanded(&batch, "P_SYNTHESIZED");
+    assert!(synthesized.dependencies.iter().any(|dependency| dependency.name == last));
+    assert_skip(&batch, "P_FORGED_CONSTANT", ExpansionSkipCode::TokenPaste);
 }
 
 /// Checks that malformed paste probes cannot swallow a later operand validation.

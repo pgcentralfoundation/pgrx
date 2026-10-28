@@ -178,7 +178,9 @@ pub enum ExpansionSkipCode {
 pub struct ExpansionLimits {
     /// Maximum selected macro candidates admitted to one expansion batch.
     pub macros: usize,
-    /// Maximum instrumented source bytes allocated for a bounded expansion pass.
+    /// Maximum instrumented source bytes allocated for a bounded expansion pass. The token-paste
+    /// proof's poison table names every active macro, so it grows with the inspected
+    /// environment and is not counted.
     pub source_bytes: usize,
     /// Maximum preprocessor output size accepted for body extraction.
     pub expanded_bytes: usize,
