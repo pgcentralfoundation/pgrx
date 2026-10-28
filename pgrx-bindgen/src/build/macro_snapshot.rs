@@ -614,16 +614,33 @@ pub(super) fn snapshot_files(
         return Err(eyre!("the rendered snapshot support does not reproduce its merged items"));
     }
     let mut files = BTreeMap::new();
-    for fragment in partition_items(&rendered, trailing, &mut files)? {
-        writeln!(
-            index,
-            "include!({:?});",
-            fragment.to_str().ok_or_else(|| eyre!("support fragment path is not UTF-8"))?
-        )
-        .expect("String output");
-    }
+    index.push_str(&partition_items(&rendered, trailing, &mut files)?);
     tree.write(Path::new(""), &index, PREAMBLE, all, &mut files)?;
+    check_case_insensitive_paths(&files)?;
     Ok(MacroFiles { sources: files })
+}
+
+/// Reject snapshot paths that differ only in case.
+///
+/// The snapshot is committed and checked out on case-insensitive filesystems too,
+/// where such files would overwrite each other. Merging versions can bring together
+/// headers or directories whose names differ only in case.
+fn check_case_insensitive_paths(files: &BTreeMap<PathBuf, String>) -> eyre::Result<()> {
+    let mut folded = BTreeMap::new();
+    for path in files.keys() {
+        let key = path
+            .iter()
+            .map(|component| component.to_string_lossy().to_lowercase())
+            .collect::<Vec<_>>();
+        if let Some(other) = folded.insert(key, path) {
+            return Err(eyre!(
+                "documentation snapshot files {} and {} differ only in case",
+                other.display(),
+                path.display()
+            ));
+        }
+    }
+    Ok(())
 }
 
 /// Describe where each version defines a merged macro, such as
@@ -708,6 +725,7 @@ fn write_classifier(index: &mut String, versions: &[SnapshotVersion], all: &BTre
 /// Check merging, gating, verification and rendering without a PostgreSQL installation.
 #[cfg(test)]
 mod tests {
+    use super::super::macro_files::assert_relative_paths_resolve;
     use super::*;
 
     /// A witness naming `field`'s generated marker, as a member macro's shell does.
@@ -816,6 +834,7 @@ mod tests {
             "#[cfg(any(feature = \"pg16\", feature = \"pg17\"))]\n/// Report the C macros"
         ));
         assert!(index.contains("include!(\"__pgrx_c_support/shared_0000.rs\");"));
+        assert_relative_paths_resolve(&files.sources);
         let support = support_source(&files);
         assert!(support.contains("pub type r#size_t = crate::__pgrx_c_macros::CUnsignedLong;"));
         assert!(support.contains("pub enum Field_value {}"));
@@ -1057,6 +1076,25 @@ mod tests {
         let index = &files.sources[Path::new("mod.rs")];
         assert!(index.contains("#[cfg(feature = \"pg15\")]\n#[path = \"old.rs\"]\nmod old;"));
         assert!(index.contains("#[cfg(feature = \"pg16\")]\n#[path = \"new.rs\"]\nmod new;"));
+        assert_relative_paths_resolve(&files.sources);
+    }
+
+    /// Checks that merged headers or directories whose names differ only in case are
+    /// rejected, since case-insensitive filesystems could not check out both files.
+    #[test]
+    fn paths_differing_only_in_case_are_rejected() {
+        for (old, new, collision) in [
+            ("utils/Example.h", "utils/example.h", "Example.rs"),
+            ("Utils/old.h", "utils/new.h", "mod.rs"),
+        ] {
+            let versions = [
+                version(15, &[(old, documentation("OLD", "(x)", 1))], support("")),
+                version(16, &[(new, documentation("NEW", "(x)", 1))], support("")),
+            ];
+            let error = snapshot_files(&versions, &[15, 16]).err().unwrap().to_string();
+            assert!(error.contains("differ only in case"), "{error}");
+            assert!(error.contains(collision), "{error}");
+        }
     }
 
     /// Checks that a macro moving between headers keeps disjoint gates.

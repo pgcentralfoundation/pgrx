@@ -43,11 +43,7 @@ impl MacroFiles {
         header_root: &Path,
     ) -> eyre::Result<Self> {
         let mut files = BTreeMap::new();
-        let shared = partition_support(&support, &mut files)?;
-        let mut index = String::new();
-        for fragment in shared {
-            writeln!(index, "include!({:?});", source_path(&fragment)?).expect("String output");
-        }
+        let index = partition_support(&support, &mut files)?;
         let mut tree = Directory::default();
         let mut headers = HeaderPaths::new(header_root);
         let mut public_names = BTreeSet::new();
@@ -378,21 +374,6 @@ pub(super) fn insert_file(
     Ok(())
 }
 
-/// Render a UTF-8 relative include path with stable separators and reject escaping or absolute
-/// components.
-fn source_path(path: &Path) -> eyre::Result<String> {
-    path.components()
-        .map(|component| match component {
-            Component::Normal(name) => name
-                .to_str()
-                .map(str::to_owned)
-                .ok_or_else(|| eyre!("generated module path is not UTF-8")),
-            _ => Err(eyre!("generated module path must be relative")),
-        })
-        .collect::<eyre::Result<Vec<_>>>()
-        .map(|components| components.join("/"))
-}
-
 /// Offsets are indexed once, so fragment boundaries do not repeatedly scan the
 /// entire (often tens of megabytes) support source.
 struct SourceOffsets<'a> {
@@ -466,8 +447,8 @@ struct Fragments<'a> {
     files: &'a mut BTreeMap<PathBuf, String>,
     /// Whole items accumulated since the previous flush.
     current: String,
-    /// Ordered include paths preserving the original support declaration sequence.
-    paths: Vec<PathBuf>,
+    /// Ordered fragment filenames preserving the original support declaration sequence.
+    names: Vec<String>,
 }
 
 /// Accumulate whole support items and publish ordered include leaves without changing lexical
@@ -476,7 +457,7 @@ impl<'a> Fragments<'a> {
     /// Partition adapter support and group emitted macros by verified header provenance,
     /// rejecting external roots and duplicate public identifiers.
     fn new(label: &'a str, files: &'a mut BTreeMap<PathBuf, String>) -> Self {
-        Self { label, files, current: String::new(), paths: Vec::new() }
+        Self { label, files, current: String::new(), names: Vec::new() }
     }
 
     /// Append a complete Rust item, flushing at the soft fragment bound without splitting
@@ -493,29 +474,34 @@ impl<'a> Fragments<'a> {
         Ok(())
     }
 
-    /// Publish the current complete fragment into the source map and retain its ordered include
-    /// path.
+    /// Publish the current complete fragment into the source map and retain its ordered
+    /// filename.
     fn flush(&mut self) -> eyre::Result<()> {
         if self.current.is_empty() {
             return Ok(());
         }
-        let path = PathBuf::from(SUPPORT_DIRECTORY).join(format!(
-            "{}_{:04}.rs",
-            self.label,
-            self.paths.len()
-        ));
+        let name = format!("{}_{:04}.rs", self.label, self.names.len());
         let mut source = String::from("// Shared generated C macro support.\n");
         source.push_str(&std::mem::take(&mut self.current));
         source.push('\n');
-        insert_file(self.files, path.clone(), source)?;
-        self.paths.push(path);
+        insert_file(self.files, Path::new(SUPPORT_DIRECTORY).join(&name), source)?;
+        self.names.push(name);
         Ok(())
     }
 
-    /// Flush the final fragment and return include paths in their original semantic order.
-    fn finish(mut self) -> eyre::Result<Vec<PathBuf>> {
+    /// Flush the final fragment and return an `include!` item for each fragment, in their
+    /// original semantic order.
+    ///
+    /// `directory` is the support directory as seen from the including file, ending in
+    /// `/`, or empty for a file inside it. Paths are written with `/`, which `include!`
+    /// accepts on every host, so the generated source does not depend on the host.
+    fn finish(mut self, directory: &str) -> eyre::Result<String> {
         self.flush()?;
-        Ok(self.paths)
+        let mut includes = String::new();
+        for name in &self.names {
+            writeln!(includes, "include!(\"{directory}{name}\");").expect("String output");
+        }
+        Ok(includes)
     }
 }
 
@@ -647,12 +633,15 @@ fn item_name(item: &Item) -> Option<String> {
 /// Split shared and private-native support at parsed item boundaries, preserving comments and
 /// same-scope includes. Documentation builds also need these adapters because
 /// pgrx itself now invokes generated macros in ordinary library code.
+///
+/// Returns the `include!` items that load the shared fragments, in order, for the
+/// index at the root of the tree.
 pub(super) fn partition_support(
     source: &str,
     files: &mut BTreeMap<PathBuf, String>,
-) -> eyre::Result<Vec<PathBuf>> {
+) -> eyre::Result<String> {
     if source.is_empty() {
-        return Ok(Vec::new());
+        return Ok(String::new());
     }
     let (items, trailing) = support_items(source)?;
     partition_items(&items, trailing, files)
@@ -663,7 +652,7 @@ pub(super) fn partition_items(
     items: &[SupportItem<'_>],
     trailing: &str,
     files: &mut BTreeMap<PathBuf, String>,
-) -> eyre::Result<Vec<PathBuf>> {
+) -> eyre::Result<String> {
     let mut pieces = Vec::new();
     let mut native_seen = false;
     for item in items {
@@ -686,13 +675,8 @@ pub(super) fn partition_items(
                 native.push(trailing)?;
                 let mut shell = (*open).to_owned();
                 shell.push('\n');
-                for fragment in native.finish()? {
-                    let filename = fragment
-                        .file_name()
-                        .and_then(|name| name.to_str())
-                        .ok_or_else(|| eyre!("native support fragment has no UTF-8 filename"))?;
-                    writeln!(shell, "include!({filename:?});").expect("String output");
-                }
+                // The module is declared in a shared fragment beside these.
+                shell.push_str(&native.finish("")?);
                 shell.push('}');
                 pieces.push(shell);
             }
@@ -709,7 +693,33 @@ pub(super) fn partition_items(
     for piece in pieces {
         shared.push(&piece)?;
     }
-    shared.finish()
+    shared.finish(&format!("{SUPPORT_DIRECTORY}/"))
+}
+
+/// Check that every `include!` and `#[path]` in a generated tree is written with `/` and
+/// names a file of that tree, relative to the directory of the file that contains it.
+#[cfg(test)]
+pub(super) fn assert_relative_paths_resolve(files: &BTreeMap<PathBuf, String>) {
+    for (file, source) in files {
+        for opening in ["include!(\"", "#[path = \""] {
+            for (start, _) in source.match_indices(opening) {
+                let rest = &source[start + opening.len()..];
+                let written = &rest[..rest.find('"').expect("a closed path literal")];
+                assert!(
+                    !written.contains('\\') && !written.starts_with('/'),
+                    "{} names {written}",
+                    file.display()
+                );
+                let mut target = file.parent().expect("a relative file path").to_owned();
+                target.extend(written.split('/'));
+                assert!(
+                    files.contains_key(&target),
+                    "{} names {written}, which is not generated",
+                    file.display()
+                );
+            }
+        }
+    }
 }
 
 /// Check catalog, publication, and invalidation invariants directly against the private
@@ -990,6 +1000,28 @@ mod tests {
             syn::parse_file(source).unwrap();
             assert!(source.len() <= FRAGMENT_BYTES + 256);
         }
+    }
+
+    /// Checks that include and module paths are written with `/` on every host and name
+    /// generated files. Windows joins paths with `\`, which these must not depend on.
+    #[test]
+    fn generated_paths_are_written_with_forward_slashes() {
+        let fixture = Fixture::new();
+        let emissions = [
+            fixture.emission("access/nested/example.h", "NESTED_EXAMPLE"),
+            fixture.emission("root.h", "ROOT_EXAMPLE"),
+        ];
+        let support = "pub const SHARED: u8 = 1;\n#[doc(hidden)]\npub mod __pgrx_c_generated {\npub const NATIVE: u8 = 2;\n}\n";
+        let files = MacroFiles::new(support.into(), &emissions, &fixture.0).unwrap();
+        let index = &files.sources[Path::new("mod.rs")];
+        assert!(index.starts_with("include!(\"__pgrx_c_support/shared_0000.rs\");\n"), "{index}");
+        assert!(index.contains("#[path = \"access/mod.rs\"]"), "{index}");
+        assert!(files.sources[Path::new("access/mod.rs")].contains("#[path = \"nested/mod.rs\"]"));
+        assert!(
+            files.sources[Path::new("__pgrx_c_support/shared_0000.rs")]
+                .contains("{\ninclude!(\"native_0000.rs\");\n}")
+        );
+        assert_relative_paths_resolve(&files.sources);
     }
 
     /// Checks that duplicate public Rust macro names fail instead of silently overwriting a

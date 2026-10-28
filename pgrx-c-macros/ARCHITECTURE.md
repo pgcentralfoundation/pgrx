@@ -1722,6 +1722,9 @@ The snapshot merges versions:
    a shell names must be defined by the support of each version it is gated to.
    The rendered support must split back into exactly the merged items, each
    preceded by its own gate.
+6. `include!` and `#[path]` paths are written with `/` on every host. Two snapshot
+   files may not differ only in case, since case-insensitive filesystems check out
+   the snapshot too.
 
 Release generation keeps the committed bindings and snapshot coherent:
 
