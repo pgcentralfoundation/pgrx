@@ -2364,6 +2364,7 @@ fn build_inputs(
     let environment = [
         "PATH",
         "CLANG_PATH",
+        "CLANG_NO_DEFAULT_CONFIG",
         "LIBCLANG_PATH",
         "LLVM_CONFIG_PATH",
         "SDKROOT",
@@ -2802,12 +2803,19 @@ pub(crate) fn version_major(version: &str) -> Option<u32> {
 
 /// Reject automatically loaded driver configuration whose unrecorded flags would defeat reproducible
 /// analysis.
+///
+/// Clang 16 and later load default configuration files named for the target triple, which some
+/// distributions install (Gentoo's `/etc/clang/<major>/x86_64-unknown-linux-gnu-clang.cfg`).
+/// `CLANG_NO_DEFAULT_CONFIG=1` or `--no-default-config` turns them off for the driver and
+/// libclang alike, so the refusal names both.
 pub(crate) fn validate_driver_configuration(verbose: &str) -> Result<(), FrontendError> {
     if let Some(configuration) =
         verbose.lines().find(|line| line.trim_start().starts_with("Configuration file:"))
     {
         return Err(FrontendError::Environment(format!(
-            "automatic Clang configuration is unsupported for reproducible analysis: {}",
+            "automatic Clang configuration is unsupported for reproducible analysis: {}; \
+             set CLANG_NO_DEFAULT_CONFIG=1 or pass --no-default-config to analyze without \
+             default configuration files",
             configuration.trim()
         )));
     }
@@ -4391,15 +4399,22 @@ printf '%s\n' '#include "..." search starts here:' ' /fake/quoted' \
         }
     }
 
-    /// Checks automatically loaded driver configuration is rejected.
+    /// Automatically loaded driver configuration is rejected, and the refusal names the
+    /// settings that turn default configuration files off.
     #[test]
     fn automatically_loaded_driver_configuration_is_rejected() {
-        assert!(matches!(
-            validate_driver_configuration(
-                "clang version 21.0.0\nConfiguration file: /tmp/clang.cfg\n"
-            ),
-            Err(FrontendError::Environment(_))
-        ));
+        let error = validate_driver_configuration(
+            "clang version 21.0.0\nConfiguration file: /etc/clang/21/x86_64-unknown-linux-gnu-clang.cfg\n",
+        )
+        .unwrap_err();
+        assert!(matches!(error, FrontendError::Environment(_)), "{error:?}");
+        assert_eq!(
+            error.to_string(),
+            "incompatible compiler environment: automatic Clang configuration is unsupported for \
+             reproducible analysis: Configuration file: /etc/clang/21/x86_64-unknown-linux-gnu-clang.cfg; \
+             set CLANG_NO_DEFAULT_CONFIG=1 or pass --no-default-config to analyze without default \
+             configuration files"
+        );
         validate_driver_configuration("clang version 21.0.0\nTarget: x86_64-linux-gnu\n").unwrap();
     }
 }
