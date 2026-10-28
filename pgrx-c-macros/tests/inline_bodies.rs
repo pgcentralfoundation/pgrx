@@ -55,6 +55,10 @@ const TRANSLATED: &[&str] = &[
     // The directives' comment and spliced line belong to them, not to the body.
     "BODY_DIRECTIVE_COMMENT",
     "BODY_DIRECTIVE_SPLICE",
+    // A line splice is part of the spelling of the token after it.
+    "BODY_BRACE_SPLICE",
+    "BODY_SPLICED_HASH",
+    "BODY_SPLICED_DIGRAPH",
 ];
 
 /// Macros that call translated inline functions.
@@ -88,6 +92,10 @@ const NATIVE: &[&str] = &[
     "BODY_SECOND_VALUE",
     "BODY_FIRST_BRANCH",
     "BODY_SECOND_BRANCH",
+    // Trigraphs and bare carriage returns are not modeled.
+    "BODY_TRIGRAPH_SPLICE",
+    "BODY_TRIGRAPH_HASH",
+    "BODY_CR_STORE",
 ];
 
 /// Compare translated and native inline roots with the original compiler's results.
@@ -171,7 +179,7 @@ fn translated_bodies_match_their_original_definitions() {
     assert!(error.contains("unsafe"), "{error}");
     // BODY_EARLY is called twice; each other native root, and the native self-call inside
     // the translated BODY_RECURSIVE, once.
-    rust.push_str("const EXPECTED_GUARDS: usize = 16;\n");
+    rust.push_str("const EXPECTED_GUARDS: usize = 19;\n");
     rust.push_str("fn pure() -> i32 { BODY_MACRO!(1_i32).get() + BODY_CALLER!(1_i32).get() }\n");
     rust.push_str(include_str!("fixtures/inline_bodies.rs"));
     let profile = frontend.profile();

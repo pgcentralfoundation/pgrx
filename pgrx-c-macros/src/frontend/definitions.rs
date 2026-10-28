@@ -16,7 +16,7 @@
 use super::{FrontendError, type_info};
 use crate::{
     ActiveMacro, DeclarationLinkage, FrontendOutput, InlineFunctionDefinition, MacroKind,
-    MacroScanner, SourceSpan, TokenKind,
+    MacroScanner, SourceSpan, TokenKind, unspliced,
 };
 use clang::source::File;
 use clang::{Entity, EntityKind, EntityVisitResult, Index, Linkage, StorageClass, TypeKind};
@@ -254,7 +254,8 @@ fn source<'tu>(
 /// Recover the tokens the preprocessor read for a definition's body, without its braces.
 ///
 /// Conditional directives, through the end of their logical lines, and the text they
-/// skipped are removed; any other directive makes the body unavailable. Every remaining
+/// skipped are removed; any other directive makes the body unavailable, as does a trigraph
+/// or a carriage return that is not part of a CR-LF line end. Every remaining
 /// token must belong to one of the compiler's statements or be a `;` between them, so a
 /// statement that ends inside a macro argument cannot leave a fragment behind. The tokens
 /// must expand at the end of the translation unit as they did in the definition, which
@@ -278,7 +279,23 @@ fn body_tokens<'tu>(
     let all = body.get_range()?.tokenize();
     let (open, rest) = all.split_first()?;
     let (close, inner) = rest.split_last()?;
-    if open.get_spelling() != "{" || close.get_spelling() != "}" {
+    if unspliced(open.get_spelling()) != "{" || unspliced(close.get_spelling()) != "}" {
+        return None;
+    }
+    let contents = file.get_contents()?;
+    // The line handling below ends lines only at newlines and splices them only with a
+    // backslash. Clang also ends a line at a bare carriage return, and with trigraphs
+    // enabled `??/` is a backslash and `??=` a `#`.
+    let start = usize::try_from(located(open.get_location())?.offset).ok()?;
+    let end = usize::try_from(located(close.get_location())?.offset).ok()?;
+    let bytes = contents.as_bytes();
+    let text = bytes.get(start..end)?;
+    if text.windows(3).any(|window| window[..2] == *b"??" && b"=(/)'<!>-".contains(&window[2]))
+        || text
+            .iter()
+            .enumerate()
+            .any(|(index, &byte)| byte == b'\r' && bytes.get(start + index + 1) != Some(&b'\n'))
+    {
         return None;
     }
     let skipped = file
@@ -288,7 +305,6 @@ fn body_tokens<'tu>(
             Some(located(range.get_start())?.offset..located(range.get_end())?.offset)
         })
         .collect::<Vec<_>>();
-    let contents = file.get_contents()?;
     let mut active = Vec::new();
     // Tokens before this offset belong to the last directive. A skipped range ends with
     // the directive that closes it, not with that directive's logical line.
@@ -300,20 +316,21 @@ fn body_tokens<'tu>(
             continue;
         }
         let skipped = skipped.iter().any(|range| range.contains(&location.offset));
-        let spelling = token.get_spelling();
+        let spelling = unspliced(token.get_spelling());
         if matches!(spelling.as_str(), "#" | "%:") {
             // A conditional directive only selects tokens. Any other directive, or a `#`
             // this check cannot place at the start of a line, changes or hides
-            // preprocessing state inside the body.
-            directive_end = logical_line_end(contents.as_bytes(), offset)?;
+            // preprocessing state inside the body. A token that follows a splice begins
+            // at the backslash, so this offset is where the directive's line starts.
+            directive_end = logical_line_end(bytes, offset)?;
             let name = inner
                 .get(index + 1)
                 .filter(|next| {
                     located(next.get_location())
                         .is_some_and(|next| (next.offset as usize) < directive_end)
                 })
-                .map(|next| next.get_spelling());
-            let conditional = starts_line(contents.as_bytes(), offset)
+                .map(|next| unspliced(next.get_spelling()));
+            let conditional = starts_line(bytes, offset)
                 && name.as_deref().is_some_and(|name| {
                     matches!(
                         name,

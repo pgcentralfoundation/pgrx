@@ -316,9 +316,10 @@ cannot be inferred from a declaration's name or broad type category:
    per function. The body's tokens are also retained without conditional
    directives and the branches they skipped. A directive extends to the end of
    its logical line, after line splices and comments, including a closing
-   directive at the end of a skipped range. Any other directive, a `#` that does
-   not start a line, or a token outside the compiler's statements other than `;`,
-   leaves no body. A token that names a macro must have a top-level expansion
+   directive at the end of a skipped range. Token spellings are compared without
+   their line splices, which libclang keeps. Any other directive, a `#` that does
+   not start a line, a token outside the compiler's statements other than `;`, a
+   trigraph, or a carriage return outside a CR-LF line end leaves no body. A token that names a macro must have a top-level expansion
    record at that position; that macro, and every macro its replacement list
    names, must have its last definition before the expansion and still be active
    at the end of the unit. Undefinitions are not recorded, so this is what proves

@@ -32,4 +32,8 @@ int main(void)
     printf("argument late\t%d\n", BODY_ARGUMENT_LATE(1));
     printf("template\t%d\t%d\t%d\t%d\n", BODY_FIRST_VALUE(), BODY_SECOND_VALUE(),
            BODY_FIRST_BRANCH(10), BODY_SECOND_BRANCH(10));
+    int carriage = 0;
+    BODY_CR_STORE(&carriage, 0);
+    printf("spliced\t%d\t%d\t%d\t%d\t%d\t%d\n", BODY_BRACE_SPLICE(1), BODY_SPLICED_HASH(10),
+           BODY_SPLICED_DIGRAPH(10), BODY_TRIGRAPH_SPLICE(10), BODY_TRIGRAPH_HASH(10), carriage);
 }

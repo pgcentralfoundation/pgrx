@@ -89,6 +89,16 @@ fn main() {
             BODY_FIRST_BRANCH!(10_i32).get(),
             BODY_SECOND_BRANCH!(10_i32).get()
         );
+        let mut carriage = 0_i32;
+        BODY_CR_STORE!(&raw mut carriage, 0_i32).get();
+        println!(
+            "spliced\t{}\t{}\t{}\t{}\t{}\t{carriage}",
+            BODY_BRACE_SPLICE!(1_i32).get(),
+            BODY_SPLICED_HASH!(10_i32).get(),
+            BODY_SPLICED_DIGRAPH!(10_i32).get(),
+            BODY_TRIGRAPH_SPLICE!(10_i32).get(),
+            BODY_TRIGRAPH_HASH!(10_i32).get()
+        );
     }
     assert_eq!(ffi::CALLS.load(std::sync::atomic::Ordering::SeqCst), EXPECTED_GUARDS);
 }

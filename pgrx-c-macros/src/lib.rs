@@ -629,7 +629,7 @@ fn collect_macro_inventory(
 /// a backslash followed by optional blanks (space, tab, vertical tab, form feed) and a line
 /// end (LF, CR, CR-LF or LF-CR) is removed. Removal is one pass, so a backslash that precedes
 /// a removed splice is kept.
-fn unspliced(spelling: String) -> String {
+pub(crate) fn unspliced(spelling: String) -> String {
     if !spelling.contains('\\') {
         return spelling;
     }
@@ -708,6 +708,9 @@ mod tests {
             ("\\", "\\"),
             ("\\\\\n\n", "\\\n"),
             ("\\\n\\\n#", "#"),
+            ("\\ \t\r\n#", "#"),
+            ("%\\\n:", "%:"),
+            ("\"a\\\\\nb\"", "\"a\\b\""),
         ] {
             assert_eq!(unspliced(raw.into()), clean, "{raw:?}");
         }

@@ -119,3 +119,53 @@ static inline int BODY_ARGUMENT_LATE(int value) { return BODY_ID(BODY_ARGUMENT) 
 #define BODY_TEMPLATE_BRANCH_NAME BODY_SECOND_BRANCH
 #define BODY_TEMPLATE_VALUE 2
 #include "inline_bodies_template.h"
+/* PostgreSQL 18 continues a signature onto the line of its opening brace, whose
+ * spelling then begins with the splice. */
+static inline int BODY_BRACE_SPLICE(int value) \
+{
+	return value + 3;
+}
+/* The directive that closes a skipped group begins with a line splice. */
+static inline int BODY_SPLICED_HASH(int value)
+{
+	return (value
+#if 0
+		* 100
+\
+#endif \
+		- 1
+		);
+}
+/* The same directive is spelled with a digraph that a splice divides. */
+static inline int BODY_SPLICED_DIGRAPH(int value)
+{
+	return (value
+#if 0
+		* 100
+%\
+:endif \
+		- 1
+		);
+}
+/* With -std=c17, trigraphs spell the splice or the directive's `#`. */
+static inline int BODY_TRIGRAPH_SPLICE(int value)
+{
+	return (value
+#if 0
+		* 100
+#endif ??/
+		- 1
+		);
+}
+static inline int BODY_TRIGRAPH_HASH(int value)
+{
+	return (value
+#if 0
+		* 100
+??=endif \
+		- 1
+		);
+}
+/* Its body's lines end with a bare carriage return, as on classic Mac OS. */
+static inline void BODY_CR_STORE(int *where, int value)
+{	if (value)		*where = 1;#if 0		*where = 3;#endif	else		*where = 2;}
