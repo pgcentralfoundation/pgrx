@@ -6,7 +6,8 @@
 //!
 //! Renamed imports, checked integer wrappers, repeated operands, symbolic binding
 //! references, and raw fields verify the public export path. All version-specific
-//! facts come from this build rather than documentation snapshots.
+//! facts come from this build. Docs builds only type-check these tests, against the
+//! documentation snapshot's typed shells.
 
 // Exercise the public exports from a downstream crate, including a renamed import.
 use pg::__pgrx_c_macros::{CInt, CUnsignedInt, CValue};
@@ -64,7 +65,6 @@ fn expansion_hygiene_preserves_repeated_and_lazy_arguments() {
 
 /// Checks symbolic ALIGNOF_BUFFER and nested TYPEALIGN calls against the current generated
 /// bindings, including unsigned wraparound.
-#[cfg(not(docsrs))]
 #[test]
 fn binding_references_and_macro_calls_use_the_selected_build() {
     // These macros use the selected build's ALIGNOF_BUFFER binding and the
@@ -79,7 +79,6 @@ fn binding_references_and_macro_calls_use_the_selected_build() {
 
 /// Checks raw enum bytes and union fields without materializing invalid Rust record or enum
 /// values.
-#[cfg(not(docsrs))]
 #[test]
 fn generated_field_access_preserves_raw_c_storage() {
     let mut node = core::mem::MaybeUninit::<pg::Node>::uninit();
