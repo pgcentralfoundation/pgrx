@@ -77,11 +77,11 @@ mod tests {
         }
     }
 
+    /// Uses its own lock: `test_spinlock` may hold the shared one from another backend.
     #[cfg(all(feature = "cshim", not(feature = "pg19")))]
     #[pg_test]
     pub fn test_spinlock_is_locked() {
-        use super::SPINLOCK;
-        let spinlock = SPINLOCK.get();
+        let spinlock = pgrx::spinlock::PgSpinLock::new(0_usize);
         assert!(!spinlock.is_locked());
         let lock = spinlock.lock();
         assert!(spinlock.is_locked());
