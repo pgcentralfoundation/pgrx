@@ -1028,7 +1028,9 @@ observed record or omitting valid generic callers. For example, a declared
 member result can restrict the owner of a following field access, while an
 unconstrained caller-supplied record may retain several compatible owners.
 Unevaluated calls retain capabilities needed for Rust type checking; a function
-address alone does not retain a callable wrapper.
+address alone does not retain a callable wrapper. A statement local's declared
+type is always requested, because its marker appears at the declaration and at
+each use even when no cast, call, or field names that enum or callback type.
 
 Generate adapters in dependency order:
 

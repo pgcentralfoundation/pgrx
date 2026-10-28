@@ -306,6 +306,98 @@ fn main() {
     }
 }
 
+/// Checks that a statement local's declared type alone retains its generated identity.
+///
+/// Neither macro casts to, calls, or otherwise names its local's enum or callback type
+/// outside the declaration, so only the local can request those support items.
+#[cfg(all(
+    target_pointer_width = "64",
+    target_endian = "little",
+    any(target_arch = "x86_64", target_arch = "aarch64"),
+    any(target_os = "linux", target_os = "macos"),
+))]
+#[test]
+fn statement_locals_retain_their_declared_type_identities() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    let header = directory.join("tests/fixtures/statement_oracle.h");
+    let scanner = MacroScanner::new().expect("libclang required");
+    let mut arguments = vec!["-std=c17".into(), "-O2".into()];
+    #[cfg(target_os = "macos")]
+    {
+        let sdk = rust_oracle::run_tool(
+            std::process::Command::new("xcrun").arg("--show-sdk-path"),
+            "statement oracle SDK",
+        );
+        arguments.extend(["-isysroot".into(), sdk.trim().into()]);
+    }
+    let names = ["STMT_ENUM_LOCAL", "STMT_CALLBACK_LOCAL"];
+    let frontend = inspect(&scanner, &header, &arguments, None).expect("inspect statements");
+    let session = AnalysisSession::prepare(&scanner, &frontend, &names).expect("prepare locals");
+    let bindings = bindgen::Builder::default()
+        .rust_target(bindgen::RustTarget::stable(85, 0).unwrap())
+        .rust_edition(bindgen::RustEdition::Edition2024)
+        .header(header.to_str().unwrap())
+        .clang_args(&frontend.profile().arguments)
+        .allowlist_type("StatementRecord|StatementMode|statement_hook")
+        .layout_tests(false)
+        .generate_comments(false)
+        .formatter(bindgen::Formatter::None)
+        .generate()
+        .expect("generate statement local bindings")
+        .to_string();
+    let catalog = binding_symbols::collect_bindings(
+        &syn::parse_file(&bindings).unwrap(),
+        session.integer_constants(),
+        frontend.declarations(),
+        &frontend.profile().target,
+    );
+    let generated = pgrx_c_macros::generate_with_bindings(&session, &names, &catalog)
+        .expect("generate statement local support");
+    let support = directory.join("../pgrx-pg-sys/src/c_macros/support.rs").canonicalize().unwrap();
+    let mut rust = format!(
+        "#![deny(unsafe_op_in_unsafe_fn)]\n#![allow(non_snake_case,non_camel_case_types,dead_code,unused_parens)]\n#[path={support:?}] pub mod __pgrx_c_macros;\n{bindings}\n{}",
+        generated.support.rust
+    );
+    for emission in generated.macros {
+        let EmissionStatus::Emitted { rust: definition, .. } = &emission.status else {
+            panic!("statement macro with a typed local must emit: {emission:?}")
+        };
+        rust.push_str(definition);
+    }
+    let original = r#"
+#include <stdio.h>
+int main(void) {
+    StatementRecord object = {0, 0, 0};
+    STMT_ENUM_LOCAL(&object);
+    printf("%u\n", object.total);
+    STMT_CALLBACK_LOCAL(&object);
+    printf("%u\n", object.total);
+}
+"#;
+    let consumer = r#"
+fn main() {
+    let mut object = StatementRecord { byte: 0, flag: false, total: 0 };
+    let pointer = &raw mut object;
+    // SAFETY: pointer identifies the live initialized local record with proper
+    // alignment and exclusive write access.
+    unsafe {
+        STMT_ENUM_LOCAL!(pointer);
+        println!("{}", object.total);
+        STMT_CALLBACK_LOCAL!(pointer);
+        println!("{}", object.total);
+    }
+}
+"#;
+    let profile = frontend.profile();
+    let arguments = profile.arguments.iter().map(String::as_str).collect::<Vec<_>>();
+    assert_eq!(
+        rust_oracle::run_rust(&format!("{rust}\n{consumer}")),
+        oracle::run_c(&profile.compiler.executable, &header, original, &arguments, true),
+        "enum and callback locals must compile against their retained identities"
+    );
+}
+
 /// Checks that unsupported control flow and uninitialized local reads remain skipped.
 #[test]
 fn unsupported_control_flow_and_uninitialized_local_reads_remain_skipped() {

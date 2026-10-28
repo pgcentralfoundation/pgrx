@@ -97,7 +97,12 @@ pub(super) fn plan(
                 )
                 .map(|ty| (name.clone(), ty))
             })
-            .collect();
+            .collect::<BTreeMap<_, _>>();
+        // Rendering writes each local's marker at its declaration and every use,
+        // so the declared type needs support even when no other node names it.
+        for ty in locals.values() {
+            requests.types.insert(ty.canonical_spelling.clone(), ty.clone());
+        }
         let objects = typed::declared_objects(frontend, &analysis, &lowering, &locals);
         let constraints = Constraints::new(frontend, &analysis, &objects, &records, &compatibility);
         let mut callees = BTreeSet::new();
