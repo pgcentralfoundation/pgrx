@@ -73,6 +73,13 @@ fn main() {
             BODY_SIZED_CALLER!(1_i32).get(),
             BODY_SIZED_MACRO!(3_i32).get()
         );
+        // An argument's temporary that mutably borrows a local, as `Drain` does, lives
+        // through the body. Nothing else in the body may borrow that local.
+        let mut values = vec![3_i32, 3, 3];
+        let sized = BODY_SIZED!(values.drain(..1).next().unwrap()).get();
+        let caller = BODY_SIZED_CALLER!(values.drain(..1).next().unwrap()).get();
+        let from_macro = BODY_SIZED_MACRO!(values.drain(..1).next().unwrap()).get();
+        println!("drained\t{sized}\t{caller}\t{from_macro}");
         println!(
             "directive\t{}\t{}",
             BODY_DIRECTIVE_COMMENT!(10_i32).get(),

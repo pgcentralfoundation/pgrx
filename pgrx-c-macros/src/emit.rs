@@ -1073,6 +1073,10 @@ fn render(
             Some(expression.syntax.nodes[node].tokens),
         ));
     }
+    // A translated inline function is a statement body whose returns yield the macro's
+    // value; it is emitted as an expression macro with the function's result type.
+    let translated = matches!(original, InvocationSource::Inline(_))
+        && expression.syntax.statement_body.is_some();
     let renderer = typed::Renderer::new(
         session.frontend(),
         analysis,
@@ -1080,13 +1084,9 @@ fn render(
         adapters,
         &constants,
         lowering,
+        translated,
     );
-    // A translated inline function is a statement body whose returns yield the macro's
-    // value; it is emitted as an expression macro with the function's result type.
-    let inline_body = (matches!(original, InvocationSource::Inline(_))
-        && expression.syntax.statement_body.is_some())
-    .then(|| inline_result(session, analysis, lowering))
-    .transpose()?;
+    let inline_body = translated.then(|| inline_result(session, analysis, lowering)).transpose()?;
     // A translated void body has no return, so its root expression is empty, but the
     // body itself is the macro's value.
     let empty = inline_body.is_none()

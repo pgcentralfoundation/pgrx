@@ -188,6 +188,17 @@ fn translated_bodies_match_their_original_definitions() {
             }
             _ => {}
         }
+        // A translated body evaluates its arguments outside generated `unsafe`, so only the
+        // arm used by a caller's own size witness checks them. Its size witnesses, and the
+        // operands it passes to translated callees, carry no checks that a chain of
+        // translated calls would multiply.
+        if TRANSLATED.contains(&name.as_str()) {
+            assert_eq!(
+                compact.matches("@check_safety").count(),
+                emission.analysis.parameters.len(),
+                "{name}"
+            );
+        }
         rust.push_str(&definition);
     }
     let prelude = include_str!("fixtures/inline_bodies.rs").split_once("fn main()").unwrap().0;

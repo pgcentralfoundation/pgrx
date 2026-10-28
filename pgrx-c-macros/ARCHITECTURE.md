@@ -1103,7 +1103,12 @@ each caller operand; for a compiled argument those are the checks bracket, the
 producing macro's own checks of its caller operands. They are always well typed
 and do not depend on whether any alternative could be rendered. A call to a
 translated inline function passes the same descriptor with only a value
-alternative.
+alternative. A translated function evaluates its arguments in its match
+scrutinee, outside generated `unsafe`, so its body holds no caller tokens. Its
+size witnesses check nothing, and the descriptors it passes to translated callees
+have an empty checks bracket. Checks there would only reject operands, such as
+one whose temporary still borrows a local, and would multiply along a chain of
+translated calls.
 
 ```text
  BUFFERALIGN(LEN) --> TYPEALIGN(ALIGNOF_BUFFER, (LEN))

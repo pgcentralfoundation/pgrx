@@ -103,6 +103,8 @@ pub(super) struct Renderer<'a> {
     floats: bool,
     /// Whether the selected profile permits floating values outside composed arithmetic.
     float_values: bool,
+    /// Whether this is a translated inline function's body, which holds no caller tokens.
+    inline_body: bool,
     /// Arena-indexed addressability facts propagated once through groups and member chains.
     places: Vec<bool>,
     /// Compiler-proved object types; unresolved caller families intentionally remain None.
@@ -125,6 +127,7 @@ impl<'a> Renderer<'a> {
         adapters: Option<&'a super::GeneratedAdapters>,
         constants: &'a [Option<&'a ResolvedConstant>],
         lowering: &'a Lowering<'a>,
+        inline_body: bool,
     ) -> Self {
         let expression = analysis.expression.as_ref().expect("candidate expression");
         let locals = expression
@@ -212,6 +215,7 @@ impl<'a> Renderer<'a> {
             lowering,
             floats,
             float_values,
+            inline_body,
             places,
             objects,
             locals,
@@ -251,6 +255,21 @@ impl<'a> Renderer<'a> {
             .filter(|marker| lowered == format!("{SUPPORT}::{marker}"))
             .and_then(|_| super::rust_identifier(spelling))
             .map_or_else(|| lowered.to_owned(), |name| format!("$crate::__pgrx_c_types::{name}"))
+    }
+
+    /// Dead checks of the caller's operands, for a size witness that wraps generated
+    /// operations in `unsafe` and for a compiled operand that may reach one.
+    ///
+    /// A translated inline function evaluates its arguments in its match scrutinee, outside
+    /// generated `unsafe`, so its body holds no caller tokens to check. Its checks would
+    /// only reject operands, such as one whose temporary still borrows a local, and each
+    /// translated caller in a chain would multiply them.
+    fn caller_checks(&self) -> String {
+        if self.inline_body {
+            String::new()
+        } else {
+            arguments::render_safety_checks(self.analysis, self.mode == RenderMode::Witness)
+        }
     }
 
     /// Refuse a body that declares or computes a floating value the profile for its
@@ -373,9 +392,7 @@ impl<'a> Renderer<'a> {
             }
             rust.push_str("] ");
         }
-        // A witness never delegates, so these are always the real macro's checks.
-        write!(rust, "[{}]), ", arguments::render_safety_checks(self.analysis, false))
-            .expect("String output");
+        write!(rust, "[{}]), ", self.caller_checks()).expect("String output");
     }
 
     /// Argument substitution can make a callee's dynamic expectation fixed.
@@ -519,10 +536,7 @@ impl<'a> Renderer<'a> {
                                         .field_marker(*base, *indirect, field)
                                         .map_err(failure)?,
                                 };
-                                let checks = arguments::render_safety_checks(
-                                    analysis,
-                                    self.mode == RenderMode::Witness,
-                                );
+                                let checks = self.caller_checks();
                                 write!(rust, "{EXPRESSION}::record::size_of_member_type::<{marker}, _>(if false {{ {checks} ::core::option::Option::Some(unsafe {{ ").expect("String output");
                                 tasks.extend([
                                     text(" }) } else { ::core::option::Option::None })"),
@@ -531,10 +545,7 @@ impl<'a> Renderer<'a> {
                                 continue;
                             }
                             let known = self.places[index];
-                            let checks = arguments::render_safety_checks(
-                                analysis,
-                                self.mode == RenderMode::Witness,
-                            );
+                            let checks = self.caller_checks();
                             write!(
                                 rust,
                                 "{EXPRESSION}::{}(if false {{ {checks} ::core::option::Option::Some(unsafe {{ ",
@@ -1192,9 +1203,10 @@ impl<'a> Renderer<'a> {
                                 }
                                 // The translation evaluates each argument once and converts it
                                 // to its parameter type, as the call does, using only its value.
-                                // A sizeof in the callee expands each argument's own checks.
+                                // A sizeof in the callee expands each argument's own checks,
+                                // which a translated caller does not need.
                                 const VALUE_ONLY: &str = "::core::compile_error!(\"a translated C function argument is only a value\")";
-                                let checks = arguments::render_safety_checks(analysis, false);
+                                let checks = self.caller_checks();
                                 if let Some(result) = &result {
                                     write!(rust, "{EXPRESSION}::implicit::<{}, _>(", result.marker)
                                         .expect("String output");
