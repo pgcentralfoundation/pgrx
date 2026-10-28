@@ -57,9 +57,10 @@ pub fn u64_to_item_pointer_parts(value: u64) -> (pg_sys::BlockNumber, pg_sys::Of
 /// PG15 defines `ItemPointerSet` and `BlockIdSet` as macros and PG16-19 as static
 /// inline functions, with the same stores in every version:
 /// `bi_hi = blockNumber >> 16`, `bi_lo = blockNumber & 0xffff`, and `ip_posid = offNum`.
-/// The generated `ItemPointerSet!` is a guarded native call on some of those versions,
-/// which would make these safe helpers call into PostgreSQL and panic off the backend
-/// thread, so they build the fields in Rust.
+/// Whether the generated `ItemPointerSet!` translates that body or calls the native
+/// function depends on the PostgreSQL version and build and on libclang. The native call
+/// would make these safe helpers call into PostgreSQL and panic off the backend thread,
+/// so they build the fields in Rust.
 #[inline]
 fn item_pointer(
     blockno: pg_sys::BlockNumber,
@@ -127,6 +128,11 @@ impl IntoDatum for pg_sys::ItemPointerData {
 mod tests {
     use super::*;
 
+    /// The helpers must not call into PostgreSQL, which this test binary cannot do: a
+    /// PostgreSQL symbol left in it makes the binary fail to load or link before any test
+    /// runs. That is how a native `ItemPointerSet!` call would show up here. Where the
+    /// generated macro translates the body, as it can with non-assert headers, this test
+    /// cannot tell the helpers from that macro.
     #[test]
     fn u64_item_pointer_round_trip_needs_no_backend_thread() {
         let convert = |value: u64| {
@@ -136,7 +142,6 @@ mod tests {
         };
         let value = (0x1234_5678_u64 << 32) | 0x9abc;
         assert_eq!(convert(value), ((0x1234_5678, 0x9abc), value));
-        // Guarded native calls panic on any thread but the first one that used them.
         let other = std::thread::spawn(move || convert(value)).join().unwrap();
         assert_eq!(other, ((0x1234_5678, 0x9abc), value));
     }
