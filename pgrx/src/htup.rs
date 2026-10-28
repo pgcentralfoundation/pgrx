@@ -59,16 +59,13 @@ pub fn heap_getattr<T: FromDatum, AllocatedBy: WhoAllocated>(
 ) -> Option<T> {
     // PostgreSQL only asserts that `attno` is within the descriptor, so check it first.
     let typoid = tupdesc.get(attno.get() - 1).expect("no attribute").type_oid();
-    let mut is_null = false;
     // SAFETY: not established. The lookup above bounds `attno`, and its reference ends with that
-    // statement. This safe function cannot check the rest of heap_getattr_inline's contract or
-    // the result's lifetime: `tuple` can be null or store attributes that `tupdesc` does not
+    // statement. This safe function cannot check the rest of heap_getattr_raw's contract or the
+    // result's lifetime: `tuple` can be null or store attributes that `tupdesc` does not
     // describe, a caller can hold a reference to `tupdesc`'s attribute entries across the call,
     // and a by-reference `T` can outlive the tuple.
-    let datum =
-        unsafe { heap_getattr_inline(tuple.as_ptr(), attno, tupdesc.as_ptr(), &mut is_null) };
-
-    if is_null { None } else { unsafe { T::from_polymorphic_datum(datum, false, typoid.value()) } }
+    let datum = unsafe { heap_getattr_raw(tuple.as_ptr(), attno, tupdesc.as_ptr()) }?;
+    unsafe { T::from_polymorphic_datum(datum, false, typoid.value()) }
 }
 
 /// Extract user attribute `attno` (1-based) of a heap tuple and return it as a Datum.
@@ -101,61 +98,36 @@ pub unsafe fn heap_getattr_raw(
     attno: NonZeroUsize,
     tupdesc: pg_sys::TupleDesc,
 ) -> Option<pg_sys::Datum> {
-    let mut is_null = false;
-    // SAFETY: the caller upholds heap_getattr_inline's contract, which matches this one.
-    let datum = unsafe { heap_getattr_inline(tuple, attno, tupdesc, &mut is_null) };
-    if is_null { None } else { Some(datum) }
-}
-
-/// Read user attribute `attno` of `tuple`, as PostgreSQL's `heap_getattr` does.
-///
-/// PostgreSQL 15 through 19 define `heap_getattr` and `fastgetattr` as static inline
-/// functions with this logic for a positive attribute number (PG18 and later read the
-/// `CompactAttribute` instead of the `FormData_pg_attribute`):
-///
-/// ```c
-/// if (attnum > (int) HeapTupleHeaderGetNatts(tup->t_data))
-///     return getmissingattr(tupleDesc, attnum, isnull);
-/// *isnull = false;
-/// if (HeapTupleNoNulls(tup))
-/// {
-///     att = TupleDescAttr(tupleDesc, attnum - 1);
-///     if (att->attcacheoff >= 0)
-///         return fetchatt(att, (char *) tup->t_data + tup->t_data->t_hoff +
-///                         att->attcacheoff);
-///     else
-///         return nocachegetattr(tup, attnum, tupleDesc);
-/// }
-/// else
-/// {
-///     if (att_isnull(attnum - 1, tup->t_data->t_bits))
-///     {
-///         *isnull = true;
-///         return (Datum) NULL;
-///     }
-///     else
-///         return nocachegetattr(tup, attnum, tupleDesc);
-/// }
-/// ```
-///
-/// The generated `heap_getattr!` calls a guarded native `fastgetattr` or `fetch_att` for
-/// every attribute, so this keeps the cached-offset and NULL-bitmap paths in Rust and calls
-/// the exported `getmissingattr` and `nocachegetattr` only where the C does.
-///
-/// # Safety
-///
-/// `tuple` must point to a live heap tuple, and each attribute it stores must have the same
-/// length, alignment, and pass-by-value flag as the attribute in that position of the live
-/// descriptor `tupdesc`. `attno` must not exceed the descriptor's attribute count. No Rust
-/// reference to `tupdesc`'s attribute entries may be live across the call. A by-reference
-/// result can point into the tuple or, on PostgreSQL 15.0 through 15.4, into `tupdesc`.
-#[inline]
-unsafe fn heap_getattr_inline(
-    tuple: *mut pg_sys::HeapTupleData,
-    attno: NonZeroUsize,
-    tupdesc: pg_sys::TupleDesc,
-    isnull: &mut bool,
-) -> pg_sys::Datum {
+    // PostgreSQL 15 through 19 define `heap_getattr` and `fastgetattr` as static inline
+    // functions with this logic for a positive attribute number (PG18 and later read the
+    // `CompactAttribute` instead of the `FormData_pg_attribute`):
+    //
+    //     if (attnum > (int) HeapTupleHeaderGetNatts(tup->t_data))
+    //         return getmissingattr(tupleDesc, attnum, isnull);
+    //     *isnull = false;
+    //     if (HeapTupleNoNulls(tup))
+    //     {
+    //         att = TupleDescAttr(tupleDesc, attnum - 1);
+    //         if (att->attcacheoff >= 0)
+    //             return fetchatt(att, (char *) tup->t_data + tup->t_data->t_hoff +
+    //                             att->attcacheoff);
+    //         else
+    //             return nocachegetattr(tup, attnum, tupleDesc);
+    //     }
+    //     else
+    //     {
+    //         if (att_isnull(attnum - 1, tup->t_data->t_bits))
+    //         {
+    //             *isnull = true;
+    //             return (Datum) NULL;
+    //         }
+    //         else
+    //             return nocachegetattr(tup, attnum, tupleDesc);
+    //     }
+    //
+    // The generated `heap_getattr!` calls a guarded native `fastgetattr` or `fetch_att` for
+    // every attribute, so this keeps the cached-offset and NULL-bitmap paths in Rust and calls
+    // the exported `getmissingattr` and `nocachegetattr` only where the C does.
     let index = attno.get() - 1;
     // tupdesc->natts is a C int, which bounds attno.
     let attnum = attno.get() as core::ffi::c_int;
@@ -164,24 +136,24 @@ unsafe fn heap_getattr_inline(
     unsafe {
         let t_data = (*tuple).t_data;
         if attno.get() > pg_sys::HeapTupleHeaderGetNatts!(t_data).get() as usize {
-            return pg_sys::getmissingattr(tupdesc, attnum, isnull);
+            let mut isnull = false;
+            let datum = pg_sys::getmissingattr(tupdesc, attnum, &mut isnull);
+            return (!isnull).then_some(datum);
         }
 
-        *isnull = false;
         if pg_sys::HeapTupleNoNulls!(tuple).is_true() {
             let (cacheoff, attbyval, attlen) = attribute_fetch_info(tupdesc, index);
             if cacheoff >= 0 {
                 let value = t_data.cast::<u8>().add((*t_data).t_hoff as usize + cacheoff as usize);
-                return fetch_att(value, attbyval, attlen);
+                return Some(fetch_att(value, attbyval, attlen));
             }
         } else {
             let bits = ptr::addr_of!((*t_data).t_bits).cast::<pg_sys::bits8>();
             if pg_sys::att_isnull!(attnum - 1, bits).is_true() {
-                *isnull = true;
-                return pg_sys::Datum::null();
+                return None;
             }
         }
-        pg_sys::nocachegetattr(tuple, attnum, tupdesc)
+        Some(pg_sys::nocachegetattr(tuple, attnum, tupdesc))
     }
 }
 
@@ -282,13 +254,13 @@ pub fn heap_getattr_datum_ex(
 ) -> DatumWithTypeInfo {
     // PostgreSQL only asserts that `attno` is within the descriptor, so check it first.
     let typoid = tupdesc.get(attno.get() - 1).expect("no attribute").type_oid();
-    let mut is_null = false;
     // SAFETY: not established. The lookup above bounds `attno`, and its reference ends with that
-    // statement. This safe function cannot check the rest of heap_getattr_inline's contract:
+    // statement. This safe function cannot check the rest of heap_getattr_raw's contract:
     // `tuple` can be null or store attributes that `tupdesc` does not describe, and a caller can
     // hold a reference to `tupdesc`'s attribute entries across the call.
-    let datum =
-        unsafe { heap_getattr_inline(tuple.as_ptr(), attno, tupdesc.as_ptr(), &mut is_null) };
+    let datum = unsafe { heap_getattr_raw(tuple.as_ptr(), attno, tupdesc.as_ptr()) };
+    let is_null = datum.is_none();
+    let datum = datum.unwrap_or_else(pg_sys::Datum::null);
 
     let mut typlen = 0;
     let mut typbyval = false;
