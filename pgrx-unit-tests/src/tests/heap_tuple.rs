@@ -1100,4 +1100,54 @@ mod tests {
         assert!(matches!(read, Ok(None)), "{read:?}");
         Ok(())
     }
+
+    /// Reading an `int4` attribute as a composite returns an error instead of reading the
+    /// integer as a pointer to a tuple.
+    #[pg_test]
+    fn test_get_by_index_rejects_scalar_attribute_as_composite() -> Result<(), spi::Error> {
+        Spi::run("CREATE TYPE ProbeIntHolder AS (v int4)")?;
+        let row =
+            Spi::get_one::<PgHeapTuple<'_, AllocatedByRust>>("SELECT ROW(7)::ProbeIntHolder")?
+                .expect("the row is not NULL");
+
+        let by_index =
+            row.get_by_index::<PgHeapTuple<'_, AllocatedByRust>>(NonZeroUsize::new(1).unwrap());
+        let by_name = row.get_by_name::<PgHeapTuple<'_, AllocatedByRust>>("v");
+        for read in [by_index, by_name] {
+            assert!(
+                matches!(
+                    read,
+                    Err(TryFromDatumError::IncompatibleTypes { datum_oid, .. })
+                        if datum_oid == pg_sys::INT4OID
+                ),
+                "{:?}",
+                read.as_ref().err()
+            );
+        }
+        assert_eq!(row.get_by_index::<i32>(NonZeroUsize::new(1).unwrap())?, Some(7));
+        Ok(())
+    }
+
+    /// Composite attributes, including one whose type is a domain over a composite type, still
+    /// read as composites.
+    #[pg_test]
+    fn test_get_by_index_reads_composite_and_domain_attributes() -> Result<(), spi::Error> {
+        Spi::run(
+            "CREATE DOMAIN DomainDog AS Dog;
+             CREATE TYPE DogHolder AS (dog Dog, domain_dog DomainDog);",
+        )?;
+        let row = Spi::get_one::<PgHeapTuple<'_, AllocatedByRust>>(
+            "SELECT ROW(ROW('Nami', 7)::Dog, ROW('Brandy', 3)::DomainDog)::DogHolder",
+        )?
+        .expect("the row is not NULL");
+
+        for (attname, name, scritches) in [("dog", "Nami", 7), ("domain_dog", "Brandy", 3)] {
+            let dog = row
+                .get_by_name::<PgHeapTuple<'_, AllocatedByRust>>(attname)?
+                .expect("the dog is not NULL");
+            assert_eq!(dog.get_by_name::<String>("name")?.as_deref(), Some(name));
+            assert_eq!(dog.get_by_name::<i32>("scritches")?, Some(scritches));
+        }
+        Ok(())
+    }
 }

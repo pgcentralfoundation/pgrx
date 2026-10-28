@@ -589,14 +589,21 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
         // Ask T for its type only now: for a PostgresType, that is a catalog lookup by name,
         // which can raise an ERROR and is not needed to return a NULL.
         let typoid = match T::type_oid() {
-            record @ pg_sys::RECORDOID => record,
+            // A `T` that reads records reads a row-type attribute (a record, a composite type,
+            // or a domain over one) as RECORDOID. Any other attribute keeps its own type, which
+            // try_from_datum checks against `T`.
+            // SAFETY: type_is_rowtype takes the OID by value and only looks it up; an OID with
+            // no type, such as a dropped attribute's, is not a row type.
+            pg_sys::RECORDOID if unsafe { pg_sys::type_is_rowtype(att_typoid) } => {
+                pg_sys::RECORDOID
+            }
             _ => att_typoid,
         };
         // SAFETY: the datum is this attribute's value, of type `att_typoid`. It lives as long as
         // the tuple and descriptor that `self` holds and `'tup` borrows: on PG15.0-15.4, a
-        // missing value points into the descriptor. When `T` reads records, `typoid` is
-        // RECORDOID, so try_from_datum does not check `att_typoid`, and a non-composite
-        // attribute reaches the composite reader; that is a known gap in this safe API.
+        // missing value points into the descriptor. `typoid` is RECORDOID only when that type
+        // is a row type, whose values are composite Datums; otherwise it is `att_typoid`, which
+        // try_from_datum checks against `T` before reading the datum.
         unsafe { T::try_from_datum(datum, false, typoid) }
     }
 }
