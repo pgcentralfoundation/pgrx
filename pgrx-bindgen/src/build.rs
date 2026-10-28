@@ -1255,6 +1255,7 @@ fn run_bindgen(
         macro_arguments,
         &environment_arguments,
         explicit_clang.as_deref(),
+        &pg_target_includes[0],
         native,
         &cflags,
         &target,
@@ -1269,6 +1270,14 @@ fn run_bindgen(
             pg_target_includes[0]
         )
     })
+}
+
+/// Give macro ownership to the server headers that bindgen and inspection include, the first
+/// of `pg_target_includes`. A `PGRX_INCLUDEDIR_SERVER` override replaces pg_config's directory
+/// as that root, so the macros it defines are generated and the installation's are not.
+fn macro_postgres_config(pg_config: &PgConfig, server_root: &str) -> eyre::Result<PostgresConfig> {
+    Ok(PostgresConfig::from_pg_config(pg_config.clone())?
+        .with_server_include_dir(server_root.into()))
 }
 
 /// Name the supported ways to supply target headers when the selected headers were configured
@@ -1341,6 +1350,7 @@ fn generate_macros(
     binder_arguments: Vec<String>,
     environment_arguments: &[String],
     preferred_clang: Option<&Path>,
+    server_root: &str,
     native: NativeBuild<'_>,
     cflags: &MacroCflags,
     target: &str,
@@ -1348,7 +1358,7 @@ fn generate_macros(
 ) -> eyre::Result<(String, MacroOutput)> {
     let _lock = MACRO_SCANNER.lock().map_err(|_| eyre!("C macro scanner lock was poisoned"))?;
     let scanner = MacroScanner::new().wrap_err("could not initialize C macro discovery")?;
-    let postgres = PostgresConfig::from_pg_config(pg_config.clone())?;
+    let postgres = macro_postgres_config(pg_config, server_root)?;
     let major_version = pg_config.major_version()?;
     let msvc = env_tracked("CARGO_CFG_TARGET_ENV").as_deref() == Some("msvc");
     // Bindgen appends its original environment tail itself. A CRT selection
@@ -2476,6 +2486,26 @@ macro_rules! EXAMPLE {
             "could not establish the binding generator's C macro compilation profile"
         );
         assert!(!format!("{other:?}").contains("PGRX_INCLUDEDIR_SERVER"));
+    }
+
+    /// A PGRX_INCLUDEDIR_SERVER override, the first selected include directory, owns the
+    /// generated macros rather than pg_config's server directory.
+    #[cfg(unix)]
+    #[test]
+    fn server_include_overrides_own_generated_macros() {
+        use std::os::unix::fs::PermissionsExt;
+        let directory = TemporaryDirectory::new();
+        let pg_config = directory.0.join("pg_config");
+        fs::write(
+            &pg_config,
+            "#!/bin/sh\ncase \"$1\" in\n--includedir-server) echo /installation/server ;;\n--version) echo 'PostgreSQL 18.4' ;;\n--cppflags) echo ;;\n*) exit 1 ;;\nesac\n",
+        )
+        .unwrap();
+        fs::set_permissions(&pg_config, fs::Permissions::from_mode(0o755)).unwrap();
+        let postgres =
+            macro_postgres_config(&PgConfig::new_with_defaults(pg_config), "/override/server/")
+                .unwrap();
+        assert_eq!(postgres.server_include_dir(), Path::new("/override/server/"));
     }
 
     /// Checks that unchanged generated artifacts keep their modification time.
