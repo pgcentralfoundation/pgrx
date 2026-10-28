@@ -14,10 +14,43 @@
 #[macro_export]
 macro_rules! EvalPlanQualSetSlot {
     ($epqstate:expr, $slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_origslot,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_operand!(
+                                                @value [true];
+                                                (@native [$epqstate])
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; (@native [$slot]))
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// Typed call adapter for C inline function ExecEvalExpr from executor.h:324 (PostgreSQL 15), executor.h:335 (PostgreSQL 16), executor.h:336 (PostgreSQL 17), executor.h:388 (PostgreSQL 18), executor.h:402 (PostgreSQL 19)
+/// Typed call adapter for C inline function ExecEvalExpr from executor.h:324 (PostgreSQL 15), executor.h:335 (PostgreSQL 16), executor.h:336 (PostgreSQL 17), executor.h:388 (PostgreSQL 18), executor.h:400 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Datum
@@ -42,11 +75,24 @@ macro_rules! EvalPlanQualSetSlot {
 #[macro_export]
 macro_rules! ExecEvalExpr {
     ($state:expr, $econtext:expr, $isNull:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$state;
+                let _ = &$econtext;
+                let _ = &$isNull;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function ExecEvalExprNoReturn from executor.h:413 (PostgreSQL 18), executor.h:427 (PostgreSQL 19)
+/// Typed call adapter for C inline function ExecEvalExprNoReturn from executor.h:413 (PostgreSQL 18), executor.h:425 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -74,11 +120,17 @@ macro_rules! ExecEvalExpr {
 #[macro_export]
 macro_rules! ExecEvalExprNoReturn {
     ($state:expr, $econtext:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$state;
+                let _ = &$econtext;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function ExecEvalExprNoReturnSwitchContext from executor.h:453 (PostgreSQL 18), executor.h:467 (PostgreSQL 19)
+/// Typed call adapter for C inline function ExecEvalExprNoReturnSwitchContext from executor.h:453 (PostgreSQL 18), executor.h:465 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -106,10 +158,16 @@ macro_rules! ExecEvalExprNoReturn {
 #[macro_export]
 macro_rules! ExecEvalExprNoReturnSwitchContext {
     ($state:expr, $econtext:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$state;
+                let _ = &$econtext;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
-/// Typed call adapter for C inline function ExecEvalExprSwitchContext from executor.h:339 (PostgreSQL 15), executor.h:350 (PostgreSQL 16), executor.h:351 (PostgreSQL 17), executor.h:431 (PostgreSQL 18), executor.h:445 (PostgreSQL 19)
+/// Typed call adapter for C inline function ExecEvalExprSwitchContext from executor.h:339 (PostgreSQL 15), executor.h:350 (PostgreSQL 16), executor.h:351 (PostgreSQL 17), executor.h:431 (PostgreSQL 18), executor.h:443 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Datum
@@ -140,7 +198,20 @@ macro_rules! ExecEvalExprNoReturnSwitchContext {
 #[macro_export]
 macro_rules! ExecEvalExprSwitchContext {
     ($state:expr, $econtext:expr, $isNull:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$state;
+                let _ = &$econtext;
+                let _ = &$isNull;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function ExecGetJunkAttribute from executor.h:177 (PostgreSQL 15), executor.h:189 (PostgreSQL 16–17), executor.h:220 (PostgreSQL 18), executor.h:225 (PostgreSQL 19)
@@ -167,7 +238,20 @@ macro_rules! ExecEvalExprSwitchContext {
 #[macro_export]
 macro_rules! ExecGetJunkAttribute {
     ($slot:expr, $attno:expr, $isNull:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                let _ = &$attno;
+                let _ = &$isNull;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function ExecProcNode from executor.h:260 (PostgreSQL 15), executor.h:271 (PostgreSQL 16), executor.h:272 (PostgreSQL 17), executor.h:309 (PostgreSQL 18), executor.h:321 (PostgreSQL 19)
@@ -196,7 +280,20 @@ macro_rules! ExecGetJunkAttribute {
 #[macro_export]
 macro_rules! ExecProcNode {
     ($node:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$node;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TupleTableSlot
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -244,11 +341,24 @@ macro_rules! ExecProcNode {
 #[macro_export]
 macro_rules! ExecProject {
     ($projInfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$projInfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TupleTableSlot
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function ExecProject from executor.h:478 (PostgreSQL 18), executor.h:492 (PostgreSQL 19)
+/// Typed call adapter for C inline function ExecProject from executor.h:478 (PostgreSQL 18), executor.h:490 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TupleTableSlot *
@@ -291,10 +401,23 @@ macro_rules! ExecProject {
 #[macro_export]
 macro_rules! ExecProject {
     ($projInfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$projInfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TupleTableSlot
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
-/// Typed call adapter for C inline function ExecQual from executor.h:404 (PostgreSQL 15), executor.h:415 (PostgreSQL 16), executor.h:416 (PostgreSQL 17), executor.h:514 (PostgreSQL 18), executor.h:528 (PostgreSQL 19)
+/// Typed call adapter for C inline function ExecQual from executor.h:404 (PostgreSQL 15), executor.h:415 (PostgreSQL 16), executor.h:416 (PostgreSQL 17), executor.h:514 (PostgreSQL 18), executor.h:526 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -332,10 +455,20 @@ macro_rules! ExecProject {
 #[macro_export]
 macro_rules! ExecQual {
     ($state:expr, $econtext:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$state;
+                let _ = &$econtext;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
-/// Typed call adapter for C inline function ExecQualAndReset from executor.h:431 (PostgreSQL 15), executor.h:442 (PostgreSQL 16), executor.h:443 (PostgreSQL 17), executor.h:541 (PostgreSQL 18), executor.h:555 (PostgreSQL 19)
+/// Typed call adapter for C inline function ExecQualAndReset from executor.h:431 (PostgreSQL 15), executor.h:442 (PostgreSQL 16), executor.h:443 (PostgreSQL 17), executor.h:541 (PostgreSQL 18), executor.h:553 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -362,10 +495,20 @@ macro_rules! ExecQual {
 #[macro_export]
 macro_rules! ExecQualAndReset {
     ($state:expr, $econtext:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$state;
+                let _ = &$econtext;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
-/// C macro GetPerTupleExprContext from executor.h:542 (PostgreSQL 15), executor.h:553 (PostgreSQL 16), executor.h:554 (PostgreSQL 17), executor.h:652 (PostgreSQL 18), executor.h:667 (PostgreSQL 19)
+/// C macro GetPerTupleExprContext from executor.h:542 (PostgreSQL 15), executor.h:553 (PostgreSQL 16), executor.h:554 (PostgreSQL 17), executor.h:652 (PostgreSQL 18), executor.h:665 (PostgreSQL 19)
 ///
 /// ```text
 /// #define GetPerTupleExprContext( estate ) ( ( estate ) -> es_per_tuple_exprcontext ? ( estate ) -> es_per_tuple_exprcontext : MakePerTupleExprContext ( estate ) )
@@ -382,10 +525,82 @@ macro_rules! ExecQualAndReset {
 #[macro_export]
 macro_rules! GetPerTupleExprContext {
     ($estate:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::load(
+                                        $crate::__pgrx_c_macros::expression::project::<
+                                            $crate::__pgrx_c_generated::Field_es_per_tuple_exprcontext,
+                                            _,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            (@native [$estate])
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::project::<
+                                                $crate::__pgrx_c_generated::Field_es_per_tuple_exprcontext,
+                                                _,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_operand!(
+                                                                @value [true];
+                                                                (@native [$estate])
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                    $crate::__pgrx_c_bindings::ExprContext
+                                                >,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >>()
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro GetPerTupleMemoryContext from executor.h:547 (PostgreSQL 15), executor.h:558 (PostgreSQL 16), executor.h:559 (PostgreSQL 17), executor.h:657 (PostgreSQL 18), executor.h:672 (PostgreSQL 19)
+/// C macro GetPerTupleMemoryContext from executor.h:547 (PostgreSQL 15), executor.h:558 (PostgreSQL 16), executor.h:559 (PostgreSQL 17), executor.h:657 (PostgreSQL 18), executor.h:670 (PostgreSQL 19)
 ///
 /// ```text
 /// #define GetPerTupleMemoryContext( estate ) ( GetPerTupleExprContext ( estate ) -> ecxt_per_tuple_memory )
@@ -402,10 +617,112 @@ macro_rules! GetPerTupleExprContext {
 #[macro_export]
 macro_rules! GetPerTupleMemoryContext {
     ($estate:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ecxt_per_tuple_memory,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::select(
+                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::load(
+                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                $crate::__pgrx_c_generated::Field_es_per_tuple_exprcontext,
+                                                                _,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_operand!(
+                                                                                @value [true];
+                                                                                (@native [$estate])
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ) {
+                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::load(
+                                                                $crate::__pgrx_c_macros::expression::project::<
+                                                                    $crate::__pgrx_c_generated::Field_es_per_tuple_exprcontext,
+                                                                    _,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                                        (
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                true,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_operand!(
+                                                                                    @value [true];
+                                                                                    (
+                                                                                        @native [
+                                                                                            $estate
+                                                                                        ]
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                } else {
+                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                                        $crate::__pgrx_c_bindings::ExprContext
+                                                                    >,
+                                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                >>()
+                                                        )
+                                                    )
+                                                }
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro ResetExprContext from executor.h:536 (PostgreSQL 15), executor.h:547 (PostgreSQL 16), executor.h:548 (PostgreSQL 17), executor.h:646 (PostgreSQL 18), executor.h:661 (PostgreSQL 19)
+/// C macro ResetExprContext from executor.h:536 (PostgreSQL 15), executor.h:547 (PostgreSQL 16), executor.h:548 (PostgreSQL 17), executor.h:646 (PostgreSQL 18), executor.h:659 (PostgreSQL 19)
 ///
 /// ```text
 /// #define ResetExprContext( econtext ) MemoryContextReset ( ( econtext ) -> ecxt_per_tuple_memory )
@@ -422,10 +739,15 @@ macro_rules! GetPerTupleMemoryContext {
 #[macro_export]
 macro_rules! ResetExprContext {
     ($econtext:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$econtext;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
-/// C macro ResetPerTupleExprContext from executor.h:551 (PostgreSQL 15), executor.h:562 (PostgreSQL 16), executor.h:563 (PostgreSQL 17), executor.h:661 (PostgreSQL 18), executor.h:676 (PostgreSQL 19)
+/// C macro ResetPerTupleExprContext from executor.h:551 (PostgreSQL 15), executor.h:562 (PostgreSQL 16), executor.h:563 (PostgreSQL 17), executor.h:661 (PostgreSQL 18), executor.h:674 (PostgreSQL 19)
 ///
 /// ```text
 /// #define ResetPerTupleExprContext( estate ) do { if ( ( estate ) -> es_per_tuple_exprcontext ) ResetExprContext ( ( estate ) -> es_per_tuple_exprcontext ) ; } while ( 0 )
@@ -444,7 +766,9 @@ macro_rules! ResetExprContext {
 #[macro_export]
 macro_rules! ResetPerTupleExprContext {
     ($estate:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$estate;
+        })
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -474,7 +798,19 @@ macro_rules! ResetPerTupleExprContext {
 #[macro_export]
 macro_rules! TupleHashEntryGetAdditional {
     ($hashtable:expr, $entry:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$hashtable;
+                let _ = &$entry;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CVoid,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -501,7 +837,20 @@ macro_rules! TupleHashEntryGetAdditional {
 #[macro_export]
 macro_rules! TupleHashEntryGetTuple {
     ($entry:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$entry;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::MinimalTupleData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -528,10 +877,20 @@ macro_rules! TupleHashEntryGetTuple {
 #[macro_export]
 macro_rules! TupleHashEntrySize {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            usize
+                        >>()
+                )
+            }
+        )
     };
 }
-/// Typed call adapter for C inline function exec_rt_fetch from executor.h:579 (PostgreSQL 15), executor.h:590 (PostgreSQL 16–17), executor.h:692 (PostgreSQL 18), executor.h:709 (PostgreSQL 19)
+/// Typed call adapter for C inline function exec_rt_fetch from executor.h:579 (PostgreSQL 15), executor.h:590 (PostgreSQL 16–17), executor.h:692 (PostgreSQL 18), executor.h:708 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline RangeTblEntry *
@@ -554,7 +913,21 @@ macro_rules! TupleHashEntrySize {
 #[macro_export]
 macro_rules! exec_rt_fetch {
     ($rti:expr, $estate:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rti;
+                let _ = &$estate;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::RangeTblEntry
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 pub use EvalPlanQualSetSlot;

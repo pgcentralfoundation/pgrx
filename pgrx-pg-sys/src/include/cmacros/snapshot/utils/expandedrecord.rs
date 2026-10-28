@@ -19,7 +19,20 @@
 #[macro_export]
 macro_rules! ExpandedRecordGetDatum {
     ($erh:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$erh;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::Datum
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -46,7 +59,18 @@ macro_rules! ExpandedRecordGetDatum {
 #[macro_export]
 macro_rules! ExpandedRecordGetDatum {
     ($erh:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$erh;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -67,7 +91,20 @@ macro_rules! ExpandedRecordGetDatum {
 #[macro_export]
 macro_rules! ExpandedRecordGetRODatum {
     ($erh:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$erh;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::Datum
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -94,7 +131,18 @@ macro_rules! ExpandedRecordGetRODatum {
 #[macro_export]
 macro_rules! ExpandedRecordGetRODatum {
     ($erh:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$erh;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro ExpandedRecordIsDomain from expandedrecord.h:150 (PostgreSQL 15), expandedrecord.h:160 (PostgreSQL 16–19)
@@ -110,7 +158,18 @@ macro_rules! ExpandedRecordGetRODatum {
 #[macro_export]
 macro_rules! ExpandedRecordIsDomain {
     ($erh:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$erh;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro ExpandedRecordIsEmpty from expandedrecord.h:148 (PostgreSQL 15), expandedrecord.h:158 (PostgreSQL 16–19)
@@ -126,7 +185,18 @@ macro_rules! ExpandedRecordIsDomain {
 #[macro_export]
 macro_rules! ExpandedRecordIsEmpty {
     ($erh:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$erh;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_EXPANDED_RECORD from expandedrecord.h:142 (PostgreSQL 15), expandedrecord.h:154 (PostgreSQL 16–19)
@@ -148,7 +218,21 @@ macro_rules! ExpandedRecordIsEmpty {
 #[macro_export]
 macro_rules! PG_GETARG_EXPANDED_RECORD {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ExpandedRecordHeader
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -220,7 +304,13 @@ macro_rules! PG_RETURN_EXPANDED_RECORD {
 #[macro_export]
 macro_rules! TransferExpandedRecord {
     ($erh:expr, $cxt:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$erh;
+                let _ = &$cxt;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function expanded_record_get_field from expandedrecord.h:217 (PostgreSQL 15), expandedrecord.h:227 (PostgreSQL 16–19)
@@ -254,7 +344,20 @@ macro_rules! TransferExpandedRecord {
 #[macro_export]
 macro_rules! expanded_record_get_field {
     ($erh:expr, $fnumber:expr, $isnull:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$erh;
+                let _ = &$fnumber;
+                let _ = &$isnull;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function expanded_record_get_tupdesc from expandedrecord.h:207 (PostgreSQL 15), expandedrecord.h:217 (PostgreSQL 16–19)
@@ -283,7 +386,20 @@ macro_rules! expanded_record_get_field {
 #[macro_export]
 macro_rules! expanded_record_get_tupdesc {
     ($erh:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$erh;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TupleDescData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro expanded_record_set_field from expandedrecord.h:198 (PostgreSQL 15), expandedrecord.h:208 (PostgreSQL 16–19)
@@ -303,7 +419,16 @@ macro_rules! expanded_record_get_tupdesc {
 #[macro_export]
 macro_rules! expanded_record_set_field {
     ($erh:expr, $fnumber:expr, $newValue:expr, $isnull:expr, $expand_external:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$erh;
+                let _ = &$fnumber;
+                let _ = &$newValue;
+                let _ = &$isnull;
+                let _ = &$expand_external;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 pub use ExpandedRecordGetDatum;

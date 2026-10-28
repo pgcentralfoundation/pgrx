@@ -15,7 +15,34 @@
 #[macro_export]
 macro_rules! SET_LOCKTAG_ADVISORY {
     ($locktag:expr, $id1:expr, $id2:expr, $id3:expr, $id4:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$id1;
+                let _ = &$id2;
+                let _ = &$id3;
+                let _ = &$id4;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::USER_LOCKMETHOD as i32)
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -32,7 +59,34 @@ macro_rules! SET_LOCKTAG_ADVISORY {
 #[macro_export]
 macro_rules! SET_LOCKTAG_APPLY_TRANSACTION {
     ($locktag:expr, $dboid:expr, $suboid:expr, $xid:expr, $objid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$dboid;
+                let _ = &$suboid;
+                let _ = &$xid;
+                let _ = &$objid;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32)
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -49,7 +103,31 @@ macro_rules! SET_LOCKTAG_APPLY_TRANSACTION {
 #[macro_export]
 macro_rules! SET_LOCKTAG_DATABASE_FROZEN_IDS {
     ($locktag:expr, $dboid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$dboid;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32)
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -66,7 +144,34 @@ macro_rules! SET_LOCKTAG_DATABASE_FROZEN_IDS {
 #[macro_export]
 macro_rules! SET_LOCKTAG_OBJECT {
     ($locktag:expr, $dboid:expr, $classoid:expr, $objoid:expr, $objsubid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$dboid;
+                let _ = &$classoid;
+                let _ = &$objoid;
+                let _ = &$objsubid;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32)
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -83,7 +188,33 @@ macro_rules! SET_LOCKTAG_OBJECT {
 #[macro_export]
 macro_rules! SET_LOCKTAG_PAGE {
     ($locktag:expr, $dboid:expr, $reloid:expr, $blocknum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$dboid;
+                let _ = &$reloid;
+                let _ = &$blocknum;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32)
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -100,7 +231,32 @@ macro_rules! SET_LOCKTAG_PAGE {
 #[macro_export]
 macro_rules! SET_LOCKTAG_RELATION {
     ($locktag:expr, $dboid:expr, $reloid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$dboid;
+                let _ = &$reloid;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32)
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -117,7 +273,32 @@ macro_rules! SET_LOCKTAG_RELATION {
 #[macro_export]
 macro_rules! SET_LOCKTAG_RELATION_EXTEND {
     ($locktag:expr, $dboid:expr, $reloid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$dboid;
+                let _ = &$reloid;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32)
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -134,7 +315,32 @@ macro_rules! SET_LOCKTAG_RELATION_EXTEND {
 #[macro_export]
 macro_rules! SET_LOCKTAG_SPECULATIVE_INSERTION {
     ($locktag:expr, $xid:expr, $token:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$xid;
+                let _ = &$token;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32)
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -151,7 +357,31 @@ macro_rules! SET_LOCKTAG_SPECULATIVE_INSERTION {
 #[macro_export]
 macro_rules! SET_LOCKTAG_TRANSACTION {
     ($locktag:expr, $xid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$xid;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32)
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -168,7 +398,34 @@ macro_rules! SET_LOCKTAG_TRANSACTION {
 #[macro_export]
 macro_rules! SET_LOCKTAG_TUPLE {
     ($locktag:expr, $dboid:expr, $reloid:expr, $blocknum:expr, $offnum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$dboid;
+                let _ = &$reloid;
+                let _ = &$blocknum;
+                let _ = &$offnum;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32)
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -185,7 +442,31 @@ macro_rules! SET_LOCKTAG_TUPLE {
 #[macro_export]
 macro_rules! SET_LOCKTAG_VIRTUALTRANSACTION {
     ($locktag:expr, $vxid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$vxid;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32)
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]

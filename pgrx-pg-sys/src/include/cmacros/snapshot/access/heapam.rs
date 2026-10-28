@@ -19,7 +19,18 @@
 #[macro_export]
 macro_rules! HeapScanIsValid {
     ($scan:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scan;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -55,7 +66,13 @@ macro_rules! HeapScanIsValid {
 #[macro_export]
 macro_rules! heap_execute_freeze_tuple {
     ($tuple:expr, $frz:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$tuple;
+                let _ = &$frz;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]

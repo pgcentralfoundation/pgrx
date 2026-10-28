@@ -29,7 +29,20 @@
 #[macro_export]
 macro_rules! for_both_cell_setup {
     ($list1:expr, $initcell1:expr, $list2:expr, $initcell2:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list1;
+                let _ = &$initcell1;
+                let _ = &$list2;
+                let _ = &$initcell2;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CRawRecord<
+                            $crate::__pgrx_c_bindings::ForBothCellState
+                        >>()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function for_each_cell_setup from pg_list.h:425 (PostgreSQL 15), pg_list.h:446 (PostgreSQL 16–18), pg_list.h:478 (PostgreSQL 19)
@@ -58,7 +71,18 @@ macro_rules! for_both_cell_setup {
 #[macro_export]
 macro_rules! for_each_cell_setup {
     ($lst:expr, $initcell:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$lst;
+                let _ = &$initcell;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CRawRecord<
+                            $crate::__pgrx_c_bindings::ForEachState
+                        >>()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function for_each_from_setup from pg_list.h:401 (PostgreSQL 15), pg_list.h:422 (PostgreSQL 16–18), pg_list.h:454 (PostgreSQL 19)
@@ -87,7 +111,18 @@ macro_rules! for_each_cell_setup {
 #[macro_export]
 macro_rules! for_each_from_setup {
     ($lst:expr, $N:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$lst;
+                let _ = &$N;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CRawRecord<
+                            $crate::__pgrx_c_bindings::ForEachState
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro lfirst from pg_list.h:169 (PostgreSQL 15), pg_list.h:172 (PostgreSQL 16–19)
@@ -103,7 +138,30 @@ macro_rules! for_each_from_setup {
 #[macro_export]
 macro_rules! lfirst {
     ($lc:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ptr_value,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; (@native [$lc])))
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro lfirst_int from pg_list.h:170 (PostgreSQL 15), pg_list.h:173 (PostgreSQL 16–19)
@@ -119,11 +177,33 @@ macro_rules! lfirst {
 #[macro_export]
 macro_rules! lfirst_int {
     ($lc:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_int_value,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; (@native [$lc])))
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-#[cfg(feature = "pg18")]
-/// C macro lfirst_node from pg_list.h:176 (PostgreSQL 18)
+/// C macro lfirst_node from pg_list.h:172 (PostgreSQL 15), pg_list.h:176 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define lfirst_node( type , lc ) castNode ( type , lfirst ( lc ) )
@@ -140,7 +220,19 @@ macro_rules! lfirst_int {
 #[macro_export]
 macro_rules! lfirst_node {
     ($type:ty, $lc:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$lc;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
+                        >::Marker,
+                        $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro lfirst_oid from pg_list.h:171 (PostgreSQL 15), pg_list.h:174 (PostgreSQL 16–19)
@@ -156,7 +248,30 @@ macro_rules! lfirst_node {
 #[macro_export]
 macro_rules! lfirst_oid {
     ($lc:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_oid_value,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; (@native [$lc])))
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -173,7 +288,30 @@ macro_rules! lfirst_oid {
 #[macro_export]
 macro_rules! lfirst_xid {
     ($lc:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_xid_value,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; (@native [$lc])))
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro lfourth from pg_list.h:189 (PostgreSQL 15), pg_list.h:193 (PostgreSQL 16–19)
@@ -193,7 +331,39 @@ macro_rules! lfirst_xid {
 #[macro_export]
 macro_rules! lfourth {
     ($l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ptr_value,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                        $crate::__pgrx_c_bindings::ListCell
+                                                    >,
+                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                >>()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro lfourth_int from pg_list.h:190 (PostgreSQL 15), pg_list.h:194 (PostgreSQL 16–19)
@@ -213,11 +383,42 @@ macro_rules! lfourth {
 #[macro_export]
 macro_rules! lfourth_int {
     ($l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_int_value,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                        $crate::__pgrx_c_bindings::ListCell
+                                                    >,
+                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                >>()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-#[cfg(feature = "pg18")]
-/// C macro lfourth_node from pg_list.h:196 (PostgreSQL 18)
+/// C macro lfourth_node from pg_list.h:192 (PostgreSQL 15), pg_list.h:196 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define lfourth_node( type , l ) castNode ( type , lfourth ( l ) )
@@ -234,7 +435,19 @@ macro_rules! lfourth_int {
 #[macro_export]
 macro_rules! lfourth_node {
     ($type:ty, $l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
+                        >::Marker,
+                        $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro lfourth_oid from pg_list.h:191 (PostgreSQL 15), pg_list.h:195 (PostgreSQL 16–19)
@@ -254,7 +467,39 @@ macro_rules! lfourth_node {
 #[macro_export]
 macro_rules! lfourth_oid {
     ($l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_oid_value,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                        $crate::__pgrx_c_bindings::ListCell
+                                                    >,
+                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                >>()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro linitial from pg_list.h:174 (PostgreSQL 15), pg_list.h:178 (PostgreSQL 16–19)
@@ -274,7 +519,39 @@ macro_rules! lfourth_oid {
 #[macro_export]
 macro_rules! linitial {
     ($l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ptr_value,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                        $crate::__pgrx_c_bindings::ListCell
+                                                    >,
+                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                >>()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro linitial_int from pg_list.h:175 (PostgreSQL 15), pg_list.h:179 (PostgreSQL 16–19)
@@ -294,11 +571,42 @@ macro_rules! linitial {
 #[macro_export]
 macro_rules! linitial_int {
     ($l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_int_value,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                        $crate::__pgrx_c_bindings::ListCell
+                                                    >,
+                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                >>()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-#[cfg(feature = "pg18")]
-/// C macro linitial_node from pg_list.h:181 (PostgreSQL 18)
+/// C macro linitial_node from pg_list.h:177 (PostgreSQL 15), pg_list.h:181 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define linitial_node( type , l ) castNode ( type , linitial ( l ) )
@@ -315,7 +623,19 @@ macro_rules! linitial_int {
 #[macro_export]
 macro_rules! linitial_node {
     ($type:ty, $l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
+                        >::Marker,
+                        $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro linitial_oid from pg_list.h:176 (PostgreSQL 15), pg_list.h:180 (PostgreSQL 16–19)
@@ -335,7 +655,39 @@ macro_rules! linitial_node {
 #[macro_export]
 macro_rules! linitial_oid {
     ($l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_oid_value,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                        $crate::__pgrx_c_bindings::ListCell
+                                                    >,
+                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                >>()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function list_cell_number from pg_list.h:311 (PostgreSQL 15), pg_list.h:332 (PostgreSQL 16–18), pg_list.h:364 (PostgreSQL 19)
@@ -362,7 +714,17 @@ macro_rules! linitial_oid {
 #[macro_export]
 macro_rules! list_cell_number {
     ($l:expr, $c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                let _ = &$c;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CInt
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function list_head from pg_list.h:124 (PostgreSQL 15), pg_list.h:127 (PostgreSQL 16–19)
@@ -388,7 +750,20 @@ macro_rules! list_cell_number {
 #[macro_export]
 macro_rules! list_head {
     ($l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ListCell
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function list_last_cell from pg_list.h:266 (PostgreSQL 15), pg_list.h:287 (PostgreSQL 16–18), pg_list.h:319 (PostgreSQL 19)
@@ -415,7 +790,20 @@ macro_rules! list_head {
 #[macro_export]
 macro_rules! list_last_cell {
     ($list:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ListCell
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function list_length from pg_list.h:148 (PostgreSQL 15), pg_list.h:151 (PostgreSQL 16–19)
@@ -441,7 +829,16 @@ macro_rules! list_last_cell {
 #[macro_export]
 macro_rules! list_length {
     ($l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CInt
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -462,7 +859,20 @@ macro_rules! list_length {
 #[macro_export]
 macro_rules! list_make1 {
     ($x1:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x1;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::List
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -483,7 +893,20 @@ macro_rules! list_make1 {
 #[macro_export]
 macro_rules! list_make1_int {
     ($x1:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x1;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::List
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -504,7 +927,20 @@ macro_rules! list_make1_int {
 #[macro_export]
 macro_rules! list_make1_oid {
     ($x1:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x1;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::List
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -525,7 +961,20 @@ macro_rules! list_make1_oid {
 #[macro_export]
 macro_rules! list_make1_xid {
     ($x1:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x1;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::List
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -546,7 +995,21 @@ macro_rules! list_make1_xid {
 #[macro_export]
 macro_rules! list_make2 {
     ($x1:expr, $x2:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x1;
+                let _ = &$x2;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::List
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -567,7 +1030,21 @@ macro_rules! list_make2 {
 #[macro_export]
 macro_rules! list_make2_int {
     ($x1:expr, $x2:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x1;
+                let _ = &$x2;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::List
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -588,7 +1065,21 @@ macro_rules! list_make2_int {
 #[macro_export]
 macro_rules! list_make2_oid {
     ($x1:expr, $x2:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x1;
+                let _ = &$x2;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::List
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -609,7 +1100,21 @@ macro_rules! list_make2_oid {
 #[macro_export]
 macro_rules! list_make2_xid {
     ($x1:expr, $x2:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x1;
+                let _ = &$x2;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::List
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -630,7 +1135,22 @@ macro_rules! list_make2_xid {
 #[macro_export]
 macro_rules! list_make3 {
     ($x1:expr, $x2:expr, $x3:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x1;
+                let _ = &$x2;
+                let _ = &$x3;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::List
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -651,7 +1171,22 @@ macro_rules! list_make3 {
 #[macro_export]
 macro_rules! list_make3_int {
     ($x1:expr, $x2:expr, $x3:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x1;
+                let _ = &$x2;
+                let _ = &$x3;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::List
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -672,7 +1207,22 @@ macro_rules! list_make3_int {
 #[macro_export]
 macro_rules! list_make3_oid {
     ($x1:expr, $x2:expr, $x3:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x1;
+                let _ = &$x2;
+                let _ = &$x3;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::List
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -693,7 +1243,22 @@ macro_rules! list_make3_oid {
 #[macro_export]
 macro_rules! list_make3_xid {
     ($x1:expr, $x2:expr, $x3:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x1;
+                let _ = &$x2;
+                let _ = &$x3;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::List
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -714,7 +1279,23 @@ macro_rules! list_make3_xid {
 #[macro_export]
 macro_rules! list_make4 {
     ($x1:expr, $x2:expr, $x3:expr, $x4:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x1;
+                let _ = &$x2;
+                let _ = &$x3;
+                let _ = &$x4;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::List
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -735,7 +1316,23 @@ macro_rules! list_make4 {
 #[macro_export]
 macro_rules! list_make4_int {
     ($x1:expr, $x2:expr, $x3:expr, $x4:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x1;
+                let _ = &$x2;
+                let _ = &$x3;
+                let _ = &$x4;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::List
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -756,7 +1353,23 @@ macro_rules! list_make4_int {
 #[macro_export]
 macro_rules! list_make4_oid {
     ($x1:expr, $x2:expr, $x3:expr, $x4:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x1;
+                let _ = &$x2;
+                let _ = &$x3;
+                let _ = &$x4;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::List
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -777,7 +1390,23 @@ macro_rules! list_make4_oid {
 #[macro_export]
 macro_rules! list_make4_xid {
     ($x1:expr, $x2:expr, $x3:expr, $x4:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x1;
+                let _ = &$x2;
+                let _ = &$x3;
+                let _ = &$x4;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::List
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -798,7 +1427,24 @@ macro_rules! list_make4_xid {
 #[macro_export]
 macro_rules! list_make5 {
     ($x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x1;
+                let _ = &$x2;
+                let _ = &$x3;
+                let _ = &$x4;
+                let _ = &$x5;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::List
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -819,7 +1465,24 @@ macro_rules! list_make5 {
 #[macro_export]
 macro_rules! list_make5_int {
     ($x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x1;
+                let _ = &$x2;
+                let _ = &$x3;
+                let _ = &$x4;
+                let _ = &$x5;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::List
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -840,7 +1503,24 @@ macro_rules! list_make5_int {
 #[macro_export]
 macro_rules! list_make5_oid {
     ($x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x1;
+                let _ = &$x2;
+                let _ = &$x3;
+                let _ = &$x4;
+                let _ = &$x5;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::List
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -861,7 +1541,24 @@ macro_rules! list_make5_oid {
 #[macro_export]
 macro_rules! list_make5_xid {
     ($x1:expr, $x2:expr, $x3:expr, $x4:expr, $x5:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x1;
+                let _ = &$x2;
+                let _ = &$x3;
+                let _ = &$x4;
+                let _ = &$x5;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::List
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -891,7 +1588,17 @@ macro_rules! list_make5_xid {
 #[macro_export]
 macro_rules! list_make_int_cell {
     ($v:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$v;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CRawRecord<
+                            $crate::__pgrx_c_bindings::ListCell
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -921,7 +1628,17 @@ macro_rules! list_make_int_cell {
 #[macro_export]
 macro_rules! list_make_oid_cell {
     ($v:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$v;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CRawRecord<
+                            $crate::__pgrx_c_bindings::ListCell
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -951,7 +1668,17 @@ macro_rules! list_make_oid_cell {
 #[macro_export]
 macro_rules! list_make_ptr_cell {
     ($v:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$v;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CRawRecord<
+                            $crate::__pgrx_c_bindings::ListCell
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -981,7 +1708,17 @@ macro_rules! list_make_ptr_cell {
 #[macro_export]
 macro_rules! list_make_xid_cell {
     ($v:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$v;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CRawRecord<
+                            $crate::__pgrx_c_bindings::ListCell
+                        >>()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function list_nth from pg_list.h:277 (PostgreSQL 15), pg_list.h:298 (PostgreSQL 16–18), pg_list.h:330 (PostgreSQL 19)
@@ -1008,7 +1745,19 @@ macro_rules! list_make_xid_cell {
 #[macro_export]
 macro_rules! list_nth {
     ($list:expr, $n:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                let _ = &$n;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CVoid,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function list_nth_cell from pg_list.h:255 (PostgreSQL 15), pg_list.h:276 (PostgreSQL 16–18), pg_list.h:308 (PostgreSQL 19)
@@ -1036,7 +1785,21 @@ macro_rules! list_nth {
 #[macro_export]
 macro_rules! list_nth_cell {
     ($list:expr, $n:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                let _ = &$n;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ListCell
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function list_nth_int from pg_list.h:288 (PostgreSQL 15), pg_list.h:309 (PostgreSQL 16–18), pg_list.h:341 (PostgreSQL 19)
@@ -1063,11 +1826,20 @@ macro_rules! list_nth_cell {
 #[macro_export]
 macro_rules! list_nth_int {
     ($list:expr, $n:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                let _ = &$n;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CInt
+                    >()
+                )
+            }
+        )
     };
 }
-#[cfg(feature = "pg18")]
-/// C macro list_nth_node from pg_list.h:327 (PostgreSQL 18)
+/// C macro list_nth_node from pg_list.h:306 (PostgreSQL 15), pg_list.h:327 (PostgreSQL 16–18), pg_list.h:359 (PostgreSQL 19)
 ///
 /// ```text
 /// #define list_nth_node( type , list , n ) castNode ( type , list_nth ( list , n ) )
@@ -1084,7 +1856,20 @@ macro_rules! list_nth_int {
 #[macro_export]
 macro_rules! list_nth_node {
     ($type:ty, $list:expr, $n:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                let _ = &$n;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
+                        >::Marker,
+                        $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                    )
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function list_nth_oid from pg_list.h:299 (PostgreSQL 15), pg_list.h:320 (PostgreSQL 16–18), pg_list.h:352 (PostgreSQL 19)
@@ -1111,7 +1896,19 @@ macro_rules! list_nth_node {
 #[macro_export]
 macro_rules! list_nth_oid {
     ($list:expr, $n:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                let _ = &$n;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedInt,
+                            $crate::__pgrx_c_bindings::Oid
+                        >>()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function list_second_cell from pg_list.h:138 (PostgreSQL 15), pg_list.h:141 (PostgreSQL 16–19)
@@ -1140,7 +1937,20 @@ macro_rules! list_nth_oid {
 #[macro_export]
 macro_rules! list_second_cell {
     ($l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ListCell
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function list_tail from pg_list.h:131 (PostgreSQL 15), pg_list.h:134 (PostgreSQL 16–19)
@@ -1166,7 +1976,20 @@ macro_rules! list_second_cell {
 #[macro_export]
 macro_rules! list_tail {
     ($l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ListCell
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro llast from pg_list.h:194 (PostgreSQL 15), pg_list.h:198 (PostgreSQL 16–19)
@@ -1186,7 +2009,39 @@ macro_rules! list_tail {
 #[macro_export]
 macro_rules! llast {
     ($l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ptr_value,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                        $crate::__pgrx_c_bindings::ListCell
+                                                    >,
+                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                >>()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro llast_int from pg_list.h:195 (PostgreSQL 15), pg_list.h:199 (PostgreSQL 16–19)
@@ -1206,11 +2061,42 @@ macro_rules! llast {
 #[macro_export]
 macro_rules! llast_int {
     ($l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_int_value,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                        $crate::__pgrx_c_bindings::ListCell
+                                                    >,
+                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                >>()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-#[cfg(feature = "pg18")]
-/// C macro llast_node from pg_list.h:202 (PostgreSQL 18)
+/// C macro llast_node from pg_list.h:197 (PostgreSQL 15), pg_list.h:202 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define llast_node( type , l ) castNode ( type , llast ( l ) )
@@ -1227,7 +2113,19 @@ macro_rules! llast_int {
 #[macro_export]
 macro_rules! llast_node {
     ($type:ty, $l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
+                        >::Marker,
+                        $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro llast_oid from pg_list.h:196 (PostgreSQL 15), pg_list.h:200 (PostgreSQL 16–19)
@@ -1247,7 +2145,39 @@ macro_rules! llast_node {
 #[macro_export]
 macro_rules! llast_oid {
     ($l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_oid_value,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                        $crate::__pgrx_c_bindings::ListCell
+                                                    >,
+                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                >>()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1268,7 +2198,39 @@ macro_rules! llast_oid {
 #[macro_export]
 macro_rules! llast_xid {
     ($l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_xid_value,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                        $crate::__pgrx_c_bindings::ListCell
+                                                    >,
+                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                >>()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function lnext from pg_list.h:321 (PostgreSQL 15), pg_list.h:342 (PostgreSQL 16–18), pg_list.h:374 (PostgreSQL 19)
@@ -1299,7 +2261,21 @@ macro_rules! llast_xid {
 #[macro_export]
 macro_rules! lnext {
     ($l:expr, $c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                let _ = &$c;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ListCell
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro lsecond from pg_list.h:179 (PostgreSQL 15), pg_list.h:183 (PostgreSQL 16–19)
@@ -1319,7 +2295,39 @@ macro_rules! lnext {
 #[macro_export]
 macro_rules! lsecond {
     ($l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ptr_value,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                        $crate::__pgrx_c_bindings::ListCell
+                                                    >,
+                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                >>()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro lsecond_int from pg_list.h:180 (PostgreSQL 15), pg_list.h:184 (PostgreSQL 16–19)
@@ -1339,11 +2347,42 @@ macro_rules! lsecond {
 #[macro_export]
 macro_rules! lsecond_int {
     ($l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_int_value,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                        $crate::__pgrx_c_bindings::ListCell
+                                                    >,
+                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                >>()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-#[cfg(feature = "pg18")]
-/// C macro lsecond_node from pg_list.h:186 (PostgreSQL 18)
+/// C macro lsecond_node from pg_list.h:182 (PostgreSQL 15), pg_list.h:186 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define lsecond_node( type , l ) castNode ( type , lsecond ( l ) )
@@ -1360,7 +2399,19 @@ macro_rules! lsecond_int {
 #[macro_export]
 macro_rules! lsecond_node {
     ($type:ty, $l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
+                        >::Marker,
+                        $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro lsecond_oid from pg_list.h:181 (PostgreSQL 15), pg_list.h:185 (PostgreSQL 16–19)
@@ -1380,7 +2431,39 @@ macro_rules! lsecond_node {
 #[macro_export]
 macro_rules! lsecond_oid {
     ($l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_oid_value,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                        $crate::__pgrx_c_bindings::ListCell
+                                                    >,
+                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                >>()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro lthird from pg_list.h:184 (PostgreSQL 15), pg_list.h:188 (PostgreSQL 16–19)
@@ -1400,7 +2483,39 @@ macro_rules! lsecond_oid {
 #[macro_export]
 macro_rules! lthird {
     ($l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ptr_value,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                        $crate::__pgrx_c_bindings::ListCell
+                                                    >,
+                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                >>()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro lthird_int from pg_list.h:185 (PostgreSQL 15), pg_list.h:189 (PostgreSQL 16–19)
@@ -1420,11 +2535,42 @@ macro_rules! lthird {
 #[macro_export]
 macro_rules! lthird_int {
     ($l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_int_value,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                        $crate::__pgrx_c_bindings::ListCell
+                                                    >,
+                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                >>()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-#[cfg(feature = "pg18")]
-/// C macro lthird_node from pg_list.h:191 (PostgreSQL 18)
+/// C macro lthird_node from pg_list.h:187 (PostgreSQL 15), pg_list.h:191 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define lthird_node( type , l ) castNode ( type , lthird ( l ) )
@@ -1441,7 +2587,19 @@ macro_rules! lthird_int {
 #[macro_export]
 macro_rules! lthird_node {
     ($type:ty, $l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<<$type as $crate::__pgrx_c_macros::expression::NativeType
+                        >::Marker,
+                        $crate::__pgrx_c_macros::expression::ReadWrite>>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro lthird_oid from pg_list.h:186 (PostgreSQL 15), pg_list.h:190 (PostgreSQL 16–19)
@@ -1461,7 +2619,39 @@ macro_rules! lthird_node {
 #[macro_export]
 macro_rules! lthird_oid {
     ($l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_oid_value,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                        $crate::__pgrx_c_bindings::ListCell
+                                                    >,
+                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                >>()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro multi_for_advance_cell from pg_list.h:453 (PostgreSQL 15), pg_list.h:474 (PostgreSQL 16), pg_list.h:525 (PostgreSQL 17–18), pg_list.h:557 (PostgreSQL 19)
@@ -1480,8 +2670,360 @@ macro_rules! lthird_oid {
 /// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! multi_for_advance_cell {
+    ($cell:expr, * $state:ident, $l:ident, $i:ident $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            $crate::__pgrx_c_operand!(@place; (@native [$cell])),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::select(
+                                    if $crate::__pgrx_c_macros::expression::truth(
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >()
+                                            )
+                                        )
+                                    ) {
+                                        $crate::__pgrx_c_macros::Either::Left(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::address(
+                                                    $crate::__pgrx_c_macros::expression::index(
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::load(
+                                                                $crate::__pgrx_c_macros::expression::project::<
+                                                                    $crate::__pgrx_c_generated::Field_elements,
+                                                                    _,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::load(
+                                                                                $crate::__pgrx_c_macros::expression::project::<
+                                                                                    $crate::__pgrx_c_field_marker!(
+                                                                                        $l
+                                                                                    ),
+                                                                                    _,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_operand!(
+                                                                                        @read_place;
+                                                                                        (
+                                                                                            @deref [
+                                                                                                * $state
+                                                                                            ] [
+                                                                                                $state
+                                                                                            ]
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        ),
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::load(
+                                                                $crate::__pgrx_c_macros::expression::project::<
+                                                                    $crate::__pgrx_c_field_marker!(
+                                                                        $i
+                                                                    ),
+                                                                    _,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_operand!(
+                                                                        @read_place;
+                                                                        (@deref [* $state] [$state])
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    } else {
+                                        $crate::__pgrx_c_macros::Either::Right(
+                                            (
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::null::null_void(
+                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CVoid,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>()
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    }
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
+    };
+    ($cell:expr, (* $state:ident), $l:ident, $i:ident $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            $crate::__pgrx_c_operand!(@place; (@native [$cell])),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::select(
+                                    if $crate::__pgrx_c_macros::expression::truth(
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >()
+                                            )
+                                        )
+                                    ) {
+                                        $crate::__pgrx_c_macros::Either::Left(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::address(
+                                                    $crate::__pgrx_c_macros::expression::index(
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::load(
+                                                                $crate::__pgrx_c_macros::expression::project::<
+                                                                    $crate::__pgrx_c_generated::Field_elements,
+                                                                    _,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::load(
+                                                                                $crate::__pgrx_c_macros::expression::project::<
+                                                                                    $crate::__pgrx_c_field_marker!(
+                                                                                        $l
+                                                                                    ),
+                                                                                    _,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_operand!(
+                                                                                        @read_place;
+                                                                                        (
+                                                                                            @deref [
+                                                                                                (
+                                                                                                    * $state
+                                                                                                )
+                                                                                            ] [
+                                                                                                $state
+                                                                                            ]
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        ),
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::load(
+                                                                $crate::__pgrx_c_macros::expression::project::<
+                                                                    $crate::__pgrx_c_field_marker!(
+                                                                        $i
+                                                                    ),
+                                                                    _,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_operand!(
+                                                                        @read_place;
+                                                                        (
+                                                                            @deref [(* $state)] [
+                                                                                $state
+                                                                            ]
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    } else {
+                                        $crate::__pgrx_c_macros::Either::Right(
+                                            (
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::null::null_void(
+                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CVoid,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>()
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    }
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
+    };
     ($cell:expr, $state:expr, $l:ident, $i:ident $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            $crate::__pgrx_c_operand!(@place; (@native [$cell])),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::select(
+                                    if $crate::__pgrx_c_macros::expression::truth(
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >()
+                                            )
+                                        )
+                                    ) {
+                                        $crate::__pgrx_c_macros::Either::Left(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::address(
+                                                    $crate::__pgrx_c_macros::expression::index(
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::load(
+                                                                $crate::__pgrx_c_macros::expression::project::<
+                                                                    $crate::__pgrx_c_generated::Field_elements,
+                                                                    _,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::load(
+                                                                                $crate::__pgrx_c_macros::expression::project::<
+                                                                                    $crate::__pgrx_c_field_marker!(
+                                                                                        $l
+                                                                                    ),
+                                                                                    _,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_operand!(
+                                                                                        @read_place;
+                                                                                        (
+                                                                                            @native [
+                                                                                                $state
+                                                                                            ]
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        ),
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::load(
+                                                                $crate::__pgrx_c_macros::expression::project::<
+                                                                    $crate::__pgrx_c_field_marker!(
+                                                                        $i
+                                                                    ),
+                                                                    _,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_operand!(
+                                                                        @read_place;
+                                                                        (@native [$state])
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    } else {
+                                        $crate::__pgrx_c_macros::Either::Right(
+                                            (
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::null::null_void(
+                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                $crate::__pgrx_c_macros::expression::CVoid,
+                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                            >>()
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    }
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 pub use for_both_cell_setup;
@@ -1489,19 +3031,16 @@ pub use for_each_cell_setup;
 pub use for_each_from_setup;
 pub use lfirst;
 pub use lfirst_int;
-#[cfg(feature = "pg18")]
 pub use lfirst_node;
 pub use lfirst_oid;
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use lfirst_xid;
 pub use lfourth;
 pub use lfourth_int;
-#[cfg(feature = "pg18")]
 pub use lfourth_node;
 pub use lfourth_oid;
 pub use linitial;
 pub use linitial_int;
-#[cfg(feature = "pg18")]
 pub use linitial_node;
 pub use linitial_oid;
 pub use list_cell_number;
@@ -1559,14 +3098,12 @@ pub use list_make5_xid;
 pub use list_nth;
 pub use list_nth_cell;
 pub use list_nth_int;
-#[cfg(feature = "pg18")]
 pub use list_nth_node;
 pub use list_nth_oid;
 pub use list_second_cell;
 pub use list_tail;
 pub use llast;
 pub use llast_int;
-#[cfg(feature = "pg18")]
 pub use llast_node;
 pub use llast_oid;
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1574,12 +3111,10 @@ pub use llast_xid;
 pub use lnext;
 pub use lsecond;
 pub use lsecond_int;
-#[cfg(feature = "pg18")]
 pub use lsecond_node;
 pub use lsecond_oid;
 pub use lthird;
 pub use lthird_int;
-#[cfg(feature = "pg18")]
 pub use lthird_node;
 pub use lthird_oid;
 pub use multi_for_advance_cell;

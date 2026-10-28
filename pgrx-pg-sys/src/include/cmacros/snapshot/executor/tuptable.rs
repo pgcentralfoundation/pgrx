@@ -26,7 +26,20 @@
 #[macro_export]
 macro_rules! ExecClearTuple {
     ($slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TupleTableSlot
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -58,7 +71,21 @@ macro_rules! ExecClearTuple {
 #[macro_export]
 macro_rules! ExecCopySlot {
     ($dstslot:expr, $srcslot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$dstslot;
+                let _ = &$srcslot;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TupleTableSlot
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg16")]
@@ -90,7 +117,21 @@ macro_rules! ExecCopySlot {
 #[macro_export]
 macro_rules! ExecCopySlot {
     ($dstslot:expr, $srcslot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$dstslot;
+                let _ = &$srcslot;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TupleTableSlot
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -124,7 +165,21 @@ macro_rules! ExecCopySlot {
 #[macro_export]
 macro_rules! ExecCopySlot {
     ($dstslot:expr, $srcslot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$dstslot;
+                let _ = &$srcslot;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TupleTableSlot
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function ExecCopySlotHeapTuple from tuptable.h:451 (PostgreSQL 15), tuptable.h:458 (PostgreSQL 16), tuptable.h:480 (PostgreSQL 17), tuptable.h:484 (PostgreSQL 18), tuptable.h:503 (PostgreSQL 19)
@@ -152,7 +207,20 @@ macro_rules! ExecCopySlot {
 #[macro_export]
 macro_rules! ExecCopySlotHeapTuple {
     ($slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::HeapTupleData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -179,7 +247,20 @@ macro_rules! ExecCopySlotHeapTuple {
 #[macro_export]
 macro_rules! ExecCopySlotMinimalTuple {
     ($slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::MinimalTupleData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -206,7 +287,20 @@ macro_rules! ExecCopySlotMinimalTuple {
 #[macro_export]
 macro_rules! ExecCopySlotMinimalTuple {
     ($slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::MinimalTupleData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -233,7 +327,21 @@ macro_rules! ExecCopySlotMinimalTuple {
 #[macro_export]
 macro_rules! ExecCopySlotMinimalTupleExtra {
     ($slot:expr, $extra:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                let _ = &$extra;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::MinimalTupleData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function ExecMaterializeSlot from tuptable.h:442 (PostgreSQL 15), tuptable.h:449 (PostgreSQL 16), tuptable.h:471 (PostgreSQL 17), tuptable.h:475 (PostgreSQL 18), tuptable.h:494 (PostgreSQL 19)
@@ -259,7 +367,12 @@ macro_rules! ExecCopySlotMinimalTupleExtra {
 #[macro_export]
 macro_rules! ExecMaterializeSlot {
     ($slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 /// C macro TTS_EMPTY from tuptable.h:97 (PostgreSQL 15), tuptable.h:96 (PostgreSQL 16–18), tuptable.h:92 (PostgreSQL 19)
@@ -275,7 +388,18 @@ macro_rules! ExecMaterializeSlot {
 #[macro_export]
 macro_rules! TTS_EMPTY {
     ($slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro TTS_FIXED from tuptable.h:109 (PostgreSQL 15), tuptable.h:108 (PostgreSQL 16–19)
@@ -291,7 +415,18 @@ macro_rules! TTS_EMPTY {
 #[macro_export]
 macro_rules! TTS_FIXED {
     ($slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro TTS_IS_BUFFERTUPLE from tuptable.h:231 (PostgreSQL 15), tuptable.h:230 (PostgreSQL 16), tuptable.h:237 (PostgreSQL 17), tuptable.h:241 (PostgreSQL 18), tuptable.h:256 (PostgreSQL 19)
@@ -307,7 +442,18 @@ macro_rules! TTS_FIXED {
 #[macro_export]
 macro_rules! TTS_IS_BUFFERTUPLE {
     ($slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro TTS_IS_HEAPTUPLE from tuptable.h:229 (PostgreSQL 15), tuptable.h:228 (PostgreSQL 16), tuptable.h:235 (PostgreSQL 17), tuptable.h:239 (PostgreSQL 18), tuptable.h:254 (PostgreSQL 19)
@@ -323,7 +469,18 @@ macro_rules! TTS_IS_BUFFERTUPLE {
 #[macro_export]
 macro_rules! TTS_IS_HEAPTUPLE {
     ($slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro TTS_IS_MINIMALTUPLE from tuptable.h:230 (PostgreSQL 15), tuptable.h:229 (PostgreSQL 16), tuptable.h:236 (PostgreSQL 17), tuptable.h:240 (PostgreSQL 18), tuptable.h:255 (PostgreSQL 19)
@@ -339,7 +496,18 @@ macro_rules! TTS_IS_HEAPTUPLE {
 #[macro_export]
 macro_rules! TTS_IS_MINIMALTUPLE {
     ($slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro TTS_IS_VIRTUAL from tuptable.h:228 (PostgreSQL 15), tuptable.h:227 (PostgreSQL 16), tuptable.h:234 (PostgreSQL 17), tuptable.h:238 (PostgreSQL 18), tuptable.h:253 (PostgreSQL 19)
@@ -355,7 +523,18 @@ macro_rules! TTS_IS_MINIMALTUPLE {
 #[macro_export]
 macro_rules! TTS_IS_VIRTUAL {
     ($slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -372,7 +551,18 @@ macro_rules! TTS_IS_VIRTUAL {
 #[macro_export]
 macro_rules! TTS_OBEYS_NOT_NULL_CONSTRAINTS {
     ($slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro TTS_SHOULDFREE from tuptable.h:101 (PostgreSQL 15), tuptable.h:100 (PostgreSQL 16–18), tuptable.h:96 (PostgreSQL 19)
@@ -388,7 +578,18 @@ macro_rules! TTS_OBEYS_NOT_NULL_CONSTRAINTS {
 #[macro_export]
 macro_rules! TTS_SHOULDFREE {
     ($slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -405,7 +606,18 @@ macro_rules! TTS_SHOULDFREE {
 #[macro_export]
 macro_rules! TTS_SLOW {
     ($slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro TupIsNull from tuptable.h:292 (PostgreSQL 15), tuptable.h:299 (PostgreSQL 16), tuptable.h:306 (PostgreSQL 17), tuptable.h:310 (PostgreSQL 18), tuptable.h:325 (PostgreSQL 19)
@@ -425,7 +637,18 @@ macro_rules! TTS_SLOW {
 #[macro_export]
 macro_rules! TupIsNull {
     ($slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -457,7 +680,17 @@ macro_rules! TupIsNull {
 #[macro_export]
 macro_rules! slot_attisnull {
     ($slot:expr, $attnum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                let _ = &$attnum;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -489,7 +722,17 @@ macro_rules! slot_attisnull {
 #[macro_export]
 macro_rules! slot_attisnull {
     ($slot:expr, $attnum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                let _ = &$attnum;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function slot_getallattrs from tuptable.h:353 (PostgreSQL 15), tuptable.h:360 (PostgreSQL 16), tuptable.h:367 (PostgreSQL 17), tuptable.h:371 (PostgreSQL 18), tuptable.h:389 (PostgreSQL 19)
@@ -515,7 +758,12 @@ macro_rules! slot_attisnull {
 #[macro_export]
 macro_rules! slot_getallattrs {
     ($slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -550,7 +798,20 @@ macro_rules! slot_getallattrs {
 #[macro_export]
 macro_rules! slot_getattr {
     ($slot:expr, $attnum:expr, $isnull:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                let _ = &$attnum;
+                let _ = &$isnull;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -585,7 +846,20 @@ macro_rules! slot_getattr {
 #[macro_export]
 macro_rules! slot_getattr {
     ($slot:expr, $attnum:expr, $isnull:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                let _ = &$attnum;
+                let _ = &$isnull;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -613,7 +887,13 @@ macro_rules! slot_getattr {
 #[macro_export]
 macro_rules! slot_getsomeattrs {
     ($slot:expr, $attnum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                let _ = &$attnum;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -642,7 +922,13 @@ macro_rules! slot_getsomeattrs {
 #[macro_export]
 macro_rules! slot_getsomeattrs {
     ($slot:expr, $attnum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                let _ = &$attnum;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -683,7 +969,20 @@ macro_rules! slot_getsomeattrs {
 #[macro_export]
 macro_rules! slot_getsysattr {
     ($slot:expr, $attnum:expr, $isnull:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                let _ = &$attnum;
+                let _ = &$isnull;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -724,7 +1023,20 @@ macro_rules! slot_getsysattr {
 #[macro_export]
 macro_rules! slot_getsysattr {
     ($slot:expr, $attnum:expr, $isnull:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                let _ = &$attnum;
+                let _ = &$isnull;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -751,7 +1063,16 @@ macro_rules! slot_getsysattr {
 #[macro_export]
 macro_rules! slot_is_current_xact_tuple {
     ($slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 pub use ExecClearTuple;

@@ -15,7 +15,51 @@
 #[macro_export]
 macro_rules! BackendIdForTempRelations {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                        $crate::__pgrx_c_macros::CInt
+                                    >()
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::place::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >(
+                                                ::core::ptr::addr_of_mut!(
+                                                    $crate::__pgrx_c_bindings::MyBackendId
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::place::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >(
+                                                ::core::ptr::addr_of_mut!(
+                                                    $crate::__pgrx_c_bindings::ParallelLeaderBackendId
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]

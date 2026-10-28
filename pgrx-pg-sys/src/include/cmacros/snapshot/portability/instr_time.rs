@@ -19,7 +19,67 @@
 #[macro_export]
 macro_rules! INSTR_TIME_ACCUM_DIFF {
     ($x:expr, $y:expr, $z:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::modify(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ticks,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@place; (@native [$x])))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::sub::<
+                                    $crate::__pgrx_c_macros::Wrapping,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::project::<
+                                                $crate::__pgrx_c_generated::Field_ticks,
+                                                _,
+                                                _
+                                            >(
+                                                (
+                                                    $crate::__pgrx_c_operand!(
+                                                        @read_place;
+                                                        (@native [$y])
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::project::<
+                                                $crate::__pgrx_c_generated::Field_ticks,
+                                                _,
+                                                _
+                                            >(
+                                                (
+                                                    $crate::__pgrx_c_operand!(
+                                                        @read_place;
+                                                        (@native [$z])
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            |__pgrx_old,
+                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::add::<
+                                $crate::__pgrx_c_macros::Wrapping,
+                                _,
+                                _
+                            >(__pgrx_old, __pgrx_rhs)
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -39,8 +99,115 @@ macro_rules! INSTR_TIME_ACCUM_DIFF {
 /// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! INSTR_TIME_ADD {
+    ($x:expr, * $y:ident $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::modify(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ticks,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@place; (@native [$x])))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::load(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_ticks,
+                                        _,
+                                        _
+                                    >(
+                                        (
+                                            $crate::__pgrx_c_operand!(
+                                                @read_place;
+                                                (@deref [* $y] [$y])
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            |__pgrx_old,
+                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::add::<
+                                $crate::__pgrx_c_macros::Wrapping,
+                                _,
+                                _
+                            >(__pgrx_old, __pgrx_rhs)
+                        )
+                    )
+                )
+            }
+        )
+    };
+    ($x:expr, (* $y:ident) $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::modify(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ticks,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@place; (@native [$x])))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::load(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_ticks,
+                                        _,
+                                        _
+                                    >(
+                                        (
+                                            $crate::__pgrx_c_operand!(
+                                                @read_place;
+                                                (@deref [(* $y)] [$y])
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            |__pgrx_old,
+                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::add::<
+                                $crate::__pgrx_c_macros::Wrapping,
+                                _,
+                                _
+                            >(__pgrx_old, __pgrx_rhs)
+                        )
+                    )
+                )
+            }
+        )
+    };
     ($x:expr, $y:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::modify(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ticks,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@place; (@native [$x])))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::load(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_ticks,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@read_place; (@native [$y]))))
+                                )
+                            ),
+                            |__pgrx_old,
+                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::add::<
+                                $crate::__pgrx_c_macros::Wrapping,
+                                _,
+                                _
+                            >(__pgrx_old, __pgrx_rhs)
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -61,7 +228,33 @@ macro_rules! INSTR_TIME_ADD {
 #[macro_export]
 macro_rules! INSTR_TIME_ADD_NANOSEC {
     ($t:expr, $n:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::modify(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ticks,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@place; (@native [$t])))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                    $crate::__pgrx_c_types::int64
+                                >()
+                            ),
+                            |__pgrx_old,
+                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::add::<
+                                $crate::__pgrx_c_macros::Wrapping,
+                                _,
+                                _
+                            >(__pgrx_old, __pgrx_rhs)
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -82,7 +275,27 @@ macro_rules! INSTR_TIME_ADD_NANOSEC {
 #[macro_export]
 macro_rules! INSTR_TIME_GET_DOUBLE {
     ($t:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$t;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::div(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                    $crate::__pgrx_c_macros::expression::CDouble
+                                >()
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CLong>::new(
+                                    $crate::__pgrx_c_bindings::NS_PER_S as i64
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -103,7 +316,27 @@ macro_rules! INSTR_TIME_GET_DOUBLE {
 #[macro_export]
 macro_rules! INSTR_TIME_GET_DOUBLE {
     ($t:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$t;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::div(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                    $crate::__pgrx_c_macros::expression::CDouble
+                                >()
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CLong>::new(
+                                    $crate::__pgrx_c_bindings::NS_PER_S as i64
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -124,7 +357,52 @@ macro_rules! INSTR_TIME_GET_DOUBLE {
 #[macro_export]
 macro_rules! INSTR_TIME_GET_MICROSEC {
     ($t:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$t;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                        $crate::__pgrx_c_macros::expression::add::<
+                            $crate::__pgrx_c_macros::Wrapping,
+                            _,
+                            _
+                        >(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                    $crate::__pgrx_c_macros::expression::mul::<
+                                        $crate::__pgrx_c_macros::Wrapping,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            false,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uint64
+                                            >()
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            false,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uint64
+                                            >()
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                    $crate::__pgrx_c_types::uint64
+                                >()
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -145,7 +423,29 @@ macro_rules! INSTR_TIME_GET_MICROSEC {
 #[macro_export]
 macro_rules! INSTR_TIME_GET_MICROSEC {
     ($t:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$t;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::div(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                        $crate::__pgrx_c_types::int64
+                                    >()
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CLong>::new(
+                                    $crate::__pgrx_c_bindings::NS_PER_US as i64
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -166,7 +466,29 @@ macro_rules! INSTR_TIME_GET_MICROSEC {
 #[macro_export]
 macro_rules! INSTR_TIME_GET_MICROSEC {
     ($t:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$t;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::div(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                        $crate::__pgrx_c_types::int64
+                                    >()
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CLong>::new(
+                                    $crate::__pgrx_c_bindings::NS_PER_US as i64
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -187,7 +509,27 @@ macro_rules! INSTR_TIME_GET_MICROSEC {
 #[macro_export]
 macro_rules! INSTR_TIME_GET_MILLISEC {
     ($t:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$t;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::div(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                    $crate::__pgrx_c_macros::expression::CDouble
+                                >()
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CLong>::new(
+                                    $crate::__pgrx_c_bindings::NS_PER_MS as i64
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -208,7 +550,27 @@ macro_rules! INSTR_TIME_GET_MILLISEC {
 #[macro_export]
 macro_rules! INSTR_TIME_GET_MILLISEC {
     ($t:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$t;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::div(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                    $crate::__pgrx_c_macros::expression::CDouble
+                                >()
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CLong>::new(
+                                    $crate::__pgrx_c_bindings::NS_PER_MS as i64
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -229,7 +591,18 @@ macro_rules! INSTR_TIME_GET_MILLISEC {
 #[macro_export]
 macro_rules! INSTR_TIME_GET_NANOSEC {
     ($t:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$t;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_types::int64
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -250,7 +623,18 @@ macro_rules! INSTR_TIME_GET_NANOSEC {
 #[macro_export]
 macro_rules! INSTR_TIME_GET_NANOSEC {
     ($t:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$t;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_types::int64
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -267,7 +651,19 @@ macro_rules! INSTR_TIME_GET_NANOSEC {
 #[macro_export]
 macro_rules! INSTR_TIME_GT {
     ($x:expr, $y:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x;
+                let _ = &$y;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -284,7 +680,18 @@ macro_rules! INSTR_TIME_GT {
 #[macro_export]
 macro_rules! INSTR_TIME_IS_ZERO {
     ($t:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$t;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -301,7 +708,18 @@ macro_rules! INSTR_TIME_IS_ZERO {
 #[macro_export]
 macro_rules! INSTR_TIME_IS_ZERO {
     ($t:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$t;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -322,7 +740,12 @@ macro_rules! INSTR_TIME_IS_ZERO {
 #[macro_export]
 macro_rules! INSTR_TIME_SET_CURRENT {
     ($t:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$t;
+                ($crate::__pgrx_c_macros::expression::profile_value::<true, _>(()))
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -343,7 +766,23 @@ macro_rules! INSTR_TIME_SET_CURRENT {
 #[macro_export]
 macro_rules! INSTR_TIME_SET_CURRENT {
     ($t:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            ($crate::__pgrx_c_operand!(@place; (@native [$t]))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                    $crate::__pgrx_c_macros::expression::CRawRecord<
+                                        $crate::__pgrx_c_bindings::instr_time
+                                    >>()
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -364,7 +803,23 @@ macro_rules! INSTR_TIME_SET_CURRENT {
 #[macro_export]
 macro_rules! INSTR_TIME_SET_CURRENT {
     ($t:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            ($crate::__pgrx_c_operand!(@place; (@native [$t]))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                    $crate::__pgrx_c_macros::expression::CRawRecord<
+                                        $crate::__pgrx_c_bindings::instr_time
+                                    >>()
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -385,7 +840,23 @@ macro_rules! INSTR_TIME_SET_CURRENT {
 #[macro_export]
 macro_rules! INSTR_TIME_SET_CURRENT_FAST {
     ($t:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            ($crate::__pgrx_c_operand!(@place; (@native [$t]))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                    $crate::__pgrx_c_macros::expression::CRawRecord<
+                                        $crate::__pgrx_c_bindings::instr_time
+                                    >>()
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -406,7 +877,53 @@ macro_rules! INSTR_TIME_SET_CURRENT_FAST {
 #[macro_export]
 macro_rules! INSTR_TIME_SET_CURRENT_LAZY {
     ($t:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$t;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >()
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        {
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                $crate::__pgrx_c_macros::CValue::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >::new(1i32)
+                                            )
+                                        }
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::null_constant(
+                                            /* PGRX: false remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(0i32)
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -427,7 +944,53 @@ macro_rules! INSTR_TIME_SET_CURRENT_LAZY {
 #[macro_export]
 macro_rules! INSTR_TIME_SET_CURRENT_LAZY {
     ($t:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$t;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >()
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        {
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                $crate::__pgrx_c_macros::CValue::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >::new(1i32)
+                                            )
+                                        }
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::null_constant(
+                                            /* PGRX: false remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(0i32)
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -444,7 +1007,32 @@ macro_rules! INSTR_TIME_SET_CURRENT_LAZY {
 #[macro_export]
 macro_rules! INSTR_TIME_SET_ZERO {
     ($t:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_tv_nsec,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$t])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::null_constant(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(0i32)
+                                        )
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -461,7 +1049,28 @@ macro_rules! INSTR_TIME_SET_ZERO {
 #[macro_export]
 macro_rules! INSTR_TIME_SET_ZERO {
     ($t:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ticks,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@place; (@native [$t])))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::null_constant(
+                                    $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                        0i32
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -481,8 +1090,115 @@ macro_rules! INSTR_TIME_SET_ZERO {
 /// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! INSTR_TIME_SUBTRACT {
+    ($x:expr, * $y:ident $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::modify(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ticks,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@place; (@native [$x])))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::load(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_ticks,
+                                        _,
+                                        _
+                                    >(
+                                        (
+                                            $crate::__pgrx_c_operand!(
+                                                @read_place;
+                                                (@deref [* $y] [$y])
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            |__pgrx_old,
+                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::sub::<
+                                $crate::__pgrx_c_macros::Wrapping,
+                                _,
+                                _
+                            >(__pgrx_old, __pgrx_rhs)
+                        )
+                    )
+                )
+            }
+        )
+    };
+    ($x:expr, (* $y:ident) $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::modify(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ticks,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@place; (@native [$x])))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::load(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_ticks,
+                                        _,
+                                        _
+                                    >(
+                                        (
+                                            $crate::__pgrx_c_operand!(
+                                                @read_place;
+                                                (@deref [(* $y)] [$y])
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            |__pgrx_old,
+                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::sub::<
+                                $crate::__pgrx_c_macros::Wrapping,
+                                _,
+                                _
+                            >(__pgrx_old, __pgrx_rhs)
+                        )
+                    )
+                )
+            }
+        )
+    };
     ($x:expr, $y:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::modify(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ticks,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@place; (@native [$x])))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::load(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_ticks,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@read_place; (@native [$y]))))
+                                )
+                            ),
+                            |__pgrx_old,
+                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::sub::<
+                                $crate::__pgrx_c_macros::Wrapping,
+                                _,
+                                _
+                            >(__pgrx_old, __pgrx_rhs)
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -515,7 +1231,16 @@ macro_rules! INSTR_TIME_SUBTRACT {
 #[macro_export]
 macro_rules! pg_clock_gettime_ns {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CRawRecord<
+                            $crate::__pgrx_c_bindings::instr_time
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -546,16 +1271,35 @@ macro_rules! pg_clock_gettime_ns {
 #[macro_export]
 macro_rules! pg_current_timing_clock_source {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CEnumObject<
+                            $crate::__pgrx_c_generated::EnumIdentity_TimingClockSourceType,
+                            $crate::__pgrx_c_macros::CUnsignedInt,
+                            u32
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function pg_get_ticks from instr_time.h:409 (PostgreSQL 19)
+/// Typed call adapter for C inline function pg_get_ticks from instr_time.h:379 (PostgreSQL 19)
 ///
 /// ```c
-/// static pg_attribute_always_inline instr_time
+/// static pg_always_inline instr_time
 /// pg_get_ticks(void)
 /// {
+/// 	if (likely(timing_tsc_enabled))
+/// 	{
+/// 		instr_time	now;
+///
+/// 		now.ticks = pg_rdtscp();
+/// 		return now;
+/// 	}
+///
 /// 	return pg_get_ticks_system();
 /// }
 /// ```
@@ -573,16 +1317,33 @@ macro_rules! pg_current_timing_clock_source {
 #[macro_export]
 macro_rules! pg_get_ticks {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CRawRecord<
+                            $crate::__pgrx_c_bindings::instr_time
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function pg_get_ticks_fast from instr_time.h:415 (PostgreSQL 19)
+/// Typed call adapter for C inline function pg_get_ticks_fast from instr_time.h:393 (PostgreSQL 19)
 ///
 /// ```c
-/// static pg_attribute_always_inline instr_time
+/// static pg_always_inline instr_time
 /// pg_get_ticks_fast(void)
 /// {
+/// 	if (likely(timing_tsc_enabled))
+/// 	{
+/// 		instr_time	now;
+///
+/// 		now.ticks = pg_rdtsc();
+/// 		return now;
+/// 	}
+///
 /// 	return pg_get_ticks_system();
 /// }
 /// ```
@@ -600,7 +1361,16 @@ macro_rules! pg_get_ticks {
 #[macro_export]
 macro_rules! pg_get_ticks_fast {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CRawRecord<
+                            $crate::__pgrx_c_bindings::instr_time
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -635,7 +1405,16 @@ macro_rules! pg_get_ticks_fast {
 #[macro_export]
 macro_rules! pg_get_ticks_system {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CRawRecord<
+                            $crate::__pgrx_c_bindings::instr_time
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -692,7 +1471,96 @@ macro_rules! pg_get_ticks_system {
 #[macro_export]
 macro_rules! pg_ns_to_ticks {
     ($ns:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ns;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::int64
+                    >()
+                )
+            }
+        )
+    };
+}
+#[cfg(feature = "pg19")]
+/// Typed call adapter for C inline function pg_rdtsc from instr_time.h:352 (PostgreSQL 19)
+///
+/// ```c
+/// static inline int64
+/// pg_rdtsc(void)
+/// {
+/// #ifdef _MSC_VER
+/// 	return __rdtsc();
+/// #else
+/// 	return __builtin_ia32_rdtsc();
+/// #endif							/* defined(_MSC_VER) */
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! pg_rdtsc {
+    () => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::int64
+                    >()
+                )
+            }
+        )
+    };
+}
+#[cfg(feature = "pg19")]
+/// Typed call adapter for C inline function pg_rdtscp from instr_time.h:362 (PostgreSQL 19)
+///
+/// ```c
+/// static inline int64
+/// pg_rdtscp(void)
+/// {
+/// 	uint32		unused;
+///
+/// #ifdef _MSC_VER
+/// 	return __rdtscp(&unused);
+/// #else
+/// 	return __builtin_ia32_rdtscp(&unused);
+/// #endif							/* defined(_MSC_VER) */
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_call!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! pg_rdtscp {
+    () => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::int64
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -757,7 +1625,16 @@ macro_rules! pg_ns_to_ticks {
 #[macro_export]
 macro_rules! pg_ticks_to_ns {
     ($ticks:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ticks;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::int64
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -796,5 +1673,9 @@ pub use pg_get_ticks_fast;
 pub use pg_get_ticks_system;
 #[cfg(feature = "pg19")]
 pub use pg_ns_to_ticks;
+#[cfg(feature = "pg19")]
+pub use pg_rdtsc;
+#[cfg(feature = "pg19")]
+pub use pg_rdtscp;
 #[cfg(feature = "pg19")]
 pub use pg_ticks_to_ns;

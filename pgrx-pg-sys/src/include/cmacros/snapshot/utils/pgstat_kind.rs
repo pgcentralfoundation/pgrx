@@ -25,7 +25,16 @@
 #[macro_export]
 macro_rules! pgstat_is_kind_builtin {
     ($kind:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$kind;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -52,7 +61,16 @@ macro_rules! pgstat_is_kind_builtin {
 #[macro_export]
 macro_rules! pgstat_is_kind_custom {
     ($kind:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$kind;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]

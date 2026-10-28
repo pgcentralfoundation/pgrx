@@ -18,7 +18,18 @@
 #[macro_export]
 macro_rules! AllocSizeIsValid {
     ($size:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$size;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -62,7 +73,20 @@ macro_rules! AllocSizeIsValid {
 #[macro_export]
 macro_rules! GetMemoryChunkContext {
     ($pointer:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$pointer;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::MemoryContextData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro MemoryContextCopyAndSetIdentifier from memutils.h:99 (PostgreSQL 15), memutils.h:101 (PostgreSQL 16–19)
@@ -82,7 +106,13 @@ macro_rules! GetMemoryChunkContext {
 #[macro_export]
 macro_rules! MemoryContextCopyAndSetIdentifier {
     ($cxt:expr, $id:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$cxt;
+                let _ = &$id;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -103,7 +133,12 @@ macro_rules! MemoryContextCopyAndSetIdentifier {
 #[macro_export]
 macro_rules! MemoryContextResetAndDeleteChildren {
     ($ctx:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ctx;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg18")]
@@ -228,7 +263,17 @@ macro_rules! MemoryContextResetAndDeleteChildren {
 #[macro_export]
 macro_rules! pg_memory_is_all_zeros {
     ($ptr:expr, $len:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ptr;
+                let _ = &$len;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -353,7 +398,17 @@ macro_rules! pg_memory_is_all_zeros {
 #[macro_export]
 macro_rules! pg_memory_is_all_zeros {
     ($ptr:expr, $len:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ptr;
+                let _ = &$len;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 pub use AllocSizeIsValid;

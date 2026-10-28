@@ -2,7 +2,7 @@
 // C macros from logical.h.
 
 #[cfg(feature = "pg19")]
-/// C macro LogicalDecodingLogLevel from logical.h:175 (PostgreSQL 19)
+/// C macro LogicalDecodingLogLevel from logical.h:178 (PostgreSQL 19)
 ///
 /// ```text
 /// #define LogicalDecodingLogLevel( ) ( AmRegularBackendProcess ( ) ? DEBUG1 : LOG )
@@ -15,7 +15,41 @@
 #[macro_export]
 macro_rules! LogicalDecodingLogLevel {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >()
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::DEBUG1 as i32)
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::LOG as i32)
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]

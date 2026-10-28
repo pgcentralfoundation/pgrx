@@ -18,7 +18,39 @@
 #[macro_export]
 macro_rules! appendStringInfoCharMacro {
     ($str:expr, $ch:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$str;
+                let _ = &$ch;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >()
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        ()
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        ()
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -48,7 +80,14 @@ macro_rules! appendStringInfoCharMacro {
 #[macro_export]
 macro_rules! initReadOnlyStringInfo {
     ($str:expr, $data:expr, $len:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$str;
+                let _ = &$data;
+                let _ = &$len;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -80,7 +119,14 @@ macro_rules! initReadOnlyStringInfo {
 #[macro_export]
 macro_rules! initStringInfoFromString {
     ($str:expr, $data:expr, $len:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$str;
+                let _ = &$data;
+                let _ = &$len;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 pub use appendStringInfoCharMacro;

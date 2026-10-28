@@ -28,7 +28,16 @@
 #[macro_export]
 macro_rules! BackupHistoryFileName {
     ($fname:expr, $tli:expr, $logSegNo:expr, $startpoint:expr, $wal_segsz_bytes:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$fname;
+                let _ = &$tli;
+                let _ = &$logSegNo;
+                let _ = &$startpoint;
+                let _ = &$wal_segsz_bytes;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -58,10 +67,19 @@ macro_rules! BackupHistoryFileName {
 #[macro_export]
 macro_rules! BackupHistoryFilePath {
     ($path:expr, $tli:expr, $logSegNo:expr, $startpoint:expr, $wal_segsz_bytes:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$path;
+                let _ = &$tli;
+                let _ = &$logSegNo;
+                let _ = &$startpoint;
+                let _ = &$wal_segsz_bytes;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
-/// Typed call adapter for C inline function GetRmgr from xlog_internal.h:336 (PostgreSQL 15), xlog_internal.h:374 (PostgreSQL 16), xlog_internal.h:375 (PostgreSQL 17–18), xlog_internal.h:377 (PostgreSQL 19)
+/// Typed call adapter for C inline function GetRmgr from xlog_internal.h:336 (PostgreSQL 15), xlog_internal.h:374 (PostgreSQL 16), xlog_internal.h:375 (PostgreSQL 17–18), xlog_internal.h:370 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline RmgrData
@@ -86,7 +104,17 @@ macro_rules! BackupHistoryFilePath {
 #[macro_export]
 macro_rules! GetRmgr {
     ($rmid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rmid;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CRawRecord<
+                            $crate::__pgrx_c_bindings::RmgrData
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -107,7 +135,18 @@ macro_rules! GetRmgr {
 #[macro_export]
 macro_rules! IsBackupHistoryFileName {
     ($fname:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$fname;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -136,7 +175,16 @@ macro_rules! IsBackupHistoryFileName {
 #[macro_export]
 macro_rules! IsBackupHistoryFileName {
     ($fname:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$fname;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -157,7 +205,18 @@ macro_rules! IsBackupHistoryFileName {
 #[macro_export]
 macro_rules! IsPartialXLogFileName {
     ($fname:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$fname;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -186,7 +245,16 @@ macro_rules! IsPartialXLogFileName {
 #[macro_export]
 macro_rules! IsPartialXLogFileName {
     ($fname:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$fname;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 /// C macro IsPowerOf2 from xlog_internal.h:95 (PostgreSQL 15–18), xlog_internal.h:94 (PostgreSQL 19)
@@ -206,7 +274,18 @@ macro_rules! IsPartialXLogFileName {
 #[macro_export]
 macro_rules! IsPowerOf2 {
     ($x:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -227,7 +306,18 @@ macro_rules! IsPowerOf2 {
 #[macro_export]
 macro_rules! IsTLHistoryFileName {
     ($fname:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$fname;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -256,7 +346,16 @@ macro_rules! IsTLHistoryFileName {
 #[macro_export]
 macro_rules! IsTLHistoryFileName {
     ($fname:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$fname;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 /// C macro IsValidWalSegSize from xlog_internal.h:96 (PostgreSQL 15–18), xlog_internal.h:95 (PostgreSQL 19)
@@ -276,7 +375,18 @@ macro_rules! IsTLHistoryFileName {
 #[macro_export]
 macro_rules! IsValidWalSegSize {
     ($size:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$size;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -297,7 +407,18 @@ macro_rules! IsValidWalSegSize {
 #[macro_export]
 macro_rules! IsXLogFileName {
     ($fname:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$fname;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -325,10 +446,19 @@ macro_rules! IsXLogFileName {
 #[macro_export]
 macro_rules! IsXLogFileName {
     ($fname:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$fname;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
-/// Typed call adapter for C inline function RmgrIdExists from xlog_internal.h:330 (PostgreSQL 15), xlog_internal.h:368 (PostgreSQL 16), xlog_internal.h:369 (PostgreSQL 17–18), xlog_internal.h:371 (PostgreSQL 19)
+/// Typed call adapter for C inline function RmgrIdExists from xlog_internal.h:330 (PostgreSQL 15), xlog_internal.h:368 (PostgreSQL 16), xlog_internal.h:369 (PostgreSQL 17–18), xlog_internal.h:364 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -351,7 +481,16 @@ macro_rules! IsXLogFileName {
 #[macro_export]
 macro_rules! RmgrIdExists {
     ($rmid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rmid;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -378,7 +517,14 @@ macro_rules! RmgrIdExists {
 #[macro_export]
 macro_rules! StatusFilePath {
     ($path:expr, $xlog:expr, $suffix:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$path;
+                let _ = &$xlog;
+                let _ = &$suffix;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -405,7 +551,13 @@ macro_rules! StatusFilePath {
 #[macro_export]
 macro_rules! TLHistoryFileName {
     ($fname:expr, $tli:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$fname;
+                let _ = &$tli;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -432,7 +584,13 @@ macro_rules! TLHistoryFileName {
 #[macro_export]
 macro_rules! TLHistoryFilePath {
     ($path:expr, $tli:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$path;
+                let _ = &$tli;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 /// C macro XLByteInPrevSeg from xlog_internal.h:139 (PostgreSQL 15–18), xlog_internal.h:138 (PostgreSQL 19)
@@ -452,7 +610,20 @@ macro_rules! TLHistoryFilePath {
 #[macro_export]
 macro_rules! XLByteInPrevSeg {
     ($xlrp:expr, $logSegNo:expr, $wal_segsz_bytes:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$xlrp;
+                let _ = &$logSegNo;
+                let _ = &$wal_segsz_bytes;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro XLByteInSeg from xlog_internal.h:136 (PostgreSQL 15–18), xlog_internal.h:135 (PostgreSQL 19)
@@ -472,7 +643,20 @@ macro_rules! XLByteInPrevSeg {
 #[macro_export]
 macro_rules! XLByteInSeg {
     ($xlrp:expr, $logSegNo:expr, $wal_segsz_bytes:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$xlrp;
+                let _ = &$logSegNo;
+                let _ = &$wal_segsz_bytes;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro XLByteToPrevSeg from xlog_internal.h:120 (PostgreSQL 15–18), xlog_internal.h:119 (PostgreSQL 19)
@@ -494,7 +678,56 @@ macro_rules! XLByteInSeg {
 #[macro_export]
 macro_rules! XLByteToPrevSeg {
     (@__pgrx_c_expression; $xlrp:expr, $logSegNo:expr, $wal_segsz_bytes:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::assign(
+                        $crate::__pgrx_c_operand!(@place; (@native [$logSegNo])),
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::div(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::sub::<
+                                            $crate::__pgrx_c_macros::Wrapping,
+                                            _,
+                                            _
+                                        >(
+                                            (
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_operand!(
+                                                        @value [true];
+                                                        (@native [$xlrp])
+                                                    )
+                                                )
+                                            ),
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::CValue::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >::new(1i32)
+                                            )
+                                        )
+                                    )
+                                ),
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_operand!(
+                                            @value [true];
+                                            (@native [$wal_segsz_bytes])
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro XLByteToSeg from xlog_internal.h:117 (PostgreSQL 15–18), xlog_internal.h:116 (PostgreSQL 19)
@@ -516,7 +749,32 @@ macro_rules! XLByteToPrevSeg {
 #[macro_export]
 macro_rules! XLByteToSeg {
     (@__pgrx_c_expression; $xlrp:expr, $logSegNo:expr, $wal_segsz_bytes:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::assign(
+                        $crate::__pgrx_c_operand!(@place; (@native [$logSegNo])),
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::div(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_operand!(@value [true]; (@native [$xlrp]))
+                                    )
+                                ),
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_operand!(
+                                            @value [true];
+                                            (@native [$wal_segsz_bytes])
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -545,7 +803,15 @@ macro_rules! XLByteToSeg {
 #[macro_export]
 macro_rules! XLogFileName {
     ($fname:expr, $tli:expr, $logSegNo:expr, $wal_segsz_bytes:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$fname;
+                let _ = &$tli;
+                let _ = &$logSegNo;
+                let _ = &$wal_segsz_bytes;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -572,7 +838,15 @@ macro_rules! XLogFileName {
 #[macro_export]
 macro_rules! XLogFileNameById {
     ($fname:expr, $tli:expr, $log:expr, $seg:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$fname;
+                let _ = &$tli;
+                let _ = &$log;
+                let _ = &$seg;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -601,7 +875,15 @@ macro_rules! XLogFileNameById {
 #[macro_export]
 macro_rules! XLogFilePath {
     ($path:expr, $tli:expr, $logSegNo:expr, $wal_segsz_bytes:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$path;
+                let _ = &$tli;
+                let _ = &$logSegNo;
+                let _ = &$wal_segsz_bytes;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -632,7 +914,15 @@ macro_rules! XLogFilePath {
 #[macro_export]
 macro_rules! XLogFromFileName {
     ($fname:expr, $tli:expr, $logSegNo:expr, $wal_segsz_bytes:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$fname;
+                let _ = &$tli;
+                let _ = &$logSegNo;
+                let _ = &$wal_segsz_bytes;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 /// C macro XLogMBVarToSegs from xlog_internal.h:127 (PostgreSQL 15–18), xlog_internal.h:126 (PostgreSQL 19)
@@ -652,7 +942,67 @@ macro_rules! XLogFromFileName {
 #[macro_export]
 macro_rules! XLogMBVarToSegs {
     ($mbvar:expr, $wal_segsz_bytes:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::div(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; (@native [$mbvar]))
+                                )
+                            ),
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::div(
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_operand!(
+                                                    @value [true];
+                                                    (@native [$wal_segsz_bytes])
+                                                )
+                                            )
+                                        ),
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::mul::<
+                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                    _,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(1024i32)
+                                                    ),
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(1024i32)
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro XLogPageHeaderSize from xlog_internal.h:84 (PostgreSQL 15–18), xlog_internal.h:83 (PostgreSQL 19)
@@ -672,7 +1022,226 @@ macro_rules! XLogMBVarToSegs {
 #[macro_export]
 macro_rules! XLogPageHeaderSize {
     ($hdr:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::bitand(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::load(
+                                                    $crate::__pgrx_c_macros::expression::project::<
+                                                        $crate::__pgrx_c_generated::Field_xlp_info,
+                                                        _,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::pointee(
+                                                            (
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_operand!(
+                                                                        @value [true];
+                                                                        (@native [$hdr])
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            ),
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::CValue::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::XLP_LONG_HEADER as i32
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::add::<
+                                                            $crate::__pgrx_c_macros::Wrapping,
+                                                            _,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::uintptr_t
+                                                                >()
+                                                            ),
+                                                            (
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::sub::<
+                                                                        $crate::__pgrx_c_macros::Wrapping,
+                                                                        _,
+                                                                        _
+                                                                    >(
+                                                                        (
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                true,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::CValue::<
+                                                                                    $crate::__pgrx_c_macros::CInt
+                                                                                >::new(
+                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
+                                                                                )
+                                                                            )
+                                                                        ),
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                $crate::__pgrx_c_macros::CInt
+                                                                            >::new(1i32)
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::bitnot(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::uintptr_t
+                                                                >()
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::add::<
+                                                            $crate::__pgrx_c_macros::Wrapping,
+                                                            _,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::uintptr_t
+                                                                >()
+                                                            ),
+                                                            (
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::sub::<
+                                                                        $crate::__pgrx_c_macros::Wrapping,
+                                                                        _,
+                                                                        _
+                                                                    >(
+                                                                        (
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                true,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::CValue::<
+                                                                                    $crate::__pgrx_c_macros::CInt
+                                                                                >::new(
+                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
+                                                                                )
+                                                                            )
+                                                                        ),
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                $crate::__pgrx_c_macros::CInt
+                                                                            >::new(1i32)
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::bitnot(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::uintptr_t
+                                                                >()
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro XLogSegNoOffsetToRecPtr from xlog_internal.h:103 (PostgreSQL 15–18), xlog_internal.h:102 (PostgreSQL 19)
@@ -694,7 +1263,61 @@ macro_rules! XLogPageHeaderSize {
 #[macro_export]
 macro_rules! XLogSegNoOffsetToRecPtr {
     (@__pgrx_c_expression; $segno:expr, $offset:expr, $wal_segsz_bytes:expr, $dest:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                    $crate::__pgrx_c_macros::expression::assign(
+                        ($crate::__pgrx_c_operand!(@place; (@native [$dest]))),
+                        $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                            $crate::__pgrx_c_macros::expression::add::<
+                                $crate::__pgrx_c_macros::Wrapping,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                    $crate::__pgrx_c_macros::expression::mul::<
+                                        $crate::__pgrx_c_macros::Wrapping,
+                                        _,
+                                        _
+                                    >(
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                false,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_operand!(
+                                                    @value [false];
+                                                    (@native [$segno])
+                                                )
+                                            )
+                                        ),
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                false,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_operand!(
+                                                    @value [false];
+                                                    (@native [$wal_segsz_bytes])
+                                                )
+                                            )
+                                        )
+                                    )
+                                ),
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                        $crate::__pgrx_c_operand!(
+                                            @value [false];
+                                            (@native [$offset])
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro XLogSegmentOffset from xlog_internal.h:106 (PostgreSQL 15–18), xlog_internal.h:105 (PostgreSQL 19)
@@ -714,10 +1337,54 @@ macro_rules! XLogSegNoOffsetToRecPtr {
 #[macro_export]
 macro_rules! XLogSegmentOffset {
     ($xlogptr:expr, $wal_segsz_bytes:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; (@native [$xlogptr]))
+                                )
+                            ),
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::sub::<
+                                        $crate::__pgrx_c_macros::Wrapping,
+                                        _,
+                                        _
+                                    >(
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_operand!(
+                                                    @value [true];
+                                                    (@native [$wal_segsz_bytes])
+                                                )
+                                            )
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(1i32)
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro XLogSegmentsPerXLogId from xlog_internal.h:100 (PostgreSQL 15–18), xlog_internal.h:99 (PostgreSQL 19)
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+/// C macro XLogSegmentsPerXLogId from xlog_internal.h:100 (PostgreSQL 15–17)
 ///
 /// ```text
 /// #define XLogSegmentsPerXLogId( wal_segsz_bytes ) ( UINT64CONST ( 0x100000000 ) / ( wal_segsz_bytes ) )
@@ -734,7 +1401,74 @@ macro_rules! XLogSegmentOffset {
 #[macro_export]
 macro_rules! XLogSegmentsPerXLogId {
     ($wal_segsz_bytes:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::div(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::CValue::<
+                                        $crate::__pgrx_c_macros::CUnsignedLong
+                                    >::new(0x100000000u64)
+                                )
+                            ),
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(
+                                        @value [true];
+                                        (@native [$wal_segsz_bytes])
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
+    };
+}
+#[cfg(any(feature = "pg18", feature = "pg19"))]
+/// C macro XLogSegmentsPerXLogId from xlog_internal.h:100 (PostgreSQL 18), xlog_internal.h:99 (PostgreSQL 19)
+///
+/// ```text
+/// #define XLogSegmentsPerXLogId( wal_segsz_bytes ) ( UINT64CONST ( 0x100000000 ) / ( wal_segsz_bytes ) )
+/// ```
+///
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! XLogSegmentsPerXLogId {
+    ($wal_segsz_bytes:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::div(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<
+                                    $crate::__pgrx_c_macros::CUnsignedLong
+                                >::new(0x100000000u64)
+                            ),
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(
+                                        @value [true];
+                                        (@native [$wal_segsz_bytes])
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro XRecOffIsValid from xlog_internal.h:143 (PostgreSQL 15–18), xlog_internal.h:142 (PostgreSQL 19)
@@ -754,7 +1488,18 @@ macro_rules! XLogSegmentsPerXLogId {
 #[macro_export]
 macro_rules! XRecOffIsValid {
     ($xlrp:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$xlrp;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]

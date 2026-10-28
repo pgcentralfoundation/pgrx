@@ -18,7 +18,191 @@
 #[macro_export]
 macro_rules! EstimateParallelHashJoinBatch {
     ($hashtable:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$hashtable;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                        $crate::__pgrx_c_macros::expression::add::<
+                            $crate::__pgrx_c_macros::Wrapping,
+                            _,
+                            _
+                        >(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                    $crate::__pgrx_c_macros::expression::bitand(
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                false,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::add::<
+                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                    _,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        false,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                            $crate::__pgrx_c_types::uintptr_t
+                                                        >()
+                                                    ),
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            false,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::sub::<
+                                                                $crate::__pgrx_c_macros::Wrapping,
+                                                                _,
+                                                                _
+                                                            >(
+                                                                (
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        false,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                            $crate::__pgrx_c_macros::CInt
+                                                                        >::new(
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
+                                                                        )
+                                                                    )
+                                                                ),
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    false,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::CValue::<
+                                                                        $crate::__pgrx_c_macros::CInt
+                                                                    >::new(1i32)
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            false,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitnot(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        false,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                            $crate::__pgrx_c_types::uintptr_t
+                                                        >()
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                $crate::__pgrx_c_macros::expression::mul::<
+                                    $crate::__pgrx_c_macros::Wrapping,
+                                    _,
+                                    _
+                                >(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            false,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        false,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::add::<
+                                                            $crate::__pgrx_c_macros::Wrapping,
+                                                            _,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                false,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::uintptr_t
+                                                                >()
+                                                            ),
+                                                            (
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    false,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::sub::<
+                                                                        $crate::__pgrx_c_macros::Wrapping,
+                                                                        _,
+                                                                        _
+                                                                    >(
+                                                                        (
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                false,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::CValue::<
+                                                                                    $crate::__pgrx_c_macros::CInt
+                                                                                >::new(
+                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
+                                                                                )
+                                                                            )
+                                                                        ),
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            false,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                $crate::__pgrx_c_macros::CInt
+                                                                            >::new(1i32)
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    false,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::bitnot(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                false,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::uintptr_t
+                                                                >()
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(2i32)
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro HASH_CHUNK_DATA from hashjoin.h:141 (PostgreSQL 15), hashjoin.h:152 (PostgreSQL 16–18), hashjoin.h:163 (PostgreSQL 19)
@@ -38,7 +222,107 @@ macro_rules! EstimateParallelHashJoinBatch {
 #[macro_export]
 macro_rules! HASH_CHUNK_DATA {
     ($hc:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$hc;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::add::<
+                            $crate::__pgrx_c_macros::Wrapping,
+                            _,
+                            _
+                        >(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::CChar,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        >>()
+                                )
+                            ),
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::bitand(
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::add::<
+                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                    _,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                            $crate::__pgrx_c_types::uintptr_t
+                                                        >()
+                                                    ),
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::sub::<
+                                                                $crate::__pgrx_c_macros::Wrapping,
+                                                                _,
+                                                                _
+                                                            >(
+                                                                (
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                            $crate::__pgrx_c_macros::CInt
+                                                                        >::new(
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
+                                                                        )
+                                                                    )
+                                                                ),
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::CValue::<
+                                                                        $crate::__pgrx_c_macros::CInt
+                                                                    >::new(1i32)
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitnot(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                            $crate::__pgrx_c_types::uintptr_t
+                                                        >()
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro HJTUPLE_MINTUPLE from hashjoin.h:80 (PostgreSQL 15), hashjoin.h:91 (PostgreSQL 16–18), hashjoin.h:102 (PostgreSQL 19)
@@ -58,7 +342,22 @@ macro_rules! HASH_CHUNK_DATA {
 #[macro_export]
 macro_rules! HJTUPLE_MINTUPLE {
     ($hjtup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$hjtup;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::MinimalTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro NthParallelHashJoinBatch from hashjoin.h:186 (PostgreSQL 15), hashjoin.h:198 (PostgreSQL 16–18), hashjoin.h:209 (PostgreSQL 19)
@@ -80,7 +379,24 @@ macro_rules! HJTUPLE_MINTUPLE {
 #[macro_export]
 macro_rules! NthParallelHashJoinBatch {
     ($base:expr, $n:expr, $hashtable:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$base;
+                let _ = &$n;
+                let _ = &$hashtable;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::ParallelHashJoinBatch
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PHJ_GROW_BATCHES_PHASE from hashjoin.h:277 (PostgreSQL 15), hashjoin.h:290 (PostgreSQL 16–18), hashjoin.h:301 (PostgreSQL 19)
@@ -100,7 +416,26 @@ macro_rules! NthParallelHashJoinBatch {
 #[macro_export]
 macro_rules! PHJ_GROW_BATCHES_PHASE {
     ($n:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::rem(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; (@native [$n]))
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    5i32
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PHJ_GROW_BUCKETS_PHASE from hashjoin.h:283 (PostgreSQL 15), hashjoin.h:296 (PostgreSQL 16–18), hashjoin.h:307 (PostgreSQL 19)
@@ -120,7 +455,26 @@ macro_rules! PHJ_GROW_BATCHES_PHASE {
 #[macro_export]
 macro_rules! PHJ_GROW_BUCKETS_PHASE {
     ($n:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::rem(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; (@native [$n]))
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    3i32
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro ParallelHashJoinBatchInner from hashjoin.h:170 (PostgreSQL 15), hashjoin.h:182 (PostgreSQL 16–18), hashjoin.h:193 (PostgreSQL 19)
@@ -140,7 +494,22 @@ macro_rules! PHJ_GROW_BUCKETS_PHASE {
 #[macro_export]
 macro_rules! ParallelHashJoinBatchInner {
     ($batch:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$batch;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::COpaque<
+                                    $crate::__pgrx_c_bindings::SharedTuplestore
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro ParallelHashJoinBatchOuter from hashjoin.h:175 (PostgreSQL 15), hashjoin.h:187 (PostgreSQL 16–18), hashjoin.h:198 (PostgreSQL 19)
@@ -160,7 +529,23 @@ macro_rules! ParallelHashJoinBatchInner {
 #[macro_export]
 macro_rules! ParallelHashJoinBatchOuter {
     ($batch:expr, $nparticipants:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$batch;
+                let _ = &$nparticipants;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::COpaque<
+                                    $crate::__pgrx_c_bindings::SharedTuplestore
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 pub use EstimateParallelHashJoinBatch;

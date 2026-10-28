@@ -21,7 +21,14 @@
 #[macro_export]
 macro_rules! CHECK_ENCODING_CONVERSION_ARGS {
     ($srcencoding:expr, $destencoding:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$srcencoding;
+                let _ = &$destencoding;
+                let _ = &$fcinfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -44,7 +51,14 @@ macro_rules! CHECK_ENCODING_CONVERSION_ARGS {
 #[macro_export]
 macro_rules! CHECK_ENCODING_CONVERSION_ARGS {
     ($srcencoding:expr, $destencoding:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$srcencoding;
+                let _ = &$destencoding;
+                let _ = &$fcinfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 /// C macro ISSJISHEAD from pg_wchar.h:41 (PostgreSQL 15–16), pg_wchar.h:44 (PostgreSQL 17–18), pg_wchar.h:55 (PostgreSQL 19)
@@ -60,7 +74,18 @@ macro_rules! CHECK_ENCODING_CONVERSION_ARGS {
 #[macro_export]
 macro_rules! ISSJISHEAD {
     ($c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$c;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro ISSJISTAIL from pg_wchar.h:42 (PostgreSQL 15–16), pg_wchar.h:45 (PostgreSQL 17–18), pg_wchar.h:56 (PostgreSQL 19)
@@ -76,7 +101,18 @@ macro_rules! ISSJISHEAD {
 #[macro_export]
 macro_rules! ISSJISTAIL {
     ($c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$c;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -97,7 +133,18 @@ macro_rules! ISSJISTAIL {
 #[macro_export]
 macro_rules! IS_LC1 {
     ($c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$c;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -118,7 +165,18 @@ macro_rules! IS_LC1 {
 #[macro_export]
 macro_rules! IS_LC2 {
     ($c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$c;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -139,7 +197,18 @@ macro_rules! IS_LC2 {
 #[macro_export]
 macro_rules! IS_LCPRV1 {
     ($c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$c;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -160,7 +229,18 @@ macro_rules! IS_LCPRV1 {
 #[macro_export]
 macro_rules! IS_LCPRV1_A_RANGE {
     ($c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$c;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -181,7 +261,18 @@ macro_rules! IS_LCPRV1_A_RANGE {
 #[macro_export]
 macro_rules! IS_LCPRV1_B_RANGE {
     ($c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$c;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -202,7 +293,18 @@ macro_rules! IS_LCPRV1_B_RANGE {
 #[macro_export]
 macro_rules! IS_LCPRV2 {
     ($c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$c;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -223,7 +325,18 @@ macro_rules! IS_LCPRV2 {
 #[macro_export]
 macro_rules! IS_LCPRV2_A_RANGE {
     ($c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$c;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -244,7 +357,18 @@ macro_rules! IS_LCPRV2_A_RANGE {
 #[macro_export]
 macro_rules! IS_LCPRV2_B_RANGE {
     ($c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$c;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PG_ENCODING_IS_CLIENT_ONLY from pg_wchar.h:298 (PostgreSQL 15–16), pg_wchar.h:300 (PostgreSQL 17–18), pg_wchar.h:137 (PostgreSQL 19)
@@ -260,7 +384,18 @@ macro_rules! IS_LCPRV2_B_RANGE {
 #[macro_export]
 macro_rules! PG_ENCODING_IS_CLIENT_ONLY {
     ($_enc:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$_enc;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -277,7 +412,18 @@ macro_rules! PG_ENCODING_IS_CLIENT_ONLY {
 #[macro_export]
 macro_rules! PG_UNUSED_ENCODING {
     ($_enc:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$_enc;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -294,7 +440,18 @@ macro_rules! PG_UNUSED_ENCODING {
 #[macro_export]
 macro_rules! PG_VALID_BE_ENCODING {
     ($_enc:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$_enc;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -311,7 +468,18 @@ macro_rules! PG_VALID_BE_ENCODING {
 #[macro_export]
 macro_rules! PG_VALID_BE_ENCODING {
     ($_enc:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$_enc;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -328,7 +496,18 @@ macro_rules! PG_VALID_BE_ENCODING {
 #[macro_export]
 macro_rules! PG_VALID_ENCODING {
     ($_enc:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$_enc;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -345,7 +524,18 @@ macro_rules! PG_VALID_ENCODING {
 #[macro_export]
 macro_rules! PG_VALID_ENCODING {
     ($_enc:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$_enc;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PG_VALID_FE_ENCODING from pg_wchar.h:305 (PostgreSQL 15–16), pg_wchar.h:307 (PostgreSQL 17–18), pg_wchar.h:144 (PostgreSQL 19)
@@ -361,7 +551,18 @@ macro_rules! PG_VALID_ENCODING {
 #[macro_export]
 macro_rules! PG_VALID_FE_ENCODING {
     ($_enc:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$_enc;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -388,7 +589,16 @@ macro_rules! PG_VALID_FE_ENCODING {
 #[macro_export]
 macro_rules! is_utf16_surrogate_first {
     ($c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$c;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -415,7 +625,16 @@ macro_rules! is_utf16_surrogate_first {
 #[macro_export]
 macro_rules! is_utf16_surrogate_first {
     ($c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$c;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -442,7 +661,16 @@ macro_rules! is_utf16_surrogate_first {
 #[macro_export]
 macro_rules! is_utf16_surrogate_second {
     ($c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$c;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -469,7 +697,16 @@ macro_rules! is_utf16_surrogate_second {
 #[macro_export]
 macro_rules! is_utf16_surrogate_second {
     ($c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$c;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -496,7 +733,16 @@ macro_rules! is_utf16_surrogate_second {
 #[macro_export]
 macro_rules! is_valid_unicode_codepoint {
     ($c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$c;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -523,7 +769,16 @@ macro_rules! is_valid_unicode_codepoint {
 #[macro_export]
 macro_rules! is_valid_unicode_codepoint {
     ($c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$c;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -550,7 +805,17 @@ macro_rules! is_valid_unicode_codepoint {
 #[macro_export]
 macro_rules! surrogate_pair_to_codepoint {
     ($first:expr, $second:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$first;
+                let _ = &$second;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::pg_wchar
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -577,7 +842,17 @@ macro_rules! surrogate_pair_to_codepoint {
 #[macro_export]
 macro_rules! surrogate_pair_to_codepoint {
     ($first:expr, $second:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$first;
+                let _ = &$second;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::char32_t
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -627,7 +902,19 @@ macro_rules! surrogate_pair_to_codepoint {
 #[macro_export]
 macro_rules! unicode_to_utf8 {
     ($c:expr, $utf8string:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$c;
+                let _ = &$utf8string;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::CUnsignedChar,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
@@ -661,7 +948,16 @@ macro_rules! unicode_to_utf8 {
 #[macro_export]
 macro_rules! unicode_utf8len {
     ($c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$c;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CInt
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -695,7 +991,16 @@ macro_rules! unicode_utf8len {
 #[macro_export]
 macro_rules! unicode_utf8len {
     ($c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$c;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CInt
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -738,7 +1043,16 @@ macro_rules! unicode_utf8len {
 #[macro_export]
 macro_rules! utf8_to_unicode {
     ($c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$c;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::char32_t
+                    >()
+                )
+            }
+        )
     };
 }
 pub use CHECK_ENCODING_CONVERSION_ARGS;

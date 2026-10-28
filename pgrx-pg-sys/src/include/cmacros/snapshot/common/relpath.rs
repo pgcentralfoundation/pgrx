@@ -19,7 +19,18 @@
 #[macro_export]
 macro_rules! RelFileNumberIsValid {
     ($relnumber:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$relnumber;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CBool
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -40,11 +51,26 @@ macro_rules! RelFileNumberIsValid {
 #[macro_export]
 macro_rules! relpath {
     ($rnode:expr, $forknum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rnode;
+                let _ = &$forknum;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CChar,
+                                ::core::ffi::c_char
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro relpath from relpath.h:94 (PostgreSQL 16–17), relpath.h:151 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17"))]
+/// C macro relpath from relpath.h:94 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define relpath( rlocator , forknum ) relpathbackend ( ( rlocator ) . locator , ( rlocator ) . backend , forknum )
@@ -61,7 +87,54 @@ macro_rules! relpath {
 #[macro_export]
 macro_rules! relpath {
     ($rlocator:expr, $forknum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rlocator;
+                let _ = &$forknum;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CChar,
+                                ::core::ffi::c_char
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
+    };
+}
+#[cfg(any(feature = "pg18", feature = "pg19"))]
+/// C macro relpath from relpath.h:151 (PostgreSQL 18–19)
+///
+/// ```text
+/// #define relpath( rlocator , forknum ) relpathbackend ( ( rlocator ) . locator , ( rlocator ) . backend , forknum )
+/// ```
+///
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! relpath {
+    ($rlocator:expr, $forknum:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rlocator;
+                let _ = &$forknum;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CRawRecord<
+                            $crate::__pgrx_c_bindings::RelPathStr
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -82,11 +155,27 @@ macro_rules! relpath {
 #[macro_export]
 macro_rules! relpathbackend {
     ($rnode:expr, $backend:expr, $forknum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rnode;
+                let _ = &$backend;
+                let _ = &$forknum;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CChar,
+                                ::core::ffi::c_char
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro relpathbackend from relpath.h:85 (PostgreSQL 16–17), relpath.h:142 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17"))]
+/// C macro relpathbackend from relpath.h:85 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define relpathbackend( rlocator , backend , forknum ) GetRelationPath ( ( rlocator ) . dbOid , ( rlocator ) . spcOid , ( rlocator ) . relNumber , backend , forknum )
@@ -103,7 +192,56 @@ macro_rules! relpathbackend {
 #[macro_export]
 macro_rules! relpathbackend {
     ($rlocator:expr, $backend:expr, $forknum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rlocator;
+                let _ = &$backend;
+                let _ = &$forknum;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CChar,
+                                ::core::ffi::c_char
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
+    };
+}
+#[cfg(any(feature = "pg18", feature = "pg19"))]
+/// C macro relpathbackend from relpath.h:142 (PostgreSQL 18–19)
+///
+/// ```text
+/// #define relpathbackend( rlocator , backend , forknum ) GetRelationPath ( ( rlocator ) . dbOid , ( rlocator ) . spcOid , ( rlocator ) . relNumber , backend , forknum )
+/// ```
+///
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! relpathbackend {
+    ($rlocator:expr, $backend:expr, $forknum:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rlocator;
+                let _ = &$backend;
+                let _ = &$forknum;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CRawRecord<
+                            $crate::__pgrx_c_bindings::RelPathStr
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -124,7 +262,22 @@ macro_rules! relpathbackend {
 #[macro_export]
 macro_rules! relpathperm {
     ($rnode:expr, $forknum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rnode;
+                let _ = &$forknum;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CChar,
+                                ::core::ffi::c_char
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg16")]
@@ -145,11 +298,26 @@ macro_rules! relpathperm {
 #[macro_export]
 macro_rules! relpathperm {
     ($rlocator:expr, $forknum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rlocator;
+                let _ = &$forknum;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CChar,
+                                ::core::ffi::c_char
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro relpathperm from relpath.h:90 (PostgreSQL 17), relpath.h:147 (PostgreSQL 18–19)
+#[cfg(feature = "pg17")]
+/// C macro relpathperm from relpath.h:90 (PostgreSQL 17)
 ///
 /// ```text
 /// #define relpathperm( rlocator , forknum ) relpathbackend ( rlocator , INVALID_PROC_NUMBER , forknum )
@@ -166,7 +334,54 @@ macro_rules! relpathperm {
 #[macro_export]
 macro_rules! relpathperm {
     ($rlocator:expr, $forknum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rlocator;
+                let _ = &$forknum;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CChar,
+                                ::core::ffi::c_char
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
+    };
+}
+#[cfg(any(feature = "pg18", feature = "pg19"))]
+/// C macro relpathperm from relpath.h:147 (PostgreSQL 18–19)
+///
+/// ```text
+/// #define relpathperm( rlocator , forknum ) relpathbackend ( rlocator , INVALID_PROC_NUMBER , forknum )
+/// ```
+///
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! relpathperm {
+    ($rlocator:expr, $forknum:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rlocator;
+                let _ = &$forknum;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CRawRecord<
+                            $crate::__pgrx_c_bindings::RelPathStr
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]

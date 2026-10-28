@@ -13,8 +13,8 @@
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! ENL1_printf {
-    ($message:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($($message:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 /// C macro MJ1_printf from execdebug.h:121 (PostgreSQL 15–19)
@@ -29,8 +29,8 @@ macro_rules! ENL1_printf {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! MJ1_printf {
-    ($s:expr, $p:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($s:expr, $($p:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 /// C macro MJ2_printf from execdebug.h:122 (PostgreSQL 15–19)
@@ -45,8 +45,8 @@ macro_rules! MJ1_printf {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! MJ2_printf {
-    ($s:expr, $p1:expr, $p2:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($s:expr, $p1:expr, $($p2:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 /// C macro MJ_DEBUG_COMPARE from execdebug.h:125 (PostgreSQL 15–19)
@@ -61,8 +61,8 @@ macro_rules! MJ2_printf {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! MJ_DEBUG_COMPARE {
-    ($res:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($($res:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 /// C macro MJ_DEBUG_PROC_NODE from execdebug.h:127 (PostgreSQL 15–19)
@@ -77,8 +77,8 @@ macro_rules! MJ_DEBUG_COMPARE {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! MJ_DEBUG_PROC_NODE {
-    ($slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($($slot:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 /// C macro MJ_DEBUG_QUAL from execdebug.h:126 (PostgreSQL 15–19)
@@ -93,8 +93,8 @@ macro_rules! MJ_DEBUG_PROC_NODE {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! MJ_DEBUG_QUAL {
-    ($clause:expr, $res:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($clause:expr, $($res:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 /// C macro MJ_debugtup from execdebug.h:123 (PostgreSQL 15–19)
@@ -109,8 +109,8 @@ macro_rules! MJ_DEBUG_QUAL {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! MJ_debugtup {
-    ($slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($($slot:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 /// C macro MJ_dump from execdebug.h:124 (PostgreSQL 15–19)
@@ -125,8 +125,8 @@ macro_rules! MJ_debugtup {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! MJ_dump {
-    ($state:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($($state:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 /// C macro MJ_nodeDisplay from execdebug.h:119 (PostgreSQL 15–19)
@@ -141,8 +141,8 @@ macro_rules! MJ_dump {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! MJ_nodeDisplay {
-    ($l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($($l:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 /// C macro MJ_printf from execdebug.h:120 (PostgreSQL 15–19)
@@ -157,8 +157,8 @@ macro_rules! MJ_nodeDisplay {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! MJ_printf {
-    ($s:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($($s:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 /// C macro NL1_printf from execdebug.h:77 (PostgreSQL 15–19)
@@ -173,8 +173,8 @@ macro_rules! MJ_printf {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! NL1_printf {
-    ($s:expr, $a:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($s:expr, $($a:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 /// C macro NL_nodeDisplay from execdebug.h:75 (PostgreSQL 15–19)
@@ -189,8 +189,8 @@ macro_rules! NL1_printf {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! NL_nodeDisplay {
-    ($l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($($l:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 /// C macro NL_printf from execdebug.h:76 (PostgreSQL 15–19)
@@ -205,8 +205,8 @@ macro_rules! NL_nodeDisplay {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! NL_printf {
-    ($s:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($($s:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 /// C macro NULL_OR_TUPLE from execdebug.h:63 (PostgreSQL 15–19)
@@ -226,7 +226,67 @@ macro_rules! NL_printf {
 #[macro_export]
 macro_rules! NULL_OR_TUPLE {
     ($slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >()
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::decay(
+                                            {
+                                                const __PGRX_C_STRING: &[u8; 5] = &[
+                                                    110,
+                                                    117,
+                                                    108,
+                                                    108,
+                                                    0
+                                                ];
+                                                $crate::__pgrx_c_macros::expression::string_literal(
+                                                    __PGRX_C_STRING
+                                                )
+                                            }
+                                        )
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::decay(
+                                            {
+                                                const __PGRX_C_STRING: &[u8; 8] = &[
+                                                    97,
+                                                    32,
+                                                    116,
+                                                    117,
+                                                    112,
+                                                    108,
+                                                    101,
+                                                    0
+                                                ];
+                                                $crate::__pgrx_c_macros::expression::string_literal(
+                                                    __PGRX_C_STRING
+                                                )
+                                            }
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro SO1_printf from execdebug.h:93 (PostgreSQL 15–19)
@@ -241,8 +301,8 @@ macro_rules! NULL_OR_TUPLE {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! SO1_printf {
-    ($s:expr, $p:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($s:expr, $($p:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 /// C macro SO2_printf from execdebug.h:94 (PostgreSQL 15–19)
@@ -257,8 +317,8 @@ macro_rules! SO1_printf {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! SO2_printf {
-    ($s:expr, $p1:expr, $p2:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($s:expr, $p1:expr, $($p2:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 /// C macro SO_nodeDisplay from execdebug.h:91 (PostgreSQL 15–19)
@@ -273,8 +333,8 @@ macro_rules! SO2_printf {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! SO_nodeDisplay {
-    ($l:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($($l:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 /// C macro SO_printf from execdebug.h:92 (PostgreSQL 15–19)
@@ -289,8 +349,8 @@ macro_rules! SO_nodeDisplay {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! SO_printf {
-    ($s:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($($s:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 /// C macro T_OR_F from execdebug.h:62 (PostgreSQL 15–19)
@@ -306,7 +366,62 @@ macro_rules! SO_printf {
 #[macro_export]
 macro_rules! T_OR_F {
     ($b:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_operand!(@value [true]; (@native [$b]))
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::decay(
+                                            {
+                                                const __PGRX_C_STRING: &[u8; 5] = &[
+                                                    116,
+                                                    114,
+                                                    117,
+                                                    101,
+                                                    0
+                                                ];
+                                                $crate::__pgrx_c_macros::expression::string_literal(
+                                                    __PGRX_C_STRING
+                                                )
+                                            }
+                                        )
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::decay(
+                                            {
+                                                const __PGRX_C_STRING: &[u8; 6] = &[
+                                                    102,
+                                                    97,
+                                                    108,
+                                                    115,
+                                                    101,
+                                                    0
+                                                ];
+                                                $crate::__pgrx_c_macros::expression::string_literal(
+                                                    __PGRX_C_STRING
+                                                )
+                                            }
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 pub use ENL1_printf;

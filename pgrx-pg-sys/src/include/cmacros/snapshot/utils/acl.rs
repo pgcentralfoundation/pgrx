@@ -18,8 +18,155 @@
 /// Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ACLITEM_GET_GOPTIONS {
+    (* $item:ident $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::shr(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_ai_privs,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_operand!(
+                                                            @read_place;
+                                                            (@deref [* $item] [$item])
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(16i32)
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    0xFFFFi32
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
+    };
+    ((* $item:ident) $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::shr(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_ai_privs,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_operand!(
+                                                            @read_place;
+                                                            (@deref [(* $item)] [$item])
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(16i32)
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    0xFFFFi32
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
+    };
     ($item:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::shr(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_ai_privs,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_operand!(
+                                                            @read_place;
+                                                            (@native [$item])
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(16i32)
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    0xFFFFi32
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -39,8 +186,155 @@ macro_rules! ACLITEM_GET_GOPTIONS {
 /// Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ACLITEM_GET_GOPTIONS {
+    (* $item:ident $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::shr(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_ai_privs,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_operand!(
+                                                            @read_place;
+                                                            (@deref [* $item] [$item])
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(32i32)
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<
+                                    $crate::__pgrx_c_macros::CUnsignedInt
+                                >::new(0xFFFFFFFFu32)
+                            )
+                        )
+                    )
+                )
+            }
+        )
+    };
+    ((* $item:ident) $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::shr(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_ai_privs,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_operand!(
+                                                            @read_place;
+                                                            (@deref [(* $item)] [$item])
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(32i32)
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<
+                                    $crate::__pgrx_c_macros::CUnsignedInt
+                                >::new(0xFFFFFFFFu32)
+                            )
+                        )
+                    )
+                )
+            }
+        )
+    };
     ($item:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::shr(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_ai_privs,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_operand!(
+                                                            @read_place;
+                                                            (@native [$item])
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(32i32)
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<
+                                    $crate::__pgrx_c_macros::CUnsignedInt
+                                >::new(0xFFFFFFFFu32)
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -56,8 +350,97 @@ macro_rules! ACLITEM_GET_GOPTIONS {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! ACLITEM_GET_PRIVS {
+    (* $item:ident $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::load(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_ai_privs,
+                                        _,
+                                        _
+                                    >(
+                                        (
+                                            $crate::__pgrx_c_operand!(
+                                                @read_place;
+                                                (@deref [* $item] [$item])
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    0xFFFFi32
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
+    };
+    ((* $item:ident) $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::load(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_ai_privs,
+                                        _,
+                                        _
+                                    >(
+                                        (
+                                            $crate::__pgrx_c_operand!(
+                                                @read_place;
+                                                (@deref [(* $item)] [$item])
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    0xFFFFi32
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
+    };
     ($item:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::load(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_ai_privs,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@read_place; (@native [$item]))))
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    0xFFFFi32
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -73,8 +456,97 @@ macro_rules! ACLITEM_GET_PRIVS {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! ACLITEM_GET_PRIVS {
+    (* $item:ident $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::load(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_ai_privs,
+                                        _,
+                                        _
+                                    >(
+                                        (
+                                            $crate::__pgrx_c_operand!(
+                                                @read_place;
+                                                (@deref [* $item] [$item])
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<
+                                    $crate::__pgrx_c_macros::CUnsignedInt
+                                >::new(0xFFFFFFFFu32)
+                            )
+                        )
+                    )
+                )
+            }
+        )
+    };
+    ((* $item:ident) $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::load(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_ai_privs,
+                                        _,
+                                        _
+                                    >(
+                                        (
+                                            $crate::__pgrx_c_operand!(
+                                                @read_place;
+                                                (@deref [(* $item)] [$item])
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<
+                                    $crate::__pgrx_c_macros::CUnsignedInt
+                                >::new(0xFFFFFFFFu32)
+                            )
+                        )
+                    )
+                )
+            }
+        )
+    };
     ($item:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::load(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_ai_privs,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@read_place; (@native [$item]))))
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<
+                                    $crate::__pgrx_c_macros::CUnsignedInt
+                                >::new(0xFFFFFFFFu32)
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro ACLITEM_GET_RIGHTS from acl.h:68 (PostgreSQL 15–19)
@@ -89,8 +561,63 @@ macro_rules! ACLITEM_GET_PRIVS {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! ACLITEM_GET_RIGHTS {
+    (* $item:ident $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ai_privs,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@read_place; (@deref [* $item] [$item]))))
+                        )
+                    )
+                )
+            }
+        )
+    };
+    ((* $item:ident) $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ai_privs,
+                                _,
+                                _
+                            >(
+                                (
+                                    $crate::__pgrx_c_operand!(
+                                        @read_place;
+                                        (@deref [(* $item)] [$item])
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
+    };
     ($item:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ai_privs,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@read_place; (@native [$item]))))
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -110,8 +637,407 @@ macro_rules! ACLITEM_GET_RIGHTS {
 /// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ACLITEM_SET_GOPTIONS {
+    (* $item:ident, $goptions:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$goptions;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ai_privs,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@place; (@deref [* $item] [$item])))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitor(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::load(
+                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                            $crate::__pgrx_c_generated::Field_ai_privs,
+                                                            _,
+                                                            _
+                                                        >(
+                                                            (
+                                                                $crate::__pgrx_c_operand!(
+                                                                    @read_place;
+                                                                    (@deref [* $item] [$item])
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::bitnot(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::shl::<
+                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                    _,
+                                                                    _
+                                                                >(
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                $crate::__pgrx_c_types::AclMode
+                                                                            >()
+                                                                        )
+                                                                    ),
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                            $crate::__pgrx_c_macros::CInt
+                                                                        >::new(16i32)
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::shl::<
+                                                $crate::__pgrx_c_macros::Wrapping,
+                                                _,
+                                                _
+                                            >(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::bitand(
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::AclMode
+                                                                >()
+                                                            ),
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::CValue::<
+                                                                    $crate::__pgrx_c_macros::CInt
+                                                                >::new(0xFFFFi32)
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(16i32)
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
+    };
+    ((* $item:ident), $goptions:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$goptions;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ai_privs,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@place; (@deref [(* $item)] [$item])))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitor(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::load(
+                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                            $crate::__pgrx_c_generated::Field_ai_privs,
+                                                            _,
+                                                            _
+                                                        >(
+                                                            (
+                                                                $crate::__pgrx_c_operand!(
+                                                                    @read_place;
+                                                                    (@deref [(* $item)] [$item])
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::bitnot(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::shl::<
+                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                    _,
+                                                                    _
+                                                                >(
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                $crate::__pgrx_c_types::AclMode
+                                                                            >()
+                                                                        )
+                                                                    ),
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                            $crate::__pgrx_c_macros::CInt
+                                                                        >::new(16i32)
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::shl::<
+                                                $crate::__pgrx_c_macros::Wrapping,
+                                                _,
+                                                _
+                                            >(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::bitand(
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::AclMode
+                                                                >()
+                                                            ),
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::CValue::<
+                                                                    $crate::__pgrx_c_macros::CInt
+                                                                >::new(0xFFFFi32)
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(16i32)
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
+    };
     ($item:expr, $goptions:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$goptions;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ai_privs,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@place; (@native [$item])))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitor(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::load(
+                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                            $crate::__pgrx_c_generated::Field_ai_privs,
+                                                            _,
+                                                            _
+                                                        >(
+                                                            (
+                                                                $crate::__pgrx_c_operand!(
+                                                                    @read_place;
+                                                                    (@native [$item])
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::bitnot(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::shl::<
+                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                    _,
+                                                                    _
+                                                                >(
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                $crate::__pgrx_c_types::AclMode
+                                                                            >()
+                                                                        )
+                                                                    ),
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                            $crate::__pgrx_c_macros::CInt
+                                                                        >::new(16i32)
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::shl::<
+                                                $crate::__pgrx_c_macros::Wrapping,
+                                                _,
+                                                _
+                                            >(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::bitand(
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::AclMode
+                                                                >()
+                                                            ),
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::CValue::<
+                                                                    $crate::__pgrx_c_macros::CInt
+                                                                >::new(0xFFFFi32)
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(16i32)
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -131,8 +1057,407 @@ macro_rules! ACLITEM_SET_GOPTIONS {
 /// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ACLITEM_SET_GOPTIONS {
+    (* $item:ident, $goptions:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$goptions;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ai_privs,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@place; (@deref [* $item] [$item])))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitor(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::load(
+                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                            $crate::__pgrx_c_generated::Field_ai_privs,
+                                                            _,
+                                                            _
+                                                        >(
+                                                            (
+                                                                $crate::__pgrx_c_operand!(
+                                                                    @read_place;
+                                                                    (@deref [* $item] [$item])
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::bitnot(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::shl::<
+                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                    _,
+                                                                    _
+                                                                >(
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                $crate::__pgrx_c_types::AclMode
+                                                                            >()
+                                                                        )
+                                                                    ),
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                            $crate::__pgrx_c_macros::CInt
+                                                                        >::new(32i32)
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::shl::<
+                                                $crate::__pgrx_c_macros::Wrapping,
+                                                _,
+                                                _
+                                            >(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::bitand(
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::AclMode
+                                                                >()
+                                                            ),
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::CValue::<
+                                                                    $crate::__pgrx_c_macros::CUnsignedInt
+                                                                >::new(0xFFFFFFFFu32)
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(32i32)
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
+    };
+    ((* $item:ident), $goptions:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$goptions;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ai_privs,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@place; (@deref [(* $item)] [$item])))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitor(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::load(
+                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                            $crate::__pgrx_c_generated::Field_ai_privs,
+                                                            _,
+                                                            _
+                                                        >(
+                                                            (
+                                                                $crate::__pgrx_c_operand!(
+                                                                    @read_place;
+                                                                    (@deref [(* $item)] [$item])
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::bitnot(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::shl::<
+                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                    _,
+                                                                    _
+                                                                >(
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                $crate::__pgrx_c_types::AclMode
+                                                                            >()
+                                                                        )
+                                                                    ),
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                            $crate::__pgrx_c_macros::CInt
+                                                                        >::new(32i32)
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::shl::<
+                                                $crate::__pgrx_c_macros::Wrapping,
+                                                _,
+                                                _
+                                            >(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::bitand(
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::AclMode
+                                                                >()
+                                                            ),
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::CValue::<
+                                                                    $crate::__pgrx_c_macros::CUnsignedInt
+                                                                >::new(0xFFFFFFFFu32)
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(32i32)
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
+    };
     ($item:expr, $goptions:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$goptions;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ai_privs,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@place; (@native [$item])))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitor(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::load(
+                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                            $crate::__pgrx_c_generated::Field_ai_privs,
+                                                            _,
+                                                            _
+                                                        >(
+                                                            (
+                                                                $crate::__pgrx_c_operand!(
+                                                                    @read_place;
+                                                                    (@native [$item])
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::bitnot(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::shl::<
+                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                    _,
+                                                                    _
+                                                                >(
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                $crate::__pgrx_c_types::AclMode
+                                                                            >()
+                                                                        )
+                                                                    ),
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                            $crate::__pgrx_c_macros::CInt
+                                                                        >::new(32i32)
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::shl::<
+                                                $crate::__pgrx_c_macros::Wrapping,
+                                                _,
+                                                _
+                                            >(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::bitand(
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::AclMode
+                                                                >()
+                                                            ),
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::CValue::<
+                                                                    $crate::__pgrx_c_macros::CUnsignedInt
+                                                                >::new(0xFFFFFFFFu32)
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(32i32)
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -152,8 +1477,281 @@ macro_rules! ACLITEM_SET_GOPTIONS {
 /// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ACLITEM_SET_PRIVS {
+    (* $item:ident, $privs:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$privs;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ai_privs,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@place; (@deref [* $item] [$item])))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitor(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::load(
+                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                            $crate::__pgrx_c_generated::Field_ai_privs,
+                                                            _,
+                                                            _
+                                                        >(
+                                                            (
+                                                                $crate::__pgrx_c_operand!(
+                                                                    @read_place;
+                                                                    (@deref [* $item] [$item])
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::bitnot(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::AclMode
+                                                                >()
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                        $crate::__pgrx_c_types::AclMode
+                                                    >()
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(0xFFFFi32)
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
+    };
+    ((* $item:ident), $privs:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$privs;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ai_privs,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@place; (@deref [(* $item)] [$item])))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitor(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::load(
+                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                            $crate::__pgrx_c_generated::Field_ai_privs,
+                                                            _,
+                                                            _
+                                                        >(
+                                                            (
+                                                                $crate::__pgrx_c_operand!(
+                                                                    @read_place;
+                                                                    (@deref [(* $item)] [$item])
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::bitnot(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::AclMode
+                                                                >()
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                        $crate::__pgrx_c_types::AclMode
+                                                    >()
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(0xFFFFi32)
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
+    };
     ($item:expr, $privs:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$privs;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ai_privs,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@place; (@native [$item])))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitor(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::load(
+                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                            $crate::__pgrx_c_generated::Field_ai_privs,
+                                                            _,
+                                                            _
+                                                        >(
+                                                            (
+                                                                $crate::__pgrx_c_operand!(
+                                                                    @read_place;
+                                                                    (@native [$item])
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::bitnot(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::AclMode
+                                                                >()
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                        $crate::__pgrx_c_types::AclMode
+                                                    >()
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(0xFFFFi32)
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -173,8 +1771,281 @@ macro_rules! ACLITEM_SET_PRIVS {
 /// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ACLITEM_SET_PRIVS {
+    (* $item:ident, $privs:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$privs;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ai_privs,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@place; (@deref [* $item] [$item])))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitor(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::load(
+                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                            $crate::__pgrx_c_generated::Field_ai_privs,
+                                                            _,
+                                                            _
+                                                        >(
+                                                            (
+                                                                $crate::__pgrx_c_operand!(
+                                                                    @read_place;
+                                                                    (@deref [* $item] [$item])
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::bitnot(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::AclMode
+                                                                >()
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                        $crate::__pgrx_c_types::AclMode
+                                                    >()
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CUnsignedInt
+                                                    >::new(0xFFFFFFFFu32)
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
+    };
+    ((* $item:ident), $privs:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$privs;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ai_privs,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@place; (@deref [(* $item)] [$item])))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitor(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::load(
+                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                            $crate::__pgrx_c_generated::Field_ai_privs,
+                                                            _,
+                                                            _
+                                                        >(
+                                                            (
+                                                                $crate::__pgrx_c_operand!(
+                                                                    @read_place;
+                                                                    (@deref [(* $item)] [$item])
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::bitnot(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::AclMode
+                                                                >()
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                        $crate::__pgrx_c_types::AclMode
+                                                    >()
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CUnsignedInt
+                                                    >::new(0xFFFFFFFFu32)
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
+    };
     ($item:expr, $privs:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$privs;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ai_privs,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@place; (@native [$item])))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitor(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::load(
+                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                            $crate::__pgrx_c_generated::Field_ai_privs,
+                                                            _,
+                                                            _
+                                                        >(
+                                                            (
+                                                                $crate::__pgrx_c_operand!(
+                                                                    @read_place;
+                                                                    (@native [$item])
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::bitnot(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::AclMode
+                                                                >()
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                        $crate::__pgrx_c_types::AclMode
+                                                    >()
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CUnsignedInt
+                                                    >::new(0xFFFFFFFFu32)
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -195,7 +2066,98 @@ macro_rules! ACLITEM_SET_PRIVS {
 #[macro_export]
 macro_rules! ACLITEM_SET_PRIVS_GOPTIONS {
     ($item:expr, $privs:expr, $goptions:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$privs;
+                let _ = &$goptions;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ai_privs,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@place; (@native [$item])))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitor(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                        $crate::__pgrx_c_types::AclMode
+                                                    >()
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(0xFFFFi32)
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::shl::<
+                                                $crate::__pgrx_c_macros::Wrapping,
+                                                _,
+                                                _
+                                            >(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::bitand(
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::AclMode
+                                                                >()
+                                                            ),
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::CValue::<
+                                                                    $crate::__pgrx_c_macros::CInt
+                                                                >::new(0xFFFFi32)
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(16i32)
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -216,7 +2178,98 @@ macro_rules! ACLITEM_SET_PRIVS_GOPTIONS {
 #[macro_export]
 macro_rules! ACLITEM_SET_PRIVS_GOPTIONS {
     ($item:expr, $privs:expr, $goptions:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$privs;
+                let _ = &$goptions;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ai_privs,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@place; (@native [$item])))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitor(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                        $crate::__pgrx_c_types::AclMode
+                                                    >()
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CUnsignedInt
+                                                    >::new(0xFFFFFFFFu32)
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::shl::<
+                                                $crate::__pgrx_c_macros::Wrapping,
+                                                _,
+                                                _
+                                            >(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::bitand(
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::AclMode
+                                                                >()
+                                                            ),
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::CValue::<
+                                                                    $crate::__pgrx_c_macros::CUnsignedInt
+                                                                >::new(0xFFFFFFFFu32)
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(32i32)
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro ACLITEM_SET_RIGHTS from acl.h:79 (PostgreSQL 15–19)
@@ -236,7 +2289,27 @@ macro_rules! ACLITEM_SET_PRIVS_GOPTIONS {
 #[macro_export]
 macro_rules! ACLITEM_SET_RIGHTS {
     ($item:expr, $rights:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rights;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_ai_privs,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@place; (@native [$item])))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                    $crate::__pgrx_c_types::AclMode
+                                >()
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro ACL_DAT from acl.h:109 (PostgreSQL 15–19)
@@ -256,7 +2329,22 @@ macro_rules! ACLITEM_SET_RIGHTS {
 #[macro_export]
 macro_rules! ACL_DAT {
     ($ACL:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ACL;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::AclItem
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -277,7 +2365,48 @@ macro_rules! ACL_DAT {
 #[macro_export]
 macro_rules! ACL_GRANT_OPTION_FOR {
     ($privs:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$privs;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::shl::<
+                            $crate::__pgrx_c_macros::Wrapping,
+                            _,
+                            _
+                        >(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::bitand(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::AclMode
+                                            >()
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(0xFFFFi32)
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    16i32
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -298,7 +2427,48 @@ macro_rules! ACL_GRANT_OPTION_FOR {
 #[macro_export]
 macro_rules! ACL_GRANT_OPTION_FOR {
     ($privs:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$privs;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::shl::<
+                            $crate::__pgrx_c_macros::Wrapping,
+                            _,
+                            _
+                        >(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::bitand(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::AclMode
+                                            >()
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CUnsignedInt
+                                            >::new(0xFFFFFFFFu32)
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    32i32
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro ACL_NUM from acl.h:108 (PostgreSQL 15–19)
@@ -318,7 +2488,35 @@ macro_rules! ACL_GRANT_OPTION_FOR {
 #[macro_export]
 macro_rules! ACL_NUM {
     ($ACL:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ACL;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::index(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::CInt,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >>()
+                                    )
+                                ),
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::null_constant(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(0i32)
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro ACL_N_SIZE from acl.h:110 (PostgreSQL 15–19)
@@ -338,7 +2536,126 @@ macro_rules! ACL_NUM {
 #[macro_export]
 macro_rules! ACL_N_SIZE {
     ($N:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                        $crate::__pgrx_c_macros::expression::add::<
+                            $crate::__pgrx_c_macros::Wrapping,
+                            _,
+                            _
+                        >(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                    $crate::__pgrx_c_macros::expression::bitand(
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                false,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::add::<
+                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                    _,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        false,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                            $crate::__pgrx_c_types::uintptr_t
+                                                        >()
+                                                    ),
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            false,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::sub::<
+                                                                $crate::__pgrx_c_macros::Wrapping,
+                                                                _,
+                                                                _
+                                                            >(
+                                                                (
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        false,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                            $crate::__pgrx_c_macros::CInt
+                                                                        >::new(
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
+                                                                        )
+                                                                    )
+                                                                ),
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    false,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::CValue::<
+                                                                        $crate::__pgrx_c_macros::CInt
+                                                                    >::new(1i32)
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            false,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitnot(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        false,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                            $crate::__pgrx_c_types::uintptr_t
+                                                        >()
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                    $crate::__pgrx_c_macros::expression::mul::<
+                                        $crate::__pgrx_c_macros::Wrapping,
+                                        _,
+                                        _
+                                    >(
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                false,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_operand!(
+                                                    @value [false];
+                                                    (@native [$N])
+                                                )
+                                            )
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            false,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::CSize
+                                            >()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -359,7 +2676,44 @@ macro_rules! ACL_N_SIZE {
 #[macro_export]
 macro_rules! ACL_OPTION_TO_PRIVS {
     ($privs:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$privs;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::shr(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::AclMode
+                                            >()
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(16i32)
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    0xFFFFi32
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -380,7 +2734,44 @@ macro_rules! ACL_OPTION_TO_PRIVS {
 #[macro_export]
 macro_rules! ACL_OPTION_TO_PRIVS {
     ($privs:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$privs;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::shr(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::AclMode
+                                            >()
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(32i32)
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<
+                                    $crate::__pgrx_c_macros::CUnsignedInt
+                                >::new(0xFFFFFFFFu32)
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -401,7 +2792,71 @@ macro_rules! ACL_OPTION_TO_PRIVS {
 #[macro_export]
 macro_rules! ACL_SIZE {
     ($ACL:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ACL;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::shr(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_va_header,
+                                                    _,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::project::<
+                                                        $crate::__pgrx_c_generated::Field_va_4byte,
+                                                        _,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::pointee(
+                                                            (
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                $crate::__pgrx_c_bindings::varattrib_4b
+                                                                            >,
+                                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                        >>()
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(2i32)
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    0x3FFFFFFFi32
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -422,7 +2877,18 @@ macro_rules! ACL_SIZE {
 #[macro_export]
 macro_rules! ACL_SIZE {
     ($ACL:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ACL;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            usize
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -443,7 +2909,22 @@ macro_rules! ACL_SIZE {
 #[macro_export]
 macro_rules! DatumGetAclItemP {
     ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::AclItem
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -464,7 +2945,22 @@ macro_rules! DatumGetAclItemP {
 #[macro_export]
 macro_rules! DatumGetAclItemP {
     ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::AclItem
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro DatumGetAclP from acl.h:120 (PostgreSQL 15–19)
@@ -484,7 +2980,22 @@ macro_rules! DatumGetAclItemP {
 #[macro_export]
 macro_rules! DatumGetAclP {
     ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::ArrayType
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro DatumGetAclPCopy from acl.h:121 (PostgreSQL 15–19)
@@ -504,7 +3015,22 @@ macro_rules! DatumGetAclP {
 #[macro_export]
 macro_rules! DatumGetAclPCopy {
     ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::ArrayType
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -527,7 +3053,23 @@ macro_rules! DatumGetAclPCopy {
 #[macro_export]
 macro_rules! PG_GETARG_ACLITEM_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::AclItem
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -550,7 +3092,23 @@ macro_rules! PG_GETARG_ACLITEM_P {
 #[macro_export]
 macro_rules! PG_GETARG_ACLITEM_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::AclItem
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_ACL_P from acl.h:122 (PostgreSQL 15–19)
@@ -572,7 +3130,23 @@ macro_rules! PG_GETARG_ACLITEM_P {
 #[macro_export]
 macro_rules! PG_GETARG_ACL_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::ArrayType
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_ACL_P_COPY from acl.h:123 (PostgreSQL 15–19)
@@ -594,7 +3168,23 @@ macro_rules! PG_GETARG_ACL_P {
 #[macro_export]
 macro_rules! PG_GETARG_ACL_P_COPY {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::ArrayType
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg19"))]

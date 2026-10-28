@@ -27,10 +27,8 @@ pub use nodeFuncs::*;
 mod nodes;
 #[allow(unused_imports)]
 pub use nodes::*;
-#[cfg(any(feature = "pg18", feature = "pg19"))]
 #[path = "parsenodes.rs"]
 mod parsenodes;
-#[cfg(any(feature = "pg18", feature = "pg19"))]
 #[allow(unused_imports)]
 pub use parsenodes::*;
 #[path = "pathnodes.rs"]

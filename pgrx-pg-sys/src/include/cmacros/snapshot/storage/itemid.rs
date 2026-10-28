@@ -14,7 +14,35 @@
 #[macro_export]
 macro_rules! ItemIdGetFlags {
     ($itemId:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_lp_flags,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_operand!(
+                                                @value [true];
+                                                (@native [$itemId])
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro ItemIdGetLength from itemid.h:59 (PostgreSQL 15–19)
@@ -30,7 +58,35 @@ macro_rules! ItemIdGetFlags {
 #[macro_export]
 macro_rules! ItemIdGetLength {
     ($itemId:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_lp_len,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_operand!(
+                                                @value [true];
+                                                (@native [$itemId])
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro ItemIdGetOffset from itemid.h:65 (PostgreSQL 15–19)
@@ -46,7 +102,35 @@ macro_rules! ItemIdGetLength {
 #[macro_export]
 macro_rules! ItemIdGetOffset {
     ($itemId:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_lp_off,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_operand!(
+                                                @value [true];
+                                                (@native [$itemId])
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro ItemIdGetRedirect from itemid.h:78 (PostgreSQL 15–19)
@@ -62,7 +146,35 @@ macro_rules! ItemIdGetOffset {
 #[macro_export]
 macro_rules! ItemIdGetRedirect {
     ($itemId:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_lp_off,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_operand!(
+                                                @value [true];
+                                                (@native [$itemId])
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro ItemIdHasStorage from itemid.h:120 (PostgreSQL 15–19)
@@ -78,7 +190,18 @@ macro_rules! ItemIdGetRedirect {
 #[macro_export]
 macro_rules! ItemIdHasStorage {
     ($itemId:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$itemId;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro ItemIdIsDead from itemid.h:113 (PostgreSQL 15–19)
@@ -94,7 +217,18 @@ macro_rules! ItemIdHasStorage {
 #[macro_export]
 macro_rules! ItemIdIsDead {
     ($itemId:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$itemId;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro ItemIdIsNormal from itemid.h:99 (PostgreSQL 15–19)
@@ -110,7 +244,18 @@ macro_rules! ItemIdIsDead {
 #[macro_export]
 macro_rules! ItemIdIsNormal {
     ($itemId:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$itemId;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro ItemIdIsRedirected from itemid.h:106 (PostgreSQL 15–19)
@@ -126,7 +271,18 @@ macro_rules! ItemIdIsNormal {
 #[macro_export]
 macro_rules! ItemIdIsRedirected {
     ($itemId:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$itemId;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro ItemIdIsUsed from itemid.h:92 (PostgreSQL 15–19)
@@ -142,7 +298,18 @@ macro_rules! ItemIdIsRedirected {
 #[macro_export]
 macro_rules! ItemIdIsUsed {
     ($itemId:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$itemId;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -163,7 +330,18 @@ macro_rules! ItemIdIsUsed {
 #[macro_export]
 macro_rules! ItemIdIsValid {
     ($itemId:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$itemId;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -184,7 +362,18 @@ macro_rules! ItemIdIsValid {
 #[macro_export]
 macro_rules! ItemIdIsValid {
     ($itemId:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$itemId;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro ItemIdMarkDead from itemid.h:179 (PostgreSQL 15–19)
@@ -200,7 +389,40 @@ macro_rules! ItemIdIsValid {
 #[macro_export]
 macro_rules! ItemIdMarkDead {
     ($itemId:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_lp_flags,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_operand!(
+                                                @value [true];
+                                                (@native [$itemId])
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    $crate::__pgrx_c_bindings::LP_DEAD as i32
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro ItemIdSetDead from itemid.h:164 (PostgreSQL 15–19)
@@ -216,7 +438,46 @@ macro_rules! ItemIdMarkDead {
 #[macro_export]
 macro_rules! ItemIdSetDead {
     ($itemId:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_lp_len,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::pointee(
+                                            (
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_operand!(
+                                                        @value [true];
+                                                        (@native [$itemId])
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::null_constant(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(0i32)
+                                        )
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro ItemIdSetNormal from itemid.h:140 (PostgreSQL 15–19)
@@ -232,7 +493,51 @@ macro_rules! ItemIdSetDead {
 #[macro_export]
 macro_rules! ItemIdSetNormal {
     ($itemId:expr, $off:expr, $len:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$off;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_lp_len,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::pointee(
+                                            (
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_operand!(
+                                                        @value [true];
+                                                        (@native [$itemId])
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_operand!(
+                                                @value [true];
+                                                (@native [$len])
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro ItemIdSetRedirect from itemid.h:152 (PostgreSQL 15–19)
@@ -248,7 +553,47 @@ macro_rules! ItemIdSetNormal {
 #[macro_export]
 macro_rules! ItemIdSetRedirect {
     ($itemId:expr, $link:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$link;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_lp_len,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::pointee(
+                                            (
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_operand!(
+                                                        @value [true];
+                                                        (@native [$itemId])
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::null_constant(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(0i32)
+                                        )
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro ItemIdSetUnused from itemid.h:128 (PostgreSQL 15–19)
@@ -264,7 +609,46 @@ macro_rules! ItemIdSetRedirect {
 #[macro_export]
 macro_rules! ItemIdSetUnused {
     ($itemId:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_lp_len,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::pointee(
+                                            (
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_operand!(
+                                                        @value [true];
+                                                        (@native [$itemId])
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::null_constant(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(0i32)
+                                        )
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 pub use ItemIdGetFlags;

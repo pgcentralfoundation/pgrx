@@ -15,7 +15,18 @@
 #[macro_export]
 macro_rules! SmgrIsTemp {
     ($smgr:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$smgr;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -32,7 +43,18 @@ macro_rules! SmgrIsTemp {
 #[macro_export]
 macro_rules! SmgrIsTemp {
     ($smgr:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$smgr;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -60,7 +82,15 @@ macro_rules! SmgrIsTemp {
 #[macro_export]
 macro_rules! smgrread {
     ($reln:expr, $forknum:expr, $blocknum:expr, $buffer:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$reln;
+                let _ = &$forknum;
+                let _ = &$blocknum;
+                let _ = &$buffer;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -88,7 +118,16 @@ macro_rules! smgrread {
 #[macro_export]
 macro_rules! smgrwrite {
     ($reln:expr, $forknum:expr, $blocknum:expr, $buffer:expr, $skipFsync:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$reln;
+                let _ = &$forknum;
+                let _ = &$blocknum;
+                let _ = &$buffer;
+                let _ = &$skipFsync;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 pub use SmgrIsTemp;

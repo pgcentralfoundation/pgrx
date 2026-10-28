@@ -101,10 +101,8 @@ pub use rangetypes::*;
 mod rel;
 #[allow(unused_imports)]
 pub use rel::*;
-#[cfg(feature = "pg18")]
 #[path = "relcache.rs"]
 mod relcache;
-#[cfg(feature = "pg18")]
 #[allow(unused_imports)]
 pub use relcache::*;
 #[path = "selfuncs.rs"]

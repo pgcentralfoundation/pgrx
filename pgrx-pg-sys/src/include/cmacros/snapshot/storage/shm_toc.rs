@@ -18,7 +18,38 @@
 #[macro_export]
 macro_rules! shm_toc_estimate_chunk {
     ($e:expr, $sz:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$sz;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_space_for_chunks,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; (@native [$e])))
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                        $crate::__pgrx_c_macros::CUnsignedLong,
+                                        usize
+                                    >>()
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro shm_toc_estimate_keys from shm_toc.h:53 (PostgreSQL 15–19)
@@ -38,7 +69,38 @@ macro_rules! shm_toc_estimate_chunk {
 #[macro_export]
 macro_rules! shm_toc_estimate_keys {
     ($e:expr, $cnt:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$cnt;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_number_of_keys,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; (@native [$e])))
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                        $crate::__pgrx_c_macros::CUnsignedLong,
+                                        usize
+                                    >>()
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro shm_toc_initialize_estimator from shm_toc.h:49 (PostgreSQL 15–19)
@@ -54,7 +116,46 @@ macro_rules! shm_toc_estimate_keys {
 #[macro_export]
 macro_rules! shm_toc_initialize_estimator {
     ($e:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_number_of_keys,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::pointee(
+                                            (
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_operand!(
+                                                        @value [true];
+                                                        (@native [$e])
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::null_constant(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(0i32)
+                                        )
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 pub use shm_toc_estimate_chunk;

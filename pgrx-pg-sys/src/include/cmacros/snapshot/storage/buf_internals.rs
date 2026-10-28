@@ -15,7 +15,19 @@
 #[macro_export]
 macro_rules! BUFFERTAGS_EQUAL {
     ($a:expr, $b:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$a;
+                let _ = &$b;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -36,7 +48,54 @@ macro_rules! BUFFERTAGS_EQUAL {
 #[macro_export]
 macro_rules! BUF_DEFINE_FLAG {
     ($flagno:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::shl::<
+                            $crate::__pgrx_c_macros::Wrapping,
+                            _,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<
+                                    $crate::__pgrx_c_macros::CUnsignedLong
+                                >::new(1u64)
+                            ),
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::add::<
+                                        $crate::__pgrx_c_macros::Wrapping,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new($crate::__pgrx_c_bindings::BUF_FLAG_SHIFT as i32)
+                                        ),
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_operand!(
+                                                    @value [true];
+                                                    (@native [$flagno])
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -53,7 +112,26 @@ macro_rules! BUF_DEFINE_FLAG {
 #[macro_export]
 macro_rules! BUF_STATE_GET_REFCOUNT {
     ($state:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; (@native [$state]))
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<
+                                    $crate::__pgrx_c_macros::CUnsignedInt
+                                >::new($crate::__pgrx_c_bindings::BUF_REFCOUNT_MASK as u32)
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -74,7 +152,18 @@ macro_rules! BUF_STATE_GET_REFCOUNT {
 #[macro_export]
 macro_rules! BUF_STATE_GET_REFCOUNT {
     ($state:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$state;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_types::uint32
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -95,7 +184,48 @@ macro_rules! BUF_STATE_GET_REFCOUNT {
 #[macro_export]
 macro_rules! BUF_STATE_GET_USAGECOUNT {
     ($state:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::shr(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::bitand(
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_operand!(
+                                                    @value [true];
+                                                    (@native [$state])
+                                                )
+                                            )
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CUnsignedInt
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::BUF_USAGECOUNT_MASK as u32
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    $crate::__pgrx_c_bindings::BUF_USAGECOUNT_SHIFT as i32
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -116,7 +246,18 @@ macro_rules! BUF_STATE_GET_USAGECOUNT {
 #[macro_export]
 macro_rules! BUF_STATE_GET_USAGECOUNT {
     ($state:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$state;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_types::uint32
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -137,7 +278,87 @@ macro_rules! BUF_STATE_GET_USAGECOUNT {
 #[macro_export]
 macro_rules! BufMappingPartitionLock {
     ($hashcode:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::address(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_lock,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::index(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::place::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                        $crate::__pgrx_c_bindings::LWLockPadded
+                                                    >,
+                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                >>(
+                                                ::core::ptr::addr_of_mut!(
+                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::add::<
+                                            $crate::__pgrx_c_macros::Wrapping,
+                                            _,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::CValue::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::BUFFER_MAPPING_LWLOCK_OFFSET as i32
+                                                )
+                                            ),
+                                            (
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::rem(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_operand!(
+                                                                    @value [true];
+                                                                    (@native [$hashcode])
+                                                                )
+                                                            )
+                                                        ),
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::NUM_BUFFER_PARTITIONS as i32
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -165,7 +386,20 @@ macro_rules! BufMappingPartitionLock {
 #[macro_export]
 macro_rules! BufMappingPartitionLock {
     ($hashcode:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$hashcode;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::LWLock
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -186,7 +420,68 @@ macro_rules! BufMappingPartitionLock {
 #[macro_export]
 macro_rules! BufMappingPartitionLockByIndex {
     ($i:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::address(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_lock,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::index(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::place::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                        $crate::__pgrx_c_bindings::LWLockPadded
+                                                    >,
+                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                >>(
+                                                ::core::ptr::addr_of_mut!(
+                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::add::<
+                                            $crate::__pgrx_c_macros::Wrapping,
+                                            _,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::CValue::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::BUFFER_MAPPING_LWLOCK_OFFSET as i32
+                                                )
+                                            ),
+                                            (
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_operand!(
+                                                        @value [true];
+                                                        (@native [$i])
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -213,7 +508,20 @@ macro_rules! BufMappingPartitionLockByIndex {
 #[macro_export]
 macro_rules! BufMappingPartitionLockByIndex {
     ($index:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$index;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::LWLock
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -234,7 +542,26 @@ macro_rules! BufMappingPartitionLockByIndex {
 #[macro_export]
 macro_rules! BufTableHashPartition {
     ($hashcode:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::rem(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; (@native [$hashcode]))
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    $crate::__pgrx_c_bindings::NUM_BUFFER_PARTITIONS as i32
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -261,7 +588,16 @@ macro_rules! BufTableHashPartition {
 #[macro_export]
 macro_rules! BufTableHashPartition {
     ($hashcode:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$hashcode;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::uint32
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -288,7 +624,19 @@ macro_rules! BufTableHashPartition {
 #[macro_export]
 macro_rules! BufTagGetForkNum {
     ($tag:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$tag;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CEnumObject<
+                            $crate::__pgrx_c_generated::EnumIdentity_enum__ForkNumber,
+                            $crate::__pgrx_c_macros::CInt,
+                            i32
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -321,7 +669,17 @@ macro_rules! BufTagGetForkNum {
 #[macro_export]
 macro_rules! BufTagGetRelFileLocator {
     ($tag:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$tag;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CRawRecord<
+                            $crate::__pgrx_c_bindings::RelFileLocator
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -348,7 +706,18 @@ macro_rules! BufTagGetRelFileLocator {
 #[macro_export]
 macro_rules! BufTagGetRelNumber {
     ($tag:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$tag;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedInt,
+                            $crate::__pgrx_c_bindings::Oid
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -378,7 +747,17 @@ macro_rules! BufTagGetRelNumber {
 #[macro_export]
 macro_rules! BufTagMatchesRelFileLocator {
     ($tag:expr, $rlocator:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$tag;
+                let _ = &$rlocator;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -407,7 +786,14 @@ macro_rules! BufTagMatchesRelFileLocator {
 #[macro_export]
 macro_rules! BufTagSetRelForkDetails {
     ($tag:expr, $relnumber:expr, $forknum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$tag;
+                let _ = &$relnumber;
+                let _ = &$forknum;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -428,11 +814,52 @@ macro_rules! BufTagSetRelForkDetails {
 #[macro_export]
 macro_rules! BufferDescriptorGetBuffer {
     ($bdesc:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::add::<
+                            $crate::__pgrx_c_macros::Wrapping,
+                            _,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::load(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_buf_id,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::pointee(
+                                            (
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_operand!(
+                                                        @value [true];
+                                                        (@native [$bdesc])
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    1i32
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function BufferDescriptorGetBuffer from buf_internals.h:329 (PostgreSQL 16), buf_internals.h:330 (PostgreSQL 17), buf_internals.h:345 (PostgreSQL 18), buf_internals.h:433 (PostgreSQL 19)
+/// Typed call adapter for C inline function BufferDescriptorGetBuffer from buf_internals.h:329 (PostgreSQL 16), buf_internals.h:330 (PostgreSQL 17), buf_internals.h:345 (PostgreSQL 18), buf_internals.h:432 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Buffer
@@ -455,7 +882,16 @@ macro_rules! BufferDescriptorGetBuffer {
 #[macro_export]
 macro_rules! BufferDescriptorGetBuffer {
     ($bdesc:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$bdesc;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::Buffer
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -476,7 +912,22 @@ macro_rules! BufferDescriptorGetBuffer {
 #[macro_export]
 macro_rules! BufferDescriptorGetContentLock {
     ($bdesc:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$bdesc;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::LWLock
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -503,7 +954,20 @@ macro_rules! BufferDescriptorGetContentLock {
 #[macro_export]
 macro_rules! BufferDescriptorGetContentLock {
     ($bdesc:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$bdesc;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::LWLock
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -520,11 +984,74 @@ macro_rules! BufferDescriptorGetContentLock {
 #[macro_export]
 macro_rules! BufferDescriptorGetIOCV {
     ($bdesc:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::address(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_cv,
+                                _,
+                                _
+                            >(
+                                (
+                                    $crate::__pgrx_c_macros::expression::index(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::ConditionVariableMinimallyPadded
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                    >>(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::BufferIOCVArray
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_buf_id,
+                                                    _,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_operand!(
+                                                                    @value [true];
+                                                                    (@native [$bdesc])
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function BufferDescriptorGetIOCV from buf_internals.h:335 (PostgreSQL 16), buf_internals.h:336 (PostgreSQL 17), buf_internals.h:351 (PostgreSQL 18), buf_internals.h:439 (PostgreSQL 19)
+/// Typed call adapter for C inline function BufferDescriptorGetIOCV from buf_internals.h:335 (PostgreSQL 16), buf_internals.h:336 (PostgreSQL 17), buf_internals.h:351 (PostgreSQL 18), buf_internals.h:438 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline ConditionVariable *
@@ -547,7 +1074,20 @@ macro_rules! BufferDescriptorGetIOCV {
 #[macro_export]
 macro_rules! BufferDescriptorGetIOCV {
     ($bdesc:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$bdesc;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ConditionVariable
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -578,7 +1118,17 @@ macro_rules! BufferDescriptorGetIOCV {
 #[macro_export]
 macro_rules! BufferTagsEqual {
     ($tag1:expr, $tag2:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$tag1;
+                let _ = &$tag2;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -595,7 +1145,30 @@ macro_rules! BufferTagsEqual {
 #[macro_export]
 macro_rules! CLEAR_BUFFERTAG {
     ($a:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_blockNum,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$a])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CUnsignedInt
+                                        >::new($crate::__pgrx_c_bindings::InvalidBlockNumber as u32)
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -625,7 +1198,12 @@ macro_rules! CLEAR_BUFFERTAG {
 #[macro_export]
 macro_rules! ClearBufferTag {
     ($tag:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$tag;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -642,11 +1220,49 @@ macro_rules! ClearBufferTag {
 #[macro_export]
 macro_rules! GetBufferDescriptor {
     ($id:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::address(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_bufferdesc,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::index(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::place::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                        $crate::__pgrx_c_bindings::BufferDescPadded
+                                                    >,
+                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                >>(
+                                                ::core::ptr::addr_of_mut!(
+                                                    $crate::__pgrx_c_bindings::BufferDescriptors
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; (@native [$id])))
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function GetBufferDescriptor from buf_internals.h:317 (PostgreSQL 16), buf_internals.h:318 (PostgreSQL 17), buf_internals.h:333 (PostgreSQL 18), buf_internals.h:421 (PostgreSQL 19)
+/// Typed call adapter for C inline function GetBufferDescriptor from buf_internals.h:317 (PostgreSQL 16), buf_internals.h:318 (PostgreSQL 17), buf_internals.h:333 (PostgreSQL 18), buf_internals.h:420 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline BufferDesc *
@@ -669,7 +1285,20 @@ macro_rules! GetBufferDescriptor {
 #[macro_export]
 macro_rules! GetBufferDescriptor {
     ($id:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$id;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::BufferDesc
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -686,11 +1315,42 @@ macro_rules! GetBufferDescriptor {
 #[macro_export]
 macro_rules! GetLocalBufferDescriptor {
     ($id:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::address(
+                            $crate::__pgrx_c_macros::expression::index(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::load(
+                                        $crate::__pgrx_c_macros::expression::place::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                    $crate::__pgrx_c_bindings::BufferDesc
+                                                >,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >>(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::LocalBufferDescriptors
+                                            )
+                                        )
+                                    )
+                                ),
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_operand!(@value [true]; (@native [$id]))
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function GetLocalBufferDescriptor from buf_internals.h:323 (PostgreSQL 16), buf_internals.h:324 (PostgreSQL 17), buf_internals.h:339 (PostgreSQL 18), buf_internals.h:427 (PostgreSQL 19)
+/// Typed call adapter for C inline function GetLocalBufferDescriptor from buf_internals.h:323 (PostgreSQL 16), buf_internals.h:324 (PostgreSQL 17), buf_internals.h:339 (PostgreSQL 18), buf_internals.h:426 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline BufferDesc *
@@ -713,7 +1373,20 @@ macro_rules! GetLocalBufferDescriptor {
 #[macro_export]
 macro_rules! GetLocalBufferDescriptor {
     ($id:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$id;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::BufferDesc
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -730,7 +1403,38 @@ macro_rules! GetLocalBufferDescriptor {
 #[macro_export]
 macro_rules! INIT_BUFFERTAG {
     ($a:expr, $xx_rnode:expr, $xx_forkNum:expr, $xx_blockNum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$xx_rnode;
+                let _ = &$xx_forkNum;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_blockNum,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$a])))),
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_operand!(
+                                                @value [true];
+                                                (@native [$xx_blockNum])
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -761,7 +1465,15 @@ macro_rules! INIT_BUFFERTAG {
 #[macro_export]
 macro_rules! InitBufferTag {
     ($tag:expr, $rlocator:expr, $forkNum:expr, $blockNum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$tag;
+                let _ = &$rlocator;
+                let _ = &$forkNum;
+                let _ = &$blockNum;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
@@ -788,11 +1500,17 @@ macro_rules! InitBufferTag {
 #[macro_export]
 macro_rules! ResourceOwnerForgetBuffer {
     ($owner:expr, $buffer:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$owner;
+                let _ = &$buffer;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function ResourceOwnerForgetBuffer from buf_internals.h:530 (PostgreSQL 19)
+/// Typed call adapter for C inline function ResourceOwnerForgetBuffer from buf_internals.h:534 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -815,11 +1533,17 @@ macro_rules! ResourceOwnerForgetBuffer {
 #[macro_export]
 macro_rules! ResourceOwnerForgetBuffer {
     ($owner:expr, $buffer:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$owner;
+                let _ = &$buffer;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function ResourceOwnerForgetBufferIO from buf_internals.h:407 (PostgreSQL 17), buf_internals.h:422 (PostgreSQL 18), buf_internals.h:540 (PostgreSQL 19)
+/// Typed call adapter for C inline function ResourceOwnerForgetBufferIO from buf_internals.h:407 (PostgreSQL 17), buf_internals.h:422 (PostgreSQL 18), buf_internals.h:544 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -842,7 +1566,13 @@ macro_rules! ResourceOwnerForgetBuffer {
 #[macro_export]
 macro_rules! ResourceOwnerForgetBufferIO {
     ($owner:expr, $buffer:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$owner;
+                let _ = &$buffer;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
@@ -869,11 +1599,17 @@ macro_rules! ResourceOwnerForgetBufferIO {
 #[macro_export]
 macro_rules! ResourceOwnerRememberBuffer {
     ($owner:expr, $buffer:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$owner;
+                let _ = &$buffer;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function ResourceOwnerRememberBuffer from buf_internals.h:525 (PostgreSQL 19)
+/// Typed call adapter for C inline function ResourceOwnerRememberBuffer from buf_internals.h:529 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -896,11 +1632,17 @@ macro_rules! ResourceOwnerRememberBuffer {
 #[macro_export]
 macro_rules! ResourceOwnerRememberBuffer {
     ($owner:expr, $buffer:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$owner;
+                let _ = &$buffer;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function ResourceOwnerRememberBufferIO from buf_internals.h:402 (PostgreSQL 17), buf_internals.h:417 (PostgreSQL 18), buf_internals.h:535 (PostgreSQL 19)
+/// Typed call adapter for C inline function ResourceOwnerRememberBufferIO from buf_internals.h:402 (PostgreSQL 17), buf_internals.h:417 (PostgreSQL 18), buf_internals.h:539 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -923,7 +1665,13 @@ macro_rules! ResourceOwnerRememberBuffer {
 #[macro_export]
 macro_rules! ResourceOwnerRememberBufferIO {
     ($owner:expr, $buffer:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$owner;
+                let _ = &$buffer;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -951,11 +1699,17 @@ macro_rules! ResourceOwnerRememberBufferIO {
 #[macro_export]
 macro_rules! UnlockBufHdr {
     ($desc:expr, $buf_state:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$desc;
+                let _ = &$buf_state;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function UnlockBufHdr from buf_internals.h:457 (PostgreSQL 19)
+/// Typed call adapter for C inline function UnlockBufHdr from buf_internals.h:456 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -980,7 +1734,12 @@ macro_rules! UnlockBufHdr {
 #[macro_export]
 macro_rules! UnlockBufHdr {
     ($desc:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$desc;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -998,8 +1757,12 @@ macro_rules! UnlockBufHdr {
 ///
 /// 		Assert(buf_state & BM_LOCKED);
 ///
-/// 		buf_state |= set_bits;
+/// 		/*
+/// 		 * Set bits after clearing bits, so that a cleared and re-added flag
+/// 		 * survives.
+/// 		 */
 /// 		buf_state &= ~unset_bits;
+/// 		buf_state |= set_bits;
 /// 		buf_state &= ~BM_LOCKED;
 ///
 /// 		if (refcount_change != 0)
@@ -1027,7 +1790,20 @@ macro_rules! UnlockBufHdr {
 #[macro_export]
 macro_rules! UnlockBufHdrExt {
     ($desc:expr, $old_buf_state:expr, $set_bits:expr, $unset_bits:expr, $refcount_change:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$desc;
+                let _ = &$old_buf_state;
+                let _ = &$set_bits;
+                let _ = &$unset_bits;
+                let _ = &$refcount_change;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::uint64
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]

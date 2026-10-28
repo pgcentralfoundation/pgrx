@@ -18,7 +18,22 @@
 #[macro_export]
 macro_rules! DatumGetBpCharP {
     ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro DatumGetBpCharPCopy from fmgr.h:299 (PostgreSQL 15–18), fmgr.h:300 (PostgreSQL 19)
@@ -38,7 +53,22 @@ macro_rules! DatumGetBpCharP {
 #[macro_export]
 macro_rules! DatumGetBpCharPCopy {
     ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro DatumGetBpCharPP from fmgr.h:293 (PostgreSQL 15–18), fmgr.h:294 (PostgreSQL 19)
@@ -58,7 +88,22 @@ macro_rules! DatumGetBpCharPCopy {
 #[macro_export]
 macro_rules! DatumGetBpCharPP {
     ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro DatumGetBpCharPSlice from fmgr.h:305 (PostgreSQL 15–18), fmgr.h:306 (PostgreSQL 19)
@@ -78,7 +123,24 @@ macro_rules! DatumGetBpCharPP {
 #[macro_export]
 macro_rules! DatumGetBpCharPSlice {
     ($X:expr, $m:expr, $n:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                let _ = &$m;
+                let _ = &$n;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro DatumGetByteaP from fmgr.h:331 (PostgreSQL 15–18), fmgr.h:332 (PostgreSQL 19)
@@ -98,7 +160,22 @@ macro_rules! DatumGetBpCharPSlice {
 #[macro_export]
 macro_rules! DatumGetByteaP {
     ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro DatumGetByteaPCopy from fmgr.h:297 (PostgreSQL 15–18), fmgr.h:298 (PostgreSQL 19)
@@ -118,7 +195,22 @@ macro_rules! DatumGetByteaP {
 #[macro_export]
 macro_rules! DatumGetByteaPCopy {
     ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro DatumGetByteaPP from fmgr.h:291 (PostgreSQL 15–18), fmgr.h:292 (PostgreSQL 19)
@@ -138,7 +230,22 @@ macro_rules! DatumGetByteaPCopy {
 #[macro_export]
 macro_rules! DatumGetByteaPP {
     ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro DatumGetByteaPSlice from fmgr.h:303 (PostgreSQL 15–18), fmgr.h:304 (PostgreSQL 19)
@@ -158,7 +265,24 @@ macro_rules! DatumGetByteaPP {
 #[macro_export]
 macro_rules! DatumGetByteaPSlice {
     ($X:expr, $m:expr, $n:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                let _ = &$m;
+                let _ = &$n;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro DatumGetHeapTupleHeader from fmgr.h:295 (PostgreSQL 15–18), fmgr.h:296 (PostgreSQL 19)
@@ -178,7 +302,22 @@ macro_rules! DatumGetByteaPSlice {
 #[macro_export]
 macro_rules! DatumGetHeapTupleHeader {
     ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::HeapTupleHeaderData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro DatumGetHeapTupleHeaderCopy from fmgr.h:301 (PostgreSQL 15–18), fmgr.h:302 (PostgreSQL 19)
@@ -198,7 +337,22 @@ macro_rules! DatumGetHeapTupleHeader {
 #[macro_export]
 macro_rules! DatumGetHeapTupleHeaderCopy {
     ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::HeapTupleHeaderData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro DatumGetTextP from fmgr.h:332 (PostgreSQL 15–18), fmgr.h:333 (PostgreSQL 19)
@@ -218,7 +372,22 @@ macro_rules! DatumGetHeapTupleHeaderCopy {
 #[macro_export]
 macro_rules! DatumGetTextP {
     ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro DatumGetTextPCopy from fmgr.h:298 (PostgreSQL 15–18), fmgr.h:299 (PostgreSQL 19)
@@ -238,7 +407,22 @@ macro_rules! DatumGetTextP {
 #[macro_export]
 macro_rules! DatumGetTextPCopy {
     ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro DatumGetTextPP from fmgr.h:292 (PostgreSQL 15–18), fmgr.h:293 (PostgreSQL 19)
@@ -258,7 +442,22 @@ macro_rules! DatumGetTextPCopy {
 #[macro_export]
 macro_rules! DatumGetTextPP {
     ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro DatumGetTextPSlice from fmgr.h:304 (PostgreSQL 15–18), fmgr.h:305 (PostgreSQL 19)
@@ -278,7 +477,24 @@ macro_rules! DatumGetTextPP {
 #[macro_export]
 macro_rules! DatumGetTextPSlice {
     ($X:expr, $m:expr, $n:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                let _ = &$m;
+                let _ = &$n;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro DatumGetVarCharP from fmgr.h:334 (PostgreSQL 15–18), fmgr.h:335 (PostgreSQL 19)
@@ -298,7 +514,22 @@ macro_rules! DatumGetTextPSlice {
 #[macro_export]
 macro_rules! DatumGetVarCharP {
     ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro DatumGetVarCharPCopy from fmgr.h:300 (PostgreSQL 15–18), fmgr.h:301 (PostgreSQL 19)
@@ -318,7 +549,22 @@ macro_rules! DatumGetVarCharP {
 #[macro_export]
 macro_rules! DatumGetVarCharPCopy {
     ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro DatumGetVarCharPP from fmgr.h:294 (PostgreSQL 15–18), fmgr.h:295 (PostgreSQL 19)
@@ -338,7 +584,22 @@ macro_rules! DatumGetVarCharPCopy {
 #[macro_export]
 macro_rules! DatumGetVarCharPP {
     ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro DatumGetVarCharPSlice from fmgr.h:306 (PostgreSQL 15–18), fmgr.h:307 (PostgreSQL 19)
@@ -358,7 +619,24 @@ macro_rules! DatumGetVarCharPP {
 #[macro_export]
 macro_rules! DatumGetVarCharPSlice {
     ($X:expr, $m:expr, $n:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                let _ = &$m;
+                let _ = &$n;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro DirectFunctionCall1 from fmgr.h:631 (PostgreSQL 15), fmgr.h:642 (PostgreSQL 16–17), fmgr.h:682 (PostgreSQL 18), fmgr.h:688 (PostgreSQL 19)
@@ -378,7 +656,19 @@ macro_rules! DatumGetVarCharPSlice {
 #[macro_export]
 macro_rules! DirectFunctionCall1 {
     ($func:expr, $arg1:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$func;
+                let _ = &$arg1;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro DirectFunctionCall2 from fmgr.h:633 (PostgreSQL 15), fmgr.h:644 (PostgreSQL 16–17), fmgr.h:684 (PostgreSQL 18), fmgr.h:690 (PostgreSQL 19)
@@ -398,7 +688,20 @@ macro_rules! DirectFunctionCall1 {
 #[macro_export]
 macro_rules! DirectFunctionCall2 {
     ($func:expr, $arg1:expr, $arg2:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$func;
+                let _ = &$arg1;
+                let _ = &$arg2;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro DirectFunctionCall3 from fmgr.h:635 (PostgreSQL 15), fmgr.h:646 (PostgreSQL 16–17), fmgr.h:686 (PostgreSQL 18), fmgr.h:692 (PostgreSQL 19)
@@ -418,7 +721,21 @@ macro_rules! DirectFunctionCall2 {
 #[macro_export]
 macro_rules! DirectFunctionCall3 {
     ($func:expr, $arg1:expr, $arg2:expr, $arg3:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$func;
+                let _ = &$arg1;
+                let _ = &$arg2;
+                let _ = &$arg3;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro DirectFunctionCall4 from fmgr.h:637 (PostgreSQL 15), fmgr.h:648 (PostgreSQL 16–17), fmgr.h:688 (PostgreSQL 18), fmgr.h:694 (PostgreSQL 19)
@@ -438,7 +755,22 @@ macro_rules! DirectFunctionCall3 {
 #[macro_export]
 macro_rules! DirectFunctionCall4 {
     ($func:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$func;
+                let _ = &$arg1;
+                let _ = &$arg2;
+                let _ = &$arg3;
+                let _ = &$arg4;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro DirectFunctionCall5 from fmgr.h:639 (PostgreSQL 15), fmgr.h:650 (PostgreSQL 16–17), fmgr.h:690 (PostgreSQL 18), fmgr.h:696 (PostgreSQL 19)
@@ -458,7 +790,23 @@ macro_rules! DirectFunctionCall4 {
 #[macro_export]
 macro_rules! DirectFunctionCall5 {
     ($func:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$func;
+                let _ = &$arg1;
+                let _ = &$arg2;
+                let _ = &$arg3;
+                let _ = &$arg4;
+                let _ = &$arg5;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro DirectFunctionCall6 from fmgr.h:641 (PostgreSQL 15), fmgr.h:652 (PostgreSQL 16–17), fmgr.h:692 (PostgreSQL 18), fmgr.h:698 (PostgreSQL 19)
@@ -478,7 +826,24 @@ macro_rules! DirectFunctionCall5 {
 #[macro_export]
 macro_rules! DirectFunctionCall6 {
     ($func:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr, $arg6:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$func;
+                let _ = &$arg1;
+                let _ = &$arg2;
+                let _ = &$arg3;
+                let _ = &$arg4;
+                let _ = &$arg5;
+                let _ = &$arg6;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro DirectFunctionCall7 from fmgr.h:643 (PostgreSQL 15), fmgr.h:654 (PostgreSQL 16–17), fmgr.h:694 (PostgreSQL 18), fmgr.h:700 (PostgreSQL 19)
@@ -497,8 +862,35 @@ macro_rules! DirectFunctionCall6 {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DirectFunctionCall7 {
-    ($func:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr, $arg6:expr, $arg7:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $func:expr,
+        $arg1:expr,
+        $arg2:expr,
+        $arg3:expr,
+        $arg4:expr,
+        $arg5:expr,
+        $arg6:expr,
+        $arg7:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$func;
+                let _ = &$arg1;
+                let _ = &$arg2;
+                let _ = &$arg3;
+                let _ = &$arg4;
+                let _ = &$arg5;
+                let _ = &$arg6;
+                let _ = &$arg7;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro DirectFunctionCall8 from fmgr.h:645 (PostgreSQL 15), fmgr.h:656 (PostgreSQL 16–17), fmgr.h:696 (PostgreSQL 18), fmgr.h:702 (PostgreSQL 19)
@@ -517,8 +909,37 @@ macro_rules! DirectFunctionCall7 {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DirectFunctionCall8 {
-    ($func:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr, $arg6:expr, $arg7:expr, $arg8:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $func:expr,
+        $arg1:expr,
+        $arg2:expr,
+        $arg3:expr,
+        $arg4:expr,
+        $arg5:expr,
+        $arg6:expr,
+        $arg7:expr,
+        $arg8:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$func;
+                let _ = &$arg1;
+                let _ = &$arg2;
+                let _ = &$arg3;
+                let _ = &$arg4;
+                let _ = &$arg5;
+                let _ = &$arg6;
+                let _ = &$arg7;
+                let _ = &$arg8;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro DirectFunctionCall9 from fmgr.h:647 (PostgreSQL 15), fmgr.h:658 (PostgreSQL 16–17), fmgr.h:698 (PostgreSQL 18), fmgr.h:704 (PostgreSQL 19)
@@ -537,8 +958,39 @@ macro_rules! DirectFunctionCall8 {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DirectFunctionCall9 {
-    ($func:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr, $arg6:expr, $arg7:expr, $arg8:expr, $arg9:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $func:expr,
+        $arg1:expr,
+        $arg2:expr,
+        $arg3:expr,
+        $arg4:expr,
+        $arg5:expr,
+        $arg6:expr,
+        $arg7:expr,
+        $arg8:expr,
+        $arg9:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$func;
+                let _ = &$arg1;
+                let _ = &$arg2;
+                let _ = &$arg3;
+                let _ = &$arg4;
+                let _ = &$arg5;
+                let _ = &$arg6;
+                let _ = &$arg7;
+                let _ = &$arg8;
+                let _ = &$arg9;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro FmgrHookIsNeeded from fmgr.h:778 (PostgreSQL 15), fmgr.h:797 (PostgreSQL 16–17), fmgr.h:848 (PostgreSQL 18), fmgr.h:854 (PostgreSQL 19)
@@ -558,7 +1010,76 @@ macro_rules! DirectFunctionCall9 {
 #[macro_export]
 macro_rules! FmgrHookIsNeeded {
     ($fn_oid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                        $crate::__pgrx_c_macros::CInt
+                                    >()
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::null_constant(
+                                            /* PGRX: false remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(0i32)
+                                        )
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::invoke(
+                                            (
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::dereference(
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::load(
+                                                                $crate::__pgrx_c_macros::expression::place::<
+                                                                    $crate::__pgrx_c_macros::expression::CFunction<
+                                                                        $crate::__pgrx_c_generated::Signature_0x5f426f6f6c__0l__unsigned__int__0r
+                                                                    >>(
+                                                                    ::core::ptr::addr_of_mut!(
+                                                                        $crate::__pgrx_c_bindings::needs_fmgr_hook
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            ),
+                                            (
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_operand!(
+                                                        @value [true];
+                                                        (@native [$fn_oid])
+                                                    )
+                                                ),
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro FunctionCall1 from fmgr.h:649 (PostgreSQL 15), fmgr.h:660 (PostgreSQL 16–17), fmgr.h:700 (PostgreSQL 18), fmgr.h:706 (PostgreSQL 19)
@@ -578,7 +1099,19 @@ macro_rules! FmgrHookIsNeeded {
 #[macro_export]
 macro_rules! FunctionCall1 {
     ($flinfo:expr, $arg1:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$flinfo;
+                let _ = &$arg1;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro FunctionCall2 from fmgr.h:651 (PostgreSQL 15), fmgr.h:662 (PostgreSQL 16–17), fmgr.h:702 (PostgreSQL 18), fmgr.h:708 (PostgreSQL 19)
@@ -598,7 +1131,20 @@ macro_rules! FunctionCall1 {
 #[macro_export]
 macro_rules! FunctionCall2 {
     ($flinfo:expr, $arg1:expr, $arg2:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$flinfo;
+                let _ = &$arg1;
+                let _ = &$arg2;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro FunctionCall3 from fmgr.h:653 (PostgreSQL 15), fmgr.h:664 (PostgreSQL 16–17), fmgr.h:704 (PostgreSQL 18), fmgr.h:710 (PostgreSQL 19)
@@ -618,7 +1164,21 @@ macro_rules! FunctionCall2 {
 #[macro_export]
 macro_rules! FunctionCall3 {
     ($flinfo:expr, $arg1:expr, $arg2:expr, $arg3:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$flinfo;
+                let _ = &$arg1;
+                let _ = &$arg2;
+                let _ = &$arg3;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro FunctionCall4 from fmgr.h:655 (PostgreSQL 15), fmgr.h:666 (PostgreSQL 16–17), fmgr.h:706 (PostgreSQL 18), fmgr.h:712 (PostgreSQL 19)
@@ -638,7 +1198,22 @@ macro_rules! FunctionCall3 {
 #[macro_export]
 macro_rules! FunctionCall4 {
     ($flinfo:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$flinfo;
+                let _ = &$arg1;
+                let _ = &$arg2;
+                let _ = &$arg3;
+                let _ = &$arg4;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro FunctionCall5 from fmgr.h:657 (PostgreSQL 15), fmgr.h:668 (PostgreSQL 16–17), fmgr.h:708 (PostgreSQL 18), fmgr.h:714 (PostgreSQL 19)
@@ -658,7 +1233,23 @@ macro_rules! FunctionCall4 {
 #[macro_export]
 macro_rules! FunctionCall5 {
     ($flinfo:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$flinfo;
+                let _ = &$arg1;
+                let _ = &$arg2;
+                let _ = &$arg3;
+                let _ = &$arg4;
+                let _ = &$arg5;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro FunctionCall6 from fmgr.h:659 (PostgreSQL 15), fmgr.h:670 (PostgreSQL 16–17), fmgr.h:710 (PostgreSQL 18), fmgr.h:716 (PostgreSQL 19)
@@ -678,7 +1269,24 @@ macro_rules! FunctionCall5 {
 #[macro_export]
 macro_rules! FunctionCall6 {
     ($flinfo:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr, $arg6:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$flinfo;
+                let _ = &$arg1;
+                let _ = &$arg2;
+                let _ = &$arg3;
+                let _ = &$arg4;
+                let _ = &$arg5;
+                let _ = &$arg6;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro FunctionCall7 from fmgr.h:661 (PostgreSQL 15), fmgr.h:672 (PostgreSQL 16–17), fmgr.h:712 (PostgreSQL 18), fmgr.h:718 (PostgreSQL 19)
@@ -697,8 +1305,35 @@ macro_rules! FunctionCall6 {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! FunctionCall7 {
-    ($flinfo:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr, $arg6:expr, $arg7:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $flinfo:expr,
+        $arg1:expr,
+        $arg2:expr,
+        $arg3:expr,
+        $arg4:expr,
+        $arg5:expr,
+        $arg6:expr,
+        $arg7:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$flinfo;
+                let _ = &$arg1;
+                let _ = &$arg2;
+                let _ = &$arg3;
+                let _ = &$arg4;
+                let _ = &$arg5;
+                let _ = &$arg6;
+                let _ = &$arg7;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro FunctionCall8 from fmgr.h:663 (PostgreSQL 15), fmgr.h:674 (PostgreSQL 16–17), fmgr.h:714 (PostgreSQL 18), fmgr.h:720 (PostgreSQL 19)
@@ -717,8 +1352,37 @@ macro_rules! FunctionCall7 {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! FunctionCall8 {
-    ($flinfo:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr, $arg6:expr, $arg7:expr, $arg8:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $flinfo:expr,
+        $arg1:expr,
+        $arg2:expr,
+        $arg3:expr,
+        $arg4:expr,
+        $arg5:expr,
+        $arg6:expr,
+        $arg7:expr,
+        $arg8:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$flinfo;
+                let _ = &$arg1;
+                let _ = &$arg2;
+                let _ = &$arg3;
+                let _ = &$arg4;
+                let _ = &$arg5;
+                let _ = &$arg6;
+                let _ = &$arg7;
+                let _ = &$arg8;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro FunctionCall9 from fmgr.h:665 (PostgreSQL 15), fmgr.h:676 (PostgreSQL 16–17), fmgr.h:716 (PostgreSQL 18), fmgr.h:722 (PostgreSQL 19)
@@ -737,8 +1401,39 @@ macro_rules! FunctionCall8 {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! FunctionCall9 {
-    ($flinfo:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr, $arg6:expr, $arg7:expr, $arg8:expr, $arg9:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $flinfo:expr,
+        $arg1:expr,
+        $arg2:expr,
+        $arg3:expr,
+        $arg4:expr,
+        $arg5:expr,
+        $arg6:expr,
+        $arg7:expr,
+        $arg8:expr,
+        $arg9:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$flinfo;
+                let _ = &$arg1;
+                let _ = &$arg2;
+                let _ = &$arg3;
+                let _ = &$arg4;
+                let _ = &$arg5;
+                let _ = &$arg6;
+                let _ = &$arg7;
+                let _ = &$arg8;
+                let _ = &$arg9;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro FunctionCallInvoke from fmgr.h:172 (PostgreSQL 15–19)
@@ -758,7 +1453,72 @@ macro_rules! FunctionCall9 {
 #[macro_export]
 macro_rules! FunctionCallInvoke {
     ($fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::invoke(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::dereference(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_fn_addr,
+                                                    _,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::load(
+                                                                $crate::__pgrx_c_macros::expression::project::<
+                                                                    $crate::__pgrx_c_generated::Field_flinfo,
+                                                                    _,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                                        (
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                true,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_operand!(
+                                                                                    @value [true];
+                                                                                    (
+                                                                                        @native [
+                                                                                            $fcinfo
+                                                                                        ]
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; (@native [$fcinfo]))
+                                ),
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro InitFunctionCallInfoData from fmgr.h:150 (PostgreSQL 15–19)
@@ -775,8 +1535,24 @@ macro_rules! FunctionCallInvoke {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! InitFunctionCallInfoData {
-    ($Fcinfo:expr, $Flinfo:expr, $Nargs:expr, $Collation:expr, $Context:expr, $Resultinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $Fcinfo:expr,
+        $Flinfo:expr,
+        $Nargs:expr,
+        $Collation:expr,
+        $Context:expr,
+        $Resultinfo:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @unit {
+                let _ = &$Fcinfo;
+                let _ = &$Flinfo;
+                let _ = &$Nargs;
+                let _ = &$Collation;
+                let _ = &$Context;
+                let _ = &$Resultinfo;
+            }
+        )
     };
 }
 /// C macro OidFunctionCall0 from fmgr.h:667 (PostgreSQL 15), fmgr.h:678 (PostgreSQL 16–17), fmgr.h:718 (PostgreSQL 18), fmgr.h:724 (PostgreSQL 19)
@@ -796,7 +1572,18 @@ macro_rules! InitFunctionCallInfoData {
 #[macro_export]
 macro_rules! OidFunctionCall0 {
     ($functionId:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$functionId;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro OidFunctionCall1 from fmgr.h:669 (PostgreSQL 15), fmgr.h:680 (PostgreSQL 16–17), fmgr.h:720 (PostgreSQL 18), fmgr.h:726 (PostgreSQL 19)
@@ -816,7 +1603,19 @@ macro_rules! OidFunctionCall0 {
 #[macro_export]
 macro_rules! OidFunctionCall1 {
     ($functionId:expr, $arg1:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$functionId;
+                let _ = &$arg1;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro OidFunctionCall2 from fmgr.h:671 (PostgreSQL 15), fmgr.h:682 (PostgreSQL 16–17), fmgr.h:722 (PostgreSQL 18), fmgr.h:728 (PostgreSQL 19)
@@ -836,7 +1635,20 @@ macro_rules! OidFunctionCall1 {
 #[macro_export]
 macro_rules! OidFunctionCall2 {
     ($functionId:expr, $arg1:expr, $arg2:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$functionId;
+                let _ = &$arg1;
+                let _ = &$arg2;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro OidFunctionCall3 from fmgr.h:673 (PostgreSQL 15), fmgr.h:684 (PostgreSQL 16–17), fmgr.h:724 (PostgreSQL 18), fmgr.h:730 (PostgreSQL 19)
@@ -856,7 +1668,21 @@ macro_rules! OidFunctionCall2 {
 #[macro_export]
 macro_rules! OidFunctionCall3 {
     ($functionId:expr, $arg1:expr, $arg2:expr, $arg3:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$functionId;
+                let _ = &$arg1;
+                let _ = &$arg2;
+                let _ = &$arg3;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro OidFunctionCall4 from fmgr.h:675 (PostgreSQL 15), fmgr.h:686 (PostgreSQL 16–17), fmgr.h:726 (PostgreSQL 18), fmgr.h:732 (PostgreSQL 19)
@@ -876,7 +1702,22 @@ macro_rules! OidFunctionCall3 {
 #[macro_export]
 macro_rules! OidFunctionCall4 {
     ($functionId:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$functionId;
+                let _ = &$arg1;
+                let _ = &$arg2;
+                let _ = &$arg3;
+                let _ = &$arg4;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro OidFunctionCall5 from fmgr.h:677 (PostgreSQL 15), fmgr.h:688 (PostgreSQL 16–17), fmgr.h:728 (PostgreSQL 18), fmgr.h:734 (PostgreSQL 19)
@@ -896,7 +1737,23 @@ macro_rules! OidFunctionCall4 {
 #[macro_export]
 macro_rules! OidFunctionCall5 {
     ($functionId:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$functionId;
+                let _ = &$arg1;
+                let _ = &$arg2;
+                let _ = &$arg3;
+                let _ = &$arg4;
+                let _ = &$arg5;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro OidFunctionCall6 from fmgr.h:679 (PostgreSQL 15), fmgr.h:690 (PostgreSQL 16–17), fmgr.h:730 (PostgreSQL 18), fmgr.h:736 (PostgreSQL 19)
@@ -916,7 +1773,24 @@ macro_rules! OidFunctionCall5 {
 #[macro_export]
 macro_rules! OidFunctionCall6 {
     ($functionId:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr, $arg6:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$functionId;
+                let _ = &$arg1;
+                let _ = &$arg2;
+                let _ = &$arg3;
+                let _ = &$arg4;
+                let _ = &$arg5;
+                let _ = &$arg6;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro OidFunctionCall7 from fmgr.h:681 (PostgreSQL 15), fmgr.h:692 (PostgreSQL 16–17), fmgr.h:732 (PostgreSQL 18), fmgr.h:738 (PostgreSQL 19)
@@ -935,8 +1809,35 @@ macro_rules! OidFunctionCall6 {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! OidFunctionCall7 {
-    ($functionId:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr, $arg6:expr, $arg7:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $functionId:expr,
+        $arg1:expr,
+        $arg2:expr,
+        $arg3:expr,
+        $arg4:expr,
+        $arg5:expr,
+        $arg6:expr,
+        $arg7:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$functionId;
+                let _ = &$arg1;
+                let _ = &$arg2;
+                let _ = &$arg3;
+                let _ = &$arg4;
+                let _ = &$arg5;
+                let _ = &$arg6;
+                let _ = &$arg7;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro OidFunctionCall8 from fmgr.h:683 (PostgreSQL 15), fmgr.h:694 (PostgreSQL 16–17), fmgr.h:734 (PostgreSQL 18), fmgr.h:740 (PostgreSQL 19)
@@ -955,8 +1856,37 @@ macro_rules! OidFunctionCall7 {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! OidFunctionCall8 {
-    ($functionId:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr, $arg6:expr, $arg7:expr, $arg8:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $functionId:expr,
+        $arg1:expr,
+        $arg2:expr,
+        $arg3:expr,
+        $arg4:expr,
+        $arg5:expr,
+        $arg6:expr,
+        $arg7:expr,
+        $arg8:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$functionId;
+                let _ = &$arg1;
+                let _ = &$arg2;
+                let _ = &$arg3;
+                let _ = &$arg4;
+                let _ = &$arg5;
+                let _ = &$arg6;
+                let _ = &$arg7;
+                let _ = &$arg8;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro OidFunctionCall9 from fmgr.h:685 (PostgreSQL 15), fmgr.h:696 (PostgreSQL 16–17), fmgr.h:736 (PostgreSQL 18), fmgr.h:742 (PostgreSQL 19)
@@ -975,8 +1905,39 @@ macro_rules! OidFunctionCall8 {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! OidFunctionCall9 {
-    ($functionId:expr, $arg1:expr, $arg2:expr, $arg3:expr, $arg4:expr, $arg5:expr, $arg6:expr, $arg7:expr, $arg8:expr, $arg9:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $functionId:expr,
+        $arg1:expr,
+        $arg2:expr,
+        $arg3:expr,
+        $arg4:expr,
+        $arg5:expr,
+        $arg6:expr,
+        $arg7:expr,
+        $arg8:expr,
+        $arg9:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$functionId;
+                let _ = &$arg1;
+                let _ = &$arg2;
+                let _ = &$arg3;
+                let _ = &$arg4;
+                let _ = &$arg5;
+                let _ = &$arg6;
+                let _ = &$arg7;
+                let _ = &$arg8;
+                let _ = &$arg9;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro PG_ARGISNULL from fmgr.h:209 (PostgreSQL 15–19)
@@ -994,7 +1955,48 @@ macro_rules! OidFunctionCall9 {
 #[macro_export]
 macro_rules! PG_ARGISNULL {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_isnull,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::index(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::project::<
+                                                $crate::__pgrx_c_generated::Field_args,
+                                                _,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            (@native [$fcinfo])
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_operand!(@value [true]; (@native [$n]))
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1015,7 +2017,20 @@ macro_rules! PG_ARGISNULL {
 #[macro_export]
 macro_rules! PG_DETOAST_DATUM {
     ($datum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$datum;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::varlena
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -1036,7 +2051,20 @@ macro_rules! PG_DETOAST_DATUM {
 #[macro_export]
 macro_rules! PG_DETOAST_DATUM {
     ($datum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$datum;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::varlena
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1057,7 +2085,20 @@ macro_rules! PG_DETOAST_DATUM {
 #[macro_export]
 macro_rules! PG_DETOAST_DATUM_COPY {
     ($datum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$datum;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::varlena
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -1078,7 +2119,20 @@ macro_rules! PG_DETOAST_DATUM_COPY {
 #[macro_export]
 macro_rules! PG_DETOAST_DATUM_COPY {
     ($datum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$datum;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::varlena
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1099,7 +2153,20 @@ macro_rules! PG_DETOAST_DATUM_COPY {
 #[macro_export]
 macro_rules! PG_DETOAST_DATUM_PACKED {
     ($datum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$datum;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::varlena
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -1120,7 +2187,20 @@ macro_rules! PG_DETOAST_DATUM_PACKED {
 #[macro_export]
 macro_rules! PG_DETOAST_DATUM_PACKED {
     ($datum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$datum;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::varlena
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1141,7 +2221,22 @@ macro_rules! PG_DETOAST_DATUM_PACKED {
 #[macro_export]
 macro_rules! PG_DETOAST_DATUM_SLICE {
     ($datum:expr, $f:expr, $c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$datum;
+                let _ = &$f;
+                let _ = &$c;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::varlena
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -1162,7 +2257,22 @@ macro_rules! PG_DETOAST_DATUM_SLICE {
 #[macro_export]
 macro_rules! PG_DETOAST_DATUM_SLICE {
     ($datum:expr, $f:expr, $c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$datum;
+                let _ = &$f;
+                let _ = &$c;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::varlena
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1187,7 +2297,11 @@ macro_rules! PG_DETOAST_DATUM_SLICE {
 #[macro_export]
 macro_rules! PG_FREE_IF_COPY {
     ($ptr:expr, $n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$ptr;
+            let _ = &$n;
+            let _ = &$fcinfo;
+        })
     };
 }
 #[cfg(feature = "pg19")]
@@ -1212,7 +2326,11 @@ macro_rules! PG_FREE_IF_COPY {
 #[macro_export]
 macro_rules! PG_FREE_IF_COPY {
     ($ptr:expr, $n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$ptr;
+            let _ = &$n;
+            let _ = &$fcinfo;
+        })
     };
 }
 #[cfg(feature = "pg15")]
@@ -1235,7 +2353,19 @@ macro_rules! PG_FREE_IF_COPY {
 #[macro_export]
 macro_rules! PG_GETARG_BOOL {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CBool
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1258,7 +2388,17 @@ macro_rules! PG_GETARG_BOOL {
 #[macro_export]
 macro_rules! PG_GETARG_BOOL {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_BPCHAR_P from fmgr.h:337 (PostgreSQL 15–18), fmgr.h:338 (PostgreSQL 19)
@@ -1280,7 +2420,23 @@ macro_rules! PG_GETARG_BOOL {
 #[macro_export]
 macro_rules! PG_GETARG_BPCHAR_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_BPCHAR_PP from fmgr.h:310 (PostgreSQL 15–18), fmgr.h:311 (PostgreSQL 19)
@@ -1302,7 +2458,23 @@ macro_rules! PG_GETARG_BPCHAR_P {
 #[macro_export]
 macro_rules! PG_GETARG_BPCHAR_PP {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_BPCHAR_P_COPY from fmgr.h:316 (PostgreSQL 15–18), fmgr.h:317 (PostgreSQL 19)
@@ -1324,7 +2496,23 @@ macro_rules! PG_GETARG_BPCHAR_PP {
 #[macro_export]
 macro_rules! PG_GETARG_BPCHAR_P_COPY {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_BPCHAR_P_SLICE from fmgr.h:322 (PostgreSQL 15–18), fmgr.h:323 (PostgreSQL 19)
@@ -1346,7 +2534,25 @@ macro_rules! PG_GETARG_BPCHAR_P_COPY {
 #[macro_export]
 macro_rules! PG_GETARG_BPCHAR_P_SLICE {
     ($n:expr, $a:expr, $b:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$a;
+                let _ = &$b;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_BYTEA_P from fmgr.h:335 (PostgreSQL 15–18), fmgr.h:336 (PostgreSQL 19)
@@ -1368,7 +2574,23 @@ macro_rules! PG_GETARG_BPCHAR_P_SLICE {
 #[macro_export]
 macro_rules! PG_GETARG_BYTEA_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_BYTEA_PP from fmgr.h:308 (PostgreSQL 15–18), fmgr.h:309 (PostgreSQL 19)
@@ -1390,7 +2612,23 @@ macro_rules! PG_GETARG_BYTEA_P {
 #[macro_export]
 macro_rules! PG_GETARG_BYTEA_PP {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_BYTEA_P_COPY from fmgr.h:314 (PostgreSQL 15–18), fmgr.h:315 (PostgreSQL 19)
@@ -1412,7 +2650,23 @@ macro_rules! PG_GETARG_BYTEA_PP {
 #[macro_export]
 macro_rules! PG_GETARG_BYTEA_P_COPY {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_BYTEA_P_SLICE from fmgr.h:320 (PostgreSQL 15–18), fmgr.h:321 (PostgreSQL 19)
@@ -1434,7 +2688,25 @@ macro_rules! PG_GETARG_BYTEA_P_COPY {
 #[macro_export]
 macro_rules! PG_GETARG_BYTEA_P_SLICE {
     ($n:expr, $a:expr, $b:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$a;
+                let _ = &$b;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -1457,7 +2729,19 @@ macro_rules! PG_GETARG_BYTEA_P_SLICE {
 #[macro_export]
 macro_rules! PG_GETARG_CHAR {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CChar
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1480,7 +2764,17 @@ macro_rules! PG_GETARG_CHAR {
 #[macro_export]
 macro_rules! PG_GETARG_CHAR {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CChar
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -1503,7 +2797,21 @@ macro_rules! PG_GETARG_CHAR {
 #[macro_export]
 macro_rules! PG_GETARG_CSTRING {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::CChar,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1526,7 +2834,22 @@ macro_rules! PG_GETARG_CSTRING {
 #[macro_export]
 macro_rules! PG_GETARG_CSTRING {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CChar,
+                                ::core::ffi::c_char
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_DATUM from fmgr.h:268 (PostgreSQL 15–19)
@@ -1544,7 +2867,48 @@ macro_rules! PG_GETARG_CSTRING {
 #[macro_export]
 macro_rules! PG_GETARG_DATUM {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_value,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::index(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::project::<
+                                                $crate::__pgrx_c_generated::Field_args,
+                                                _,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            (@native [$fcinfo])
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_operand!(@value [true]; (@native [$n]))
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_FLOAT4 from fmgr.h:281 (PostgreSQL 15–18), fmgr.h:282 (PostgreSQL 19)
@@ -1566,7 +2930,17 @@ macro_rules! PG_GETARG_DATUM {
 #[macro_export]
 macro_rules! PG_GETARG_FLOAT4 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CFloat
+                    >()
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_FLOAT8 from fmgr.h:282 (PostgreSQL 15–18), fmgr.h:283 (PostgreSQL 19)
@@ -1588,7 +2962,17 @@ macro_rules! PG_GETARG_FLOAT4 {
 #[macro_export]
 macro_rules! PG_GETARG_FLOAT8 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CDouble
+                    >()
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_HEAPTUPLEHEADER from fmgr.h:312 (PostgreSQL 15–18), fmgr.h:313 (PostgreSQL 19)
@@ -1610,7 +2994,23 @@ macro_rules! PG_GETARG_FLOAT8 {
 #[macro_export]
 macro_rules! PG_GETARG_HEAPTUPLEHEADER {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::HeapTupleHeaderData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_HEAPTUPLEHEADER_COPY from fmgr.h:318 (PostgreSQL 15–18), fmgr.h:319 (PostgreSQL 19)
@@ -1632,7 +3032,23 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER {
 #[macro_export]
 macro_rules! PG_GETARG_HEAPTUPLEHEADER_COPY {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::HeapTupleHeaderData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -1655,7 +3071,19 @@ macro_rules! PG_GETARG_HEAPTUPLEHEADER_COPY {
 #[macro_export]
 macro_rules! PG_GETARG_INT16 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_types::int16
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1678,7 +3106,17 @@ macro_rules! PG_GETARG_INT16 {
 #[macro_export]
 macro_rules! PG_GETARG_INT16 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::int16
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -1701,7 +3139,19 @@ macro_rules! PG_GETARG_INT16 {
 #[macro_export]
 macro_rules! PG_GETARG_INT32 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_types::int32
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1724,7 +3174,17 @@ macro_rules! PG_GETARG_INT32 {
 #[macro_export]
 macro_rules! PG_GETARG_INT32 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::int32
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -1747,7 +3207,19 @@ macro_rules! PG_GETARG_INT32 {
 #[macro_export]
 macro_rules! PG_GETARG_INT64 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_types::int64
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1770,7 +3242,17 @@ macro_rules! PG_GETARG_INT64 {
 #[macro_export]
 macro_rules! PG_GETARG_INT64 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::int64
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -1793,7 +3275,23 @@ macro_rules! PG_GETARG_INT64 {
 #[macro_export]
 macro_rules! PG_GETARG_NAME {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::nameData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1816,7 +3314,21 @@ macro_rules! PG_GETARG_NAME {
 #[macro_export]
 macro_rules! PG_GETARG_NAME {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::nameData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -1839,7 +3351,21 @@ macro_rules! PG_GETARG_NAME {
 #[macro_export]
 macro_rules! PG_GETARG_OID {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CUnsignedInt,
+                                $crate::Oid
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -1862,7 +3388,19 @@ macro_rules! PG_GETARG_OID {
 #[macro_export]
 macro_rules! PG_GETARG_OID {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedInt,
+                            $crate::__pgrx_c_bindings::Oid
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -1885,7 +3423,17 @@ macro_rules! PG_GETARG_OID {
 #[macro_export]
 macro_rules! PG_GETARG_OID8 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::Oid8
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -1908,11 +3456,28 @@ macro_rules! PG_GETARG_OID8 {
 #[macro_export]
 macro_rules! PG_GETARG_POINTER {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                    $crate::__pgrx_c_macros::CChar,
+                                    ::core::ffi::c_char
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro PG_GETARG_POINTER from fmgr.h:276 (PostgreSQL 16–18), fmgr.h:277 (PostgreSQL 19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C macro PG_GETARG_POINTER from fmgr.h:276 (PostgreSQL 16–18)
 ///
 /// ```text
 /// #define PG_GETARG_POINTER( n ) DatumGetPointer ( PG_GETARG_DATUM ( n ) )
@@ -1931,7 +3496,57 @@ macro_rules! PG_GETARG_POINTER {
 #[macro_export]
 macro_rules! PG_GETARG_POINTER {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CChar,
+                                ::core::ffi::c_char
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
+    };
+}
+#[cfg(feature = "pg19")]
+/// C macro PG_GETARG_POINTER from fmgr.h:277 (PostgreSQL 19)
+///
+/// ```text
+/// #define PG_GETARG_POINTER( n ) DatumGetPointer ( PG_GETARG_DATUM ( n ) )
+/// ```
+///
+///
+/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! PG_GETARG_POINTER {
+    ($n:expr, $fcinfo:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CVoid,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -1954,7 +3569,23 @@ macro_rules! PG_GETARG_POINTER {
 #[macro_export]
 macro_rules! PG_GETARG_RAW_VARLENA_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1977,7 +3608,23 @@ macro_rules! PG_GETARG_RAW_VARLENA_P {
 #[macro_export]
 macro_rules! PG_GETARG_RAW_VARLENA_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -2000,7 +3647,23 @@ macro_rules! PG_GETARG_RAW_VARLENA_P {
 #[macro_export]
 macro_rules! PG_GETARG_RAW_VARLENA_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_TEXT_P from fmgr.h:336 (PostgreSQL 15–18), fmgr.h:337 (PostgreSQL 19)
@@ -2022,7 +3685,23 @@ macro_rules! PG_GETARG_RAW_VARLENA_P {
 #[macro_export]
 macro_rules! PG_GETARG_TEXT_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_TEXT_PP from fmgr.h:309 (PostgreSQL 15–18), fmgr.h:310 (PostgreSQL 19)
@@ -2044,7 +3723,23 @@ macro_rules! PG_GETARG_TEXT_P {
 #[macro_export]
 macro_rules! PG_GETARG_TEXT_PP {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_TEXT_P_COPY from fmgr.h:315 (PostgreSQL 15–18), fmgr.h:316 (PostgreSQL 19)
@@ -2066,7 +3761,23 @@ macro_rules! PG_GETARG_TEXT_PP {
 #[macro_export]
 macro_rules! PG_GETARG_TEXT_P_COPY {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_TEXT_P_SLICE from fmgr.h:321 (PostgreSQL 15–18), fmgr.h:322 (PostgreSQL 19)
@@ -2088,7 +3799,25 @@ macro_rules! PG_GETARG_TEXT_P_COPY {
 #[macro_export]
 macro_rules! PG_GETARG_TEXT_P_SLICE {
     ($n:expr, $a:expr, $b:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$a;
+                let _ = &$b;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -2111,7 +3840,21 @@ macro_rules! PG_GETARG_TEXT_P_SLICE {
 #[macro_export]
 macro_rules! PG_GETARG_TRANSACTIONID {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CUnsignedInt,
+                                $crate::TransactionId
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2134,7 +3877,19 @@ macro_rules! PG_GETARG_TRANSACTIONID {
 #[macro_export]
 macro_rules! PG_GETARG_TRANSACTIONID {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedInt,
+                            $crate::__pgrx_c_bindings::TransactionId
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -2157,7 +3912,19 @@ macro_rules! PG_GETARG_TRANSACTIONID {
 #[macro_export]
 macro_rules! PG_GETARG_UINT16 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_types::uint16
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2180,7 +3947,17 @@ macro_rules! PG_GETARG_UINT16 {
 #[macro_export]
 macro_rules! PG_GETARG_UINT16 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::uint16
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -2203,7 +3980,19 @@ macro_rules! PG_GETARG_UINT16 {
 #[macro_export]
 macro_rules! PG_GETARG_UINT32 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_types::uint32
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2226,7 +4015,17 @@ macro_rules! PG_GETARG_UINT32 {
 #[macro_export]
 macro_rules! PG_GETARG_UINT32 {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::uint32
+                    >()
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_VARCHAR_P from fmgr.h:338 (PostgreSQL 15–18), fmgr.h:339 (PostgreSQL 19)
@@ -2248,7 +4047,23 @@ macro_rules! PG_GETARG_UINT32 {
 #[macro_export]
 macro_rules! PG_GETARG_VARCHAR_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_VARCHAR_PP from fmgr.h:311 (PostgreSQL 15–18), fmgr.h:312 (PostgreSQL 19)
@@ -2270,7 +4085,23 @@ macro_rules! PG_GETARG_VARCHAR_P {
 #[macro_export]
 macro_rules! PG_GETARG_VARCHAR_PP {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_VARCHAR_P_COPY from fmgr.h:317 (PostgreSQL 15–18), fmgr.h:318 (PostgreSQL 19)
@@ -2292,7 +4123,23 @@ macro_rules! PG_GETARG_VARCHAR_PP {
 #[macro_export]
 macro_rules! PG_GETARG_VARCHAR_P_COPY {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_VARCHAR_P_SLICE from fmgr.h:323 (PostgreSQL 15–18), fmgr.h:324 (PostgreSQL 19)
@@ -2314,7 +4161,25 @@ macro_rules! PG_GETARG_VARCHAR_P_COPY {
 #[macro_export]
 macro_rules! PG_GETARG_VARCHAR_P_SLICE {
     ($n:expr, $a:expr, $b:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$a;
+                let _ = &$b;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_VARLENA_P from fmgr.h:287 (PostgreSQL 15–18), fmgr.h:288 (PostgreSQL 19)
@@ -2336,7 +4201,21 @@ macro_rules! PG_GETARG_VARCHAR_P_SLICE {
 #[macro_export]
 macro_rules! PG_GETARG_VARLENA_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::varlena
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro PG_GETARG_VARLENA_PP from fmgr.h:289 (PostgreSQL 15–18), fmgr.h:290 (PostgreSQL 19)
@@ -2358,7 +4237,21 @@ macro_rules! PG_GETARG_VARLENA_P {
 #[macro_export]
 macro_rules! PG_GETARG_VARLENA_PP {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::varlena
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro PG_GET_COLLATION from fmgr.h:198 (PostgreSQL 15–19)
@@ -2376,7 +4269,30 @@ macro_rules! PG_GETARG_VARLENA_PP {
 #[macro_export]
 macro_rules! PG_GET_COLLATION {
     ($fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_fncollation,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_operand!(
+                                            @value [true];
+                                            (@native [$fcinfo])
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PG_GET_OPCLASS_OPTIONS from fmgr.h:342 (PostgreSQL 15–18), fmgr.h:343 (PostgreSQL 19)
@@ -2398,7 +4314,20 @@ macro_rules! PG_GET_COLLATION {
 #[macro_export]
 macro_rules! PG_GET_OPCLASS_OPTIONS {
     ($fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$fcinfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::varlena
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro PG_HAS_OPCLASS_OPTIONS from fmgr.h:341 (PostgreSQL 15–18), fmgr.h:342 (PostgreSQL 19)
@@ -2420,7 +4349,16 @@ macro_rules! PG_GET_OPCLASS_OPTIONS {
 #[macro_export]
 macro_rules! PG_HAS_OPCLASS_OPTIONS {
     ($fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$fcinfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 /// C macro PG_NARGS from fmgr.h:203 (PostgreSQL 15–19)
@@ -2438,7 +4376,30 @@ macro_rules! PG_HAS_OPCLASS_OPTIONS {
 #[macro_export]
 macro_rules! PG_NARGS {
     ($fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_nargs,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_operand!(
+                                            @value [true];
+                                            (@native [$fcinfo])
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -3516,7 +5477,49 @@ macro_rules! PG_RETURN_VOID {
 #[macro_export]
 macro_rules! SizeForFunctionCallInfo {
     ($nargs:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                        $crate::__pgrx_c_macros::expression::add::<
+                            $crate::__pgrx_c_macros::Wrapping,
+                            _,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                    $crate::__pgrx_c_macros::CSize
+                                >()
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                $crate::__pgrx_c_macros::expression::mul::<
+                                    $crate::__pgrx_c_macros::Wrapping,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CSize
+                                        >()
+                                    ),
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            false,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_operand!(
+                                                @value [false];
+                                                (@native [$nargs])
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro fmgr_info_set_expr from fmgr.h:135 (PostgreSQL 15–19)
@@ -3532,7 +5535,40 @@ macro_rules! SizeForFunctionCallInfo {
 #[macro_export]
 macro_rules! fmgr_info_set_expr {
     ($expr:expr, $finfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_fn_expr,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_operand!(
+                                                @value [true];
+                                                (@native [$finfo])
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; (@native [$expr]))
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 pub use DatumGetBpCharP;

@@ -21,7 +21,7 @@
 #[macro_export]
 macro_rules! WalSndWakeupProcessRequests {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -53,7 +53,13 @@ macro_rules! WalSndWakeupProcessRequests {
 #[macro_export]
 macro_rules! WalSndWakeupProcessRequests {
     ($physical:expr, $logical:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$physical;
+                let _ = &$logical;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 /// C macro WalSndWakeupRequest from walsender.h:57 (PostgreSQL 15–16, 19), walsender.h:59 (PostgreSQL 17), walsender.h:58 (PostgreSQL 18)
@@ -71,7 +77,7 @@ macro_rules! WalSndWakeupProcessRequests {
 #[macro_export]
 macro_rules! WalSndWakeupRequest {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 pub use WalSndWakeupProcessRequests;

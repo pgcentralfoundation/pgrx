@@ -19,7 +19,18 @@
 #[macro_export]
 macro_rules! EarlyPruningEnabled {
     ($rel:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro InitDirtySnapshot from snapmgr.h:74 (PostgreSQL 15–16), snapmgr.h:40 (PostgreSQL 17), snapmgr.h:42 (PostgreSQL 18–19)
@@ -35,7 +46,26 @@ macro_rules! EarlyPruningEnabled {
 #[macro_export]
 macro_rules! InitDirtySnapshot {
     ($snapshotdata:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_snapshot_type,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@place; (@native [$snapshotdata])))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    $crate::__pgrx_c_bindings::SnapshotType::SNAPSHOT_DIRTY as i32
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro InitNonVacuumableSnapshot from snapmgr.h:82 (PostgreSQL 15–16), snapmgr.h:48 (PostgreSQL 17), snapmgr.h:50 (PostgreSQL 18–19)
@@ -51,7 +81,43 @@ macro_rules! InitDirtySnapshot {
 #[macro_export]
 macro_rules! InitNonVacuumableSnapshot {
     ($snapshotdata:expr, $vistestp:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_vistest,
+                                        _,
+                                        _
+                                    >(
+                                        (
+                                            $crate::__pgrx_c_operand!(
+                                                @place;
+                                                (@native [$snapshotdata])
+                                            )
+                                        )
+                                    ),
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_operand!(
+                                                @value [true];
+                                                (@native [$vistestp])
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -68,7 +134,39 @@ macro_rules! InitNonVacuumableSnapshot {
 #[macro_export]
 macro_rules! InitToastSnapshot {
     ($snapshotdata:expr, $l:expr, $w:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$l;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_whenTaken,
+                                        _,
+                                        _
+                                    >(
+                                        (
+                                            $crate::__pgrx_c_operand!(
+                                                @place;
+                                                (@native [$snapshotdata])
+                                            )
+                                        )
+                                    ),
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; (@native [$w])))
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -85,7 +183,18 @@ macro_rules! InitToastSnapshot {
 #[macro_export]
 macro_rules! IsHistoricMVCCSnapshot {
     ($snapshot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$snapshot;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -102,7 +211,18 @@ macro_rules! IsHistoricMVCCSnapshot {
 #[macro_export]
 macro_rules! IsMVCCLikeSnapshot {
     ($snapshot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$snapshot;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -119,7 +239,18 @@ macro_rules! IsMVCCLikeSnapshot {
 #[macro_export]
 macro_rules! IsMVCCSnapshot {
     ($snapshot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$snapshot;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -136,7 +267,18 @@ macro_rules! IsMVCCSnapshot {
 #[macro_export]
 macro_rules! IsMVCCSnapshot {
     ($snapshot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$snapshot;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -157,7 +299,36 @@ macro_rules! IsMVCCSnapshot {
 #[macro_export]
 macro_rules! OLD_SNAPSHOT_TIME_MAP_ENTRIES {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::add::<
+                            $crate::__pgrx_c_macros::Wrapping,
+                            _,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::load(
+                                    $crate::__pgrx_c_macros::expression::place::<
+                                        $crate::__pgrx_c_macros::CInt
+                                    >(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::old_snapshot_threshold
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    $crate::__pgrx_c_bindings::OLD_SNAPSHOT_PADDING_ENTRIES as i32
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -184,7 +355,15 @@ macro_rules! OLD_SNAPSHOT_TIME_MAP_ENTRIES {
 #[macro_export]
 macro_rules! OldSnapshotThresholdActive {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -205,7 +384,18 @@ macro_rules! OldSnapshotThresholdActive {
 #[macro_export]
 macro_rules! RelationAllowsEarlyPruning {
     ($rel:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro SnapshotAny from snapmgr.h:67 (PostgreSQL 15–16), snapmgr.h:33 (PostgreSQL 17–19)
@@ -221,7 +411,24 @@ macro_rules! RelationAllowsEarlyPruning {
 #[macro_export]
 macro_rules! SnapshotAny {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::address(
+                            $crate::__pgrx_c_macros::expression::place::<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::SnapshotData
+                                >>(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::SnapshotAnyData
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro SnapshotSelf from snapmgr.h:66 (PostgreSQL 15–16), snapmgr.h:32 (PostgreSQL 17–19)
@@ -237,7 +444,24 @@ macro_rules! SnapshotAny {
 #[macro_export]
 macro_rules! SnapshotSelf {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::address(
+                            $crate::__pgrx_c_macros::expression::place::<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::SnapshotData
+                                >>(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::SnapshotSelfData
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]

@@ -19,7 +19,22 @@
 #[macro_export]
 macro_rules! expression_tree_mutator {
     ($n:expr, $m:expr, $c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$m;
+                let _ = &$c;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::Node
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -40,7 +55,18 @@ macro_rules! expression_tree_mutator {
 #[macro_export]
 macro_rules! expression_tree_walker {
     ($n:expr, $w:expr, $c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$w;
+                let _ = &$c;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function get_leftop from nodeFuncs.h:72 (PostgreSQL 15), nodeFuncs.h:82 (PostgreSQL 16–17), nodeFuncs.h:84 (PostgreSQL 18–19)
@@ -71,7 +97,20 @@ macro_rules! expression_tree_walker {
 #[macro_export]
 macro_rules! get_leftop {
     ($clause:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$clause;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::Node
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function get_notclausearg from nodeFuncs.h:123 (PostgreSQL 15), nodeFuncs.h:133 (PostgreSQL 16–17), nodeFuncs.h:135 (PostgreSQL 18–19)
@@ -97,7 +136,20 @@ macro_rules! get_leftop {
 #[macro_export]
 macro_rules! get_notclausearg {
     ($notclause:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$notclause;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::Expr
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function get_rightop from nodeFuncs.h:84 (PostgreSQL 15), nodeFuncs.h:94 (PostgreSQL 16–17), nodeFuncs.h:96 (PostgreSQL 18–19)
@@ -128,7 +180,20 @@ macro_rules! get_notclausearg {
 #[macro_export]
 macro_rules! get_rightop {
     ($clause:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$clause;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::Node
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function is_andclause from nodeFuncs.h:96 (PostgreSQL 15), nodeFuncs.h:106 (PostgreSQL 16–17), nodeFuncs.h:108 (PostgreSQL 18–19)
@@ -156,7 +221,16 @@ macro_rules! get_rightop {
 #[macro_export]
 macro_rules! is_andclause {
     ($clause:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$clause;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function is_funcclause from nodeFuncs.h:58 (PostgreSQL 15), nodeFuncs.h:68 (PostgreSQL 16–17), nodeFuncs.h:70 (PostgreSQL 18–19)
@@ -182,7 +256,16 @@ macro_rules! is_andclause {
 #[macro_export]
 macro_rules! is_funcclause {
     ($clause:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$clause;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function is_notclause from nodeFuncs.h:114 (PostgreSQL 15), nodeFuncs.h:124 (PostgreSQL 16–17), nodeFuncs.h:126 (PostgreSQL 18–19)
@@ -210,7 +293,16 @@ macro_rules! is_funcclause {
 #[macro_export]
 macro_rules! is_notclause {
     ($clause:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$clause;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function is_opclause from nodeFuncs.h:65 (PostgreSQL 15), nodeFuncs.h:75 (PostgreSQL 16–17), nodeFuncs.h:77 (PostgreSQL 18–19)
@@ -236,7 +328,16 @@ macro_rules! is_notclause {
 #[macro_export]
 macro_rules! is_opclause {
     ($clause:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$clause;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function is_orclause from nodeFuncs.h:105 (PostgreSQL 15), nodeFuncs.h:115 (PostgreSQL 16–17), nodeFuncs.h:117 (PostgreSQL 18–19)
@@ -264,7 +365,16 @@ macro_rules! is_opclause {
 #[macro_export]
 macro_rules! is_orclause {
     ($clause:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$clause;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -285,7 +395,18 @@ macro_rules! is_orclause {
 #[macro_export]
 macro_rules! planstate_tree_walker {
     ($ps:expr, $w:expr, $c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ps;
+                let _ = &$w;
+                let _ = &$c;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -306,7 +427,23 @@ macro_rules! planstate_tree_walker {
 #[macro_export]
 macro_rules! query_or_expression_tree_mutator {
     ($n:expr, $m:expr, $c:expr, $f:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$m;
+                let _ = &$c;
+                let _ = &$f;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::Node
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -327,7 +464,19 @@ macro_rules! query_or_expression_tree_mutator {
 #[macro_export]
 macro_rules! query_or_expression_tree_walker {
     ($n:expr, $w:expr, $c:expr, $f:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$w;
+                let _ = &$c;
+                let _ = &$f;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -348,7 +497,23 @@ macro_rules! query_or_expression_tree_walker {
 #[macro_export]
 macro_rules! query_tree_mutator {
     ($q:expr, $m:expr, $c:expr, $f:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$q;
+                let _ = &$m;
+                let _ = &$c;
+                let _ = &$f;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::Query
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -369,7 +534,19 @@ macro_rules! query_tree_mutator {
 #[macro_export]
 macro_rules! query_tree_walker {
     ($q:expr, $w:expr, $c:expr, $f:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$q;
+                let _ = &$w;
+                let _ = &$c;
+                let _ = &$f;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -390,7 +567,19 @@ macro_rules! query_tree_walker {
 #[macro_export]
 macro_rules! range_table_entry_walker {
     ($r:expr, $w:expr, $c:expr, $f:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$r;
+                let _ = &$w;
+                let _ = &$c;
+                let _ = &$f;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -411,7 +600,23 @@ macro_rules! range_table_entry_walker {
 #[macro_export]
 macro_rules! range_table_mutator {
     ($rt:expr, $m:expr, $c:expr, $f:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rt;
+                let _ = &$m;
+                let _ = &$c;
+                let _ = &$f;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::List
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -432,7 +637,19 @@ macro_rules! range_table_mutator {
 #[macro_export]
 macro_rules! range_table_walker {
     ($rt:expr, $w:expr, $c:expr, $f:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rt;
+                let _ = &$w;
+                let _ = &$c;
+                let _ = &$f;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -453,7 +670,18 @@ macro_rules! range_table_walker {
 #[macro_export]
 macro_rules! raw_expression_tree_walker {
     ($n:expr, $w:expr, $c:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$w;
+                let _ = &$c;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]

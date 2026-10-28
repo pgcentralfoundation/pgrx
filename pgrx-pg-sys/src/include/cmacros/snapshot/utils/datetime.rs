@@ -18,7 +18,30 @@
 #[macro_export]
 macro_rules! DTK_M {
     ($t:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::shl::<
+                            $crate::__pgrx_c_macros::Wrapping,
+                            _,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    0x01i32
+                                )
+                            ),
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; (@native [$t]))
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro FMODULO from datetime.h:238 (PostgreSQL 15, 19), datetime.h:237 (PostgreSQL 16–18)
@@ -40,7 +63,11 @@ macro_rules! DTK_M {
 #[macro_export]
 macro_rules! FMODULO {
     ($t:expr, $q:expr, $u:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$t;
+            let _ = &$q;
+            let _ = &$u;
+        })
     };
 }
 /// C macro TMODULO from datetime.h:249 (PostgreSQL 15), datetime.h:248 (PostgreSQL 16–18), datetime.h:250 (PostgreSQL 19)
@@ -62,7 +89,11 @@ macro_rules! FMODULO {
 #[macro_export]
 macro_rules! TMODULO {
     ($t:expr, $q:expr, $u:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$t;
+            let _ = &$q;
+            let _ = &$u;
+        })
     };
 }
 /// C macro isleap from datetime.h:272 (PostgreSQL 15), datetime.h:271 (PostgreSQL 16–18), datetime.h:273 (PostgreSQL 19)
@@ -82,7 +113,18 @@ macro_rules! TMODULO {
 #[macro_export]
 macro_rules! isleap {
     ($y:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$y;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 pub use DTK_M;

@@ -14,7 +14,18 @@
 #[macro_export]
 macro_rules! DsaPointerIsValid {
     ($x:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro dsa_allocate from dsa.h:84 (PostgreSQL 15–16), dsa.h:109 (PostgreSQL 17–19)
@@ -34,7 +45,17 @@ macro_rules! DsaPointerIsValid {
 #[macro_export]
 macro_rules! dsa_allocate {
     ($area:expr, $size:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$area;
+                let _ = &$size;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::dsa_pointer
+                    >()
+                )
+            }
+        )
     };
 }
 /// C macro dsa_allocate0 from dsa.h:88 (PostgreSQL 15–16), dsa.h:113 (PostgreSQL 17–19)
@@ -54,7 +75,17 @@ macro_rules! dsa_allocate {
 #[macro_export]
 macro_rules! dsa_allocate0 {
     ($area:expr, $size:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$area;
+                let _ = &$size;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::dsa_pointer
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
@@ -75,7 +106,20 @@ macro_rules! dsa_allocate0 {
 #[macro_export]
 macro_rules! dsa_create {
     ($tranch_id:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$tranch_id;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::COpaque<
+                                $crate::__pgrx_c_bindings::dsa_area
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -96,7 +140,20 @@ macro_rules! dsa_create {
 #[macro_export]
 macro_rules! dsa_create {
     ($tranche_id:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$tranche_id;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::COpaque<
+                                $crate::__pgrx_c_bindings::dsa_area
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
@@ -117,7 +174,23 @@ macro_rules! dsa_create {
 #[macro_export]
 macro_rules! dsa_create_in_place {
     ($place:expr, $size:expr, $tranch_id:expr, $segment:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$place;
+                let _ = &$size;
+                let _ = &$tranch_id;
+                let _ = &$segment;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::COpaque<
+                                $crate::__pgrx_c_bindings::dsa_area
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -138,7 +211,23 @@ macro_rules! dsa_create_in_place {
 #[macro_export]
 macro_rules! dsa_create_in_place {
     ($place:expr, $size:expr, $tranche_id:expr, $segment:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$place;
+                let _ = &$size;
+                let _ = &$tranche_id;
+                let _ = &$segment;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::COpaque<
+                                $crate::__pgrx_c_bindings::dsa_area
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 pub use DsaPointerIsValid;

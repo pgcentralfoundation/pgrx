@@ -53,7 +53,20 @@
 #[macro_export]
 macro_rules! ApplyInt32SortComparator {
     ($datum1:expr, $isNull1:expr, $datum2:expr, $isNull2:expr, $ssup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$datum1;
+                let _ = &$isNull1;
+                let _ = &$datum2;
+                let _ = &$isNull2;
+                let _ = &$ssup;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CInt
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -108,7 +121,20 @@ macro_rules! ApplyInt32SortComparator {
 #[macro_export]
 macro_rules! ApplySignedSortComparator {
     ($datum1:expr, $isNull1:expr, $datum2:expr, $isNull2:expr, $ssup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$datum1;
+                let _ = &$isNull1;
+                let _ = &$datum2;
+                let _ = &$isNull2;
+                let _ = &$ssup;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CInt
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function ApplySortAbbrevFullComparator from sortsupport.h:340 (PostgreSQL 15–18), sortsupport.h:237 (PostgreSQL 19)
@@ -161,7 +187,20 @@ macro_rules! ApplySignedSortComparator {
 #[macro_export]
 macro_rules! ApplySortAbbrevFullComparator {
     ($datum1:expr, $isNull1:expr, $datum2:expr, $isNull2:expr, $ssup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$datum1;
+                let _ = &$isNull1;
+                let _ = &$datum2;
+                let _ = &$isNull2;
+                let _ = &$ssup;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CInt
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function ApplySortComparator from sortsupport.h:199 (PostgreSQL 15–19)
@@ -214,7 +253,20 @@ macro_rules! ApplySortAbbrevFullComparator {
 #[macro_export]
 macro_rules! ApplySortComparator {
     ($datum1:expr, $isNull1:expr, $datum2:expr, $isNull2:expr, $ssup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$datum1;
+                let _ = &$isNull1;
+                let _ = &$datum2;
+                let _ = &$isNull2;
+                let _ = &$ssup;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CInt
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -268,7 +320,20 @@ macro_rules! ApplySortComparator {
 #[macro_export]
 macro_rules! ApplyUnsignedSortComparator {
     ($datum1:expr, $isNull1:expr, $datum2:expr, $isNull2:expr, $ssup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$datum1;
+                let _ = &$isNull1;
+                let _ = &$datum2;
+                let _ = &$isNull2;
+                let _ = &$ssup;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CInt
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]

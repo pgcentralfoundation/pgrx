@@ -14,7 +14,18 @@
 #[macro_export]
 macro_rules! IS_DIR_SEP {
     ($ch:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ch;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro IS_NONWINDOWS_DIR_SEP from port.h:83 (PostgreSQL 15–19)
@@ -30,7 +41,18 @@ macro_rules! IS_DIR_SEP {
 #[macro_export]
 macro_rules! IS_NONWINDOWS_DIR_SEP {
     ($ch:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ch;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro IS_WINDOWS_DIR_SEP from port.h:89 (PostgreSQL 15–19)
@@ -46,7 +68,18 @@ macro_rules! IS_NONWINDOWS_DIR_SEP {
 #[macro_export]
 macro_rules! IS_WINDOWS_DIR_SEP {
     ($ch:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ch;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro is_absolute_path from port.h:105 (PostgreSQL 15–19)
@@ -62,7 +95,20 @@ macro_rules! IS_WINDOWS_DIR_SEP {
 #[macro_export]
 macro_rules! is_absolute_path {
     ($filename:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$filename;
+                (
+                    (
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                $crate::__pgrx_c_macros::CInt
+                            >()
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro is_nonwindows_absolute_path from port.h:84 (PostgreSQL 15–19)
@@ -78,7 +124,20 @@ macro_rules! is_absolute_path {
 #[macro_export]
 macro_rules! is_nonwindows_absolute_path {
     ($filename:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$filename;
+                (
+                    (
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                $crate::__pgrx_c_macros::CInt
+                            >()
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro is_windows_absolute_path from port.h:91 (PostgreSQL 15–19)
@@ -98,7 +157,18 @@ macro_rules! is_nonwindows_absolute_path {
 #[macro_export]
 macro_rules! is_windows_absolute_path {
     ($filename:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$filename;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -127,7 +197,16 @@ macro_rules! is_windows_absolute_path {
 #[macro_export]
 macro_rules! pg_ascii_tolower {
     ($ch:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ch;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CUnsignedChar
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -156,7 +235,16 @@ macro_rules! pg_ascii_tolower {
 #[macro_export]
 macro_rules! pg_ascii_toupper {
     ($ch:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ch;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CUnsignedChar
+                    >()
+                )
+            }
+        )
     };
 }
 /// C macro qsort from port.h:531 (PostgreSQL 15), port.h:477 (PostgreSQL 16), port.h:481 (PostgreSQL 17), port.h:479 (PostgreSQL 18), port.h:496 (PostgreSQL 19)
@@ -176,7 +264,15 @@ macro_rules! pg_ascii_toupper {
 #[macro_export]
 macro_rules! qsort {
     ($a:expr, $b:expr, $c:expr, $d:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$a;
+                let _ = &$b;
+                let _ = &$c;
+                let _ = &$d;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 pub use IS_DIR_SEP;

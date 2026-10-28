@@ -14,7 +14,18 @@
 #[macro_export]
 macro_rules! FILE_POSSIBLY_DELETED {
     ($err:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$err;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
@@ -47,7 +58,22 @@ macro_rules! FILE_POSSIBLY_DELETED {
 #[macro_export]
 macro_rules! FileRead {
     ($file:expr, $buffer:expr, $amount:expr, $offset:expr, $wait_event_info:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$file;
+                let _ = &$buffer;
+                let _ = &$amount;
+                let _ = &$offset;
+                let _ = &$wait_event_info;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CLong,
+                            isize
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -80,7 +106,22 @@ macro_rules! FileRead {
 #[macro_export]
 macro_rules! FileRead {
     ($file:expr, $buffer:expr, $amount:expr, $offset:expr, $wait_event_info:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$file;
+                let _ = &$buffer;
+                let _ = &$amount;
+                let _ = &$offset;
+                let _ = &$wait_event_info;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CLong,
+                            isize
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
@@ -113,7 +154,22 @@ macro_rules! FileRead {
 #[macro_export]
 macro_rules! FileWrite {
     ($file:expr, $buffer:expr, $amount:expr, $offset:expr, $wait_event_info:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$file;
+                let _ = &$buffer;
+                let _ = &$amount;
+                let _ = &$offset;
+                let _ = &$wait_event_info;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CLong,
+                            isize
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -146,7 +202,22 @@ macro_rules! FileWrite {
 #[macro_export]
 macro_rules! FileWrite {
     ($file:expr, $buffer:expr, $amount:expr, $offset:expr, $wait_event_info:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$file;
+                let _ = &$buffer;
+                let _ = &$amount;
+                let _ = &$offset;
+                let _ = &$wait_event_info;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CLong,
+                            isize
+                        >>()
+                )
+            }
+        )
     };
 }
 pub use FILE_POSSIBLY_DELETED;

@@ -18,7 +18,18 @@
 #[macro_export]
 macro_rules! OffsetNumberIsValid {
     ($offsetNumber:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$offsetNumber;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CBool
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro OffsetNumberNext from off.h:52 (PostgreSQL 15–19)
@@ -38,7 +49,18 @@ macro_rules! OffsetNumberIsValid {
 #[macro_export]
 macro_rules! OffsetNumberNext {
     ($offsetNumber:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$offsetNumber;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_types::OffsetNumber
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro OffsetNumberPrev from off.h:54 (PostgreSQL 15–19)
@@ -58,7 +80,18 @@ macro_rules! OffsetNumberNext {
 #[macro_export]
 macro_rules! OffsetNumberPrev {
     ($offsetNumber:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$offsetNumber;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_types::OffsetNumber
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 pub use OffsetNumberIsValid;

@@ -50,7 +50,19 @@
 #[macro_export]
 macro_rules! HeapKeyTest {
     ($tuple:expr, $tupdesc:expr, $nkeys:expr, $keys:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$tuple;
+                let _ = &$tupdesc;
+                let _ = &$nkeys;
+                let _ = &$keys;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]

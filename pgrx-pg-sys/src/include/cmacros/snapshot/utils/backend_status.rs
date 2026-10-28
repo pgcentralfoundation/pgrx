@@ -14,7 +14,19 @@
 #[macro_export]
 macro_rules! pgstat_read_activity_complete {
     ($before_changecount:expr, $after_changecount:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$before_changecount;
+                let _ = &$after_changecount;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 pub use pgstat_read_activity_complete;

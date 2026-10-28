@@ -34,7 +34,13 @@
 #[macro_export]
 macro_rules! AccumulateIOStats {
     ($dst:expr, $src:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$dst;
+                let _ = &$src;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]

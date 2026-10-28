@@ -18,7 +18,20 @@
 #[macro_export]
 macro_rules! BrinTupleDataOffset {
     ($tup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$tup;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                usize
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro BrinTupleHasNulls from brin_tuple.h:91 (PostgreSQL 15–19)
@@ -38,7 +51,18 @@ macro_rules! BrinTupleDataOffset {
 #[macro_export]
 macro_rules! BrinTupleHasNulls {
     ($tup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$tup;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro BrinTupleIsEmptyRange from brin_tuple.h:93 (PostgreSQL 15–19)
@@ -58,7 +82,18 @@ macro_rules! BrinTupleHasNulls {
 #[macro_export]
 macro_rules! BrinTupleIsEmptyRange {
     ($tup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$tup;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro BrinTupleIsPlaceholder from brin_tuple.h:92 (PostgreSQL 15–19)
@@ -78,7 +113,18 @@ macro_rules! BrinTupleIsEmptyRange {
 #[macro_export]
 macro_rules! BrinTupleIsPlaceholder {
     ($tup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$tup;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 pub use BrinTupleDataOffset;

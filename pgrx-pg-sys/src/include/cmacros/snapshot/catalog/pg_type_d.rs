@@ -14,7 +14,18 @@
 #[macro_export]
 macro_rules! IsPolymorphicType {
     ($typid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$typid;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro IsPolymorphicTypeFamily1 from pg_type_d.h:107 (PostgreSQL 15–17), pg_type_d.h:111 (PostgreSQL 18–19)
@@ -30,7 +41,18 @@ macro_rules! IsPolymorphicType {
 #[macro_export]
 macro_rules! IsPolymorphicTypeFamily1 {
     ($typid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$typid;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro IsPolymorphicTypeFamily2 from pg_type_d.h:115 (PostgreSQL 15–17), pg_type_d.h:119 (PostgreSQL 18–19)
@@ -46,7 +68,18 @@ macro_rules! IsPolymorphicTypeFamily1 {
 #[macro_export]
 macro_rules! IsPolymorphicTypeFamily2 {
     ($typid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$typid;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro IsTrueArrayType from pg_type_d.h:123 (PostgreSQL 15–17), pg_type_d.h:127 (PostgreSQL 18–19)
@@ -66,7 +99,18 @@ macro_rules! IsPolymorphicTypeFamily2 {
 #[macro_export]
 macro_rules! IsTrueArrayType {
     ($typeForm:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$typeForm;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 pub use IsPolymorphicType;

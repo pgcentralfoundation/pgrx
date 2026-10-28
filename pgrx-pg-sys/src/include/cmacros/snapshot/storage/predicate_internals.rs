@@ -18,7 +18,20 @@
 #[macro_export]
 macro_rules! GET_PREDICATELOCKTARGETTAG_DB {
     ($locktag:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$locktag;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CUnsignedInt,
+                                $crate::Oid
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro GET_PREDICATELOCKTARGETTAG_OFFSET from predicate_internals.h:428 (PostgreSQL 15), predicate_internals.h:412 (PostgreSQL 16–19)
@@ -38,7 +51,18 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_DB {
 #[macro_export]
 macro_rules! GET_PREDICATELOCKTARGETTAG_OFFSET {
     ($locktag:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$locktag;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_types::OffsetNumber
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro GET_PREDICATELOCKTARGETTAG_PAGE from predicate_internals.h:426 (PostgreSQL 15), predicate_internals.h:410 (PostgreSQL 16–19)
@@ -58,7 +82,18 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_OFFSET {
 #[macro_export]
 macro_rules! GET_PREDICATELOCKTARGETTAG_PAGE {
     ($locktag:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$locktag;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_types::BlockNumber
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro GET_PREDICATELOCKTARGETTAG_RELATION from predicate_internals.h:424 (PostgreSQL 15), predicate_internals.h:408 (PostgreSQL 16–19)
@@ -78,7 +113,20 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_PAGE {
 #[macro_export]
 macro_rules! GET_PREDICATELOCKTARGETTAG_RELATION {
     ($locktag:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$locktag;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CUnsignedInt,
+                                $crate::Oid
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro GET_PREDICATELOCKTARGETTAG_TYPE from predicate_internals.h:430 (PostgreSQL 15), predicate_internals.h:414 (PostgreSQL 16–19)
@@ -94,7 +142,88 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_RELATION {
 #[macro_export]
 macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
     ($locktag:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$locktag;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >()
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::PredicateLockTargetType::PREDLOCKTAG_TUPLE as i32
+                                        )
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::select(
+                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >()
+                                                        )
+                                                    )
+                                                ) {
+                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::PredicateLockTargetType::PREDLOCKTAG_PAGE as i32
+                                                            )
+                                                        )
+                                                    )
+                                                } else {
+                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::null_constant(
+                                                                $crate::__pgrx_c_macros::CValue::<
+                                                                    $crate::__pgrx_c_macros::CInt
+                                                                >::new(
+                                                                    $crate::__pgrx_c_bindings::PredicateLockTargetType::PREDLOCKTAG_RELATION as i32
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                }
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro SET_PREDICATELOCKTARGETTAG_PAGE from predicate_internals.h:410 (PostgreSQL 15), predicate_internals.h:394 (PostgreSQL 16–19)
@@ -110,7 +239,37 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
 #[macro_export]
 macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
     ($locktag:expr, $dboid:expr, $reloid:expr, $blocknum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$dboid;
+                let _ = &$reloid;
+                let _ = &$blocknum;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_field4,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::null_constant(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CUnsignedShort
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::InvalidOffsetNumber as u16
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro SET_PREDICATELOCKTARGETTAG_RELATION from predicate_internals.h:404 (PostgreSQL 15), predicate_internals.h:388 (PostgreSQL 16–19)
@@ -126,7 +285,36 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
 #[macro_export]
 macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
     ($locktag:expr, $dboid:expr, $reloid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$dboid;
+                let _ = &$reloid;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_field4,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::null_constant(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CUnsignedShort
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::InvalidOffsetNumber as u16
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro SET_PREDICATELOCKTARGETTAG_TUPLE from predicate_internals.h:416 (PostgreSQL 15), predicate_internals.h:400 (PostgreSQL 16–19)
@@ -142,7 +330,39 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
 #[macro_export]
 macro_rules! SET_PREDICATELOCKTARGETTAG_TUPLE {
     ($locktag:expr, $dboid:expr, $reloid:expr, $blocknum:expr, $offnum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$dboid;
+                let _ = &$reloid;
+                let _ = &$blocknum;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_field4,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_operand!(
+                                                @value [true];
+                                                (@native [$offnum])
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 pub use GET_PREDICATELOCKTARGETTAG_DB;

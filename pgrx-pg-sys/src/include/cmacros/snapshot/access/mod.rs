@@ -19,6 +19,10 @@ pub use brin_page::*;
 mod brin_tuple;
 #[allow(unused_imports)]
 pub use brin_tuple::*;
+#[path = "detoast.rs"]
+mod detoast;
+#[allow(unused_imports)]
+pub use detoast::*;
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
 #[path = "genam.rs"]
 mod genam;
@@ -105,10 +109,8 @@ pub use rmgr::*;
 mod sdir;
 #[allow(unused_imports)]
 pub use sdir::*;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 #[path = "slru.rs"]
 mod slru;
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 #[allow(unused_imports)]
 pub use slru::*;
 #[path = "spgist_private.rs"]

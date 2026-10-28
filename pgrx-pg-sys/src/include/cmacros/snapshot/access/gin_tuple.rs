@@ -2,7 +2,7 @@
 // C macros from gin_tuple.h.
 
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function GinTupleGetFirst from gin_tuple.h:32 (PostgreSQL 18), gin_tuple.h:34 (PostgreSQL 19)
+/// Typed call adapter for C inline function GinTupleGetFirst from gin_tuple.h:32 (PostgreSQL 18), gin_tuple.h:39 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline ItemPointer
@@ -29,7 +29,20 @@
 #[macro_export]
 macro_rules! GinTupleGetFirst {
     ($tup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$tup;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]

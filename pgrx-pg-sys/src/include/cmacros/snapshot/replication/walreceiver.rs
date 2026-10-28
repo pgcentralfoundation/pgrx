@@ -14,11 +14,21 @@
 #[macro_export]
 macro_rules! AllowCascadeReplication {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg17")]
-/// C macro walrcv_alter_slot from walreceiver.h:458 (PostgreSQL 17)
+/// C macro walrcv_alter_slot from walreceiver.h:465 (PostgreSQL 17)
 ///
 /// ```text
 /// #define walrcv_alter_slot( conn , slotname , failover ) WalReceiverFunctions -> walrcv_alter_slot ( conn , slotname , failover )
@@ -35,11 +45,59 @@ macro_rules! AllowCascadeReplication {
 #[macro_export]
 macro_rules! walrcv_alter_slot {
     ($conn:expr, $slotname:expr, $failover:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::invoke(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::load(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_walrcv_alter_slot,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                    >>(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$conn]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$slotname]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$failover]))
+                            ),
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro walrcv_alter_slot from walreceiver.h:461 (PostgreSQL 18), walreceiver.h:462 (PostgreSQL 19)
+/// C macro walrcv_alter_slot from walreceiver.h:468 (PostgreSQL 18), walreceiver.h:465 (PostgreSQL 19)
 ///
 /// ```text
 /// #define walrcv_alter_slot( conn , slotname , failover , two_phase ) WalReceiverFunctions -> walrcv_alter_slot ( conn , slotname , failover , two_phase )
@@ -56,11 +114,62 @@ macro_rules! walrcv_alter_slot {
 #[macro_export]
 macro_rules! walrcv_alter_slot {
     ($conn:expr, $slotname:expr, $failover:expr, $two_phase:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::invoke(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::load(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_walrcv_alter_slot,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                    >>(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$conn]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$slotname]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$failover]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$two_phase]))
+                            ),
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro walrcv_check_conninfo from walreceiver.h:406 (PostgreSQL 15)
+/// C macro walrcv_check_conninfo from walreceiver.h:413 (PostgreSQL 15)
 ///
 /// ```text
 /// #define walrcv_check_conninfo( conninfo ) WalReceiverFunctions -> walrcv_check_conninfo ( conninfo )
@@ -77,11 +186,53 @@ macro_rules! walrcv_alter_slot {
 #[macro_export]
 macro_rules! walrcv_check_conninfo {
     ($conninfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::invoke(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::load(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_walrcv_check_conninfo,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                    >>(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$conninfo]))
+                            ),
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro walrcv_check_conninfo from walreceiver.h:412 (PostgreSQL 16), walreceiver.h:434 (PostgreSQL 17), walreceiver.h:437 (PostgreSQL 18), walreceiver.h:438 (PostgreSQL 19)
+/// C macro walrcv_check_conninfo from walreceiver.h:419 (PostgreSQL 16), walreceiver.h:441 (PostgreSQL 17, 19), walreceiver.h:444 (PostgreSQL 18)
 ///
 /// ```text
 /// #define walrcv_check_conninfo( conninfo , must_use_password ) WalReceiverFunctions -> walrcv_check_conninfo ( conninfo , must_use_password )
@@ -98,10 +249,58 @@ macro_rules! walrcv_check_conninfo {
 #[macro_export]
 macro_rules! walrcv_check_conninfo {
     ($conninfo:expr, $must_use_password:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::invoke(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::load(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_walrcv_check_conninfo,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                    >>(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$conninfo]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(
+                                    @value [true];
+                                    (@native [$must_use_password])
+                                )
+                            ),
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// Typed call adapter for C inline function walrcv_clear_result from walreceiver.h:435 (PostgreSQL 15), walreceiver.h:441 (PostgreSQL 16), walreceiver.h:467 (PostgreSQL 17), walreceiver.h:470 (PostgreSQL 18), walreceiver.h:471 (PostgreSQL 19)
+/// Typed call adapter for C inline function walrcv_clear_result from walreceiver.h:442 (PostgreSQL 15), walreceiver.h:448 (PostgreSQL 16), walreceiver.h:474 (PostgreSQL 17, 19), walreceiver.h:477 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -136,11 +335,16 @@ macro_rules! walrcv_check_conninfo {
 #[macro_export]
 macro_rules! walrcv_clear_result {
     ($walres:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$walres;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro walrcv_connect from walreceiver.h:404 (PostgreSQL 15)
+/// C macro walrcv_connect from walreceiver.h:411 (PostgreSQL 15)
 ///
 /// ```text
 /// #define walrcv_connect( conninfo , logical , appname , err ) WalReceiverFunctions -> walrcv_connect ( conninfo , logical , appname , err )
@@ -157,11 +361,62 @@ macro_rules! walrcv_clear_result {
 #[macro_export]
 macro_rules! walrcv_connect {
     ($conninfo:expr, $logical:expr, $appname:expr, $err:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::invoke(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::load(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_walrcv_connect,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                    >>(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$conninfo]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$logical]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$appname]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$err]))
+                            ),
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg16")]
-/// C macro walrcv_connect from walreceiver.h:410 (PostgreSQL 16)
+/// C macro walrcv_connect from walreceiver.h:417 (PostgreSQL 16)
 ///
 /// ```text
 /// #define walrcv_connect( conninfo , logical , must_use_password , appname , err ) WalReceiverFunctions -> walrcv_connect ( conninfo , logical , must_use_password , appname , err )
@@ -178,11 +433,68 @@ macro_rules! walrcv_connect {
 #[macro_export]
 macro_rules! walrcv_connect {
     ($conninfo:expr, $logical:expr, $must_use_password:expr, $appname:expr, $err:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::invoke(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::load(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_walrcv_connect,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                    >>(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$conninfo]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$logical]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(
+                                    @value [true];
+                                    (@native [$must_use_password])
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$appname]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$err]))
+                            ),
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro walrcv_connect from walreceiver.h:432 (PostgreSQL 17), walreceiver.h:435 (PostgreSQL 18), walreceiver.h:436 (PostgreSQL 19)
+/// C macro walrcv_connect from walreceiver.h:439 (PostgreSQL 17, 19), walreceiver.h:442 (PostgreSQL 18)
 ///
 /// ```text
 /// #define walrcv_connect( conninfo , replication , logical , must_use_password , appname , err ) WalReceiverFunctions -> walrcv_connect ( conninfo , replication , logical , must_use_password , appname , err )
@@ -198,12 +510,79 @@ macro_rules! walrcv_connect {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! walrcv_connect {
-    ($conninfo:expr, $replication:expr, $logical:expr, $must_use_password:expr, $appname:expr, $err:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $conninfo:expr,
+        $replication:expr,
+        $logical:expr,
+        $must_use_password:expr,
+        $appname:expr,
+        $err:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::invoke(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::load(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_walrcv_connect,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                    >>(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$conninfo]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$replication]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$logical]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(
+                                    @value [true];
+                                    (@native [$must_use_password])
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$appname]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$err]))
+                            ),
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
-/// C macro walrcv_create_slot from walreceiver.h:426 (PostgreSQL 15), walreceiver.h:432 (PostgreSQL 16)
+/// C macro walrcv_create_slot from walreceiver.h:433 (PostgreSQL 15), walreceiver.h:439 (PostgreSQL 16)
 ///
 /// ```text
 /// #define walrcv_create_slot( conn , slotname , temporary , two_phase , snapshot_action , lsn ) WalReceiverFunctions -> walrcv_create_slot ( conn , slotname , temporary , two_phase , snapshot_action , lsn )
@@ -219,12 +598,79 @@ macro_rules! walrcv_connect {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! walrcv_create_slot {
-    ($conn:expr, $slotname:expr, $temporary:expr, $two_phase:expr, $snapshot_action:expr, $lsn:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $conn:expr,
+        $slotname:expr,
+        $temporary:expr,
+        $two_phase:expr,
+        $snapshot_action:expr,
+        $lsn:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::invoke(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::load(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_walrcv_create_slot,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                    >>(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$conn]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$slotname]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$temporary]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$two_phase]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(
+                                    @value [true];
+                                    (@native [$snapshot_action])
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$lsn]))
+                            ),
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro walrcv_create_slot from walreceiver.h:456 (PostgreSQL 17), walreceiver.h:459 (PostgreSQL 18), walreceiver.h:460 (PostgreSQL 19)
+/// C macro walrcv_create_slot from walreceiver.h:463 (PostgreSQL 17, 19), walreceiver.h:466 (PostgreSQL 18)
 ///
 /// ```text
 /// #define walrcv_create_slot( conn , slotname , temporary , two_phase , failover , snapshot_action , lsn ) WalReceiverFunctions -> walrcv_create_slot ( conn , slotname , temporary , two_phase , failover , snapshot_action , lsn )
@@ -240,11 +686,82 @@ macro_rules! walrcv_create_slot {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! walrcv_create_slot {
-    ($conn:expr, $slotname:expr, $temporary:expr, $two_phase:expr, $failover:expr, $snapshot_action:expr, $lsn:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $conn:expr,
+        $slotname:expr,
+        $temporary:expr,
+        $two_phase:expr,
+        $failover:expr,
+        $snapshot_action:expr,
+        $lsn:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::invoke(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::load(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_walrcv_create_slot,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                    >>(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$conn]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$slotname]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$temporary]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$two_phase]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$failover]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(
+                                    @value [true];
+                                    (@native [$snapshot_action])
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$lsn]))
+                            ),
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro walrcv_disconnect from walreceiver.h:432 (PostgreSQL 15), walreceiver.h:438 (PostgreSQL 16), walreceiver.h:464 (PostgreSQL 17), walreceiver.h:467 (PostgreSQL 18), walreceiver.h:468 (PostgreSQL 19)
+/// C macro walrcv_disconnect from walreceiver.h:439 (PostgreSQL 15), walreceiver.h:445 (PostgreSQL 16), walreceiver.h:471 (PostgreSQL 17, 19), walreceiver.h:474 (PostgreSQL 18)
 ///
 /// ```text
 /// #define walrcv_disconnect( conn ) WalReceiverFunctions -> walrcv_disconnect ( conn )
@@ -261,10 +778,52 @@ macro_rules! walrcv_create_slot {
 #[macro_export]
 macro_rules! walrcv_disconnect {
     ($conn:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::invoke(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::load(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_walrcv_disconnect,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                    >>(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$conn]))
+                            ),
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro walrcv_endstreaming from walreceiver.h:420 (PostgreSQL 15), walreceiver.h:426 (PostgreSQL 16), walreceiver.h:450 (PostgreSQL 17), walreceiver.h:453 (PostgreSQL 18), walreceiver.h:454 (PostgreSQL 19)
+/// C macro walrcv_endstreaming from walreceiver.h:427 (PostgreSQL 15), walreceiver.h:433 (PostgreSQL 16), walreceiver.h:457 (PostgreSQL 17, 19), walreceiver.h:460 (PostgreSQL 18)
 ///
 /// ```text
 /// #define walrcv_endstreaming( conn , next_tli ) WalReceiverFunctions -> walrcv_endstreaming ( conn , next_tli )
@@ -281,10 +840,55 @@ macro_rules! walrcv_disconnect {
 #[macro_export]
 macro_rules! walrcv_endstreaming {
     ($conn:expr, $next_tli:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::invoke(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::load(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_walrcv_endstreaming,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                    >>(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$conn]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$next_tli]))
+                            ),
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro walrcv_exec from walreceiver.h:430 (PostgreSQL 15), walreceiver.h:436 (PostgreSQL 16), walreceiver.h:462 (PostgreSQL 17), walreceiver.h:465 (PostgreSQL 18), walreceiver.h:466 (PostgreSQL 19)
+/// C macro walrcv_exec from walreceiver.h:437 (PostgreSQL 15), walreceiver.h:443 (PostgreSQL 16), walreceiver.h:469 (PostgreSQL 17, 19), walreceiver.h:472 (PostgreSQL 18)
 ///
 /// ```text
 /// #define walrcv_exec( conn , exec , nRetTypes , retTypes ) WalReceiverFunctions -> walrcv_exec ( conn , exec , nRetTypes , retTypes )
@@ -301,10 +905,61 @@ macro_rules! walrcv_endstreaming {
 #[macro_export]
 macro_rules! walrcv_exec {
     ($conn:expr, $exec:expr, $nRetTypes:expr, $retTypes:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::invoke(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::load(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_walrcv_exec,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                    >>(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$conn]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$exec]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$nRetTypes]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$retTypes]))
+                            ),
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro walrcv_get_backend_pid from walreceiver.h:428 (PostgreSQL 15), walreceiver.h:434 (PostgreSQL 16), walreceiver.h:460 (PostgreSQL 17), walreceiver.h:463 (PostgreSQL 18), walreceiver.h:464 (PostgreSQL 19)
+/// C macro walrcv_get_backend_pid from walreceiver.h:435 (PostgreSQL 15), walreceiver.h:441 (PostgreSQL 16), walreceiver.h:467 (PostgreSQL 17, 19), walreceiver.h:470 (PostgreSQL 18)
 ///
 /// ```text
 /// #define walrcv_get_backend_pid( conn ) WalReceiverFunctions -> walrcv_get_backend_pid ( conn )
@@ -321,10 +976,52 @@ macro_rules! walrcv_exec {
 #[macro_export]
 macro_rules! walrcv_get_backend_pid {
     ($conn:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::invoke(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::load(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_walrcv_get_backend_pid,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                    >>(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$conn]))
+                            ),
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro walrcv_get_conninfo from walreceiver.h:408 (PostgreSQL 15), walreceiver.h:414 (PostgreSQL 16), walreceiver.h:436 (PostgreSQL 17), walreceiver.h:439 (PostgreSQL 18), walreceiver.h:440 (PostgreSQL 19)
+/// C macro walrcv_get_conninfo from walreceiver.h:415 (PostgreSQL 15), walreceiver.h:421 (PostgreSQL 16), walreceiver.h:443 (PostgreSQL 17, 19), walreceiver.h:446 (PostgreSQL 18)
 ///
 /// ```text
 /// #define walrcv_get_conninfo( conn ) WalReceiverFunctions -> walrcv_get_conninfo ( conn )
@@ -341,11 +1038,53 @@ macro_rules! walrcv_get_backend_pid {
 #[macro_export]
 macro_rules! walrcv_get_conninfo {
     ($conn:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::invoke(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::load(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_walrcv_get_conninfo,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                    >>(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$conn]))
+                            ),
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro walrcv_get_dbname_from_conninfo from walreceiver.h:442 (PostgreSQL 17), walreceiver.h:445 (PostgreSQL 18), walreceiver.h:446 (PostgreSQL 19)
+/// C macro walrcv_get_dbname_from_conninfo from walreceiver.h:449 (PostgreSQL 17, 19), walreceiver.h:452 (PostgreSQL 18)
 ///
 /// ```text
 /// #define walrcv_get_dbname_from_conninfo( conninfo ) WalReceiverFunctions -> walrcv_get_dbname_from_conninfo ( conninfo )
@@ -362,10 +1101,52 @@ macro_rules! walrcv_get_conninfo {
 #[macro_export]
 macro_rules! walrcv_get_dbname_from_conninfo {
     ($conninfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::invoke(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::load(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_walrcv_get_dbname_from_conninfo,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                    >>(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$conninfo]))
+                            ),
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro walrcv_get_senderinfo from walreceiver.h:410 (PostgreSQL 15), walreceiver.h:416 (PostgreSQL 16), walreceiver.h:438 (PostgreSQL 17), walreceiver.h:441 (PostgreSQL 18), walreceiver.h:442 (PostgreSQL 19)
+/// C macro walrcv_get_senderinfo from walreceiver.h:417 (PostgreSQL 15), walreceiver.h:423 (PostgreSQL 16), walreceiver.h:445 (PostgreSQL 17, 19), walreceiver.h:448 (PostgreSQL 18)
 ///
 /// ```text
 /// #define walrcv_get_senderinfo( conn , sender_host , sender_port ) WalReceiverFunctions -> walrcv_get_senderinfo ( conn , sender_host , sender_port )
@@ -382,10 +1163,59 @@ macro_rules! walrcv_get_dbname_from_conninfo {
 #[macro_export]
 macro_rules! walrcv_get_senderinfo {
     ($conn:expr, $sender_host:expr, $sender_port:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::invoke(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::load(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_walrcv_get_senderinfo,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                    >>(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$conn]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$sender_host]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$sender_port]))
+                            ),
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro walrcv_identify_system from walreceiver.h:412 (PostgreSQL 15), walreceiver.h:418 (PostgreSQL 16), walreceiver.h:440 (PostgreSQL 17), walreceiver.h:443 (PostgreSQL 18), walreceiver.h:444 (PostgreSQL 19)
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C macro walrcv_identify_system from walreceiver.h:419 (PostgreSQL 15), walreceiver.h:425 (PostgreSQL 16), walreceiver.h:447 (PostgreSQL 17), walreceiver.h:450 (PostgreSQL 18)
 ///
 /// ```text
 /// #define walrcv_identify_system( conn , primary_tli ) WalReceiverFunctions -> walrcv_identify_system ( conn , primary_tli )
@@ -402,10 +1232,124 @@ macro_rules! walrcv_get_senderinfo {
 #[macro_export]
 macro_rules! walrcv_identify_system {
     ($conn:expr, $primary_tli:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::invoke(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::load(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_walrcv_identify_system,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                    >>(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$conn]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$primary_tli]))
+                            ),
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro walrcv_readtimelinehistoryfile from walreceiver.h:416 (PostgreSQL 15), walreceiver.h:422 (PostgreSQL 16), walreceiver.h:446 (PostgreSQL 17), walreceiver.h:449 (PostgreSQL 18), walreceiver.h:450 (PostgreSQL 19)
+#[cfg(feature = "pg19")]
+/// C macro walrcv_identify_system from walreceiver.h:447 (PostgreSQL 19)
+///
+/// ```text
+/// #define walrcv_identify_system( conn , primary_tli , server_lsn ) WalReceiverFunctions -> walrcv_identify_system ( conn , primary_tli , server_lsn )
+/// ```
+///
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! walrcv_identify_system {
+    ($conn:expr, $primary_tli:expr, $server_lsn:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::invoke(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::load(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_walrcv_identify_system,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                    >>(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$conn]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$primary_tli]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$server_lsn]))
+                            ),
+                        )
+                    )
+                )
+            }
+        )
+    };
+}
+/// C macro walrcv_readtimelinehistoryfile from walreceiver.h:423 (PostgreSQL 15), walreceiver.h:429 (PostgreSQL 16), walreceiver.h:453 (PostgreSQL 17, 19), walreceiver.h:456 (PostgreSQL 18)
 ///
 /// ```text
 /// #define walrcv_readtimelinehistoryfile( conn , tli , filename , content , size ) WalReceiverFunctions -> walrcv_readtimelinehistoryfile ( conn , tli , filename , content , size )
@@ -422,10 +1366,64 @@ macro_rules! walrcv_identify_system {
 #[macro_export]
 macro_rules! walrcv_readtimelinehistoryfile {
     ($conn:expr, $tli:expr, $filename:expr, $content:expr, $size:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::invoke(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::load(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_walrcv_readtimelinehistoryfile,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                    >>(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$conn]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$tli]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$filename]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$content]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$size]))
+                            ),
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro walrcv_receive from walreceiver.h:422 (PostgreSQL 15), walreceiver.h:428 (PostgreSQL 16), walreceiver.h:452 (PostgreSQL 17), walreceiver.h:455 (PostgreSQL 18), walreceiver.h:456 (PostgreSQL 19)
+/// C macro walrcv_receive from walreceiver.h:429 (PostgreSQL 15), walreceiver.h:435 (PostgreSQL 16), walreceiver.h:459 (PostgreSQL 17, 19), walreceiver.h:462 (PostgreSQL 18)
 ///
 /// ```text
 /// #define walrcv_receive( conn , buffer , wait_fd ) WalReceiverFunctions -> walrcv_receive ( conn , buffer , wait_fd )
@@ -442,10 +1440,58 @@ macro_rules! walrcv_readtimelinehistoryfile {
 #[macro_export]
 macro_rules! walrcv_receive {
     ($conn:expr, $buffer:expr, $wait_fd:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::invoke(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::load(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_walrcv_receive,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                    >>(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$conn]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$buffer]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$wait_fd]))
+                            ),
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro walrcv_send from walreceiver.h:424 (PostgreSQL 15), walreceiver.h:430 (PostgreSQL 16), walreceiver.h:454 (PostgreSQL 17), walreceiver.h:457 (PostgreSQL 18), walreceiver.h:458 (PostgreSQL 19)
+/// C macro walrcv_send from walreceiver.h:431 (PostgreSQL 15), walreceiver.h:437 (PostgreSQL 16), walreceiver.h:461 (PostgreSQL 17, 19), walreceiver.h:464 (PostgreSQL 18)
 ///
 /// ```text
 /// #define walrcv_send( conn , buffer , nbytes ) WalReceiverFunctions -> walrcv_send ( conn , buffer , nbytes )
@@ -462,10 +1508,58 @@ macro_rules! walrcv_receive {
 #[macro_export]
 macro_rules! walrcv_send {
     ($conn:expr, $buffer:expr, $nbytes:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::invoke(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::load(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_walrcv_send,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                    >>(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$conn]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$buffer]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$nbytes]))
+                            ),
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro walrcv_server_version from walreceiver.h:414 (PostgreSQL 15), walreceiver.h:420 (PostgreSQL 16), walreceiver.h:444 (PostgreSQL 17), walreceiver.h:447 (PostgreSQL 18), walreceiver.h:448 (PostgreSQL 19)
+/// C macro walrcv_server_version from walreceiver.h:421 (PostgreSQL 15), walreceiver.h:427 (PostgreSQL 16), walreceiver.h:451 (PostgreSQL 17, 19), walreceiver.h:454 (PostgreSQL 18)
 ///
 /// ```text
 /// #define walrcv_server_version( conn ) WalReceiverFunctions -> walrcv_server_version ( conn )
@@ -482,10 +1576,52 @@ macro_rules! walrcv_send {
 #[macro_export]
 macro_rules! walrcv_server_version {
     ($conn:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::invoke(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::load(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_walrcv_server_version,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                    >>(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$conn]))
+                            ),
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro walrcv_startstreaming from walreceiver.h:418 (PostgreSQL 15), walreceiver.h:424 (PostgreSQL 16), walreceiver.h:448 (PostgreSQL 17), walreceiver.h:451 (PostgreSQL 18), walreceiver.h:452 (PostgreSQL 19)
+/// C macro walrcv_startstreaming from walreceiver.h:425 (PostgreSQL 15), walreceiver.h:431 (PostgreSQL 16), walreceiver.h:455 (PostgreSQL 17, 19), walreceiver.h:458 (PostgreSQL 18)
 ///
 /// ```text
 /// #define walrcv_startstreaming( conn , options ) WalReceiverFunctions -> walrcv_startstreaming ( conn , options )
@@ -502,7 +1638,52 @@ macro_rules! walrcv_server_version {
 #[macro_export]
 macro_rules! walrcv_startstreaming {
     ($conn:expr, $options:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::invoke(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::load(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_walrcv_startstreaming,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::WalReceiverFunctionsType
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                    >>(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$conn]))
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; (@native [$options]))
+                            ),
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 pub use AllowCascadeReplication;

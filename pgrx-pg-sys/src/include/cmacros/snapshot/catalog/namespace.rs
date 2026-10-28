@@ -18,7 +18,20 @@
 #[macro_export]
 macro_rules! RangeVarGetRelid {
     ($relation:expr, $lockmode:expr, $missing_ok:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$relation;
+                let _ = &$lockmode;
+                let _ = &$missing_ok;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedInt,
+                            $crate::__pgrx_c_bindings::Oid
+                        >>()
+                )
+            }
+        )
     };
 }
 pub use RangeVarGetRelid;

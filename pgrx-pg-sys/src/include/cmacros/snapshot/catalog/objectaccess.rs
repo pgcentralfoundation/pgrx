@@ -20,7 +20,9 @@
 #[macro_export]
 macro_rules! InvokeFunctionExecuteHook {
     ($objectId:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$objectId;
+        })
     };
 }
 /// C macro InvokeFunctionExecuteHookStr from objectaccess.h:258 (PostgreSQL 15), objectaccess.h:260 (PostgreSQL 16–19)
@@ -42,7 +44,9 @@ macro_rules! InvokeFunctionExecuteHook {
 #[macro_export]
 macro_rules! InvokeFunctionExecuteHookStr {
     ($objectName:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$objectName;
+        })
     };
 }
 /// C macro InvokeNamespaceSearchHook from objectaccess.h:206 (PostgreSQL 15), objectaccess.h:208 (PostgreSQL 16–19)
@@ -62,7 +66,42 @@ macro_rules! InvokeFunctionExecuteHookStr {
 #[macro_export]
 macro_rules! InvokeNamespaceSearchHook {
     ($objectId:expr, $ereport_on_violation:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$objectId;
+                let _ = &$ereport_on_violation;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                        $crate::__pgrx_c_macros::CInt
+                                    >()
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CBool
+                                        >()
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro InvokeNamespaceSearchHookStr from objectaccess.h:253 (PostgreSQL 15), objectaccess.h:255 (PostgreSQL 16–19)
@@ -82,7 +121,42 @@ macro_rules! InvokeNamespaceSearchHook {
 #[macro_export]
 macro_rules! InvokeNamespaceSearchHookStr {
     ($objectName:expr, $ereport_on_violation:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$objectName;
+                let _ = &$ereport_on_violation;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                        $crate::__pgrx_c_macros::CInt
+                                    >()
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CBool
+                                        >()
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro InvokeObjectDropHook from objectaccess.h:180 (PostgreSQL 15), objectaccess.h:182 (PostgreSQL 16–19)
@@ -104,7 +178,13 @@ macro_rules! InvokeNamespaceSearchHookStr {
 #[macro_export]
 macro_rules! InvokeObjectDropHook {
     ($classId:expr, $objectId:expr, $subId:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @unit {
+                let _ = &$classId;
+                let _ = &$objectId;
+                let _ = &$subId;
+            }
+        )
     };
 }
 /// C macro InvokeObjectDropHookArg from objectaccess.h:182 (PostgreSQL 15), objectaccess.h:184 (PostgreSQL 16–19)
@@ -126,7 +206,14 @@ macro_rules! InvokeObjectDropHook {
 #[macro_export]
 macro_rules! InvokeObjectDropHookArg {
     ($classId:expr, $objectId:expr, $subId:expr, $dropflags:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @unit {
+                let _ = &$classId;
+                let _ = &$objectId;
+                let _ = &$subId;
+                let _ = &$dropflags;
+            }
+        )
     };
 }
 /// C macro InvokeObjectDropHookArgStr from objectaccess.h:229 (PostgreSQL 15), objectaccess.h:231 (PostgreSQL 16–19)
@@ -148,7 +235,14 @@ macro_rules! InvokeObjectDropHookArg {
 #[macro_export]
 macro_rules! InvokeObjectDropHookArgStr {
     ($classId:expr, $objectName:expr, $subId:expr, $dropflags:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @unit {
+                let _ = &$classId;
+                let _ = &$objectName;
+                let _ = &$subId;
+                let _ = &$dropflags;
+            }
+        )
     };
 }
 /// C macro InvokeObjectDropHookStr from objectaccess.h:227 (PostgreSQL 15), objectaccess.h:229 (PostgreSQL 16–19)
@@ -170,7 +264,13 @@ macro_rules! InvokeObjectDropHookArgStr {
 #[macro_export]
 macro_rules! InvokeObjectDropHookStr {
     ($classId:expr, $objectName:expr, $subId:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @unit {
+                let _ = &$classId;
+                let _ = &$objectName;
+                let _ = &$subId;
+            }
+        )
     };
 }
 /// C macro InvokeObjectPostAlterHook from objectaccess.h:195 (PostgreSQL 15), objectaccess.h:197 (PostgreSQL 16–19)
@@ -192,7 +292,13 @@ macro_rules! InvokeObjectDropHookStr {
 #[macro_export]
 macro_rules! InvokeObjectPostAlterHook {
     ($classId:expr, $objectId:expr, $subId:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @unit {
+                let _ = &$classId;
+                let _ = &$objectId;
+                let _ = &$subId;
+            }
+        )
     };
 }
 /// C macro InvokeObjectPostAlterHookArg from objectaccess.h:198 (PostgreSQL 15), objectaccess.h:200 (PostgreSQL 16–19)
@@ -214,7 +320,15 @@ macro_rules! InvokeObjectPostAlterHook {
 #[macro_export]
 macro_rules! InvokeObjectPostAlterHookArg {
     ($classId:expr, $objectId:expr, $subId:expr, $auxiliaryId:expr, $is_internal:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @unit {
+                let _ = &$classId;
+                let _ = &$objectId;
+                let _ = &$subId;
+                let _ = &$auxiliaryId;
+                let _ = &$is_internal;
+            }
+        )
     };
 }
 /// C macro InvokeObjectPostAlterHookArgStr from objectaccess.h:245 (PostgreSQL 15), objectaccess.h:247 (PostgreSQL 16–19)
@@ -236,7 +350,15 @@ macro_rules! InvokeObjectPostAlterHookArg {
 #[macro_export]
 macro_rules! InvokeObjectPostAlterHookArgStr {
     ($classId:expr, $objectName:expr, $subId:expr, $auxiliaryId:expr, $is_internal:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @unit {
+                let _ = &$classId;
+                let _ = &$objectName;
+                let _ = &$subId;
+                let _ = &$auxiliaryId;
+                let _ = &$is_internal;
+            }
+        )
     };
 }
 /// C macro InvokeObjectPostAlterHookStr from objectaccess.h:242 (PostgreSQL 15), objectaccess.h:244 (PostgreSQL 16–19)
@@ -258,7 +380,13 @@ macro_rules! InvokeObjectPostAlterHookArgStr {
 #[macro_export]
 macro_rules! InvokeObjectPostAlterHookStr {
     ($classId:expr, $objectName:expr, $subId:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @unit {
+                let _ = &$classId;
+                let _ = &$objectName;
+                let _ = &$subId;
+            }
+        )
     };
 }
 /// C macro InvokeObjectPostCreateHook from objectaccess.h:171 (PostgreSQL 15), objectaccess.h:173 (PostgreSQL 16–19)
@@ -280,7 +408,13 @@ macro_rules! InvokeObjectPostAlterHookStr {
 #[macro_export]
 macro_rules! InvokeObjectPostCreateHook {
     ($classId:expr, $objectId:expr, $subId:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @unit {
+                let _ = &$classId;
+                let _ = &$objectId;
+                let _ = &$subId;
+            }
+        )
     };
 }
 /// C macro InvokeObjectPostCreateHookArg from objectaccess.h:173 (PostgreSQL 15), objectaccess.h:175 (PostgreSQL 16–19)
@@ -302,7 +436,14 @@ macro_rules! InvokeObjectPostCreateHook {
 #[macro_export]
 macro_rules! InvokeObjectPostCreateHookArg {
     ($classId:expr, $objectId:expr, $subId:expr, $is_internal:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @unit {
+                let _ = &$classId;
+                let _ = &$objectId;
+                let _ = &$subId;
+                let _ = &$is_internal;
+            }
+        )
     };
 }
 /// C macro InvokeObjectPostCreateHookArgStr from objectaccess.h:220 (PostgreSQL 15), objectaccess.h:222 (PostgreSQL 16–19)
@@ -324,7 +465,14 @@ macro_rules! InvokeObjectPostCreateHookArg {
 #[macro_export]
 macro_rules! InvokeObjectPostCreateHookArgStr {
     ($classId:expr, $objectName:expr, $subId:expr, $is_internal:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @unit {
+                let _ = &$classId;
+                let _ = &$objectName;
+                let _ = &$subId;
+                let _ = &$is_internal;
+            }
+        )
     };
 }
 /// C macro InvokeObjectPostCreateHookStr from objectaccess.h:218 (PostgreSQL 15), objectaccess.h:220 (PostgreSQL 16–19)
@@ -346,7 +494,13 @@ macro_rules! InvokeObjectPostCreateHookArgStr {
 #[macro_export]
 macro_rules! InvokeObjectPostCreateHookStr {
     ($classId:expr, $objectName:expr, $subId:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @unit {
+                let _ = &$classId;
+                let _ = &$objectName;
+                let _ = &$subId;
+            }
+        )
     };
 }
 /// C macro InvokeObjectTruncateHook from objectaccess.h:189 (PostgreSQL 15), objectaccess.h:191 (PostgreSQL 16–19)
@@ -368,7 +522,9 @@ macro_rules! InvokeObjectPostCreateHookStr {
 #[macro_export]
 macro_rules! InvokeObjectTruncateHook {
     ($objectId:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$objectId;
+        })
     };
 }
 /// C macro InvokeObjectTruncateHookStr from objectaccess.h:236 (PostgreSQL 15), objectaccess.h:238 (PostgreSQL 16–19)
@@ -390,7 +546,9 @@ macro_rules! InvokeObjectTruncateHook {
 #[macro_export]
 macro_rules! InvokeObjectTruncateHookStr {
     ($objectName:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$objectName;
+        })
     };
 }
 pub use InvokeFunctionExecuteHook;

@@ -14,7 +14,18 @@
 #[macro_export]
 macro_rules! XLogRecPtrIsInvalid {
     ($r:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$r;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro XLogRecPtrIsValid from xlogdefs.h:29 (PostgreSQL 15–19)
@@ -30,7 +41,18 @@ macro_rules! XLogRecPtrIsInvalid {
 #[macro_export]
 macro_rules! XLogRecPtrIsValid {
     ($r:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$r;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 pub use XLogRecPtrIsInvalid;

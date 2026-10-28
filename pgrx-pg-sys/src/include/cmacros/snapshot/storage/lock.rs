@@ -14,8 +14,116 @@
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! GET_VXID_FROM_PGPROC {
+    ($vxid:expr, * $proc:ident $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_localTransactionId,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$vxid])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::project::<
+                                                $crate::__pgrx_c_generated::Field_lxid,
+                                                _,
+                                                _
+                                            >(
+                                                (
+                                                    $crate::__pgrx_c_operand!(
+                                                        @read_place;
+                                                        (@deref [* $proc] [$proc])
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
+    };
+    ($vxid:expr, (* $proc:ident) $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_localTransactionId,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$vxid])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::project::<
+                                                $crate::__pgrx_c_generated::Field_lxid,
+                                                _,
+                                                _
+                                            >(
+                                                (
+                                                    $crate::__pgrx_c_operand!(
+                                                        @read_place;
+                                                        (@deref [(* $proc)] [$proc])
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
+    };
     ($vxid:expr, $proc:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_localTransactionId,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$vxid])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::project::<
+                                                $crate::__pgrx_c_generated::Field_lxid,
+                                                _,
+                                                _
+                                            >(
+                                                (
+                                                    $crate::__pgrx_c_operand!(
+                                                        @read_place;
+                                                        (@native [$proc])
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -31,8 +139,134 @@ macro_rules! GET_VXID_FROM_PGPROC {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! GET_VXID_FROM_PGPROC {
+    ($vxid_dst:expr, * $proc:ident $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_localTransactionId,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$vxid_dst])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::project::<
+                                                $crate::__pgrx_c_generated::Field_lxid,
+                                                _,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_vxid,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_operand!(
+                                                            @read_place;
+                                                            (@deref [* $proc] [$proc])
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
+    };
+    ($vxid_dst:expr, (* $proc:ident) $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_localTransactionId,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$vxid_dst])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::project::<
+                                                $crate::__pgrx_c_generated::Field_lxid,
+                                                _,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_vxid,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_operand!(
+                                                            @read_place;
+                                                            (@deref [(* $proc)] [$proc])
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
+    };
     ($vxid_dst:expr, $proc:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_localTransactionId,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$vxid_dst])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::project::<
+                                                $crate::__pgrx_c_generated::Field_lxid,
+                                                _,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_vxid,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_operand!(
+                                                            @read_place;
+                                                            (@native [$proc])
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro LOCALLOCK_LOCKMETHOD from lock.h:435 (PostgreSQL 15), lock.h:443 (PostgreSQL 16–17), lock.h:444 (PostgreSQL 18), lock.h:274 (PostgreSQL 19)
@@ -47,8 +281,106 @@ macro_rules! GET_VXID_FROM_PGPROC {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! LOCALLOCK_LOCKMETHOD {
+    (* $llock:ident $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_lock,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_tag,
+                                        _,
+                                        _
+                                    >(
+                                        (
+                                            $crate::__pgrx_c_operand!(
+                                                @read_place;
+                                                (@deref [* $llock] [$llock])
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
+    };
+    ((* $llock:ident) $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_lock,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_tag,
+                                        _,
+                                        _
+                                    >(
+                                        (
+                                            $crate::__pgrx_c_operand!(
+                                                @read_place;
+                                                (@deref [(* $llock)] [$llock])
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
+    };
     ($llock:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_lock,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_tag,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@read_place; (@native [$llock]))))
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro LOCALLOCK_LOCKTAG from lock.h:436 (PostgreSQL 15), lock.h:444 (PostgreSQL 16–17), lock.h:445 (PostgreSQL 18), lock.h:275 (PostgreSQL 19)
@@ -68,7 +400,21 @@ macro_rules! LOCALLOCK_LOCKMETHOD {
 #[macro_export]
 macro_rules! LOCALLOCK_LOCKTAG {
     ($llock:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$llock;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CEnumObject<
+                                $crate::__pgrx_c_generated::EnumIdentity_enum__LockTagType,
+                                $crate::__pgrx_c_macros::CUnsignedInt,
+                                u32
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro LOCKBIT_OFF from lock.h:90 (PostgreSQL 15), lock.h:85 (PostgreSQL 16–17), lock.h:86 (PostgreSQL 18), lock.h:88 (PostgreSQL 19)
@@ -88,7 +434,45 @@ macro_rules! LOCALLOCK_LOCKTAG {
 #[macro_export]
 macro_rules! LOCKBIT_OFF {
     ($lockmode:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitnot(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::shl::<
+                                        $crate::__pgrx_c_macros::Wrapping,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(1i32)
+                                        ),
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_operand!(
+                                                    @value [true];
+                                                    (@native [$lockmode])
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro LOCKBIT_ON from lock.h:89 (PostgreSQL 15), lock.h:84 (PostgreSQL 16–17), lock.h:85 (PostgreSQL 18), lock.h:87 (PostgreSQL 19)
@@ -108,7 +492,30 @@ macro_rules! LOCKBIT_OFF {
 #[macro_export]
 macro_rules! LOCKBIT_ON {
     ($lockmode:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::shl::<
+                            $crate::__pgrx_c_macros::Wrapping,
+                            _,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    1i32
+                                )
+                            ),
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; (@native [$lockmode]))
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro LOCK_LOCKMETHOD from lock.h:316 (PostgreSQL 15), lock.h:324 (PostgreSQL 16–17), lock.h:325 (PostgreSQL 18), lock.h:155 (PostgreSQL 19)
@@ -128,7 +535,18 @@ macro_rules! LOCKBIT_ON {
 #[macro_export]
 macro_rules! LOCK_LOCKMETHOD {
     ($lock:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$lock;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_types::LOCKMETHODID
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro LOCK_LOCKTAG from lock.h:317 (PostgreSQL 15), lock.h:325 (PostgreSQL 16–17), lock.h:326 (PostgreSQL 18), lock.h:156 (PostgreSQL 19)
@@ -148,7 +566,21 @@ macro_rules! LOCK_LOCKMETHOD {
 #[macro_export]
 macro_rules! LOCK_LOCKTAG {
     ($lock:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$lock;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CEnumObject<
+                                $crate::__pgrx_c_generated::EnumIdentity_enum__LockTagType,
+                                $crate::__pgrx_c_macros::CUnsignedInt,
+                                u32
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro LocalTransactionIdIsValid from lock.h:71 (PostgreSQL 15), lock.h:66 (PostgreSQL 16–17), lock.h:67 (PostgreSQL 18), lock.h:69 (PostgreSQL 19)
@@ -164,7 +596,18 @@ macro_rules! LOCK_LOCKTAG {
 #[macro_export]
 macro_rules! LocalTransactionIdIsValid {
     ($lxid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$lxid;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro LockHashPartition from lock.h:517 (PostgreSQL 15), lock.h:525 (PostgreSQL 16, 18), lock.h:524 (PostgreSQL 17), lock.h:355 (PostgreSQL 19)
@@ -184,7 +627,26 @@ macro_rules! LocalTransactionIdIsValid {
 #[macro_export]
 macro_rules! LockHashPartition {
     ($hashcode:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::rem(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; (@native [$hashcode]))
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    $crate::__pgrx_c_bindings::NUM_LOCK_PARTITIONS as i32
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro LockHashPartitionLock from lock.h:519 (PostgreSQL 15), lock.h:527 (PostgreSQL 16, 18), lock.h:526 (PostgreSQL 17), lock.h:357 (PostgreSQL 19)
@@ -204,7 +666,87 @@ macro_rules! LockHashPartition {
 #[macro_export]
 macro_rules! LockHashPartitionLock {
     ($hashcode:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::address(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_lock,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::index(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::place::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                        $crate::__pgrx_c_bindings::LWLockPadded
+                                                    >,
+                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                >>(
+                                                ::core::ptr::addr_of_mut!(
+                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::add::<
+                                            $crate::__pgrx_c_macros::Wrapping,
+                                            _,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::CValue::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::LOCK_MANAGER_LWLOCK_OFFSET as i32
+                                                )
+                                            ),
+                                            (
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::rem(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_operand!(
+                                                                    @value [true];
+                                                                    (@native [$hashcode])
+                                                                )
+                                                            )
+                                                        ),
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::NUM_LOCK_PARTITIONS as i32
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro LockHashPartitionLockByIndex from lock.h:522 (PostgreSQL 15), lock.h:530 (PostgreSQL 16, 18), lock.h:529 (PostgreSQL 17), lock.h:360 (PostgreSQL 19)
@@ -224,7 +766,68 @@ macro_rules! LockHashPartitionLock {
 #[macro_export]
 macro_rules! LockHashPartitionLockByIndex {
     ($i:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::address(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_lock,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::index(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::place::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                        $crate::__pgrx_c_bindings::LWLockPadded
+                                                    >,
+                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                >>(
+                                                ::core::ptr::addr_of_mut!(
+                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::add::<
+                                            $crate::__pgrx_c_macros::Wrapping,
+                                            _,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::CValue::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::LOCK_MANAGER_LWLOCK_OFFSET as i32
+                                                )
+                                            ),
+                                            (
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_operand!(
+                                                        @value [true];
+                                                        (@native [$i])
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -245,7 +848,110 @@ macro_rules! LockHashPartitionLockByIndex {
 #[macro_export]
 macro_rules! LockHashPartitionLockByProc {
     ($leader_pgproc:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::address(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_lock,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::index(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::place::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                        $crate::__pgrx_c_bindings::LWLockPadded
+                                                    >,
+                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                >>(
+                                                ::core::ptr::addr_of_mut!(
+                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::add::<
+                                            $crate::__pgrx_c_macros::Wrapping,
+                                            _,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::CValue::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::LOCK_MANAGER_LWLOCK_OFFSET as i32
+                                                )
+                                            ),
+                                            (
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::rem(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::load(
+                                                                    $crate::__pgrx_c_macros::expression::project::<
+                                                                        $crate::__pgrx_c_generated::Field_pgprocno,
+                                                                        _,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::pointee(
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_operand!(
+                                                                                        @value [
+                                                                                            true
+                                                                                        ];
+                                                                                        (
+                                                                                            @native [
+                                                                                                $leader_pgproc
+                                                                                            ]
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        ),
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::NUM_LOCK_PARTITIONS as i32
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -266,7 +972,160 @@ macro_rules! LockHashPartitionLockByProc {
 #[macro_export]
 macro_rules! LockHashPartitionLockByProc {
     ($leader_pgproc:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::address(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_lock,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::index(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::place::<
+                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                        $crate::__pgrx_c_bindings::LWLockPadded
+                                                    >,
+                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                >>(
+                                                ::core::ptr::addr_of_mut!(
+                                                    $crate::__pgrx_c_bindings::MainLWLockArray
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::add::<
+                                            $crate::__pgrx_c_macros::Wrapping,
+                                            _,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::CValue::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::LOCK_MANAGER_LWLOCK_OFFSET as i32
+                                                )
+                                            ),
+                                            (
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::rem(
+                                                        (
+                                                            (
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::sub::<
+                                                                        $crate::__pgrx_c_macros::Wrapping,
+                                                                        _,
+                                                                        _
+                                                                    >(
+                                                                        (
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                true,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_operand!(
+                                                                                    @value [true];
+                                                                                    (
+                                                                                        @native [
+                                                                                            $leader_pgproc
+                                                                                        ]
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        ),
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::address(
+                                                                                $crate::__pgrx_c_macros::expression::index(
+                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                        true,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_macros::expression::load(
+                                                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                                                $crate::__pgrx_c_generated::Field_allProcs,
+                                                                                                _,
+                                                                                                _
+                                                                                            >(
+                                                                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                        true,
+                                                                                                        _
+                                                                                                    >(
+                                                                                                        $crate::__pgrx_c_macros::expression::load(
+                                                                                                            $crate::__pgrx_c_macros::expression::place::<
+                                                                                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                                                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                                                        $crate::__pgrx_c_bindings::PROC_HDR
+                                                                                                                    >,
+                                                                                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                                                                >>(
+                                                                                                                ::core::ptr::addr_of_mut!(
+                                                                                                                    $crate::__pgrx_c_bindings::ProcGlobal
+                                                                                                                )
+                                                                                                            )
+                                                                                                        )
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    ),
+                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                        true,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_macros::expression::null_constant(
+                                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                            >::new(
+                                                                                                0i32
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        ),
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::NUM_LOCK_PARTITIONS as i32
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro PROCLOCK_LOCKMETHOD from lock.h:374 (PostgreSQL 15), lock.h:382 (PostgreSQL 16–17), lock.h:383 (PostgreSQL 18), lock.h:213 (PostgreSQL 19)
@@ -286,7 +1145,18 @@ macro_rules! LockHashPartitionLockByProc {
 #[macro_export]
 macro_rules! PROCLOCK_LOCKMETHOD {
     ($proclock:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$proclock;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_types::LOCKMETHODID
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -303,7 +1173,34 @@ macro_rules! PROCLOCK_LOCKMETHOD {
 #[macro_export]
 macro_rules! SET_LOCKTAG_ADVISORY {
     ($locktag:expr, $id1:expr, $id2:expr, $id3:expr, $id4:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$id1;
+                let _ = &$id2;
+                let _ = &$id3;
+                let _ = &$id4;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::USER_LOCKMETHOD as i32)
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -320,7 +1217,34 @@ macro_rules! SET_LOCKTAG_ADVISORY {
 #[macro_export]
 macro_rules! SET_LOCKTAG_APPLY_TRANSACTION {
     ($locktag:expr, $dboid:expr, $suboid:expr, $xid:expr, $objid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$dboid;
+                let _ = &$suboid;
+                let _ = &$xid;
+                let _ = &$objid;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32)
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -337,7 +1261,31 @@ macro_rules! SET_LOCKTAG_APPLY_TRANSACTION {
 #[macro_export]
 macro_rules! SET_LOCKTAG_DATABASE_FROZEN_IDS {
     ($locktag:expr, $dboid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$dboid;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32)
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -354,7 +1302,34 @@ macro_rules! SET_LOCKTAG_DATABASE_FROZEN_IDS {
 #[macro_export]
 macro_rules! SET_LOCKTAG_OBJECT {
     ($locktag:expr, $dboid:expr, $classoid:expr, $objoid:expr, $objsubid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$dboid;
+                let _ = &$classoid;
+                let _ = &$objoid;
+                let _ = &$objsubid;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32)
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -371,7 +1346,33 @@ macro_rules! SET_LOCKTAG_OBJECT {
 #[macro_export]
 macro_rules! SET_LOCKTAG_PAGE {
     ($locktag:expr, $dboid:expr, $reloid:expr, $blocknum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$dboid;
+                let _ = &$reloid;
+                let _ = &$blocknum;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32)
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -388,7 +1389,32 @@ macro_rules! SET_LOCKTAG_PAGE {
 #[macro_export]
 macro_rules! SET_LOCKTAG_RELATION {
     ($locktag:expr, $dboid:expr, $reloid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$dboid;
+                let _ = &$reloid;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32)
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -405,7 +1431,32 @@ macro_rules! SET_LOCKTAG_RELATION {
 #[macro_export]
 macro_rules! SET_LOCKTAG_RELATION_EXTEND {
     ($locktag:expr, $dboid:expr, $reloid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$dboid;
+                let _ = &$reloid;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32)
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -422,7 +1473,32 @@ macro_rules! SET_LOCKTAG_RELATION_EXTEND {
 #[macro_export]
 macro_rules! SET_LOCKTAG_SPECULATIVE_INSERTION {
     ($locktag:expr, $xid:expr, $token:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$xid;
+                let _ = &$token;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32)
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -439,7 +1515,31 @@ macro_rules! SET_LOCKTAG_SPECULATIVE_INSERTION {
 #[macro_export]
 macro_rules! SET_LOCKTAG_TRANSACTION {
     ($locktag:expr, $xid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$xid;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32)
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -456,7 +1556,34 @@ macro_rules! SET_LOCKTAG_TRANSACTION {
 #[macro_export]
 macro_rules! SET_LOCKTAG_TUPLE {
     ($locktag:expr, $dboid:expr, $reloid:expr, $blocknum:expr, $offnum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$dboid;
+                let _ = &$reloid;
+                let _ = &$blocknum;
+                let _ = &$offnum;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32)
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -473,7 +1600,31 @@ macro_rules! SET_LOCKTAG_TUPLE {
 #[macro_export]
 macro_rules! SET_LOCKTAG_VIRTUALTRANSACTION {
     ($locktag:expr, $vxid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$vxid;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32)
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
@@ -490,7 +1641,31 @@ macro_rules! SET_LOCKTAG_VIRTUALTRANSACTION {
 #[macro_export]
 macro_rules! SET_LOCKTAG_VIRTUALTRANSACTION {
     ($locktag:expr, $vxid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$vxid;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_locktag_lockmethodid,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$locktag])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32)
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -507,7 +1682,34 @@ macro_rules! SET_LOCKTAG_VIRTUALTRANSACTION {
 #[macro_export]
 macro_rules! SetInvalidVirtualTransactionId {
     ($vxid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_localTransactionId,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$vxid])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::null_constant(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::InvalidLocalTransactionId as i32
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -524,7 +1726,34 @@ macro_rules! SetInvalidVirtualTransactionId {
 #[macro_export]
 macro_rules! SetInvalidVirtualTransactionId {
     ($vxid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::assign(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_localTransactionId,
+                                        _,
+                                        _
+                                    >(($crate::__pgrx_c_operand!(@place; (@native [$vxid])))),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::null_constant(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::InvalidLocalTransactionId as i32
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -541,7 +1770,19 @@ macro_rules! SetInvalidVirtualTransactionId {
 #[macro_export]
 macro_rules! VirtualTransactionIdEquals {
     ($vxid1:expr, $vxid2:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$vxid1;
+                let _ = &$vxid2;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -558,7 +1799,19 @@ macro_rules! VirtualTransactionIdEquals {
 #[macro_export]
 macro_rules! VirtualTransactionIdEquals {
     ($vxid1:expr, $vxid2:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$vxid1;
+                let _ = &$vxid2;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -575,7 +1828,18 @@ macro_rules! VirtualTransactionIdEquals {
 #[macro_export]
 macro_rules! VirtualTransactionIdIsRecoveredPreparedXact {
     ($vxid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$vxid;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -592,7 +1856,18 @@ macro_rules! VirtualTransactionIdIsRecoveredPreparedXact {
 #[macro_export]
 macro_rules! VirtualTransactionIdIsRecoveredPreparedXact {
     ($vxid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$vxid;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro VirtualTransactionIdIsValid from lock.h:72 (PostgreSQL 15), lock.h:67 (PostgreSQL 16–17), lock.h:68 (PostgreSQL 18), lock.h:70 (PostgreSQL 19)
@@ -608,7 +1883,20 @@ macro_rules! VirtualTransactionIdIsRecoveredPreparedXact {
 #[macro_export]
 macro_rules! VirtualTransactionIdIsValid {
     ($vxid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$vxid;
+                (
+                    (
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                $crate::__pgrx_c_macros::CInt
+                            >()
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 pub use GET_VXID_FROM_PGPROC;

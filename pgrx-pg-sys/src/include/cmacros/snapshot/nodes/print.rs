@@ -18,7 +18,12 @@
 #[macro_export]
 macro_rules! nodeDisplay {
     ($x:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 pub use nodeDisplay;

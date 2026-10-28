@@ -11,6 +11,12 @@ mod geqo;
 #[cfg(feature = "pg19")]
 #[allow(unused_imports)]
 pub use geqo::*;
+#[cfg(feature = "pg19")]
+#[path = "geqo_gene.rs"]
+mod geqo_gene;
+#[cfg(feature = "pg19")]
+#[allow(unused_imports)]
+pub use geqo_gene::*;
 #[path = "restrictinfo.rs"]
 mod restrictinfo;
 #[allow(unused_imports)]

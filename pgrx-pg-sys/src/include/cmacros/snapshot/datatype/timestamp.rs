@@ -15,7 +15,18 @@
 #[macro_export]
 macro_rules! INTERVAL_IS_NOBEGIN {
     ($i:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$i;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -32,7 +43,18 @@ macro_rules! INTERVAL_IS_NOBEGIN {
 #[macro_export]
 macro_rules! INTERVAL_IS_NOEND {
     ($i:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$i;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -51,7 +73,9 @@ macro_rules! INTERVAL_IS_NOEND {
 #[macro_export]
 macro_rules! INTERVAL_NOBEGIN {
     ($i:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$i;
+        })
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -70,7 +94,9 @@ macro_rules! INTERVAL_NOBEGIN {
 #[macro_export]
 macro_rules! INTERVAL_NOEND {
     ($i:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$i;
+        })
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -87,7 +113,18 @@ macro_rules! INTERVAL_NOEND {
 #[macro_export]
 macro_rules! INTERVAL_NOT_FINITE {
     ($i:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$i;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro IS_VALID_DATE from timestamp.h:229 (PostgreSQL 15), timestamp.h:236 (PostgreSQL 16), timestamp.h:262 (PostgreSQL 17–19)
@@ -107,7 +144,18 @@ macro_rules! INTERVAL_NOT_FINITE {
 #[macro_export]
 macro_rules! IS_VALID_DATE {
     ($d:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$d;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro IS_VALID_JULIAN from timestamp.h:194 (PostgreSQL 15), timestamp.h:201 (PostgreSQL 16), timestamp.h:227 (PostgreSQL 17–19)
@@ -122,11 +170,24 @@ macro_rules! IS_VALID_DATE {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! IS_VALID_JULIAN {
-    ($y:expr, $m:expr, $d:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($y:expr, $m:expr, $($d:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$y;
+                let _ = &$m;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro IS_VALID_TIMESTAMP from timestamp.h:234 (PostgreSQL 15), timestamp.h:241 (PostgreSQL 16), timestamp.h:267 (PostgreSQL 17–19)
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+/// C macro IS_VALID_TIMESTAMP from timestamp.h:234 (PostgreSQL 15), timestamp.h:241 (PostgreSQL 16), timestamp.h:267 (PostgreSQL 17)
 ///
 /// ```text
 /// #define IS_VALID_TIMESTAMP( t ) ( MIN_TIMESTAMP <= ( t ) && ( t ) < END_TIMESTAMP )
@@ -139,7 +200,50 @@ macro_rules! IS_VALID_JULIAN {
 #[macro_export]
 macro_rules! IS_VALID_TIMESTAMP {
     ($t:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$t;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
+    };
+}
+#[cfg(any(feature = "pg18", feature = "pg19"))]
+/// C macro IS_VALID_TIMESTAMP from timestamp.h:267 (PostgreSQL 18–19)
+///
+/// ```text
+/// #define IS_VALID_TIMESTAMP( t ) ( MIN_TIMESTAMP <= ( t ) && ( t ) < END_TIMESTAMP )
+/// ```
+///
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! IS_VALID_TIMESTAMP {
+    ($t:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$t;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro TIMESTAMP_IS_NOBEGIN from timestamp.h:154 (PostgreSQL 15), timestamp.h:161 (PostgreSQL 16), timestamp.h:162 (PostgreSQL 17–19)
@@ -155,7 +259,18 @@ macro_rules! IS_VALID_TIMESTAMP {
 #[macro_export]
 macro_rules! TIMESTAMP_IS_NOBEGIN {
     ($j:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$j;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro TIMESTAMP_IS_NOEND from timestamp.h:159 (PostgreSQL 15), timestamp.h:166 (PostgreSQL 16), timestamp.h:167 (PostgreSQL 17–19)
@@ -171,7 +286,18 @@ macro_rules! TIMESTAMP_IS_NOBEGIN {
 #[macro_export]
 macro_rules! TIMESTAMP_IS_NOEND {
     ($j:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$j;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro TIMESTAMP_NOBEGIN from timestamp.h:151 (PostgreSQL 15), timestamp.h:158 (PostgreSQL 16), timestamp.h:159 (PostgreSQL 17–19)
@@ -189,7 +315,9 @@ macro_rules! TIMESTAMP_IS_NOEND {
 #[macro_export]
 macro_rules! TIMESTAMP_NOBEGIN {
     ($j:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$j;
+        })
     };
 }
 /// C macro TIMESTAMP_NOEND from timestamp.h:156 (PostgreSQL 15), timestamp.h:163 (PostgreSQL 16), timestamp.h:164 (PostgreSQL 17–19)
@@ -207,7 +335,9 @@ macro_rules! TIMESTAMP_NOBEGIN {
 #[macro_export]
 macro_rules! TIMESTAMP_NOEND {
     ($j:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$j;
+        })
     };
 }
 /// C macro TIMESTAMP_NOT_FINITE from timestamp.h:161 (PostgreSQL 15), timestamp.h:168 (PostgreSQL 16), timestamp.h:169 (PostgreSQL 17–19)
@@ -223,7 +353,18 @@ macro_rules! TIMESTAMP_NOEND {
 #[macro_export]
 macro_rules! TIMESTAMP_NOT_FINITE {
     ($j:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$j;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]

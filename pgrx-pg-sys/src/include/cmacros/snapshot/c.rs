@@ -2,7 +2,7 @@
 // C macros from c.h.
 
 #[cfg(feature = "pg15")]
-/// C macro Abs from c.h:1030 (PostgreSQL 15)
+/// C macro Abs from c.h:1037 (PostgreSQL 15)
 ///
 /// ```text
 /// #define Abs( x ) ( ( x ) >= 0 ? ( x ) : - ( x ) )
@@ -19,11 +19,56 @@
 #[macro_export]
 macro_rules! Abs {
     ($x:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                        $crate::__pgrx_c_macros::CInt
+                                    >()
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; (@native [$x])))
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::neg::<
+                                            $crate::__pgrx_c_macros::Wrapping,
+                                            _
+                                        >(
+                                            (
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_operand!(
+                                                        @value [true];
+                                                        (@native [$x])
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-#[cfg(feature = "pg18")]
-/// C macro Assert from c.h:837 (PostgreSQL 18)
+/// C macro Assert from c.h:849 (PostgreSQL 15), c.h:859 (PostgreSQL 16), c.h:875 (PostgreSQL 17), c.h:844 (PostgreSQL 18), c.h:949 (PostgreSQL 19)
 ///
 /// ```text
 /// #define Assert( condition ) ( ( void ) true )
@@ -39,12 +84,40 @@ macro_rules! Abs {
 /// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! Assert {
-    ($condition:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($($condition:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                ($crate::__pgrx_c_macros::expression::profile_value::<true, _>(()))
+            }
+        )
     };
 }
-#[cfg(feature = "pg18")]
-/// C macro AssertMacro from c.h:838 (PostgreSQL 18)
+#[cfg(feature = "pg15")]
+/// C macro AssertArg from c.h:851 (PostgreSQL 15)
+///
+/// ```text
+/// #define AssertArg( condition ) ( ( void ) true )
+/// ```
+///
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! AssertArg {
+    ($($condition:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                ($crate::__pgrx_c_macros::expression::profile_value::<true, _>(()))
+            }
+        )
+    };
+}
+/// C macro AssertMacro from c.h:850 (PostgreSQL 15), c.h:860 (PostgreSQL 16), c.h:876 (PostgreSQL 17), c.h:845 (PostgreSQL 18), c.h:950 (PostgreSQL 19)
 ///
 /// ```text
 /// #define AssertMacro( condition ) ( ( void ) true )
@@ -60,23 +133,21 @@ macro_rules! Assert {
 /// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! AssertMacro {
-    ($condition:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($($condition:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                ($crate::__pgrx_c_macros::expression::profile_value::<true, _>(()))
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
-/// C macro AssertPointerAlignment from c.h:913 (PostgreSQL 15)
+/// C macro AssertPointerAlignment from c.h:853 (PostgreSQL 15)
 ///
 /// ```text
-/// #define AssertPointerAlignment( ptr , bndr ) Trap ( TYPEALIGN ( bndr , ( uintptr_t ) ( ptr ) ) != ( uintptr_t ) ( ptr ) , "UnalignedPointer" )
+/// #define AssertPointerAlignment( ptr , bndr ) ( ( void ) true )
 /// ```
 ///
-///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
-#[doc = crate::__pgrx_c_doc_statements!()]
 ///
 /// # Safety
 ///
@@ -84,42 +155,19 @@ macro_rules! AssertMacro {
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! AssertPointerAlignment {
-    ($ptr:expr, $bndr:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($ptr:expr, $($bndr:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                ($crate::__pgrx_c_macros::expression::profile_value::<true, _>(()))
+            }
+        )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg19"))]
-/// C macro AssertPointerAlignment from c.h:888 (PostgreSQL 16), c.h:904 (PostgreSQL 17), c.h:978 (PostgreSQL 19)
-///
-/// ```text
-/// #define AssertPointerAlignment( ptr , bndr ) Assert ( TYPEALIGN ( bndr , ( uintptr_t ) ( ptr ) ) == ( uintptr_t ) ( ptr ) )
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
-#[doc = crate::__pgrx_c_doc_statements!()]
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! AssertPointerAlignment {
-    ($ptr:expr, $bndr:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-#[cfg(feature = "pg18")]
-/// C macro AssertPointerAlignment from c.h:873 (PostgreSQL 18)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro AssertPointerAlignment from c.h:895 (PostgreSQL 16), c.h:911 (PostgreSQL 17), c.h:880 (PostgreSQL 18), c.h:984 (PostgreSQL 19)
 ///
 /// ```text
 /// #define AssertPointerAlignment( ptr , bndr ) Assert ( TYPEALIGN ( bndr , ( uintptr_t ) ( ptr ) ) == ( uintptr_t ) ( ptr ) )
@@ -135,11 +183,40 @@ macro_rules! AssertPointerAlignment {
 /// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! AssertPointerAlignment {
-    ($ptr:expr, $bndr:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($ptr:expr, $($bndr:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                ($crate::__pgrx_c_macros::expression::profile_value::<true, _>(()))
+            }
+        )
     };
 }
-/// C macro BUFFERALIGN from c.h:797 (PostgreSQL 15), c.h:807 (PostgreSQL 16), c.h:823 (PostgreSQL 17), c.h:792 (PostgreSQL 18), c.h:898 (PostgreSQL 19)
+#[cfg(feature = "pg15")]
+/// C macro AssertState from c.h:852 (PostgreSQL 15)
+///
+/// ```text
+/// #define AssertState( condition ) ( ( void ) true )
+/// ```
+///
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! AssertState {
+    ($($condition:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                ($crate::__pgrx_c_macros::expression::profile_value::<true, _>(()))
+            }
+        )
+    };
+}
+/// C macro BUFFERALIGN from c.h:804 (PostgreSQL 15), c.h:814 (PostgreSQL 16), c.h:830 (PostgreSQL 17), c.h:799 (PostgreSQL 18), c.h:904 (PostgreSQL 19)
 ///
 /// ```text
 /// #define BUFFERALIGN( LEN ) TYPEALIGN ( ALIGNOF_BUFFER , ( LEN ) )
@@ -156,10 +233,85 @@ macro_rules! AssertPointerAlignment {
 #[macro_export]
 macro_rules! BUFFERALIGN {
     ($LEN:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$LEN;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::add::<
+                                        $crate::__pgrx_c_macros::Wrapping,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        ),
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::sub::<
+                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
+                                                            )
+                                                        )
+                                                    ),
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(1i32)
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitnot(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro BUFFERALIGN_DOWN from c.h:808 (PostgreSQL 15), c.h:818 (PostgreSQL 16), c.h:834 (PostgreSQL 17), c.h:803 (PostgreSQL 18), c.h:909 (PostgreSQL 19)
+/// C macro BUFFERALIGN_DOWN from c.h:815 (PostgreSQL 15), c.h:825 (PostgreSQL 16), c.h:841 (PostgreSQL 17), c.h:810 (PostgreSQL 18), c.h:915 (PostgreSQL 19)
 ///
 /// ```text
 /// #define BUFFERALIGN_DOWN( LEN ) TYPEALIGN_DOWN ( ALIGNOF_BUFFER , ( LEN ) )
@@ -176,10 +328,41 @@ macro_rules! BUFFERALIGN {
 #[macro_export]
 macro_rules! BUFFERALIGN_DOWN {
     ($LEN:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$LEN;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                        $crate::__pgrx_c_types::uintptr_t
+                                    >()
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitnot(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro BoolIsValid from c.h:730 (PostgreSQL 15), c.h:751 (PostgreSQL 16), c.h:767 (PostgreSQL 17), c.h:736 (PostgreSQL 18), c.h:846 (PostgreSQL 19)
+/// C macro BoolIsValid from c.h:737 (PostgreSQL 15), c.h:758 (PostgreSQL 16), c.h:774 (PostgreSQL 17), c.h:743 (PostgreSQL 18), c.h:852 (PostgreSQL 19)
 ///
 /// ```text
 /// #define BoolIsValid( boolean ) ( ( boolean ) == false || ( boolean ) == true )
@@ -192,10 +375,21 @@ macro_rules! BUFFERALIGN_DOWN {
 #[macro_export]
 macro_rules! BoolIsValid {
     ($boolean:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$boolean;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro CACHELINEALIGN from c.h:798 (PostgreSQL 15), c.h:808 (PostgreSQL 16), c.h:824 (PostgreSQL 17), c.h:793 (PostgreSQL 18), c.h:899 (PostgreSQL 19)
+/// C macro CACHELINEALIGN from c.h:805 (PostgreSQL 15), c.h:815 (PostgreSQL 16), c.h:831 (PostgreSQL 17), c.h:800 (PostgreSQL 18), c.h:905 (PostgreSQL 19)
 ///
 /// ```text
 /// #define CACHELINEALIGN( LEN ) TYPEALIGN ( PG_CACHE_LINE_SIZE , ( LEN ) )
@@ -212,10 +406,85 @@ macro_rules! BoolIsValid {
 #[macro_export]
 macro_rules! CACHELINEALIGN {
     ($LEN:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$LEN;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::add::<
+                                        $crate::__pgrx_c_macros::Wrapping,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        ),
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::sub::<
+                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::PG_CACHE_LINE_SIZE as i32
+                                                            )
+                                                        )
+                                                    ),
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(1i32)
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitnot(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro DOUBLEALIGN from c.h:794 (PostgreSQL 15), c.h:804 (PostgreSQL 16), c.h:820 (PostgreSQL 17), c.h:789 (PostgreSQL 18), c.h:895 (PostgreSQL 19)
+/// C macro DOUBLEALIGN from c.h:801 (PostgreSQL 15), c.h:811 (PostgreSQL 16), c.h:827 (PostgreSQL 17), c.h:796 (PostgreSQL 18), c.h:901 (PostgreSQL 19)
 ///
 /// ```text
 /// #define DOUBLEALIGN( LEN ) TYPEALIGN ( ALIGNOF_DOUBLE , ( LEN ) )
@@ -232,10 +501,85 @@ macro_rules! CACHELINEALIGN {
 #[macro_export]
 macro_rules! DOUBLEALIGN {
     ($LEN:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$LEN;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::add::<
+                                        $crate::__pgrx_c_macros::Wrapping,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        ),
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::sub::<
+                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32
+                                                            )
+                                                        )
+                                                    ),
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(1i32)
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitnot(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro DOUBLEALIGN_DOWN from c.h:806 (PostgreSQL 15), c.h:816 (PostgreSQL 16), c.h:832 (PostgreSQL 17), c.h:801 (PostgreSQL 18), c.h:907 (PostgreSQL 19)
+/// C macro DOUBLEALIGN_DOWN from c.h:813 (PostgreSQL 15), c.h:823 (PostgreSQL 16), c.h:839 (PostgreSQL 17), c.h:808 (PostgreSQL 18), c.h:913 (PostgreSQL 19)
 ///
 /// ```text
 /// #define DOUBLEALIGN_DOWN( LEN ) TYPEALIGN_DOWN ( ALIGNOF_DOUBLE , ( LEN ) )
@@ -252,10 +596,41 @@ macro_rules! DOUBLEALIGN {
 #[macro_export]
 macro_rules! DOUBLEALIGN_DOWN {
     ($LEN:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$LEN;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                        $crate::__pgrx_c_types::uintptr_t
+                                    >()
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitnot(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro FLOAT4_FITS_IN_INT16 from c.h:1135 (PostgreSQL 15), c.h:1103 (PostgreSQL 16), c.h:1095 (PostgreSQL 17), c.h:1064 (PostgreSQL 18), c.h:1172 (PostgreSQL 19)
+/// C macro FLOAT4_FITS_IN_INT16 from c.h:1142 (PostgreSQL 15), c.h:1110 (PostgreSQL 16), c.h:1102 (PostgreSQL 17), c.h:1071 (PostgreSQL 18), c.h:1178 (PostgreSQL 19)
 ///
 /// ```text
 /// #define FLOAT4_FITS_IN_INT16( num ) ( ( num ) >= ( float4 ) PG_INT16_MIN && ( num ) < - ( ( float4 ) PG_INT16_MIN ) )
@@ -272,10 +647,21 @@ macro_rules! DOUBLEALIGN_DOWN {
 #[macro_export]
 macro_rules! FLOAT4_FITS_IN_INT16 {
     ($num:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$num;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro FLOAT4_FITS_IN_INT32 from c.h:1137 (PostgreSQL 15), c.h:1105 (PostgreSQL 16), c.h:1097 (PostgreSQL 17), c.h:1066 (PostgreSQL 18), c.h:1174 (PostgreSQL 19)
+/// C macro FLOAT4_FITS_IN_INT32 from c.h:1144 (PostgreSQL 15), c.h:1112 (PostgreSQL 16), c.h:1104 (PostgreSQL 17), c.h:1073 (PostgreSQL 18), c.h:1180 (PostgreSQL 19)
 ///
 /// ```text
 /// #define FLOAT4_FITS_IN_INT32( num ) ( ( num ) >= ( float4 ) PG_INT32_MIN && ( num ) < - ( ( float4 ) PG_INT32_MIN ) )
@@ -292,10 +678,21 @@ macro_rules! FLOAT4_FITS_IN_INT16 {
 #[macro_export]
 macro_rules! FLOAT4_FITS_IN_INT32 {
     ($num:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$num;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro FLOAT4_FITS_IN_INT64 from c.h:1139 (PostgreSQL 15), c.h:1107 (PostgreSQL 16), c.h:1099 (PostgreSQL 17), c.h:1068 (PostgreSQL 18), c.h:1176 (PostgreSQL 19)
+/// C macro FLOAT4_FITS_IN_INT64 from c.h:1146 (PostgreSQL 15), c.h:1114 (PostgreSQL 16), c.h:1106 (PostgreSQL 17), c.h:1075 (PostgreSQL 18), c.h:1182 (PostgreSQL 19)
 ///
 /// ```text
 /// #define FLOAT4_FITS_IN_INT64( num ) ( ( num ) >= ( float4 ) PG_INT64_MIN && ( num ) < - ( ( float4 ) PG_INT64_MIN ) )
@@ -312,10 +709,21 @@ macro_rules! FLOAT4_FITS_IN_INT32 {
 #[macro_export]
 macro_rules! FLOAT4_FITS_IN_INT64 {
     ($num:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$num;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro FLOAT8_FITS_IN_INT16 from c.h:1141 (PostgreSQL 15), c.h:1109 (PostgreSQL 16), c.h:1101 (PostgreSQL 17), c.h:1070 (PostgreSQL 18), c.h:1178 (PostgreSQL 19)
+/// C macro FLOAT8_FITS_IN_INT16 from c.h:1148 (PostgreSQL 15), c.h:1116 (PostgreSQL 16), c.h:1108 (PostgreSQL 17), c.h:1077 (PostgreSQL 18), c.h:1184 (PostgreSQL 19)
 ///
 /// ```text
 /// #define FLOAT8_FITS_IN_INT16( num ) ( ( num ) >= ( float8 ) PG_INT16_MIN && ( num ) < - ( ( float8 ) PG_INT16_MIN ) )
@@ -332,10 +740,21 @@ macro_rules! FLOAT4_FITS_IN_INT64 {
 #[macro_export]
 macro_rules! FLOAT8_FITS_IN_INT16 {
     ($num:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$num;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro FLOAT8_FITS_IN_INT32 from c.h:1143 (PostgreSQL 15), c.h:1111 (PostgreSQL 16), c.h:1103 (PostgreSQL 17), c.h:1072 (PostgreSQL 18), c.h:1180 (PostgreSQL 19)
+/// C macro FLOAT8_FITS_IN_INT32 from c.h:1150 (PostgreSQL 15), c.h:1118 (PostgreSQL 16), c.h:1110 (PostgreSQL 17), c.h:1079 (PostgreSQL 18), c.h:1186 (PostgreSQL 19)
 ///
 /// ```text
 /// #define FLOAT8_FITS_IN_INT32( num ) ( ( num ) >= ( float8 ) PG_INT32_MIN && ( num ) < - ( ( float8 ) PG_INT32_MIN ) )
@@ -352,10 +771,21 @@ macro_rules! FLOAT8_FITS_IN_INT16 {
 #[macro_export]
 macro_rules! FLOAT8_FITS_IN_INT32 {
     ($num:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$num;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro FLOAT8_FITS_IN_INT64 from c.h:1145 (PostgreSQL 15), c.h:1113 (PostgreSQL 16), c.h:1105 (PostgreSQL 17), c.h:1074 (PostgreSQL 18), c.h:1182 (PostgreSQL 19)
+/// C macro FLOAT8_FITS_IN_INT64 from c.h:1152 (PostgreSQL 15), c.h:1120 (PostgreSQL 16), c.h:1112 (PostgreSQL 17), c.h:1081 (PostgreSQL 18), c.h:1188 (PostgreSQL 19)
 ///
 /// ```text
 /// #define FLOAT8_FITS_IN_INT64( num ) ( ( num ) >= ( float8 ) PG_INT64_MIN && ( num ) < - ( ( float8 ) PG_INT64_MIN ) )
@@ -372,11 +802,22 @@ macro_rules! FLOAT8_FITS_IN_INT32 {
 #[macro_export]
 macro_rules! FLOAT8_FITS_IN_INT64 {
     ($num:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$num;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// C macro INT64ALIGN from c.h:894 (PostgreSQL 19)
+/// C macro INT64ALIGN from c.h:900 (PostgreSQL 19)
 ///
 /// ```text
 /// #define INT64ALIGN( LEN ) TYPEALIGN ( ALIGNOF_INT64_T , ( LEN ) )
@@ -393,11 +834,86 @@ macro_rules! FLOAT8_FITS_IN_INT64 {
 #[macro_export]
 macro_rules! INT64ALIGN {
     ($LEN:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$LEN;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::add::<
+                                        $crate::__pgrx_c_macros::Wrapping,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        ),
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::sub::<
+                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::ALIGNOF_INT64_T as i32
+                                                            )
+                                                        )
+                                                    ),
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(1i32)
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitnot(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// C macro INT64ALIGN_DOWN from c.h:906 (PostgreSQL 19)
+/// C macro INT64ALIGN_DOWN from c.h:912 (PostgreSQL 19)
 ///
 /// ```text
 /// #define INT64ALIGN_DOWN( LEN ) TYPEALIGN_DOWN ( ALIGNOF_INT64_T , ( LEN ) )
@@ -414,10 +930,41 @@ macro_rules! INT64ALIGN {
 #[macro_export]
 macro_rules! INT64ALIGN_DOWN {
     ($LEN:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$LEN;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                        $crate::__pgrx_c_types::uintptr_t
+                                    >()
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitnot(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro INTALIGN from c.h:792 (PostgreSQL 15), c.h:802 (PostgreSQL 16), c.h:818 (PostgreSQL 17), c.h:787 (PostgreSQL 18), c.h:893 (PostgreSQL 19)
+/// C macro INTALIGN from c.h:799 (PostgreSQL 15), c.h:809 (PostgreSQL 16), c.h:825 (PostgreSQL 17), c.h:794 (PostgreSQL 18), c.h:899 (PostgreSQL 19)
 ///
 /// ```text
 /// #define INTALIGN( LEN ) TYPEALIGN ( ALIGNOF_INT , ( LEN ) )
@@ -434,10 +981,85 @@ macro_rules! INT64ALIGN_DOWN {
 #[macro_export]
 macro_rules! INTALIGN {
     ($LEN:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$LEN;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::add::<
+                                        $crate::__pgrx_c_macros::Wrapping,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        ),
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::sub::<
+                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::ALIGNOF_INT as i32
+                                                            )
+                                                        )
+                                                    ),
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(1i32)
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitnot(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro INTALIGN_DOWN from c.h:804 (PostgreSQL 15), c.h:814 (PostgreSQL 16), c.h:830 (PostgreSQL 17), c.h:799 (PostgreSQL 18), c.h:905 (PostgreSQL 19)
+/// C macro INTALIGN_DOWN from c.h:811 (PostgreSQL 15), c.h:821 (PostgreSQL 16), c.h:837 (PostgreSQL 17), c.h:806 (PostgreSQL 18), c.h:911 (PostgreSQL 19)
 ///
 /// ```text
 /// #define INTALIGN_DOWN( LEN ) TYPEALIGN_DOWN ( ALIGNOF_INT , ( LEN ) )
@@ -454,10 +1076,41 @@ macro_rules! INTALIGN {
 #[macro_export]
 macro_rules! INTALIGN_DOWN {
     ($LEN:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$LEN;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                        $crate::__pgrx_c_types::uintptr_t
+                                    >()
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitnot(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro INVERT_COMPARE_RESULT from c.h:1163 (PostgreSQL 15), c.h:1127 (PostgreSQL 16), c.h:1119 (PostgreSQL 17), c.h:1088 (PostgreSQL 18), c.h:1196 (PostgreSQL 19)
+/// C macro INVERT_COMPARE_RESULT from c.h:1170 (PostgreSQL 15), c.h:1134 (PostgreSQL 16), c.h:1126 (PostgreSQL 17), c.h:1095 (PostgreSQL 18), c.h:1202 (PostgreSQL 19)
 ///
 /// ```text
 /// #define INVERT_COMPARE_RESULT( var ) ( ( var ) = ( ( var ) < 0 ) ? 1 : - ( var ) )
@@ -474,10 +1127,71 @@ macro_rules! INTALIGN_DOWN {
 #[macro_export]
 macro_rules! INVERT_COMPARE_RESULT {
     ($var:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::assign(
+                            ($crate::__pgrx_c_operand!(@place; (@native [$var]))),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::select(
+                                    if $crate::__pgrx_c_macros::expression::truth(
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >()
+                                            )
+                                        )
+                                    ) {
+                                        $crate::__pgrx_c_macros::Either::Left(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::CValue::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >::new(1i32)
+                                            )
+                                        )
+                                    } else {
+                                        $crate::__pgrx_c_macros::Either::Right(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::neg::<
+                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_operand!(
+                                                                @value [true];
+                                                                (@native [$var])
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    }
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro IS_HIGHBIT_SET from c.h:1194 (PostgreSQL 15), c.h:1176 (PostgreSQL 16), c.h:1168 (PostgreSQL 17), c.h:1137 (PostgreSQL 18), c.h:1247 (PostgreSQL 19)
+/// C macro IS_HIGHBIT_SET from c.h:1201 (PostgreSQL 15), c.h:1183 (PostgreSQL 16), c.h:1175 (PostgreSQL 17), c.h:1144 (PostgreSQL 18), c.h:1253 (PostgreSQL 19)
 ///
 /// ```text
 /// #define IS_HIGHBIT_SET( ch ) ( ( unsigned char ) ( ch ) & HIGHBIT )
@@ -494,11 +1208,31 @@ macro_rules! INVERT_COMPARE_RESULT {
 #[macro_export]
 macro_rules! IS_HIGHBIT_SET {
     ($ch:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ch;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                    $crate::__pgrx_c_macros::CUnsignedChar
+                                >()
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    $crate::__pgrx_c_bindings::HIGHBIT as i32
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro LONGALIGN from c.h:793 (PostgreSQL 15), c.h:803 (PostgreSQL 16), c.h:819 (PostgreSQL 17), c.h:788 (PostgreSQL 18)
+/// C macro LONGALIGN from c.h:800 (PostgreSQL 15), c.h:810 (PostgreSQL 16), c.h:826 (PostgreSQL 17), c.h:795 (PostgreSQL 18)
 ///
 /// ```text
 /// #define LONGALIGN( LEN ) TYPEALIGN ( ALIGNOF_LONG , ( LEN ) )
@@ -515,11 +1249,86 @@ macro_rules! IS_HIGHBIT_SET {
 #[macro_export]
 macro_rules! LONGALIGN {
     ($LEN:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$LEN;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::add::<
+                                        $crate::__pgrx_c_macros::Wrapping,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        ),
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::sub::<
+                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::ALIGNOF_LONG as i32
+                                                            )
+                                                        )
+                                                    ),
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(1i32)
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitnot(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro LONGALIGN_DOWN from c.h:805 (PostgreSQL 15), c.h:815 (PostgreSQL 16), c.h:831 (PostgreSQL 17), c.h:800 (PostgreSQL 18)
+/// C macro LONGALIGN_DOWN from c.h:812 (PostgreSQL 15), c.h:822 (PostgreSQL 16), c.h:838 (PostgreSQL 17), c.h:807 (PostgreSQL 18)
 ///
 /// ```text
 /// #define LONGALIGN_DOWN( LEN ) TYPEALIGN_DOWN ( ALIGNOF_LONG , ( LEN ) )
@@ -536,10 +1345,41 @@ macro_rules! LONGALIGN {
 #[macro_export]
 macro_rules! LONGALIGN_DOWN {
     ($LEN:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$LEN;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                        $crate::__pgrx_c_types::uintptr_t
+                                    >()
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitnot(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro MAXALIGN from c.h:795 (PostgreSQL 15), c.h:805 (PostgreSQL 16), c.h:821 (PostgreSQL 17), c.h:790 (PostgreSQL 18), c.h:896 (PostgreSQL 19)
+/// C macro MAXALIGN from c.h:802 (PostgreSQL 15), c.h:812 (PostgreSQL 16), c.h:828 (PostgreSQL 17), c.h:797 (PostgreSQL 18), c.h:902 (PostgreSQL 19)
 ///
 /// ```text
 /// #define MAXALIGN( LEN ) TYPEALIGN ( MAXIMUM_ALIGNOF , ( LEN ) )
@@ -556,10 +1396,85 @@ macro_rules! LONGALIGN_DOWN {
 #[macro_export]
 macro_rules! MAXALIGN {
     ($LEN:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$LEN;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::add::<
+                                        $crate::__pgrx_c_macros::Wrapping,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        ),
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::sub::<
+                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
+                                                            )
+                                                        )
+                                                    ),
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(1i32)
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitnot(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro MAXALIGN64 from c.h:820 (PostgreSQL 15), c.h:830 (PostgreSQL 16), c.h:846 (PostgreSQL 17), c.h:815 (PostgreSQL 18), c.h:921 (PostgreSQL 19)
+/// C macro MAXALIGN64 from c.h:827 (PostgreSQL 15), c.h:837 (PostgreSQL 16), c.h:853 (PostgreSQL 17), c.h:822 (PostgreSQL 18), c.h:927 (PostgreSQL 19)
 ///
 /// ```text
 /// #define MAXALIGN64( LEN ) TYPEALIGN64 ( MAXIMUM_ALIGNOF , ( LEN ) )
@@ -576,10 +1491,85 @@ macro_rules! MAXALIGN {
 #[macro_export]
 macro_rules! MAXALIGN64 {
     ($LEN:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$LEN;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::add::<
+                                        $crate::__pgrx_c_macros::Wrapping,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uint64
+                                            >()
+                                        ),
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::sub::<
+                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
+                                                            )
+                                                        )
+                                                    ),
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(1i32)
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitnot(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uint64
+                                            >()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro MAXALIGN_DOWN from c.h:807 (PostgreSQL 15), c.h:817 (PostgreSQL 16), c.h:833 (PostgreSQL 17), c.h:802 (PostgreSQL 18), c.h:908 (PostgreSQL 19)
+/// C macro MAXALIGN_DOWN from c.h:814 (PostgreSQL 15), c.h:824 (PostgreSQL 16), c.h:840 (PostgreSQL 17), c.h:809 (PostgreSQL 18), c.h:914 (PostgreSQL 19)
 ///
 /// ```text
 /// #define MAXALIGN_DOWN( LEN ) TYPEALIGN_DOWN ( MAXIMUM_ALIGNOF , ( LEN ) )
@@ -596,10 +1586,41 @@ macro_rules! MAXALIGN64 {
 #[macro_export]
 macro_rules! MAXALIGN_DOWN {
     ($LEN:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$LEN;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                        $crate::__pgrx_c_types::uintptr_t
+                                    >()
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitnot(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro Max from c.h:1018 (PostgreSQL 15), c.h:992 (PostgreSQL 16), c.h:1008 (PostgreSQL 17), c.h:977 (PostgreSQL 18), c.h:1085 (PostgreSQL 19)
+/// C macro Max from c.h:1025 (PostgreSQL 15), c.h:999 (PostgreSQL 16), c.h:1015 (PostgreSQL 17), c.h:984 (PostgreSQL 18), c.h:1091 (PostgreSQL 19)
 ///
 /// ```text
 /// #define Max( x , y ) ( ( x ) > ( y ) ? ( x ) : ( y ) )
@@ -612,11 +1633,45 @@ macro_rules! MAXALIGN_DOWN {
 #[macro_export]
 macro_rules! Max {
     ($x:expr, $y:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                        $crate::__pgrx_c_macros::CInt
+                                    >()
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; (@native [$x])))
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; (@native [$y])))
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
-/// C macro MemSetTest from c.h:1108 (PostgreSQL 15), c.h:1076 (PostgreSQL 16)
+/// C macro MemSetTest from c.h:1115 (PostgreSQL 15), c.h:1083 (PostgreSQL 16)
 ///
 /// ```text
 /// #define MemSetTest( val , len ) ( ( ( len ) & LONG_ALIGN_MASK ) == 0 && ( len ) <= MEMSET_LOOP_LIMIT && MEMSET_LOOP_LIMIT != 0 && ( val ) == 0 )
@@ -633,10 +1688,22 @@ macro_rules! Max {
 #[macro_export]
 macro_rules! MemSetTest {
     ($val:expr, $len:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$val;
+                let _ = &$len;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro Min from c.h:1024 (PostgreSQL 15), c.h:998 (PostgreSQL 16), c.h:1014 (PostgreSQL 17), c.h:983 (PostgreSQL 18), c.h:1091 (PostgreSQL 19)
+/// C macro Min from c.h:1031 (PostgreSQL 15), c.h:1005 (PostgreSQL 16), c.h:1021 (PostgreSQL 17), c.h:990 (PostgreSQL 18), c.h:1097 (PostgreSQL 19)
 ///
 /// ```text
 /// #define Min( x , y ) ( ( x ) < ( y ) ? ( x ) : ( y ) )
@@ -649,10 +1716,44 @@ macro_rules! MemSetTest {
 #[macro_export]
 macro_rules! Min {
     ($x:expr, $y:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                        $crate::__pgrx_c_macros::CInt
+                                    >()
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; (@native [$x])))
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; (@native [$y])))
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro NameStr from c.h:719 (PostgreSQL 15), c.h:740 (PostgreSQL 16), c.h:756 (PostgreSQL 17), c.h:725 (PostgreSQL 18), c.h:835 (PostgreSQL 19)
+/// C macro NameStr from c.h:726 (PostgreSQL 15), c.h:747 (PostgreSQL 16), c.h:763 (PostgreSQL 17), c.h:732 (PostgreSQL 18), c.h:841 (PostgreSQL 19)
 ///
 /// ```text
 /// #define NameStr( name ) ( ( name ) . data )
@@ -664,11 +1765,66 @@ macro_rules! Min {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! NameStr {
+    (* $name:ident $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_data,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@read_place; (@deref [* $name] [$name]))))
+                        )
+                    )
+                )
+            }
+        )
+    };
+    ((* $name:ident) $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_data,
+                                _,
+                                _
+                            >(
+                                (
+                                    $crate::__pgrx_c_operand!(
+                                        @read_place;
+                                        (@deref [(* $name)] [$name])
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
+    };
     ($name:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_data,
+                                _,
+                                _
+                            >(($crate::__pgrx_c_operand!(@read_place; (@native [$name]))))
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro OffsetToPointer from c.h:745 (PostgreSQL 15), c.h:766 (PostgreSQL 16), c.h:782 (PostgreSQL 17), c.h:751 (PostgreSQL 18), c.h:855 (PostgreSQL 19)
+/// C macro OffsetToPointer from c.h:752 (PostgreSQL 15), c.h:773 (PostgreSQL 16), c.h:789 (PostgreSQL 17), c.h:758 (PostgreSQL 18), c.h:861 (PostgreSQL 19)
 ///
 /// ```text
 /// #define OffsetToPointer( base , offset ) ( ( void * ) ( ( char * ) base + offset ) )
@@ -685,11 +1841,25 @@ macro_rules! NameStr {
 #[macro_export]
 macro_rules! OffsetToPointer {
     ($base:expr, $offset:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$base;
+                let _ = &$offset;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CVoid,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// C macro Oid8IsValid from c.h:860 (PostgreSQL 19)
+/// C macro Oid8IsValid from c.h:866 (PostgreSQL 19)
 ///
 /// ```text
 /// #define Oid8IsValid( objectId ) ( ( bool ) ( ( objectId ) != InvalidOid8 ) )
@@ -706,10 +1876,21 @@ macro_rules! OffsetToPointer {
 #[macro_export]
 macro_rules! Oid8IsValid {
     ($objectId:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$objectId;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CBool
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro OidIsValid from c.h:748 (PostgreSQL 15), c.h:769 (PostgreSQL 16), c.h:785 (PostgreSQL 17), c.h:754 (PostgreSQL 18), c.h:858 (PostgreSQL 19)
+/// C macro OidIsValid from c.h:755 (PostgreSQL 15), c.h:776 (PostgreSQL 16), c.h:792 (PostgreSQL 17), c.h:761 (PostgreSQL 18), c.h:864 (PostgreSQL 19)
 ///
 /// ```text
 /// #define OidIsValid( objectId ) ( ( bool ) ( ( objectId ) != InvalidOid ) )
@@ -726,10 +1907,21 @@ macro_rules! Oid8IsValid {
 #[macro_export]
 macro_rules! OidIsValid {
     ($objectId:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$objectId;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CBool
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro PointerIsAligned from c.h:742 (PostgreSQL 15), c.h:763 (PostgreSQL 16), c.h:779 (PostgreSQL 17), c.h:748 (PostgreSQL 18), c.h:852 (PostgreSQL 19)
+/// C macro PointerIsAligned from c.h:749 (PostgreSQL 15), c.h:770 (PostgreSQL 16), c.h:786 (PostgreSQL 17), c.h:755 (PostgreSQL 18), c.h:858 (PostgreSQL 19)
 ///
 /// ```text
 /// #define PointerIsAligned( pointer , type ) ( ( ( uintptr_t ) ( pointer ) % ( sizeof ( type ) ) ) == 0 )
@@ -746,11 +1938,23 @@ macro_rules! OidIsValid {
 #[macro_export]
 macro_rules! PointerIsAligned {
     ($pointer:expr, $type:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$pointer;
+                let _ = &$type;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro PointerIsValid from c.h:736 (PostgreSQL 15), c.h:757 (PostgreSQL 16), c.h:773 (PostgreSQL 17), c.h:742 (PostgreSQL 18)
+/// C macro PointerIsValid from c.h:743 (PostgreSQL 15), c.h:764 (PostgreSQL 16), c.h:780 (PostgreSQL 17), c.h:749 (PostgreSQL 18)
 ///
 /// ```text
 /// #define PointerIsValid( pointer ) ( ( const void * ) ( pointer ) != NULL )
@@ -767,10 +1971,21 @@ macro_rules! PointerIsAligned {
 #[macro_export]
 macro_rules! PointerIsValid {
     ($pointer:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$pointer;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro RegProcedureIsValid from c.h:750 (PostgreSQL 15), c.h:771 (PostgreSQL 16), c.h:787 (PostgreSQL 17), c.h:756 (PostgreSQL 18), c.h:862 (PostgreSQL 19)
+/// C macro RegProcedureIsValid from c.h:757 (PostgreSQL 15), c.h:778 (PostgreSQL 16), c.h:794 (PostgreSQL 17), c.h:763 (PostgreSQL 18), c.h:868 (PostgreSQL 19)
 ///
 /// ```text
 /// #define RegProcedureIsValid( p ) OidIsValid ( p )
@@ -787,10 +2002,21 @@ macro_rules! PointerIsValid {
 #[macro_export]
 macro_rules! RegProcedureIsValid {
     ($p:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$p;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CBool
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro SHORTALIGN from c.h:791 (PostgreSQL 15), c.h:801 (PostgreSQL 16), c.h:817 (PostgreSQL 17), c.h:786 (PostgreSQL 18), c.h:892 (PostgreSQL 19)
+/// C macro SHORTALIGN from c.h:798 (PostgreSQL 15), c.h:808 (PostgreSQL 16), c.h:824 (PostgreSQL 17), c.h:793 (PostgreSQL 18), c.h:898 (PostgreSQL 19)
 ///
 /// ```text
 /// #define SHORTALIGN( LEN ) TYPEALIGN ( ALIGNOF_SHORT , ( LEN ) )
@@ -807,10 +2033,85 @@ macro_rules! RegProcedureIsValid {
 #[macro_export]
 macro_rules! SHORTALIGN {
     ($LEN:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$LEN;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::add::<
+                                        $crate::__pgrx_c_macros::Wrapping,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        ),
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::sub::<
+                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
+                                                            )
+                                                        )
+                                                    ),
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(1i32)
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitnot(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro SHORTALIGN_DOWN from c.h:803 (PostgreSQL 15), c.h:813 (PostgreSQL 16), c.h:829 (PostgreSQL 17), c.h:798 (PostgreSQL 18), c.h:904 (PostgreSQL 19)
+/// C macro SHORTALIGN_DOWN from c.h:810 (PostgreSQL 15), c.h:820 (PostgreSQL 16), c.h:836 (PostgreSQL 17), c.h:805 (PostgreSQL 18), c.h:910 (PostgreSQL 19)
 ///
 /// ```text
 /// #define SHORTALIGN_DOWN( LEN ) TYPEALIGN_DOWN ( ALIGNOF_SHORT , ( LEN ) )
@@ -827,10 +2128,41 @@ macro_rules! SHORTALIGN {
 #[macro_export]
 macro_rules! SHORTALIGN_DOWN {
     ($LEN:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$LEN;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                        $crate::__pgrx_c_types::uintptr_t
+                                    >()
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitnot(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro SQL_STR_DOUBLE from c.h:1202 (PostgreSQL 15), c.h:1184 (PostgreSQL 16), c.h:1176 (PostgreSQL 17), c.h:1145 (PostgreSQL 18), c.h:1255 (PostgreSQL 19)
+/// C macro SQL_STR_DOUBLE from c.h:1209 (PostgreSQL 15), c.h:1191 (PostgreSQL 16), c.h:1183 (PostgreSQL 17), c.h:1152 (PostgreSQL 18), c.h:1261 (PostgreSQL 19)
 ///
 /// ```text
 /// #define SQL_STR_DOUBLE( ch , escape_backslash ) ( ( ch ) == '\'' || ( ( ch ) == '\\' && ( escape_backslash ) ) )
@@ -843,10 +2175,22 @@ macro_rules! SHORTALIGN_DOWN {
 #[macro_export]
 macro_rules! SQL_STR_DOUBLE {
     ($ch:expr, $escape_backslash:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ch;
+                let _ = &$escape_backslash;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro TYPEALIGN from c.h:788 (PostgreSQL 15), c.h:798 (PostgreSQL 16), c.h:814 (PostgreSQL 17), c.h:783 (PostgreSQL 18), c.h:889 (PostgreSQL 19)
+/// C macro TYPEALIGN from c.h:795 (PostgreSQL 15), c.h:805 (PostgreSQL 16), c.h:821 (PostgreSQL 17), c.h:790 (PostgreSQL 18), c.h:895 (PostgreSQL 19)
 ///
 /// ```text
 /// #define TYPEALIGN( ALIGNVAL , LEN ) ( ( ( uintptr_t ) ( LEN ) + ( ( ALIGNVAL ) - 1 ) ) & ~ ( ( uintptr_t ) ( ( ALIGNVAL ) - 1 ) ) )
@@ -863,10 +2207,84 @@ macro_rules! SQL_STR_DOUBLE {
 #[macro_export]
 macro_rules! TYPEALIGN {
     ($ALIGNVAL:expr, $LEN:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$LEN;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::add::<
+                                        $crate::__pgrx_c_macros::Wrapping,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        ),
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::sub::<
+                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_operand!(
+                                                                @value [true];
+                                                                (@native [$ALIGNVAL])
+                                                            )
+                                                        )
+                                                    ),
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(1i32)
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitnot(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro TYPEALIGN64 from c.h:816 (PostgreSQL 15), c.h:826 (PostgreSQL 16), c.h:842 (PostgreSQL 17), c.h:811 (PostgreSQL 18), c.h:917 (PostgreSQL 19)
+/// C macro TYPEALIGN64 from c.h:823 (PostgreSQL 15), c.h:833 (PostgreSQL 16), c.h:849 (PostgreSQL 17), c.h:818 (PostgreSQL 18), c.h:923 (PostgreSQL 19)
 ///
 /// ```text
 /// #define TYPEALIGN64( ALIGNVAL , LEN ) ( ( ( uint64 ) ( LEN ) + ( ( ALIGNVAL ) - 1 ) ) & ~ ( ( uint64 ) ( ( ALIGNVAL ) - 1 ) ) )
@@ -883,10 +2301,84 @@ macro_rules! TYPEALIGN {
 #[macro_export]
 macro_rules! TYPEALIGN64 {
     ($ALIGNVAL:expr, $LEN:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$LEN;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::add::<
+                                        $crate::__pgrx_c_macros::Wrapping,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uint64
+                                            >()
+                                        ),
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::sub::<
+                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_operand!(
+                                                                @value [true];
+                                                                (@native [$ALIGNVAL])
+                                                            )
+                                                        )
+                                                    ),
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(1i32)
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitnot(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uint64
+                                            >()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro TYPEALIGN_DOWN from c.h:800 (PostgreSQL 15), c.h:810 (PostgreSQL 16), c.h:826 (PostgreSQL 17), c.h:795 (PostgreSQL 18), c.h:901 (PostgreSQL 19)
+/// C macro TYPEALIGN_DOWN from c.h:807 (PostgreSQL 15), c.h:817 (PostgreSQL 16), c.h:833 (PostgreSQL 17), c.h:802 (PostgreSQL 18), c.h:907 (PostgreSQL 19)
 ///
 /// ```text
 /// #define TYPEALIGN_DOWN( ALIGNVAL , LEN ) ( ( ( uintptr_t ) ( LEN ) ) & ~ ( ( uintptr_t ) ( ( ALIGNVAL ) - 1 ) ) )
@@ -903,13 +2395,71 @@ macro_rules! TYPEALIGN64 {
 #[macro_export]
 macro_rules! TYPEALIGN_DOWN {
     ($ALIGNVAL:expr, $LEN:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ALIGNVAL;
+                let _ = &$LEN;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                        $crate::__pgrx_c_types::uintptr_t
+                                    >()
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitnot(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro dgettext from c.h:1219 (PostgreSQL 15), c.h:1201 (PostgreSQL 16), c.h:1193 (PostgreSQL 17), c.h:1162 (PostgreSQL 18), c.h:1272 (PostgreSQL 19)
+#[cfg(feature = "pg15")]
+/// C macro Trap from c.h:854 (PostgreSQL 15)
 ///
 /// ```text
-/// #define dgettext( d , x ) ( x )
+/// #define Trap( condition , errorType ) ( ( void ) true )
+/// ```
+///
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! Trap {
+    ($condition:expr, $($errorType:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                ($crate::__pgrx_c_macros::expression::profile_value::<true, _>(()))
+            }
+        )
+    };
+}
+#[cfg(feature = "pg15")]
+/// C macro TrapMacro from c.h:855 (PostgreSQL 15)
+///
+/// ```text
+/// #define TrapMacro( condition , errorType ) ( true )
 /// ```
 ///
 ///
@@ -917,44 +2467,21 @@ macro_rules! TYPEALIGN_DOWN {
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
-macro_rules! dgettext {
-    ($d:expr, $x:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+macro_rules! TrapMacro {
+    ($condition:expr, $($errorType:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                        $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(1i32)
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro dngettext from c.h:1221 (PostgreSQL 15), c.h:1203 (PostgreSQL 16), c.h:1195 (PostgreSQL 17), c.h:1164 (PostgreSQL 18), c.h:1274 (PostgreSQL 19)
-///
-/// ```text
-/// #define dngettext( d , s , p , n ) ( ( n ) == 1 ? ( s ) : ( p ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-#[macro_export]
-macro_rules! dngettext {
-    ($d:expr, $s:expr, $p:expr, $n:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-/// C macro gettext from c.h:1218 (PostgreSQL 15), c.h:1200 (PostgreSQL 16), c.h:1192 (PostgreSQL 17), c.h:1161 (PostgreSQL 18), c.h:1271 (PostgreSQL 19)
-///
-/// ```text
-/// #define gettext( x ) ( x )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-#[macro_export]
-macro_rules! gettext {
-    ($x:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-/// C macro gettext_noop from c.h:1235 (PostgreSQL 15), c.h:1217 (PostgreSQL 16), c.h:1209 (PostgreSQL 17), c.h:1178 (PostgreSQL 18), c.h:1288 (PostgreSQL 19)
+/// C macro gettext_noop from c.h:1242 (PostgreSQL 15), c.h:1224 (PostgreSQL 16), c.h:1216 (PostgreSQL 17), c.h:1185 (PostgreSQL 18), c.h:1294 (PostgreSQL 19)
 ///
 /// ```text
 /// #define gettext_noop( x ) ( x )
@@ -967,11 +2494,19 @@ macro_rules! gettext {
 #[macro_export]
 macro_rules! gettext_noop {
     ($x:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_operand!(@value [true]; (@native [$x]))
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro i64abs from c.h:1323 (PostgreSQL 16), c.h:1318 (PostgreSQL 17)
+/// C macro i64abs from c.h:1330 (PostgreSQL 16), c.h:1325 (PostgreSQL 17)
 ///
 /// ```text
 /// #define i64abs( i ) labs ( i )
@@ -988,11 +2523,20 @@ macro_rules! gettext_noop {
 #[macro_export]
 macro_rules! i64abs {
     ($i:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$i;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CLong
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro i64abs from c.h:1289 (PostgreSQL 18), c.h:1411 (PostgreSQL 19)
+/// C macro i64abs from c.h:1296 (PostgreSQL 18), c.h:1429 (PostgreSQL 19)
 ///
 /// ```text
 /// #define i64abs( i ) ( ( int64 ) labs ( i ) )
@@ -1009,10 +2553,21 @@ macro_rules! i64abs {
 #[macro_export]
 macro_rules! i64abs {
     ($i:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$i;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_types::int64
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro lengthof from c.h:772 (PostgreSQL 15), c.h:782 (PostgreSQL 16), c.h:798 (PostgreSQL 17), c.h:767 (PostgreSQL 18), c.h:873 (PostgreSQL 19)
+/// C macro lengthof from c.h:779 (PostgreSQL 15), c.h:789 (PostgreSQL 16), c.h:805 (PostgreSQL 17), c.h:774 (PostgreSQL 18), c.h:879 (PostgreSQL 19)
 ///
 /// ```text
 /// #define lengthof( array ) ( sizeof ( array ) / sizeof ( ( array ) [ 0 ] ) )
@@ -1029,10 +2584,30 @@ macro_rules! i64abs {
 #[macro_export]
 macro_rules! lengthof {
     ($array:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$array;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::div(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                    $crate::__pgrx_c_macros::CSize
+                                >()
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                    $crate::__pgrx_c_macros::CSize
+                                >()
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro likely from c.h:279 (PostgreSQL 15), c.h:301 (PostgreSQL 16), c.h:317 (PostgreSQL 17), c.h:353 (PostgreSQL 18), c.h:434 (PostgreSQL 19)
+/// C macro likely from c.h:286 (PostgreSQL 15), c.h:308 (PostgreSQL 16), c.h:324 (PostgreSQL 17), c.h:360 (PostgreSQL 18), c.h:441 (PostgreSQL 19)
 ///
 /// ```text
 /// #define likely( x ) __builtin_expect ( ( x ) != 0 , 1 )
@@ -1049,74 +2624,19 @@ macro_rules! lengthof {
 #[macro_export]
 macro_rules! likely {
     ($x:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CLong
+                    >()
+                )
+            }
+        )
     };
 }
-/// C macro ngettext from c.h:1220 (PostgreSQL 15), c.h:1202 (PostgreSQL 16), c.h:1194 (PostgreSQL 17), c.h:1163 (PostgreSQL 18), c.h:1273 (PostgreSQL 19)
-///
-/// ```text
-/// #define ngettext( s , p , n ) ( ( n ) == 1 ? ( s ) : ( p ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-#[macro_export]
-macro_rules! ngettext {
-    ($s:expr, $p:expr, $n:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-#[cfg(feature = "pg19")]
-/// C macro pg_assume from c.h:413 (PostgreSQL 19)
-///
-/// ```text
-/// #define pg_assume( expr ) Assert ( expr )
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
-#[doc = crate::__pgrx_c_doc_statements!()]
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! pg_assume {
-    ($expr:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
-/// C macro pg_unreachable from c.h:268 (PostgreSQL 15), c.h:290 (PostgreSQL 16), c.h:306 (PostgreSQL 17), c.h:367 (PostgreSQL 19)
-///
-/// ```text
-/// #define pg_unreachable( ) abort ( )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! pg_unreachable {
-    () => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-/// C macro strtoi64 from c.h:1359 (PostgreSQL 15), c.h:1312 (PostgreSQL 16), c.h:1307 (PostgreSQL 17), c.h:1276 (PostgreSQL 18), c.h:1398 (PostgreSQL 19)
+/// C macro strtoi64 from c.h:1366 (PostgreSQL 15), c.h:1319 (PostgreSQL 16), c.h:1314 (PostgreSQL 17), c.h:1283 (PostgreSQL 18), c.h:1416 (PostgreSQL 19)
 ///
 /// ```text
 /// #define strtoi64( str , endptr , base ) ( ( int64 ) strtol ( str , endptr , base ) )
@@ -1133,10 +2653,23 @@ macro_rules! pg_unreachable {
 #[macro_export]
 macro_rules! strtoi64 {
     ($str:expr, $endptr:expr, $base:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$str;
+                let _ = &$endptr;
+                let _ = &$base;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_types::int64
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro strtou64 from c.h:1360 (PostgreSQL 15), c.h:1313 (PostgreSQL 16), c.h:1308 (PostgreSQL 17), c.h:1277 (PostgreSQL 18), c.h:1399 (PostgreSQL 19)
+/// C macro strtou64 from c.h:1367 (PostgreSQL 15), c.h:1320 (PostgreSQL 16), c.h:1315 (PostgreSQL 17), c.h:1284 (PostgreSQL 18), c.h:1417 (PostgreSQL 19)
 ///
 /// ```text
 /// #define strtou64( str , endptr , base ) ( ( uint64 ) strtoul ( str , endptr , base ) )
@@ -1153,10 +2686,23 @@ macro_rules! strtoi64 {
 #[macro_export]
 macro_rules! strtou64 {
     ($str:expr, $endptr:expr, $base:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$str;
+                let _ = &$endptr;
+                let _ = &$base;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_types::uint64
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro unlikely from c.h:280 (PostgreSQL 15), c.h:302 (PostgreSQL 16), c.h:318 (PostgreSQL 17), c.h:354 (PostgreSQL 18), c.h:435 (PostgreSQL 19)
+/// C macro unlikely from c.h:287 (PostgreSQL 15), c.h:309 (PostgreSQL 16), c.h:325 (PostgreSQL 17), c.h:361 (PostgreSQL 18), c.h:442 (PostgreSQL 19)
 ///
 /// ```text
 /// #define unlikely( x ) __builtin_expect ( ( x ) != 0 , 0 )
@@ -1173,16 +2719,27 @@ macro_rules! strtou64 {
 #[macro_export]
 macro_rules! unlikely {
     ($x:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$x;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CLong
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
 pub use Abs;
-#[cfg(feature = "pg18")]
 pub use Assert;
-#[cfg(feature = "pg18")]
+#[cfg(feature = "pg15")]
+pub use AssertArg;
 pub use AssertMacro;
 pub use AssertPointerAlignment;
+#[cfg(feature = "pg15")]
+pub use AssertState;
 pub use BUFFERALIGN;
 pub use BUFFERALIGN_DOWN;
 pub use BoolIsValid;
@@ -1229,19 +2786,15 @@ pub use SQL_STR_DOUBLE;
 pub use TYPEALIGN;
 pub use TYPEALIGN_DOWN;
 pub use TYPEALIGN64;
-pub use dgettext;
-pub use dngettext;
-pub use gettext;
+#[cfg(feature = "pg15")]
+pub use Trap;
+#[cfg(feature = "pg15")]
+pub use TrapMacro;
 pub use gettext_noop;
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use i64abs;
 pub use lengthof;
 pub use likely;
-pub use ngettext;
-#[cfg(feature = "pg19")]
-pub use pg_assume;
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
-pub use pg_unreachable;
 pub use strtoi64;
 pub use strtou64;
 pub use unlikely;

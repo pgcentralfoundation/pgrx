@@ -5,7 +5,7 @@
 /// Typed call adapter for C inline function ExecScanExtended from execScan.h:159 (PostgreSQL 18), execScan.h:160 (PostgreSQL 19)
 ///
 /// ```c
-/// static pg_attribute_always_inline TupleTableSlot *
+/// static pg_always_inline TupleTableSlot *
 /// ExecScanExtended(ScanState *node,
 /// 				 ExecScanAccessMtd accessMtd,	/* function returning a tuple */
 /// 				 ExecScanRecheckMtd recheckMtd,
@@ -113,15 +113,40 @@
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ExecScanExtended {
-    ($node:expr, $accessMtd:expr, $recheckMtd:expr, $epqstate:expr, $qual:expr, $projInfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $node:expr,
+        $accessMtd:expr,
+        $recheckMtd:expr,
+        $epqstate:expr,
+        $qual:expr,
+        $projInfo:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$node;
+                let _ = &$accessMtd;
+                let _ = &$recheckMtd;
+                let _ = &$epqstate;
+                let _ = &$qual;
+                let _ = &$projInfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TupleTableSlot
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
 /// Typed call adapter for C inline function ExecScanFetch from execScan.h:31 (PostgreSQL 18), execScan.h:32 (PostgreSQL 19)
 ///
 /// ```c
-/// static pg_attribute_always_inline TupleTableSlot *
+/// static pg_always_inline TupleTableSlot *
 /// ExecScanFetch(ScanState *node,
 /// 			  EPQState *epqstate,
 /// 			  ExecScanAccessMtd accessMtd,
@@ -241,7 +266,23 @@ macro_rules! ExecScanExtended {
 #[macro_export]
 macro_rules! ExecScanFetch {
     ($node:expr, $epqstate:expr, $accessMtd:expr, $recheckMtd:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$node;
+                let _ = &$epqstate;
+                let _ = &$accessMtd;
+                let _ = &$recheckMtd;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TupleTableSlot
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]

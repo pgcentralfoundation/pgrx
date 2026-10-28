@@ -18,36 +18,48 @@
 #[macro_export]
 macro_rules! BTCommuteStrategyNumber {
     ($strat:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::sub::<
+                            $crate::__pgrx_c_macros::Wrapping,
+                            _,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::add::<
+                                    $crate::__pgrx_c_macros::Wrapping,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::BTMaxStrategyNumber as i32
+                                        )
+                                    ),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    )
+                                )
+                            ),
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; (@native [$strat]))
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
-/// C macro BTGetDeduplicateItems from nbtree.h:1105 (PostgreSQL 15), nbtree.h:1110 (PostgreSQL 16), nbtree.h:1146 (PostgreSQL 17), nbtree.h:1135 (PostgreSQL 19)
-///
-/// ```text
-/// #define BTGetDeduplicateItems( relation ) ( AssertMacro ( relation -> rd_rel -> relkind == RELKIND_INDEX && relation -> rd_rel -> relam == BTREE_AM_OID ) , ( ( relation ) -> rd_options ? ( ( BTOptions * ) ( relation ) -> rd_options ) -> deduplicate_items : true ) )
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! BTGetDeduplicateItems {
-    ($relation:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-#[cfg(feature = "pg18")]
-/// C macro BTGetDeduplicateItems from nbtree.h:1166 (PostgreSQL 18)
+/// C macro BTGetDeduplicateItems from nbtree.h:1105 (PostgreSQL 15), nbtree.h:1110 (PostgreSQL 16), nbtree.h:1146 (PostgreSQL 17), nbtree.h:1166 (PostgreSQL 18), nbtree.h:1135 (PostgreSQL 19)
 ///
 /// ```text
 /// #define BTGetDeduplicateItems( relation ) ( AssertMacro ( relation -> rd_rel -> relkind == RELKIND_INDEX && relation -> rd_rel -> relam == BTREE_AM_OID ) , ( ( relation ) -> rd_options ? ( ( BTOptions * ) ( relation ) -> rd_options ) -> deduplicate_items : true ) )
@@ -64,36 +76,97 @@ macro_rules! BTGetDeduplicateItems {
 #[macro_export]
 macro_rules! BTGetDeduplicateItems {
     ($relation:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::select(
+                                        if $crate::__pgrx_c_macros::expression::truth(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::load(
+                                                    $crate::__pgrx_c_macros::expression::project::<
+                                                        $crate::__pgrx_c_generated::Field_rd_options,
+                                                        _,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::pointee(
+                                                            (
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_operand!(
+                                                                        @value [true];
+                                                                        (@native [$relation])
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ) {
+                                            $crate::__pgrx_c_macros::Either::Left(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::load(
+                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                            $crate::__pgrx_c_generated::Field_deduplicate_items,
+                                                            _,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                                (
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                    $crate::__pgrx_c_bindings::BTOptions
+                                                                                >,
+                                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                            >>()
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        } else {
+                                            $crate::__pgrx_c_macros::Either::Right(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(1i32)
+                                                )
+                                            )
+                                        }
+                                    )
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
-/// C macro BTGetFillFactor from nbtree.h:1097 (PostgreSQL 15), nbtree.h:1102 (PostgreSQL 16), nbtree.h:1138 (PostgreSQL 17), nbtree.h:1127 (PostgreSQL 19)
-///
-/// ```text
-/// #define BTGetFillFactor( relation ) ( AssertMacro ( relation -> rd_rel -> relkind == RELKIND_INDEX && relation -> rd_rel -> relam == BTREE_AM_OID ) , ( relation ) -> rd_options ? ( ( BTOptions * ) ( relation ) -> rd_options ) -> fillfactor : BTREE_DEFAULT_FILLFACTOR )
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! BTGetFillFactor {
-    ($relation:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-#[cfg(feature = "pg18")]
-/// C macro BTGetFillFactor from nbtree.h:1158 (PostgreSQL 18)
+/// C macro BTGetFillFactor from nbtree.h:1097 (PostgreSQL 15), nbtree.h:1102 (PostgreSQL 16), nbtree.h:1138 (PostgreSQL 17), nbtree.h:1158 (PostgreSQL 18), nbtree.h:1127 (PostgreSQL 19)
 ///
 /// ```text
 /// #define BTGetFillFactor( relation ) ( AssertMacro ( relation -> rd_rel -> relkind == RELKIND_INDEX && relation -> rd_rel -> relam == BTREE_AM_OID ) , ( relation ) -> rd_options ? ( ( BTOptions * ) ( relation ) -> rd_options ) -> fillfactor : BTREE_DEFAULT_FILLFACTOR )
@@ -110,36 +183,96 @@ macro_rules! BTGetFillFactor {
 #[macro_export]
 macro_rules! BTGetFillFactor {
     ($relation:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::select(
+                                    if $crate::__pgrx_c_macros::expression::truth(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_rd_options,
+                                                    _,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_operand!(
+                                                                    @value [true];
+                                                                    (@native [$relation])
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ) {
+                                        $crate::__pgrx_c_macros::Either::Left(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::load(
+                                                    $crate::__pgrx_c_macros::expression::project::<
+                                                        $crate::__pgrx_c_generated::Field_fillfactor,
+                                                        _,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::pointee(
+                                                            (
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                $crate::__pgrx_c_bindings::BTOptions
+                                                                            >,
+                                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                        >>()
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    } else {
+                                        $crate::__pgrx_c_macros::Either::Right(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::CValue::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::BTREE_DEFAULT_FILLFACTOR as i32
+                                                )
+                                            )
+                                        )
+                                    }
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
-/// C macro BTGetTargetPageFreeSpace from nbtree.h:1103 (PostgreSQL 15), nbtree.h:1108 (PostgreSQL 16), nbtree.h:1144 (PostgreSQL 17), nbtree.h:1133 (PostgreSQL 19)
-///
-/// ```text
-/// #define BTGetTargetPageFreeSpace( relation ) ( BLCKSZ * ( 100 - BTGetFillFactor ( relation ) ) / 100 )
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! BTGetTargetPageFreeSpace {
-    ($relation:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-#[cfg(feature = "pg18")]
-/// C macro BTGetTargetPageFreeSpace from nbtree.h:1164 (PostgreSQL 18)
+/// C macro BTGetTargetPageFreeSpace from nbtree.h:1103 (PostgreSQL 15), nbtree.h:1108 (PostgreSQL 16), nbtree.h:1144 (PostgreSQL 17), nbtree.h:1164 (PostgreSQL 18), nbtree.h:1133 (PostgreSQL 19)
 ///
 /// ```text
 /// #define BTGetTargetPageFreeSpace( relation ) ( BLCKSZ * ( 100 - BTGetFillFactor ( relation ) ) / 100 )
@@ -156,7 +289,150 @@ macro_rules! BTGetTargetPageFreeSpace {
 #[macro_export]
 macro_rules! BTGetTargetPageFreeSpace {
     ($relation:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                        $crate::__pgrx_c_macros::expression::div(
+                            $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                $crate::__pgrx_c_macros::expression::mul::<
+                                    $crate::__pgrx_c_macros::Wrapping,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::BLCKSZ as i32)
+                                    ),
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            false,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::sub::<
+                                                $crate::__pgrx_c_macros::Wrapping,
+                                                _,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    false,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(100i32)
+                                                ),
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        false,
+                                                        _
+                                                    >(
+                                                        {
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                false,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::select(
+                                                                    if $crate::__pgrx_c_macros::expression::truth(
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            false,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::load(
+                                                                                $crate::__pgrx_c_macros::expression::project::<
+                                                                                    $crate::__pgrx_c_generated::Field_rd_options,
+                                                                                    _,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                                                        (
+                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                false,
+                                                                                                _
+                                                                                            >(
+                                                                                                $crate::__pgrx_c_operand!(
+                                                                                                    @value [
+                                                                                                        false
+                                                                                                    ];
+                                                                                                    (
+                                                                                                        @native [
+                                                                                                            $relation
+                                                                                                        ]
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    ) {
+                                                                        $crate::__pgrx_c_macros::Either::Left(
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                false,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::load(
+                                                                                    $crate::__pgrx_c_macros::expression::project::<
+                                                                                        $crate::__pgrx_c_generated::Field_fillfactor,
+                                                                                        _,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_macros::expression::pointee(
+                                                                                            (
+                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                    false,
+                                                                                                    _
+                                                                                                >(
+                                                                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                                                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                                                $crate::__pgrx_c_bindings::BTOptions
+                                                                                                            >,
+                                                                                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                                                        >>()
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    } else {
+                                                                        $crate::__pgrx_c_macros::Either::Right(
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                false,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::CValue::<
+                                                                                    $crate::__pgrx_c_macros::CInt
+                                                                                >::new(
+                                                                                    $crate::__pgrx_c_bindings::BTREE_DEFAULT_FILLFACTOR as i32
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    }
+                                                                )
+                                                            )
+                                                        }
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    100i32
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -177,7 +453,38 @@ macro_rules! BTGetTargetPageFreeSpace {
 #[macro_export]
 macro_rules! BTMaxItemSize {
     ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$page;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                        $crate::__pgrx_c_types::uintptr_t
+                                    >()
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                $crate::__pgrx_c_macros::expression::bitnot(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            false,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -198,7 +505,131 @@ macro_rules! BTMaxItemSize {
 #[macro_export]
 macro_rules! BTMaxItemSize {
     ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$page;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                        $crate::__pgrx_c_macros::expression::sub::<
+                            $crate::__pgrx_c_macros::Wrapping,
+                            _,
+                            _
+                        >(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                    $crate::__pgrx_c_macros::expression::bitand(
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                false,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                    $crate::__pgrx_c_types::uintptr_t
+                                                >()
+                                            )
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            false,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitnot(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        false,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                            $crate::__pgrx_c_types::uintptr_t
+                                                        >()
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                    $crate::__pgrx_c_macros::expression::bitand(
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                false,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::add::<
+                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                    _,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        false,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                            $crate::__pgrx_c_types::uintptr_t
+                                                        >()
+                                                    ),
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            false,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::sub::<
+                                                                $crate::__pgrx_c_macros::Wrapping,
+                                                                _,
+                                                                _
+                                                            >(
+                                                                (
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        false,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                            $crate::__pgrx_c_macros::CInt
+                                                                        >::new(
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
+                                                                        )
+                                                                    )
+                                                                ),
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    false,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::CValue::<
+                                                                        $crate::__pgrx_c_macros::CInt
+                                                                    >::new(1i32)
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            false,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitnot(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        false,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                            $crate::__pgrx_c_types::uintptr_t
+                                                        >()
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -219,7 +650,38 @@ macro_rules! BTMaxItemSize {
 #[macro_export]
 macro_rules! BTMaxItemSizeNoHeapTid {
     ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$page;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                        $crate::__pgrx_c_types::uintptr_t
+                                    >()
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                $crate::__pgrx_c_macros::expression::bitnot(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            false,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -240,7 +702,38 @@ macro_rules! BTMaxItemSizeNoHeapTid {
 #[macro_export]
 macro_rules! BTMaxItemSizeNoHeapTid {
     ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$page;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                        $crate::__pgrx_c_types::uintptr_t
+                                    >()
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                $crate::__pgrx_c_macros::expression::bitnot(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            false,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -281,7 +774,17 @@ macro_rules! BTMaxItemSizeNoHeapTid {
 #[macro_export]
 macro_rules! BTPageGetDeleteXid {
     ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$page;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CRawRecord<
+                            $crate::__pgrx_c_bindings::FullTransactionId
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -322,7 +825,17 @@ macro_rules! BTPageGetDeleteXid {
 #[macro_export]
 macro_rules! BTPageGetDeleteXid {
     ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$page;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CRawRecord<
+                            $crate::__pgrx_c_bindings::FullTransactionId
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -343,7 +856,22 @@ macro_rules! BTPageGetDeleteXid {
 #[macro_export]
 macro_rules! BTPageGetMeta {
     ($p:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$p;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::BTMetaPageData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -364,7 +892,22 @@ macro_rules! BTPageGetMeta {
 #[macro_export]
 macro_rules! BTPageGetMeta {
     ($p:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$p;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::BTMetaPageData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -375,21 +918,32 @@ macro_rules! BTPageGetMeta {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTPageGetOpaque {
     ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$page;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::BTPageOpaqueData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
@@ -410,7 +964,22 @@ macro_rules! BTPageGetOpaque {
 #[macro_export]
 macro_rules! BTPageGetOpaque {
     ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$page;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::BTPageOpaqueData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -431,7 +1000,22 @@ macro_rules! BTPageGetOpaque {
 #[macro_export]
 macro_rules! BTPageGetOpaque {
     ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$page;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::BTPageOpaqueData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -483,7 +1067,16 @@ macro_rules! BTPageGetOpaque {
 #[macro_export]
 macro_rules! BTPageIsRecyclable {
     ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$page;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -534,7 +1127,17 @@ macro_rules! BTPageIsRecyclable {
 #[macro_export]
 macro_rules! BTPageIsRecyclable {
     ($page:expr, $heaprel:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$page;
+                let _ = &$heaprel;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function BTPageSetDeleted from nbtree.h:239 (PostgreSQL 15, 18–19), nbtree.h:238 (PostgreSQL 16–17)
@@ -575,7 +1178,13 @@ macro_rules! BTPageIsRecyclable {
 #[macro_export]
 macro_rules! BTPageSetDeleted {
     ($page:expr, $safexid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$page;
+                let _ = &$safexid;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -594,7 +1203,9 @@ macro_rules! BTPageSetDeleted {
 #[macro_export]
 macro_rules! BTScanPosInvalidate {
     ($scanpos:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$scanpos;
+        })
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -613,7 +1224,9 @@ macro_rules! BTScanPosInvalidate {
 #[macro_export]
 macro_rules! BTScanPosInvalidate {
     ($scanpos:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$scanpos;
+        })
     };
 }
 #[cfg(feature = "pg15")]
@@ -624,50 +1237,45 @@ macro_rules! BTScanPosInvalidate {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTScanPosIsPinned {
     ($scanpos:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scanpos;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    {
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >()
+                                        )
+                                    }
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg19"))]
-/// C macro BTScanPosIsPinned from nbtree.h:995 (PostgreSQL 16), nbtree.h:999 (PostgreSQL 17), nbtree.h:1004 (PostgreSQL 19)
-///
-/// ```text
-/// #define BTScanPosIsPinned( scanpos ) ( AssertMacro ( BlockNumberIsValid ( ( scanpos ) . currPage ) || ! BufferIsValid ( ( scanpos ) . buf ) ) , BufferIsValid ( ( scanpos ) . buf ) )
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! BTScanPosIsPinned {
-    ($scanpos:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-#[cfg(feature = "pg18")]
-/// C macro BTScanPosIsPinned from nbtree.h:1004 (PostgreSQL 18)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro BTScanPosIsPinned from nbtree.h:995 (PostgreSQL 16), nbtree.h:999 (PostgreSQL 17), nbtree.h:1004 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define BTScanPosIsPinned( scanpos ) ( AssertMacro ( BlockNumberIsValid ( ( scanpos ) . currPage ) || ! BufferIsValid ( ( scanpos ) . buf ) ) , BufferIsValid ( ( scanpos ) . buf ) )
@@ -684,7 +1292,22 @@ macro_rules! BTScanPosIsPinned {
 #[macro_export]
 macro_rules! BTScanPosIsPinned {
     ($scanpos:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scanpos;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                    $crate::__pgrx_c_macros::CBool
+                                >()
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -695,50 +1318,38 @@ macro_rules! BTScanPosIsPinned {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BTScanPosIsValid {
     ($scanpos:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scanpos;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                        $crate::__pgrx_c_macros::CInt
+                                    >()
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg19"))]
-/// C macro BTScanPosIsValid from nbtree.h:1012 (PostgreSQL 16), nbtree.h:1016 (PostgreSQL 17), nbtree.h:1021 (PostgreSQL 19)
-///
-/// ```text
-/// #define BTScanPosIsValid( scanpos ) ( AssertMacro ( BlockNumberIsValid ( ( scanpos ) . currPage ) || ! BufferIsValid ( ( scanpos ) . buf ) ) , BlockNumberIsValid ( ( scanpos ) . currPage ) )
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! BTScanPosIsValid {
-    ($scanpos:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-#[cfg(feature = "pg18")]
-/// C macro BTScanPosIsValid from nbtree.h:1021 (PostgreSQL 18)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro BTScanPosIsValid from nbtree.h:1012 (PostgreSQL 16), nbtree.h:1016 (PostgreSQL 17), nbtree.h:1021 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define BTScanPosIsValid( scanpos ) ( AssertMacro ( BlockNumberIsValid ( ( scanpos ) . currPage ) || ! BufferIsValid ( ( scanpos ) . buf ) ) , BlockNumberIsValid ( ( scanpos ) . currPage ) )
@@ -755,7 +1366,22 @@ macro_rules! BTScanPosIsValid {
 #[macro_export]
 macro_rules! BTScanPosIsValid {
     ($scanpos:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scanpos;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        {
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                    $crate::__pgrx_c_macros::CBool
+                                >()
+                            )
+                        }
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro BTScanPosUnpin from nbtree.h:996 (PostgreSQL 15), nbtree.h:1001 (PostgreSQL 16), nbtree.h:1005 (PostgreSQL 17), nbtree.h:1010 (PostgreSQL 18–19)
@@ -777,65 +1403,12 @@ macro_rules! BTScanPosIsValid {
 #[macro_export]
 macro_rules! BTScanPosUnpin {
     ($scanpos:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$scanpos;
+        })
     };
 }
-#[cfg(feature = "pg15")]
-/// C macro BTScanPosUnpinIfPinned from nbtree.h:1001 (PostgreSQL 15)
-///
-/// ```text
-/// #define BTScanPosUnpinIfPinned( scanpos ) do { if ( BTScanPosIsPinned ( scanpos ) ) BTScanPosUnpin ( scanpos ) ; } while ( 0 )
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
-#[doc = crate::__pgrx_c_doc_statements!()]
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! BTScanPosUnpinIfPinned {
-    ($scanpos:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg19"))]
-/// C macro BTScanPosUnpinIfPinned from nbtree.h:1006 (PostgreSQL 16), nbtree.h:1010 (PostgreSQL 17), nbtree.h:1015 (PostgreSQL 19)
-///
-/// ```text
-/// #define BTScanPosUnpinIfPinned( scanpos ) do { if ( BTScanPosIsPinned ( scanpos ) ) BTScanPosUnpin ( scanpos ) ; } while ( 0 )
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
-#[doc = crate::__pgrx_c_doc_statements!()]
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! BTScanPosUnpinIfPinned {
-    ($scanpos:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-#[cfg(feature = "pg18")]
-/// C macro BTScanPosUnpinIfPinned from nbtree.h:1015 (PostgreSQL 18)
+/// C macro BTScanPosUnpinIfPinned from nbtree.h:1001 (PostgreSQL 15), nbtree.h:1006 (PostgreSQL 16), nbtree.h:1010 (PostgreSQL 17), nbtree.h:1015 (PostgreSQL 18–19)
 ///
 /// ```text
 /// #define BTScanPosUnpinIfPinned( scanpos ) do { if ( BTScanPosIsPinned ( scanpos ) ) BTScanPosUnpin ( scanpos ) ; } while ( 0 )
@@ -854,7 +1427,9 @@ macro_rules! BTScanPosUnpinIfPinned {
 #[macro_export]
 macro_rules! BTScanPosUnpinIfPinned {
     ($scanpos:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$scanpos;
+        })
     };
 }
 /// Typed call adapter for C inline function BTreeTupleGetDownLink from nbtree.h:550 (PostgreSQL 15), nbtree.h:555 (PostgreSQL 16–17), nbtree.h:556 (PostgreSQL 18–19)
@@ -880,7 +1455,16 @@ macro_rules! BTScanPosUnpinIfPinned {
 #[macro_export]
 macro_rules! BTreeTupleGetDownLink {
     ($pivot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$pivot;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::BlockNumber
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function BTreeTupleGetHeapTID from nbtree.h:632 (PostgreSQL 15), nbtree.h:637 (PostgreSQL 16–17), nbtree.h:638 (PostgreSQL 18–19)
@@ -920,7 +1504,20 @@ macro_rules! BTreeTupleGetDownLink {
 #[macro_export]
 macro_rules! BTreeTupleGetHeapTID {
     ($itup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$itup;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function BTreeTupleGetMaxHeapTID from nbtree.h:658 (PostgreSQL 15), nbtree.h:663 (PostgreSQL 16–17), nbtree.h:664 (PostgreSQL 18–19)
@@ -955,10 +1552,24 @@ macro_rules! BTreeTupleGetHeapTID {
 #[macro_export]
 macro_rules! BTreeTupleGetMaxHeapTID {
     ($itup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$itup;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
-/// C macro BTreeTupleGetNAtts from nbtree.h:572 (PostgreSQL 15), nbtree.h:577 (PostgreSQL 16–17), nbtree.h:578 (PostgreSQL 18–19)
+#[cfg(feature = "pg15")]
+/// C macro BTreeTupleGetNAtts from nbtree.h:572 (PostgreSQL 15)
 ///
 /// ```text
 /// #define BTreeTupleGetNAtts( itup , rel ) ( ( BTreeTupleIsPivot ( itup ) ) ? ( ItemPointerGetOffsetNumberNoCheck ( & ( itup ) -> t_tid ) & BT_OFFSET_MASK ) : IndexRelationGetNumberOfAttributes ( rel ) )
@@ -975,7 +1586,260 @@ macro_rules! BTreeTupleGetMaxHeapTID {
 #[macro_export]
 macro_rules! BTreeTupleGetNAtts {
     ($itup:expr, $rel:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CBool
+                                        >()
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::load(
+                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                $crate::__pgrx_c_generated::Field_ip_posid,
+                                                                _,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::address(
+                                                                                $crate::__pgrx_c_macros::expression::project::<
+                                                                                    $crate::__pgrx_c_generated::Field_t_tid,
+                                                                                    _,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                                                        (
+                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                true,
+                                                                                                _
+                                                                                            >(
+                                                                                                $crate::__pgrx_c_operand!(
+                                                                                                    @value [
+                                                                                                        true
+                                                                                                    ];
+                                                                                                    (
+                                                                                                        @native [
+                                                                                                            $itup
+                                                                                                        ]
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::BT_OFFSET_MASK as i32
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_indnatts,
+                                                    _,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::load(
+                                                                $crate::__pgrx_c_macros::expression::project::<
+                                                                    $crate::__pgrx_c_generated::Field_rd_index,
+                                                                    _,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                                        (
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                true,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_operand!(
+                                                                                    @value [true];
+                                                                                    (@native [$rel])
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
+    };
+}
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro BTreeTupleGetNAtts from nbtree.h:577 (PostgreSQL 16–17), nbtree.h:578 (PostgreSQL 18–19)
+///
+/// ```text
+/// #define BTreeTupleGetNAtts( itup , rel ) ( ( BTreeTupleIsPivot ( itup ) ) ? ( ItemPointerGetOffsetNumberNoCheck ( & ( itup ) -> t_tid ) & BT_OFFSET_MASK ) : IndexRelationGetNumberOfAttributes ( rel ) )
+/// ```
+///
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleGetNAtts {
+    ($itup:expr, $rel:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$itup;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CBool
+                                        >()
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                        $crate::__pgrx_c_types::OffsetNumber
+                                                    >()
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::BT_OFFSET_MASK as i32
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_indnatts,
+                                                    _,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::load(
+                                                                $crate::__pgrx_c_macros::expression::project::<
+                                                                    $crate::__pgrx_c_generated::Field_rd_index,
+                                                                    _,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                                        (
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                true,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_operand!(
+                                                                                    @value [true];
+                                                                                    (@native [$rel])
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function BTreeTupleGetNPosting from nbtree.h:512 (PostgreSQL 15), nbtree.h:517 (PostgreSQL 16–17), nbtree.h:518 (PostgreSQL 18–19)
@@ -1006,7 +1870,16 @@ macro_rules! BTreeTupleGetNAtts {
 #[macro_export]
 macro_rules! BTreeTupleGetNPosting {
     ($posting:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$posting;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::uint16
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function BTreeTupleGetPosting from nbtree.h:531 (PostgreSQL 15), nbtree.h:536 (PostgreSQL 16–17), nbtree.h:537 (PostgreSQL 18–19)
@@ -1033,7 +1906,20 @@ macro_rules! BTreeTupleGetNPosting {
 #[macro_export]
 macro_rules! BTreeTupleGetPosting {
     ($posting:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$posting;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function BTreeTupleGetPostingN from nbtree.h:538 (PostgreSQL 15), nbtree.h:543 (PostgreSQL 16–17), nbtree.h:544 (PostgreSQL 18–19)
@@ -1059,7 +1945,21 @@ macro_rules! BTreeTupleGetPosting {
 #[macro_export]
 macro_rules! BTreeTupleGetPostingN {
     ($posting:expr, $n:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$posting;
+                let _ = &$n;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function BTreeTupleGetPostingOffset from nbtree.h:523 (PostgreSQL 15), nbtree.h:528 (PostgreSQL 16–17), nbtree.h:529 (PostgreSQL 18–19)
@@ -1087,7 +1987,16 @@ macro_rules! BTreeTupleGetPostingN {
 #[macro_export]
 macro_rules! BTreeTupleGetPostingOffset {
     ($posting:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$posting;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::uint32
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function BTreeTupleGetTopParent from nbtree.h:614 (PostgreSQL 15), nbtree.h:619 (PostgreSQL 16–17), nbtree.h:620 (PostgreSQL 18–19)
@@ -1113,7 +2022,16 @@ macro_rules! BTreeTupleGetPostingOffset {
 #[macro_export]
 macro_rules! BTreeTupleGetTopParent {
     ($leafhikey:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$leafhikey;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::BlockNumber
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function BTreeTupleIsPivot from nbtree.h:474 (PostgreSQL 15), nbtree.h:479 (PostgreSQL 16–17), nbtree.h:480 (PostgreSQL 18–19)
@@ -1145,7 +2063,16 @@ macro_rules! BTreeTupleGetTopParent {
 #[macro_export]
 macro_rules! BTreeTupleIsPivot {
     ($itup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$itup;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function BTreeTupleIsPosting from nbtree.h:486 (PostgreSQL 15), nbtree.h:491 (PostgreSQL 16–17), nbtree.h:492 (PostgreSQL 18–19)
@@ -1177,7 +2104,16 @@ macro_rules! BTreeTupleIsPivot {
 #[macro_export]
 macro_rules! BTreeTupleIsPosting {
     ($itup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$itup;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function BTreeTupleSetDownLink from nbtree.h:556 (PostgreSQL 15), nbtree.h:561 (PostgreSQL 16–17), nbtree.h:562 (PostgreSQL 18–19)
@@ -1203,7 +2139,13 @@ macro_rules! BTreeTupleIsPosting {
 #[macro_export]
 macro_rules! BTreeTupleSetDownLink {
     ($pivot:expr, $blkno:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$pivot;
+                let _ = &$blkno;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function BTreeTupleSetNAtts from nbtree.h:589 (PostgreSQL 15), nbtree.h:594 (PostgreSQL 16–17), nbtree.h:595 (PostgreSQL 18–19)
@@ -1241,7 +2183,14 @@ macro_rules! BTreeTupleSetDownLink {
 #[macro_export]
 macro_rules! BTreeTupleSetNAtts {
     ($itup:expr, $nkeyatts:expr, $heaptid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$itup;
+                let _ = &$nkeyatts;
+                let _ = &$heaptid;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function BTreeTupleSetPosting from nbtree.h:498 (PostgreSQL 15), nbtree.h:503 (PostgreSQL 16–17), nbtree.h:504 (PostgreSQL 18–19)
@@ -1275,7 +2224,14 @@ macro_rules! BTreeTupleSetNAtts {
 #[macro_export]
 macro_rules! BTreeTupleSetPosting {
     ($itup:expr, $nhtids:expr, $postingoffset:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$itup;
+                let _ = &$nhtids;
+                let _ = &$postingoffset;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function BTreeTupleSetTopParent from nbtree.h:620 (PostgreSQL 15), nbtree.h:625 (PostgreSQL 16–17), nbtree.h:626 (PostgreSQL 18–19)
@@ -1302,7 +2258,13 @@ macro_rules! BTreeTupleSetPosting {
 #[macro_export]
 macro_rules! BTreeTupleSetTopParent {
     ($leafhikey:expr, $blkno:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$leafhikey;
+                let _ = &$blkno;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 /// C macro P_FIRSTDATAKEY from nbtree.h:371 (PostgreSQL 15), nbtree.h:369 (PostgreSQL 16–17), nbtree.h:370 (PostgreSQL 18–19)
@@ -1318,7 +2280,42 @@ macro_rules! BTreeTupleSetTopParent {
 #[macro_export]
 macro_rules! P_FIRSTDATAKEY {
     ($opaque:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$opaque;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >()
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CUnsignedShort
+                                        >::new($crate::__pgrx_c_bindings::P_HIKEY as u16)
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CUnsignedShort
+                                        >::new($crate::__pgrx_c_bindings::P_FIRSTKEY as u16)
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro P_HAS_FULLXID from nbtree.h:229 (PostgreSQL 15, 18–19), nbtree.h:228 (PostgreSQL 16–17)
@@ -1334,7 +2331,18 @@ macro_rules! P_FIRSTDATAKEY {
 #[macro_export]
 macro_rules! P_HAS_FULLXID {
     ($opaque:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$opaque;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro P_HAS_GARBAGE from nbtree.h:227 (PostgreSQL 15, 18–19), nbtree.h:226 (PostgreSQL 16–17)
@@ -1350,7 +2358,18 @@ macro_rules! P_HAS_FULLXID {
 #[macro_export]
 macro_rules! P_HAS_GARBAGE {
     ($opaque:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$opaque;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro P_IGNORE from nbtree.h:226 (PostgreSQL 15, 18–19), nbtree.h:225 (PostgreSQL 16–17)
@@ -1366,7 +2385,18 @@ macro_rules! P_HAS_GARBAGE {
 #[macro_export]
 macro_rules! P_IGNORE {
     ($opaque:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$opaque;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro P_INCOMPLETE_SPLIT from nbtree.h:228 (PostgreSQL 15, 18–19), nbtree.h:227 (PostgreSQL 16–17)
@@ -1382,7 +2412,18 @@ macro_rules! P_IGNORE {
 #[macro_export]
 macro_rules! P_INCOMPLETE_SPLIT {
     ($opaque:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$opaque;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro P_ISDELETED from nbtree.h:223 (PostgreSQL 15, 18–19), nbtree.h:222 (PostgreSQL 16–17)
@@ -1398,7 +2439,18 @@ macro_rules! P_INCOMPLETE_SPLIT {
 #[macro_export]
 macro_rules! P_ISDELETED {
     ($opaque:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$opaque;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro P_ISHALFDEAD from nbtree.h:225 (PostgreSQL 15, 18–19), nbtree.h:224 (PostgreSQL 16–17)
@@ -1414,7 +2466,18 @@ macro_rules! P_ISDELETED {
 #[macro_export]
 macro_rules! P_ISHALFDEAD {
     ($opaque:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$opaque;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro P_ISLEAF from nbtree.h:221 (PostgreSQL 15, 18–19), nbtree.h:220 (PostgreSQL 16–17)
@@ -1430,7 +2493,18 @@ macro_rules! P_ISHALFDEAD {
 #[macro_export]
 macro_rules! P_ISLEAF {
     ($opaque:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$opaque;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro P_ISMETA from nbtree.h:224 (PostgreSQL 15, 18–19), nbtree.h:223 (PostgreSQL 16–17)
@@ -1446,7 +2520,18 @@ macro_rules! P_ISLEAF {
 #[macro_export]
 macro_rules! P_ISMETA {
     ($opaque:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$opaque;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro P_ISROOT from nbtree.h:222 (PostgreSQL 15, 18–19), nbtree.h:221 (PostgreSQL 16–17)
@@ -1462,7 +2547,18 @@ macro_rules! P_ISMETA {
 #[macro_export]
 macro_rules! P_ISROOT {
     ($opaque:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$opaque;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro P_LEFTMOST from nbtree.h:219 (PostgreSQL 15, 18–19), nbtree.h:218 (PostgreSQL 16–17)
@@ -1478,7 +2574,18 @@ macro_rules! P_ISROOT {
 #[macro_export]
 macro_rules! P_LEFTMOST {
     ($opaque:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$opaque;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro P_RIGHTMOST from nbtree.h:220 (PostgreSQL 15, 18–19), nbtree.h:219 (PostgreSQL 16–17)
@@ -1494,7 +2601,18 @@ macro_rules! P_LEFTMOST {
 #[macro_export]
 macro_rules! P_RIGHTMOST {
     ($opaque:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$opaque;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 pub use BTCommuteStrategyNumber;

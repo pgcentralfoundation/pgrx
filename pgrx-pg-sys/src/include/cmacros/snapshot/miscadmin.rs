@@ -15,11 +15,21 @@
 #[macro_export]
 macro_rules! AmArchiverProcess {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro AmArchiverProcess from miscadmin.h:382 (PostgreSQL 17), miscadmin.h:387 (PostgreSQL 18), miscadmin.h:393 (PostgreSQL 19)
+/// C macro AmArchiverProcess from miscadmin.h:382 (PostgreSQL 17), miscadmin.h:387 (PostgreSQL 18), miscadmin.h:391 (PostgreSQL 19)
 ///
 /// ```text
 /// #define AmArchiverProcess( ) ( MyBackendType == B_ARCHIVER )
@@ -32,11 +42,21 @@ macro_rules! AmArchiverProcess {
 #[macro_export]
 macro_rules! AmArchiverProcess {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro AmAutoVacuumLauncherProcess from miscadmin.h:377 (PostgreSQL 17), miscadmin.h:382 (PostgreSQL 18), miscadmin.h:388 (PostgreSQL 19)
+/// C macro AmAutoVacuumLauncherProcess from miscadmin.h:377 (PostgreSQL 17), miscadmin.h:382 (PostgreSQL 18), miscadmin.h:385 (PostgreSQL 19)
 ///
 /// ```text
 /// #define AmAutoVacuumLauncherProcess( ) ( MyBackendType == B_AUTOVAC_LAUNCHER )
@@ -49,11 +69,21 @@ macro_rules! AmArchiverProcess {
 #[macro_export]
 macro_rules! AmAutoVacuumLauncherProcess {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro AmAutoVacuumWorkerProcess from miscadmin.h:378 (PostgreSQL 17), miscadmin.h:383 (PostgreSQL 18), miscadmin.h:389 (PostgreSQL 19)
+/// C macro AmAutoVacuumWorkerProcess from miscadmin.h:378 (PostgreSQL 17), miscadmin.h:383 (PostgreSQL 18), miscadmin.h:387 (PostgreSQL 19)
 ///
 /// ```text
 /// #define AmAutoVacuumWorkerProcess( ) ( MyBackendType == B_AUTOVAC_WORKER )
@@ -66,11 +96,21 @@ macro_rules! AmAutoVacuumLauncherProcess {
 #[macro_export]
 macro_rules! AmAutoVacuumWorkerProcess {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro AmBackgroundWorkerProcess from miscadmin.h:379 (PostgreSQL 17), miscadmin.h:384 (PostgreSQL 18), miscadmin.h:390 (PostgreSQL 19)
+/// C macro AmBackgroundWorkerProcess from miscadmin.h:379 (PostgreSQL 17), miscadmin.h:384 (PostgreSQL 18), miscadmin.h:388 (PostgreSQL 19)
 ///
 /// ```text
 /// #define AmBackgroundWorkerProcess( ) ( MyBackendType == B_BG_WORKER )
@@ -83,7 +123,17 @@ macro_rules! AmAutoVacuumWorkerProcess {
 #[macro_export]
 macro_rules! AmBackgroundWorkerProcess {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -100,11 +150,21 @@ macro_rules! AmBackgroundWorkerProcess {
 #[macro_export]
 macro_rules! AmBackgroundWriterProcess {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro AmBackgroundWriterProcess from miscadmin.h:383 (PostgreSQL 17), miscadmin.h:388 (PostgreSQL 18), miscadmin.h:394 (PostgreSQL 19)
+/// C macro AmBackgroundWriterProcess from miscadmin.h:383 (PostgreSQL 17), miscadmin.h:388 (PostgreSQL 18), miscadmin.h:392 (PostgreSQL 19)
 ///
 /// ```text
 /// #define AmBackgroundWriterProcess( ) ( MyBackendType == B_BG_WRITER )
@@ -117,7 +177,17 @@ macro_rules! AmBackgroundWriterProcess {
 #[macro_export]
 macro_rules! AmBackgroundWriterProcess {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -134,11 +204,21 @@ macro_rules! AmBackgroundWriterProcess {
 #[macro_export]
 macro_rules! AmCheckpointerProcess {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro AmCheckpointerProcess from miscadmin.h:384 (PostgreSQL 17), miscadmin.h:389 (PostgreSQL 18), miscadmin.h:395 (PostgreSQL 19)
+/// C macro AmCheckpointerProcess from miscadmin.h:384 (PostgreSQL 17), miscadmin.h:389 (PostgreSQL 18), miscadmin.h:393 (PostgreSQL 19)
 ///
 /// ```text
 /// #define AmCheckpointerProcess( ) ( MyBackendType == B_CHECKPOINTER )
@@ -151,28 +231,21 @@ macro_rules! AmCheckpointerProcess {
 #[macro_export]
 macro_rules! AmCheckpointerProcess {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-#[cfg(feature = "pg19")]
-/// C macro AmDataChecksumsWorkerProcess from miscadmin.h:401 (PostgreSQL 19)
-///
-/// ```text
-/// #define AmDataChecksumsWorkerProcess( ) ( MyBackendType == B_DATACHECKSUMSWORKER_LAUNCHER || MyBackendType == B_DATACHECKSUMSWORKER_WORKER )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-#[macro_export]
-macro_rules! AmDataChecksumsWorkerProcess {
-    () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro AmIoWorkerProcess from miscadmin.h:394 (PostgreSQL 18), miscadmin.h:400 (PostgreSQL 19)
+/// C macro AmIoWorkerProcess from miscadmin.h:394 (PostgreSQL 18), miscadmin.h:398 (PostgreSQL 19)
 ///
 /// ```text
 /// #define AmIoWorkerProcess( ) ( MyBackendType == B_IO_WORKER )
@@ -185,11 +258,21 @@ macro_rules! AmDataChecksumsWorkerProcess {
 #[macro_export]
 macro_rules! AmIoWorkerProcess {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro AmLogicalSlotSyncWorkerProcess from miscadmin.h:381 (PostgreSQL 17), miscadmin.h:386 (PostgreSQL 18), miscadmin.h:392 (PostgreSQL 19)
+/// C macro AmLogicalSlotSyncWorkerProcess from miscadmin.h:381 (PostgreSQL 17), miscadmin.h:386 (PostgreSQL 18), miscadmin.h:390 (PostgreSQL 19)
 ///
 /// ```text
 /// #define AmLogicalSlotSyncWorkerProcess( ) ( MyBackendType == B_SLOTSYNC_WORKER )
@@ -202,10 +285,20 @@ macro_rules! AmIoWorkerProcess {
 #[macro_export]
 macro_rules! AmLogicalSlotSyncWorkerProcess {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro AmRegularBackendProcess from miscadmin.h:344 (PostgreSQL 15), miscadmin.h:349 (PostgreSQL 16), miscadmin.h:376 (PostgreSQL 17), miscadmin.h:381 (PostgreSQL 18), miscadmin.h:387 (PostgreSQL 19)
+/// C macro AmRegularBackendProcess from miscadmin.h:344 (PostgreSQL 15), miscadmin.h:349 (PostgreSQL 16), miscadmin.h:376 (PostgreSQL 17), miscadmin.h:381 (PostgreSQL 18), miscadmin.h:384 (PostgreSQL 19)
 ///
 /// ```text
 /// #define AmRegularBackendProcess( ) ( MyBackendType == B_BACKEND )
@@ -218,11 +311,21 @@ macro_rules! AmLogicalSlotSyncWorkerProcess {
 #[macro_export]
 macro_rules! AmRegularBackendProcess {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro AmSpecialWorkerProcess from miscadmin.h:390 (PostgreSQL 17), miscadmin.h:396 (PostgreSQL 18), miscadmin.h:405 (PostgreSQL 19)
+/// C macro AmSpecialWorkerProcess from miscadmin.h:390 (PostgreSQL 17), miscadmin.h:396 (PostgreSQL 18), miscadmin.h:400 (PostgreSQL 19)
 ///
 /// ```text
 /// #define AmSpecialWorkerProcess( ) ( AmAutoVacuumLauncherProcess ( ) || AmLogicalSlotSyncWorkerProcess ( ) )
@@ -235,7 +338,17 @@ macro_rules! AmRegularBackendProcess {
 #[macro_export]
 macro_rules! AmSpecialWorkerProcess {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -252,11 +365,21 @@ macro_rules! AmSpecialWorkerProcess {
 #[macro_export]
 macro_rules! AmStartupProcess {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro AmStartupProcess from miscadmin.h:385 (PostgreSQL 17), miscadmin.h:390 (PostgreSQL 18), miscadmin.h:396 (PostgreSQL 19)
+/// C macro AmStartupProcess from miscadmin.h:385 (PostgreSQL 17), miscadmin.h:390 (PostgreSQL 18), miscadmin.h:394 (PostgreSQL 19)
 ///
 /// ```text
 /// #define AmStartupProcess( ) ( MyBackendType == B_STARTUP )
@@ -269,7 +392,17 @@ macro_rules! AmStartupProcess {
 #[macro_export]
 macro_rules! AmStartupProcess {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -286,11 +419,21 @@ macro_rules! AmStartupProcess {
 #[macro_export]
 macro_rules! AmWalReceiverProcess {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro AmWalReceiverProcess from miscadmin.h:386 (PostgreSQL 17), miscadmin.h:391 (PostgreSQL 18), miscadmin.h:397 (PostgreSQL 19)
+/// C macro AmWalReceiverProcess from miscadmin.h:386 (PostgreSQL 17), miscadmin.h:391 (PostgreSQL 18), miscadmin.h:395 (PostgreSQL 19)
 ///
 /// ```text
 /// #define AmWalReceiverProcess( ) ( MyBackendType == B_WAL_RECEIVER )
@@ -303,11 +446,21 @@ macro_rules! AmWalReceiverProcess {
 #[macro_export]
 macro_rules! AmWalReceiverProcess {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro AmWalSenderProcess from miscadmin.h:380 (PostgreSQL 17), miscadmin.h:385 (PostgreSQL 18), miscadmin.h:391 (PostgreSQL 19)
+/// C macro AmWalSenderProcess from miscadmin.h:380 (PostgreSQL 17), miscadmin.h:385 (PostgreSQL 18), miscadmin.h:389 (PostgreSQL 19)
 ///
 /// ```text
 /// #define AmWalSenderProcess( ) ( MyBackendType == B_WAL_SENDER )
@@ -320,11 +473,21 @@ macro_rules! AmWalReceiverProcess {
 #[macro_export]
 macro_rules! AmWalSenderProcess {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro AmWalSummarizerProcess from miscadmin.h:387 (PostgreSQL 17), miscadmin.h:392 (PostgreSQL 18), miscadmin.h:398 (PostgreSQL 19)
+/// C macro AmWalSummarizerProcess from miscadmin.h:387 (PostgreSQL 17), miscadmin.h:392 (PostgreSQL 18), miscadmin.h:396 (PostgreSQL 19)
 ///
 /// ```text
 /// #define AmWalSummarizerProcess( ) ( MyBackendType == B_WAL_SUMMARIZER )
@@ -337,7 +500,17 @@ macro_rules! AmWalSenderProcess {
 #[macro_export]
 macro_rules! AmWalSummarizerProcess {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -354,11 +527,21 @@ macro_rules! AmWalSummarizerProcess {
 #[macro_export]
 macro_rules! AmWalWriterProcess {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro AmWalWriterProcess from miscadmin.h:388 (PostgreSQL 17), miscadmin.h:393 (PostgreSQL 18), miscadmin.h:399 (PostgreSQL 19)
+/// C macro AmWalWriterProcess from miscadmin.h:388 (PostgreSQL 17), miscadmin.h:393 (PostgreSQL 18), miscadmin.h:397 (PostgreSQL 19)
 ///
 /// ```text
 /// #define AmWalWriterProcess( ) ( MyBackendType == B_WAL_WRITER )
@@ -371,7 +554,17 @@ macro_rules! AmWalWriterProcess {
 #[macro_export]
 macro_rules! AmWalWriterProcess {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro CHECK_FOR_INTERRUPTS from miscadmin.h:122 (PostgreSQL 15–16), miscadmin.h:123 (PostgreSQL 17–18), miscadmin.h:125 (PostgreSQL 19)
@@ -393,36 +586,10 @@ macro_rules! AmWalWriterProcess {
 #[macro_export]
 macro_rules! CHECK_FOR_INTERRUPTS {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
-/// C macro END_CRIT_SECTION from miscadmin.h:151 (PostgreSQL 15–16), miscadmin.h:152 (PostgreSQL 17), miscadmin.h:154 (PostgreSQL 19)
-///
-/// ```text
-/// #define END_CRIT_SECTION( ) do { Assert ( CritSectionCount > 0 ) ; CritSectionCount -- ; } while ( 0 )
-/// ```
-///
-///
-/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
-#[doc = crate::__pgrx_c_doc_statements!()]
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! END_CRIT_SECTION {
-    () => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-#[cfg(feature = "pg18")]
-/// C macro END_CRIT_SECTION from miscadmin.h:152 (PostgreSQL 18)
+/// C macro END_CRIT_SECTION from miscadmin.h:151 (PostgreSQL 15–16), miscadmin.h:152 (PostgreSQL 17–18), miscadmin.h:154 (PostgreSQL 19)
 ///
 /// ```text
 /// #define END_CRIT_SECTION( ) do { Assert ( CritSectionCount > 0 ) ; CritSectionCount -- ; } while ( 0 )
@@ -441,10 +608,10 @@ macro_rules! END_CRIT_SECTION {
 #[macro_export]
 macro_rules! END_CRIT_SECTION {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
-/// C macro GetProcessingMode from miscadmin.h:416 (PostgreSQL 15), miscadmin.h:424 (PostgreSQL 16), miscadmin.h:467 (PostgreSQL 17), miscadmin.h:481 (PostgreSQL 18), miscadmin.h:490 (PostgreSQL 19)
+/// C macro GetProcessingMode from miscadmin.h:416 (PostgreSQL 15), miscadmin.h:424 (PostgreSQL 16), miscadmin.h:467 (PostgreSQL 17), miscadmin.h:481 (PostgreSQL 18), miscadmin.h:485 (PostgreSQL 19)
 ///
 /// ```text
 /// #define GetProcessingMode( ) Mode
@@ -457,7 +624,20 @@ macro_rules! END_CRIT_SECTION {
 #[macro_export]
 macro_rules! GetProcessingMode {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::load(
+                        $crate::__pgrx_c_macros::expression::place::<
+                            $crate::__pgrx_c_macros::expression::CEnumObject<
+                                $crate::__pgrx_c_generated::EnumIdentity_enum__ProcessingMode,
+                                $crate::__pgrx_c_macros::CUnsignedInt,
+                                u32
+                            >>(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::Mode))
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro HOLD_CANCEL_INTERRUPTS from miscadmin.h:141 (PostgreSQL 15–16), miscadmin.h:142 (PostgreSQL 17–18), miscadmin.h:144 (PostgreSQL 19)
@@ -477,7 +657,33 @@ macro_rules! GetProcessingMode {
 #[macro_export]
 macro_rules! HOLD_CANCEL_INTERRUPTS {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::post_modify(
+                            $crate::__pgrx_c_macros::expression::place::<
+                                $crate::__pgrx_c_macros::expression::CVolatile<
+                                    $crate::__pgrx_c_macros::CUnsignedInt
+                                >>(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::QueryCancelHoldoffCount
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                1i32
+                            ),
+                            |__pgrx_old,
+                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::add::<
+                                $crate::__pgrx_c_macros::Wrapping,
+                                _,
+                                _
+                            >(__pgrx_old, __pgrx_rhs)
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro HOLD_INTERRUPTS from miscadmin.h:133 (PostgreSQL 15–16), miscadmin.h:134 (PostgreSQL 17–18), miscadmin.h:136 (PostgreSQL 19)
@@ -497,7 +703,33 @@ macro_rules! HOLD_CANCEL_INTERRUPTS {
 #[macro_export]
 macro_rules! HOLD_INTERRUPTS {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::post_modify(
+                            $crate::__pgrx_c_macros::expression::place::<
+                                $crate::__pgrx_c_macros::expression::CVolatile<
+                                    $crate::__pgrx_c_macros::CUnsignedInt
+                                >>(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::InterruptHoldoffCount
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                1i32
+                            ),
+                            |__pgrx_old,
+                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::add::<
+                                $crate::__pgrx_c_macros::Wrapping,
+                                _,
+                                _
+                            >(__pgrx_old, __pgrx_rhs)
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro INTERRUPTS_CAN_BE_PROCESSED from miscadmin.h:129 (PostgreSQL 15–16), miscadmin.h:130 (PostgreSQL 17–18), miscadmin.h:132 (PostgreSQL 19)
@@ -513,7 +745,17 @@ macro_rules! HOLD_INTERRUPTS {
 #[macro_export]
 macro_rules! INTERRUPTS_CAN_BE_PROCESSED {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro INTERRUPTS_PENDING_CONDITION from miscadmin.h:112 (PostgreSQL 15–16), miscadmin.h:113 (PostgreSQL 17–18), miscadmin.h:115 (PostgreSQL 19)
@@ -533,10 +775,20 @@ macro_rules! INTERRUPTS_CAN_BE_PROCESSED {
 #[macro_export]
 macro_rules! INTERRUPTS_PENDING_CONDITION {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CLong
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro IsBootstrapProcessingMode from miscadmin.h:412 (PostgreSQL 15), miscadmin.h:420 (PostgreSQL 16), miscadmin.h:463 (PostgreSQL 17), miscadmin.h:477 (PostgreSQL 18), miscadmin.h:486 (PostgreSQL 19)
+/// C macro IsBootstrapProcessingMode from miscadmin.h:412 (PostgreSQL 15), miscadmin.h:420 (PostgreSQL 16), miscadmin.h:463 (PostgreSQL 17), miscadmin.h:477 (PostgreSQL 18), miscadmin.h:481 (PostgreSQL 19)
 ///
 /// ```text
 /// #define IsBootstrapProcessingMode( ) ( Mode == BootstrapProcessing )
@@ -549,11 +801,21 @@ macro_rules! INTERRUPTS_PENDING_CONDITION {
 #[macro_export]
 macro_rules! IsBootstrapProcessingMode {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro IsExternalConnectionBackend from miscadmin.h:405 (PostgreSQL 18), miscadmin.h:414 (PostgreSQL 19)
+/// C macro IsExternalConnectionBackend from miscadmin.h:405 (PostgreSQL 18), miscadmin.h:409 (PostgreSQL 19)
 ///
 /// ```text
 /// #define IsExternalConnectionBackend( backend_type ) ( backend_type == B_BACKEND || backend_type == B_WAL_SENDER )
@@ -566,10 +828,21 @@ macro_rules! IsBootstrapProcessingMode {
 #[macro_export]
 macro_rules! IsExternalConnectionBackend {
     ($backend_type:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$backend_type;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro IsInitProcessingMode from miscadmin.h:413 (PostgreSQL 15), miscadmin.h:421 (PostgreSQL 16), miscadmin.h:464 (PostgreSQL 17), miscadmin.h:478 (PostgreSQL 18), miscadmin.h:487 (PostgreSQL 19)
+/// C macro IsInitProcessingMode from miscadmin.h:413 (PostgreSQL 15), miscadmin.h:421 (PostgreSQL 16), miscadmin.h:464 (PostgreSQL 17), miscadmin.h:478 (PostgreSQL 18), miscadmin.h:482 (PostgreSQL 19)
 ///
 /// ```text
 /// #define IsInitProcessingMode( ) ( Mode == InitProcessing )
@@ -582,10 +855,20 @@ macro_rules! IsExternalConnectionBackend {
 #[macro_export]
 macro_rules! IsInitProcessingMode {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro IsNormalProcessingMode from miscadmin.h:414 (PostgreSQL 15), miscadmin.h:422 (PostgreSQL 16), miscadmin.h:465 (PostgreSQL 17), miscadmin.h:479 (PostgreSQL 18), miscadmin.h:488 (PostgreSQL 19)
+/// C macro IsNormalProcessingMode from miscadmin.h:414 (PostgreSQL 15), miscadmin.h:422 (PostgreSQL 16), miscadmin.h:465 (PostgreSQL 17), miscadmin.h:479 (PostgreSQL 18), miscadmin.h:483 (PostgreSQL 19)
 ///
 /// ```text
 /// #define IsNormalProcessingMode( ) ( Mode == NormalProcessing )
@@ -598,36 +881,20 @@ macro_rules! IsInitProcessingMode {
 #[macro_export]
 macro_rules! IsNormalProcessingMode {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
-/// C macro RESUME_CANCEL_INTERRUPTS from miscadmin.h:143 (PostgreSQL 15–16), miscadmin.h:144 (PostgreSQL 17), miscadmin.h:146 (PostgreSQL 19)
-///
-/// ```text
-/// #define RESUME_CANCEL_INTERRUPTS( ) do { Assert ( QueryCancelHoldoffCount > 0 ) ; QueryCancelHoldoffCount -- ; } while ( 0 )
-/// ```
-///
-///
-/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
-#[doc = crate::__pgrx_c_doc_statements!()]
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! RESUME_CANCEL_INTERRUPTS {
-    () => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-#[cfg(feature = "pg18")]
-/// C macro RESUME_CANCEL_INTERRUPTS from miscadmin.h:144 (PostgreSQL 18)
+/// C macro RESUME_CANCEL_INTERRUPTS from miscadmin.h:143 (PostgreSQL 15–16), miscadmin.h:144 (PostgreSQL 17–18), miscadmin.h:146 (PostgreSQL 19)
 ///
 /// ```text
 /// #define RESUME_CANCEL_INTERRUPTS( ) do { Assert ( QueryCancelHoldoffCount > 0 ) ; QueryCancelHoldoffCount -- ; } while ( 0 )
@@ -646,36 +913,10 @@ macro_rules! RESUME_CANCEL_INTERRUPTS {
 #[macro_export]
 macro_rules! RESUME_CANCEL_INTERRUPTS {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg19"))]
-/// C macro RESUME_INTERRUPTS from miscadmin.h:135 (PostgreSQL 15–16), miscadmin.h:136 (PostgreSQL 17), miscadmin.h:138 (PostgreSQL 19)
-///
-/// ```text
-/// #define RESUME_INTERRUPTS( ) do { Assert ( InterruptHoldoffCount > 0 ) ; InterruptHoldoffCount -- ; } while ( 0 )
-/// ```
-///
-///
-/// Invocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
-#[doc = crate::__pgrx_c_doc_statements!()]
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! RESUME_INTERRUPTS {
-    () => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-#[cfg(feature = "pg18")]
-/// C macro RESUME_INTERRUPTS from miscadmin.h:136 (PostgreSQL 18)
+/// C macro RESUME_INTERRUPTS from miscadmin.h:135 (PostgreSQL 15–16), miscadmin.h:136 (PostgreSQL 17–18), miscadmin.h:138 (PostgreSQL 19)
 ///
 /// ```text
 /// #define RESUME_INTERRUPTS( ) do { Assert ( InterruptHoldoffCount > 0 ) ; InterruptHoldoffCount -- ; } while ( 0 )
@@ -694,7 +935,7 @@ macro_rules! RESUME_INTERRUPTS {
 #[macro_export]
 macro_rules! RESUME_INTERRUPTS {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 /// C macro START_CRIT_SECTION from miscadmin.h:149 (PostgreSQL 15–16), miscadmin.h:150 (PostgreSQL 17–18), miscadmin.h:152 (PostgreSQL 19)
@@ -714,7 +955,33 @@ macro_rules! RESUME_INTERRUPTS {
 #[macro_export]
 macro_rules! START_CRIT_SECTION {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::post_modify(
+                            $crate::__pgrx_c_macros::expression::place::<
+                                $crate::__pgrx_c_macros::expression::CVolatile<
+                                    $crate::__pgrx_c_macros::CUnsignedInt
+                                >>(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::CritSectionCount
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                1i32
+                            ),
+                            |__pgrx_old,
+                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::add::<
+                                $crate::__pgrx_c_macros::Wrapping,
+                                _,
+                                _
+                            >(__pgrx_old, __pgrx_rhs)
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -725,10 +992,6 @@ macro_rules! START_CRIT_SECTION {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
 #[doc = crate::__pgrx_c_doc_statements!()]
 ///
 /// # Safety
@@ -737,42 +1000,17 @@ macro_rules! START_CRIT_SECTION {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SetProcessingMode {
     ($mode:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$mode;
+        })
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg19"))]
-/// C macro SetProcessingMode from miscadmin.h:426 (PostgreSQL 16), miscadmin.h:469 (PostgreSQL 17), miscadmin.h:492 (PostgreSQL 19)
-///
-/// ```text
-/// #define SetProcessingMode( mode ) do { Assert ( ( mode ) == BootstrapProcessing || ( mode ) == InitProcessing || ( mode ) == NormalProcessing ) ; Mode = ( mode ) ; } while ( 0 )
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
-#[doc = crate::__pgrx_c_doc_statements!()]
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! SetProcessingMode {
-    ($mode:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-#[cfg(feature = "pg18")]
-/// C macro SetProcessingMode from miscadmin.h:483 (PostgreSQL 18)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro SetProcessingMode from miscadmin.h:426 (PostgreSQL 16), miscadmin.h:469 (PostgreSQL 17), miscadmin.h:483 (PostgreSQL 18), miscadmin.h:487 (PostgreSQL 19)
 ///
 /// ```text
 /// #define SetProcessingMode( mode ) do { Assert ( ( mode ) == BootstrapProcessing || ( mode ) == InitProcessing || ( mode ) == NormalProcessing ) ; Mode = ( mode ) ; } while ( 0 )
@@ -791,7 +1029,9 @@ macro_rules! SetProcessingMode {
 #[macro_export]
 macro_rules! SetProcessingMode {
     ($mode:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$mode;
+        })
     };
 }
 pub use AmArchiverProcess;
@@ -803,8 +1043,6 @@ pub use AmAutoVacuumWorkerProcess;
 pub use AmBackgroundWorkerProcess;
 pub use AmBackgroundWriterProcess;
 pub use AmCheckpointerProcess;
-#[cfg(feature = "pg19")]
-pub use AmDataChecksumsWorkerProcess;
 #[cfg(any(feature = "pg18", feature = "pg19"))]
 pub use AmIoWorkerProcess;
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]

@@ -21,11 +21,13 @@
 #[macro_export]
 macro_rules! pgstat_count_buffer_hit {
     ($rel:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$rel;
+        })
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro pgstat_count_buffer_hit from pgstat.h:638 (PostgreSQL 16), pgstat.h:640 (PostgreSQL 17), pgstat.h:710 (PostgreSQL 18), pgstat.h:747 (PostgreSQL 19)
+/// C macro pgstat_count_buffer_hit from pgstat.h:638 (PostgreSQL 16), pgstat.h:640 (PostgreSQL 17), pgstat.h:710 (PostgreSQL 18), pgstat.h:748 (PostgreSQL 19)
 ///
 /// ```text
 /// #define pgstat_count_buffer_hit( rel ) do { if ( pgstat_should_count_relation ( rel ) ) ( rel ) -> pgstat_info -> counts . blocks_hit ++ ; } while ( 0 )
@@ -44,7 +46,9 @@ macro_rules! pgstat_count_buffer_hit {
 #[macro_export]
 macro_rules! pgstat_count_buffer_hit {
     ($rel:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$rel;
+        })
     };
 }
 #[cfg(feature = "pg15")]
@@ -67,11 +71,13 @@ macro_rules! pgstat_count_buffer_hit {
 #[macro_export]
 macro_rules! pgstat_count_buffer_read {
     ($rel:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$rel;
+        })
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro pgstat_count_buffer_read from pgstat.h:633 (PostgreSQL 16), pgstat.h:635 (PostgreSQL 17), pgstat.h:705 (PostgreSQL 18), pgstat.h:742 (PostgreSQL 19)
+/// C macro pgstat_count_buffer_read from pgstat.h:633 (PostgreSQL 16), pgstat.h:635 (PostgreSQL 17), pgstat.h:705 (PostgreSQL 18), pgstat.h:743 (PostgreSQL 19)
 ///
 /// ```text
 /// #define pgstat_count_buffer_read( rel ) do { if ( pgstat_should_count_relation ( rel ) ) ( rel ) -> pgstat_info -> counts . blocks_fetched ++ ; } while ( 0 )
@@ -90,10 +96,12 @@ macro_rules! pgstat_count_buffer_read {
 #[macro_export]
 macro_rules! pgstat_count_buffer_read {
     ($rel:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$rel;
+        })
     };
 }
-/// C macro pgstat_count_buffer_read_time from pgstat.h:474 (PostgreSQL 15), pgstat.h:550 (PostgreSQL 16), pgstat.h:552 (PostgreSQL 17), pgstat.h:621 (PostgreSQL 18), pgstat.h:658 (PostgreSQL 19)
+/// C macro pgstat_count_buffer_read_time from pgstat.h:474 (PostgreSQL 15), pgstat.h:550 (PostgreSQL 16), pgstat.h:552 (PostgreSQL 17), pgstat.h:621 (PostgreSQL 18), pgstat.h:659 (PostgreSQL 19)
 ///
 /// ```text
 /// #define pgstat_count_buffer_read_time( n ) ( pgStatBlockReadTime += ( n ) )
@@ -110,10 +118,37 @@ macro_rules! pgstat_count_buffer_read {
 #[macro_export]
 macro_rules! pgstat_count_buffer_read_time {
     ($n:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::modify(
+                            $crate::__pgrx_c_macros::expression::place::<
+                                $crate::__pgrx_c_macros::CLong
+                            >(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::pgStatBlockReadTime
+                                )
+                            ),
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; (@native [$n]))
+                                )
+                            ),
+                            |__pgrx_old,
+                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::add::<
+                                $crate::__pgrx_c_macros::Wrapping,
+                                _,
+                                _
+                            >(__pgrx_old, __pgrx_rhs)
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro pgstat_count_buffer_write_time from pgstat.h:476 (PostgreSQL 15), pgstat.h:552 (PostgreSQL 16), pgstat.h:554 (PostgreSQL 17), pgstat.h:623 (PostgreSQL 18), pgstat.h:660 (PostgreSQL 19)
+/// C macro pgstat_count_buffer_write_time from pgstat.h:476 (PostgreSQL 15), pgstat.h:552 (PostgreSQL 16), pgstat.h:554 (PostgreSQL 17), pgstat.h:623 (PostgreSQL 18), pgstat.h:661 (PostgreSQL 19)
 ///
 /// ```text
 /// #define pgstat_count_buffer_write_time( n ) ( pgStatBlockWriteTime += ( n ) )
@@ -130,10 +165,37 @@ macro_rules! pgstat_count_buffer_read_time {
 #[macro_export]
 macro_rules! pgstat_count_buffer_write_time {
     ($n:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::modify(
+                            $crate::__pgrx_c_macros::expression::place::<
+                                $crate::__pgrx_c_macros::CLong
+                            >(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::pgStatBlockWriteTime
+                                )
+                            ),
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; (@native [$n]))
+                                )
+                            ),
+                            |__pgrx_old,
+                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::add::<
+                                $crate::__pgrx_c_macros::Wrapping,
+                                _,
+                                _
+                            >(__pgrx_old, __pgrx_rhs)
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro pgstat_count_conn_active_time from pgstat.h:478 (PostgreSQL 15), pgstat.h:554 (PostgreSQL 16), pgstat.h:556 (PostgreSQL 17), pgstat.h:625 (PostgreSQL 18), pgstat.h:662 (PostgreSQL 19)
+/// C macro pgstat_count_conn_active_time from pgstat.h:478 (PostgreSQL 15), pgstat.h:554 (PostgreSQL 16), pgstat.h:556 (PostgreSQL 17), pgstat.h:625 (PostgreSQL 18), pgstat.h:663 (PostgreSQL 19)
 ///
 /// ```text
 /// #define pgstat_count_conn_active_time( n ) ( pgStatActiveTime += ( n ) )
@@ -150,10 +212,37 @@ macro_rules! pgstat_count_buffer_write_time {
 #[macro_export]
 macro_rules! pgstat_count_conn_active_time {
     ($n:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::modify(
+                            $crate::__pgrx_c_macros::expression::place::<
+                                $crate::__pgrx_c_macros::CLong
+                            >(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::pgStatActiveTime
+                                )
+                            ),
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; (@native [$n]))
+                                )
+                            ),
+                            |__pgrx_old,
+                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::add::<
+                                $crate::__pgrx_c_macros::Wrapping,
+                                _,
+                                _
+                            >(__pgrx_old, __pgrx_rhs)
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro pgstat_count_conn_txn_idle_time from pgstat.h:480 (PostgreSQL 15), pgstat.h:556 (PostgreSQL 16), pgstat.h:558 (PostgreSQL 17), pgstat.h:627 (PostgreSQL 18), pgstat.h:664 (PostgreSQL 19)
+/// C macro pgstat_count_conn_txn_idle_time from pgstat.h:480 (PostgreSQL 15), pgstat.h:556 (PostgreSQL 16), pgstat.h:558 (PostgreSQL 17), pgstat.h:627 (PostgreSQL 18), pgstat.h:665 (PostgreSQL 19)
 ///
 /// ```text
 /// #define pgstat_count_conn_txn_idle_time( n ) ( pgStatTransactionIdleTime += ( n ) )
@@ -170,7 +259,34 @@ macro_rules! pgstat_count_conn_active_time {
 #[macro_export]
 macro_rules! pgstat_count_conn_txn_idle_time {
     ($n:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::modify(
+                            $crate::__pgrx_c_macros::expression::place::<
+                                $crate::__pgrx_c_macros::CLong
+                            >(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::pgStatTransactionIdleTime
+                                )
+                            ),
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; (@native [$n]))
+                                )
+                            ),
+                            |__pgrx_old,
+                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::add::<
+                                $crate::__pgrx_c_macros::Wrapping,
+                                _,
+                                _
+                            >(__pgrx_old, __pgrx_rhs)
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -193,11 +309,13 @@ macro_rules! pgstat_count_conn_txn_idle_time {
 #[macro_export]
 macro_rules! pgstat_count_heap_fetch {
     ($rel:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$rel;
+        })
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro pgstat_count_heap_fetch from pgstat.h:618 (PostgreSQL 16), pgstat.h:620 (PostgreSQL 17), pgstat.h:690 (PostgreSQL 18), pgstat.h:727 (PostgreSQL 19)
+/// C macro pgstat_count_heap_fetch from pgstat.h:618 (PostgreSQL 16), pgstat.h:620 (PostgreSQL 17), pgstat.h:690 (PostgreSQL 18), pgstat.h:728 (PostgreSQL 19)
 ///
 /// ```text
 /// #define pgstat_count_heap_fetch( rel ) do { if ( pgstat_should_count_relation ( rel ) ) ( rel ) -> pgstat_info -> counts . tuples_fetched ++ ; } while ( 0 )
@@ -216,7 +334,9 @@ macro_rules! pgstat_count_heap_fetch {
 #[macro_export]
 macro_rules! pgstat_count_heap_fetch {
     ($rel:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$rel;
+        })
     };
 }
 #[cfg(feature = "pg15")]
@@ -239,11 +359,13 @@ macro_rules! pgstat_count_heap_fetch {
 #[macro_export]
 macro_rules! pgstat_count_heap_getnext {
     ($rel:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$rel;
+        })
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro pgstat_count_heap_getnext from pgstat.h:613 (PostgreSQL 16), pgstat.h:615 (PostgreSQL 17), pgstat.h:685 (PostgreSQL 18), pgstat.h:722 (PostgreSQL 19)
+/// C macro pgstat_count_heap_getnext from pgstat.h:613 (PostgreSQL 16), pgstat.h:615 (PostgreSQL 17), pgstat.h:685 (PostgreSQL 18), pgstat.h:723 (PostgreSQL 19)
 ///
 /// ```text
 /// #define pgstat_count_heap_getnext( rel ) do { if ( pgstat_should_count_relation ( rel ) ) ( rel ) -> pgstat_info -> counts . tuples_returned ++ ; } while ( 0 )
@@ -262,7 +384,9 @@ macro_rules! pgstat_count_heap_getnext {
 #[macro_export]
 macro_rules! pgstat_count_heap_getnext {
     ($rel:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$rel;
+        })
     };
 }
 #[cfg(feature = "pg15")]
@@ -285,11 +409,13 @@ macro_rules! pgstat_count_heap_getnext {
 #[macro_export]
 macro_rules! pgstat_count_heap_scan {
     ($rel:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$rel;
+        })
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro pgstat_count_heap_scan from pgstat.h:608 (PostgreSQL 16), pgstat.h:610 (PostgreSQL 17), pgstat.h:680 (PostgreSQL 18), pgstat.h:717 (PostgreSQL 19)
+/// C macro pgstat_count_heap_scan from pgstat.h:608 (PostgreSQL 16), pgstat.h:610 (PostgreSQL 17), pgstat.h:680 (PostgreSQL 18), pgstat.h:718 (PostgreSQL 19)
 ///
 /// ```text
 /// #define pgstat_count_heap_scan( rel ) do { if ( pgstat_should_count_relation ( rel ) ) ( rel ) -> pgstat_info -> counts . numscans ++ ; } while ( 0 )
@@ -308,7 +434,9 @@ macro_rules! pgstat_count_heap_scan {
 #[macro_export]
 macro_rules! pgstat_count_heap_scan {
     ($rel:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$rel;
+        })
     };
 }
 #[cfg(feature = "pg15")]
@@ -331,11 +459,13 @@ macro_rules! pgstat_count_heap_scan {
 #[macro_export]
 macro_rules! pgstat_count_index_scan {
     ($rel:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$rel;
+        })
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro pgstat_count_index_scan from pgstat.h:623 (PostgreSQL 16), pgstat.h:625 (PostgreSQL 17), pgstat.h:695 (PostgreSQL 18), pgstat.h:732 (PostgreSQL 19)
+/// C macro pgstat_count_index_scan from pgstat.h:623 (PostgreSQL 16), pgstat.h:625 (PostgreSQL 17), pgstat.h:695 (PostgreSQL 18), pgstat.h:733 (PostgreSQL 19)
 ///
 /// ```text
 /// #define pgstat_count_index_scan( rel ) do { if ( pgstat_should_count_relation ( rel ) ) ( rel ) -> pgstat_info -> counts . numscans ++ ; } while ( 0 )
@@ -354,7 +484,9 @@ macro_rules! pgstat_count_index_scan {
 #[macro_export]
 macro_rules! pgstat_count_index_scan {
     ($rel:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$rel;
+        })
     };
 }
 #[cfg(feature = "pg15")]
@@ -377,11 +509,14 @@ macro_rules! pgstat_count_index_scan {
 #[macro_export]
 macro_rules! pgstat_count_index_tuples {
     ($rel:expr, $n:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$rel;
+            let _ = &$n;
+        })
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro pgstat_count_index_tuples from pgstat.h:628 (PostgreSQL 16), pgstat.h:630 (PostgreSQL 17), pgstat.h:700 (PostgreSQL 18), pgstat.h:737 (PostgreSQL 19)
+/// C macro pgstat_count_index_tuples from pgstat.h:628 (PostgreSQL 16), pgstat.h:630 (PostgreSQL 17), pgstat.h:700 (PostgreSQL 18), pgstat.h:738 (PostgreSQL 19)
 ///
 /// ```text
 /// #define pgstat_count_index_tuples( rel , n ) do { if ( pgstat_should_count_relation ( rel ) ) ( rel ) -> pgstat_info -> counts . tuples_returned += ( n ) ; } while ( 0 )
@@ -400,7 +535,10 @@ macro_rules! pgstat_count_index_tuples {
 #[macro_export]
 macro_rules! pgstat_count_index_tuples {
     ($rel:expr, $n:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$rel;
+            let _ = &$n;
+        })
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -421,10 +559,21 @@ macro_rules! pgstat_count_index_tuples {
 #[macro_export]
 macro_rules! pgstat_is_ioop_tracked_in_bytes {
     ($io_op:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$io_op;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
-/// C macro pgstat_should_count_relation from pgstat.h:525 (PostgreSQL 15), pgstat.h:602 (PostgreSQL 16), pgstat.h:604 (PostgreSQL 17), pgstat.h:674 (PostgreSQL 18), pgstat.h:711 (PostgreSQL 19)
+/// C macro pgstat_should_count_relation from pgstat.h:525 (PostgreSQL 15), pgstat.h:602 (PostgreSQL 16), pgstat.h:604 (PostgreSQL 17), pgstat.h:674 (PostgreSQL 18), pgstat.h:712 (PostgreSQL 19)
 ///
 /// ```text
 /// #define pgstat_should_count_relation( rel ) ( likely ( ( rel ) -> pgstat_info != NULL ) ? true : ( ( rel ) -> pgstat_enabled ? pgstat_assoc_relation ( rel ) , true : false ) )
@@ -441,7 +590,105 @@ macro_rules! pgstat_is_ioop_tracked_in_bytes {
 #[macro_export]
 macro_rules! pgstat_should_count_relation {
     ($rel:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                        $crate::__pgrx_c_macros::CLong
+                                    >()
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::select(
+                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::load(
+                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                $crate::__pgrx_c_generated::Field_pgstat_enabled,
+                                                                _,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_operand!(
+                                                                                @value [true];
+                                                                                (@native [$rel])
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ) {
+                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            {
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                                    $crate::__pgrx_c_macros::CValue::<
+                                                                        $crate::__pgrx_c_macros::CInt
+                                                                    >::new(1i32)
+                                                                )
+                                                            }
+                                                        )
+                                                    )
+                                                } else {
+                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::null_constant(
+                                                                /* PGRX: false remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                                $crate::__pgrx_c_macros::CValue::<
+                                                                    $crate::__pgrx_c_macros::CInt
+                                                                >::new(0i32)
+                                                            )
+                                                        )
+                                                    )
+                                                }
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 pub use pgstat_count_buffer_hit;

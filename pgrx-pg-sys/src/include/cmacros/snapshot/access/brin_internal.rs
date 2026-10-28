@@ -17,8 +17,12 @@
 /// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BRIN_elog {
-    ($args:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($($args:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                ($crate::__pgrx_c_macros::expression::profile_value::<true, _>(()))
+            }
+        )
     };
 }
 /// C macro SizeofBrinOpcInfo from brin_internal.h:41 (PostgreSQL 15–19)
@@ -38,7 +42,44 @@ macro_rules! BRIN_elog {
 #[macro_export]
 macro_rules! SizeofBrinOpcInfo {
     ($ncols:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                        $crate::__pgrx_c_macros::expression::add::<
+                            $crate::__pgrx_c_macros::Wrapping,
+                            _,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                    $crate::__pgrx_c_macros::CSize
+                                >()
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                $crate::__pgrx_c_macros::expression::mul::<
+                                    $crate::__pgrx_c_macros::Wrapping,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CSize
+                                        >()
+                                    ),
+                                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                        $crate::__pgrx_c_operand!(
+                                            @value [false];
+                                            (@native [$ncols])
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 pub use BRIN_elog;

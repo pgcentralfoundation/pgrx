@@ -24,7 +24,17 @@
 #[macro_export]
 macro_rules! pg_atomic_add_fetch_u32_impl {
     ($ptr:expr, $add_:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ptr;
+                let _ = &$add_;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::uint32
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function pg_atomic_add_fetch_u64_impl from generic.h:387 (PostgreSQL 15–16), generic.h:405 (PostgreSQL 17), generic.h:395 (PostgreSQL 18), generic.h:404 (PostgreSQL 19)
@@ -50,7 +60,17 @@ macro_rules! pg_atomic_add_fetch_u32_impl {
 #[macro_export]
 macro_rules! pg_atomic_add_fetch_u64_impl {
     ($ptr:expr, $add_:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ptr;
+                let _ = &$add_;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::uint64
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -81,7 +101,17 @@ macro_rules! pg_atomic_add_fetch_u64_impl {
 #[macro_export]
 macro_rules! pg_atomic_exchange_u32_impl {
     ($ptr:expr, $xchg_:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ptr;
+                let _ = &$xchg_;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::uint32
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -112,7 +142,17 @@ macro_rules! pg_atomic_exchange_u32_impl {
 #[macro_export]
 macro_rules! pg_atomic_exchange_u64_impl {
     ($ptr:expr, $xchg_:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ptr;
+                let _ = &$xchg_;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::uint64
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function pg_atomic_init_u32_impl from generic.h:160 (PostgreSQL 15–17), generic.h:150 (PostgreSQL 18–19)
@@ -138,7 +178,13 @@ macro_rules! pg_atomic_exchange_u64_impl {
 #[macro_export]
 macro_rules! pg_atomic_init_u32_impl {
     ($ptr:expr, $val_:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ptr;
+                let _ = &$val_;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function pg_atomic_init_u64_impl from generic.h:330 (PostgreSQL 15–16), generic.h:348 (PostgreSQL 17), generic.h:338 (PostgreSQL 18), generic.h:347 (PostgreSQL 19)
@@ -164,7 +210,13 @@ macro_rules! pg_atomic_init_u32_impl {
 #[macro_export]
 macro_rules! pg_atomic_init_u64_impl {
     ($ptr:expr, $val_:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ptr;
+                let _ = &$val_;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -191,7 +243,16 @@ macro_rules! pg_atomic_init_u64_impl {
 #[macro_export]
 macro_rules! pg_atomic_read_membarrier_u32_impl {
     ($ptr:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ptr;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::uint32
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -218,7 +279,16 @@ macro_rules! pg_atomic_read_membarrier_u32_impl {
 #[macro_export]
 macro_rules! pg_atomic_read_membarrier_u64_impl {
     ($ptr:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ptr;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::uint64
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function pg_atomic_read_u32_impl from generic.h:45 (PostgreSQL 15–19)
@@ -244,7 +314,16 @@ macro_rules! pg_atomic_read_membarrier_u64_impl {
 #[macro_export]
 macro_rules! pg_atomic_read_u32_impl {
     ($ptr:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ptr;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::uint32
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function pg_atomic_read_u64_impl from generic.h:298 (PostgreSQL 15–16), generic.h:316 (PostgreSQL 17), generic.h:306 (PostgreSQL 18), generic.h:315 (PostgreSQL 19)
@@ -274,7 +353,16 @@ macro_rules! pg_atomic_read_u32_impl {
 #[macro_export]
 macro_rules! pg_atomic_read_u64_impl {
     ($ptr:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ptr;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::uint64
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function pg_atomic_sub_fetch_u32_impl from generic.h:239 (PostgreSQL 15–17), generic.h:229 (PostgreSQL 18–19)
@@ -300,7 +388,17 @@ macro_rules! pg_atomic_read_u64_impl {
 #[macro_export]
 macro_rules! pg_atomic_sub_fetch_u32_impl {
     ($ptr:expr, $sub_:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ptr;
+                let _ = &$sub_;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::uint32
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function pg_atomic_sub_fetch_u64_impl from generic.h:396 (PostgreSQL 15–16), generic.h:414 (PostgreSQL 17), generic.h:404 (PostgreSQL 18), generic.h:413 (PostgreSQL 19)
@@ -326,7 +424,17 @@ macro_rules! pg_atomic_sub_fetch_u32_impl {
 #[macro_export]
 macro_rules! pg_atomic_sub_fetch_u64_impl {
     ($ptr:expr, $sub_:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ptr;
+                let _ = &$sub_;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::uint64
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function pg_atomic_unlocked_write_u32_impl from generic.h:63 (PostgreSQL 15–19)
@@ -352,7 +460,13 @@ macro_rules! pg_atomic_sub_fetch_u64_impl {
 #[macro_export]
 macro_rules! pg_atomic_unlocked_write_u32_impl {
     ($ptr:expr, $val:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ptr;
+                let _ = &$val;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -379,7 +493,13 @@ macro_rules! pg_atomic_unlocked_write_u32_impl {
 #[macro_export]
 macro_rules! pg_atomic_unlocked_write_u64_impl {
     ($ptr:expr, $val:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ptr;
+                let _ = &$val;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -406,7 +526,13 @@ macro_rules! pg_atomic_unlocked_write_u64_impl {
 #[macro_export]
 macro_rules! pg_atomic_write_membarrier_u32_impl {
     ($ptr:expr, $val:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ptr;
+                let _ = &$val;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -433,7 +559,13 @@ macro_rules! pg_atomic_write_membarrier_u32_impl {
 #[macro_export]
 macro_rules! pg_atomic_write_membarrier_u64_impl {
     ($ptr:expr, $val:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ptr;
+                let _ = &$val;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function pg_atomic_write_u32_impl from generic.h:54 (PostgreSQL 15–19)
@@ -459,7 +591,13 @@ macro_rules! pg_atomic_write_membarrier_u64_impl {
 #[macro_export]
 macro_rules! pg_atomic_write_u32_impl {
     ($ptr:expr, $val:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ptr;
+                let _ = &$val;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function pg_atomic_write_u64_impl from generic.h:265 (PostgreSQL 15–16), generic.h:283 (PostgreSQL 17), generic.h:273 (PostgreSQL 18–19)
@@ -491,27 +629,13 @@ macro_rules! pg_atomic_write_u32_impl {
 #[macro_export]
 macro_rules! pg_atomic_write_u64_impl {
     ($ptr:expr, $val:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-/// C macro pg_spin_delay_impl from generic.h:33 (PostgreSQL 15–19)
-///
-/// ```text
-/// #define pg_spin_delay_impl( ) ( ( void ) 0 )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! pg_spin_delay_impl {
-    () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ptr;
+                let _ = &$val;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 pub use pg_atomic_add_fetch_u32_impl;
@@ -539,4 +663,3 @@ pub use pg_atomic_write_membarrier_u32_impl;
 pub use pg_atomic_write_membarrier_u64_impl;
 pub use pg_atomic_write_u32_impl;
 pub use pg_atomic_write_u64_impl;
-pub use pg_spin_delay_impl;

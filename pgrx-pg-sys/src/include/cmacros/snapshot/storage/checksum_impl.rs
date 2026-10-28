@@ -20,7 +20,10 @@
 #[macro_export]
 macro_rules! CHECKSUM_COMP {
     ($checksum:expr, $value:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$checksum;
+            let _ = &$value;
+        })
     };
 }
 pub use CHECKSUM_COMP;

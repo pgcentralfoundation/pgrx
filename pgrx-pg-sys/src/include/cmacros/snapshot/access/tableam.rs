@@ -29,7 +29,23 @@
 #[macro_export]
 macro_rules! table_beginscan {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$snapshot;
+                let _ = &$nkeys;
+                let _ = &$key;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TableScanDescData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -60,7 +76,23 @@ macro_rules! table_beginscan {
 #[macro_export]
 macro_rules! table_beginscan {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$snapshot;
+                let _ = &$nkeys;
+                let _ = &$key;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TableScanDescData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -92,7 +124,24 @@ macro_rules! table_beginscan {
 #[macro_export]
 macro_rules! table_beginscan {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr, $flags:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$snapshot;
+                let _ = &$nkeys;
+                let _ = &$key;
+                let _ = &$flags;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TableScanDescData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -121,7 +170,20 @@ macro_rules! table_beginscan {
 #[macro_export]
 macro_rules! table_beginscan_analyze {
     ($rel:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TableScanDescData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -151,7 +213,20 @@ macro_rules! table_beginscan_analyze {
 #[macro_export]
 macro_rules! table_beginscan_analyze {
     ($rel:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TableScanDescData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -181,7 +256,23 @@ macro_rules! table_beginscan_analyze {
 #[macro_export]
 macro_rules! table_beginscan_bm {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$snapshot;
+                let _ = &$nkeys;
+                let _ = &$key;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TableScanDescData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg17")]
@@ -214,7 +305,24 @@ macro_rules! table_beginscan_bm {
 #[macro_export]
 macro_rules! table_beginscan_bm {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr, $need_tuple:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$snapshot;
+                let _ = &$nkeys;
+                let _ = &$key;
+                let _ = &$need_tuple;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TableScanDescData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg18")]
@@ -245,7 +353,23 @@ macro_rules! table_beginscan_bm {
 #[macro_export]
 macro_rules! table_beginscan_bm {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$snapshot;
+                let _ = &$nkeys;
+                let _ = &$key;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TableScanDescData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -276,7 +400,24 @@ macro_rules! table_beginscan_bm {
 #[macro_export]
 macro_rules! table_beginscan_bm {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr, $flags:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$snapshot;
+                let _ = &$nkeys;
+                let _ = &$key;
+                let _ = &$flags;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TableScanDescData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -314,8 +455,35 @@ macro_rules! table_beginscan_bm {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_beginscan_sampling {
-    ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr, $allow_strat:expr, $allow_sync:expr, $allow_pagemode:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $rel:expr,
+        $snapshot:expr,
+        $nkeys:expr,
+        $key:expr,
+        $allow_strat:expr,
+        $allow_sync:expr,
+        $allow_pagemode:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$snapshot;
+                let _ = &$nkeys;
+                let _ = &$key;
+                let _ = &$allow_strat;
+                let _ = &$allow_sync;
+                let _ = &$allow_pagemode;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TableScanDescData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -354,8 +522,37 @@ macro_rules! table_beginscan_sampling {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_beginscan_sampling {
-    ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr, $allow_strat:expr, $allow_sync:expr, $allow_pagemode:expr, $flags:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $rel:expr,
+        $snapshot:expr,
+        $nkeys:expr,
+        $key:expr,
+        $allow_strat:expr,
+        $allow_sync:expr,
+        $allow_pagemode:expr,
+        $flags:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$snapshot;
+                let _ = &$nkeys;
+                let _ = &$key;
+                let _ = &$allow_strat;
+                let _ = &$allow_sync;
+                let _ = &$allow_pagemode;
+                let _ = &$flags;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TableScanDescData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -391,7 +588,25 @@ macro_rules! table_beginscan_sampling {
 #[macro_export]
 macro_rules! table_beginscan_strat {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr, $allow_strat:expr, $allow_sync:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$snapshot;
+                let _ = &$nkeys;
+                let _ = &$key;
+                let _ = &$allow_strat;
+                let _ = &$allow_sync;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TableScanDescData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -428,7 +643,25 @@ macro_rules! table_beginscan_strat {
 #[macro_export]
 macro_rules! table_beginscan_strat {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr, $allow_strat:expr, $allow_sync:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$snapshot;
+                let _ = &$nkeys;
+                let _ = &$key;
+                let _ = &$allow_strat;
+                let _ = &$allow_sync;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TableScanDescData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -457,7 +690,21 @@ macro_rules! table_beginscan_strat {
 #[macro_export]
 macro_rules! table_beginscan_tid {
     ($rel:expr, $snapshot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$snapshot;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TableScanDescData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -487,7 +734,21 @@ macro_rules! table_beginscan_tid {
 #[macro_export]
 macro_rules! table_beginscan_tid {
     ($rel:expr, $snapshot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$snapshot;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TableScanDescData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -524,7 +785,23 @@ macro_rules! table_beginscan_tid {
 #[macro_export]
 macro_rules! table_beginscan_tidrange {
     ($rel:expr, $snapshot:expr, $mintid:expr, $maxtid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$snapshot;
+                let _ = &$mintid;
+                let _ = &$maxtid;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TableScanDescData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -562,7 +839,24 @@ macro_rules! table_beginscan_tidrange {
 #[macro_export]
 macro_rules! table_beginscan_tidrange {
     ($rel:expr, $snapshot:expr, $mintid:expr, $maxtid:expr, $flags:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$snapshot;
+                let _ = &$mintid;
+                let _ = &$maxtid;
+                let _ = &$flags;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TableScanDescData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function table_endscan from tableam.h:998 (PostgreSQL 15), tableam.h:1014 (PostgreSQL 16), tableam.h:1024 (PostgreSQL 17), tableam.h:983 (PostgreSQL 18), tableam.h:1060 (PostgreSQL 19)
@@ -588,7 +882,12 @@ macro_rules! table_beginscan_tidrange {
 #[macro_export]
 macro_rules! table_endscan {
     ($scan:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scan;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -617,11 +916,17 @@ macro_rules! table_endscan {
 #[macro_export]
 macro_rules! table_finish_bulk_insert {
     ($rel:expr, $options:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$options;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_finish_bulk_insert from tableam.h:1660 (PostgreSQL 19)
+/// Typed call adapter for C inline function table_finish_bulk_insert from tableam.h:1664 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -646,7 +951,13 @@ macro_rules! table_finish_bulk_insert {
 #[macro_export]
 macro_rules! table_finish_bulk_insert {
     ($rel:expr, $options:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$options;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -692,12 +1003,43 @@ macro_rules! table_finish_bulk_insert {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_index_build_range_scan {
-    ($table_rel:expr, $index_rel:expr, $index_info:expr, $allow_sync:expr, $anyvisible:expr, $progress:expr, $start_blockno:expr, $numblocks:expr, $callback:expr, $callback_state:expr, $scan:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $table_rel:expr,
+        $index_rel:expr,
+        $index_info:expr,
+        $allow_sync:expr,
+        $anyvisible:expr,
+        $progress:expr,
+        $start_blockno:expr,
+        $numblocks:expr,
+        $callback:expr,
+        $callback_state:expr,
+        $scan:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$table_rel;
+                let _ = &$index_rel;
+                let _ = &$index_info;
+                let _ = &$allow_sync;
+                let _ = &$anyvisible;
+                let _ = &$progress;
+                let _ = &$start_blockno;
+                let _ = &$numblocks;
+                let _ = &$callback;
+                let _ = &$callback_state;
+                let _ = &$scan;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CDouble
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_index_build_range_scan from tableam.h:1877 (PostgreSQL 19)
+/// Typed call adapter for C inline function table_index_build_range_scan from tableam.h:1881 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline double
@@ -739,8 +1081,39 @@ macro_rules! table_index_build_range_scan {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_index_build_range_scan {
-    ($table_rel:expr, $index_rel:expr, $index_info:expr, $allow_sync:expr, $anyvisible:expr, $progress:expr, $start_blockno:expr, $numblocks:expr, $callback:expr, $callback_state:expr, $scan:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $table_rel:expr,
+        $index_rel:expr,
+        $index_info:expr,
+        $allow_sync:expr,
+        $anyvisible:expr,
+        $progress:expr,
+        $start_blockno:expr,
+        $numblocks:expr,
+        $callback:expr,
+        $callback_state:expr,
+        $scan:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$table_rel;
+                let _ = &$index_rel;
+                let _ = &$index_info;
+                let _ = &$allow_sync;
+                let _ = &$anyvisible;
+                let _ = &$progress;
+                let _ = &$start_blockno;
+                let _ = &$numblocks;
+                let _ = &$callback;
+                let _ = &$callback_state;
+                let _ = &$scan;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CDouble
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -783,12 +1156,37 @@ macro_rules! table_index_build_range_scan {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_index_build_scan {
-    ($table_rel:expr, $index_rel:expr, $index_info:expr, $allow_sync:expr, $progress:expr, $callback:expr, $callback_state:expr, $scan:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $table_rel:expr,
+        $index_rel:expr,
+        $index_info:expr,
+        $allow_sync:expr,
+        $progress:expr,
+        $callback:expr,
+        $callback_state:expr,
+        $scan:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$table_rel;
+                let _ = &$index_rel;
+                let _ = &$index_info;
+                let _ = &$allow_sync;
+                let _ = &$progress;
+                let _ = &$callback;
+                let _ = &$callback_state;
+                let _ = &$scan;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CDouble
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_index_build_scan from tableam.h:1844 (PostgreSQL 19)
+/// Typed call adapter for C inline function table_index_build_scan from tableam.h:1848 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline double
@@ -827,8 +1225,33 @@ macro_rules! table_index_build_scan {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_index_build_scan {
-    ($table_rel:expr, $index_rel:expr, $index_info:expr, $allow_sync:expr, $progress:expr, $callback:expr, $callback_state:expr, $scan:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $table_rel:expr,
+        $index_rel:expr,
+        $index_info:expr,
+        $allow_sync:expr,
+        $progress:expr,
+        $callback:expr,
+        $callback_state:expr,
+        $scan:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$table_rel;
+                let _ = &$index_rel;
+                let _ = &$index_info;
+                let _ = &$allow_sync;
+                let _ = &$progress;
+                let _ = &$callback;
+                let _ = &$callback_state;
+                let _ = &$scan;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CDouble
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function table_index_delete_tuples from tableam.h:1332 (PostgreSQL 15), tableam.h:1356 (PostgreSQL 16), tableam.h:1361 (PostgreSQL 17), tableam.h:1320 (PostgreSQL 18), tableam.h:1411 (PostgreSQL 19)
@@ -854,7 +1277,19 @@ macro_rules! table_index_build_scan {
 #[macro_export]
 macro_rules! table_index_delete_tuples {
     ($rel:expr, $delstate:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$delstate;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedInt,
+                            $crate::__pgrx_c_bindings::TransactionId
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -881,7 +1316,20 @@ macro_rules! table_index_delete_tuples {
 #[macro_export]
 macro_rules! table_index_fetch_begin {
     ($rel:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::IndexFetchTableData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -918,7 +1366,21 @@ macro_rules! table_index_fetch_begin {
 #[macro_export]
 macro_rules! table_index_fetch_begin {
     ($rel:expr, $flags:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$flags;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::IndexFetchTableData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function table_index_fetch_end from tableam.h:1187 (PostgreSQL 15), tableam.h:1211 (PostgreSQL 16), tableam.h:1216 (PostgreSQL 17), tableam.h:1175 (PostgreSQL 18), tableam.h:1274 (PostgreSQL 19)
@@ -944,7 +1406,12 @@ macro_rules! table_index_fetch_begin {
 #[macro_export]
 macro_rules! table_index_fetch_end {
     ($scan:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scan;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function table_index_fetch_reset from tableam.h:1178 (PostgreSQL 15), tableam.h:1202 (PostgreSQL 16), tableam.h:1207 (PostgreSQL 17), tableam.h:1166 (PostgreSQL 18), tableam.h:1265 (PostgreSQL 19)
@@ -970,7 +1437,12 @@ macro_rules! table_index_fetch_end {
 #[macro_export]
 macro_rules! table_index_fetch_reset {
     ($scan:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scan;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1011,7 +1483,21 @@ macro_rules! table_index_fetch_reset {
 #[macro_export]
 macro_rules! table_index_fetch_tuple {
     ($scan:expr, $tid:expr, $snapshot:expr, $slot:expr, $call_again:expr, $all_dead:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scan;
+                let _ = &$tid;
+                let _ = &$snapshot;
+                let _ = &$slot;
+                let _ = &$call_again;
+                let _ = &$all_dead;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -1044,7 +1530,21 @@ macro_rules! table_index_fetch_tuple {
 #[macro_export]
 macro_rules! table_index_fetch_tuple {
     ($scan:expr, $tid:expr, $snapshot:expr, $slot:expr, $call_again:expr, $all_dead:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scan;
+                let _ = &$tid;
+                let _ = &$snapshot;
+                let _ = &$slot;
+                let _ = &$call_again;
+                let _ = &$all_dead;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1079,11 +1579,20 @@ macro_rules! table_index_fetch_tuple {
 #[macro_export]
 macro_rules! table_index_validate_scan {
     ($table_rel:expr, $index_rel:expr, $index_info:expr, $snapshot:expr, $state:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$table_rel;
+                let _ = &$index_rel;
+                let _ = &$index_info;
+                let _ = &$snapshot;
+                let _ = &$state;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_index_validate_scan from tableam.h:1908 (PostgreSQL 19)
+/// Typed call adapter for C inline function table_index_validate_scan from tableam.h:1912 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1114,7 +1623,16 @@ macro_rules! table_index_validate_scan {
 #[macro_export]
 macro_rules! table_index_validate_scan {
     ($table_rel:expr, $index_rel:expr, $index_info:expr, $snapshot:expr, $state:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$table_rel;
+                let _ = &$index_rel;
+                let _ = &$index_info;
+                let _ = &$snapshot;
+                let _ = &$state;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1143,7 +1661,17 @@ macro_rules! table_index_validate_scan {
 #[macro_export]
 macro_rules! table_multi_insert {
     ($rel:expr, $slots:expr, $nslots:expr, $cid:expr, $options:expr, $bistate:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$slots;
+                let _ = &$nslots;
+                let _ = &$cid;
+                let _ = &$options;
+                let _ = &$bistate;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -1172,7 +1700,17 @@ macro_rules! table_multi_insert {
 #[macro_export]
 macro_rules! table_multi_insert {
     ($rel:expr, $slots:expr, $nslots:expr, $cid:expr, $options:expr, $bistate:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$slots;
+                let _ = &$nslots;
+                let _ = &$cid;
+                let _ = &$options;
+                let _ = &$bistate;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function table_parallelscan_reinitialize from tableam.h:1150 (PostgreSQL 15), tableam.h:1174 (PostgreSQL 16), tableam.h:1179 (PostgreSQL 17), tableam.h:1138 (PostgreSQL 18), tableam.h:1225 (PostgreSQL 19)
@@ -1198,7 +1736,13 @@ macro_rules! table_multi_insert {
 #[macro_export]
 macro_rules! table_parallelscan_reinitialize {
     ($rel:expr, $pscan:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$pscan;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -1225,11 +1769,17 @@ macro_rules! table_parallelscan_reinitialize {
 #[macro_export]
 macro_rules! table_relation_copy_data {
     ($rel:expr, $newrnode:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$newrnode;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function table_relation_copy_data from tableam.h:1653 (PostgreSQL 16), tableam.h:1658 (PostgreSQL 17), tableam.h:1617 (PostgreSQL 18), tableam.h:1716 (PostgreSQL 19)
+/// Typed call adapter for C inline function table_relation_copy_data from tableam.h:1653 (PostgreSQL 16), tableam.h:1658 (PostgreSQL 17), tableam.h:1617 (PostgreSQL 18), tableam.h:1720 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1252,7 +1802,13 @@ macro_rules! table_relation_copy_data {
 #[macro_export]
 macro_rules! table_relation_copy_data {
     ($rel:expr, $newrlocator:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$newrlocator;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1290,12 +1846,37 @@ macro_rules! table_relation_copy_data {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_relation_copy_for_cluster {
-    ($OldTable:expr, $NewTable:expr, $OldIndex:expr, $use_sort:expr, $OldestXmin:expr, $xid_cutoff:expr, $multi_cutoff:expr, $num_tuples:expr, $tups_vacuumed:expr, $tups_recently_dead:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $OldTable:expr,
+        $NewTable:expr,
+        $OldIndex:expr,
+        $use_sort:expr,
+        $OldestXmin:expr,
+        $xid_cutoff:expr,
+        $multi_cutoff:expr,
+        $num_tuples:expr,
+        $tups_vacuumed:expr,
+        $tups_recently_dead:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$OldTable;
+                let _ = &$NewTable;
+                let _ = &$OldIndex;
+                let _ = &$use_sort;
+                let _ = &$OldestXmin;
+                let _ = &$xid_cutoff;
+                let _ = &$multi_cutoff;
+                let _ = &$num_tuples;
+                let _ = &$tups_vacuumed;
+                let _ = &$tups_recently_dead;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_relation_copy_for_cluster from tableam.h:1745 (PostgreSQL 19)
+/// Typed call adapter for C inline function table_relation_copy_for_cluster from tableam.h:1749 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1331,11 +1912,38 @@ macro_rules! table_relation_copy_for_cluster {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_relation_copy_for_cluster {
-    ($OldTable:expr, $NewTable:expr, $OldIndex:expr, $use_sort:expr, $OldestXmin:expr, $snapshot:expr, $xid_cutoff:expr, $multi_cutoff:expr, $num_tuples:expr, $tups_vacuumed:expr, $tups_recently_dead:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $OldTable:expr,
+        $NewTable:expr,
+        $OldIndex:expr,
+        $use_sort:expr,
+        $OldestXmin:expr,
+        $snapshot:expr,
+        $xid_cutoff:expr,
+        $multi_cutoff:expr,
+        $num_tuples:expr,
+        $tups_vacuumed:expr,
+        $tups_recently_dead:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$OldTable;
+                let _ = &$NewTable;
+                let _ = &$OldIndex;
+                let _ = &$use_sort;
+                let _ = &$OldestXmin;
+                let _ = &$snapshot;
+                let _ = &$xid_cutoff;
+                let _ = &$multi_cutoff;
+                let _ = &$num_tuples;
+                let _ = &$tups_vacuumed;
+                let _ = &$tups_recently_dead;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
-/// Typed call adapter for C inline function table_relation_estimate_size from tableam.h:1916 (PostgreSQL 15), tableam.h:1941 (PostgreSQL 16), tableam.h:1944 (PostgreSQL 17), tableam.h:1903 (PostgreSQL 18), tableam.h:2006 (PostgreSQL 19)
+/// Typed call adapter for C inline function table_relation_estimate_size from tableam.h:1916 (PostgreSQL 15), tableam.h:1941 (PostgreSQL 16), tableam.h:1944 (PostgreSQL 17), tableam.h:1903 (PostgreSQL 18), tableam.h:2010 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1361,7 +1969,16 @@ macro_rules! table_relation_copy_for_cluster {
 #[macro_export]
 macro_rules! table_relation_estimate_size {
     ($rel:expr, $attr_widths:expr, $pages:expr, $tuples:expr, $allvisfrac:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$attr_widths;
+                let _ = &$pages;
+                let _ = &$tuples;
+                let _ = &$allvisfrac;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1392,12 +2009,29 @@ macro_rules! table_relation_estimate_size {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_relation_fetch_toast_slice {
-    ($toastrel:expr, $valueid:expr, $attrsize:expr, $sliceoffset:expr, $slicelength:expr, $result:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $toastrel:expr,
+        $valueid:expr,
+        $attrsize:expr,
+        $sliceoffset:expr,
+        $slicelength:expr,
+        $result:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$toastrel;
+                let _ = &$valueid;
+                let _ = &$attrsize;
+                let _ = &$sliceoffset;
+                let _ = &$slicelength;
+                let _ = &$result;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_relation_fetch_toast_slice from tableam.h:1985 (PostgreSQL 19)
+/// Typed call adapter for C inline function table_relation_fetch_toast_slice from tableam.h:1989 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1424,11 +2058,28 @@ macro_rules! table_relation_fetch_toast_slice {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_relation_fetch_toast_slice {
-    ($toastrel:expr, $valueid:expr, $attrsize:expr, $sliceoffset:expr, $slicelength:expr, $result:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $toastrel:expr,
+        $valueid:expr,
+        $attrsize:expr,
+        $sliceoffset:expr,
+        $slicelength:expr,
+        $result:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$toastrel;
+                let _ = &$valueid;
+                let _ = &$attrsize;
+                let _ = &$sliceoffset;
+                let _ = &$slicelength;
+                let _ = &$result;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
-/// Typed call adapter for C inline function table_relation_needs_toast_table from tableam.h:1856 (PostgreSQL 15), tableam.h:1881 (PostgreSQL 16), tableam.h:1884 (PostgreSQL 17), tableam.h:1843 (PostgreSQL 18), tableam.h:1946 (PostgreSQL 19)
+/// Typed call adapter for C inline function table_relation_needs_toast_table from tableam.h:1856 (PostgreSQL 15), tableam.h:1881 (PostgreSQL 16), tableam.h:1884 (PostgreSQL 17), tableam.h:1843 (PostgreSQL 18), tableam.h:1950 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1451,10 +2102,19 @@ macro_rules! table_relation_fetch_toast_slice {
 #[macro_export]
 macro_rules! table_relation_needs_toast_table {
     ($rel:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
-/// Typed call adapter for C inline function table_relation_nontransactional_truncate from tableam.h:1616 (PostgreSQL 15), tableam.h:1641 (PostgreSQL 16), tableam.h:1646 (PostgreSQL 17), tableam.h:1605 (PostgreSQL 18), tableam.h:1704 (PostgreSQL 19)
+/// Typed call adapter for C inline function table_relation_nontransactional_truncate from tableam.h:1616 (PostgreSQL 15), tableam.h:1641 (PostgreSQL 16), tableam.h:1646 (PostgreSQL 17), tableam.h:1605 (PostgreSQL 18), tableam.h:1708 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1477,11 +2137,16 @@ macro_rules! table_relation_needs_toast_table {
 #[macro_export]
 macro_rules! table_relation_nontransactional_truncate {
     ($rel:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function table_relation_set_new_filelocator from tableam.h:1623 (PostgreSQL 16), tableam.h:1628 (PostgreSQL 17), tableam.h:1587 (PostgreSQL 18), tableam.h:1686 (PostgreSQL 19)
+/// Typed call adapter for C inline function table_relation_set_new_filelocator from tableam.h:1623 (PostgreSQL 16), tableam.h:1628 (PostgreSQL 17), tableam.h:1587 (PostgreSQL 18), tableam.h:1690 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1510,7 +2175,16 @@ macro_rules! table_relation_nontransactional_truncate {
 #[macro_export]
 macro_rules! table_relation_set_new_filelocator {
     ($rel:expr, $newrlocator:expr, $persistence:expr, $freezeXid:expr, $minmulti:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$newrlocator;
+                let _ = &$persistence;
+                let _ = &$freezeXid;
+                let _ = &$minmulti;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -1542,10 +2216,19 @@ macro_rules! table_relation_set_new_filelocator {
 #[macro_export]
 macro_rules! table_relation_set_new_filenode {
     ($rel:expr, $newrnode:expr, $persistence:expr, $freezeXid:expr, $minmulti:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$newrnode;
+                let _ = &$persistence;
+                let _ = &$freezeXid;
+                let _ = &$minmulti;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
-/// Typed call adapter for C inline function table_relation_size from tableam.h:1847 (PostgreSQL 15), tableam.h:1872 (PostgreSQL 16), tableam.h:1875 (PostgreSQL 17), tableam.h:1834 (PostgreSQL 18), tableam.h:1937 (PostgreSQL 19)
+/// Typed call adapter for C inline function table_relation_size from tableam.h:1847 (PostgreSQL 15), tableam.h:1872 (PostgreSQL 16), tableam.h:1875 (PostgreSQL 17), tableam.h:1834 (PostgreSQL 18), tableam.h:1941 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline uint64
@@ -1568,10 +2251,20 @@ macro_rules! table_relation_set_new_filenode {
 #[macro_export]
 macro_rules! table_relation_size {
     ($rel:expr, $forkNumber:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$forkNumber;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::uint64
+                    >()
+                )
+            }
+        )
     };
 }
-/// Typed call adapter for C inline function table_relation_toast_am from tableam.h:1866 (PostgreSQL 15), tableam.h:1891 (PostgreSQL 16), tableam.h:1894 (PostgreSQL 17), tableam.h:1853 (PostgreSQL 18), tableam.h:1956 (PostgreSQL 19)
+/// Typed call adapter for C inline function table_relation_toast_am from tableam.h:1866 (PostgreSQL 15), tableam.h:1891 (PostgreSQL 16), tableam.h:1894 (PostgreSQL 17), tableam.h:1853 (PostgreSQL 18), tableam.h:1960 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Oid
@@ -1594,7 +2287,18 @@ macro_rules! table_relation_size {
 #[macro_export]
 macro_rules! table_relation_toast_am {
     ($rel:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedInt,
+                            $crate::__pgrx_c_bindings::Oid
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1622,11 +2326,18 @@ macro_rules! table_relation_toast_am {
 #[macro_export]
 macro_rules! table_relation_vacuum {
     ($rel:expr, $params:expr, $bstrategy:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$params;
+                let _ = &$bstrategy;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_relation_vacuum from tableam.h:1776 (PostgreSQL 19)
+/// Typed call adapter for C inline function table_relation_vacuum from tableam.h:1780 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1650,7 +2361,14 @@ macro_rules! table_relation_vacuum {
 #[macro_export]
 macro_rules! table_relation_vacuum {
     ($rel:expr, $params:expr, $bstrategy:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$params;
+                let _ = &$bstrategy;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1678,7 +2396,13 @@ macro_rules! table_relation_vacuum {
 #[macro_export]
 macro_rules! table_rescan {
     ($scan:expr, $key:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scan;
+                let _ = &$key;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -1705,7 +2429,13 @@ macro_rules! table_rescan {
 #[macro_export]
 macro_rules! table_rescan {
     ($scan:expr, $key:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scan;
+                let _ = &$key;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1735,7 +2465,16 @@ macro_rules! table_rescan {
 #[macro_export]
 macro_rules! table_rescan_set_params {
     ($scan:expr, $key:expr, $allow_strat:expr, $allow_sync:expr, $allow_pagemode:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scan;
+                let _ = &$key;
+                let _ = &$allow_strat;
+                let _ = &$allow_sync;
+                let _ = &$allow_pagemode;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -1765,7 +2504,16 @@ macro_rules! table_rescan_set_params {
 #[macro_export]
 macro_rules! table_rescan_set_params {
     ($scan:expr, $key:expr, $allow_strat:expr, $allow_sync:expr, $allow_pagemode:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scan;
+                let _ = &$key;
+                let _ = &$allow_strat;
+                let _ = &$allow_sync;
+                let _ = &$allow_pagemode;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function table_rescan_tidrange from tableam.h:1085 (PostgreSQL 15), tableam.h:1105 (PostgreSQL 16), tableam.h:1110 (PostgreSQL 17), tableam.h:1069 (PostgreSQL 18), tableam.h:1140 (PostgreSQL 19)
@@ -1796,7 +2544,14 @@ macro_rules! table_rescan_set_params {
 #[macro_export]
 macro_rules! table_rescan_tidrange {
     ($sscan:expr, $mintid:expr, $maxtid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$sscan;
+                let _ = &$mintid;
+                let _ = &$maxtid;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -1825,11 +2580,22 @@ macro_rules! table_rescan_tidrange {
 #[macro_export]
 macro_rules! table_scan_analyze_next_block {
     ($scan:expr, $blockno:expr, $bstrategy:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scan;
+                let _ = &$blockno;
+                let _ = &$bstrategy;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function table_scan_analyze_next_block from tableam.h:1729 (PostgreSQL 17), tableam.h:1688 (PostgreSQL 18), tableam.h:1791 (PostgreSQL 19)
+/// Typed call adapter for C inline function table_scan_analyze_next_block from tableam.h:1729 (PostgreSQL 17), tableam.h:1688 (PostgreSQL 18), tableam.h:1795 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1852,7 +2618,17 @@ macro_rules! table_scan_analyze_next_block {
 #[macro_export]
 macro_rules! table_scan_analyze_next_block {
     ($scan:expr, $stream:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scan;
+                let _ = &$stream;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1883,11 +2659,24 @@ macro_rules! table_scan_analyze_next_block {
 #[macro_export]
 macro_rules! table_scan_analyze_next_tuple {
     ($scan:expr, $OldestXmin:expr, $liverows:expr, $deadrows:expr, $slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scan;
+                let _ = &$OldestXmin;
+                let _ = &$liverows;
+                let _ = &$deadrows;
+                let _ = &$slot;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_scan_analyze_next_tuple from tableam.h:1807 (PostgreSQL 19)
+/// Typed call adapter for C inline function table_scan_analyze_next_tuple from tableam.h:1811 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1914,7 +2703,19 @@ macro_rules! table_scan_analyze_next_tuple {
 #[macro_export]
 macro_rules! table_scan_analyze_next_tuple {
     ($scan:expr, $liverows:expr, $deadrows:expr, $slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scan;
+                let _ = &$liverows;
+                let _ = &$deadrows;
+                let _ = &$slot;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -1951,7 +2752,17 @@ macro_rules! table_scan_analyze_next_tuple {
 #[macro_export]
 macro_rules! table_scan_bitmap_next_block {
     ($scan:expr, $tbmres:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scan;
+                let _ = &$tbmres;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -1990,7 +2801,18 @@ macro_rules! table_scan_bitmap_next_block {
 #[macro_export]
 macro_rules! table_scan_bitmap_next_tuple {
     ($scan:expr, $tbmres:expr, $slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scan;
+                let _ = &$tbmres;
+                let _ = &$slot;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg18")]
@@ -2033,11 +2855,24 @@ macro_rules! table_scan_bitmap_next_tuple {
 #[macro_export]
 macro_rules! table_scan_bitmap_next_tuple {
     ($scan:expr, $slot:expr, $recheck:expr, $lossy_pages:expr, $exact_pages:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scan;
+                let _ = &$slot;
+                let _ = &$recheck;
+                let _ = &$lossy_pages;
+                let _ = &$exact_pages;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_scan_bitmap_next_tuple from tableam.h:2034 (PostgreSQL 19)
+/// Typed call adapter for C inline function table_scan_bitmap_next_tuple from tableam.h:2038 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2068,7 +2903,20 @@ macro_rules! table_scan_bitmap_next_tuple {
 #[macro_export]
 macro_rules! table_scan_bitmap_next_tuple {
     ($scan:expr, $slot:expr, $recheck:expr, $lossy_pages:expr, $exact_pages:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scan;
+                let _ = &$slot;
+                let _ = &$recheck;
+                let _ = &$lossy_pages;
+                let _ = &$exact_pages;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -2105,7 +2953,18 @@ macro_rules! table_scan_bitmap_next_tuple {
 #[macro_export]
 macro_rules! table_scan_getnextslot {
     ($sscan:expr, $direction:expr, $slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$sscan;
+                let _ = &$direction;
+                let _ = &$slot;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -2146,7 +3005,18 @@ macro_rules! table_scan_getnextslot {
 #[macro_export]
 macro_rules! table_scan_getnextslot {
     ($sscan:expr, $direction:expr, $slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$sscan;
+                let _ = &$direction;
+                let _ = &$slot;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -2179,7 +3049,18 @@ macro_rules! table_scan_getnextslot {
 #[macro_export]
 macro_rules! table_scan_getnextslot {
     ($sscan:expr, $direction:expr, $slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$sscan;
+                let _ = &$direction;
+                let _ = &$slot;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -2212,7 +3093,18 @@ macro_rules! table_scan_getnextslot {
 #[macro_export]
 macro_rules! table_scan_getnextslot_tidrange {
     ($sscan:expr, $direction:expr, $slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$sscan;
+                let _ = &$direction;
+                let _ = &$slot;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -2249,7 +3141,18 @@ macro_rules! table_scan_getnextslot_tidrange {
 #[macro_export]
 macro_rules! table_scan_getnextslot_tidrange {
     ($sscan:expr, $direction:expr, $slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$sscan;
+                let _ = &$direction;
+                let _ = &$slot;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -2284,11 +3187,21 @@ macro_rules! table_scan_getnextslot_tidrange {
 #[macro_export]
 macro_rules! table_scan_sample_next_block {
     ($scan:expr, $scanstate:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scan;
+                let _ = &$scanstate;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_scan_sample_next_block from tableam.h:2057 (PostgreSQL 19)
+/// Typed call adapter for C inline function table_scan_sample_next_block from tableam.h:2061 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2312,7 +3225,17 @@ macro_rules! table_scan_sample_next_block {
 #[macro_export]
 macro_rules! table_scan_sample_next_block {
     ($scan:expr, $scanstate:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scan;
+                let _ = &$scanstate;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -2349,11 +3272,22 @@ macro_rules! table_scan_sample_next_block {
 #[macro_export]
 macro_rules! table_scan_sample_next_tuple {
     ($scan:expr, $scanstate:expr, $slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scan;
+                let _ = &$scanstate;
+                let _ = &$slot;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_scan_sample_next_tuple from tableam.h:2072 (PostgreSQL 19)
+/// Typed call adapter for C inline function table_scan_sample_next_tuple from tableam.h:2076 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2379,7 +3313,18 @@ macro_rules! table_scan_sample_next_tuple {
 #[macro_export]
 macro_rules! table_scan_sample_next_tuple {
     ($scan:expr, $scanstate:expr, $slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scan;
+                let _ = &$scanstate;
+                let _ = &$slot;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function table_tuple_complete_speculative from tableam.h:1411 (PostgreSQL 15), tableam.h:1435 (PostgreSQL 16), tableam.h:1440 (PostgreSQL 17), tableam.h:1399 (PostgreSQL 18), tableam.h:1490 (PostgreSQL 19)
@@ -2407,7 +3352,15 @@ macro_rules! table_scan_sample_next_tuple {
 #[macro_export]
 macro_rules! table_tuple_complete_speculative {
     ($rel:expr, $slot:expr, $specToken:expr, $succeeded:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$slot;
+                let _ = &$specToken;
+                let _ = &$succeeded;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -2437,12 +3390,40 @@ macro_rules! table_tuple_complete_speculative {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_tuple_delete {
-    ($rel:expr, $tid:expr, $cid:expr, $snapshot:expr, $crosscheck:expr, $wait:expr, $tmfd:expr, $changingPart:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $rel:expr,
+        $tid:expr,
+        $cid:expr,
+        $snapshot:expr,
+        $crosscheck:expr,
+        $wait:expr,
+        $tmfd:expr,
+        $changingPart:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$tid;
+                let _ = &$cid;
+                let _ = &$snapshot;
+                let _ = &$crosscheck;
+                let _ = &$wait;
+                let _ = &$tmfd;
+                let _ = &$changingPart;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CEnumObject<
+                            $crate::__pgrx_c_generated::EnumIdentity_enum__TM_Result,
+                            $crate::__pgrx_c_macros::CUnsignedInt,
+                            u32
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_tuple_delete from tableam.h:1548 (PostgreSQL 19)
+/// Typed call adapter for C inline function table_tuple_delete from tableam.h:1552 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TM_Result
@@ -2468,8 +3449,36 @@ macro_rules! table_tuple_delete {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_tuple_delete {
-    ($rel:expr, $tid:expr, $cid:expr, $options:expr, $snapshot:expr, $crosscheck:expr, $wait:expr, $tmfd:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $rel:expr,
+        $tid:expr,
+        $cid:expr,
+        $options:expr,
+        $snapshot:expr,
+        $crosscheck:expr,
+        $wait:expr,
+        $tmfd:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$tid;
+                let _ = &$cid;
+                let _ = &$options;
+                let _ = &$snapshot;
+                let _ = &$crosscheck;
+                let _ = &$wait;
+                let _ = &$tmfd;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CEnumObject<
+                            $crate::__pgrx_c_generated::EnumIdentity_enum__TM_Result,
+                            $crate::__pgrx_c_macros::CUnsignedInt,
+                            u32
+                        >>()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function table_tuple_fetch_row_version from tableam.h:1264 (PostgreSQL 15), tableam.h:1288 (PostgreSQL 16), tableam.h:1293 (PostgreSQL 17), tableam.h:1252 (PostgreSQL 18), tableam.h:1343 (PostgreSQL 19)
@@ -2506,7 +3515,19 @@ macro_rules! table_tuple_delete {
 #[macro_export]
 macro_rules! table_tuple_fetch_row_version {
     ($rel:expr, $tid:expr, $snapshot:expr, $slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$tid;
+                let _ = &$snapshot;
+                let _ = &$slot;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -2535,7 +3556,16 @@ macro_rules! table_tuple_fetch_row_version {
 #[macro_export]
 macro_rules! table_tuple_insert {
     ($rel:expr, $slot:expr, $cid:expr, $options:expr, $bistate:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$slot;
+                let _ = &$cid;
+                let _ = &$options;
+                let _ = &$bistate;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -2564,7 +3594,16 @@ macro_rules! table_tuple_insert {
 #[macro_export]
 macro_rules! table_tuple_insert {
     ($rel:expr, $slot:expr, $cid:expr, $options:expr, $bistate:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$slot;
+                let _ = &$cid;
+                let _ = &$options;
+                let _ = &$bistate;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -2595,7 +3634,17 @@ macro_rules! table_tuple_insert {
 #[macro_export]
 macro_rules! table_tuple_insert_speculative {
     ($rel:expr, $slot:expr, $cid:expr, $options:expr, $bistate:expr, $specToken:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$slot;
+                let _ = &$cid;
+                let _ = &$options;
+                let _ = &$bistate;
+                let _ = &$specToken;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -2626,10 +3675,20 @@ macro_rules! table_tuple_insert_speculative {
 #[macro_export]
 macro_rules! table_tuple_insert_speculative {
     ($rel:expr, $slot:expr, $cid:expr, $options:expr, $bistate:expr, $specToken:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$slot;
+                let _ = &$cid;
+                let _ = &$options;
+                let _ = &$bistate;
+                let _ = &$specToken;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
-/// Typed call adapter for C inline function table_tuple_lock from tableam.h:1558 (PostgreSQL 15), tableam.h:1582 (PostgreSQL 16), tableam.h:1587 (PostgreSQL 17), tableam.h:1546 (PostgreSQL 18), tableam.h:1645 (PostgreSQL 19)
+/// Typed call adapter for C inline function table_tuple_lock from tableam.h:1558 (PostgreSQL 15), tableam.h:1582 (PostgreSQL 16), tableam.h:1587 (PostgreSQL 17), tableam.h:1546 (PostgreSQL 18), tableam.h:1649 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TM_Result
@@ -2656,8 +3715,38 @@ macro_rules! table_tuple_insert_speculative {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_tuple_lock {
-    ($rel:expr, $tid:expr, $snapshot:expr, $slot:expr, $cid:expr, $mode:expr, $wait_policy:expr, $flags:expr, $tmfd:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $rel:expr,
+        $tid:expr,
+        $snapshot:expr,
+        $slot:expr,
+        $cid:expr,
+        $mode:expr,
+        $wait_policy:expr,
+        $flags:expr,
+        $tmfd:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$tid;
+                let _ = &$snapshot;
+                let _ = &$slot;
+                let _ = &$cid;
+                let _ = &$mode;
+                let _ = &$wait_policy;
+                let _ = &$flags;
+                let _ = &$tmfd;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CEnumObject<
+                            $crate::__pgrx_c_generated::EnumIdentity_enum__TM_Result,
+                            $crate::__pgrx_c_macros::CUnsignedInt,
+                            u32
+                        >>()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function table_tuple_satisfies_snapshot from tableam.h:1311 (PostgreSQL 15), tableam.h:1335 (PostgreSQL 16), tableam.h:1340 (PostgreSQL 17), tableam.h:1299 (PostgreSQL 18), tableam.h:1390 (PostgreSQL 19)
@@ -2684,7 +3773,18 @@ macro_rules! table_tuple_lock {
 #[macro_export]
 macro_rules! table_tuple_satisfies_snapshot {
     ($rel:expr, $slot:expr, $snapshot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$slot;
+                let _ = &$snapshot;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function table_tuple_tid_valid from tableam.h:1290 (PostgreSQL 15), tableam.h:1314 (PostgreSQL 16), tableam.h:1319 (PostgreSQL 17), tableam.h:1278 (PostgreSQL 18), tableam.h:1369 (PostgreSQL 19)
@@ -2710,7 +3810,17 @@ macro_rules! table_tuple_satisfies_snapshot {
 #[macro_export]
 macro_rules! table_tuple_tid_valid {
     ($scan:expr, $tid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$scan;
+                let _ = &$tid;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -2742,8 +3852,40 @@ macro_rules! table_tuple_tid_valid {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_tuple_update {
-    ($rel:expr, $otid:expr, $slot:expr, $cid:expr, $snapshot:expr, $crosscheck:expr, $wait:expr, $tmfd:expr, $lockmode:expr, $update_indexes:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $rel:expr,
+        $otid:expr,
+        $slot:expr,
+        $cid:expr,
+        $snapshot:expr,
+        $crosscheck:expr,
+        $wait:expr,
+        $tmfd:expr,
+        $lockmode:expr,
+        $update_indexes:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$otid;
+                let _ = &$slot;
+                let _ = &$cid;
+                let _ = &$snapshot;
+                let _ = &$crosscheck;
+                let _ = &$wait;
+                let _ = &$tmfd;
+                let _ = &$lockmode;
+                let _ = &$update_indexes;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CEnumObject<
+                            $crate::__pgrx_c_generated::EnumIdentity_enum__TM_Result,
+                            $crate::__pgrx_c_macros::CUnsignedInt,
+                            u32
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -2775,12 +3917,44 @@ macro_rules! table_tuple_update {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_tuple_update {
-    ($rel:expr, $otid:expr, $slot:expr, $cid:expr, $snapshot:expr, $crosscheck:expr, $wait:expr, $tmfd:expr, $lockmode:expr, $update_indexes:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $rel:expr,
+        $otid:expr,
+        $slot:expr,
+        $cid:expr,
+        $snapshot:expr,
+        $crosscheck:expr,
+        $wait:expr,
+        $tmfd:expr,
+        $lockmode:expr,
+        $update_indexes:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$otid;
+                let _ = &$slot;
+                let _ = &$cid;
+                let _ = &$snapshot;
+                let _ = &$crosscheck;
+                let _ = &$wait;
+                let _ = &$tmfd;
+                let _ = &$lockmode;
+                let _ = &$update_indexes;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CEnumObject<
+                            $crate::__pgrx_c_generated::EnumIdentity_enum__TM_Result,
+                            $crate::__pgrx_c_macros::CUnsignedInt,
+                            u32
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_tuple_update from tableam.h:1597 (PostgreSQL 19)
+/// Typed call adapter for C inline function table_tuple_update from tableam.h:1601 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TM_Result
@@ -2809,8 +3983,42 @@ macro_rules! table_tuple_update {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_tuple_update {
-    ($rel:expr, $otid:expr, $slot:expr, $cid:expr, $options:expr, $snapshot:expr, $crosscheck:expr, $wait:expr, $tmfd:expr, $lockmode:expr, $update_indexes:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    (
+        $rel:expr,
+        $otid:expr,
+        $slot:expr,
+        $cid:expr,
+        $options:expr,
+        $snapshot:expr,
+        $crosscheck:expr,
+        $wait:expr,
+        $tmfd:expr,
+        $lockmode:expr,
+        $update_indexes:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$otid;
+                let _ = &$slot;
+                let _ = &$cid;
+                let _ = &$options;
+                let _ = &$snapshot;
+                let _ = &$crosscheck;
+                let _ = &$wait;
+                let _ = &$tmfd;
+                let _ = &$lockmode;
+                let _ = &$update_indexes;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CEnumObject<
+                            $crate::__pgrx_c_generated::EnumIdentity_enum__TM_Result,
+                            $crate::__pgrx_c_macros::CUnsignedInt,
+                            u32
+                        >>()
+                )
+            }
+        )
     };
 }
 pub use table_beginscan;

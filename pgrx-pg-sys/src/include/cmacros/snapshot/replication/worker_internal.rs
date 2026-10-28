@@ -26,11 +26,19 @@
 #[macro_export]
 macro_rules! am_leader_apply_worker {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function am_leader_apply_worker from worker_internal.h:339 (PostgreSQL 17), worker_internal.h:340 (PostgreSQL 18), worker_internal.h:381 (PostgreSQL 19)
+/// Typed call adapter for C inline function am_leader_apply_worker from worker_internal.h:339 (PostgreSQL 17), worker_internal.h:340 (PostgreSQL 18), worker_internal.h:382 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -54,7 +62,15 @@ macro_rules! am_leader_apply_worker {
 #[macro_export]
 macro_rules! am_leader_apply_worker {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg16")]
@@ -81,11 +97,19 @@ macro_rules! am_leader_apply_worker {
 #[macro_export]
 macro_rules! am_parallel_apply_worker {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function am_parallel_apply_worker from worker_internal.h:346 (PostgreSQL 17), worker_internal.h:347 (PostgreSQL 18), worker_internal.h:388 (PostgreSQL 19)
+/// Typed call adapter for C inline function am_parallel_apply_worker from worker_internal.h:346 (PostgreSQL 17), worker_internal.h:347 (PostgreSQL 18), worker_internal.h:389 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -109,11 +133,19 @@ macro_rules! am_parallel_apply_worker {
 #[macro_export]
 macro_rules! am_parallel_apply_worker {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function am_sequencesync_worker from worker_internal.h:375 (PostgreSQL 19)
+/// Typed call adapter for C inline function am_sequencesync_worker from worker_internal.h:376 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -136,7 +168,15 @@ macro_rules! am_parallel_apply_worker {
 #[macro_export]
 macro_rules! am_sequencesync_worker {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -163,7 +203,15 @@ macro_rules! am_sequencesync_worker {
 #[macro_export]
 macro_rules! am_tablesync_worker {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
@@ -190,11 +238,19 @@ macro_rules! am_tablesync_worker {
 #[macro_export]
 macro_rules! am_tablesync_worker {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function am_tablesync_worker from worker_internal.h:369 (PostgreSQL 19)
+/// Typed call adapter for C inline function am_tablesync_worker from worker_internal.h:370 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -217,11 +273,19 @@ macro_rules! am_tablesync_worker {
 #[macro_export]
 macro_rules! am_tablesync_worker {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function get_logical_worker_type from worker_internal.h:395 (PostgreSQL 19)
+/// Typed call adapter for C inline function get_logical_worker_type from worker_internal.h:396 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline LogicalRepWorkerType
@@ -245,7 +309,18 @@ macro_rules! am_tablesync_worker {
 #[macro_export]
 macro_rules! get_logical_worker_type {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CEnumObject<
+                            $crate::__pgrx_c_generated::EnumIdentity_enum__LogicalRepWorkerType,
+                            $crate::__pgrx_c_macros::CUnsignedInt,
+                            u32
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg16")]
@@ -262,11 +337,22 @@ macro_rules! get_logical_worker_type {
 #[macro_export]
 macro_rules! isParallelApplyWorker {
     ($worker:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$worker;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro isParallelApplyWorker from worker_internal.h:328 (PostgreSQL 17), worker_internal.h:329 (PostgreSQL 18), worker_internal.h:362 (PostgreSQL 19)
+/// C macro isParallelApplyWorker from worker_internal.h:328 (PostgreSQL 17), worker_internal.h:329 (PostgreSQL 18), worker_internal.h:363 (PostgreSQL 19)
 ///
 /// ```text
 /// #define isParallelApplyWorker( worker ) ( ( worker ) -> in_use && ( worker ) -> type == WORKERTYPE_PARALLEL_APPLY )
@@ -279,11 +365,22 @@ macro_rules! isParallelApplyWorker {
 #[macro_export]
 macro_rules! isParallelApplyWorker {
     ($worker:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$worker;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// C macro isSequenceSyncWorker from worker_internal.h:366 (PostgreSQL 19)
+/// C macro isSequenceSyncWorker from worker_internal.h:367 (PostgreSQL 19)
 ///
 /// ```text
 /// #define isSequenceSyncWorker( worker ) ( ( worker ) -> in_use && ( worker ) -> type == WORKERTYPE_SEQUENCESYNC )
@@ -296,11 +393,22 @@ macro_rules! isParallelApplyWorker {
 #[macro_export]
 macro_rules! isSequenceSyncWorker {
     ($worker:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$worker;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
-/// C macro isTableSyncWorker from worker_internal.h:364 (PostgreSQL 19)
+/// C macro isTableSyncWorker from worker_internal.h:365 (PostgreSQL 19)
 ///
 /// ```text
 /// #define isTableSyncWorker( worker ) ( ( worker ) -> in_use && ( worker ) -> type == WORKERTYPE_TABLESYNC )
@@ -313,7 +421,18 @@ macro_rules! isSequenceSyncWorker {
 #[macro_export]
 macro_rules! isTableSyncWorker {
     ($worker:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$worker;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
@@ -330,7 +449,18 @@ macro_rules! isTableSyncWorker {
 #[macro_export]
 macro_rules! isTablesyncWorker {
     ($worker:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$worker;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]

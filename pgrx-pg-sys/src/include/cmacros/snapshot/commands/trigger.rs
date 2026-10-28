@@ -18,7 +18,18 @@
 #[macro_export]
 macro_rules! CALLED_AS_TRIGGER {
     ($fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro TRIGGER_FIRED_AFTER from trigger.h:133 (PostgreSQL 15–19)
@@ -34,7 +45,18 @@ macro_rules! CALLED_AS_TRIGGER {
 #[macro_export]
 macro_rules! TRIGGER_FIRED_AFTER {
     ($event:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$event;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro TRIGGER_FIRED_BEFORE from trigger.h:130 (PostgreSQL 15–19)
@@ -50,7 +72,18 @@ macro_rules! TRIGGER_FIRED_AFTER {
 #[macro_export]
 macro_rules! TRIGGER_FIRED_BEFORE {
     ($event:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$event;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro TRIGGER_FIRED_BY_DELETE from trigger.h:115 (PostgreSQL 15–19)
@@ -66,7 +99,18 @@ macro_rules! TRIGGER_FIRED_BEFORE {
 #[macro_export]
 macro_rules! TRIGGER_FIRED_BY_DELETE {
     ($event:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$event;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro TRIGGER_FIRED_BY_INSERT from trigger.h:112 (PostgreSQL 15–19)
@@ -82,7 +126,18 @@ macro_rules! TRIGGER_FIRED_BY_DELETE {
 #[macro_export]
 macro_rules! TRIGGER_FIRED_BY_INSERT {
     ($event:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$event;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro TRIGGER_FIRED_BY_TRUNCATE from trigger.h:121 (PostgreSQL 15–19)
@@ -98,7 +153,18 @@ macro_rules! TRIGGER_FIRED_BY_INSERT {
 #[macro_export]
 macro_rules! TRIGGER_FIRED_BY_TRUNCATE {
     ($event:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$event;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro TRIGGER_FIRED_BY_UPDATE from trigger.h:118 (PostgreSQL 15–19)
@@ -114,7 +180,18 @@ macro_rules! TRIGGER_FIRED_BY_TRUNCATE {
 #[macro_export]
 macro_rules! TRIGGER_FIRED_BY_UPDATE {
     ($event:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$event;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro TRIGGER_FIRED_FOR_ROW from trigger.h:124 (PostgreSQL 15–19)
@@ -130,7 +207,26 @@ macro_rules! TRIGGER_FIRED_BY_UPDATE {
 #[macro_export]
 macro_rules! TRIGGER_FIRED_FOR_ROW {
     ($event:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; (@native [$event]))
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    $crate::__pgrx_c_bindings::TRIGGER_EVENT_ROW as i32
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro TRIGGER_FIRED_FOR_STATEMENT from trigger.h:127 (PostgreSQL 15–19)
@@ -146,7 +242,18 @@ macro_rules! TRIGGER_FIRED_FOR_ROW {
 #[macro_export]
 macro_rules! TRIGGER_FIRED_FOR_STATEMENT {
     ($event:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$event;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro TRIGGER_FIRED_INSTEAD from trigger.h:136 (PostgreSQL 15–19)
@@ -162,7 +269,18 @@ macro_rules! TRIGGER_FIRED_FOR_STATEMENT {
 #[macro_export]
 macro_rules! TRIGGER_FIRED_INSTEAD {
     ($event:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$event;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 pub use CALLED_AS_TRIGGER;

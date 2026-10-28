@@ -25,7 +25,13 @@
 #[macro_export]
 macro_rules! CopyQueryCompletion {
     ($dst:expr, $src:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$dst;
+                let _ = &$src;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function SetQueryCompletion from cmdtag.h:35 (PostgreSQL 15), cmdtag.h:37 (PostgreSQL 16), cmdtag.h:36 (PostgreSQL 17–19)
@@ -53,7 +59,14 @@ macro_rules! CopyQueryCompletion {
 #[macro_export]
 macro_rules! SetQueryCompletion {
     ($qc:expr, $commandTag:expr, $nprocessed:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$qc;
+                let _ = &$commandTag;
+                let _ = &$nprocessed;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 pub use CopyQueryCompletion;

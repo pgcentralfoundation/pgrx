@@ -73,36 +73,26 @@
 #[macro_export]
 macro_rules! align_fetch_then_add {
     ($tupptr:expr, $off:expr, $attbyval:expr, $attlen:expr, $attalignby:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$tupptr;
+                let _ = &$off;
+                let _ = &$attbyval;
+                let _ = &$attlen;
+                let _ = &$attalignby;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro att_addlength_datum from tupmacs.h:164 (PostgreSQL 15), tupmacs.h:145 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define att_addlength_datum( cur_offset , attlen , attdatum ) att_addlength_pointer ( cur_offset , attlen , DatumGetPointer ( attdatum ) )
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! att_addlength_datum {
-    ($cur_offset:expr, $attlen:expr, $attdatum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-#[cfg(feature = "pg18")]
-/// C macro att_addlength_datum from tupmacs.h:173 (PostgreSQL 18)
+#[cfg(feature = "pg15")]
+/// C macro att_addlength_datum from tupmacs.h:164 (PostgreSQL 15)
 ///
 /// ```text
 /// #define att_addlength_datum( cur_offset , attlen , attdatum ) att_addlength_pointer ( cur_offset , attlen , DatumGetPointer ( attdatum ) )
@@ -119,7 +109,1052 @@ macro_rules! att_addlength_datum {
 #[macro_export]
 macro_rules! att_addlength_datum {
     ($cur_offset:expr, $attlen:expr, $attdatum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$attdatum;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >()
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::add::<
+                                                $crate::__pgrx_c_macros::Wrapping,
+                                                _,
+                                                _
+                                            >(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            (@native [$cur_offset])
+                                                        )
+                                                    )
+                                                ),
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            (@native [$attlen])
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::select(
+                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >()
+                                                        )
+                                                    )
+                                                ) {
+                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::add::<
+                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                    _,
+                                                                    _
+                                                                >(
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_operand!(
+                                                                                @value [true];
+                                                                                (
+                                                                                    @native [
+                                                                                        $cur_offset
+                                                                                    ]
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    ),
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::select(
+                                                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                                                    (
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                            >()
+                                                                                        )
+                                                                                    )
+                                                                                ) {
+                                                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                                                        (
+                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                true,
+                                                                                                _
+                                                                                            >(
+                                                                                                $crate::__pgrx_c_macros::expression::add::<
+                                                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                                                    _,
+                                                                                                    _
+                                                                                                >(
+                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                        true,
+                                                                                                        _
+                                                                                                    >(
+                                                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                            $crate::__pgrx_c_macros::CSize
+                                                                                                        >()
+                                                                                                    ),
+                                                                                                    (
+                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                            true,
+                                                                                                            _
+                                                                                                        >(
+                                                                                                            $crate::__pgrx_c_macros::expression::select(
+                                                                                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                        true,
+                                                                                                                        _
+                                                                                                                    >(
+                                                                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                            $crate::__pgrx_c_macros::CInt
+                                                                                                                        >()
+                                                                                                                    )
+                                                                                                                ) {
+                                                                                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                            true,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                $crate::__pgrx_c_macros::CSize
+                                                                                                                            >()
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                } else {
+                                                                                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                            true,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            $crate::__pgrx_c_macros::expression::select(
+                                                                                                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                                                                                                    (
+                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                            true,
+                                                                                                                                            _
+                                                                                                                                        >(
+                                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                                                                            >()
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                ) {
+                                                                                                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                            true,
+                                                                                                                                            _
+                                                                                                                                        >(
+                                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                                $crate::__pgrx_c_macros::CSize
+                                                                                                                                            >()
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                } else {
+                                                                                                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                            true,
+                                                                                                                                            _
+                                                                                                                                        >(
+                                                                                                                                            $crate::__pgrx_c_macros::expression::select(
+                                                                                                                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                        true,
+                                                                                                                                                        _
+                                                                                                                                                    >(
+                                                                                                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                                            $crate::__pgrx_c_macros::CInt
+                                                                                                                                                        >()
+                                                                                                                                                    )
+                                                                                                                                                ) {
+                                                                                                                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                            true,
+                                                                                                                                                            _
+                                                                                                                                                        >(
+                                                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                                                $crate::__pgrx_c_macros::CSize
+                                                                                                                                                            >()
+                                                                                                                                                        )
+                                                                                                                                                    )
+                                                                                                                                                } else {
+                                                                                                                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                                                                                                                        (
+                                                                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                                true,
+                                                                                                                                                                _
+                                                                                                                                                            >(
+                                                                                                                                                                /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                                                                                                                                $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                                                    $crate::__pgrx_c_macros::CInt
+                                                                                                                                                                >::new(
+                                                                                                                                                                    1i32
+                                                                                                                                                                )
+                                                                                                                                                            )
+                                                                                                                                                        )
+                                                                                                                                                    )
+                                                                                                                                                }
+                                                                                                                                            )
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                }
+                                                                                                                            )
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                }
+                                                                                                            )
+                                                                                                        )
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                } else {
+                                                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                                                        (
+                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                true,
+                                                                                                _
+                                                                                            >(
+                                                                                                $crate::__pgrx_c_macros::expression::select(
+                                                                                                    if $crate::__pgrx_c_macros::expression::truth(
+                                                                                                        (
+                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                true,
+                                                                                                                _
+                                                                                                            >(
+                                                                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                    $crate::__pgrx_c_macros::CInt
+                                                                                                                >()
+                                                                                                            )
+                                                                                                        )
+                                                                                                    ) {
+                                                                                                        $crate::__pgrx_c_macros::Either::Left(
+                                                                                                            (
+                                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                    true,
+                                                                                                                    _
+                                                                                                                >(
+                                                                                                                    $crate::__pgrx_c_macros::expression::bitand(
+                                                                                                                        (
+                                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                true,
+                                                                                                                                _
+                                                                                                                            >(
+                                                                                                                                $crate::__pgrx_c_macros::expression::shr(
+                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                        true,
+                                                                                                                                        _
+                                                                                                                                    >(
+                                                                                                                                        $crate::__pgrx_c_macros::expression::load(
+                                                                                                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                                                                                                $crate::__pgrx_c_generated::Field_va_header,
+                                                                                                                                                _,
+                                                                                                                                                _
+                                                                                                                                            >(
+                                                                                                                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                                                                                                                    (
+                                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                            true,
+                                                                                                                                                            _
+                                                                                                                                                        >(
+                                                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                                                                                                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                                                                                                        $crate::__pgrx_c_bindings::varattrib_1b
+                                                                                                                                                                    >,
+                                                                                                                                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                                                                                                                >>()
+                                                                                                                                                        )
+                                                                                                                                                    )
+                                                                                                                                                )
+                                                                                                                                            )
+                                                                                                                                        )
+                                                                                                                                    ),
+                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                        true,
+                                                                                                                                        _
+                                                                                                                                    >(
+                                                                                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                            $crate::__pgrx_c_macros::CInt
+                                                                                                                                        >::new(
+                                                                                                                                            1i32
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                )
+                                                                                                                            )
+                                                                                                                        ),
+                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                            true,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                                                            >::new(
+                                                                                                                                0x7Fi32
+                                                                                                                            )
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                )
+                                                                                                            )
+                                                                                                        )
+                                                                                                    } else {
+                                                                                                        $crate::__pgrx_c_macros::Either::Right(
+                                                                                                            (
+                                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                    true,
+                                                                                                                    _
+                                                                                                                >(
+                                                                                                                    $crate::__pgrx_c_macros::expression::bitand(
+                                                                                                                        (
+                                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                true,
+                                                                                                                                _
+                                                                                                                            >(
+                                                                                                                                $crate::__pgrx_c_macros::expression::shr(
+                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                        true,
+                                                                                                                                        _
+                                                                                                                                    >(
+                                                                                                                                        $crate::__pgrx_c_macros::expression::load(
+                                                                                                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                                                                                                $crate::__pgrx_c_generated::Field_va_header,
+                                                                                                                                                _,
+                                                                                                                                                _
+                                                                                                                                            >(
+                                                                                                                                                $crate::__pgrx_c_macros::expression::project::<
+                                                                                                                                                    $crate::__pgrx_c_generated::Field_va_4byte,
+                                                                                                                                                    _,
+                                                                                                                                                    _
+                                                                                                                                                >(
+                                                                                                                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                                                                                                                        (
+                                                                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                                true,
+                                                                                                                                                                _
+                                                                                                                                                            >(
+                                                                                                                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                                                                                                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                                                                                                            $crate::__pgrx_c_bindings::varattrib_4b
+                                                                                                                                                                        >,
+                                                                                                                                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                                                                                                                    >>()
+                                                                                                                                                            )
+                                                                                                                                                        )
+                                                                                                                                                    )
+                                                                                                                                                )
+                                                                                                                                            )
+                                                                                                                                        )
+                                                                                                                                    ),
+                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                        true,
+                                                                                                                                        _
+                                                                                                                                    >(
+                                                                                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                            $crate::__pgrx_c_macros::CInt
+                                                                                                                                        >::new(
+                                                                                                                                            2i32
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                )
+                                                                                                                            )
+                                                                                                                        ),
+                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                            true,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                                                            >::new(
+                                                                                                                                0x3FFFFFFFi32
+                                                                                                                            )
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                )
+                                                                                                            )
+                                                                                                        )
+                                                                                                    }
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                }
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                } else {
+                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                {
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::add::<
+                                                                            $crate::__pgrx_c_macros::Wrapping,
+                                                                            _,
+                                                                            _
+                                                                        >(
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_operand!(
+                                                                                        @value [
+                                                                                            true
+                                                                                        ];
+                                                                                        (
+                                                                                            @native [
+                                                                                                $cur_offset
+                                                                                            ]
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            ),
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::add::<
+                                                                                        $crate::__pgrx_c_macros::Wrapping,
+                                                                                        _,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                $crate::__pgrx_c_macros::CUnsignedLong
+                                                                                            >()
+                                                                                        ),
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                            >::new(
+                                                                                                1i32
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                }
+                                                            )
+                                                        )
+                                                    )
+                                                }
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
+    };
+}
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C macro att_addlength_datum from tupmacs.h:145 (PostgreSQL 16–17), tupmacs.h:173 (PostgreSQL 18)
+///
+/// ```text
+/// #define att_addlength_datum( cur_offset , attlen , attdatum ) att_addlength_pointer ( cur_offset , attlen , DatumGetPointer ( attdatum ) )
+/// ```
+///
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! att_addlength_datum {
+    ($cur_offset:expr, $attlen:expr, $attdatum:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$attdatum;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >()
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::add::<
+                                                $crate::__pgrx_c_macros::Wrapping,
+                                                _,
+                                                _
+                                            >(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            (@native [$cur_offset])
+                                                        )
+                                                    )
+                                                ),
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            (@native [$attlen])
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::select(
+                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >()
+                                                        )
+                                                    )
+                                                ) {
+                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::add::<
+                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                    _,
+                                                                    _
+                                                                >(
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_operand!(
+                                                                                @value [true];
+                                                                                (
+                                                                                    @native [
+                                                                                        $cur_offset
+                                                                                    ]
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    ),
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::select(
+                                                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                                                    (
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                            >()
+                                                                                        )
+                                                                                    )
+                                                                                ) {
+                                                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                                                        (
+                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                true,
+                                                                                                _
+                                                                                            >(
+                                                                                                $crate::__pgrx_c_macros::expression::add::<
+                                                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                                                    _,
+                                                                                                    _
+                                                                                                >(
+                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                        true,
+                                                                                                        _
+                                                                                                    >(
+                                                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                            $crate::__pgrx_c_macros::CSize
+                                                                                                        >()
+                                                                                                    ),
+                                                                                                    (
+                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                            true,
+                                                                                                            _
+                                                                                                        >(
+                                                                                                            $crate::__pgrx_c_macros::expression::select(
+                                                                                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                        true,
+                                                                                                                        _
+                                                                                                                    >(
+                                                                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                            $crate::__pgrx_c_macros::CInt
+                                                                                                                        >()
+                                                                                                                    )
+                                                                                                                ) {
+                                                                                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                            true,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                $crate::__pgrx_c_macros::CSize
+                                                                                                                            >()
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                } else {
+                                                                                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                            true,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            $crate::__pgrx_c_macros::expression::select(
+                                                                                                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                                                                                                    (
+                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                            true,
+                                                                                                                                            _
+                                                                                                                                        >(
+                                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                                                                            >()
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                ) {
+                                                                                                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                            true,
+                                                                                                                                            _
+                                                                                                                                        >(
+                                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                                $crate::__pgrx_c_macros::CSize
+                                                                                                                                            >()
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                } else {
+                                                                                                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                            true,
+                                                                                                                                            _
+                                                                                                                                        >(
+                                                                                                                                            $crate::__pgrx_c_macros::expression::select(
+                                                                                                                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                        true,
+                                                                                                                                                        _
+                                                                                                                                                    >(
+                                                                                                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                                            $crate::__pgrx_c_macros::CInt
+                                                                                                                                                        >()
+                                                                                                                                                    )
+                                                                                                                                                ) {
+                                                                                                                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                            true,
+                                                                                                                                                            _
+                                                                                                                                                        >(
+                                                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                                                $crate::__pgrx_c_macros::CSize
+                                                                                                                                                            >()
+                                                                                                                                                        )
+                                                                                                                                                    )
+                                                                                                                                                } else {
+                                                                                                                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                                                                                                                        (
+                                                                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                                true,
+                                                                                                                                                                _
+                                                                                                                                                            >(
+                                                                                                                                                                {
+                                                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                                        true,
+                                                                                                                                                                        _
+                                                                                                                                                                    >(
+                                                                                                                                                                        $crate::__pgrx_c_macros::expression::null_constant(
+                                                                                                                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                                                                                                            >::new(
+                                                                                                                                                                                0i32
+                                                                                                                                                                            )
+                                                                                                                                                                        )
+                                                                                                                                                                    )
+                                                                                                                                                                }
+                                                                                                                                                            )
+                                                                                                                                                        )
+                                                                                                                                                    )
+                                                                                                                                                }
+                                                                                                                                            )
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                }
+                                                                                                                            )
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                }
+                                                                                                            )
+                                                                                                        )
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                } else {
+                                                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                                                        (
+                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                true,
+                                                                                                _
+                                                                                            >(
+                                                                                                $crate::__pgrx_c_macros::expression::select(
+                                                                                                    if $crate::__pgrx_c_macros::expression::truth(
+                                                                                                        (
+                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                true,
+                                                                                                                _
+                                                                                                            >(
+                                                                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                    $crate::__pgrx_c_macros::CInt
+                                                                                                                >()
+                                                                                                            )
+                                                                                                        )
+                                                                                                    ) {
+                                                                                                        $crate::__pgrx_c_macros::Either::Left(
+                                                                                                            (
+                                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                    true,
+                                                                                                                    _
+                                                                                                                >(
+                                                                                                                    $crate::__pgrx_c_macros::expression::bitand(
+                                                                                                                        (
+                                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                true,
+                                                                                                                                _
+                                                                                                                            >(
+                                                                                                                                $crate::__pgrx_c_macros::expression::shr(
+                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                        true,
+                                                                                                                                        _
+                                                                                                                                    >(
+                                                                                                                                        $crate::__pgrx_c_macros::expression::load(
+                                                                                                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                                                                                                $crate::__pgrx_c_generated::Field_va_header,
+                                                                                                                                                _,
+                                                                                                                                                _
+                                                                                                                                            >(
+                                                                                                                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                                                                                                                    (
+                                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                            true,
+                                                                                                                                                            _
+                                                                                                                                                        >(
+                                                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                                                                                                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                                                                                                        $crate::__pgrx_c_bindings::varattrib_1b
+                                                                                                                                                                    >,
+                                                                                                                                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                                                                                                                >>()
+                                                                                                                                                        )
+                                                                                                                                                    )
+                                                                                                                                                )
+                                                                                                                                            )
+                                                                                                                                        )
+                                                                                                                                    ),
+                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                        true,
+                                                                                                                                        _
+                                                                                                                                    >(
+                                                                                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                            $crate::__pgrx_c_macros::CInt
+                                                                                                                                        >::new(
+                                                                                                                                            1i32
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                )
+                                                                                                                            )
+                                                                                                                        ),
+                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                            true,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                                                            >::new(
+                                                                                                                                0x7Fi32
+                                                                                                                            )
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                )
+                                                                                                            )
+                                                                                                        )
+                                                                                                    } else {
+                                                                                                        $crate::__pgrx_c_macros::Either::Right(
+                                                                                                            (
+                                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                    true,
+                                                                                                                    _
+                                                                                                                >(
+                                                                                                                    $crate::__pgrx_c_macros::expression::bitand(
+                                                                                                                        (
+                                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                true,
+                                                                                                                                _
+                                                                                                                            >(
+                                                                                                                                $crate::__pgrx_c_macros::expression::shr(
+                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                        true,
+                                                                                                                                        _
+                                                                                                                                    >(
+                                                                                                                                        $crate::__pgrx_c_macros::expression::load(
+                                                                                                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                                                                                                $crate::__pgrx_c_generated::Field_va_header,
+                                                                                                                                                _,
+                                                                                                                                                _
+                                                                                                                                            >(
+                                                                                                                                                $crate::__pgrx_c_macros::expression::project::<
+                                                                                                                                                    $crate::__pgrx_c_generated::Field_va_4byte,
+                                                                                                                                                    _,
+                                                                                                                                                    _
+                                                                                                                                                >(
+                                                                                                                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                                                                                                                        (
+                                                                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                                true,
+                                                                                                                                                                _
+                                                                                                                                                            >(
+                                                                                                                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                                                                                                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                                                                                                            $crate::__pgrx_c_bindings::varattrib_4b
+                                                                                                                                                                        >,
+                                                                                                                                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                                                                                                                    >>()
+                                                                                                                                                            )
+                                                                                                                                                        )
+                                                                                                                                                    )
+                                                                                                                                                )
+                                                                                                                                            )
+                                                                                                                                        )
+                                                                                                                                    ),
+                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                        true,
+                                                                                                                                        _
+                                                                                                                                    >(
+                                                                                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                            $crate::__pgrx_c_macros::CInt
+                                                                                                                                        >::new(
+                                                                                                                                            2i32
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                )
+                                                                                                                            )
+                                                                                                                        ),
+                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                            true,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                                                            >::new(
+                                                                                                                                0x3FFFFFFFi32
+                                                                                                                            )
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                )
+                                                                                                            )
+                                                                                                        )
+                                                                                                    }
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                }
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                } else {
+                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                {
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::add::<
+                                                                            $crate::__pgrx_c_macros::Wrapping,
+                                                                            _,
+                                                                            _
+                                                                        >(
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_operand!(
+                                                                                        @value [
+                                                                                            true
+                                                                                        ];
+                                                                                        (
+                                                                                            @native [
+                                                                                                $cur_offset
+                                                                                            ]
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            ),
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::add::<
+                                                                                        $crate::__pgrx_c_macros::Wrapping,
+                                                                                        _,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                $crate::__pgrx_c_macros::CUnsignedLong
+                                                                                            >()
+                                                                                        ),
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                            >::new(
+                                                                                                1i32
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                }
+                                                            )
+                                                        )
+                                                    )
+                                                }
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -130,10 +1165,6 @@ macro_rules! att_addlength_datum {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -144,20 +1175,209 @@ macro_rules! att_addlength_datum {
 #[macro_export]
 macro_rules! att_addlength_datum {
     ($cur_offset:expr, $attlen:expr, $attdatum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$attdatum;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >()
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::add::<
+                                                $crate::__pgrx_c_macros::Wrapping,
+                                                _,
+                                                _
+                                            >(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            (@native [$cur_offset])
+                                                        )
+                                                    )
+                                                ),
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            (@native [$attlen])
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::select(
+                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >()
+                                                        )
+                                                    )
+                                                ) {
+                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::add::<
+                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                    _,
+                                                                    _
+                                                                >(
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_operand!(
+                                                                                @value [true];
+                                                                                (
+                                                                                    @native [
+                                                                                        $cur_offset
+                                                                                    ]
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    ),
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                                                usize
+                                                                            >>()
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                } else {
+                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                {
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::add::<
+                                                                            $crate::__pgrx_c_macros::Wrapping,
+                                                                            _,
+                                                                            _
+                                                                        >(
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_operand!(
+                                                                                        @value [
+                                                                                            true
+                                                                                        ];
+                                                                                        (
+                                                                                            @native [
+                                                                                                $cur_offset
+                                                                                            ]
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            ),
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::add::<
+                                                                                        $crate::__pgrx_c_macros::Wrapping,
+                                                                                        _,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                $crate::__pgrx_c_macros::CUnsignedLong
+                                                                                            >()
+                                                                                        ),
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                            >::new(
+                                                                                                1i32
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                }
+                                                            )
+                                                        )
+                                                    )
+                                                }
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro att_addlength_pointer from tupmacs.h:176 (PostgreSQL 15), tupmacs.h:157 (PostgreSQL 16–17)
+#[cfg(feature = "pg15")]
+/// C macro att_addlength_pointer from tupmacs.h:176 (PostgreSQL 15)
 ///
 /// ```text
 /// #define att_addlength_pointer( cur_offset , attlen , attptr ) ( ( ( attlen ) > 0 ) ? ( ( cur_offset ) + ( attlen ) ) : ( ( ( attlen ) == - 1 ) ? ( ( cur_offset ) + VARSIZE_ANY ( attptr ) ) : ( AssertMacro ( ( attlen ) == - 2 ) , ( cur_offset ) + ( strlen ( ( char * ) ( attptr ) ) + 1 ) ) ) )
 /// ```
 ///
-///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 /// # Safety
 ///
@@ -169,11 +1389,519 @@ macro_rules! att_addlength_datum {
 #[macro_export]
 macro_rules! att_addlength_pointer {
     ($cur_offset:expr, $attlen:expr, $attptr:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$attptr;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >()
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::add::<
+                                                $crate::__pgrx_c_macros::Wrapping,
+                                                _,
+                                                _
+                                            >(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            (@native [$cur_offset])
+                                                        )
+                                                    )
+                                                ),
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            (@native [$attlen])
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::select(
+                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >()
+                                                        )
+                                                    )
+                                                ) {
+                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::add::<
+                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                    _,
+                                                                    _
+                                                                >(
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_operand!(
+                                                                                @value [true];
+                                                                                (
+                                                                                    @native [
+                                                                                        $cur_offset
+                                                                                    ]
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    ),
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::select(
+                                                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                                                    (
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                            >()
+                                                                                        )
+                                                                                    )
+                                                                                ) {
+                                                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                                                        (
+                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                true,
+                                                                                                _
+                                                                                            >(
+                                                                                                $crate::__pgrx_c_macros::expression::add::<
+                                                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                                                    _,
+                                                                                                    _
+                                                                                                >(
+                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                        true,
+                                                                                                        _
+                                                                                                    >(
+                                                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                            $crate::__pgrx_c_macros::CSize
+                                                                                                        >()
+                                                                                                    ),
+                                                                                                    (
+                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                            true,
+                                                                                                            _
+                                                                                                        >(
+                                                                                                            $crate::__pgrx_c_macros::expression::select(
+                                                                                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                        true,
+                                                                                                                        _
+                                                                                                                    >(
+                                                                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                            $crate::__pgrx_c_macros::CInt
+                                                                                                                        >()
+                                                                                                                    )
+                                                                                                                ) {
+                                                                                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                            true,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                $crate::__pgrx_c_macros::CSize
+                                                                                                                            >()
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                } else {
+                                                                                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                            true,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            $crate::__pgrx_c_macros::expression::select(
+                                                                                                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                                                                                                    (
+                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                            true,
+                                                                                                                                            _
+                                                                                                                                        >(
+                                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                                                                            >()
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                ) {
+                                                                                                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                            true,
+                                                                                                                                            _
+                                                                                                                                        >(
+                                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                                $crate::__pgrx_c_macros::CSize
+                                                                                                                                            >()
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                } else {
+                                                                                                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                            true,
+                                                                                                                                            _
+                                                                                                                                        >(
+                                                                                                                                            $crate::__pgrx_c_macros::expression::select(
+                                                                                                                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                        true,
+                                                                                                                                                        _
+                                                                                                                                                    >(
+                                                                                                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                                            $crate::__pgrx_c_macros::CInt
+                                                                                                                                                        >()
+                                                                                                                                                    )
+                                                                                                                                                ) {
+                                                                                                                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                            true,
+                                                                                                                                                            _
+                                                                                                                                                        >(
+                                                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                                                $crate::__pgrx_c_macros::CSize
+                                                                                                                                                            >()
+                                                                                                                                                        )
+                                                                                                                                                    )
+                                                                                                                                                } else {
+                                                                                                                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                                                                                                                        (
+                                                                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                                true,
+                                                                                                                                                                _
+                                                                                                                                                            >(
+                                                                                                                                                                /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                                                                                                                                $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                                                    $crate::__pgrx_c_macros::CInt
+                                                                                                                                                                >::new(
+                                                                                                                                                                    1i32
+                                                                                                                                                                )
+                                                                                                                                                            )
+                                                                                                                                                        )
+                                                                                                                                                    )
+                                                                                                                                                }
+                                                                                                                                            )
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                }
+                                                                                                                            )
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                }
+                                                                                                            )
+                                                                                                        )
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                } else {
+                                                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                                                        (
+                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                true,
+                                                                                                _
+                                                                                            >(
+                                                                                                $crate::__pgrx_c_macros::expression::select(
+                                                                                                    if $crate::__pgrx_c_macros::expression::truth(
+                                                                                                        (
+                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                true,
+                                                                                                                _
+                                                                                                            >(
+                                                                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                    $crate::__pgrx_c_macros::CInt
+                                                                                                                >()
+                                                                                                            )
+                                                                                                        )
+                                                                                                    ) {
+                                                                                                        $crate::__pgrx_c_macros::Either::Left(
+                                                                                                            (
+                                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                    true,
+                                                                                                                    _
+                                                                                                                >(
+                                                                                                                    $crate::__pgrx_c_macros::expression::bitand(
+                                                                                                                        (
+                                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                true,
+                                                                                                                                _
+                                                                                                                            >(
+                                                                                                                                $crate::__pgrx_c_macros::expression::shr(
+                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                        true,
+                                                                                                                                        _
+                                                                                                                                    >(
+                                                                                                                                        $crate::__pgrx_c_macros::expression::load(
+                                                                                                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                                                                                                $crate::__pgrx_c_generated::Field_va_header,
+                                                                                                                                                _,
+                                                                                                                                                _
+                                                                                                                                            >(
+                                                                                                                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                                                                                                                    (
+                                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                            true,
+                                                                                                                                                            _
+                                                                                                                                                        >(
+                                                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                                                                                                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                                                                                                        $crate::__pgrx_c_bindings::varattrib_1b
+                                                                                                                                                                    >,
+                                                                                                                                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                                                                                                                >>()
+                                                                                                                                                        )
+                                                                                                                                                    )
+                                                                                                                                                )
+                                                                                                                                            )
+                                                                                                                                        )
+                                                                                                                                    ),
+                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                        true,
+                                                                                                                                        _
+                                                                                                                                    >(
+                                                                                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                            $crate::__pgrx_c_macros::CInt
+                                                                                                                                        >::new(
+                                                                                                                                            1i32
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                )
+                                                                                                                            )
+                                                                                                                        ),
+                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                            true,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                                                            >::new(
+                                                                                                                                0x7Fi32
+                                                                                                                            )
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                )
+                                                                                                            )
+                                                                                                        )
+                                                                                                    } else {
+                                                                                                        $crate::__pgrx_c_macros::Either::Right(
+                                                                                                            (
+                                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                    true,
+                                                                                                                    _
+                                                                                                                >(
+                                                                                                                    $crate::__pgrx_c_macros::expression::bitand(
+                                                                                                                        (
+                                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                true,
+                                                                                                                                _
+                                                                                                                            >(
+                                                                                                                                $crate::__pgrx_c_macros::expression::shr(
+                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                        true,
+                                                                                                                                        _
+                                                                                                                                    >(
+                                                                                                                                        $crate::__pgrx_c_macros::expression::load(
+                                                                                                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                                                                                                $crate::__pgrx_c_generated::Field_va_header,
+                                                                                                                                                _,
+                                                                                                                                                _
+                                                                                                                                            >(
+                                                                                                                                                $crate::__pgrx_c_macros::expression::project::<
+                                                                                                                                                    $crate::__pgrx_c_generated::Field_va_4byte,
+                                                                                                                                                    _,
+                                                                                                                                                    _
+                                                                                                                                                >(
+                                                                                                                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                                                                                                                        (
+                                                                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                                true,
+                                                                                                                                                                _
+                                                                                                                                                            >(
+                                                                                                                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                                                                                                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                                                                                                            $crate::__pgrx_c_bindings::varattrib_4b
+                                                                                                                                                                        >,
+                                                                                                                                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                                                                                                                    >>()
+                                                                                                                                                            )
+                                                                                                                                                        )
+                                                                                                                                                    )
+                                                                                                                                                )
+                                                                                                                                            )
+                                                                                                                                        )
+                                                                                                                                    ),
+                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                        true,
+                                                                                                                                        _
+                                                                                                                                    >(
+                                                                                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                            $crate::__pgrx_c_macros::CInt
+                                                                                                                                        >::new(
+                                                                                                                                            2i32
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                )
+                                                                                                                            )
+                                                                                                                        ),
+                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                            true,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                                                            >::new(
+                                                                                                                                0x3FFFFFFFi32
+                                                                                                                            )
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                )
+                                                                                                            )
+                                                                                                        )
+                                                                                                    }
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                }
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                } else {
+                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                {
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::add::<
+                                                                            $crate::__pgrx_c_macros::Wrapping,
+                                                                            _,
+                                                                            _
+                                                                        >(
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_operand!(
+                                                                                        @value [
+                                                                                            true
+                                                                                        ];
+                                                                                        (
+                                                                                            @native [
+                                                                                                $cur_offset
+                                                                                            ]
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            ),
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::add::<
+                                                                                        $crate::__pgrx_c_macros::Wrapping,
+                                                                                        _,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                $crate::__pgrx_c_macros::CUnsignedLong
+                                                                                            >()
+                                                                                        ),
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                            >::new(
+                                                                                                1i32
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                }
+                                                            )
+                                                        )
+                                                    )
+                                                }
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-#[cfg(feature = "pg18")]
-/// C macro att_addlength_pointer from tupmacs.h:185 (PostgreSQL 18)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C macro att_addlength_pointer from tupmacs.h:157 (PostgreSQL 16–17), tupmacs.h:185 (PostgreSQL 18)
 ///
 /// ```text
 /// #define att_addlength_pointer( cur_offset , attlen , attptr ) ( ( ( attlen ) > 0 ) ? ( ( cur_offset ) + ( attlen ) ) : ( ( ( attlen ) == - 1 ) ? ( ( cur_offset ) + VARSIZE_ANY ( attptr ) ) : ( AssertMacro ( ( attlen ) == - 2 ) , ( cur_offset ) + ( strlen ( ( char * ) ( attptr ) ) + 1 ) ) ) )
@@ -190,7 +1918,523 @@ macro_rules! att_addlength_pointer {
 #[macro_export]
 macro_rules! att_addlength_pointer {
     ($cur_offset:expr, $attlen:expr, $attptr:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$attptr;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >()
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::add::<
+                                                $crate::__pgrx_c_macros::Wrapping,
+                                                _,
+                                                _
+                                            >(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            (@native [$cur_offset])
+                                                        )
+                                                    )
+                                                ),
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            (@native [$attlen])
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::select(
+                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >()
+                                                        )
+                                                    )
+                                                ) {
+                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::add::<
+                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                    _,
+                                                                    _
+                                                                >(
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_operand!(
+                                                                                @value [true];
+                                                                                (
+                                                                                    @native [
+                                                                                        $cur_offset
+                                                                                    ]
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    ),
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::select(
+                                                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                                                    (
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                            >()
+                                                                                        )
+                                                                                    )
+                                                                                ) {
+                                                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                                                        (
+                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                true,
+                                                                                                _
+                                                                                            >(
+                                                                                                $crate::__pgrx_c_macros::expression::add::<
+                                                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                                                    _,
+                                                                                                    _
+                                                                                                >(
+                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                        true,
+                                                                                                        _
+                                                                                                    >(
+                                                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                            $crate::__pgrx_c_macros::CSize
+                                                                                                        >()
+                                                                                                    ),
+                                                                                                    (
+                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                            true,
+                                                                                                            _
+                                                                                                        >(
+                                                                                                            $crate::__pgrx_c_macros::expression::select(
+                                                                                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                        true,
+                                                                                                                        _
+                                                                                                                    >(
+                                                                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                            $crate::__pgrx_c_macros::CInt
+                                                                                                                        >()
+                                                                                                                    )
+                                                                                                                ) {
+                                                                                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                            true,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                $crate::__pgrx_c_macros::CSize
+                                                                                                                            >()
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                } else {
+                                                                                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                            true,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            $crate::__pgrx_c_macros::expression::select(
+                                                                                                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                                                                                                    (
+                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                            true,
+                                                                                                                                            _
+                                                                                                                                        >(
+                                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                                                                            >()
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                ) {
+                                                                                                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                            true,
+                                                                                                                                            _
+                                                                                                                                        >(
+                                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                                $crate::__pgrx_c_macros::CSize
+                                                                                                                                            >()
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                } else {
+                                                                                                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                            true,
+                                                                                                                                            _
+                                                                                                                                        >(
+                                                                                                                                            $crate::__pgrx_c_macros::expression::select(
+                                                                                                                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                        true,
+                                                                                                                                                        _
+                                                                                                                                                    >(
+                                                                                                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                                            $crate::__pgrx_c_macros::CInt
+                                                                                                                                                        >()
+                                                                                                                                                    )
+                                                                                                                                                ) {
+                                                                                                                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                            true,
+                                                                                                                                                            _
+                                                                                                                                                        >(
+                                                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                                                $crate::__pgrx_c_macros::CSize
+                                                                                                                                                            >()
+                                                                                                                                                        )
+                                                                                                                                                    )
+                                                                                                                                                } else {
+                                                                                                                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                                                                                                                        (
+                                                                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                                true,
+                                                                                                                                                                _
+                                                                                                                                                            >(
+                                                                                                                                                                {
+                                                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                                        true,
+                                                                                                                                                                        _
+                                                                                                                                                                    >(
+                                                                                                                                                                        $crate::__pgrx_c_macros::expression::null_constant(
+                                                                                                                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                                                                                                            >::new(
+                                                                                                                                                                                0i32
+                                                                                                                                                                            )
+                                                                                                                                                                        )
+                                                                                                                                                                    )
+                                                                                                                                                                }
+                                                                                                                                                            )
+                                                                                                                                                        )
+                                                                                                                                                    )
+                                                                                                                                                }
+                                                                                                                                            )
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                }
+                                                                                                                            )
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                }
+                                                                                                            )
+                                                                                                        )
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                } else {
+                                                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                                                        (
+                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                true,
+                                                                                                _
+                                                                                            >(
+                                                                                                $crate::__pgrx_c_macros::expression::select(
+                                                                                                    if $crate::__pgrx_c_macros::expression::truth(
+                                                                                                        (
+                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                true,
+                                                                                                                _
+                                                                                                            >(
+                                                                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                    $crate::__pgrx_c_macros::CInt
+                                                                                                                >()
+                                                                                                            )
+                                                                                                        )
+                                                                                                    ) {
+                                                                                                        $crate::__pgrx_c_macros::Either::Left(
+                                                                                                            (
+                                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                    true,
+                                                                                                                    _
+                                                                                                                >(
+                                                                                                                    $crate::__pgrx_c_macros::expression::bitand(
+                                                                                                                        (
+                                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                true,
+                                                                                                                                _
+                                                                                                                            >(
+                                                                                                                                $crate::__pgrx_c_macros::expression::shr(
+                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                        true,
+                                                                                                                                        _
+                                                                                                                                    >(
+                                                                                                                                        $crate::__pgrx_c_macros::expression::load(
+                                                                                                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                                                                                                $crate::__pgrx_c_generated::Field_va_header,
+                                                                                                                                                _,
+                                                                                                                                                _
+                                                                                                                                            >(
+                                                                                                                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                                                                                                                    (
+                                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                            true,
+                                                                                                                                                            _
+                                                                                                                                                        >(
+                                                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                                                                                                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                                                                                                        $crate::__pgrx_c_bindings::varattrib_1b
+                                                                                                                                                                    >,
+                                                                                                                                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                                                                                                                >>()
+                                                                                                                                                        )
+                                                                                                                                                    )
+                                                                                                                                                )
+                                                                                                                                            )
+                                                                                                                                        )
+                                                                                                                                    ),
+                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                        true,
+                                                                                                                                        _
+                                                                                                                                    >(
+                                                                                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                            $crate::__pgrx_c_macros::CInt
+                                                                                                                                        >::new(
+                                                                                                                                            1i32
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                )
+                                                                                                                            )
+                                                                                                                        ),
+                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                            true,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                                                            >::new(
+                                                                                                                                0x7Fi32
+                                                                                                                            )
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                )
+                                                                                                            )
+                                                                                                        )
+                                                                                                    } else {
+                                                                                                        $crate::__pgrx_c_macros::Either::Right(
+                                                                                                            (
+                                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                    true,
+                                                                                                                    _
+                                                                                                                >(
+                                                                                                                    $crate::__pgrx_c_macros::expression::bitand(
+                                                                                                                        (
+                                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                true,
+                                                                                                                                _
+                                                                                                                            >(
+                                                                                                                                $crate::__pgrx_c_macros::expression::shr(
+                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                        true,
+                                                                                                                                        _
+                                                                                                                                    >(
+                                                                                                                                        $crate::__pgrx_c_macros::expression::load(
+                                                                                                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                                                                                                $crate::__pgrx_c_generated::Field_va_header,
+                                                                                                                                                _,
+                                                                                                                                                _
+                                                                                                                                            >(
+                                                                                                                                                $crate::__pgrx_c_macros::expression::project::<
+                                                                                                                                                    $crate::__pgrx_c_generated::Field_va_4byte,
+                                                                                                                                                    _,
+                                                                                                                                                    _
+                                                                                                                                                >(
+                                                                                                                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                                                                                                                        (
+                                                                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                                true,
+                                                                                                                                                                _
+                                                                                                                                                            >(
+                                                                                                                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                                                                                                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                                                                                                            $crate::__pgrx_c_bindings::varattrib_4b
+                                                                                                                                                                        >,
+                                                                                                                                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                                                                                                                    >>()
+                                                                                                                                                            )
+                                                                                                                                                        )
+                                                                                                                                                    )
+                                                                                                                                                )
+                                                                                                                                            )
+                                                                                                                                        )
+                                                                                                                                    ),
+                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                        true,
+                                                                                                                                        _
+                                                                                                                                    >(
+                                                                                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                            $crate::__pgrx_c_macros::CInt
+                                                                                                                                        >::new(
+                                                                                                                                            2i32
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                )
+                                                                                                                            )
+                                                                                                                        ),
+                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                            true,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                                                            >::new(
+                                                                                                                                0x3FFFFFFFi32
+                                                                                                                            )
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                )
+                                                                                                            )
+                                                                                                        )
+                                                                                                    }
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                }
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                } else {
+                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                {
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::add::<
+                                                                            $crate::__pgrx_c_macros::Wrapping,
+                                                                            _,
+                                                                            _
+                                                                        >(
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_operand!(
+                                                                                        @value [
+                                                                                            true
+                                                                                        ];
+                                                                                        (
+                                                                                            @native [
+                                                                                                $cur_offset
+                                                                                            ]
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            ),
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::add::<
+                                                                                        $crate::__pgrx_c_macros::Wrapping,
+                                                                                        _,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                $crate::__pgrx_c_macros::CUnsignedLong
+                                                                                            >()
+                                                                                        ),
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                            >::new(
+                                                                                                1i32
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                }
+                                                            )
+                                                        )
+                                                    )
+                                                }
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -201,10 +2445,6 @@ macro_rules! att_addlength_pointer {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
@@ -215,20 +2455,607 @@ macro_rules! att_addlength_pointer {
 #[macro_export]
 macro_rules! att_addlength_pointer {
     ($cur_offset:expr, $attlen:expr, $attptr:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$attptr;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >()
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::add::<
+                                                $crate::__pgrx_c_macros::Wrapping,
+                                                _,
+                                                _
+                                            >(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            (@native [$cur_offset])
+                                                        )
+                                                    )
+                                                ),
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            (@native [$attlen])
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::select(
+                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >()
+                                                        )
+                                                    )
+                                                ) {
+                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::add::<
+                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                    _,
+                                                                    _
+                                                                >(
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_operand!(
+                                                                                @value [true];
+                                                                                (
+                                                                                    @native [
+                                                                                        $cur_offset
+                                                                                    ]
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    ),
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                                                usize
+                                                                            >>()
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                } else {
+                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                {
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::add::<
+                                                                            $crate::__pgrx_c_macros::Wrapping,
+                                                                            _,
+                                                                            _
+                                                                        >(
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_operand!(
+                                                                                        @value [
+                                                                                            true
+                                                                                        ];
+                                                                                        (
+                                                                                            @native [
+                                                                                                $cur_offset
+                                                                                            ]
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            ),
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::add::<
+                                                                                        $crate::__pgrx_c_macros::Wrapping,
+                                                                                        _,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                $crate::__pgrx_c_macros::CUnsignedLong
+                                                                                            >()
+                                                                                        ),
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                            >::new(
+                                                                                                1i32
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                }
+                                                            )
+                                                        )
+                                                    )
+                                                }
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro att_align_datum from tupmacs.h:105 (PostgreSQL 15), tupmacs.h:86 (PostgreSQL 16–17)
+#[cfg(feature = "pg15")]
+/// C macro att_align_datum from tupmacs.h:105 (PostgreSQL 15)
 ///
 /// ```text
 /// #define att_align_datum( cur_offset , attalign , attlen , attdatum ) ( ( ( attlen ) == - 1 && VARATT_IS_SHORT ( DatumGetPointer ( attdatum ) ) ) ? ( uintptr_t ) ( cur_offset ) : att_align_nominal ( cur_offset , attalign ) )
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
+/// # Safety
 ///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! att_align_datum {
+    ($cur_offset:expr, $attalign:expr, $attlen:expr, $attdatum:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$cur_offset;
+                let _ = &$attalign;
+                let _ = &$attlen;
+                let _ = &$attdatum;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >()
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_types::uintptr_t
+                                        >()
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::select(
+                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >()
+                                                        )
+                                                    )
+                                                ) {
+                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::bitand(
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::add::<
+                                                                                $crate::__pgrx_c_macros::Wrapping,
+                                                                                _,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                        $crate::__pgrx_c_types::uintptr_t
+                                                                                    >()
+                                                                                ),
+                                                                                (
+                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                        true,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_macros::expression::sub::<
+                                                                                            $crate::__pgrx_c_macros::Wrapping,
+                                                                                            _,
+                                                                                            _
+                                                                                        >(
+                                                                                            (
+                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                    true,
+                                                                                                    _
+                                                                                                >(
+                                                                                                    $crate::__pgrx_c_macros::CValue::<
+                                                                                                        $crate::__pgrx_c_macros::CInt
+                                                                                                    >::new(
+                                                                                                        $crate::__pgrx_c_bindings::ALIGNOF_INT as i32
+                                                                                                    )
+                                                                                                )
+                                                                                            ),
+                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                true,
+                                                                                                _
+                                                                                            >(
+                                                                                                $crate::__pgrx_c_macros::CValue::<
+                                                                                                    $crate::__pgrx_c_macros::CInt
+                                                                                                >::new(
+                                                                                                    1i32
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    ),
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::bitnot(
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                        $crate::__pgrx_c_types::uintptr_t
+                                                                                    >()
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                } else {
+                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::select(
+                                                                    if $crate::__pgrx_c_macros::expression::truth(
+                                                                        (
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                true,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                    $crate::__pgrx_c_macros::CInt
+                                                                                >()
+                                                                            )
+                                                                        )
+                                                                    ) {
+                                                                        $crate::__pgrx_c_macros::Either::Left(
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                true,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                    $crate::__pgrx_c_types::uintptr_t
+                                                                                >()
+                                                                            )
+                                                                        )
+                                                                    } else {
+                                                                        $crate::__pgrx_c_macros::Either::Right(
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::select(
+                                                                                        if $crate::__pgrx_c_macros::expression::truth(
+                                                                                            (
+                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                    true,
+                                                                                                    _
+                                                                                                >(
+                                                                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                        $crate::__pgrx_c_macros::CInt
+                                                                                                    >()
+                                                                                                )
+                                                                                            )
+                                                                                        ) {
+                                                                                            $crate::__pgrx_c_macros::Either::Left(
+                                                                                                (
+                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                        true,
+                                                                                                        _
+                                                                                                    >(
+                                                                                                        $crate::__pgrx_c_macros::expression::bitand(
+                                                                                                            (
+                                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                    true,
+                                                                                                                    _
+                                                                                                                >(
+                                                                                                                    $crate::__pgrx_c_macros::expression::add::<
+                                                                                                                        $crate::__pgrx_c_macros::Wrapping,
+                                                                                                                        _,
+                                                                                                                        _
+                                                                                                                    >(
+                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                            true,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                $crate::__pgrx_c_types::uintptr_t
+                                                                                                                            >()
+                                                                                                                        ),
+                                                                                                                        (
+                                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                true,
+                                                                                                                                _
+                                                                                                                            >(
+                                                                                                                                $crate::__pgrx_c_macros::expression::sub::<
+                                                                                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                                                                                    _,
+                                                                                                                                    _
+                                                                                                                                >(
+                                                                                                                                    (
+                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                            true,
+                                                                                                                                            _
+                                                                                                                                        >(
+                                                                                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                                                                            >::new(
+                                                                                                                                                $crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32
+                                                                                                                                            )
+                                                                                                                                        )
+                                                                                                                                    ),
+                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                        true,
+                                                                                                                                        _
+                                                                                                                                    >(
+                                                                                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                            $crate::__pgrx_c_macros::CInt
+                                                                                                                                        >::new(
+                                                                                                                                            1i32
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                )
+                                                                                                                            )
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                )
+                                                                                                            ),
+                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                true,
+                                                                                                                _
+                                                                                                            >(
+                                                                                                                $crate::__pgrx_c_macros::expression::bitnot(
+                                                                                                                    (
+                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                            true,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                $crate::__pgrx_c_types::uintptr_t
+                                                                                                                            >()
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                )
+                                                                                                            )
+                                                                                                        )
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        } else {
+                                                                                            $crate::__pgrx_c_macros::Either::Right(
+                                                                                                (
+                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                        true,
+                                                                                                        _
+                                                                                                    >(
+                                                                                                        {
+                                                                                                            (
+                                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                    true,
+                                                                                                                    _
+                                                                                                                >(
+                                                                                                                    $crate::__pgrx_c_macros::expression::bitand(
+                                                                                                                        (
+                                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                true,
+                                                                                                                                _
+                                                                                                                            >(
+                                                                                                                                $crate::__pgrx_c_macros::expression::add::<
+                                                                                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                                                                                    _,
+                                                                                                                                    _
+                                                                                                                                >(
+                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                        true,
+                                                                                                                                        _
+                                                                                                                                    >(
+                                                                                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                            $crate::__pgrx_c_types::uintptr_t
+                                                                                                                                        >()
+                                                                                                                                    ),
+                                                                                                                                    (
+                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                            true,
+                                                                                                                                            _
+                                                                                                                                        >(
+                                                                                                                                            $crate::__pgrx_c_macros::expression::sub::<
+                                                                                                                                                $crate::__pgrx_c_macros::Wrapping,
+                                                                                                                                                _,
+                                                                                                                                                _
+                                                                                                                                            >(
+                                                                                                                                                (
+                                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                        true,
+                                                                                                                                                        _
+                                                                                                                                                    >(
+                                                                                                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                                            $crate::__pgrx_c_macros::CInt
+                                                                                                                                                        >::new(
+                                                                                                                                                            $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
+                                                                                                                                                        )
+                                                                                                                                                    )
+                                                                                                                                                ),
+                                                                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                    true,
+                                                                                                                                                    _
+                                                                                                                                                >(
+                                                                                                                                                    $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                                        $crate::__pgrx_c_macros::CInt
+                                                                                                                                                    >::new(
+                                                                                                                                                        1i32
+                                                                                                                                                    )
+                                                                                                                                                )
+                                                                                                                                            )
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                )
+                                                                                                                            )
+                                                                                                                        ),
+                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                            true,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            $crate::__pgrx_c_macros::expression::bitnot(
+                                                                                                                                (
+                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                        true,
+                                                                                                                                        _
+                                                                                                                                    >(
+                                                                                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                            $crate::__pgrx_c_types::uintptr_t
+                                                                                                                                        >()
+                                                                                                                                    )
+                                                                                                                                )
+                                                                                                                            )
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                )
+                                                                                                            )
+                                                                                                        }
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        }
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    }
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                }
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
+    };
+}
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C macro att_align_datum from tupmacs.h:86 (PostgreSQL 16–17), tupmacs.h:87 (PostgreSQL 18)
+///
+/// ```text
+/// #define att_align_datum( cur_offset , attalign , attlen , attdatum ) ( ( ( attlen ) == - 1 && VARATT_IS_SHORT ( DatumGetPointer ( attdatum ) ) ) ? ( uintptr_t ) ( cur_offset ) : att_align_nominal ( cur_offset , attalign ) )
+/// ```
+///
 ///
 /// # Safety
 ///
@@ -240,11 +3067,388 @@ macro_rules! att_addlength_pointer {
 #[macro_export]
 macro_rules! att_align_datum {
     ($cur_offset:expr, $attalign:expr, $attlen:expr, $attdatum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$cur_offset;
+                let _ = &$attalign;
+                let _ = &$attlen;
+                let _ = &$attdatum;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >()
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_types::uintptr_t
+                                        >()
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::select(
+                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >()
+                                                        )
+                                                    )
+                                                ) {
+                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::bitand(
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::add::<
+                                                                                $crate::__pgrx_c_macros::Wrapping,
+                                                                                _,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                        $crate::__pgrx_c_types::uintptr_t
+                                                                                    >()
+                                                                                ),
+                                                                                (
+                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                        true,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_macros::expression::sub::<
+                                                                                            $crate::__pgrx_c_macros::Wrapping,
+                                                                                            _,
+                                                                                            _
+                                                                                        >(
+                                                                                            (
+                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                    true,
+                                                                                                    _
+                                                                                                >(
+                                                                                                    $crate::__pgrx_c_macros::CValue::<
+                                                                                                        $crate::__pgrx_c_macros::CInt
+                                                                                                    >::new(
+                                                                                                        $crate::__pgrx_c_bindings::ALIGNOF_INT as i32
+                                                                                                    )
+                                                                                                )
+                                                                                            ),
+                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                true,
+                                                                                                _
+                                                                                            >(
+                                                                                                $crate::__pgrx_c_macros::CValue::<
+                                                                                                    $crate::__pgrx_c_macros::CInt
+                                                                                                >::new(
+                                                                                                    1i32
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    ),
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::bitnot(
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                        $crate::__pgrx_c_types::uintptr_t
+                                                                                    >()
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                } else {
+                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::select(
+                                                                    if $crate::__pgrx_c_macros::expression::truth(
+                                                                        (
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                true,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                    $crate::__pgrx_c_macros::CInt
+                                                                                >()
+                                                                            )
+                                                                        )
+                                                                    ) {
+                                                                        $crate::__pgrx_c_macros::Either::Left(
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                true,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                    $crate::__pgrx_c_types::uintptr_t
+                                                                                >()
+                                                                            )
+                                                                        )
+                                                                    } else {
+                                                                        $crate::__pgrx_c_macros::Either::Right(
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::select(
+                                                                                        if $crate::__pgrx_c_macros::expression::truth(
+                                                                                            (
+                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                    true,
+                                                                                                    _
+                                                                                                >(
+                                                                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                        $crate::__pgrx_c_macros::CInt
+                                                                                                    >()
+                                                                                                )
+                                                                                            )
+                                                                                        ) {
+                                                                                            $crate::__pgrx_c_macros::Either::Left(
+                                                                                                (
+                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                        true,
+                                                                                                        _
+                                                                                                    >(
+                                                                                                        $crate::__pgrx_c_macros::expression::bitand(
+                                                                                                            (
+                                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                    true,
+                                                                                                                    _
+                                                                                                                >(
+                                                                                                                    $crate::__pgrx_c_macros::expression::add::<
+                                                                                                                        $crate::__pgrx_c_macros::Wrapping,
+                                                                                                                        _,
+                                                                                                                        _
+                                                                                                                    >(
+                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                            true,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                $crate::__pgrx_c_types::uintptr_t
+                                                                                                                            >()
+                                                                                                                        ),
+                                                                                                                        (
+                                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                true,
+                                                                                                                                _
+                                                                                                                            >(
+                                                                                                                                $crate::__pgrx_c_macros::expression::sub::<
+                                                                                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                                                                                    _,
+                                                                                                                                    _
+                                                                                                                                >(
+                                                                                                                                    (
+                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                            true,
+                                                                                                                                            _
+                                                                                                                                        >(
+                                                                                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                                                                            >::new(
+                                                                                                                                                $crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32
+                                                                                                                                            )
+                                                                                                                                        )
+                                                                                                                                    ),
+                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                        true,
+                                                                                                                                        _
+                                                                                                                                    >(
+                                                                                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                            $crate::__pgrx_c_macros::CInt
+                                                                                                                                        >::new(
+                                                                                                                                            1i32
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                )
+                                                                                                                            )
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                )
+                                                                                                            ),
+                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                true,
+                                                                                                                _
+                                                                                                            >(
+                                                                                                                $crate::__pgrx_c_macros::expression::bitnot(
+                                                                                                                    (
+                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                            true,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                $crate::__pgrx_c_types::uintptr_t
+                                                                                                                            >()
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                )
+                                                                                                            )
+                                                                                                        )
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        } else {
+                                                                                            $crate::__pgrx_c_macros::Either::Right(
+                                                                                                (
+                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                        true,
+                                                                                                        _
+                                                                                                    >(
+                                                                                                        {
+                                                                                                            (
+                                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                    true,
+                                                                                                                    _
+                                                                                                                >(
+                                                                                                                    $crate::__pgrx_c_macros::expression::bitand(
+                                                                                                                        (
+                                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                true,
+                                                                                                                                _
+                                                                                                                            >(
+                                                                                                                                $crate::__pgrx_c_macros::expression::add::<
+                                                                                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                                                                                    _,
+                                                                                                                                    _
+                                                                                                                                >(
+                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                        true,
+                                                                                                                                        _
+                                                                                                                                    >(
+                                                                                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                            $crate::__pgrx_c_types::uintptr_t
+                                                                                                                                        >()
+                                                                                                                                    ),
+                                                                                                                                    (
+                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                            true,
+                                                                                                                                            _
+                                                                                                                                        >(
+                                                                                                                                            $crate::__pgrx_c_macros::expression::sub::<
+                                                                                                                                                $crate::__pgrx_c_macros::Wrapping,
+                                                                                                                                                _,
+                                                                                                                                                _
+                                                                                                                                            >(
+                                                                                                                                                (
+                                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                        true,
+                                                                                                                                                        _
+                                                                                                                                                    >(
+                                                                                                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                                            $crate::__pgrx_c_macros::CInt
+                                                                                                                                                        >::new(
+                                                                                                                                                            $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
+                                                                                                                                                        )
+                                                                                                                                                    )
+                                                                                                                                                ),
+                                                                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                    true,
+                                                                                                                                                    _
+                                                                                                                                                >(
+                                                                                                                                                    $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                                        $crate::__pgrx_c_macros::CInt
+                                                                                                                                                    >::new(
+                                                                                                                                                        1i32
+                                                                                                                                                    )
+                                                                                                                                                )
+                                                                                                                                            )
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                )
+                                                                                                                            )
+                                                                                                                        ),
+                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                            true,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            $crate::__pgrx_c_macros::expression::bitnot(
+                                                                                                                                (
+                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                        true,
+                                                                                                                                        _
+                                                                                                                                    >(
+                                                                                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                            $crate::__pgrx_c_types::uintptr_t
+                                                                                                                                        >()
+                                                                                                                                    )
+                                                                                                                                )
+                                                                                                                            )
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                )
+                                                                                                            )
+                                                                                                        }
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        }
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    }
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                }
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro att_align_datum from tupmacs.h:87 (PostgreSQL 18), tupmacs.h:341 (PostgreSQL 19)
+#[cfg(feature = "pg19")]
+/// C macro att_align_datum from tupmacs.h:341 (PostgreSQL 19)
 ///
 /// ```text
 /// #define att_align_datum( cur_offset , attalign , attlen , attdatum ) ( ( ( attlen ) == - 1 && VARATT_IS_SHORT ( DatumGetPointer ( attdatum ) ) ) ? ( uintptr_t ) ( cur_offset ) : att_align_nominal ( cur_offset , attalign ) )
@@ -261,36 +3465,122 @@ macro_rules! att_align_datum {
 #[macro_export]
 macro_rules! att_align_datum {
     ($cur_offset:expr, $attalign:expr, $attlen:expr, $attdatum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$cur_offset;
+                let _ = &$attalign;
+                let _ = &$attlen;
+                let _ = &$attdatum;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >()
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_types::uintptr_t
+                                        >()
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::add::<
+                                                            $crate::__pgrx_c_macros::Wrapping,
+                                                            _,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::uintptr_t
+                                                                >()
+                                                            ),
+                                                            (
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::sub::<
+                                                                        $crate::__pgrx_c_macros::Wrapping,
+                                                                        _,
+                                                                        _
+                                                                    >(
+                                                                        (
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                true,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                    $crate::__pgrx_c_types::uint8
+                                                                                >()
+                                                                            )
+                                                                        ),
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                $crate::__pgrx_c_macros::CInt
+                                                                            >::new(1i32)
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::bitnot(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::uintptr_t
+                                                                >()
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro att_align_nominal from tupmacs.h:148 (PostgreSQL 15), tupmacs.h:129 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define att_align_nominal( cur_offset , attalign ) ( ( ( attalign ) == TYPALIGN_INT ) ? INTALIGN ( cur_offset ) : ( ( ( attalign ) == TYPALIGN_CHAR ) ? ( uintptr_t ) ( cur_offset ) : ( ( ( attalign ) == TYPALIGN_DOUBLE ) ? DOUBLEALIGN ( cur_offset ) : ( AssertMacro ( ( attalign ) == TYPALIGN_SHORT ) , SHORTALIGN ( cur_offset ) ) ) ) )
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! att_align_nominal {
-    ($cur_offset:expr, $attalign:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-#[cfg(feature = "pg18")]
-/// C macro att_align_nominal from tupmacs.h:150 (PostgreSQL 18)
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C macro att_align_nominal from tupmacs.h:148 (PostgreSQL 15), tupmacs.h:129 (PostgreSQL 16–17), tupmacs.h:150 (PostgreSQL 18)
 ///
 /// ```text
 /// #define att_align_nominal( cur_offset , attalign ) ( ( ( attalign ) == TYPALIGN_INT ) ? INTALIGN ( cur_offset ) : ( ( ( attalign ) == TYPALIGN_CHAR ) ? ( uintptr_t ) ( cur_offset ) : ( ( ( attalign ) == TYPALIGN_DOUBLE ) ? DOUBLEALIGN ( cur_offset ) : ( AssertMacro ( ( attalign ) == TYPALIGN_SHORT ) , SHORTALIGN ( cur_offset ) ) ) ) )
@@ -307,7 +3597,348 @@ macro_rules! att_align_nominal {
 #[macro_export]
 macro_rules! att_align_nominal {
     ($cur_offset:expr, $attalign:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$cur_offset;
+                let _ = &$attalign;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >()
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::add::<
+                                                            $crate::__pgrx_c_macros::Wrapping,
+                                                            _,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::uintptr_t
+                                                                >()
+                                                            ),
+                                                            (
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::sub::<
+                                                                        $crate::__pgrx_c_macros::Wrapping,
+                                                                        _,
+                                                                        _
+                                                                    >(
+                                                                        (
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                true,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::CValue::<
+                                                                                    $crate::__pgrx_c_macros::CInt
+                                                                                >::new(
+                                                                                    $crate::__pgrx_c_bindings::ALIGNOF_INT as i32
+                                                                                )
+                                                                            )
+                                                                        ),
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                $crate::__pgrx_c_macros::CInt
+                                                                            >::new(1i32)
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::bitnot(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::uintptr_t
+                                                                >()
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::select(
+                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >()
+                                                        )
+                                                    )
+                                                ) {
+                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                $crate::__pgrx_c_types::uintptr_t
+                                                            >()
+                                                        )
+                                                    )
+                                                } else {
+                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::select(
+                                                                    if $crate::__pgrx_c_macros::expression::truth(
+                                                                        (
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                true,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                    $crate::__pgrx_c_macros::CInt
+                                                                                >()
+                                                                            )
+                                                                        )
+                                                                    ) {
+                                                                        $crate::__pgrx_c_macros::Either::Left(
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::bitand(
+                                                                                        (
+                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                true,
+                                                                                                _
+                                                                                            >(
+                                                                                                $crate::__pgrx_c_macros::expression::add::<
+                                                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                                                    _,
+                                                                                                    _
+                                                                                                >(
+                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                        true,
+                                                                                                        _
+                                                                                                    >(
+                                                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                            $crate::__pgrx_c_types::uintptr_t
+                                                                                                        >()
+                                                                                                    ),
+                                                                                                    (
+                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                            true,
+                                                                                                            _
+                                                                                                        >(
+                                                                                                            $crate::__pgrx_c_macros::expression::sub::<
+                                                                                                                $crate::__pgrx_c_macros::Wrapping,
+                                                                                                                _,
+                                                                                                                _
+                                                                                                            >(
+                                                                                                                (
+                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                        true,
+                                                                                                                        _
+                                                                                                                    >(
+                                                                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                                                                            $crate::__pgrx_c_macros::CInt
+                                                                                                                        >::new(
+                                                                                                                            $crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                ),
+                                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                    true,
+                                                                                                                    _
+                                                                                                                >(
+                                                                                                                    $crate::__pgrx_c_macros::CValue::<
+                                                                                                                        $crate::__pgrx_c_macros::CInt
+                                                                                                                    >::new(
+                                                                                                                        1i32
+                                                                                                                    )
+                                                                                                                )
+                                                                                                            )
+                                                                                                        )
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        ),
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::expression::bitnot(
+                                                                                                (
+                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                        true,
+                                                                                                        _
+                                                                                                    >(
+                                                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                            $crate::__pgrx_c_types::uintptr_t
+                                                                                                        >()
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    } else {
+                                                                        $crate::__pgrx_c_macros::Either::Right(
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    {
+                                                                                        (
+                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                true,
+                                                                                                _
+                                                                                            >(
+                                                                                                $crate::__pgrx_c_macros::expression::bitand(
+                                                                                                    (
+                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                            true,
+                                                                                                            _
+                                                                                                        >(
+                                                                                                            $crate::__pgrx_c_macros::expression::add::<
+                                                                                                                $crate::__pgrx_c_macros::Wrapping,
+                                                                                                                _,
+                                                                                                                _
+                                                                                                            >(
+                                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                    true,
+                                                                                                                    _
+                                                                                                                >(
+                                                                                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                        $crate::__pgrx_c_types::uintptr_t
+                                                                                                                    >()
+                                                                                                                ),
+                                                                                                                (
+                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                        true,
+                                                                                                                        _
+                                                                                                                    >(
+                                                                                                                        $crate::__pgrx_c_macros::expression::sub::<
+                                                                                                                            $crate::__pgrx_c_macros::Wrapping,
+                                                                                                                            _,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            (
+                                                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                    true,
+                                                                                                                                    _
+                                                                                                                                >(
+                                                                                                                                    $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                        $crate::__pgrx_c_macros::CInt
+                                                                                                                                    >::new(
+                                                                                                                                        $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
+                                                                                                                                    )
+                                                                                                                                )
+                                                                                                                            ),
+                                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                true,
+                                                                                                                                _
+                                                                                                                            >(
+                                                                                                                                $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                    $crate::__pgrx_c_macros::CInt
+                                                                                                                                >::new(
+                                                                                                                                    1i32
+                                                                                                                                )
+                                                                                                                            )
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                )
+                                                                                                            )
+                                                                                                        )
+                                                                                                    ),
+                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                        true,
+                                                                                                        _
+                                                                                                    >(
+                                                                                                        $crate::__pgrx_c_macros::expression::bitnot(
+                                                                                                            (
+                                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                    true,
+                                                                                                                    _
+                                                                                                                >(
+                                                                                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                        $crate::__pgrx_c_types::uintptr_t
+                                                                                                                    >()
+                                                                                                                )
+                                                                                                            )
+                                                                                                        )
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    }
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    }
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                }
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -328,36 +3959,85 @@ macro_rules! att_align_nominal {
 #[macro_export]
 macro_rules! att_align_nominal {
     ($cur_offset:expr, $attalign:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$cur_offset;
+                let _ = &$attalign;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::add::<
+                                        $crate::__pgrx_c_macros::Wrapping,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        ),
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::sub::<
+                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                $crate::__pgrx_c_types::uint8
+                                                            >()
+                                                        )
+                                                    ),
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(1i32)
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitnot(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-/// C macro att_align_pointer from tupmacs.h:126 (PostgreSQL 15), tupmacs.h:107 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define att_align_pointer( cur_offset , attalign , attlen , attptr ) ( ( ( attlen ) == - 1 && VARATT_NOT_PAD_BYTE ( attptr ) ) ? ( uintptr_t ) ( cur_offset ) : att_align_nominal ( cur_offset , attalign ) )
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! att_align_pointer {
-    ($cur_offset:expr, $attalign:expr, $attlen:expr, $attptr:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-#[cfg(feature = "pg18")]
-/// C macro att_align_pointer from tupmacs.h:118 (PostgreSQL 18)
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C macro att_align_pointer from tupmacs.h:126 (PostgreSQL 15), tupmacs.h:107 (PostgreSQL 16–17), tupmacs.h:118 (PostgreSQL 18)
 ///
 /// ```text
 /// #define att_align_pointer( cur_offset , attalign , attlen , attptr ) ( ( ( attlen ) == - 1 && VARATT_NOT_PAD_BYTE ( attptr ) ) ? ( uintptr_t ) ( cur_offset ) : att_align_nominal ( cur_offset , attalign ) )
@@ -374,7 +4054,384 @@ macro_rules! att_align_pointer {
 #[macro_export]
 macro_rules! att_align_pointer {
     ($cur_offset:expr, $attalign:expr, $attlen:expr, $attptr:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$cur_offset;
+                let _ = &$attalign;
+                let _ = &$attlen;
+                let _ = &$attptr;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >()
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_types::uintptr_t
+                                        >()
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::select(
+                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >()
+                                                        )
+                                                    )
+                                                ) {
+                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::bitand(
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::add::<
+                                                                                $crate::__pgrx_c_macros::Wrapping,
+                                                                                _,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                        $crate::__pgrx_c_types::uintptr_t
+                                                                                    >()
+                                                                                ),
+                                                                                (
+                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                        true,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_macros::expression::sub::<
+                                                                                            $crate::__pgrx_c_macros::Wrapping,
+                                                                                            _,
+                                                                                            _
+                                                                                        >(
+                                                                                            (
+                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                    true,
+                                                                                                    _
+                                                                                                >(
+                                                                                                    $crate::__pgrx_c_macros::CValue::<
+                                                                                                        $crate::__pgrx_c_macros::CInt
+                                                                                                    >::new(
+                                                                                                        $crate::__pgrx_c_bindings::ALIGNOF_INT as i32
+                                                                                                    )
+                                                                                                )
+                                                                                            ),
+                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                true,
+                                                                                                _
+                                                                                            >(
+                                                                                                $crate::__pgrx_c_macros::CValue::<
+                                                                                                    $crate::__pgrx_c_macros::CInt
+                                                                                                >::new(
+                                                                                                    1i32
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    ),
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::bitnot(
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                        $crate::__pgrx_c_types::uintptr_t
+                                                                                    >()
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                } else {
+                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::select(
+                                                                    if $crate::__pgrx_c_macros::expression::truth(
+                                                                        (
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                true,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                    $crate::__pgrx_c_macros::CInt
+                                                                                >()
+                                                                            )
+                                                                        )
+                                                                    ) {
+                                                                        $crate::__pgrx_c_macros::Either::Left(
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                true,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                    $crate::__pgrx_c_types::uintptr_t
+                                                                                >()
+                                                                            )
+                                                                        )
+                                                                    } else {
+                                                                        $crate::__pgrx_c_macros::Either::Right(
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::select(
+                                                                                        if $crate::__pgrx_c_macros::expression::truth(
+                                                                                            (
+                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                    true,
+                                                                                                    _
+                                                                                                >(
+                                                                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                        $crate::__pgrx_c_macros::CInt
+                                                                                                    >()
+                                                                                                )
+                                                                                            )
+                                                                                        ) {
+                                                                                            $crate::__pgrx_c_macros::Either::Left(
+                                                                                                (
+                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                        true,
+                                                                                                        _
+                                                                                                    >(
+                                                                                                        $crate::__pgrx_c_macros::expression::bitand(
+                                                                                                            (
+                                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                    true,
+                                                                                                                    _
+                                                                                                                >(
+                                                                                                                    $crate::__pgrx_c_macros::expression::add::<
+                                                                                                                        $crate::__pgrx_c_macros::Wrapping,
+                                                                                                                        _,
+                                                                                                                        _
+                                                                                                                    >(
+                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                            true,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                $crate::__pgrx_c_types::uintptr_t
+                                                                                                                            >()
+                                                                                                                        ),
+                                                                                                                        (
+                                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                true,
+                                                                                                                                _
+                                                                                                                            >(
+                                                                                                                                $crate::__pgrx_c_macros::expression::sub::<
+                                                                                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                                                                                    _,
+                                                                                                                                    _
+                                                                                                                                >(
+                                                                                                                                    (
+                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                            true,
+                                                                                                                                            _
+                                                                                                                                        >(
+                                                                                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                                                                            >::new(
+                                                                                                                                                $crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32
+                                                                                                                                            )
+                                                                                                                                        )
+                                                                                                                                    ),
+                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                        true,
+                                                                                                                                        _
+                                                                                                                                    >(
+                                                                                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                            $crate::__pgrx_c_macros::CInt
+                                                                                                                                        >::new(
+                                                                                                                                            1i32
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                )
+                                                                                                                            )
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                )
+                                                                                                            ),
+                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                true,
+                                                                                                                _
+                                                                                                            >(
+                                                                                                                $crate::__pgrx_c_macros::expression::bitnot(
+                                                                                                                    (
+                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                            true,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                $crate::__pgrx_c_types::uintptr_t
+                                                                                                                            >()
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                )
+                                                                                                            )
+                                                                                                        )
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        } else {
+                                                                                            $crate::__pgrx_c_macros::Either::Right(
+                                                                                                (
+                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                        true,
+                                                                                                        _
+                                                                                                    >(
+                                                                                                        {
+                                                                                                            (
+                                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                    true,
+                                                                                                                    _
+                                                                                                                >(
+                                                                                                                    $crate::__pgrx_c_macros::expression::bitand(
+                                                                                                                        (
+                                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                true,
+                                                                                                                                _
+                                                                                                                            >(
+                                                                                                                                $crate::__pgrx_c_macros::expression::add::<
+                                                                                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                                                                                    _,
+                                                                                                                                    _
+                                                                                                                                >(
+                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                        true,
+                                                                                                                                        _
+                                                                                                                                    >(
+                                                                                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                            $crate::__pgrx_c_types::uintptr_t
+                                                                                                                                        >()
+                                                                                                                                    ),
+                                                                                                                                    (
+                                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                            true,
+                                                                                                                                            _
+                                                                                                                                        >(
+                                                                                                                                            $crate::__pgrx_c_macros::expression::sub::<
+                                                                                                                                                $crate::__pgrx_c_macros::Wrapping,
+                                                                                                                                                _,
+                                                                                                                                                _
+                                                                                                                                            >(
+                                                                                                                                                (
+                                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                        true,
+                                                                                                                                                        _
+                                                                                                                                                    >(
+                                                                                                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                                            $crate::__pgrx_c_macros::CInt
+                                                                                                                                                        >::new(
+                                                                                                                                                            $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
+                                                                                                                                                        )
+                                                                                                                                                    )
+                                                                                                                                                ),
+                                                                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                                    true,
+                                                                                                                                                    _
+                                                                                                                                                >(
+                                                                                                                                                    $crate::__pgrx_c_macros::CValue::<
+                                                                                                                                                        $crate::__pgrx_c_macros::CInt
+                                                                                                                                                    >::new(
+                                                                                                                                                        1i32
+                                                                                                                                                    )
+                                                                                                                                                )
+                                                                                                                                            )
+                                                                                                                                        )
+                                                                                                                                    )
+                                                                                                                                )
+                                                                                                                            )
+                                                                                                                        ),
+                                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                            true,
+                                                                                                                            _
+                                                                                                                        >(
+                                                                                                                            $crate::__pgrx_c_macros::expression::bitnot(
+                                                                                                                                (
+                                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                        true,
+                                                                                                                                        _
+                                                                                                                                    >(
+                                                                                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                                            $crate::__pgrx_c_types::uintptr_t
+                                                                                                                                        >()
+                                                                                                                                    )
+                                                                                                                                )
+                                                                                                                            )
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                )
+                                                                                                            )
+                                                                                                        }
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        }
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    }
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                }
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -395,7 +4452,118 @@ macro_rules! att_align_pointer {
 #[macro_export]
 macro_rules! att_align_pointer {
     ($cur_offset:expr, $attalign:expr, $attlen:expr, $attptr:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$cur_offset;
+                let _ = &$attalign;
+                let _ = &$attlen;
+                let _ = &$attptr;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >()
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_types::uintptr_t
+                                        >()
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::add::<
+                                                            $crate::__pgrx_c_macros::Wrapping,
+                                                            _,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::uintptr_t
+                                                                >()
+                                                            ),
+                                                            (
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::sub::<
+                                                                        $crate::__pgrx_c_macros::Wrapping,
+                                                                        _,
+                                                                        _
+                                                                    >(
+                                                                        (
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                true,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                    $crate::__pgrx_c_types::uint8
+                                                                                >()
+                                                                            )
+                                                                        ),
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                $crate::__pgrx_c_macros::CInt
+                                                                            >::new(1i32)
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::bitnot(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::uintptr_t
+                                                                >()
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -416,7 +4584,122 @@ macro_rules! att_align_pointer {
 #[macro_export]
 macro_rules! att_datum_alignby {
     ($cur_offset:expr, $attalignby:expr, $attlen:expr, $attdatum:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$cur_offset;
+                let _ = &$attlen;
+                let _ = &$attdatum;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >()
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_types::uintptr_t
+                                        >()
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::add::<
+                                                            $crate::__pgrx_c_macros::Wrapping,
+                                                            _,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::uintptr_t
+                                                                >()
+                                                            ),
+                                                            (
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::sub::<
+                                                                        $crate::__pgrx_c_macros::Wrapping,
+                                                                        _,
+                                                                        _
+                                                                    >(
+                                                                        (
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                true,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_operand!(
+                                                                                    @value [true];
+                                                                                    (
+                                                                                        @native [
+                                                                                            $attalignby
+                                                                                        ]
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        ),
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                $crate::__pgrx_c_macros::CInt
+                                                                            >::new(1i32)
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::bitnot(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::uintptr_t
+                                                                >()
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -437,7 +4720,19 @@ macro_rules! att_datum_alignby {
 #[macro_export]
 macro_rules! att_isnull {
     ($ATT:expr, $BITS:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ATT;
+                let _ = &$BITS;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -464,7 +4759,17 @@ macro_rules! att_isnull {
 #[macro_export]
 macro_rules! att_isnull {
     ($ATT:expr, $BITS:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ATT;
+                let _ = &$BITS;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -491,7 +4796,17 @@ macro_rules! att_isnull {
 #[macro_export]
 macro_rules! att_isnull {
     ($ATT:expr, $BITS:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ATT;
+                let _ = &$BITS;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -512,7 +4827,81 @@ macro_rules! att_isnull {
 #[macro_export]
 macro_rules! att_nominal_alignby {
     ($cur_offset:expr, $attalignby:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$cur_offset;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::bitand(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::add::<
+                                        $crate::__pgrx_c_macros::Wrapping,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        ),
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::sub::<
+                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_operand!(
+                                                                @value [true];
+                                                                (@native [$attalignby])
+                                                            )
+                                                        )
+                                                    ),
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(1i32)
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitnot(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_types::uintptr_t
+                                            >()
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
@@ -533,7 +4922,122 @@ macro_rules! att_nominal_alignby {
 #[macro_export]
 macro_rules! att_pointer_alignby {
     ($cur_offset:expr, $attalignby:expr, $attlen:expr, $attptr:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$cur_offset;
+                let _ = &$attlen;
+                let _ = &$attptr;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >()
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                            $crate::__pgrx_c_types::uintptr_t
+                                        >()
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::bitand(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::add::<
+                                                            $crate::__pgrx_c_macros::Wrapping,
+                                                            _,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::uintptr_t
+                                                                >()
+                                                            ),
+                                                            (
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::sub::<
+                                                                        $crate::__pgrx_c_macros::Wrapping,
+                                                                        _,
+                                                                        _
+                                                                    >(
+                                                                        (
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                true,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_operand!(
+                                                                                    @value [true];
+                                                                                    (
+                                                                                        @native [
+                                                                                            $attalignby
+                                                                                        ]
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        ),
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                $crate::__pgrx_c_macros::CInt
+                                                                            >::new(1i32)
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                ),
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::bitnot(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                    $crate::__pgrx_c_types::uintptr_t
+                                                                >()
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -544,21 +5048,198 @@ macro_rules! att_pointer_alignby {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! fetch_att {
     ($T:expr, $attbyval:expr, $attlen:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$T;
+                let _ = &$attlen;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_operand!(
+                                            @value [true];
+                                            (@native [$attbyval])
+                                        )
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::select(
+                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >()
+                                                    )
+                                                ) {
+                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::dereference(
+                                                                (
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                                                                    $crate::Datum
+                                                                                >,
+                                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                            >>()
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                } else {
+                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::select(
+                                                                    if $crate::__pgrx_c_macros::expression::truth(
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                $crate::__pgrx_c_macros::CInt
+                                                                            >()
+                                                                        )
+                                                                    ) {
+                                                                        $crate::__pgrx_c_macros::Either::Left(
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                                                                            $crate::Datum
+                                                                                        >>()
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    } else {
+                                                                        $crate::__pgrx_c_macros::Either::Right(
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::select(
+                                                                                        if $crate::__pgrx_c_macros::expression::truth(
+                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                true,
+                                                                                                _
+                                                                                            >(
+                                                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                    $crate::__pgrx_c_macros::CInt
+                                                                                                >()
+                                                                                            )
+                                                                                        ) {
+                                                                                            $crate::__pgrx_c_macros::Either::Left(
+                                                                                                (
+                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                        true,
+                                                                                                        _
+                                                                                                    >(
+                                                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                                                                                $crate::Datum
+                                                                                                            >>()
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        } else {
+                                                                                            $crate::__pgrx_c_macros::Either::Right(
+                                                                                                (
+                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                        true,
+                                                                                                        _
+                                                                                                    >(
+                                                                                                        {
+                                                                                                            (
+                                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                    true,
+                                                                                                                    _
+                                                                                                                >(
+                                                                                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                                                                                                            $crate::Datum
+                                                                                                                        >>()
+                                                                                                                )
+                                                                                                            )
+                                                                                                        }
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        }
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    }
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                }
+                                            )
+                                        )
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                                    $crate::Datum
+                                                >>()
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -605,7 +5286,20 @@ macro_rules! fetch_att {
 #[macro_export]
 macro_rules! fetch_att {
     ($T:expr, $attbyval:expr, $attlen:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$T;
+                let _ = &$attbyval;
+                let _ = &$attlen;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -650,7 +5344,20 @@ macro_rules! fetch_att {
 #[macro_export]
 macro_rules! fetch_att {
     ($T:expr, $attbyval:expr, $attlen:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$T;
+                let _ = &$attbyval;
+                let _ = &$attlen;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -693,7 +5400,20 @@ macro_rules! fetch_att {
 #[macro_export]
 macro_rules! fetch_att_noerr {
     ($T:expr, $attbyval:expr, $attlen:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$T;
+                let _ = &$attbyval;
+                let _ = &$attlen;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -704,21 +5424,214 @@ macro_rules! fetch_att_noerr {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_invocation_diagnostics!()]
-///
-/// Dependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips. String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
-///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
 ///
 /// # Panics
 ///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! fetchatt {
     ($A:expr, $T:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$T;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::project::<
+                                                $crate::__pgrx_c_generated::Field_attbyval,
+                                                _,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_operand!(
+                                                                @value [true];
+                                                                (@native [$A])
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::select(
+                                                if $crate::__pgrx_c_macros::expression::truth(
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >()
+                                                    )
+                                                ) {
+                                                    $crate::__pgrx_c_macros::Either::Left(
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::dereference(
+                                                                (
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                                                                    $crate::Datum
+                                                                                >,
+                                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                            >>()
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                } else {
+                                                    $crate::__pgrx_c_macros::Either::Right(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::select(
+                                                                    if $crate::__pgrx_c_macros::expression::truth(
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                $crate::__pgrx_c_macros::CInt
+                                                                            >()
+                                                                        )
+                                                                    ) {
+                                                                        $crate::__pgrx_c_macros::Either::Left(
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                                                                            $crate::Datum
+                                                                                        >>()
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    } else {
+                                                                        $crate::__pgrx_c_macros::Either::Right(
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::select(
+                                                                                        if $crate::__pgrx_c_macros::expression::truth(
+                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                true,
+                                                                                                _
+                                                                                            >(
+                                                                                                $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                    $crate::__pgrx_c_macros::CInt
+                                                                                                >()
+                                                                                            )
+                                                                                        ) {
+                                                                                            $crate::__pgrx_c_macros::Either::Left(
+                                                                                                (
+                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                        true,
+                                                                                                        _
+                                                                                                    >(
+                                                                                                        $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                                                                                $crate::Datum
+                                                                                                            >>()
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        } else {
+                                                                                            $crate::__pgrx_c_macros::Either::Right(
+                                                                                                (
+                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                        true,
+                                                                                                        _
+                                                                                                    >(
+                                                                                                        {
+                                                                                                            (
+                                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                    true,
+                                                                                                                    _
+                                                                                                                >(
+                                                                                                                    $crate::__pgrx_c_macros::expression::type_witness::<
+                                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                                                                                                            $crate::Datum
+                                                                                                                        >>()
+                                                                                                                )
+                                                                                                            )
+                                                                                                        }
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        }
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    }
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                }
+                                            )
+                                        )
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::type_witness::<
+                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                                    $crate::Datum
+                                                >>()
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -739,7 +5652,19 @@ macro_rules! fetchatt {
 #[macro_export]
 macro_rules! fetchatt {
     ($A:expr, $T:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$A;
+                let _ = &$T;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -812,7 +5737,17 @@ macro_rules! fetchatt {
 #[macro_export]
 macro_rules! first_null_attr {
     ($bits:expr, $natts:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$bits;
+                let _ = &$natts;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CInt
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -880,7 +5815,14 @@ macro_rules! first_null_attr {
 #[macro_export]
 macro_rules! populate_isnull_array {
     ($bits:expr, $natts:expr, $isnull:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$bits;
+                let _ = &$natts;
+                let _ = &$isnull;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -925,7 +5867,14 @@ macro_rules! populate_isnull_array {
 #[macro_export]
 macro_rules! store_att_byval {
     ($T:expr, $newdatum:expr, $attlen:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$T;
+                let _ = &$newdatum;
+                let _ = &$attlen;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -968,7 +5917,14 @@ macro_rules! store_att_byval {
 #[macro_export]
 macro_rules! store_att_byval {
     ($T:expr, $newdatum:expr, $attlen:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$T;
+                let _ = &$newdatum;
+                let _ = &$attlen;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -1021,7 +5977,16 @@ macro_rules! store_att_byval {
 #[macro_export]
 macro_rules! typalign_to_alignby {
     ($typalign:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$typalign;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_types::uint8
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]

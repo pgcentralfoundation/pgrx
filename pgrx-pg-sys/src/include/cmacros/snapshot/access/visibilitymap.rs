@@ -18,7 +18,20 @@
 #[macro_export]
 macro_rules! VM_ALL_FROZEN {
     ($r:expr, $b:expr, $v:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$r;
+                let _ = &$b;
+                let _ = &$v;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro VM_ALL_VISIBLE from visibilitymap.h:24 (PostgreSQL 15–19)
@@ -38,7 +51,20 @@ macro_rules! VM_ALL_FROZEN {
 #[macro_export]
 macro_rules! VM_ALL_VISIBLE {
     ($r:expr, $b:expr, $v:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$r;
+                let _ = &$b;
+                let _ = &$v;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 pub use VM_ALL_FROZEN;

@@ -20,7 +20,9 @@
 #[macro_export]
 macro_rules! ReleaseVariableStats {
     ($vardata:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$vardata;
+        })
     };
 }
 pub use ReleaseVariableStats;

@@ -19,7 +19,11 @@
 #[macro_export]
 macro_rules! SPI_pop {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                ($crate::__pgrx_c_macros::expression::profile_value::<true, _>(()))
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -39,8 +43,12 @@ macro_rules! SPI_pop {
 /// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SPI_pop_conditional {
-    ($pushed:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($($pushed:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                ($crate::__pgrx_c_macros::expression::profile_value::<true, _>(()))
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -61,7 +69,11 @@ macro_rules! SPI_pop_conditional {
 #[macro_export]
 macro_rules! SPI_push {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                ($crate::__pgrx_c_macros::expression::profile_value::<true, _>(()))
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -78,7 +90,16 @@ macro_rules! SPI_push {
 #[macro_export]
 macro_rules! SPI_push_conditional {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::null_constant(
+                        /* PGRX: false remains expanded because no integer constant binding is available in the defining Rust crate. */
+                        $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(0i32)
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -99,7 +120,11 @@ macro_rules! SPI_push_conditional {
 #[macro_export]
 macro_rules! SPI_restore_connection {
     () => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                ($crate::__pgrx_c_macros::expression::profile_value::<true, _>(()))
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]

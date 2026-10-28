@@ -54,7 +54,21 @@
 #[macro_export]
 macro_rules! pg_preadv {
     ($fd:expr, $iov:expr, $iovcnt:expr, $offset:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$fd;
+                let _ = &$iov;
+                let _ = &$iovcnt;
+                let _ = &$offset;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CLong,
+                            isize
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -110,7 +124,21 @@ macro_rules! pg_preadv {
 #[macro_export]
 macro_rules! pg_preadv {
     ($fd:expr, $iov:expr, $iovcnt:expr, $offset:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$fd;
+                let _ = &$iov;
+                let _ = &$iovcnt;
+                let _ = &$offset;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CLong,
+                            isize
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18"))]
@@ -166,7 +194,21 @@ macro_rules! pg_preadv {
 #[macro_export]
 macro_rules! pg_pwritev {
     ($fd:expr, $iov:expr, $iovcnt:expr, $offset:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$fd;
+                let _ = &$iov;
+                let _ = &$iovcnt;
+                let _ = &$offset;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CLong,
+                            isize
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -222,7 +264,21 @@ macro_rules! pg_pwritev {
 #[macro_export]
 macro_rules! pg_pwritev {
     ($fd:expr, $iov:expr, $iovcnt:expr, $offset:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$fd;
+                let _ = &$iov;
+                let _ = &$iovcnt;
+                let _ = &$offset;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CLong,
+                            isize
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]

@@ -13,8 +13,8 @@
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! BKI_ARRAY_DEFAULT {
-    ($value:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($($value:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 /// C macro BKI_DEFAULT from genbki.h:35 (PostgreSQL 15–18), genbki.h:54 (PostgreSQL 19)
@@ -29,8 +29,8 @@ macro_rules! BKI_ARRAY_DEFAULT {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! BKI_DEFAULT {
-    ($value:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($($value:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 /// C macro BKI_LOOKUP from genbki.h:46 (PostgreSQL 15–18), genbki.h:65 (PostgreSQL 19)
@@ -45,8 +45,8 @@ macro_rules! BKI_DEFAULT {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! BKI_LOOKUP {
-    ($catalog:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($($catalog:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 /// C macro BKI_LOOKUP_OPT from genbki.h:47 (PostgreSQL 15–18), genbki.h:66 (PostgreSQL 19)
@@ -61,8 +61,8 @@ macro_rules! BKI_LOOKUP {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! BKI_LOOKUP_OPT {
-    ($catalog:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($($catalog:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 /// C macro BKI_ROWTYPE_OID from genbki.h:28 (PostgreSQL 15–18), genbki.h:47 (PostgreSQL 19)
@@ -77,8 +77,8 @@ macro_rules! BKI_LOOKUP_OPT {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! BKI_ROWTYPE_OID {
-    ($oid:expr, $oidmacro:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($oid:expr, $($oidmacro:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 pub use BKI_ARRAY_DEFAULT;

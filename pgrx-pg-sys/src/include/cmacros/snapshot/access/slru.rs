@@ -28,7 +28,21 @@
 #[macro_export]
 macro_rules! SimpleLruGetBankLock {
     ($ctl:expr, $pageno:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ctl;
+                let _ = &$pageno;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::LWLock
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg19")]
@@ -59,11 +73,24 @@ macro_rules! SimpleLruGetBankLock {
 #[macro_export]
 macro_rules! SimpleLruGetBankLock {
     ($ctl:expr, $pageno:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$ctl;
+                let _ = &$pageno;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::LWLock
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
-#[cfg(feature = "pg18")]
-/// C macro SlruPagePrecedesUnitTests from slru.h:199 (PostgreSQL 18)
+/// C macro SlruPagePrecedesUnitTests from slru.h:156 (PostgreSQL 15–16), slru.h:199 (PostgreSQL 17–18), slru.h:233 (PostgreSQL 19)
 ///
 /// ```text
 /// #define SlruPagePrecedesUnitTests( ctl , per_page ) do { } while ( 0 )
@@ -77,11 +104,10 @@ macro_rules! SimpleLruGetBankLock {
 #[doc = crate::__pgrx_c_doc_safety!()]
 #[macro_export]
 macro_rules! SlruPagePrecedesUnitTests {
-    ($ctl:expr, $per_page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($ctl:expr, $($per_page:tt)*) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {})
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
 pub use SimpleLruGetBankLock;
-#[cfg(feature = "pg18")]
 pub use SlruPagePrecedesUnitTests;

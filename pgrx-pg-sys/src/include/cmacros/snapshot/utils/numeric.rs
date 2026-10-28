@@ -19,11 +19,26 @@
 #[macro_export]
 macro_rules! DatumGetNumeric {
     ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::COpaque<
+                                    $crate::__pgrx_c_bindings::NumericData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function DatumGetNumeric from numeric.h:59 (PostgreSQL 16), numeric.h:60 (PostgreSQL 17–18), numeric.h:63 (PostgreSQL 19)
+/// Typed call adapter for C inline function DatumGetNumeric from numeric.h:59 (PostgreSQL 16), numeric.h:63 (PostgreSQL 17–19)
 ///
 /// ```c
 /// static inline Numeric
@@ -46,7 +61,20 @@ macro_rules! DatumGetNumeric {
 #[macro_export]
 macro_rules! DatumGetNumeric {
     ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::COpaque<
+                                $crate::__pgrx_c_bindings::NumericData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -67,11 +95,26 @@ macro_rules! DatumGetNumeric {
 #[macro_export]
 macro_rules! DatumGetNumericCopy {
     ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::COpaque<
+                                    $crate::__pgrx_c_bindings::NumericData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function DatumGetNumericCopy from numeric.h:65 (PostgreSQL 16), numeric.h:66 (PostgreSQL 17–18), numeric.h:69 (PostgreSQL 19)
+/// Typed call adapter for C inline function DatumGetNumericCopy from numeric.h:65 (PostgreSQL 16), numeric.h:69 (PostgreSQL 17–19)
 ///
 /// ```c
 /// static inline Numeric
@@ -94,7 +137,20 @@ macro_rules! DatumGetNumericCopy {
 #[macro_export]
 macro_rules! DatumGetNumericCopy {
     ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::COpaque<
+                                $crate::__pgrx_c_bindings::NumericData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -115,11 +171,24 @@ macro_rules! DatumGetNumericCopy {
 #[macro_export]
 macro_rules! NumericGetDatum {
     ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::Datum
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function NumericGetDatum from numeric.h:71 (PostgreSQL 16), numeric.h:72 (PostgreSQL 17–18), numeric.h:75 (PostgreSQL 19)
+/// Typed call adapter for C inline function NumericGetDatum from numeric.h:71 (PostgreSQL 16), numeric.h:75 (PostgreSQL 17–19)
 ///
 /// ```c
 /// static inline Datum
@@ -142,7 +211,18 @@ macro_rules! NumericGetDatum {
 #[macro_export]
 macro_rules! NumericGetDatum {
     ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$X;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -165,11 +245,27 @@ macro_rules! NumericGetDatum {
 #[macro_export]
 macro_rules! PG_GETARG_NUMERIC {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::COpaque<
+                                    $crate::__pgrx_c_bindings::NumericData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro PG_GETARG_NUMERIC from numeric.h:77 (PostgreSQL 16), numeric.h:78 (PostgreSQL 17–18), numeric.h:81 (PostgreSQL 19)
+/// C macro PG_GETARG_NUMERIC from numeric.h:77 (PostgreSQL 16), numeric.h:81 (PostgreSQL 17–19)
 ///
 /// ```text
 /// #define PG_GETARG_NUMERIC( n ) DatumGetNumeric ( PG_GETARG_DATUM ( n ) )
@@ -188,7 +284,21 @@ macro_rules! PG_GETARG_NUMERIC {
 #[macro_export]
 macro_rules! PG_GETARG_NUMERIC {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::COpaque<
+                                $crate::__pgrx_c_bindings::NumericData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -211,11 +321,27 @@ macro_rules! PG_GETARG_NUMERIC {
 #[macro_export]
 macro_rules! PG_GETARG_NUMERIC_COPY {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::COpaque<
+                                    $crate::__pgrx_c_bindings::NumericData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >>()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro PG_GETARG_NUMERIC_COPY from numeric.h:78 (PostgreSQL 16), numeric.h:79 (PostgreSQL 17–18), numeric.h:82 (PostgreSQL 19)
+/// C macro PG_GETARG_NUMERIC_COPY from numeric.h:78 (PostgreSQL 16), numeric.h:82 (PostgreSQL 17–19)
 ///
 /// ```text
 /// #define PG_GETARG_NUMERIC_COPY( n ) DatumGetNumericCopy ( PG_GETARG_DATUM ( n ) )
@@ -234,7 +360,21 @@ macro_rules! PG_GETARG_NUMERIC_COPY {
 #[macro_export]
 macro_rules! PG_GETARG_NUMERIC_COPY {
     ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$n;
+                let _ = &$fcinfo;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::COpaque<
+                                $crate::__pgrx_c_bindings::NumericData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -264,7 +404,7 @@ macro_rules! PG_RETURN_NUMERIC {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro PG_RETURN_NUMERIC from numeric.h:79 (PostgreSQL 16), numeric.h:80 (PostgreSQL 17–18), numeric.h:83 (PostgreSQL 19)
+/// C macro PG_RETURN_NUMERIC from numeric.h:79 (PostgreSQL 16), numeric.h:83 (PostgreSQL 17–19)
 ///
 /// ```text
 /// #define PG_RETURN_NUMERIC( x ) return NumericGetDatum ( x )

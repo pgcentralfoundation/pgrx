@@ -17,8 +17,18 @@
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! proclist_contains {
-    ($list:expr, $procno:expr, $link_member:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($list:expr, $procno:expr, $($link_member:ident).+ $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                let _ = &$procno;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -63,7 +73,18 @@ macro_rules! proclist_contains {
 #[macro_export]
 macro_rules! proclist_contains_offset {
     ($list:expr, $procno:expr, $node_offset:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                let _ = &$procno;
+                let _ = &$node_offset;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg16")]
@@ -108,7 +129,18 @@ macro_rules! proclist_contains_offset {
 #[macro_export]
 macro_rules! proclist_contains_offset {
     ($list:expr, $procno:expr, $node_offset:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                let _ = &$procno;
+                let _ = &$node_offset;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -153,7 +185,18 @@ macro_rules! proclist_contains_offset {
 #[macro_export]
 macro_rules! proclist_contains_offset {
     ($list:expr, $procno:expr, $node_offset:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                let _ = &$procno;
+                let _ = &$node_offset;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 /// C macro proclist_delete from proclist.h:187 (PostgreSQL 15–19)
@@ -172,8 +215,14 @@ macro_rules! proclist_contains_offset {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! proclist_delete {
-    ($list:expr, $procno:expr, $link_member:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($list:expr, $procno:expr, $($link_member:ident).+ $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                let _ = &$procno;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -220,7 +269,14 @@ macro_rules! proclist_delete {
 #[macro_export]
 macro_rules! proclist_delete_offset {
     ($list:expr, $procno:expr, $node_offset:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                let _ = &$procno;
+                let _ = &$node_offset;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -267,7 +323,14 @@ macro_rules! proclist_delete_offset {
 #[macro_export]
 macro_rules! proclist_delete_offset {
     ($list:expr, $procno:expr, $node_offset:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                let _ = &$procno;
+                let _ = &$node_offset;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -294,7 +357,12 @@ macro_rules! proclist_delete_offset {
 #[macro_export]
 macro_rules! proclist_init {
     ($list:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -321,7 +389,12 @@ macro_rules! proclist_init {
 #[macro_export]
 macro_rules! proclist_init {
     ($list:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(feature = "pg15")]
@@ -348,7 +421,16 @@ macro_rules! proclist_init {
 #[macro_export]
 macro_rules! proclist_is_empty {
     ($list:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(feature = "pg16")]
@@ -375,7 +457,16 @@ macro_rules! proclist_is_empty {
 #[macro_export]
 macro_rules! proclist_is_empty {
     ($list:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -402,7 +493,16 @@ macro_rules! proclist_is_empty {
 #[macro_export]
 macro_rules! proclist_is_empty {
     ($list:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::CBool
+                    >()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function proclist_node_get from proclist.h:47 (PostgreSQL 15–19)
@@ -430,7 +530,21 @@ macro_rules! proclist_is_empty {
 #[macro_export]
 macro_rules! proclist_node_get {
     ($procno:expr, $node_offset:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$procno;
+                let _ = &$node_offset;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::proclist_node
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro proclist_pop_head_node from proclist.h:193 (PostgreSQL 15–19)
@@ -449,8 +563,21 @@ macro_rules! proclist_node_get {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! proclist_pop_head_node {
-    ($list:expr, $link_member:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($list:expr, $($link_member:ident).+ $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::PGPROC
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// Typed call adapter for C inline function proclist_pop_head_node_offset from proclist.h:172 (PostgreSQL 15–19)
@@ -481,7 +608,21 @@ macro_rules! proclist_pop_head_node {
 #[macro_export]
 macro_rules! proclist_pop_head_node_offset {
     ($list:expr, $node_offset:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                let _ = &$node_offset;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::type_witness::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::PGPROC
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >>()
+                )
+            }
+        )
     };
 }
 /// C macro proclist_push_head from proclist.h:189 (PostgreSQL 15–19)
@@ -500,8 +641,14 @@ macro_rules! proclist_pop_head_node_offset {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! proclist_push_head {
-    ($list:expr, $procno:expr, $link_member:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($list:expr, $procno:expr, $($link_member:ident).+ $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                let _ = &$procno;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -547,7 +694,14 @@ macro_rules! proclist_push_head {
 #[macro_export]
 macro_rules! proclist_push_head_offset {
     ($list:expr, $procno:expr, $node_offset:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                let _ = &$procno;
+                let _ = &$node_offset;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -593,7 +747,14 @@ macro_rules! proclist_push_head_offset {
 #[macro_export]
 macro_rules! proclist_push_head_offset {
     ($list:expr, $procno:expr, $node_offset:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                let _ = &$procno;
+                let _ = &$node_offset;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 /// C macro proclist_push_tail from proclist.h:191 (PostgreSQL 15–19)
@@ -612,8 +773,14 @@ macro_rules! proclist_push_head_offset {
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! proclist_push_tail {
-    ($list:expr, $procno:expr, $link_member:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+    ($list:expr, $procno:expr, $($link_member:ident).+ $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                let _ = &$procno;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
@@ -659,7 +826,14 @@ macro_rules! proclist_push_tail {
 #[macro_export]
 macro_rules! proclist_push_tail_offset {
     ($list:expr, $procno:expr, $node_offset:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                let _ = &$procno;
+                let _ = &$node_offset;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
@@ -705,7 +879,14 @@ macro_rules! proclist_push_tail_offset {
 #[macro_export]
 macro_rules! proclist_push_tail_offset {
     ($list:expr, $procno:expr, $node_offset:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$list;
+                let _ = &$procno;
+                let _ = &$node_offset;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 pub use proclist_contains;

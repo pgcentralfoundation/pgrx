@@ -33,7 +33,14 @@
 #[macro_export]
 macro_rules! ReplicationSlotSetInactiveSince {
     ($s:expr, $ts:expr, $acquire_lock:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$s;
+                let _ = &$ts;
+                let _ = &$acquire_lock;
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+            }
+        )
     };
 }
 /// C macro SlotIsLogical from slot.h:169 (PostgreSQL 15), slot.h:184 (PostgreSQL 16), slot.h:214 (PostgreSQL 17), slot.h:229 (PostgreSQL 18), slot.h:288 (PostgreSQL 19)
@@ -49,7 +56,18 @@ macro_rules! ReplicationSlotSetInactiveSince {
 #[macro_export]
 macro_rules! SlotIsLogical {
     ($slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 /// C macro SlotIsPhysical from slot.h:168 (PostgreSQL 15), slot.h:183 (PostgreSQL 16), slot.h:213 (PostgreSQL 17), slot.h:228 (PostgreSQL 18), slot.h:287 (PostgreSQL 19)
@@ -65,7 +83,18 @@ macro_rules! SlotIsLogical {
 #[macro_export]
 macro_rules! SlotIsPhysical {
     ($slot:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$slot;
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::type_witness::<
+                            $crate::__pgrx_c_macros::CInt
+                        >()
+                    )
+                )
+            }
+        )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
