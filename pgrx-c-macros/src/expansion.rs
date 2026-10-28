@@ -507,6 +507,19 @@ pub(crate) fn prepare_synthetic(
                     );
                     continue 'definitions;
                 }
+                Ok((reached, false))
+                    if std::iter::once(name.as_str())
+                        .chain(reached.iter().map(|dependency| dependency.name.as_str()))
+                        .any(|name| dependencies.nodes[name].stringifies) =>
+                {
+                    // The body's tokens are replayed with a space between each pair.
+                    refuse(
+                        &mut results,
+                        ExpansionSkipCode::Stringification,
+                        "a synthetic replacement cannot reach stringification, which spells the original spacing of its operand",
+                    );
+                    continue 'definitions;
+                }
                 Ok((reached, false)) => {
                     closure.insert(
                         name.clone(),
@@ -1276,6 +1289,9 @@ struct DependencyNode<'a> {
     rejection: Option<ExpansionSkip>,
     /// Whether this local body includes ## and therefore requires paste-proof instrumentation.
     pastes: bool,
+    /// Whether this local body includes `#`, which spells its operand's tokens with their
+    /// original spacing.
+    stringifies: bool,
 }
 
 /// Own the per-batch dependency cache and token accounting while borrowing the inspected environment.
@@ -1362,6 +1378,7 @@ fn inspect_dependency<'a>(frontend: &'a FrontendOutput, name: &'a str) -> Depend
         dependencies: Vec::new(),
         rejection: Some(skip(code, message, Some(name), frontend)),
         pastes: false,
+        stringifies: false,
     };
     match &active.provenance {
         ActiveProvenance::Resolved => {}
@@ -1399,6 +1416,7 @@ fn inspect_dependency<'a>(frontend: &'a FrontendOutput, name: &'a str) -> Depend
     let parameters = parameters.iter().map(String::as_str).collect::<HashSet<_>>();
     let mut dependencies = BTreeSet::new();
     let mut pastes = false;
+    let mut stringifies = false;
     let body = &active.definition.tokens[start..];
     for (index, token) in body.iter().enumerate() {
         if token.kind == TokenKind::Comment || parameters.contains(token.spelling.as_str()) {
@@ -1413,6 +1431,7 @@ fn inspect_dependency<'a>(frontend: &'a FrontendOutput, name: &'a str) -> Depend
                 // Clang will stringify the substituted dependency operand. The
                 // resulting literal is admitted only when no symbolic marker
                 // survives inside its spelling.
+                stringifies = true;
                 continue;
             }
             spelling if dynamic_builtin(spelling) && !invocation_diagnostic(spelling) => {
@@ -1445,7 +1464,12 @@ fn inspect_dependency<'a>(frontend: &'a FrontendOutput, name: &'a str) -> Depend
             dependencies.insert(name.as_str());
         }
     }
-    DependencyNode { dependencies: dependencies.into_iter().collect(), rejection: None, pastes }
+    DependencyNode {
+        dependencies: dependencies.into_iter().collect(),
+        rejection: None,
+        pastes,
+        stringifies,
+    }
 }
 
 /// Recognize context-sensitive builtins whose changing expansion cannot be represented by a static

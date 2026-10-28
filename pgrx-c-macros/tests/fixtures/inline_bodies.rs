@@ -94,6 +94,11 @@ fn main() {
             BODY_RESCAN_TARGET!(3_i32).get()
         );
         println!(
+            "string\t{}\t{}",
+            BODY_STRING_SIZE!(0_i32).get(),
+            BODY_STRING_CHAR!(0_i32).get()
+        );
+        println!(
             "template\t{}\t{}\t{}\t{}",
             BODY_FIRST_VALUE!().get(),
             BODY_SECOND_VALUE!().get(),

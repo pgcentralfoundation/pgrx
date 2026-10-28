@@ -136,6 +136,11 @@ static inline int BODY_RESCAN_TARGET(int value) { return value + 1; }
 static inline int BODY_RESCAN(int value) { return BODY_RESCAN_SELECT(BODY_RESCAN_TARGET)(value); }
 static inline int BODY_RESCAN_ARGUMENT(int value) { return BODY_RESCAN_APPLY(BODY_RESCAN_TARGET, value); }
 #undef BODY_RESCAN_TARGET
+/* Stringification spells its argument with the body's original spacing. */
+#define BODY_STRING(text) #text
+#define BODY_STRING_OF(text) BODY_STRING(text)
+static inline int BODY_STRING_SIZE(int value) { return value + (int) sizeof(BODY_STRING(1+2)); }
+static inline int BODY_STRING_CHAR(int value) { return value + BODY_STRING_OF(1+2)[1]; }
 #define BODY_TEMPLATE_VALUE_NAME BODY_FIRST_VALUE
 #define BODY_TEMPLATE_BRANCH_NAME BODY_FIRST_BRANCH
 #define BODY_TEMPLATE_VALUE 1

@@ -97,6 +97,9 @@ const NATIVE: &[&str] = &[
     // A name that only rescanning expanded is a macro that is later undefined.
     "BODY_RESCAN",
     "BODY_RESCAN_ARGUMENT",
+    // Their replay at the end of the headers would not keep the spacing a macro stringifies.
+    "BODY_STRING_SIZE",
+    "BODY_STRING_CHAR",
     // Their header is entered twice, with different macros and conditionals. The first
     // entry's macro is redefined before the second; the others are in the second entry.
     "BODY_FIRST_VALUE",
@@ -191,7 +194,7 @@ fn translated_bodies_match_their_original_definitions() {
     assert!(error.contains("unsafe"), "{error}");
     // BODY_EARLY is called twice; each other native root, and the native self-call inside
     // the translated BODY_RECURSIVE, once.
-    rust.push_str("const EXPECTED_GUARDS: usize = 24;\n");
+    rust.push_str("const EXPECTED_GUARDS: usize = 26;\n");
     rust.push_str("fn pure() -> i32 { BODY_MACRO!(1_i32).get() + BODY_CALLER!(1_i32).get() }\n");
     rust.push_str(include_str!("fixtures/inline_bodies.rs"));
     let profile = frontend.profile();

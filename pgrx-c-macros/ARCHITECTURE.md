@@ -479,7 +479,9 @@ A retained body also yields a private statement root:
 initialized from its hole, so arguments are evaluated once and converted as in a
 call, and parameters share the body's outer scope as in C. A root that names
 macros is expanded like a macro invocation, after the original header, without
-retaining object macros as binding constants. When the analyzer admits the root
+retaining object macros as binding constants. Its tokens are replayed with a
+space between each pair, so a root whose macros reach token pasting or
+stringification is not expanded. When the analyzer admits the root
 with exactly the function's parameters, the body is emitted as an expression:
 `match (arguments...) { (bound...) => body }`. All arguments are evaluated, left
 to right, before the body runs, and Rust keeps their temporaries alive until the
