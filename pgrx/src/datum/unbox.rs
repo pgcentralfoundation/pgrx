@@ -27,7 +27,10 @@ use core::ffi::CStr;
 ///
 /// If `As<'src>` does not name `'src`, `unbox` must return a value that does not point into the
 /// Datum's memory. `Vec<T>` and `Array::into_iter` keep such values after they free the array
-/// they unboxed them from.
+/// they unboxed them from. [`PgHeapTuple::get_by_index`] relies on the same bound but reads
+/// through [`FromDatum`], so such a type's `from_polymorphic_datum` must not return a value that
+/// points into the Datum either, unless the type sets [`FromDatum::POINTS_INTO_DATUM`] and its
+/// `from_datum_in_memory_context` returns a copy.
 pub unsafe trait UnboxDatum {
     // TODO: Currently, this doesn't actually get used to identify all the cases where the Datum
     // is actually a pointer type. However, it has been noted that Postgres does yield nullptr

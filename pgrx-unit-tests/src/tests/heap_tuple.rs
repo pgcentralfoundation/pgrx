@@ -1250,4 +1250,27 @@ mod tests {
         assert_eq!(dog.set_by_index(collar, (Some(1), Some(2))), rejected);
         Ok(())
     }
+
+    /// A `PgBox` read from a tuple must be a copy. The tuple frees its memory when an attribute
+    /// is set and when it drops, which an assert-enabled build overwrites with 0x7F bytes, and
+    /// writing through a box that pointed into the tuple would change the tuple.
+    #[pg_test]
+    fn test_get_by_index_copies_pgbox() -> Result<(), spi::Error> {
+        Spi::run("CREATE TYPE PointHolder AS (p point)")?;
+        let point = |x: f64| pg_sys::Point { x, y: -x };
+        let p = NonZeroUsize::new(1).unwrap();
+        let mut holder = PgHeapTuple::new_composite_type("PointHolder").unwrap();
+        holder.set_by_name("p", point(1.0))?;
+
+        let first = holder.get_by_name::<PgBox<pg_sys::Point>>("p")?.expect("NULL point");
+        holder.set_by_name("p", point(2.0))?;
+        assert_eq!(*first, point(1.0));
+
+        let mut second = holder.get_by_index::<PgBox<pg_sys::Point>>(p)?.expect("NULL point");
+        second.x = 3.0;
+        assert_eq!(holder.get_by_index::<pg_sys::Point>(p)?, Some(point(2.0)));
+        drop(holder);
+        assert_eq!(*second, pg_sys::Point { x: 3.0, y: -2.0 });
+        Ok(())
+    }
 }

@@ -530,6 +530,8 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
     ///
     /// Attribute names are case-insensitive.
     ///
+    /// The value is read as [`PgHeapTuple::get_by_index`] reads it.
+    ///
     /// ## Errors
     /// - return [`TryFromDatumError::NoSuchAttributeName`] if the attribute does not exist
     /// - return [`TryFromDatumError::IncompatibleTypes`] if the Rust type of the `value` is not
@@ -556,6 +558,10 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
     ///
     /// A dropped attribute reads as `None`, as SQL field selection reads it, even in a row stored
     /// before the drop that still holds a value.
+    ///
+    /// A `PgBox<T>` is a copy of the attribute's first `size_of::<T>()` bytes in
+    /// `CurrentMemoryContext`, because the tuple frees its memory when it drops or when an
+    /// attribute is set. A `T` that borrows, such as `&'tup str`, keeps the tuple borrowed.
     ///
     /// ## Errors
     /// - return [`TryFromDatumError::NoSuchAttributeNumber`] if the attribute does not exist
@@ -603,10 +609,24 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
         };
         // SAFETY: the datum is this attribute's value, of type `att.atttypid`. It lives as long as
         // the tuple and descriptor that `self` holds and `'tup` borrows: on PG15.0-15.4, a
-        // missing value points into the descriptor. `typoid` is RECORDOID only when that type
-        // is a row type, whose values are composite Datums; otherwise it is `att.atttypid`, which
-        // try_from_datum checks against `T` before reading the datum.
-        unsafe { T::try_from_datum(datum, false, typoid) }
+        // missing value points into the descriptor. A `T` that names `'tup` keeps them borrowed.
+        // Any other `T` must not point into the datum, as UnboxDatum's safety section requires,
+        // unless it sets POINTS_INTO_DATUM, and then from_datum_in_memory_context copies it into
+        // CurrentMemoryContext. `typoid` is RECORDOID only when that type is a row type, whose
+        // values are composite Datums; otherwise it is `att.atttypid`, which both conversions
+        // check against `T` before reading the datum.
+        unsafe {
+            if T::POINTS_INTO_DATUM {
+                T::try_from_datum_in_memory_context(
+                    PgMemoryContexts::CurrentMemoryContext,
+                    datum,
+                    false,
+                    typoid,
+                )
+            } else {
+                T::try_from_datum(datum, false, typoid)
+            }
+        }
     }
 }
 

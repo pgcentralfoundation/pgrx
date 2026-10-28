@@ -46,6 +46,15 @@ pub trait FromDatum: Sized {
     /// Should a type OID be fetched when calling `from_datum`?
     const GET_TYPOID: bool = false;
 
+    /// Does `from_polymorphic_datum` return a value that points into the Datum's memory but has
+    /// no lifetime that keeps that memory alive?
+    ///
+    /// Code that can free the Datum's memory while the value lives reads such a type with
+    /// [`FromDatum::from_datum_in_memory_context`], which must then return a copy.
+    /// [`PgHeapTuple::get_by_index`](crate::heap_tuple::PgHeapTuple::get_by_index) does, because
+    /// a tuple frees its memory when it drops or when an attribute is set.
+    const POINTS_INTO_DATUM: bool = false;
+
     /// ## Safety
     ///
     /// This method is inherently unsafe as the `datum` argument can represent an arbitrary
@@ -663,7 +672,13 @@ impl FromDatum for () {
 }
 
 /// for user types
+///
+/// `from_polymorphic_datum` boxes the Datum's pointer, which can refer to a PostgreSQL struct
+/// passed as `internal`. `from_datum_in_memory_context` copies `size_of::<T>()` bytes into the
+/// memory context instead.
 impl<T> FromDatum for PgBox<T, AllocatedByPostgres> {
+    const POINTS_INTO_DATUM: bool = true;
+
     #[inline]
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
@@ -690,6 +705,10 @@ impl<T> FromDatum for PgBox<T, AllocatedByPostgres> {
             if is_null || datum.is_null() {
                 None
             } else {
+                // SAFETY: the caller passes a Datum that points to a `T`, so its
+                // `size_of::<T>()` bytes are readable. The copy is a palloc chunk holding those
+                // bytes, aligned to MAXALIGN, at least as strictly as PostgreSQL aligned the
+                // source, and it does not point into the Datum, as `POINTS_INTO_DATUM` requires.
                 let copied = context.copy_ptr_into(datum.cast_mut_ptr(), std::mem::size_of::<T>());
                 Some(PgBox::<T>::from_pg(copied))
             }
