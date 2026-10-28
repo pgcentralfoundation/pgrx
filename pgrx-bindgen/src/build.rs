@@ -1834,13 +1834,30 @@ fn watch_input_directory(
 /// Do not climb past a missing parent: the nearest existing ancestor of an absent `PATH` or `-I`
 /// root can be `$HOME`, `/usr/lib` or `/`, which Cargo would scan recursively. Do not watch a
 /// parent that contains OUT_DIR either, as a project below `$HOME` would then invalidate its own
-/// output. The environment values and arguments that named the input remain tracked. An absent
-/// input inside OUT_DIR is still refused by [`watch_input_directory`].
+/// output. The environment values and arguments that named the input remain tracked.
+///
+/// An absent input inside OUT_DIR is refused at any depth, even before its parent exists: this
+/// build owns that directory, so it cannot also be an inspected C input.
 fn watch_absent_input(
     watched: &mut BTreeSet<PathBuf>,
     absent: &Path,
     out_dirs: &[PathBuf],
 ) -> eyre::Result<()> {
+    // The missing tail has no canonical identity. Resolve its existing prefix so an alias of
+    // OUT_DIR is recognized as well as its spelling.
+    let resolved = absent.ancestors().find(|ancestor| ancestor.is_dir()).and_then(|existing| {
+        Some(existing.canonicalize().ok()?.join(absent.strip_prefix(existing).ok()?))
+    });
+    if [Some(absent), resolved.as_deref()]
+        .into_iter()
+        .flatten()
+        .any(|path| out_dirs.iter().any(|out_dir| path.starts_with(out_dir)))
+    {
+        return Err(eyre!(
+            "absent C macro input {} overlaps this build's OUT_DIR; the build's own output cannot be an inspected C input",
+            absent.display()
+        ));
+    }
     let Some(parent) = absent.parent().filter(|parent| parent.is_dir()) else {
         return Ok(());
     };
@@ -3100,10 +3117,13 @@ macro_rules! EXAMPLE {
             BuildInputs { directories: vec![out_dir.clone()], ..BuildInputs::default() };
         let error = macro_watch_directories(&unsafe_inputs, &out_dir).unwrap_err().to_string();
         assert!(error.contains("overlaps this build's OUT_DIR"));
-        let missing_output =
-            BuildInputs { directories: vec![out_dir.join("include")], ..BuildInputs::default() };
-        let error = macro_watch_directories(&missing_output, &out_dir).unwrap_err().to_string();
-        assert!(error.contains("overlaps this build's OUT_DIR"));
+        // A missing input inside OUT_DIR is refused whether or not its parent exists yet.
+        for missing in [out_dir.join("include"), out_dir.join("generated/include")] {
+            let missing_output =
+                BuildInputs { directories: vec![missing.clone()], ..BuildInputs::default() };
+            let error = macro_watch_directories(&missing_output, &out_dir).unwrap_err().to_string();
+            assert!(error.contains("overlaps this build's OUT_DIR"), "{missing:?}: {error}");
+        }
         let unsafe_search = BuildInputs {
             executable_search_directories: vec![directory.0.join("missing-toolchain/bin")],
             ..BuildInputs::default()
@@ -3136,6 +3156,12 @@ macro_rules! EXAMPLE {
         fs::remove_file(&alias).unwrap();
         std::os::unix::fs::symlink(&out_dir, &alias).unwrap();
         assert!(macro_watch_directories(&inputs, &out_dir).is_err());
+        let missing = BuildInputs {
+            directories: vec![alias.join("generated/include")],
+            ..BuildInputs::default()
+        };
+        let error = macro_watch_directories(&missing, &out_dir).unwrap_err().to_string();
+        assert!(error.contains("overlaps this build's OUT_DIR"), "{error}");
     }
 
     /// Own isolated compiler inputs and outputs so oracle runs cannot reuse stale artifacts or

@@ -1641,9 +1641,10 @@ directory so a missing path does not make every build dirty and its later
 creation is still detected. Do not climb past a missing parent: the nearest
 existing ancestor of an absent `PATH` or `-I` root can be `$HOME` or `/`, which
 Cargo would scan recursively. Do not watch a parent that contains OUT_DIR
-either, which would make a project below `$HOME` invalidate its own output; an
-absent input inside OUT_DIR is still refused. The environment values and
-arguments that named such an input remain tracked instead.
+either, which would make a project below `$HOME` invalidate its own output. An
+absent input inside OUT_DIR is refused at any depth, even before its parent
+exists. The environment values and arguments that named such an input remain
+tracked instead.
 
 Every artifact includes the availability classifier, even when every candidate
 was skipped or the successful macros take no value operands. Operand adapters are
