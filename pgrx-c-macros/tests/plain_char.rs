@@ -19,8 +19,8 @@ mod oracle;
 mod rust_oracle;
 
 use pgrx_c_macros::{
-    AnalysisSession, BindingCatalog, EmissionStatus, MacroScanner, PostgresConfig,
-    generate_with_bindings, inspect, support_rust_cfg, validate_support_profile,
+    AnalysisSession, BindingCatalog, EmissionStatus, FunctionBinding, MacroScanner, PostgresConfig,
+    RustBindingType, generate_with_bindings, inspect, support_rust_cfg, validate_support_profile,
 };
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -166,6 +166,44 @@ fn non_default_plain_char_profile_matches_native_c() {
     );
     assert_eq!(original.lines().count(), 256);
     assert_eq!(generated, original);
+}
+
+/// Refuse a call whose required native-transport adapter was rejected, even when a binding exists.
+///
+/// The binding's `c_char` storage cannot prove the callee's extension attributes. That is
+/// why plain-char calls go through generated C; falling back to the binding would skip it.
+#[test]
+fn rejected_native_transport_does_not_fall_back_to_the_binding() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().unwrap();
+    let header =
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/native_transport.h");
+    let mut arguments = oracle::native_arguments();
+    arguments.push("-std=c17".into());
+    let frontend = inspect(&scanner, &header, &arguments, None).unwrap();
+    let names = ["TRANSPORT_WIDEN"];
+    let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
+    // The shape bindgen's static-function wrappers give this declaration.
+    let mut bindings = BindingCatalog::default();
+    bindings.functions.insert(
+        "transport_widen".into(),
+        FunctionBinding {
+            path: vec!["transport_widen".into()],
+            parameters: vec![RustBindingType::NativeChar],
+            result: RustBindingType::Integer { signed: true, bits: 32 },
+            abi: "C".into(),
+            variadic: false,
+            link_name: "transport_widen__pgrx_cshim".into(),
+            guarded: false,
+            uses_cshim: true,
+        },
+    );
+    let generation = generate_with_bindings(&session, &names, &bindings).unwrap();
+    let [emission] = generation.macros.as_slice() else { panic!("one selected macro") };
+    let EmissionStatus::Skipped { reason } = &emission.status else {
+        panic!("a rejected native-transport adapter must not fall back to the binding")
+    };
+    assert!(reason.message.contains("static inline definition"), "{reason:?}");
 }
 
 /// Keep exact installed PG17/18 char-helper coverage independent of generated test expressions.

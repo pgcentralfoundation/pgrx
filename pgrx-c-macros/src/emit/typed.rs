@@ -936,7 +936,22 @@ impl<'a> Renderer<'a> {
                             };
                             let declared =
                                 &frontend.declarations().function_signatures[name].signature;
-                            let binding = bindings.functions.get(name).ok_or_else(|| skip(analysis, SkipReasonCode::Call, format!("{name}: {}", bindings.function_unavailable.get(name).map(String::as_str).unwrap_or("no callable binding or generated C inline shim was emitted")), Some(node.tokens)))?;
+                            // A rejected adapter outranks any binding: adapters are generated
+                            // only where no binding exists or its storage cannot prove the ABI.
+                            let binding = match bindings.function_unavailable.get(name) {
+                                Some(reason) => Err(reason.as_str()),
+                                None => bindings.functions.get(name).ok_or(
+                                    "no callable binding or generated C inline shim was emitted",
+                                ),
+                            }
+                            .map_err(|reason| {
+                                skip(
+                                    analysis,
+                                    SkipReasonCode::Call,
+                                    format!("{name}: {reason}"),
+                                    Some(node.tokens),
+                                )
+                            })?;
                             if binding.variadic
                                 || binding.parameters.len() != arguments.len()
                                 || !matches!(binding.abi.as_str(), "C" | "C-unwind")
