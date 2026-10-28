@@ -7,11 +7,22 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use super::ArrayIntoIterator;
+use super::{ArrayIntoIterator, TryFromDatumError};
 use crate::{AnyElement, Array, FromDatum, IntoDatum, pg_sys};
 use std::iter::FusedIterator;
 
 /// The [`anyarray` polymorphic pseudo-type][anyarray].
+///
+/// An `AnyArray` holds an array value and the type PostgreSQL resolved for it. Read the value
+/// with [`AnyArray::value`], which checks that the Rust type can read that type.
+///
+/// The handle does not borrow the memory that holds the array: the arguments of the call that
+/// received it, or the result of the SPI query that returned it. That memory may be freed once
+/// the call returns or the SPI connection closes, so a handle from
+/// [`Spi::get_one`](crate::spi::Spi::get_one) already refers to freed memory. `AnyArray` is
+/// `Copy` and `'static`, and the compiler does not stop it, or a borrowed value read from it,
+/// from outliving that memory. Use both only while that memory is live, and read into a type
+/// that owns its data, such as `Vec<i32>` or `Vec<String>`, to keep a value longer.
 ///
 // rustdoc doesn't directly support a warning block: https://github.com/rust-lang/rust/issues/73935
 /// **Warning**: Calling [`FromDatum::from_datum`] with this type will unconditionally panic. Call
@@ -25,17 +36,66 @@ pub struct AnyArray {
 }
 
 impl AnyArray {
+    /// The array value.
     pub fn datum(&self) -> pg_sys::Datum {
         self.datum
     }
 
+    /// The array's type, or InvalidOid if PostgreSQL did not resolve it, as for a call through
+    /// [`fn_call`](crate::fn_call::fn_call), which passes no expression tree.
     pub fn oid(&self) -> pg_sys::Oid {
         self.typoid
     }
 
+    /// Reads the array as `T` if `T` can read the array's type.
+    ///
+    /// This applies the type check of [`FromDatum::try_from_datum`], which trusts `T`'s
+    /// [`IntoDatum::type_oid`] and [`IntoDatum::is_compatible_with`] to name only types that
+    /// `T`'s [`FromDatum`] implementation can read. It accepts a domain over a type that `T`
+    /// reads, and it accepts an array of a composite type or of anonymous records as
+    /// `Array<PgHeapTuple>`.
+    ///
+    /// A `T` that borrows, such as `Array<'a, U>`, points into the array's memory or into a
+    /// detoasted copy in `CurrentMemoryContext`. Do not keep it after that memory is freed; see
+    /// [`AnyArray`].
+    ///
+    /// # Errors
+    ///
+    /// Returns [`TryFromDatumError::IncompatibleTypes`] if `T` cannot read the array's type,
+    /// including when [`AnyArray::oid`] is InvalidOid.
+    ///
+    /// # Panics
+    ///
+    /// `Vec<U>` panics if the array contains a NULL; read `Vec<Option<U>>` or `Array<U>` instead.
+    /// [`IntoDatum::type_oid`] can raise an ERROR for some `T`; see
+    /// [`FromDatum::try_from_datum`].
     #[inline]
-    pub fn into<T: FromDatum>(&self) -> Option<T> {
-        unsafe { T::from_polymorphic_datum(self.datum(), false, self.oid()) }
+    pub fn value<T: FromDatum + IntoDatum>(&self) -> Result<Option<T>, TryFromDatumError> {
+        // SAFETY: try_from_datum reads the datum only if `T` can read `self.typoid`, and it
+        // rejects InvalidOid, for which the datum's type is unknown. For a valid `typoid`, the
+        // caller of the unsafe FromDatum constructor established that the datum is a non-NULL
+        // value of that type. That the datum's memory is still live is required but not checked;
+        // the type documentation describes that gap.
+        unsafe { T::try_from_datum(self.datum, false, self.typoid) }
+    }
+
+    /// Reads the array as `T` without checking that `T` can read the array's type.
+    ///
+    /// Prefer [`AnyArray::value`]. Call this as `AnyArray::into::<T>(&array)`, because
+    /// `array.into()` on an owned `AnyArray` resolves to [`Into::into`].
+    ///
+    /// # Safety
+    ///
+    /// - `T` must be able to read a value of type [`AnyArray::oid`], or of the array's actual type
+    ///   if that is InvalidOid. `Array<U>` and `Vec<U>` take the element layout from the array
+    ///   and read each element as `U`, so reading an `int4[]` as `Array<PgHeapTuple>` treats each
+    ///   integer as a pointer.
+    /// - The memory that holds the array must still be live; see [`AnyArray`].
+    /// - A returned `T` that borrows must not outlive that memory or `CurrentMemoryContext`.
+    #[inline]
+    pub unsafe fn into<T: FromDatum>(&self) -> Option<T> {
+        // SAFETY: the caller ensures that `T` can read this live datum's type.
+        unsafe { T::from_polymorphic_datum(self.datum, false, self.typoid) }
     }
 }
 
