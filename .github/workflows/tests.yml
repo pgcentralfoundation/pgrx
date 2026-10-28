@@ -697,6 +697,8 @@ jobs:
       PG_VER: ${{ matrix.postgresql }}
 
     strategy:
+      # Windows runs are slow to repeat, so one version's failure should not hide the other's.
+      fail-fast: false
       matrix:
         os: [ "windows-2022" ]
         postgresql: [ 15, 17 ]
@@ -757,7 +759,7 @@ jobs:
         run: cargo pgrx init --pg$env:PG_VER=download
 
       - name: Run tests
-        run: cargo test --all --no-default-features --features "pg$env:PG_VER pg_test cshim proptest" --all-targets
+        run: cargo test --all --no-default-features --features "pg$env:PG_VER pg_test cshim proptest" --all-targets --no-fail-fast
 
       - name: Print sccache stats
         run: sccache --show-stats
