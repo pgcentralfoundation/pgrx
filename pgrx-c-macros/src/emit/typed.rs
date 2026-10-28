@@ -279,8 +279,10 @@ impl<'a> Renderer<'a> {
     /// Every floating value starts at a node of floating type: a local, a declaration, a
     /// literal, a cast, a call, or an object reached through a member, an index or a
     /// dereference. Analysis defers the type of such an access, and of a call through a
-    /// pointer it cannot resolve, so the compiler-proved object type of that node must be
-    /// established, and not floating, for the body to be translated.
+    /// pointer it cannot resolve, so the compiler-proved object type of a deferred node
+    /// must be established, and not floating, for the body to be translated. Only an
+    /// address, a string, and a node that takes the type of an operand checked on its
+    /// own are deferred without that proof.
     pub(super) fn check_own_floats(&self) -> Result<(), SkipReason> {
         use crate::analysis::TypeExpression;
         if self.floats {
@@ -293,13 +295,16 @@ impl<'a> Renderer<'a> {
             || nodes.any(|((node, ty), object)| match (object, ty) {
                 (Some(object), _) => floating(object),
                 (None, TypeExpression::External { ty }) => floating(ty),
-                (None, TypeExpression::Deferred) => matches!(
+                (None, TypeExpression::Deferred) => !matches!(
                     node.kind,
-                    ExpressionKind::Member { .. }
-                        | ExpressionKind::Index { .. }
-                        | ExpressionKind::Dereference { .. }
-                        | ExpressionKind::Call { .. }
-                        | ExpressionKind::TypeParameterCast { .. }
+                    ExpressionKind::AddressOf { .. }
+                        | ExpressionKind::StringLiteral { .. }
+                        | ExpressionKind::Stringification { .. }
+                        | ExpressionKind::InvocationFile
+                        | ExpressionKind::Group { .. }
+                        | ExpressionKind::Assignment { .. }
+                        | ExpressionKind::Update { .. }
+                        | ExpressionKind::Comma { .. }
                 ),
                 (None, _) => false,
             }))
