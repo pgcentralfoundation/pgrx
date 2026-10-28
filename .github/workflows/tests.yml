@@ -190,6 +190,30 @@ jobs:
             postgresql-$PG_VER \
             postgresql-server-dev-$PG_VER
 
+      # Generated C macros are checked against the server headers' target, so
+      # the aarch64 cross build needs headers configured for aarch64. Fetch the
+      # arm64 build of the installed postgresql-server-dev package from PGDG.
+      - name: Fetch aarch64 PostgreSQL server headers for the cross build
+        id: arm64-headers
+        run: |
+          set -eu
+          repo=https://apt.postgresql.org/pub/repos/apt
+          cn="$(. /etc/os-release && echo "$VERSION_CODENAME")"
+          want="$(dpkg-query -W -f='${Version}' "postgresql-server-dev-$PG_VER")"
+          deb=""
+          for dist in "$cn-pgdg/main" "$cn-pgdg/$PG_VER" "$cn-pgdg-snapshot/main" "$cn-pgdg-snapshot/$PG_VER"; do
+            deb="$(curl -fsSL "$repo/dists/$dist/binary-arm64/Packages.gz" 2>/dev/null | gunzip \
+              | awk -v p="postgresql-server-dev-$PG_VER" -v v="$want" \
+                  '$1=="Package:"{k=$2} $1=="Version:"{ver=$2} !found && $1=="Filename:" && k==p && ver==v {print $2; found=1}' || true)"
+            [ -n "$deb" ] && break
+          done
+          test -n "$deb" || { echo "no arm64 postgresql-server-dev-$PG_VER $want in PGDG"; exit 1; }
+          curl -fsSL -o "$RUNNER_TEMP/pg-server-dev-arm64.deb" "$repo/$deb"
+          dpkg-deb -x "$RUNNER_TEMP/pg-server-dev-arm64.deb" "$RUNNER_TEMP/pg-arm64"
+          server="$RUNNER_TEMP/pg-arm64/usr/include/postgresql/$PG_VER/server"
+          grep -q 'on aarch64' "$server/pg_config.h" || { echo "fetched headers are not aarch64"; exit 1; }
+          echo "server=$server" >> "$GITHUB_OUTPUT"
+
       - name: pg_config details
         run: |
           echo ""
@@ -239,7 +263,21 @@ jobs:
             --features "pg$PG_VER" \
             --no-default-features
 
+      # The workspace run above disables pgrx-c-macros' default `cli` feature.
+      - name: Run pgrx-c-macros CLI tests
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --package pgrx-c-macros --test cli
+
+      # These build isolated fixture crates with synthetic headers, so one job covers them.
+      - name: Run binding build harnesses
+        if: matrix.postgres == 18 && matrix.rust == null
+        run: |
+          CARGO_TARGET_DIR="$(pwd)/target" cargo test --package pgrx-bindgen \
+            --test macro_build --test shipped_macros -- --include-ignored --test-threads=1
+
+      # Only this step sees the target headers; tests above check that builds without them refuse.
       - name: Check that cross-compiled pgrx-unit-tests can build
+        env:
+          PGRX_INCLUDEDIR_SERVER_aarch64_unknown_linux_gnu: ${{ steps.arm64-headers.outputs.server }}
         run: |
           cargo build --tests \
             --features "pg$PG_VER" \
@@ -392,6 +430,15 @@ jobs:
 
       - name: Run 'cargo pgrx init' against system-level ${{ matrix.postgres }}
         run: cargo pgrx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
+
+      # aarch64 Linux is an unsigned-char target, so this covers C char
+      # semantics in generated macros and Datum conversions that x86_64 cannot.
+      - name: Run pgrx-unit-tests
+        run: |
+          cargo test \
+            --features "pg$PG_VER" \
+            --no-default-features \
+            --package pgrx-unit-tests --lib
 
       # Reproduces the pglinter 0.18.0 failure mode: release build with LTO
       # off and many codegen units, where `.pgrxsc` retention depends on
