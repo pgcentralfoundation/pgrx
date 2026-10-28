@@ -874,7 +874,7 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
         match spelling {
             "__builtin_offsetof" => return self.offset_of(start),
             "(" => {
-                if let Some((end, type_name)) = self.cast_type() {
+                if let Some((end, type_name)) = self.flat_type(")") {
                     self.position = end + 1;
                     let operand = self.expression(14, depth + 1)?;
                     let tokens = TokenRange { start, end: self.nodes[operand].tokens.end };
@@ -932,7 +932,7 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
                 let alignment = spelling != "sizeof";
                 self.position += 1;
                 if self.spelling() == Some("(")
-                    && let Some((end, type_name)) = self.cast_type()
+                    && let Some((end, type_name)) = self.flat_type(")")
                 {
                     self.position = end + 1;
                     let tokens = TokenRange { start, end: self.tokens[end].index + 1 };
@@ -960,6 +960,17 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
                         ExpressionKind::SizeOfTypeParameter { parameter, pointers, is_const }
                     };
                     return Ok(self.push(kind, tokens));
+                }
+                // A recognized type name followed by `[` begins an array type name. Parsed
+                // as an expression, it would index a value named after the type.
+                if self.spelling() == Some("(")
+                    && let Some((end, _)) = self.flat_type("[")
+                {
+                    self.position = end;
+                    return Err(self.error(
+                        SyntaxErrorKind::UnevaluatedExpression,
+                        "sizeof and alignment of an array type are not modeled",
+                    ));
                 }
                 if alignment {
                     return Err(self.error(
@@ -1155,20 +1166,17 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
     // stay expressions; a macro parameter is never guessed to be a typedef. Like a local
     // declaration, the type is names and pointer layers; array and function declarators
     // change the measured object and are never folded into a pointer spelling.
-    /// Recognize concrete cast syntax only with independent catalog evidence for the named type.
-    fn cast_type(&self) -> Option<(usize, String)> {
+    /// Recognize a concrete type after the current `(` only with independent catalog evidence,
+    /// returning the index of the following `stop` token and the joined type spelling.
+    fn flat_type(&self, stop: &str) -> Option<(usize, String)> {
         let mut end = self.position + 1;
-        while let Some(lexeme) = self.tokens.get(end) {
-            match lexeme.token.spelling.as_str() {
-                ")" => break,
-                "*" => end += 1,
-                _ if matches!(lexeme.token.kind, TokenKind::Identifier | TokenKind::Keyword) => {
-                    end += 1
-                }
-                _ => return None,
-            }
+        while let Some(lexeme) = self.tokens.get(end)
+            && (lexeme.token.spelling == "*"
+                || matches!(lexeme.token.kind, TokenKind::Identifier | TokenKind::Keyword))
+        {
+            end += 1;
         }
-        if self.tokens.get(end)?.token.spelling != ")" || end == self.position + 1 {
+        if self.tokens.get(end)?.token.spelling != stop || end == self.position + 1 {
             return None;
         }
         if self.tokens[self.position + 1..end]
@@ -2270,6 +2278,31 @@ mod tests {
         ] {
             let parsed = parse_expression(&tokens(&body), &["x".into()], |_| true);
             assert!(parsed.is_err(), "{body:?}: {parsed:?}");
+        }
+    }
+
+    /// A type name followed by `[` is an array type, never a value to index; only formals and
+    /// other names remain sizeof expression operands.
+    #[test]
+    fn sizeof_refuses_named_array_types_instead_of_indexing_the_type_name() {
+        let is_type = |name: &str| matches!(name, "T" | "T *");
+        for body in [
+            vec!["sizeof", "(", "T", "[", "4", "]", ")"],
+            vec!["sizeof", "(", "T", "[", "N", "]", ")"],
+            vec!["sizeof", "(", "T", "*", "[", "4", "]", ")"],
+            vec!["_Alignof", "(", "T", "[", "4", "]", ")"],
+        ] {
+            let error = parse_expression(&tokens(&body), &["x".into()], is_type).unwrap_err();
+            assert_eq!(error.kind, SyntaxErrorKind::UnevaluatedExpression, "{body:?}");
+            assert_eq!(body[error.tokens.start], "[", "{body:?}: {error:?}");
+        }
+        for name in ["x", "v"] {
+            let body = ["sizeof", "(", name, "[", "4", "]", ")"];
+            let parsed = parse_expression(&tokens(&body), &["x".into()], is_type).unwrap();
+            assert!(
+                matches!(parsed.nodes[parsed.root].kind, ExpressionKind::SizeOfExpression { .. }),
+                "{body:?}"
+            );
         }
     }
 

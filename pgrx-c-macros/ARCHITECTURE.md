@@ -643,7 +643,9 @@ types: a concrete cast, size, or alignment type is names and `*` layers, and onl
 may follow a star. `restrict` is not recorded: it changes neither size nor
 alignment, a cast result drops it, and generated Rust never relies on its
 aliasing promise. Array and function declarators, such as `char *[4]`, are
-refused rather than measured as one pointer. `offsetof` keeps a
+refused rather than measured as one pointer. A recognized type name followed by
+`[`, as in `sizeof(int32[4])`, is refused as an array type rather than parsed as
+an index into a value named `int32`. `offsetof` keeps a
 record designator and ordered field path; offsets do not require loading those
 fields. Whenever the arena holds type-hole evidence, reparse once after gathering
 it, so `(T) - 1` is a cast wherever `sizeof(T *)` appears. An application that
@@ -736,8 +738,10 @@ contextual semantic capabilities established later, not a parameter role.
 Track occurrence positions and evaluation obligations.
 An undeclared caller-scope identifier can become an additional explicit capture
 argument after the original formals. Declared C variables/functions/constants
-use the catalog instead. Captures stay separate from formals even if a nested
-expansion introduces the same spelling as an unused outer formal.
+use the catalog instead. A recognized type name never becomes a capture; it is
+refused wherever the parser leaves it in value position. Captures stay separate
+from formals even if a nested expansion introduces the same spelling as an
+unused outer formal.
 
 Determine an invocation contract from grouping and statement shape:
 

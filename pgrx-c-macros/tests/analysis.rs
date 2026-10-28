@@ -538,6 +538,49 @@ _Static_assert(DECLARATOR_POINTER_ARRAY_SIZE(1) == 4 * sizeof(char *), "an array
     assert!(checked.is_empty(), "{checked}");
 }
 
+/// A typedef name is never a caller-scope value: `sizeof(T[N])` measures an array type, not
+/// an element of a caller operand named `T`.
+#[test]
+fn typedef_names_never_become_caller_operands() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let header = fixture("analysis_declarators.h");
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    let arrays = [
+        "DECLARATOR_TYPEDEF_ARRAY_SIZE",
+        "DECLARATOR_RECORD_ARRAY_SIZE",
+        "DECLARATOR_DEPENDENT_ARRAY_SIZE",
+        "DECLARATOR_TYPEDEF_POINTER_ARRAY_SIZE",
+        "DECLARATOR_POINTER_ARRAY_SIZE",
+    ];
+    let names = arrays.into_iter().chain(["DECLARATOR_TYPE_AS_VALUE"]).collect::<Vec<_>>();
+    let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
+    for name in names {
+        let analysis = session.analyze(name);
+        let expected = if arrays.contains(&name) {
+            SkipReasonCode::UnevaluatedExpression
+        } else {
+            SkipReasonCode::UnsupportedType
+        };
+        assert_skip(&analysis, expected);
+        assert_eq!(analysis.parameters.len(), 1, "{name}: no caller operand may be invented");
+        assert!(matches!(emit(&session, name).status, EmissionStatus::Skipped { .. }), "{name}");
+    }
+    let checked = oracle::run_c(
+        &frontend.profile().compiler.executable,
+        &header,
+        r#"
+_Static_assert(DECLARATOR_TYPEDEF_ARRAY_SIZE(1) == 4 * sizeof(DeclaratorInt), "the whole array is measured");
+_Static_assert(DECLARATOR_RECORD_ARRAY_SIZE(1) == 2 * sizeof(DeclaratorPair), "the whole array is measured");
+_Static_assert(DECLARATOR_DEPENDENT_ARRAY_SIZE(1) == 4 * sizeof(DeclaratorInt), "the whole array is measured");
+_Static_assert(DECLARATOR_TYPEDEF_POINTER_ARRAY_SIZE(1) == 4 * sizeof(DeclaratorInt *), "the whole array is measured");
+"#,
+        &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        false,
+    );
+    assert!(checked.is_empty(), "{checked}");
+}
+
 /// Checks that ungrouped parameter uses require atomic arguments without changing the C body.
 #[test]
 fn ungrouped_parameter_uses_require_atomic_arguments_without_changing_the_c_body() {

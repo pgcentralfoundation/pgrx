@@ -591,6 +591,8 @@ pub(crate) fn analyze_active_with_constants(
     // macro_rules hygiene prevents that capture. Expose precisely those AST
     // value identifiers as extra holes, without confusing member names or types
     // with values and without inventing a signature from one sample invocation.
+    // A recognized type name is never a value, even where the bounded grammar left it
+    // in an expression: only a caller's local could shadow it, and nothing proves one.
     if compiler_expanded {
         let mut captures = BTreeMap::new();
         let locals = syntax
@@ -610,6 +612,7 @@ pub(crate) fn analyze_active_with_constants(
                 && !catalog.functions.contains_key(name)
                 && !catalog.builtins.contains_key(name)
                 && !catalog.builtin_unavailable.contains_key(name)
+                && !is_type(name)
         };
         for node in &syntax.nodes {
             let ExpressionKind::Group { operand } = node.kind else { continue };
@@ -1283,6 +1286,13 @@ fn analyze_types(
                         }
                         types.push(declared_type(ty, target));
                         continue;
+                    }
+                    if recognized_type(name, catalog, target) {
+                        return Err((
+                            SkipReasonCode::UnsupportedType,
+                            format!("{name}: a C type name is not a value"),
+                            node.tokens,
+                        ));
                     }
                     return Err((
                         SkipReasonCode::UnknownIdentifier,
