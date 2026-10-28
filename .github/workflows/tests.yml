@@ -284,6 +284,20 @@ jobs:
           CARGO_TARGET_DIR="$(pwd)/target" cargo test --package pgrx-bindgen \
             --test macro_build --test shipped_macros -- --include-ignored --test-threads=1
 
+      # Only Miri checks that a pointer Datum keeps its provenance through an integer, and its
+      # strict provenance mode makes the fcinfo test reject an integer round trip. Miri does
+      # not support RUSTC_WRAPPER, so this step runs without sccache. A nightly can ship
+      # without Miri, so the install may fall back to the newest nightly that has it.
+      - name: Check Datum pointer provenance with Miri
+        if: matrix.postgres == 18 && matrix.rust == null
+        run: |
+          unset RUSTC_WRAPPER
+          rustup toolchain install nightly --component miri,rust-src --allow-downgrade
+          cargo +nightly miri test --package pgrx-pg-sys \
+            --features "pg$PG_VER" --no-default-features --lib datum
+          MIRIFLAGS=-Zmiri-strict-provenance cargo +nightly miri test --package pgrx \
+            --features "pg$PG_VER" --no-default-features --lib fcinfo
+
       # Only this step sees the target headers; tests above check that builds without them refuse.
       - name: Check that cross-compiled pgrx-unit-tests can build
         env:
