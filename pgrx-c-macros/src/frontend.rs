@@ -198,7 +198,11 @@ pub(crate) struct CompilerOutput {
 /// Clang's final macro dump supplies active definitions. Libclang supplies physical
 /// origins and compiler/command-line context. Repeated observations of the same
 /// origin are deduplicated; distinct matching physical definitions remain ambiguous.
-/// A failure after compiler lookup is [`FrontendError::WithInputs`].
+///
+/// Once compiler lookup examines a candidate, a failure is [`FrontendError::WithInputs`] unless
+/// the lookup's own inputs cannot be recorded: a recorded compiler environment variable such as
+/// `CPATH` is not UTF-8, the working directory cannot be determined, or a lookup candidate cannot
+/// be examined or changes while it is fingerprinted. That recording failure carries no inputs.
 pub fn inspect(
     scanner: &MacroScanner,
     header: &Path,
@@ -226,7 +230,8 @@ pub(crate) fn inspect_with_compiler_hint(
     // Builds cache a failed inspection like any other result. From here on a
     // failure carries what it examined, so the changes that would invalidate a
     // successful profile also retry the failure: the lookup until the profile's
-    // inputs are recorded, then those inputs.
+    // inputs are recorded, then those inputs. A failure to record the lookup
+    // itself has nothing to carry and is returned alone.
     let mut frontend = inspect_selected(
         scanner,
         requested_header,
@@ -3792,6 +3797,25 @@ mod tests {
                 assert!(inputs.fingerprints[selected].is_some(), "{}", selected.display());
                 assert!(!inputs.environment.contains_key("PATH"), "absolute hints skip PATH");
             }
+        }
+
+        /// A lookup whose candidates cannot be examined cannot be recorded either. The recording
+        /// failure is returned without inputs, as documented on `inspect`, so a build that caches
+        /// it is retried only by its fixed directives.
+        #[test]
+        fn unrecordable_lookups_return_the_recording_failure_without_inputs() {
+            // Unix file names are limited to 255 bytes, so neither PATH candidate under this root
+            // can be found or fingerprinted as absent.
+            let root = std::env::temp_dir().join("x".repeat(300));
+            let result = select_compiler(None, None, None, 21, std::slice::from_ref(&root));
+            assert!(
+                matches!(
+                    &result,
+                    Err(FrontendError::CompilerIo { compiler, .. }) if compiler.starts_with(&root)
+                ),
+                "{:?}",
+                result.err()
+            );
         }
 
         /// Checks replacing a direct directory hint keeps it distinct from path lookups.

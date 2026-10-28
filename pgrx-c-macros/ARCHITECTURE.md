@@ -1366,17 +1366,27 @@ linkage is published on that path. Unsupported target families and
 `PGRX_C_MACROS=0` skip inspection altogether. Compiler inspection is still
 required for a successful macro artifact; fallback never guesses C semantics.
 Cargo caches the unavailable result like any other build-script output, so a
-refusal needs the same invalidation as a generated tree. Every inspection
-failure after compiler lookup, including a failed lookup, is
-`FrontendError::WithInputs`. It carries the lookup's candidates, directories and
-environment, or the profile's complete inputs once inspection has recorded them,
-and the build tracks them before publishing the refusal. A successful
-inspection's inputs are tracked before the later optional phases run, so a
-refusal from those phases is invalidated by the same changes as a generated
-tree. Refusals raised before the lookup, such as rejected arguments or an
-unloadable libclang, and failures while recording PostgreSQL configuration
-inputs after inspection carry no inputs; only the build's fixed environment and
-file directives invalidate them.
+refusal needs the same invalidation as a generated tree. Once compiler lookup
+examines a candidate, an inspection failure, including a failed lookup, is
+`FrontendError::WithInputs` unless the lookup's own inputs cannot be recorded.
+It carries the lookup's candidates, directories and environment, or the
+profile's complete inputs once inspection has recorded them, and the build
+tracks them before publishing the refusal. A successful inspection's inputs are
+tracked before the later optional phases run, so a refusal from those phases is
+invalidated by the same changes as a generated tree.
+
+The following refusals carry no inputs. Only the build's fixed environment and
+file directives invalidate them. Correcting a cause those directives do not
+cover, such as `CPATH`, leaves the refusal cached until a tracked input changes
+or `cargo clean -p pgrx-pg-sys` runs.
+
+- Refusals raised before the lookup, such as rejected arguments or an
+  unloadable or unrecognized libclang.
+- Failures while recording the lookup's own inputs: a recorded compiler
+  environment variable such as `CPATH` that is not UTF-8, a working directory
+  that cannot be determined, or a lookup candidate that cannot be examined or
+  changes while it is fingerprinted.
+- Failures while recording PostgreSQL configuration inputs after inspection.
 
 The loaded libclang wrapper permits one live runtime owner in a process. The
 build serializes scanner/bindgen inspection around that ownership constraint,
