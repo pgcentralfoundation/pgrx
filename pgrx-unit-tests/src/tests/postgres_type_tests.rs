@@ -253,4 +253,39 @@ mod tests {
         assert!(matches!(result, JsonEnumType::E1 { a } if a == 1.0));
         Ok(())
     }
+
+    /// Writes `value` with its type's send function and reads it back with its receive function,
+    /// as `COPY ... (FORMAT binary)` does.
+    fn binary_round_trip<T: IntoDatum + FromDatum>(value: T) -> T {
+        let typoid = T::type_oid();
+        let datum = value.into_datum().unwrap();
+        let (mut send, mut is_varlena) = (pg_sys::Oid::INVALID, false);
+        let (mut receive, mut ioparam) = (pg_sys::Oid::INVALID, pg_sys::Oid::INVALID);
+        // SAFETY: `datum` is a non-null value of `typoid`, and the receive function gets a
+        // StringInfoData holding the bytes that the send function returned.
+        unsafe {
+            pg_sys::getTypeBinaryOutputInfo(typoid, &mut send, &mut is_varlena);
+            pg_sys::getTypeBinaryInputInfo(typoid, &mut receive, &mut ioparam);
+            let sent = pg_sys::OidSendFunctionCall(send, datum);
+            let sent = Vec::<u8>::from_datum(sent.into(), false).unwrap();
+            let mut buf = pgrx::StringInfo::new();
+            buf.push_bytes(&sent);
+            let buf = buf.into_pg();
+            let datum = pg_sys::OidReceiveFunctionCall(receive, buf, ioparam, -1);
+            assert_eq!((*buf).cursor, (*buf).len, "receive must read every byte");
+            T::from_datum(datum, false).unwrap()
+        }
+    }
+
+    #[pg_test]
+    fn test_binary_protocol_round_trip() {
+        let json = binary_round_trip(JsonType { a: 1.0, b: 2.0, c: 3 });
+        assert_eq!((json.a, json.b, json.c), (1.0, 2.0, 3));
+
+        let custom = binary_round_trip(CustomTextFormatSerializedType { a: 1.0, b: 2.0, c: 3 });
+        assert_eq!((custom.a, custom.b, custom.c), (1.0, 2.0, 3));
+
+        let json_enum = binary_round_trip(JsonEnumType::E2 { b: 2.0 });
+        assert!(matches!(json_enum, JsonEnumType::E2 { b } if b == 2.0));
+    }
 }

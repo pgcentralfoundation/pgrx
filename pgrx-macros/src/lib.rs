@@ -1136,34 +1136,50 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
     if args.contains(&PostgresTypeAttribute::PgBinaryProtocol) {
         // At this time, the `PostgresTypeAttribute` does not impact the way we generate
         // the `recv` and `send` functions.
+        //
+        // Safe code can put any value in an `Internal`, and a Rust caller picks the lifetimes of
+        // the value `recv` returns, so `recv` is unsafe. PostgreSQL meets its contract when it
+        // calls `recv` as the type's receive function, and the `pg_extern` wrapper encodes the
+        // value into a new Datum before it returns.
         stream.extend(quote! {
+            /// Reads a value that `send` wrote.
+            ///
+            /// # Safety
+            ///
+            /// `internal` must point to a `pg_sys::StringInfoData` that nothing else accesses
+            /// during the call, whose `len` is not negative and whose `data` is non-null and
+            /// points to `len` initialized bytes. The value can borrow a copy of those bytes in
+            /// `CurrentMemoryContext`, so its lifetimes must end before that context is reset or
+            /// deleted.
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
-            pub fn #funcname_recv #generics(
+            pub unsafe fn #funcname_recv #generics(
                 mut internal: ::pgrx::datum::Internal,
             ) -> #name #generics {
+                // SAFETY: the caller passes a StringInfoData that nothing else accesses.
                 let buf = unsafe { internal.get_mut::<::pgrx::pg_sys::StringInfoData>().unwrap() };
 
                 let mut serialized = ::pgrx::StringInfo::new();
 
                 serialized.push_bytes(&[0u8; ::pgrx::pg_sys::VARHDRSZ as usize]); // reserve space for the header
+                // SAFETY: the caller passes a non-null `data` that points to `len` initialized bytes.
                 serialized.push_bytes(unsafe {
                     core::slice::from_raw_parts(
                         buf.data as *const u8,
                         buf.len as usize
                     )
                 });
+                buf.cursor = buf.len;
 
                 let size = serialized.len();
                 let varlena = serialized.into_char_ptr();
 
                 // SAFETY: StringInfo owns the aligned PostgreSQL allocation and initialized
                 // header prefix, and bounds its total size by MaxAllocSize. into_char_ptr
-                // transfers that live allocation without freeing it. Under the fmgr receive
-                // contract, the copied payload is the serialized value decoded below.
-                unsafe{
+                // transfers that live allocation in CurrentMemoryContext without freeing it, and
+                // the caller ends the decoded value's lifetimes before that context frees it.
+                unsafe {
                     ::pgrx::pg_sys::SET_VARSIZE_4B!(varlena as *mut ::pgrx::pg_sys::varlena, size as i32).get();
-                    buf.cursor = buf.len;
                     #cbor_decode(varlena as *mut ::pgrx::pg_sys::varlena)
                 }
             }
