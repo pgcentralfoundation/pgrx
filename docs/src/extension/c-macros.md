@@ -542,11 +542,15 @@ Generation needs a GNU-style Clang driver whose major version matches the loaded
 `libclang`, and the target's C library headers. The same inspected profile
 compiles native accessors, inline wrappers and, with the `cshim` feature, the C
 shim into one archive. The archiver comes from the driver's LLVM release:
-`llvm-ar` beside the driver, `llvm-ar-<major>` beside a `clang-<major>` driver,
-or `llvm-ar` beside the driver's resolved path, such as Debian's
+`llvm-ar-<major>` beside a `clang-<major>` driver, then `llvm-ar` beside the
+driver, then `llvm-ar` beside the driver's resolved path, such as Debian's
 `/usr/lib/llvm-<major>/bin`. Windows targets prefer an adjacent `llvm-lib` and
 otherwise use `llvm-ar --format=coff`. Without an LLVM archiver, other targets
 use the system `ar`, which may not index objects built for another machine.
+A driver that loads a default configuration file, as Gentoo's Clang does, is
+refused because the file's options appear in no recorded profile; set
+`CLANG_NO_DEFAULT_CONFIG=1` or pass `--no-default-config` in
+`BINDGEN_EXTRA_CLANG_ARGS` to build without it.
 
 The CLI and the binding build decode recorded CFLAGS before CPPFLAGS; ordinary
 bindgen retains its established CPPFLAGS invocation. GNU
@@ -558,11 +562,15 @@ explicit binding arguments, without recovering absent server build settings.
 
 Before generating anything, pgrx checks that the server headers were configured
 for the Clang target. The machine named in `PG_VERSION_STR` must match the
-target's architecture, operating system, C library and ARM float ABI, and the
-sizes, alignments, byte order and major version in `pg_config.h` must match the
-target compiler and the selected `pgNN` feature. Headers configured for another
-machine are refused, even when every layout fact agrees: x86_64 and aarch64
-Linux headers declare some PostgreSQL symbols with different shapes.
+target's architecture and operating system, and its C library and ARM float ABI
+when it names them; meson and Windows builds name neither. The sizes, alignments,
+byte order and major version in `pg_config.h` must match the target compiler
+and the selected `pgNN` feature. Headers configured for another machine are
+refused, even when every layout fact agrees: x86_64 and aarch64 Linux headers
+declare some PostgreSQL symbols with different shapes. A universal macOS
+installation such as Postgres.app builds each slice named by `-arch` in its
+CFLAGS from the same headers, so either slice is accepted; Cargo's target
+replaces the `-arch` flags in the profile.
 
 A cross build therefore needs server headers configured for the target. Select
 them with `PGRX_INCLUDEDIR_SERVER_PGNN_<target>` and keep the host's `pg_config`,

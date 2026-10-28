@@ -26,8 +26,8 @@ build does this, and a failure stops the build. A cross build therefore needs:
 
 - server headers configured for the target, from the same PostgreSQL build as
   the server that will load the extension;
-- PostgreSQL metadata for those headers: the version, CPPFLAGS, CFLAGS, the
-  `--configure` output and the library directory;
+- PostgreSQL metadata for those headers: the version, CPPFLAGS, CFLAGS and the
+  library directory;
 - a Clang driver and `llvm-ar` that match the `libclang` bindgen loads, as
   described in [Clang, LLVM and system headers](#clang-llvm-and-system-headers).
 
@@ -89,10 +89,11 @@ build host:
 | `PGRX_PG_CONFIG_INCLUDEDIR-SERVER` | where the target's server headers are on the build host |
 | `PGRX_PG_CONFIG_CPPFLAGS` | `pg_config --cppflags` |
 | `PGRX_PG_CONFIG_CFLAGS` | `pg_config --cflags` |
-| `PGRX_PG_CONFIG_CONFIGURE` | `pg_config --configure`; it must be set, but may be empty |
 | `PGRX_PG_CONFIG_LIBDIR` | `pg_config --libdir` |
 
-pgrx then runs no `pg_config` program and applies every CFLAGS value. Shells
+pgrx then runs no `pg_config` program and applies every CFLAGS value. The
+`--configure` output is not needed: only a `pg_config` program's `CLANG` entry
+is used, as a hint for the Clang driver. Shells
 cannot export `PGRX_PG_CONFIG_INCLUDEDIR-SERVER` because of its hyphen, so set
 the variables with `env`:
 
@@ -102,7 +103,6 @@ env PGRX_PG_CONFIG_AS_ENV=true \
     "PGRX_PG_CONFIG_INCLUDEDIR-SERVER=$HOME/pg-arm64/usr/include/postgresql/18/server" \
     PGRX_PG_CONFIG_CPPFLAGS="$target_cppflags" \
     PGRX_PG_CONFIG_CFLAGS="$target_cflags" \
-    PGRX_PG_CONFIG_CONFIGURE="$target_configure" \
     PGRX_PG_CONFIG_LIBDIR=/usr/lib/aarch64-linux-gnu \
     cargo build --target aarch64-unknown-linux-gnu --release
 ```
@@ -130,9 +130,22 @@ target and refuses headers that do not describe it:
 
 - **Machine.** `PG_VERSION_STR` in `pg_config.h` names the machine configure or
   meson built for, such as `on x86_64-pc-linux-gnu` or `on aarch64-darwin`. Its
-  architecture, operating system, C library and ARM float ABI must match the
-  Clang target. A machine that pgrx does not recognize is accepted only when the
-  target is the build host itself.
+  architecture and operating system must match the Clang target. Its C library
+  and ARM float ABI must match too when it names them, as autoconf's GNU and
+  musl triples such as `x86_64-pc-linux-gnu` and `arm-unknown-linux-gnueabihf`
+  do; meson's `<cpu>-<system>` spelling and Windows builds, MinGW's
+  `x86_64-w64-mingw32` or MSVC, name neither. meson records DragonFly
+  as `netbsd` and Android as `linux`, so those spellings also match those
+  systems. A machine that pgrx does not recognize is accepted only when the
+  target has the build host's architecture and operating system.
+- **macOS slices.** A universal macOS installation such as Postgres.app is
+  configured once with `-arch arm64 -arch x86_64` in its CFLAGS and compiles
+  every slice from the same headers, while `PG_VERSION_STR` names only the
+  machine configure ran on. For an installation's own macOS headers, the
+  `-arch` values decide the architecture: the target's must be one of them.
+  The `-arch` flags themselves stay out of the profile, because Clang cannot
+  preprocess for two slices at once and Cargo's target selects the slice; the
+  report lists them under `cflags_dropped`.
 - **Layout.** One parse with the target compiler compares the sizes, alignments,
   `MAXIMUM_ALIGNOF`, byte order and 64-bit integer flags recorded in
   `pg_config.h` with the target, and `PG_MAJORVERSION_NUM` with the selected
@@ -172,6 +185,8 @@ remain trusted:
   such as `USE_SVE_POPCNT_WITH_RUNTIME_CHECK`, which changes how PostgreSQL 18
   and later declare `pg_popcount_optimized` on aarch64, or the `USE_AVX512_*`
   options on x86_64;
+- the C library and ARM float ABI, when `PG_VERSION_STR` does not name them,
+  as with meson and Windows builds;
 - C library feature macros (`HAVE_*`) within one C library family;
 - build options such as `BLCKSZ`, `NAMEDATALEN` and `USE_ASSERT_CHECKING`;
 - the host's CPPFLAGS, when a host `pg_config` supplies the metadata.
@@ -188,8 +203,15 @@ header inspection and for its native support archive, rather than through the
 
 - **Driver.** Its major version must match `libclang`. pgrx uses `CLANG_PATH`
   when it is set; otherwise it uses the first match among the `CLANG` recorded
-  by `pg_config --configure`, the `clang` installed with `libclang`, and
-  `clang-<major>` or `clang` on `PATH`.
+  by a `pg_config` program's `--configure` output, the `clang` installed with
+  `libclang`, and `clang-<major>` or `clang` on `PATH`.
+- **Configuration files.** Clang 16 and later load default configuration
+  files named for the target, and some distributions install them, such as
+  Gentoo's `/etc/clang/<major>/x86_64-unknown-linux-gnu-clang.cfg`. Their
+  options would apply to the driver but appear in no recorded profile, so pgrx
+  refuses a driver that reports `Configuration file:`. Set
+  `CLANG_NO_DEFAULT_CONFIG=1`, or add `--no-default-config` to
+  `BINDGEN_EXTRA_CLANG_ARGS`, to build without them.
 - **Target arguments.** pgrx passes `--target=<Cargo target>` unless the
   arguments already name a target, followed by
   `BINDGEN_EXTRA_CLANG_ARGS_<target>` or, if that is unset,
@@ -199,16 +221,22 @@ header inspection and for its native support archive, rather than through the
   (`--sysroot=...`), or its headers and GCC installation (`-isystem` and
   `-ccc-gcc-name`), when Clang cannot find them.
 - **System headers.** pgrx asks the same Clang driver for its system include
-  directories with those target arguments, without their `-I` options, so system
-  headers come from the target's search list rather than the host's. Bindgen and
-  header inspection both search those directories first, and the build fails if
-  inspection then selects a different driver.
-- **Archiver.** pgrx uses `llvm-ar` beside the driver, `llvm-ar-<major>` beside
-  a `clang-<major>` driver, or `llvm-ar` beside the driver's resolved path, such
-  as Debian's `/usr/lib/llvm-<major>/bin`. On Debian, install the `llvm-<major>`
-  package that matches `clang-<major>`. Without an LLVM archiver pgrx uses the
-  system `ar`, which may write an archive without a symbol index for another
-  machine's objects. The link can then fail.
+  directories with the arguments of the inspected profile without their `-I`
+  options: the target arguments above, the applied CFLAGS and PostgreSQL's
+  CPPFLAGS. A `--sysroot` or `-isysroot` in any of them, such as the SDK that
+  PostgreSQL's macOS build records in CPPFLAGS, selects the search list, so
+  system headers come from the target's sysroot rather than the host's or the
+  driver's default SDK. Bindgen and header inspection both receive those
+  directories as system directories, searched after every `-I` directory as
+  the driver searches them, and the build fails if inspection then selects a
+  different driver. The report records the query under `include_detection`.
+- **Archiver.** pgrx uses `llvm-ar-<major>` beside a `clang-<major>` driver,
+  then `llvm-ar` beside the driver, then `llvm-ar` beside the driver's resolved
+  path, such as Debian's `/usr/lib/llvm-<major>/bin`. On Debian, install the
+  `llvm-<major>` package that matches `clang-<major>`; `/usr/bin/llvm-ar`
+  belongs to the distribution's default LLVM release. Without an LLVM archiver
+  pgrx uses the system `ar`, which may write an archive without a symbol index
+  for another machine's objects. The link can then fail.
 - **`cc` variables.** `CC_<target>`, `AR_<target>`, `CXX_<target>` and
   `CROSS_COMPILE` do not affect `pgrx-pg-sys`'s native support. Other crates
   that compile C with the `cc` crate still read them.
@@ -368,11 +396,11 @@ On the steps on Debian-family are as follows:
     arch=arm64    # Debian's name for aarch64; use amd64 for x86_64
     version="$(dpkg-query -W -f='${Version}' "postgresql-server-dev-$pg")"
     repo=https://apt.postgresql.org/pub/repos/apt
-    index="$repo/dists/$(lsb_release -cs)-pgdg/main/binary-$arch/Packages.gz"
+    index="$repo/dists/$(. /etc/os-release && echo "$VERSION_CODENAME")-pgdg/main/binary-$arch/Packages.gz"
     deb="$(curl -fsSL "$index" | gunzip | awk -v p="postgresql-server-dev-$pg" -v v="$version" '
         $1 == "Package:" { name = $2 }
         $1 == "Version:" { ver = $2 }
-        $1 == "Filename:" && name == p && ver == v { print $2; exit }')"
+        !found && $1 == "Filename:" && name == p && ver == v { print $2; found = 1 }')"
     if [ -n "$deb" ]; then
         curl -fsSL -o "/tmp/postgresql-server-dev-$pg-$arch.deb" "$repo/$deb" &&
             dpkg-deb -x "/tmp/postgresql-server-dev-$pg-$arch.deb" "$HOME/pg-$arch"
@@ -381,7 +409,7 @@ On the steps on Debian-family are as follows:
     fi
     ```
 
-    The headers are then in `$HOME/pg-arm64/usr/include/postgresql/18/server`. The index lists only current versions; PGDG keeps older ones in its archive repository, `apt-archive.postgresql.org`. Beta versions are published in a component named after the major version, the `19` in `deb https://apt.postgresql.org/pub/repos/apt noble-pgdg main 19`, so replace `main` in the index URL with that component.
+    awk reads the whole index rather than stopping at the match, so `curl` and `gunzip` finish writing and the pipeline also succeeds under `set -o pipefail`. The headers are then in `$HOME/pg-arm64/usr/include/postgresql/18/server`. The index lists only current versions; PGDG keeps older ones in its archive repository, `apt-archive.postgresql.org`. Beta versions are published in a component named after the major version, the `19` in `deb https://apt.postgresql.org/pub/repos/apt noble-pgdg main 19`, so replace `main` in the index URL with that component.
 
 6. Set some relevant environment vars:
     - *`target=aarch64`*: `export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc`.

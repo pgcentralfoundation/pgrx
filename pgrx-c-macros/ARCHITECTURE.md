@@ -204,9 +204,15 @@ There are two different inspection paths:
 headers to describe the inspected target, through
 [`verify_postgres_configuration`](src/postgres/configuration.rs). Headers that
 define `PG_VERSION_NUM` must name a machine in `PG_VERSION_STR` whose
-architecture, OS, C library and ARM float ABI match Clang's triple. An
-unrecognized machine is accepted only when the target is the generator's own
-host. One libclang parse of the inspected header then compares the
+architecture and OS match Clang's triple. The C library and ARM float ABI are
+compared when the machine names them: autoconf's GNU and musl triples do, while
+meson's `<cpu>-<system>`, MinGW and MSVC strings do not. meson renames DragonFly to `netbsd`
+and Android to `linux`, so those spellings also match those systems. For an
+installation's own macOS headers, the `-arch` values of its recorded CFLAGS
+replace the recorded architecture: a universal build compiles every slice from
+one configuration, while `PG_VERSION_STR` names the machine configure ran on.
+An unrecognized machine is accepted only when the target has the generator's
+own architecture and OS. One libclang parse of the inspected header then compares the
 `pg_config.h` sizes, member-offset alignments, `MAXIMUM_ALIGNOF`, byte order,
 64-bit integer flags and major version with the target compiler, and reports
 every disagreement. The machine check is the only evidence for ISA-dependent
@@ -1284,8 +1290,8 @@ not reuse an old object as success. Object/archive publication is not a single
 transaction; an error can occur after the object was replaced.
 
 The archiver comes from the inspected Clang's LLVM release: an adjacent
-`llvm-lib` for Windows targets, then an adjacent `llvm-ar`, then `llvm-ar-<major>`
-beside a `clang-<major>` driver, then `llvm-ar` beside the driver's resolved path,
+`llvm-lib` for Windows targets, then `llvm-ar-<major>` beside a `clang-<major>`
+driver, then an adjacent `llvm-ar`, then `llvm-ar` beside the driver's resolved path,
 as in Debian's `/usr/lib/llvm-<major>/bin`. Only then does it fall back to
 `llvm-ar` on `PATH` for Windows targets or the system `ar` otherwise.
 
@@ -1411,7 +1417,7 @@ CLI commands retain their own requested output and stderr diagnostics.
 
 1. Resolve configurations, the active Cargo major and the server header root;
    scope a host `pg_config`'s CFLAGS for cross builds.
-2. Ask the Clang driver that inspection selects for the target's system include
+2. Ask the Clang driver that inspection selects for the profile's system include
    directories. Inspect macros with the recorded CFLAGS plus the binding target,
    those directories, CPPFLAGS, the server include directories and environment
    overrides; verify that the server configuration describes that target and
@@ -1467,18 +1473,26 @@ such a program and Cargo's `HOST` and `TARGET` differ, only PostgreSQL's
 functional CFLAGS (`-fno-strict-aliasing`, `-fwrapv` and
 `-fexcess-precision=standard`) reach the macro profile, in recorded order. The
 report lists the others under `cflags_dropped`. Native builds and
-`PGRX_PG_CONFIG_AS_ENV` metadata keep every recorded flag. Either way, the
-verification in section 5 decides whether the headers describe the target.
+`PGRX_PG_CONFIG_AS_ENV` metadata keep every recorded flag except Darwin `-arch`
+selections, which the report also lists: a universal macOS build records two,
+which Clang cannot preprocess together, and Cargo's target selects the slice.
+Either way, the verification in section 5 decides whether the headers describe
+the target.
 
 `PostgresConfig::system_includes` selects the driver through the same lookup as
 inspection and refuses one whose major version differs from libclang's. Its
-arguments are `BINDGEN_EXTRA_CLANG_ARGS` without their `-I` options, preceded by
-Cargo's target unless those arguments name one. It preprocesses an empty input
-with them and `-E -v`, and returns the driver's `#include <...>` search list.
-The build passes those directories, framework directories as `-iframework`,
-ahead of every other include argument to both bindgen and inspection. A cross
-build therefore searches the target's directories rather than the host's, and
-libclang finds builtin headers from a driver of its own major version.
+arguments are the profile's applied CFLAGS, PostgreSQL's CPPFLAGS and
+`BINDGEN_EXTRA_CLANG_ARGS` without their `-I` options, preceded by Cargo's
+target unless those arguments name one, so a recorded `-isysroot` or
+`--sysroot` selects the list. It preprocesses an empty input with them and
+`-E -v`, and returns the driver's `#include <...>` search list. The build
+passes those directories to both bindgen and inspection as `-isystem`, framework
+directories as `-iframework`, in the driver's order. They are searched after
+every `-I` directory, as the driver searches them, and duplicate the sysroot's
+own directories rather than shadowing them. A cross build therefore searches
+the target's directories rather than the host's, and libclang finds builtin
+headers from a driver of its own major version. The report records the query's
+driver, arguments and resulting include arguments under `include_detection`.
 Inspection must then select the same driver, or the build fails.
 `PGRX_BINDGEN_NO_DETECT_INCLUDES` skips the query; bindgen's own include
 detection stays off.
@@ -1973,9 +1987,10 @@ library directory, but only PostgreSQL's functional CFLAGS; target-specific
 `PGRX_INCLUDEDIR_SERVER` variables select the target headers. Metadata in
 `PGRX_PG_CONFIG_AS_ENV` describes the target directly and keeps every CFLAGS
 value. The checks cannot see ISA options the server's build chose within one
-architecture, such as SVE or AVX-512 popcount dispatch, libc feature macros
-within one C library family, build options such as `BLCKSZ`, or host CPPFLAGS
-that still apply in a cross build. Those remain trusted, so the headers must
+architecture, such as SVE or AVX-512 popcount dispatch, the C library or ARM
+float ABI when `PG_VERSION_STR` does not name them, libc feature macros within
+one C library family, build options such as `BLCKSZ`, or host CPPFLAGS that
+still apply in a cross build. Those remain trusted, so the headers must
 come from the deployed server's build.
 
 Input content fingerprints determine when compiler facts expire. Generated

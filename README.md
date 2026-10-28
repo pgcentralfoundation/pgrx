@@ -99,9 +99,10 @@ identities.
    - Debian-likes: `apt install clang llvm libclang-dev`
    - RHEL-likes: `yum install clang llvm`
    - Windows: download installers from https://github.com/llvm/llvm-project/releases
-   - `pgrx-pg-sys` uses the driver to find the target's system headers, to check the C macro profile against the PostgreSQL headers and to compile its native support archive, including the `cshim` feature. Its major version must match `libclang`. pgrx uses `CLANG_PATH` when it is set; otherwise it uses the first match among the `CLANG` recorded by `pg_config --configure`, the `clang` installed with `libclang`, and `clang-<major>` or `clang` on `PATH`.
-   - The archiver is the `llvm-ar` that belongs to that driver, or `llvm-lib` for Windows targets. pgrx also finds Debian's `llvm-ar-<major>` and `/usr/lib/llvm-<major>/bin/llvm-ar`. Without one, builds for Unix targets use the system `ar`, which works for native builds but may not index objects built for another target.
+   - `pgrx-pg-sys` uses the driver to find the target's system headers, to check the C macro profile against the PostgreSQL headers and to compile its native support archive, including the `cshim` feature. Its major version must match `libclang`. pgrx uses `CLANG_PATH` when it is set; otherwise it uses the first match among the `CLANG` recorded in a `pg_config` program's `--configure` output, the `clang` installed with `libclang`, and `clang-<major>` or `clang` on `PATH`.
+   - The archiver is `llvm-ar` from the driver's LLVM release, or `llvm-lib` for Windows targets. pgrx looks for `llvm-ar-<major>` beside a `clang-<major>` driver, then `llvm-ar` beside the driver or beside its resolved path, such as Debian's `/usr/lib/llvm-<major>/bin/llvm-ar`. Without one, builds for Unix targets use the system `ar`, which works for native builds but may not index objects built for another target.
    - A failure to generate the C macros stops the build with an error that names the cause.
+   - A driver that loads a default configuration file, as Gentoo's Clang does, is refused. Set `CLANG_NO_DEFAULT_CONFIG=1` to build without it.
 - C compiler
    - Linux and macOS: a host C compiler, which builds the generator's SHA-256 backend
    - Windows: MSVC, which Rust's MSVC targets need for linking

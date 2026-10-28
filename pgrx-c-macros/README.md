@@ -223,8 +223,10 @@ build host of a later user.
 Ordinary bindgen retains its established target, CPPFLAGS and server include
 directories. Its system include directories come from the Clang driver that
 macro inspection selects: `PostgresConfig::system_includes` asks that driver for
-its `#include <...>` search list under the target arguments, and bindgen and
-inspection both search the result ahead of every other include directory.
+its `#include <...>` search list under the profile's arguments without include
+directories, so a recorded `-isysroot` or `--sysroot` selects the list. Bindgen
+and inspection both receive the result as system directories (`-isystem` and
+`-iframework`), searched after every `-I` directory as the driver searches them.
 Macro inspection additionally observes recorded CFLAGS before CPPFLAGS, with
 bindgen's environment overrides at the end, and reconciles those C facts with
 the fresh bindings' actual storage. The native support archive, including the C
@@ -705,9 +707,14 @@ generated files instead.
 `PostgresConfig::inspect` and `inspect_with_arguments` check that the server
 headers describe the inspected target, so the binding build and the CLI refuse
 the same headers. When the headers define `PG_VERSION_NUM`, the machine named in
-`PG_VERSION_STR` must match Clang's architecture, OS, C library and ARM float
-ABI. An unrecognized machine is accepted only when the target is the
-generator's own host. One libclang parse then compares the `pg_config.h` sizes,
+`PG_VERSION_STR` must match Clang's architecture and OS, and its C library and
+ARM float ABI when it names them, as autoconf's GNU and musl triples do and
+meson's `<cpu>-<system>`, MinGW and MSVC strings do not. meson's `netbsd` and `linux` also
+match DragonFly and Android, which meson renames to them. For an installation's
+own macOS headers, the `-arch` values in its recorded CFLAGS replace the
+recorded architecture, so a universal build such as Postgres.app describes each
+slice. An unrecognized machine is accepted only when the target has the
+generator's own architecture and OS. One libclang parse then compares the `pg_config.h` sizes,
 member-offset alignments, `MAXIMUM_ALIGNOF`, byte order, 64-bit integer flags
 and major version with the target compiler, and reports every disagreement. A
 refusal is `PostgresError::TargetConfiguration`, which wraps a
@@ -726,7 +733,9 @@ functional CFLAGS from it: `-fno-strict-aliasing`, `-fwrapv` and
 `-fexcess-precision=standard`, in recorded order. The report lists the other
 recorded flags under `cflags_dropped`, and the `PGRX_MACRO_DEBUG=1` summary
 prints them. Native builds and `PGRX_PG_CONFIG_AS_ENV` metadata apply every
-recorded flag, as does the CLI.
+recorded flag, as does the CLI, except Darwin `-arch` selections: Clang cannot
+preprocess for two slices at once, and the target selects the slice, so they
+are listed under `cflags_dropped` too.
 
 The runtime checks the selected compiler's LP64, LLP64, or ILP32 representation,
 including plain-char signedness, C long width, and the distinct ranks of `size_t`
