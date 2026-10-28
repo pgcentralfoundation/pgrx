@@ -54,6 +54,7 @@ typedef struct DerefConstState { int scalar; const int values[2]; } DerefConstSt
 #define DEREF_READ(state) ((state).scalar)
 #define DEREF_ARRAY(state) ((state).values)
 #define DEREF_ADD(value) ((value) + 3)
+#define DEREF_UNGROUPED(state) (state.scalar)
 "#;
 
 /// Own a synthetic header and its temporary directory so profile-sensitive generation has an
@@ -104,7 +105,7 @@ fn native_raw_dereferences_preserve_qualification_owners_and_precedence() {
         arguments.extend(["-isysroot".into(), sdk.trim().into()]);
     }
     let frontend = inspect(&scanner, &header.0, &arguments, None).unwrap();
-    let names = ["DEREF_READ", "DEREF_ARRAY", "DEREF_ADD"];
+    let names = ["DEREF_READ", "DEREF_ARRAY", "DEREF_ADD", "DEREF_UNGROUPED"];
     let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
     let bindings = bindgen::Builder::default()
         .rust_target(bindgen::RustTarget::stable(85, 0).unwrap())
@@ -158,6 +159,20 @@ fn native_raw_dereferences_preserve_qualification_owners_and_precedence() {
     int number = 79;
     int *scalar = &number;
     printf("%d\n%d\n", DEREF_ADD(*scalar + 5), DEREF_ADD((*scalar)));
+    int *bare = DEREF_ARRAY(*pointer);
+    bare[0] = 29;
+    const int *bare_readonly = DEREF_ARRAY(*constant);
+    printf("%d\n", bare_readonly[0]);
+    DerefState linked = { 101, { 103, 107 } };
+    DerefState *records[2] = { pointer, &linked };
+    DerefState **nested = &records[1];
+    int other = 5;
+    int *targets[2] = { scalar, &other };
+    int **scalars = &targets[0];
+    struct { DerefState *state; int *target; } link = { &owned, &other };
+    printf("%d\n%d\n%d\n%d\n%d\n", DEREF_ADD(-*scalar), DEREF_ADD(*scalar), DEREF_ADD(**scalars), DEREF_ADD(*link.target), DEREF_ADD(*targets[1]));
+    printf("%d\n%d\n%d\n", DEREF_READ(**nested), DEREF_READ(*link.state), DEREF_READ(*records[0]));
+    printf("%d\n", DEREF_UNGROUPED((*pointer)));
     "#;
     let body = r#"
     struct ObservedOwner<'a> {
@@ -201,6 +216,38 @@ fn native_raw_dereferences_preserve_qualification_owners_and_precedence() {
             let mut number = 79_i32;
             let scalar = &raw mut number;
             println!("{}\n{}", DEREF_ADD!(*scalar + 5).get(), DEREF_ADD!((*scalar)).get());
+            // A bare named dereference keeps the pointer's qualification, as its
+            // parenthesized spelling does.
+            let bare: *mut i32 = DEREF_ARRAY!(*pointer).get();
+            *bare = 29;
+            // A const pointer taken after the write keeps every read on a live pointer.
+            let reread = &raw const state;
+            let bare_readonly: *const i32 = DEREF_ARRAY!(*reread).get();
+            println!("{}", *bare_readonly);
+            let mut linked = DerefState { scalar: 101, values: [103, 107] };
+            let records = [pointer, &raw mut linked];
+            let nested = &raw const records[1];
+            let mut other = 5_i32;
+            let other_pointer = &raw mut other;
+            let targets = [scalar, other_pointer];
+            let scalars = &raw const targets[0];
+            struct Link { state: *mut DerefState, target: *mut i32 }
+            let link = Link { state: &raw mut *owned, target: other_pointer };
+            println!(
+                "{}\n{}\n{}\n{}\n{}",
+                DEREF_ADD!(-*scalar).get(),
+                DEREF_ADD!(*scalar).get(),
+                DEREF_ADD!(**scalars).get(),
+                DEREF_ADD!(*link.target).get(),
+                DEREF_ADD!(*targets[1]).get(),
+            );
+            println!(
+                "{}\n{}\n{}",
+                DEREF_READ!(**nested).get(),
+                DEREF_READ!(*link.state).get(),
+                DEREF_READ!(*records[0]).get(),
+            );
+            println!("{}", DEREF_UNGROUPED!((*pointer)).get());
             let events = std::cell::RefCell::new(Vec::new());
             observe(
                 DEREF_READ!(*ObservedOwner {
@@ -222,7 +269,7 @@ fn native_raw_dereferences_preserve_qualification_owners_and_precedence() {
         true,
     );
     let actual = rust_oracle::run_rust(&format!("{rust}\n{body}"));
-    assert_eq!(original.lines().count(), 9, "complete native dereference comparison");
+    assert_eq!(original.lines().count(), 19, "complete native dereference comparison");
     assert_eq!(actual, original, "native descriptors must preserve C value and qualification");
 
     for (label, body) in [
@@ -235,6 +282,10 @@ fn native_raw_dereferences_preserve_qualification_owners_and_precedence() {
             "let mut state = DerefConstState { scalar: 1, values: [2,3] }; let pointer=&raw mut state; unsafe { let _: *mut i32 = DEREF_ARRAY!(*pointer).get(); }",
         ),
         (
+            "parenthesized raw const record",
+            "let state = DerefState { scalar: 1, values: [2,3] }; let constant=&raw const state; unsafe { let _: *mut i32 = DEREF_ARRAY!((*constant)).get(); }",
+        ),
+        (
             "named Rust reference",
             "let mut state = DerefState { scalar: 1, values: [2,3] }; let reference=&mut state; unsafe { let _: *mut i32 = DEREF_ARRAY!(*reference).get(); }",
         ),
@@ -242,4 +293,9 @@ fn native_raw_dereferences_preserve_qualification_owners_and_precedence() {
         let error = rust_oracle::reject_rust(&format!("{rust}\nfn main() {{ {body} }}"));
         assert!(error.contains("E0308"), "{label} must retain const qualification: {error}");
     }
+    // C would parse `*pointer.scalar` here, so an ungrouped use still needs `(*pointer)`.
+    let error = rust_oracle::reject_rust(&format!(
+        "{rust}\nfn main() {{ let mut state = DerefState {{ scalar: 1, values: [2,3] }}; let pointer=&raw mut state; unsafe {{ let _ = DEREF_UNGROUPED!(*pointer); }} }}"
+    ));
+    assert!(error.contains("invocation contract"), "an ungrouped bare dereference: {error}");
 }

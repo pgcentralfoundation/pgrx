@@ -929,6 +929,9 @@ contextual value operands use token descriptors.
 For a normal value argument, classify supported token forms without evaluating
 them. Recognize calls to macros known to be generated, native expressions,
 literal forms, place forms, and unused arguments within a bounded token grammar.
+A dereference of a named operand, `*p` or `(*p)`, keeps the qualification of `p`
+when a member or element is read through it; other native operands read through
+a const place. An ungrouped C use still requires the parenthesized spelling.
 An unrelated Rust macro can be supplied as an explicit native expression using
 `(@__pgrx_c_native [some_rust_macro!(argument)])`. The classifier is not a C
 parser for arbitrary Rust expressions.

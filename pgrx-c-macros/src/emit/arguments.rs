@@ -273,6 +273,11 @@ pub(super) fn generate(analysis: &MacroAnalysis) -> Result<Option<ArgumentAdapte
                 writeln!(rust, "(@p{index} $mode:ident [$($done:tt)*]; {prefix}$head:ident $(::$tail:ident)* ! $group:tt{ending}) => {{ $crate::__pgrx_c_classify!(@argument [{normalizer}] {state} [{prefix}$head $(::$tail)* ! $group]) }};").expect("String output");
             }
             writeln!(rust, "(@p{index} $mode:ident [$($done:tt)*]; ($($inner:tt)*){ending}) => {{ $crate::__pgrx_c_classify!(@argument [{normalizer}] {state} [($($inner)*)]) }};").expect("String output");
+            if !atomic {
+                // `*p` must keep the qualification of `p`, as `(*p)` does, so both reach
+                // the classifier. An ungrouped use still requires the parenthesized form.
+                writeln!(rust, "(@p{index} $mode:ident [$($done:tt)*]; * $operand:tt{ending}) => {{ $crate::__pgrx_c_classify!(@argument [{normalizer}] {state} [* $operand]) }};").expect("String output");
+            }
             writeln!(rust, "(@p{index} $mode:ident [$($done:tt)*]; $argument:literal{ending}) => {{ $crate::{normalizer}!(@p{next} $mode [$($done)* (@original [$argument] (@literal [$argument])),]; {rest}) }};").expect("String output");
             let fragment = if atomic { "tt" } else { "expr" };
             writeln!(rust, "(@p{index} $mode:ident [$($done:tt)*]; $argument:{fragment}{ending}) => {{ $crate::{normalizer}!(@p{next} $mode [$($done)* (@original [$argument] (@native [$argument])),]; {rest}) }};").expect("String output");
