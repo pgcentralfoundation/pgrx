@@ -505,6 +505,12 @@ it does not parse arbitrary Rust expressions as C. To pass an unrelated Rust
 macro invocation as a native value, wrap that argument as
 `(@__pgrx_c_native [some_rust_macro!(argument)])`.
 
+A macro that applies `.` to a parameter, such as `XidFromFullTransactionId`,
+reads that member through the argument's place, so it never copies the rest of
+the record. The argument must therefore be a Rust place expression. C also
+accepts a function result or another macro's record value there, but those
+arguments fail to compile here; bind the record to a local first.
+
 An ungrouped C parameter accepts only an atomic token tree or an explicitly
 parenthesized argument. If the original replacement is itself unparenthesized,
 the generated documentation requires
