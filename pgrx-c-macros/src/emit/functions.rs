@@ -9,7 +9,7 @@
 //! anchor both sides of the ABI; Rust argument conversions stay outside the guarded
 //! native call so PostgreSQL error jumps cannot cross conversion-owned destructors.
 
-use super::types::{Lowering, rust_path};
+use super::types::{GeneratedTypes, Lowering, rust_path};
 use crate::{
     BindingCatalog, DeclarationCatalog, DeclarationLinkage, FunctionBinding, FunctionInfo,
     FunctionSignature, IntegerKind, RustBindingType, TargetFacts, TypeCategory, TypeInfo,
@@ -41,12 +41,13 @@ pub(super) struct FunctionAdapters {
 pub(super) fn generate(
     declarations: &DeclarationCatalog,
     bindings: &BindingCatalog,
+    generated: GeneratedTypes<'_>,
     used_functions: &BTreeSet<String>,
     called_functions: &BTreeSet<String>,
     target: &TargetFacts,
     profile_identity: &str,
 ) -> Result<FunctionAdapters, String> {
-    let lowering = Lowering::new_native(declarations, bindings, target);
+    let lowering = Lowering::new_native(declarations, bindings, generated, target);
     let mut result = FunctionAdapters {
         rust: String::new(),
         c_source: String::new(),

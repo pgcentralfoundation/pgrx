@@ -11,10 +11,10 @@
 //! Explicit typedef wrappers preserve a selected C identity when the complete
 //! catalog cannot justify inferring that identity from raw Rust storage alone.
 
-use super::types::{LoweredType, Lowering, rust_path};
+use super::types::{GeneratedTypes, LoweredType, Lowering, rust_path};
 use crate::{
-    BindingCatalog, CallbackBinding, DeclarationCatalog, FunctionSignature, RustBindingType,
-    TargetFacts, TypeCategory, TypeInfo, TypeShapeKind,
+    BindingCatalog, DeclarationCatalog, FunctionSignature, RustBindingType, TargetFacts,
+    TypeCategory, TypeInfo, TypeShapeKind,
 };
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
@@ -26,6 +26,15 @@ const EXPRESSION: &str = "c::expression";
 const SOURCE_LIMIT: usize = 16 * 1024 * 1024;
 /// Bound nested C/Rust signature and alias walks, treating exhaustion as unresolved evidence.
 const DEPTH_LIMIT: usize = 64;
+
+/// A generated function signature with a verified binding storage ABI.
+#[derive(Clone)]
+pub(super) struct CallbackBinding {
+    /// Generated semantic callback marker retaining the verified C signature identity.
+    pub marker: String,
+    /// Actual Rust function-pointer representation whose ABI must match the original C signature.
+    pub storage: RustBindingType,
+}
 
 /// Validated callback identities plus only the operations needed by emitted roots.
 pub(super) struct CallbackAdapters {
@@ -39,6 +48,17 @@ pub(super) struct CallbackAdapters {
     pub unsupported: BTreeMap<String, String>,
     /// Prototype dependencies whose semantic markers need native record or enum support.
     pub required_types: Vec<TypeInfo>,
+}
+
+impl CallbackAdapters {
+    /// The signatures and refusals of this pass, for passes that reconcile storage after it.
+    pub fn types(&self) -> GeneratedTypes<'_> {
+        GeneratedTypes {
+            callbacks: &self.markers,
+            callback_unavailable: &self.unsupported,
+            ..GeneratedTypes::NONE
+        }
+    }
 }
 
 /// Operations that emitted macros can perform on compiler-owned callbacks.
@@ -103,16 +123,18 @@ struct ValidatedAdapter {
 ///
 /// Raw storage bridges require catalog-wide uniqueness. Rejections and unresolved
 /// edges prevent that proof, even if their operations are not requested for output.
+/// `earlier` holds the signatures of an earlier pass, which nested types can use.
 pub(super) fn generate(
     declarations: &DeclarationCatalog,
     bindings: &BindingCatalog,
+    earlier: GeneratedTypes<'_>,
     target: &TargetFacts,
     used_functions: &BTreeSet<String>,
     requests: &CallbackRequests,
 ) -> Result<CallbackAdapters, String> {
     let mut candidates = BTreeMap::new();
     let mut unsupported = BTreeMap::new();
-    let witnessed_fields = Lowering::new_native(declarations, bindings, target);
+    let witnessed_fields = Lowering::new_native(declarations, bindings, earlier, target);
     let mut witnesses = CallbackWitnesses {
         seen: BTreeSet::new(),
         native: Vec::new(),
@@ -288,7 +310,7 @@ pub(super) fn generate(
 
     // Provisional capabilities permit nested callback arguments/results. No
     // provisional signature is emitted until every dependency is validated.
-    let mut capabilities = bindings.clone();
+    let mut provisional = earlier.callbacks.clone();
     let mut marker_names = BTreeMap::new();
     for (key, candidate) in &candidates {
         let mut hash = Sha256::new();
@@ -302,13 +324,16 @@ pub(super) fn generate(
             marker: format!("$crate::__pgrx_c_generated::{name}"),
             storage: candidate.storage.clone(),
         };
-        capabilities.callback_capabilities.insert(key.clone(), binding.clone());
-        capabilities
-            .callback_capabilities
-            .insert(candidate.function.canonical_spelling.clone(), binding);
+        provisional.insert(key.clone(), binding.clone());
+        provisional.insert(candidate.function.canonical_spelling.clone(), binding);
         marker_names.insert(key.clone(), name);
     }
-    let lowering = Lowering::new_native(declarations, &capabilities, target);
+    let lowering = Lowering::new_native(
+        declarations,
+        bindings,
+        GeneratedTypes { callbacks: &provisional, ..earlier },
+        target,
+    );
     let mut generated = BTreeMap::new();
     let mut reverse = BTreeMap::<String, BTreeSet<String>>::new();
     let mut dependencies_by_key = BTreeMap::new();
@@ -455,7 +480,7 @@ pub(super) fn generate(
             continue;
         }
         let candidate = &candidates[&key];
-        let binding = capabilities.callback_capabilities[&key].clone();
+        let binding = provisional[&key].clone();
         output.markers.insert(key.clone(), binding.clone());
         output.markers.insert(candidate.function.canonical_spelling.clone(), binding);
         if identities.contains(&key) && emitted.insert(marker_names[&key].clone()) {
@@ -1210,6 +1235,24 @@ fn abi_assertions(output: &mut String, storage: &str, ty: &TypeInfo) {
 mod tests {
     use super::*;
     use crate::{AliasBinding, ByteOrder, IntegerKind, IntegerType, PointerLayout, TypeShape};
+
+    /// Run a callback pass that no earlier pass precedes, as the first batch pass is.
+    fn generate(
+        declarations: &DeclarationCatalog,
+        bindings: &BindingCatalog,
+        target: &TargetFacts,
+        used_functions: &BTreeSet<String>,
+        requests: &CallbackRequests,
+    ) -> Result<CallbackAdapters, String> {
+        super::generate(
+            declarations,
+            bindings,
+            GeneratedTypes::NONE,
+            target,
+            used_functions,
+            requests,
+        )
+    }
 
     /// Construct a fixed-width C int witness for synthetic callback catalogs.
     fn integer() -> TypeInfo {

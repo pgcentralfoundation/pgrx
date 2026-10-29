@@ -74,6 +74,9 @@ mod types;
 ///
 /// These values are checked against independently resolved C constants before use.
 /// Paths are relative to `$crate`; `macros` contains macros actually emitted there.
+/// The catalog holds no generated capability. Callback signatures, function adapters,
+/// address getters and field or offset adapters, and their refusals, exist only inside
+/// batch generation, so a caller cannot assert one.
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct BindingCatalog {
     /// Crate-relative module containing generated declarations; C typedef names
@@ -98,37 +101,9 @@ pub struct BindingCatalog {
     pub integer_storage: BTreeMap<String, IntegerKind>,
     /// Bindgen storage-unit descriptions used to anchor original-C bitfield adapters.
     pub bitfields: BTreeMap<String, crate::BitfieldBinding>,
-    /// Generated field capabilities, populated by batch lowering from both catalogs.
-    #[serde(skip)]
-    pub field_capabilities: BTreeMap<String, String>,
-    /// Rejected member projections keyed `record::member`. A member marker is shared by
-    /// name across records, so a known owner must report its own rejection instead.
-    #[serde(skip)]
-    pub field_unavailable: BTreeMap<String, String>,
-    /// Offset-only field metadata, independent of load or projection support.
-    #[serde(skip)]
-    pub offset_capabilities: BTreeMap<String, Option<String>>,
-    /// Rejected offset paths whose reasons must remain visible to dependent macros.
-    #[serde(skip)]
-    pub offset_unavailable: BTreeMap<String, String>,
     /// Optional crate-relative guard for native adapters that may call PostgreSQL.
     #[serde(skip)]
     pub ffi_boundary: Option<Vec<String>>,
-    /// Native-call rejections retained instead of silently using an unverified binding.
-    #[serde(skip)]
-    pub function_unavailable: BTreeMap<String, String>,
-    /// Verified nominal callback markers and exact native signature storage.
-    #[serde(skip)]
-    pub callback_capabilities: BTreeMap<String, crate::CallbackBinding>,
-    /// Callback identity or ABI failures that prevent unsafe inference during rendering.
-    #[serde(skip)]
-    pub callback_unavailable: BTreeMap<String, String>,
-    /// Enum layout or representation failures retained for contextual lowering.
-    #[serde(skip)]
-    pub enum_unavailable: BTreeMap<String, String>,
-    /// Getters for the original C function addresses, distinct from Rust call wrappers.
-    #[serde(skip)]
-    pub function_addresses: BTreeMap<String, crate::FunctionAddressBinding>,
 }
 
 impl BindingCatalog {
@@ -174,6 +149,26 @@ impl BindingCatalog {
         })
     }
 }
+
+/// A caller's catalog cannot carry a capability that only batch generation establishes.
+///
+/// ```compile_fail
+/// pgrx_c_macros::BindingCatalog::default().callback_capabilities;
+/// ```
+///
+/// ```compile_fail
+/// pgrx_c_macros::BindingCatalog::default().function_addresses;
+/// ```
+///
+/// ```compile_fail
+/// pgrx_c_macros::BindingCatalog::default().field_capabilities;
+/// ```
+///
+/// ```compile_fail
+/// pgrx_c_macros::BindingCatalog::default().offset_capabilities;
+/// ```
+#[cfg(doctest)]
+pub struct GeneratedCapabilitiesAreNotCatalogInput;
 
 /// A symbol reference and its independently comparable binding value.
 ///
@@ -239,13 +234,15 @@ pub fn emit(session: &AnalysisSession<'_>, name: &str) -> MacroEmission {
 
 /// Emit with verified references to constants and other generated macros.
 ///
-/// This returns only the macro's Rust source and generates no native adapters.
+/// This returns only the macro's Rust source and generates no adapters or other
+/// capabilities. A macro that needs a callback signature, an original function
+/// address, or a field or offset adapter is therefore skipped.
 /// A direct call to a function whose prototype passes or returns plain `char`, an
 /// enum or a record by value needs a generated C adapter, because Rust binding
 /// storage cannot prove that call ABI. Such a macro is skipped with
 /// [`SkipReasonCode::Call`] even when `bindings` holds the function, as is a call to
-/// a function without a binding. [`generate_with_bindings`] generates the adapter
-/// when the declaration admits one, and otherwise skips the call too.
+/// a function without a binding. [`generate_with_bindings`] generates these
+/// capabilities when the declarations admit them, and otherwise skips the macro too.
 pub fn emit_with_bindings(
     session: &AnalysisSession<'_>,
     name: &str,
@@ -263,7 +260,7 @@ fn emit_with_lowering<'a>(
     session: &'a AnalysisSession<'_>,
     name: &str,
     bindings: &'a BindingCatalog,
-    adapters: Option<&functions::FunctionAdapters>,
+    adapters: Option<&'a GeneratedAdapters>,
     lowering: &mut Option<types::Lowering<'a>>,
 ) -> MacroEmission {
     let analysis = session.analyze(name);
@@ -289,6 +286,7 @@ fn emit_with_lowering<'a>(
                     types::Lowering::new(
                         session.frontend().declarations(),
                         bindings,
+                        adapters.map_or(types::GeneratedTypes::NONE, GeneratedAdapters::types),
                         &session.frontend().profile().target,
                     )
                 });
@@ -315,27 +313,9 @@ pub fn emit_batch_with_bindings(
     names: &[impl AsRef<str>],
     bindings: &BindingCatalog,
 ) -> Result<Vec<MacroEmission>, String> {
-    let mut capabilities = bindings.clone();
     let requests = demands::plan(session, names, bindings);
     let adapters = generated_adapters(session, &requests, bindings)?;
-    register_adapters(&mut capabilities, &adapters);
-    Ok(emit_prepared_batch(session, names, &capabilities, Some(&adapters.functions)))
-}
-
-/// Install verified capabilities and their rejection reasons into one rendering catalog.
-///
-/// Function adapters stay outside the catalog, so a binding from the caller can
-/// never stand in for one; rendering receives them separately.
-fn register_adapters(capabilities: &mut BindingCatalog, adapters: &GeneratedAdapters) {
-    capabilities.callback_capabilities.extend(adapters.callbacks.markers.clone());
-    capabilities.callback_unavailable.extend(adapters.callbacks.unsupported.clone());
-    capabilities.enum_unavailable.extend(adapters.enumerations.unsupported.clone());
-    capabilities.function_addresses.extend(adapters.addresses.bindings.clone());
-    capabilities.field_capabilities.extend(adapters.fields.markers.clone());
-    capabilities.field_unavailable.extend(adapters.fields.unsupported.clone());
-    capabilities.offset_capabilities.extend(adapters.fields.offsets.clone());
-    capabilities.offset_unavailable.extend(adapters.fields.offset_unsupported.clone());
-    capabilities.function_unavailable.extend(adapters.functions.unsupported.clone());
+    Ok(emit_prepared_batch(session, names, bindings, Some(&adapters)))
 }
 
 /// Render candidates, close mismatch failures through the dependency graph, and rerender calls.
@@ -346,10 +326,10 @@ fn emit_prepared_batch(
     session: &AnalysisSession<'_>,
     names: &[impl AsRef<str>],
     bindings: &BindingCatalog,
-    adapters: Option<&functions::FunctionAdapters>,
+    adapters: Option<&GeneratedAdapters>,
 ) -> Vec<MacroEmission> {
-    // Each pass borrows one immutable capability catalog. Index its C/Rust
-    // storage identities once, after the first macro passes its admission gates.
+    // Each pass borrows one immutable catalog and the generated adapters. Index its
+    // C/Rust storage identities once, after the first macro passes its admission gates.
     let initial = {
         let mut lowering = None;
         names
@@ -519,7 +499,7 @@ pub struct MacroSupportArtifact {
 /// One preparation supplies both the macros and their shared native capabilities.
 #[derive(Clone, Debug)]
 pub struct MacroGeneration {
-    /// Per-root output and skips produced with the finalized capability catalog.
+    /// Per-root output and skips produced with the finalized generated capabilities.
     pub macros: Vec<MacroEmission>,
     /// Only the shared Rust and native C support retained by successful roots.
     pub support: MacroSupportArtifact,
@@ -557,9 +537,7 @@ pub fn generate_with_bindings(
 ) -> Result<MacroGeneration, String> {
     let requests = demands::plan(session, names, bindings);
     let mut adapters = generated_adapters(session, &requests, bindings)?;
-    let mut capabilities = bindings.clone();
-    register_adapters(&mut capabilities, &adapters);
-    let macros = emit_prepared_batch(session, names, &capabilities, Some(&adapters.functions));
+    let macros = emit_prepared_batch(session, names, bindings, Some(&adapters));
     let admitted = macros
         .iter()
         .filter(|emission| matches!(emission.status, EmissionStatus::Emitted { .. }))
@@ -641,7 +619,10 @@ fn render_adapters(
     })
 }
 
-/// Reconciled capability families before registration, pruning, and final artifact assembly.
+/// Reconciled capability families before pruning and final artifact assembly.
+///
+/// Batch rendering reads these capabilities and refusals beside the caller's
+/// [`BindingCatalog`]. No public API accepts them, so a caller cannot assert one.
 struct GeneratedAdapters {
     /// Member-access and offset capabilities, including same-profile bitfield primitives.
     fields: fields::FieldAdapters,
@@ -653,6 +634,17 @@ struct GeneratedAdapters {
     addresses: addresses::AddressAdapters,
     /// Enum identities and checked storage bridges for requested types.
     enumerations: enumerations::EnumAdapters,
+}
+
+impl GeneratedAdapters {
+    /// The callback signatures and enum refusals that storage reconciliation consults.
+    fn types(&self) -> types::GeneratedTypes<'_> {
+        types::GeneratedTypes {
+            callbacks: &self.callbacks.markers,
+            callback_unavailable: &self.callbacks.unsupported,
+            enum_unavailable: &self.enumerations.unsupported,
+        }
+    }
 }
 
 /// Hash compiler-established representations and language modes rather than
@@ -686,44 +678,58 @@ fn generated_adapters(
     );
     let profile_identity =
         hash.finalize().iter().map(|byte| format!("{byte:02x}")).collect::<String>();
-    let callbacks = callbacks::generate(
+    let preliminary = callbacks::generate(
         frontend.declarations(),
         bindings,
+        types::GeneratedTypes::NONE,
         &frontend.profile().target,
         &requests.functions,
         &callbacks::CallbackRequests::default(),
     )?;
-    let mut capabilities = bindings.clone();
-    capabilities.callback_capabilities.extend(callbacks.markers.clone());
-    capabilities.callback_unavailable.extend(callbacks.unsupported.clone());
     let functions = functions::generate(
         frontend.declarations(),
-        &capabilities,
+        bindings,
+        preliminary.types(),
         &requests.functions,
         &requests.called_functions,
         &frontend.profile().target,
         &profile_identity,
     )?;
     // Later adapter passes read replacement storage from `functions`. Rendering
-    // instead receives adapters separately; see `register_adapters`.
+    // instead receives the generated adapters beside the caller's catalog.
+    let mut capabilities = bindings.clone();
     capabilities.functions.extend(functions.bindings.clone());
     let callbacks = callbacks::generate(
         frontend.declarations(),
         &capabilities,
+        preliminary.types(),
         &frontend.profile().target,
         &requests.functions,
         &requests.callbacks,
     )?;
-    capabilities.callback_capabilities.extend(callbacks.markers.clone());
-    capabilities.callback_unavailable.extend(callbacks.unsupported.clone());
+    // Later adapter passes see the signatures of both callback passes, the final pass
+    // taking precedence. Rendering sees only the final pass.
+    let mut callback_markers = preliminary.markers;
+    callback_markers.extend(callbacks.markers.clone());
+    let mut callback_unavailable = preliminary.unsupported;
+    callback_unavailable.extend(callbacks.unsupported.clone());
+    let generated = types::GeneratedTypes {
+        callbacks: &callback_markers,
+        callback_unavailable: &callback_unavailable,
+        ..types::GeneratedTypes::NONE
+    };
     let mut required_types = requests.types.values().cloned().collect::<Vec<_>>();
     required_types.extend(callbacks.required_types.iter().cloned());
     let mut enum_requests = enumerations::EnumRequests {
         types: requests.enums.types.clone(),
         open_scalar: requests.enums.open_scalar,
     };
-    let lowering =
-        types::Lowering::new(frontend.declarations(), &capabilities, &frontend.profile().target);
+    let lowering = types::Lowering::new(
+        frontend.declarations(),
+        &capabilities,
+        generated,
+        &frontend.profile().target,
+    );
     demands::type_dependencies(
         frontend.declarations(),
         &lowering,
@@ -735,12 +741,14 @@ fn generated_adapters(
         enumerations: enumerations::generate(
             frontend.declarations(),
             &capabilities,
+            generated,
             &frontend.profile().target,
             &enum_requests,
         )?,
         fields: fields::generate(
             frontend.declarations(),
             &capabilities,
+            generated,
             &requests.fields,
             &frontend.profile().target,
             &required_types,
@@ -748,6 +756,7 @@ fn generated_adapters(
         addresses: addresses::generate(
             frontend.declarations(),
             &capabilities,
+            generated,
             &requests.addresses,
             &frontend.profile().target,
             &profile_identity,
@@ -893,7 +902,7 @@ fn render(
     original: InvocationSource<'_>,
     assertions: &str,
     bindings: &BindingCatalog,
-    adapters: Option<&functions::FunctionAdapters>,
+    adapters: Option<&GeneratedAdapters>,
     lowering: &types::Lowering<'_>,
 ) -> Result<String, SkipReason> {
     let identifier = macro_identifier(&analysis.name).ok_or_else(|| {

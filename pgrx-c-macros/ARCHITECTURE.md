@@ -157,7 +157,7 @@ different names:
 | `AnalysisSession` | A borrowed frontend plus expansion results, retained integer constants, zero-constant proofs, and the augmented graph. | Emission accepts a coherent session rather than a detached AST. |
 | `Expression` | Arena nodes indexed by `NodeId`, root, token ranges, and optional structured statement body. | One syntax arena supports analysis and all emission contexts. |
 | `MacroAnalysis` | Signature, formal/capture roles, uses, invocation/evaluation contracts, symbolic result types, dependencies, and candidate/skip status. | Candidate analysis is weaker than successful emission. |
-| `BindingCatalog` | Actual crate-relative Rust paths, constant values, aliases, functions, record/enum/variable storage, bitfield metadata, and generated capabilities or rejection reasons. | Available Rust representations must be validated against C. |
+| `BindingCatalog` | Actual crate-relative Rust paths, constant values, aliases, functions, record/enum/variable storage, bitfield metadata, and the FFI guard path. It holds no generated capability or refusal. | Available Rust representations must be validated against C. |
 | `MacroGeneration` | Per-root `MacroEmission` values and one `MacroSupportArtifact` containing Rust and optional C source. | Macros and their required support must be published together. |
 
 The target model includes the C triple, byte order, byte and pointer widths,
@@ -1106,9 +1106,7 @@ Generate adapters in dependency order:
           |
  enum + field + offset + original-address adapters
           |
- register capabilities in a derived BindingCatalog
-          |
- emit batch + propagate required failures
+ emit batch with the generated adapters + propagate required failures
           |
  plan demands again from successful roots
           |
@@ -1120,6 +1118,12 @@ Generate adapters in dependency order:
 This is one final demand recomputation, not an arbitrary fixed-point loop.
 Marker identities come from stable C/declaration/profile facts, so pruning
 support cannot renumber the identities already referenced by emitted macros.
+
+Generated capabilities and their refusals never enter the caller's
+`BindingCatalog`. Rendering reads them from the generated adapters passed beside
+it, so a caller cannot assert a callback signature, function adapter, address
+getter, or field or offset adapter that generation did not create. Single-macro
+emission has no generated adapters and skips a macro that needs one.
 
 All relevant ABI and storage witnesses participate in validation before pruning.
 A rejected or unselected alias still matters when deciding whether one Rust

@@ -13,7 +13,10 @@
 //! Missing facts retain possible capabilities; they never justify excluding a valid
 //! caller type or replace the checks performed by lowering.
 
-use super::{BindingCatalog, callbacks, enumerations, fields, typed, types::Lowering};
+use super::{
+    BindingCatalog, callbacks, enumerations, fields, typed,
+    types::{GeneratedTypes, Lowering},
+};
 use crate::analysis::{AnalysisStatus, MacroAnalysis};
 use crate::syntax::{
     BinaryOperator, ExpressionKind, NodeId, OffsetComponent, OffsetRecord, UnaryOperator,
@@ -55,7 +58,12 @@ pub(super) fn plan(
     bindings: &BindingCatalog,
 ) -> Requests {
     let frontend = session.frontend();
-    let lowering = Lowering::new(frontend.declarations(), bindings, &frontend.profile().target);
+    let lowering = Lowering::new(
+        frontend.declarations(),
+        bindings,
+        GeneratedTypes::NONE,
+        &frontend.profile().target,
+    );
     let mut requests = Requests::default();
     let records = RecordIndex::new(frontend.declarations());
     let compatibility = Compatibility::new(frontend.declarations(), &frontend.profile().target);

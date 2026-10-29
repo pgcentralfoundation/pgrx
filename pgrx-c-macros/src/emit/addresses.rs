@@ -9,13 +9,17 @@
 //! internal declarations with available definitions, and verifies the callback ABI
 //! before exposing a tagged Rust function value.
 
-use super::types::Lowering;
-use crate::{
-    BindingCatalog, DeclarationCatalog, DeclarationLinkage, FunctionAddressBinding, TargetFacts,
-};
+use super::types::{GeneratedTypes, Lowering};
+use crate::{BindingCatalog, DeclarationCatalog, DeclarationLinkage, TargetFacts};
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Write;
+
+/// A generated getter returning the original C function's address.
+pub(super) struct FunctionAddressBinding {
+    /// Generated getter path returning the original C function address.
+    pub path: Vec<String>,
+}
 
 /// Original-function address getters and their verified macro-facing bindings.
 pub(super) struct AddressAdapters {
@@ -36,11 +40,12 @@ pub(super) struct AddressAdapters {
 pub(super) fn generate(
     declarations: &DeclarationCatalog,
     bindings: &BindingCatalog,
+    generated: GeneratedTypes<'_>,
     names: &BTreeSet<String>,
     target: &TargetFacts,
     profile_identity: &str,
 ) -> Result<AddressAdapters, String> {
-    let lowering = Lowering::new_native(declarations, bindings, target);
+    let lowering = Lowering::new_native(declarations, bindings, generated, target);
     let mut output = AddressAdapters {
         rust: String::new(),
         c_source: String::new(),
@@ -75,8 +80,8 @@ pub(super) fn generate(
                 return Err("function address has no single C identifier".into());
             }
             let ty = declarations.functions.get(name).ok_or("missing compiler function type")?;
-            let signature = bindings
-                .callback_capabilities
+            let signature = generated
+                .callbacks
                 .get(&ty.canonical_spelling)
                 .ok_or("function address has no verified callback ABI")?;
             let storage = lowering.storage_type(&signature.storage, 0)?.replace("$crate", "crate");
@@ -103,10 +108,7 @@ pub(super) fn generate(
             Ok::<_, String>((
                 rust,
                 c,
-                FunctionAddressBinding {
-                    marker: signature.marker.clone(),
-                    path: vec!["__pgrx_c_generated".into(), getter],
-                },
+                FunctionAddressBinding { path: vec!["__pgrx_c_generated".into(), getter] },
             ))
         })();
         match result {

@@ -8,7 +8,7 @@
 //! identity separately from numeric arithmetic and emits checked storage bridges
 //! only after the compiler-compatible integer and binding layout agree.
 
-use super::types::{LoweredType, Lowering, enum_key};
+use super::types::{GeneratedTypes, LoweredType, Lowering, enum_key};
 use crate::{
     BindingCatalog, DeclarationCatalog, EnumBinding, IntegerValue, RustBindingType, TargetFacts,
     TypeInfo, TypeShapeKind,
@@ -65,10 +65,11 @@ pub(super) fn identity_path(ty: &TypeInfo) -> String {
 pub(super) fn generate(
     declarations: &DeclarationCatalog,
     bindings: &BindingCatalog,
+    generated: GeneratedTypes<'_>,
     target: &TargetFacts,
     requests: &EnumRequests,
 ) -> Result<EnumAdapters, String> {
-    let lowering = Lowering::new_native(declarations, bindings, target);
+    let lowering = Lowering::new_native(declarations, bindings, generated, target);
     let mut identities = BTreeSet::new();
     let mut unsupported = BTreeMap::new();
     let mut validated = Vec::new();
@@ -275,14 +276,22 @@ mod tests {
     #[test]
     fn selection_preserves_unselected_enum_validation_and_checked_storage_bridges() {
         let (declarations, bindings, target) = fixture();
-        let empty = generate(&declarations, &bindings, &target, &EnumRequests::default()).unwrap();
+        let empty = generate(
+            &declarations,
+            &bindings,
+            GeneratedTypes::NONE,
+            &target,
+            &EnumRequests::default(),
+        )
+        .unwrap();
         assert!(empty.rust.is_empty());
         assert!(empty.unsupported.contains_key("enum Invalid"));
         let requests = EnumRequests {
             types: ["enum First".into()].into_iter().collect(),
             ..Default::default()
         };
-        let selected = generate(&declarations, &bindings, &target, &requests).unwrap();
+        let selected =
+            generate(&declarations, &bindings, GeneratedTypes::NONE, &target, &requests).unwrap();
         assert_eq!(selected.unsupported, empty.unsupported);
         assert_eq!(selected.rust.matches("::EnumIdentity for").count(), 1);
         assert!(selected.rust.contains("::NativeType for crate::First"));
@@ -301,7 +310,8 @@ mod tests {
                 .collect(),
             ..Default::default()
         };
-        let output = generate(&declarations, &bindings, &target, &requests).unwrap();
+        let output =
+            generate(&declarations, &bindings, GeneratedTypes::NONE, &target, &requests).unwrap();
         assert_eq!(output.rust.matches("::EnumIdentity for").count(), 2);
         assert_eq!(output.rust.matches("::enumeration::NumericEnum for").count(), 2);
         assert!(!output.rust.contains("::CompatibleIdentity<"));
@@ -318,7 +328,8 @@ mod tests {
     fn open_native_operands_retain_rust_enum_objects_without_alias_identities() {
         let (declarations, bindings, target) = fixture();
         let requests = EnumRequests { open_scalar: true, ..Default::default() };
-        let output = generate(&declarations, &bindings, &target, &requests).unwrap();
+        let output =
+            generate(&declarations, &bindings, GeneratedTypes::NONE, &target, &requests).unwrap();
         assert_eq!(output.rust.matches("::EnumIdentity for").count(), 2);
         assert!(output.rust.contains("::IntoExpression for crate::First"));
         assert!(output.rust.contains("::IntoExpression for crate::Second"));
@@ -337,7 +348,8 @@ mod tests {
             types: ["enum Alias".into()].into_iter().collect(),
             ..Default::default()
         };
-        let output = generate(&declarations, &bindings, &target, &requests).unwrap();
+        let output =
+            generate(&declarations, &bindings, GeneratedTypes::NONE, &target, &requests).unwrap();
         assert_eq!(output.rust.matches("::EnumIdentity for").count(), 1);
         assert!(output.rust.contains("::enumeration::NumericEnum for"));
         assert!(output.rust.contains("type Compatible = c::CUnsignedInt;"));

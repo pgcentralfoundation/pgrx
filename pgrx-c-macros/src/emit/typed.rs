@@ -69,14 +69,15 @@ pub(super) struct Renderer<'a> {
     frontend: &'a FrontendOutput,
     /// Macro parameters, type expressions, and arena facts established during analysis.
     analysis: &'a MacroAnalysis,
-    /// Fresh binding symbols and generated capabilities used for hygienic references.
+    /// Fresh binding symbols used for hygienic references.
     bindings: &'a BindingCatalog,
-    /// Generated native call adapters, the only callable bindings for a prototype
-    /// that needs native transport. Single-macro emission has none.
-    adapters: Option<&'a super::functions::FunctionAdapters>,
+    /// Capabilities and refusals that batch generation established, including the
+    /// only callable bindings for a prototype that needs native transport.
+    /// Single-macro emission has none.
+    adapters: Option<&'a super::GeneratedAdapters>,
     /// Arena-indexed compiler constant facts, preserving names where bindings permit.
     constants: &'a [Option<&'a ResolvedConstant>],
-    /// Shared C identity/native-storage reconciliation for the immutable capability catalog.
+    /// Shared C identity/native-storage reconciliation for the catalog and generated types.
     lowering: &'a Lowering<'a>,
     /// Whether the selected profile permits the floating expression combinations in this macro.
     floats: bool,
@@ -97,7 +98,7 @@ impl<'a> Renderer<'a> {
         frontend: &'a FrontendOutput,
         analysis: &'a MacroAnalysis,
         bindings: &'a BindingCatalog,
-        adapters: Option<&'a super::functions::FunctionAdapters>,
+        adapters: Option<&'a super::GeneratedAdapters>,
         constants: &'a [Option<&'a ResolvedConstant>],
         lowering: &'a Lowering<'a>,
     ) -> Self {
@@ -234,16 +235,14 @@ impl<'a> Renderer<'a> {
             if indirect { self.lowering.pointer_pointee(ty).ok() } else { Some(ty.clone()) }
         });
         if let Some(owner) = owner.filter(|ty| ty.category == TypeCategory::Record)
-            && let Some(reason) = self
-                .bindings
-                .field_unavailable
-                .get(&format!("{}::{field}", owner.canonical_spelling))
+            && let Some(reason) = self.adapters.and_then(|adapters| {
+                adapters.fields.unsupported.get(&format!("{}::{field}", owner.canonical_spelling))
+            })
         {
             return Err(format!("{field}: {reason}"));
         }
-        self.bindings
-            .field_capabilities
-            .get(field)
+        self.adapters
+            .and_then(|adapters| adapters.fields.markers.get(field))
             .cloned()
             .ok_or_else(|| format!("{field}: no compiler-checked field adapter is available"))
     }
@@ -510,7 +509,7 @@ impl<'a> Renderer<'a> {
                                     rust.push(')');
                                 }
                             } else {
-                                let binding = bindings.function_addresses.get(name).ok_or_else(|| skip(analysis, SkipReasonCode::Call, format!("{name}: no verified original C function-address adapter was emitted"), Some(node.tokens)))?;
+                                let binding = self.adapters.and_then(|adapters| adapters.addresses.bindings.get(name)).ok_or_else(|| skip(analysis, SkipReasonCode::Call, format!("{name}: no verified original C function-address adapter was emitted"), Some(node.tokens)))?;
                                 let path = rust_path(&binding.path).map_err(failure)?;
                                 write!(rust, "{path}()").expect("String output");
                             }
@@ -945,12 +944,14 @@ impl<'a> Renderer<'a> {
                             // only where no binding exists or its storage cannot prove the ABI.
                             // Where a prototype needs native transport, only an adapter
                             // proves it, so no other entry point can fall back to the binding.
-                            let binding = if let Some(reason) =
-                                bindings.function_unavailable.get(name)
+                            let binding = if let Some(reason) = self
+                                .adapters
+                                .and_then(|adapters| adapters.functions.unsupported.get(name))
                             {
                                 Err(reason.clone())
-                            } else if let Some(adapter) =
-                                self.adapters.and_then(|adapters| adapters.bindings.get(name))
+                            } else if let Some(adapter) = self
+                                .adapters
+                                .and_then(|adapters| adapters.functions.bindings.get(name))
                             {
                                 Ok(adapter)
                             } else if let Some(ty) = super::functions::native_transport(declared)
@@ -1087,7 +1088,7 @@ impl<'a> Renderer<'a> {
                                     OffsetComponent::Named { name } => {
                                         if let Some(record) = &canonical {
                                             let key = format!("{record}::{name}");
-                                            let member = bindings.offset_capabilities.get(&key).ok_or_else(|| failure(bindings.offset_unavailable.get(&key).cloned().unwrap_or_else(|| format!("{key}: no compiler-verified offset capability"))))?;
+                                            let member = self.adapters.and_then(|adapters| adapters.fields.offsets.get(&key)).ok_or_else(|| failure(self.adapters.and_then(|adapters| adapters.fields.offset_unsupported.get(&key)).cloned().unwrap_or_else(|| format!("{key}: no compiler-verified offset capability"))))?;
                                             if member.is_none() && position + 1 != fields.len() {
                                                 return Err(failure(format!(
                                                     "{key}: offsetof member continuation requires a record"

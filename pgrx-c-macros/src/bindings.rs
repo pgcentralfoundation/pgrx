@@ -18,24 +18,6 @@ use crate::{IntegerValue, RecordKind};
 use serde::Serialize;
 use std::collections::BTreeMap;
 
-/// A generated function signature with a verified binding storage ABI.
-#[derive(Clone, Debug)]
-pub struct CallbackBinding {
-    /// Generated semantic callback marker retaining the verified C signature identity.
-    pub marker: String,
-    /// Actual Rust function-pointer representation whose ABI must match the original C signature.
-    pub storage: RustBindingType,
-}
-
-/// A generated getter returning the original C function's address.
-#[derive(Clone, Debug)]
-pub struct FunctionAddressBinding {
-    /// Semantic function marker used to tag the original C address.
-    pub marker: String,
-    /// Generated getter path returning the original C function address.
-    pub path: Vec<String>,
-}
-
 /// A bounded structural representation of a type in the generated Rust bindings.
 ///
 /// Named paths are relative to the defining crate, except `core` and `std` paths.

@@ -10,7 +10,7 @@
 //! separately because computing an offset must not require reading the member or
 //! constructing a fully initialized record.
 
-use super::types::{Lowering, rust_path};
+use super::types::{GeneratedTypes, Lowering, rust_path};
 use crate::{
     ArrayKind, BindingCatalog, DeclarationCatalog, FieldBinding, FieldInfo, TargetFacts,
     TypeCategory, TypeInfo, TypeShapeKind,
@@ -225,12 +225,13 @@ impl<'a> FieldIds<'a> {
 pub(super) fn generate(
     declarations: &DeclarationCatalog,
     bindings: &BindingCatalog,
+    generated: GeneratedTypes<'_>,
     requests: &FieldRequests,
     target: &TargetFacts,
     required_types: &[TypeInfo],
 ) -> Result<FieldAdapters, String> {
     let field_ids = FieldIds::new(declarations);
-    let lowering = Lowering::new_native(declarations, bindings, target);
+    let lowering = Lowering::new_native(declarations, bindings, generated, target);
     let records_by_path = bindings
         .records
         .values()
@@ -1182,9 +1183,15 @@ mod tests {
         declarations.type_shapes.insert("const struct Outer".into(), shape);
         let mut requests = FieldRequests::default();
         requests.field(Some("struct Outer"), Some("count"));
-        let generated =
-            generate(&declarations, &bindings(), &requests, &frontend.profile().target, &[])
-                .unwrap();
+        let generated = generate(
+            &declarations,
+            &bindings(),
+            GeneratedTypes::NONE,
+            &requests,
+            &frontend.profile().target,
+            &[],
+        )
+        .unwrap();
         assert!(generated.unsupported.is_empty());
         assert_eq!(generated.rust.matches("size_of::<crate::Outer>").count(), 2);
         assert_eq!(
@@ -1240,6 +1247,7 @@ mod tests {
         let generated = generate(
             frontend.declarations(),
             &bindings(),
+            GeneratedTypes::NONE,
             &requests,
             &frontend.profile().target,
             &[],
@@ -1407,6 +1415,7 @@ mod tests {
         let generated = generate(
             frontend.declarations(),
             &bindings(),
+            GeneratedTypes::NONE,
             &requests,
             &frontend.profile().target,
             &[],
@@ -1519,6 +1528,7 @@ int main(void) {
         let generated = generate(
             frontend.declarations(),
             &bindings,
+            GeneratedTypes::NONE,
             &requests,
             &frontend.profile().target,
             &[],
@@ -1537,9 +1547,15 @@ int main(void) {
         assert!(ids.marker("bits").is_ok(), "rejected fields retain their immutable IDs");
         let mut subset = FieldRequests::default();
         subset.field(None, Some("count"));
-        let subset =
-            generate(frontend.declarations(), &bindings, &subset, &frontend.profile().target, &[])
-                .unwrap();
+        let subset = generate(
+            frontend.declarations(),
+            &bindings,
+            GeneratedTypes::NONE,
+            &subset,
+            &frontend.profile().target,
+            &[],
+        )
+        .unwrap();
         assert_eq!(generated.markers["count"], subset.markers["count"]);
     }
 
@@ -1560,6 +1576,7 @@ int main(void) {
         let generated = generate(
             frontend.declarations(),
             &bindings,
+            GeneratedTypes::NONE,
             &requests,
             &frontend.profile().target,
             &[],

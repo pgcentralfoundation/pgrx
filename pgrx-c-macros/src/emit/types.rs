@@ -10,7 +10,7 @@
 //! and renders distinct paths for exported macro expansions and native support
 //! items in the defining crate.
 
-use super::{BindingCatalog, SUPPORT, marker};
+use super::{BindingCatalog, SUPPORT, callbacks::CallbackBinding, marker};
 use crate::{
     ArrayKind, DeclarationCatalog, EnumBinding, FieldBinding, RecordBinding, RustBindingType,
     TargetFacts, TypeCategory, TypeInfo, TypeShapeKind,
@@ -48,6 +48,29 @@ impl RuntimePath {
     }
 }
 
+/// Callback and enum outcomes of adapter generation that storage reconciliation consults.
+///
+/// They come only from generation, never from the caller's [`BindingCatalog`].
+/// Demand planning and single-macro emission use [`GeneratedTypes::NONE`].
+#[derive(Clone, Copy)]
+pub(super) struct GeneratedTypes<'a> {
+    /// Verified nominal callback markers and exact native signature storage.
+    pub callbacks: &'a BTreeMap<String, CallbackBinding>,
+    /// Callback identity or ABI failures that prevent unsafe inference.
+    pub callback_unavailable: &'a BTreeMap<String, String>,
+    /// Enum layout or representation failures retained for contextual lowering.
+    pub enum_unavailable: &'a BTreeMap<String, String>,
+}
+
+impl GeneratedTypes<'static> {
+    /// No generated callback signatures and no recorded refusals.
+    pub const NONE: Self = Self {
+        callbacks: &BTreeMap::new(),
+        callback_unavailable: &BTreeMap::new(),
+        enum_unavailable: &BTreeMap::new(),
+    };
+}
+
 /// Paired C semantic marker and actual Rust storage after identity/representation reconciliation.
 pub(super) struct LoweredType {
     /// Capability type retaining C rank, qualifiers, or nominal object identity.
@@ -73,8 +96,10 @@ struct CastStorage {
 pub(super) struct Lowering<'a> {
     /// Compiler-owned C shapes, qualifiers, identities, and layout facts.
     declarations: &'a DeclarationCatalog,
-    /// Actual Rust alias, constructor, member, and capability storage facts.
+    /// Actual Rust alias, constructor, member, and storage facts.
     bindings: &'a BindingCatalog,
+    /// Callback signatures and refusals that adapter generation has established so far.
+    generated: GeneratedTypes<'a>,
     /// Selected platform widths, ranks, and pointer ABI used for scalar marker reconciliation.
     target: &'a TargetFacts,
     /// Helper-path mode appropriate for exported expansions or ordinary native support items.
@@ -110,9 +135,10 @@ impl<'a> Lowering<'a> {
     pub fn new(
         declarations: &'a DeclarationCatalog,
         bindings: &'a BindingCatalog,
+        generated: GeneratedTypes<'a>,
         target: &'a TargetFacts,
     ) -> Self {
-        Self::with_runtime(declarations, bindings, target, RuntimePath::ExportedMacro)
+        Self::with_runtime(declarations, bindings, generated, target, RuntimePath::ExportedMacro)
     }
 
     /// Native items share one private runtime import in `__pgrx_c_generated`.
@@ -120,15 +146,17 @@ impl<'a> Lowering<'a> {
     pub fn new_native(
         declarations: &'a DeclarationCatalog,
         bindings: &'a BindingCatalog,
+        generated: GeneratedTypes<'a>,
         target: &'a TargetFacts,
     ) -> Self {
-        Self::with_runtime(declarations, bindings, target, RuntimePath::Native)
+        Self::with_runtime(declarations, bindings, generated, target, RuntimePath::Native)
     }
 
     /// Create path-independent storage indexes and select the helper namespace used during rendering.
     fn with_runtime(
         declarations: &'a DeclarationCatalog,
         bindings: &'a BindingCatalog,
+        generated: GeneratedTypes<'a>,
         target: &'a TargetFacts,
         runtime: RuntimePath,
     ) -> Self {
@@ -139,6 +167,7 @@ impl<'a> Lowering<'a> {
         let mut lowering = Self {
             declarations,
             bindings,
+            generated,
             target,
             runtime,
             records_by_path,
@@ -256,7 +285,7 @@ impl<'a> Lowering<'a> {
         let numeric = self.resolve_unqualified_at(underlying, depth + 1)?;
         let actual = self.storage_type(storage, depth + 1)?;
         if let Some(path) = self.storage_enum_path(storage, 0) {
-            if let Some(reason) = self.bindings.enum_unavailable.get(&enum_key(ty)) {
+            if let Some(reason) = self.generated.enum_unavailable.get(&enum_key(ty)) {
                 return Err(reason.clone());
             }
             let binding = self
@@ -704,13 +733,13 @@ impl<'a> Lowering<'a> {
     ) -> Result<LoweredType, String> {
         let expression = self.runtime.expression();
         let support = self.runtime.support();
-        if let Some(callback) = self.bindings.callback_capabilities.get(&ty.canonical_spelling) {
+        if let Some(callback) = self.generated.callbacks.get(&ty.canonical_spelling) {
             return Ok(LoweredType {
                 marker: format!("{expression}::CFunction<{}>", callback.marker),
                 storage: self.storage_type(&callback.storage, 0)?,
             });
         }
-        if let Some(reason) = self.bindings.callback_unavailable.get(&ty.canonical_spelling) {
+        if let Some(reason) = self.generated.callback_unavailable.get(&ty.canonical_spelling) {
             return Err(reason.clone());
         }
         let shape = self.declarations.type_shapes.get(&ty.canonical_spelling);
@@ -851,7 +880,7 @@ impl<'a> Lowering<'a> {
         if depth > 64 {
             return Err("C/Rust storage reconciliation exceeds its bounded depth".into());
         }
-        if let Some(callback) = self.bindings.callback_capabilities.get(&ty.canonical_spelling) {
+        if let Some(callback) = self.generated.callbacks.get(&ty.canonical_spelling) {
             let expected = self.storage_type(&callback.storage, 0)?;
             let actual = self.storage_type(storage, 0)?;
             if normalize(&expected) != normalize(&actual) {
@@ -1230,8 +1259,12 @@ mod tests {
                 .unwrap();
         assert_eq!(frontend.profile().target.floating_point.evaluation_method, Some(2));
         let bindings = BindingCatalog::default();
-        let lowering =
-            Lowering::new(frontend.declarations(), &bindings, &frontend.profile().target);
+        let lowering = Lowering::new(
+            frontend.declarations(),
+            &bindings,
+            GeneratedTypes::NONE,
+            &frontend.profile().target,
+        );
         let ty = crate::analysis::resolve_type_info(
             "double",
             frontend.declarations(),
@@ -1254,8 +1287,12 @@ mod tests {
             std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/input_types.h");
         let frontend = crate::inspect(&scanner, &header, &[], None).unwrap();
         let bindings = BindingCatalog::default();
-        let lowering =
-            Lowering::new(frontend.declarations(), &bindings, &frontend.profile().target);
+        let lowering = Lowering::new(
+            frontend.declarations(),
+            &bindings,
+            GeneratedTypes::NONE,
+            &frontend.profile().target,
+        );
         let floating = |spelling: &str, size| TypeInfo {
             spelling: spelling.into(),
             canonical_spelling: spelling.into(),
@@ -1292,8 +1329,12 @@ mod tests {
         let frontend =
             crate::inspect(&scanner, &header, &["-funsigned-char".into()], None).unwrap();
         let bindings = BindingCatalog::default();
-        let lowering =
-            Lowering::new(frontend.declarations(), &bindings, &frontend.profile().target);
+        let lowering = Lowering::new(
+            frontend.declarations(),
+            &bindings,
+            GeneratedTypes::NONE,
+            &frontend.profile().target,
+        );
         let ty = TypeInfo {
             spelling: "char".into(),
             canonical_spelling: "char".into(),
@@ -1370,9 +1411,10 @@ mod tests {
             },
         );
         let signature = "$crate::__pgrx_c_generated::Signature_verified";
-        bindings.callback_capabilities.insert(
+        let mut callbacks = BTreeMap::new();
+        callbacks.insert(
             "callback".into(),
-            crate::CallbackBinding {
+            CallbackBinding {
                 marker: signature.into(),
                 storage: RustBindingType::Option {
                     value: Box::new(RustBindingType::Function {
@@ -1385,8 +1427,9 @@ mod tests {
                 },
             },
         );
-        let exported = Lowering::new(&declarations, &bindings, &target);
-        let native = Lowering::new_native(&declarations, &bindings, &target);
+        let generated = GeneratedTypes { callbacks: &callbacks, ..GeneratedTypes::NONE };
+        let exported = Lowering::new(&declarations, &bindings, generated, &target);
+        let native = Lowering::new_native(&declarations, &bindings, generated, &target);
         let (_, exported_alias) = exported.cast_alias("CountAlias", &integer).unwrap().unwrap();
         let (spelling, native_alias) = native.cast_alias("CountAlias", &integer).unwrap().unwrap();
         assert_eq!(spelling, "$crate::CountAlias");
@@ -1414,7 +1457,7 @@ mod tests {
         let storage = RustBindingType::Named { path: vec!["c".into()] };
         assert_eq!(exported.storage_type(&storage, 0).unwrap(), "$crate::c");
         assert_eq!(native.storage_type(&storage, 0).unwrap(), "$crate::c");
-        assert_eq!(bindings.callback_capabilities["callback"].marker, signature);
+        assert_eq!(callbacks["callback"].marker, signature);
     }
 
     /// Check bindgen underscore renames are accepted only when no distinct C member could own that spelling.
