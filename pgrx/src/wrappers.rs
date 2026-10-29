@@ -36,9 +36,9 @@ pub fn regtypein(type_name: &str) -> pg_sys::Oid {
 /// - Any other type names a type that belongs to this library's extension, in whatever schema it
 ///   is. The extension is the one named by the `.control` file next to the crate's `Cargo.toml`,
 ///   which [`pg_module_magic!`] records. The row type of a table, view or other relation that is
-///   not a composite type, and the array type that PostgreSQL makes for each type, do not count.
-///   PostgreSQL 17 and later make those members of the extension too, and earlier versions do
-///   not.
+///   not a composite type, the array type that PostgreSQL makes for each type, and the
+///   multirange type that it makes for each range type do not count. Whether those belong to
+///   the extension differs between PostgreSQL versions.
 ///
 /// A type that another extension or plain SQL creates does not belong to this library's
 /// extension, so this function does not find it. Name such a type with [`regtypein`] instead,
@@ -186,6 +186,8 @@ struct TypeCandidate {
     relation: pg_sys::Oid,
     /// The element type, if this is an array type
     element: pg_sys::Oid,
+    /// The kind of type, such as `TYPTYPE_MULTIRANGE`
+    kind: c_char,
 }
 
 impl TypeCandidate {
@@ -202,15 +204,21 @@ impl TypeCandidate {
                 defined: (*form).typisdefined,
                 relation: (*form).typrelid,
                 element: (*form).typelem,
+                kind: (*form).typtype,
             }
         }
     }
 
     /// Whether PostgreSQL made this type for another object: the row type of a relation that is
-    /// not a composite type, or the array type of its element type. PostgreSQL 17 and later
-    /// make such a type a member of the other object's extension, and earlier versions do not.
-    /// No Rust type names one, so the lookup skips them on every version.
+    /// not a composite type, the array type of its element type, or the multirange type of a
+    /// range type. PostgreSQL 17 and later add such a type to the other object's extension, and
+    /// remove it, along with that object. Earlier versions do not, though they add a multirange
+    /// type to the extension whose script creates it. The lookup skips these types on every
+    /// version, so that whether one counts does not depend on the version.
     fn is_dependent(&self) -> bool {
+        if self.kind == pg_sys::TYPTYPE_MULTIRANGE as c_char {
+            return true;
+        }
         // SAFETY: both functions take an OID by value and only read the catalogs. They return
         // zero when there is no such relation or array type.
         unsafe {

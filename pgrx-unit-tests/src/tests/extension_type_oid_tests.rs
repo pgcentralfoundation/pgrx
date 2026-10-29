@@ -161,6 +161,34 @@ mod tests {
         Ok(())
     }
 
+    /// Named like the multirange type of `decoy.zzrange`.
+    struct ZzRangeMultirange;
+
+    /// PostgreSQL 17 and later add a range type's multirange type to the extension along with
+    /// the range type, and earlier versions do not. Adding both leaves the multirange type a
+    /// member of the extension on every version, as when the extension's script creates the
+    /// range type, and the lookup still skips it.
+    #[pg_test(
+        error = "type \"zzrangemultirange\" does not belong to extension \"pgrx_unit_tests\""
+    )]
+    fn test_type_oid_ignores_an_extension_multirange_type() -> spi::Result<()> {
+        Spi::run("CREATE SCHEMA decoy")?;
+        Spi::run(
+            "CREATE TYPE decoy.zzrange AS RANGE \
+             (subtype = int4, multirange_type_name = decoy.zzrangemultirange)",
+        )?;
+        Spi::run("ALTER EXTENSION pgrx_unit_tests ADD TYPE decoy.zzrange")?;
+        let is_member = "SELECT EXISTS (SELECT FROM pg_depend \
+                         WHERE classid = 'pg_type'::regclass \
+                         AND objid = 'decoy.zzrangemultirange'::regtype AND deptype = 'e')";
+        if !Spi::get_one::<bool>(is_member)?.expect("a bool") {
+            Spi::run("ALTER EXTENSION pgrx_unit_tests ADD TYPE decoy.zzrangemultirange")?;
+        }
+        assert_eq!(Spi::get_one::<bool>(is_member)?, Some(true));
+        pgrx::rust_regtypein::<ZzRangeMultirange>();
+        Ok(())
+    }
+
     /// Named like the shell type `decoy.zzshell`.
     struct ZzShell;
 
