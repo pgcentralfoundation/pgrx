@@ -97,7 +97,9 @@ impl<'a> PgTupleDesc<'a> {
     ///
     /// ## Safety
     ///
-    /// `ptr` must be NULL or point to a live tuple descriptor.
+    /// `ptr` must be NULL or point to a live tuple descriptor. The copy is allocated in the
+    /// `CurrentMemoryContext` of this call, so the returned value must not be used or dropped
+    /// after that context is reset or deleted.
     ///
     /// ## Panics
     ///
@@ -107,7 +109,8 @@ impl<'a> PgTupleDesc<'a> {
         PgTupleDesc {
             // SAFETY: the caller passes a live descriptor, which non_null checked is not NULL.
             // CreateTupleDescCopyConstr reads it and returns a new copy palloc'd in
-            // CurrentMemoryContext, which this value owns and frees when it drops.
+            // CurrentMemoryContext, which this value owns and frees when it drops. The caller
+            // keeps that context alive for as long as this value exists.
             tupdesc: non_null(unsafe { pg_sys::CreateTupleDescCopyConstr(src.as_ptr()) }),
             parent: None,
             need_release: false,
@@ -156,6 +159,9 @@ impl<'a> PgTupleDesc<'a> {
 
     /** Retrieve the tuple description of the shape of a defined composite type
 
+    The descriptor is a copy in `CurrentMemoryContext`, with the limits that
+    [`for_composite_type_by_oid`](Self::for_composite_type_by_oid) describes.
+
     ```rust,no_run
     use pgrx::{prelude::*, PgTupleDesc};
 
@@ -186,6 +192,10 @@ impl<'a> PgTupleDesc<'a> {
 
     /// Similar to [`PgTupleDesc::for_composite_type()`] but using the type's [`pg_sys::Oid`] instead
     /// of its name.
+    ///
+    /// The descriptor is a copy in the `CurrentMemoryContext` of this call, which the returned
+    /// value frees when it drops. Do not use or drop it after that context is reset or deleted,
+    /// for example after returning it out of `Spi::connect`.
     pub fn for_composite_type_by_oid(typoid: pg_sys::Oid) -> Option<PgTupleDesc<'a>> {
         unsafe {
             if typoid == pg_sys::Oid::INVALID {
@@ -195,6 +205,10 @@ impl<'a> PgTupleDesc<'a> {
             // It's important to make a copy of the tupledesc: https://www.postgresql.org/message-id/flat/24471.1136768659%40sss.pgh.pa.us
             let tuple_desc = pg_sys::lookup_rowtype_tupdesc_copy(typoid, -1);
 
+            // SAFETY: lookup_rowtype_tupdesc_copy returns a live descriptor or raises an ERROR.
+            // from_pg_copy also requires that CurrentMemoryContext outlive the returned value,
+            // which nothing here ensures, because `'a` does not bound that context. That is a
+            // known gap, documented on this function.
             Some(PgTupleDesc::from_pg_copy(tuple_desc))
         }
     }
@@ -297,7 +311,10 @@ impl Clone for PgTupleDesc<'_> {
     fn clone(&self) -> Self {
         // SAFETY: self keeps its descriptor live, and
         // pg_sys::CreateTupleDescCopyConstr gives us a fresh copy with reference counters set to -1 (disabled).
-        // This will force the pfree() approach upon drop
+        // This will force the pfree() approach upon drop. The copy is palloc'd in
+        // CurrentMemoryContext, which the clone's lifetime does not bound, so a clone used or
+        // dropped after that context is reset or deleted reads or frees freed memory. That is the
+        // gap documented on `for_composite_type_by_oid`.
         let tupdesc = non_null(unsafe { pg_sys::CreateTupleDescCopyConstr(self.as_ptr()) });
         Self { tupdesc, parent: self.parent, need_release: false, need_pfree: true }
     }
