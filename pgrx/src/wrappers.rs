@@ -37,14 +37,32 @@ pub fn regtypein(type_name: &str) -> pg_sys::Oid {
 ///   is. The extension is the one named by the `.control` file next to the crate's `Cargo.toml`,
 ///   which [`pg_module_magic!`] records.
 ///
-/// Each call looks the type up in the catalogs.
+/// A type that another extension or plain SQL creates does not belong to this library's
+/// extension, so this function does not find it. Name such a type with [`regtypein`] instead,
+/// qualified by its schema.
+///
+/// # Cost
+///
+/// Nothing is cached, so each call reads the catalogs. For an extension's type, it lists the
+/// types of that name in every schema, then finds which of them belong to the extension, either
+/// by looking up each one's extension in `pg_depend` or by listing the extension's members there,
+/// whichever finishes first. The cost therefore grows with the number of same-named types, such
+/// as tables of that name in other schemas, until it reaches the cost of listing the members.
+/// pgrx calls `type_oid` for each value whose type it checks, such as each SPI read or `fn_call`
+/// argument.
 ///
 /// [`pg_module_magic!`]: crate::pg_module_magic
 ///
 /// # Panics
 ///
-/// Raises an ERROR if there is no such type, if the extension is not installed in the current
-/// database, or if the extension has more than one type of that name.
+/// Raises an ERROR if there is no such type, if the type is only a shell, if the extension is
+/// not installed in the current database, or if the extension has more than one type of that
+/// name.
+///
+/// For a type outside `pgrx_pg_sys`, panics if the library did not record its extension. That
+/// happens when the crate does not call [`pg_module_magic!`], or when its directory did not
+/// hold exactly one `.control` file when it was compiled. Names that start with `.`, such as
+/// editor lock files, do not count.
 pub fn rust_regtypein<T>() -> pg_sys::Oid {
     let type_name = std::any::type_name::<T>();
 
