@@ -286,16 +286,18 @@ jobs:
 
       # Only Miri checks that a pointer Datum keeps its provenance through an integer, and its
       # strict provenance mode makes the fcinfo test reject an integer round trip. Miri does
-      # not support RUSTC_WRAPPER, so this step runs without sccache. A nightly can ship
-      # without Miri, so the install may fall back to the newest nightly that has it.
+      # not support RUSTC_WRAPPER, so this step runs without sccache. The nightly is pinned so
+      # that a new nightly, or one shipped without Miri, cannot fail this step on its own.
       - name: Check Datum pointer provenance with Miri
         if: matrix.postgres == 18 && matrix.rust == null
+        env:
+          MIRI_TOOLCHAIN: nightly-2026-10-29
         run: |
           unset RUSTC_WRAPPER
-          rustup toolchain install nightly --component miri,rust-src --allow-downgrade
-          cargo +nightly miri test --package pgrx-pg-sys \
+          rustup toolchain install "$MIRI_TOOLCHAIN" --component miri,rust-src
+          cargo "+$MIRI_TOOLCHAIN" miri test --package pgrx-pg-sys \
             --features "pg$PG_VER" --no-default-features --lib datum
-          MIRIFLAGS=-Zmiri-strict-provenance cargo +nightly miri test --package pgrx \
+          MIRIFLAGS=-Zmiri-strict-provenance cargo "+$MIRI_TOOLCHAIN" miri test --package pgrx \
             --features "pg$PG_VER" --no-default-features --lib fcinfo
 
       # Only this step sees the target headers; tests above check that builds without them refuse.
