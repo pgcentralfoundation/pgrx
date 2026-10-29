@@ -251,19 +251,19 @@ pub fn emit_with_bindings(
     name: &str,
     bindings: &BindingCatalog,
 ) -> MacroEmission {
-    emit_with_lowering(session, name, bindings, &BTreeMap::new(), &mut None)
+    emit_with_lowering(session, name, bindings, None, &mut None)
 }
 
 /// Apply admission gates before rendering, sharing storage reconciliation across a batch.
 ///
 /// The optional lowering is populated only after a macro survives analysis and ABI
-/// checks, so skipped batches do not build indexes they cannot use. `adapters` holds
-/// only native call adapters this crate generated, never caller-supplied bindings.
+/// checks, so skipped batches do not build indexes they cannot use. Only batch
+/// generation has `adapters`; a caller's bindings cannot stand in for them.
 fn emit_with_lowering<'a>(
     session: &'a AnalysisSession<'_>,
     name: &str,
     bindings: &'a BindingCatalog,
-    adapters: &BTreeMap<String, crate::FunctionBinding>,
+    adapters: Option<&functions::FunctionAdapters>,
     lowering: &mut Option<types::Lowering<'a>>,
 ) -> MacroEmission {
     let analysis = session.analyze(name);
@@ -319,7 +319,7 @@ pub fn emit_batch_with_bindings(
     let requests = demands::plan(session, names, bindings);
     let adapters = generated_adapters(session, &requests, bindings)?;
     register_adapters(&mut capabilities, &adapters);
-    Ok(emit_prepared_batch(session, names, &capabilities, &adapters.functions.bindings))
+    Ok(emit_prepared_batch(session, names, &capabilities, Some(&adapters.functions)))
 }
 
 /// Install verified capabilities and their rejection reasons into one rendering catalog.
@@ -346,7 +346,7 @@ fn emit_prepared_batch(
     session: &AnalysisSession<'_>,
     names: &[impl AsRef<str>],
     bindings: &BindingCatalog,
-    adapters: &BTreeMap<String, crate::FunctionBinding>,
+    adapters: Option<&functions::FunctionAdapters>,
 ) -> Vec<MacroEmission> {
     // Each pass borrows one immutable capability catalog. Index its C/Rust
     // storage identities once, after the first macro passes its admission gates.
@@ -559,7 +559,7 @@ pub fn generate_with_bindings(
     let mut adapters = generated_adapters(session, &requests, bindings)?;
     let mut capabilities = bindings.clone();
     register_adapters(&mut capabilities, &adapters);
-    let macros = emit_prepared_batch(session, names, &capabilities, &adapters.functions.bindings);
+    let macros = emit_prepared_batch(session, names, &capabilities, Some(&adapters.functions));
     let admitted = macros
         .iter()
         .filter(|emission| matches!(emission.status, EmissionStatus::Emitted { .. }))
@@ -893,7 +893,7 @@ fn render(
     original: InvocationSource<'_>,
     assertions: &str,
     bindings: &BindingCatalog,
-    adapters: &BTreeMap<String, crate::FunctionBinding>,
+    adapters: Option<&functions::FunctionAdapters>,
     lowering: &types::Lowering<'_>,
 ) -> Result<String, SkipReason> {
     let identifier = macro_identifier(&analysis.name).ok_or_else(|| {

@@ -72,8 +72,8 @@ pub(super) struct Renderer<'a> {
     /// Fresh binding symbols and generated capabilities used for hygienic references.
     bindings: &'a BindingCatalog,
     /// Generated native call adapters, the only callable bindings for a prototype
-    /// that needs native transport. Callers cannot supply these.
-    adapters: &'a BTreeMap<String, crate::FunctionBinding>,
+    /// that needs native transport. Single-macro emission has none.
+    adapters: Option<&'a super::functions::FunctionAdapters>,
     /// Arena-indexed compiler constant facts, preserving names where bindings permit.
     constants: &'a [Option<&'a ResolvedConstant>],
     /// Shared C identity/native-storage reconciliation for the immutable capability catalog.
@@ -97,7 +97,7 @@ impl<'a> Renderer<'a> {
         frontend: &'a FrontendOutput,
         analysis: &'a MacroAnalysis,
         bindings: &'a BindingCatalog,
-        adapters: &'a BTreeMap<String, crate::FunctionBinding>,
+        adapters: Option<&'a super::functions::FunctionAdapters>,
         constants: &'a [Option<&'a ResolvedConstant>],
         lowering: &'a Lowering<'a>,
     ) -> Self {
@@ -949,7 +949,9 @@ impl<'a> Renderer<'a> {
                                 bindings.function_unavailable.get(name)
                             {
                                 Err(reason.clone())
-                            } else if let Some(adapter) = self.adapters.get(name) {
+                            } else if let Some(adapter) =
+                                self.adapters.and_then(|adapters| adapters.bindings.get(name))
+                            {
                                 Ok(adapter)
                             } else if let Some(ty) = super::functions::native_transport(declared)
                             {
