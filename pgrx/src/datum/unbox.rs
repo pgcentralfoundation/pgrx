@@ -534,7 +534,9 @@ mod tests {
 
         // palloc aligns only to MAXALIGN.
         #[repr(align(32))]
-        struct OverAligned([u8; 32]);
+        struct OverAligned {
+            _bytes: [u8; 32],
+        }
         assert!(!PgBox::<OverAligned>::can_unbox(32, false));
 
         // Other types leave the check to their type comparison.
