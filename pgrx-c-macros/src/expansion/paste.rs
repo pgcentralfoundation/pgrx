@@ -128,7 +128,6 @@ pub(super) fn prove(
         poisoned.insert(item.begin.clone());
         poisoned.insert(item.end.clone());
         poisoned.insert(format!("{prefix}paste_wrapper_{index}"));
-        poisoned.insert(tail(prefix, index));
     }
     // Constant retention numbers candidates from the same active environment.
     // A closed paste must not fabricate an atomic constant marker either.
@@ -223,31 +222,11 @@ pub(super) fn prove(
                 }
                 Err(error) => return Err(error),
                 Ok(output) if braced => {
-                    match guard_boundaries(
-                        &output.stdout,
-                        prefix,
-                        prepared,
-                        &selected,
-                        limits.expanded_bytes,
-                    ) {
-                        Ok(truncated) => {
-                            // The comment ends at its own line, so the other probes stand.
-                            for index in truncated {
-                                proof.rejected.insert(
-                                    index,
-                                    (
-                                        ExpansionSkipCode::TokenPaste,
-                                        "token pasting formed a comment that discards the rest of the invoking line"
-                                            .into(),
-                                    ),
-                                );
-                                selected.remove(&index);
-                            }
-                        }
-                        Err((code, message)) => {
-                            reject_all(&mut proof, &selected, code, &message);
-                            break 'modes;
-                        }
+                    if let Err((code, message)) =
+                        guard_boundaries(&output.stdout, prepared, &selected, limits.expanded_bytes)
+                    {
+                        reject_all(&mut proof, &selected, code, &message);
+                        break 'modes;
                     }
                     break;
                 }
@@ -409,7 +388,7 @@ fn reject_all(
 /// shapes.
 ///
 /// `limit` bounds everything except the poison table. The table names every active macro, a
-/// constant marker for each, and each prepared probe's markers, boundaries, wrapper and tail.
+/// constant marker for each, and each prepared probe's markers, boundaries and wrapper.
 /// Inspection already bounded the active macros, mostly from system headers. The probe names are
 /// bounded by `limits.macros` and by the invocation budget that preparation charged for them.
 #[allow(clippy::too_many_arguments)]
@@ -485,18 +464,11 @@ fn source(
         let tag = tags[&index];
         append(format!("# 1 {tag:?}\n").as_bytes())?;
         if braced {
-            append(
-                format!(
-                    "{}\n{prefix}paste_entry_{index} {}\n{}\n",
-                    prepared[index].begin,
-                    tail(prefix, index),
-                    prepared[index].end
-                )
-                .as_bytes(),
-            )?;
-        } else {
-            // The tail is poisoned here, so this pass leaves it out.
-            append(format!("{prefix}paste_entry_{index}\n").as_bytes())?;
+            append(format!("{}\n", prepared[index].begin).as_bytes())?;
+        }
+        append(format!("{prefix}paste_entry_{index}\n").as_bytes())?;
+        if braced {
+            append(format!("{}\n", prepared[index].end).as_bytes())?;
         }
     }
     // The clean braced pass proves every invocation was traversed. This final
@@ -538,37 +510,24 @@ fn append_poison_pragmas(
     Ok(())
 }
 
-/// The marker that ends a probe's invocation line in the braced pass.
-fn tail(prefix: &str, index: usize) -> String {
-    format!("{prefix}paste_tail_{index}")
-}
-
-/// Require complete boundary evidence for every probe before accepting a paste pass, and return
-/// the probes whose invocation line lost its tail marker.
+/// Require complete boundary evidence for every probe before accepting a paste pass.
 ///
 /// `limit` bounds the output from the first probe boundary on, as the authoritative pass bounds
 /// only probe bodies. The output before it is the translation unit's own declarations, which grow
 /// with the inspected headers; the frontend's output limit bounds them.
-///
-/// Under Microsoft extensions, a paste that forms `//` comments out the rest of the invoking line.
-/// The probe pragmas make Clang report that as an error, but `-w` silences it, so a missing tail
-/// marker is the evidence that holds under every warning option.
 fn guard_boundaries(
     output: &str,
-    prefix: &str,
     prepared: &[Prepared<'_>],
     selected: &BTreeSet<usize>,
     limit: usize,
-) -> Result<BTreeSet<usize>, (ExpansionSkipCode, String)> {
+) -> Result<(), (ExpansionSkipCode, String)> {
     let expected = selected
         .iter()
-        .flat_map(|&index| [(&prepared[index].begin, None), (&prepared[index].end, Some(index))])
+        .flat_map(|&index| [&prepared[index].begin, &prepared[index].end])
         .collect::<Vec<_>>();
-    let boundaries = expected.iter().map(|(name, _)| name.as_str()).collect::<BTreeSet<_>>();
-    let mut truncated = BTreeSet::new();
+    let boundaries = expected.iter().map(|name| name.as_str()).collect::<BTreeSet<_>>();
     let mut at = 0;
     let mut bytes = 0usize;
-    let mut last = None;
     for raw in output.lines() {
         let line = raw.trim();
         let boundary = boundaries.contains(line);
@@ -581,23 +540,15 @@ fn guard_boundaries(
                 ));
             }
         }
-        if !boundary {
-            last = line.split_ascii_whitespace().last().or(last);
-            continue;
+        if boundary {
+            if expected.get(at).is_none_or(|expected| expected.as_str() != line) {
+                return Err((
+                    ExpansionSkipCode::UnrecognizedOutput,
+                    "braced token-paste validation lost an ordered probe boundary".into(),
+                ));
+            }
+            at += 1;
         }
-        let Some(&(_, end)) = expected.get(at).filter(|(name, _)| name.as_str() == line) else {
-            return Err((
-                ExpansionSkipCode::UnrecognizedOutput,
-                "braced token-paste validation lost an ordered probe boundary".into(),
-            ));
-        };
-        if let Some(index) = end
-            && last != Some(tail(prefix, index).as_str())
-        {
-            truncated.insert(index);
-        }
-        last = None;
-        at += 1;
     }
     if at != expected.len() {
         return Err((
@@ -605,7 +556,7 @@ fn guard_boundaries(
             "braced token-paste validation did not traverse every probe".into(),
         ));
     }
-    Ok(truncated)
+    Ok(())
 }
 
 /// One parsed primary diagnostic whose location and fatality control paste-proof ownership.
@@ -1230,59 +1181,28 @@ mod tests {
         let selected = (0..13).collect::<BTreeSet<_>>();
         let output = selected
             .iter()
-            .map(|&index| {
-                format!("fresh_begin_{index}\nbody fresh_paste_tail_{index}\nfresh_end_{index}\n")
-            })
+            .map(|&index| format!("fresh_begin_{index}\nbody\nfresh_end_{index}\n"))
             .collect::<String>();
-        let guard =
-            |output: &str, limit| guard_boundaries(output, "fresh_", &prepared, &selected, limit);
-        assert_eq!(guard(&output, output.len()), Ok(BTreeSet::new()));
+        assert!(guard_boundaries(&output, &prepared, &selected, output.len()).is_ok());
         for malformed in [
-            output.replace("fresh_begin_5\nbody fresh_paste_tail_5\nfresh_end_5\n", ""),
+            output.replace("fresh_begin_5\nbody\nfresh_end_5\n", ""),
             output.replace("fresh_begin_5", "fresh_begin_6"),
             format!("{output}fresh_end_12\n"),
             "fresh_begin_0 fresh_end_0\n".into(),
         ] {
-            assert!(guard(&malformed, usize::MAX).is_err());
+            assert!(guard_boundaries(&malformed, &prepared, &selected, usize::MAX).is_err());
         }
         assert_eq!(
-            guard(&output, output.len() - 1).unwrap_err().0,
+            guard_boundaries(&output, &prepared, &selected, output.len() - 1).unwrap_err().0,
             ExpansionSkipCode::BudgetExceeded
         );
         // Header declarations before the first boundary grow with the environment, not the probes.
         let header = format!("{}{output}", "int declaration;\n".repeat(1024));
-        assert_eq!(guard(&header, output.len()), Ok(BTreeSet::new()));
-        assert!(guard(&header, output.len() - 1).is_err());
+        assert!(guard_boundaries(&header, &prepared, &selected, output.len()).is_ok());
+        assert!(guard_boundaries(&header, &prepared, &selected, output.len() - 1).is_err());
         // Bytes after the last boundary still count.
-        assert!(guard(&format!("{output}x\n"), output.len() + 1).is_err());
-    }
-
-    /// A probe whose invocation line lost its tail is reported alone; its peers stand.
-    #[test]
-    fn guard_reports_probes_whose_invocation_line_lost_its_tail() {
-        let definition = definition(MacroKind::FunctionLike);
-        let prepared = (0..3).map(|index| item(&definition, index)).collect::<Vec<_>>();
-        let selected = (0..3).collect::<BTreeSet<_>>();
-        let output = "fresh_begin_0\nbody fresh_paste_tail_0\nfresh_end_0\n\
-                      fresh_begin_1\n( ( m ) + 1 )\nfresh_end_1\n\
-                      fresh_begin_2\nfirst\nfresh_paste_tail_2\n\nfresh_end_2\n";
-        let guard =
-            |output: &str| guard_boundaries(output, "fresh_", &prepared, &selected, usize::MAX);
-        assert_eq!(guard(output), Ok(BTreeSet::from([1])));
-        for (from, to) in [
-            // Another probe's tail, or the tail before more output, does not end this line.
-            ("( ( m ) + 1 )", "fresh_paste_tail_0"),
-            ("( ( m ) + 1 )", "fresh_paste_tail_1 more"),
-            ("( ( m ) + 1 )", "fresh_paste_tail_1x"),
-            // A tail between boundaries of different probes belongs to neither.
-            ("( ( m ) + 1 )\nfresh_end_1", "fresh_end_1\nfresh_paste_tail_1"),
-        ] {
-            assert_eq!(guard(&output.replace(from, to)), Ok(BTreeSet::from([1])), "{to}");
-        }
-        assert_eq!(
-            guard(&output.replace("( ( m ) + 1 )", "( ( m ) + 1 ) fresh_paste_tail_1")),
-            Ok(BTreeSet::new())
-        );
+        let trailing = format!("{output}x\n");
+        assert!(guard_boundaries(&trailing, &prepared, &selected, output.len() + 1).is_err());
     }
 
     /// Checks proof source preserves object invocation and isolates instrumentation.
@@ -1336,10 +1256,6 @@ mod tests {
             if !braced {
                 assert!(text.find("left##right").unwrap() < text.find("GCC poison").unwrap());
             }
-            // Only the braced pass marks the end of each invocation line; the plain pass poisons
-            // that marker.
-            assert_eq!(text.contains("\nfresh_paste_entry_1 fresh_paste_tail_1\n"), braced);
-            assert_eq!(text.contains("\nfresh_paste_entry_1\n"), !braced);
             // The poison table is outside the budget, which bounds the remaining bytes.
             let budgeted = if braced { text.len() } else { text.len() - poison.len() };
             assert!(render(braced, budgeted).is_ok());
