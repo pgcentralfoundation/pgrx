@@ -2179,7 +2179,7 @@ fn macro_identifier(name: &str) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::{MAX_EMISSION_BYTES, definition_comment, rust_identifier, write_doc_comments};
-    use crate::{MacroDefinition, MacroKind, Token, TokenKind};
+    use crate::{MacroDefinition, MacroKind, SkipReasonCode, Token, TokenKind};
 
     /// Check that large retained C definitions account for both source text and documentation fences.
     #[test]
@@ -2256,6 +2256,46 @@ mod tests {
         let before = rust.clone();
         assert!(write_doc_comments(&mut rust, &"\n".repeat(MAX_EMISSION_BYTES / 4)).is_none());
         assert_eq!(rust, before);
+    }
+
+    /// An identity-only adapter has no call wrapper. If a call to its function reaches
+    /// rendering without demand planning seeing it, the call is refused rather than
+    /// resolved to the wrapper the adapter does not define.
+    #[test]
+    fn calls_do_not_resolve_to_identity_only_adapters() {
+        let _lock = crate::SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        let scanner = crate::MacroScanner::new().expect("libclang must be available");
+        let directory = tempfile::tempdir().unwrap();
+        let header = directory.path().join("identity.h");
+        std::fs::write(
+            &header,
+            "static inline int IdentityOnly(int value) { return value + 1; }\n\
+             #define IDENTITY_ADDRESS() (&IdentityOnly)\n\
+             #define IDENTITY_CALL(value) IdentityOnly(value)\n",
+        )
+        .unwrap();
+        // A fixed target keeps the support profile and calling convention independent of the host.
+        let frontend =
+            crate::inspect(&scanner, &header, &["--target=x86_64-unknown-linux-gnu".into()], None)
+                .unwrap();
+        let names = ["IDENTITY_ADDRESS", "IDENTITY_CALL"];
+        let session = crate::AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
+        let bindings = super::BindingCatalog::default();
+        // Plan only the address use, as if planning had missed the call.
+        let requests =
+            super::demands::plan(&session, &super::renderable(&session, &names[..1]), &bindings);
+        let adapters = super::generated_adapters(&session, &requests, &bindings).unwrap();
+        assert!(adapters.functions.identities.contains("IdentityOnly"));
+        assert!(adapters.functions.bindings.contains_key("IdentityOnly"));
+        assert!(!adapters.functions.rust.contains("Inline_IdentityOnly"));
+        let emissions =
+            super::emit_prepared_batch(&session, &names[1..], &bindings, Some(&adapters));
+        let [emission] = &emissions[..] else { panic!("one emission: {emissions:?}") };
+        let super::EmissionStatus::Skipped { reason } = &emission.status else {
+            panic!("IDENTITY_CALL rendered a call to the identity-only adapter of IdentityOnly");
+        };
+        assert_eq!(reason.code, SkipReasonCode::Call, "{reason:?}");
+        assert!(reason.message.contains("IdentityOnly: no callable binding"), "{reason:?}");
     }
 
     /// Check raw keyword handling while keeping macro names separate from operand metavariable rules.
