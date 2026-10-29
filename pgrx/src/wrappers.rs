@@ -99,25 +99,38 @@ fn fold_identifier(ident: &str) -> CString {
 
 fn builtin_type_oid(typname: &CStr) -> pg_sys::Oid {
     // SAFETY: TYPENAMENSP's keys are a name, which typname, being NUL-terminated, can be, and a
-    // namespace OID. The call returns the OID column of the matching row, if any.
-    let oid = unsafe {
-        pg_sys::GetSysCacheOid(
+    // namespace OID. The search returns NULL or a pg_type row that the cache keeps alive until
+    // ReleaseSysCache, and nothing between the search and the release can raise an ERROR.
+    let found = unsafe {
+        let tuple = pg_sys::SearchSysCache2(
             pg_sys::SysCacheIdentifier::TYPENAMENSP as _,
-            pg_sys::Anum_pg_type_oid as _,
             pg_sys::Datum::from(typname.as_ptr()),
             pg_sys::Datum::from(pg_sys::Oid::from(pg_sys::PG_CATALOG_NAMESPACE)),
-            pg_sys::Datum::from(0),
-            pg_sys::Datum::from(0),
-        )
-    };
-    if oid == pg_sys::Oid::INVALID {
-        ereport!(
-            ERROR,
-            PgSqlErrorCode::ERRCODE_UNDEFINED_OBJECT,
-            format!("type \"pg_catalog.{}\" does not exist", typname.to_string_lossy())
         );
+        (!tuple.is_null()).then(|| {
+            let form = pg_sys::GETSTRUCT!(tuple).get().cast::<pg_sys::FormData_pg_type>();
+            let found = TypeCandidate::from_form(form);
+            pg_sys::ReleaseSysCache(tuple);
+            found
+        })
+    };
+    match found {
+        Some(TypeCandidate { oid, defined: true, .. }) => oid,
+        Some(TypeCandidate { defined: false, .. }) => {
+            ereport!(
+                ERROR,
+                PgSqlErrorCode::ERRCODE_UNDEFINED_OBJECT,
+                format!("type \"pg_catalog.{}\" is only a shell", typname.to_string_lossy())
+            );
+        }
+        None => {
+            ereport!(
+                ERROR,
+                PgSqlErrorCode::ERRCODE_UNDEFINED_OBJECT,
+                format!("type \"pg_catalog.{}\" does not exist", typname.to_string_lossy())
+            );
+        }
     }
-    oid
 }
 
 fn extension_type_oid(typname: &CStr) -> pg_sys::Oid {
@@ -176,6 +189,23 @@ struct TypeCandidate {
 }
 
 impl TypeCandidate {
+    /// Read the candidate's fields from a pg_type row
+    ///
+    /// # Safety
+    ///
+    /// `form` must point to a live pg_type row.
+    unsafe fn from_form(form: *const pg_sys::FormData_pg_type) -> Self {
+        // SAFETY: the caller passes a live pg_type row, and each read copies one field.
+        unsafe {
+            TypeCandidate {
+                oid: (*form).oid,
+                defined: (*form).typisdefined,
+                relation: (*form).typrelid,
+                element: (*form).typelem,
+            }
+        }
+    }
+
     /// Whether PostgreSQL made this type for another object: the row type of a relation that is
     /// not a composite type, or the array type of its element type. PostgreSQL 17 and later
     /// make such a type a member of the other object's extension, and earlier versions do not.
@@ -219,12 +249,7 @@ fn types_named(typname: &CStr) -> Vec<TypeCandidate> {
             .map(|&member| {
                 let tuple = &raw mut (*member).tuple;
                 let form = pg_sys::GETSTRUCT!(tuple).get().cast::<pg_sys::FormData_pg_type>();
-                TypeCandidate {
-                    oid: (*form).oid,
-                    defined: (*form).typisdefined,
-                    relation: (*form).typrelid,
-                    element: (*form).typelem,
-                }
+                TypeCandidate::from_form(form)
             })
             .collect();
         pg_sys::ReleaseCatCacheList(list);

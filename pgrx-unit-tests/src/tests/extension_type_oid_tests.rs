@@ -173,6 +173,15 @@ mod tests {
         Ok(())
     }
 
+    /// `pg_sys::List` has no SQL type, so a shell named `list` can be the only type of that name
+    /// in `pg_catalog`.
+    #[pg_test(error = "type \"pg_catalog.list\" is only a shell")]
+    fn test_type_oid_rejects_a_pg_catalog_shell_type() -> spi::Result<()> {
+        Spi::run("CREATE TYPE pg_catalog.list")?;
+        pgrx::rust_regtypein::<pg_sys::List>();
+        Ok(())
+    }
+
     #[pg_test]
     fn test_builtin_type_of_the_same_name_is_incompatible() {
         let result = Spi::get_one::<Point>("SELECT '(1,2)'::pg_catalog.point");
