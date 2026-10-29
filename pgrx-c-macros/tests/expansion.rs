@@ -444,7 +444,9 @@ int __paste_native(int);
 #define P_FORGED_BOUNDARY(x) PRESCAN(CAT3(__pgrx_,c_expand_1_,end_0))
 #define P_FORGED_CONSTANT(x) PRESCAN(CAT3(__pgrx_,c_expand_1_,c0))
 #pragma clang diagnostic ignored "-Winvalid-token-paste"
+#if __has_warning("-Wgnu-line-marker")
 #pragma clang diagnostic ignored "-Wgnu-line-marker"
+#endif
 "#;
     // Preserve real definition provenance, then leave the original main file in
     // system-header status. The generator must reset that status for its probes.
@@ -737,6 +739,29 @@ fn reports_comment_pastes(frontend: &FrontendOutput, directory: &Path) -> bool {
         .output()
         .unwrap();
     String::from_utf8_lossy(&output.stderr).contains("error: pasting")
+}
+
+/// Checks that the probes' own pragmas compile when warnings are errors. Clang 14 has no
+/// `-Wgnu-line-marker` group, and naming it unguarded failed every probe under `-Werror` or
+/// `-pedantic-errors`. The header is not a system header, which would silence that warning.
+#[test]
+fn probe_pragmas_compile_when_warnings_are_errors() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = Directory::new();
+    let header = directory.0.join("strict.h");
+    std::fs::write(
+        &header,
+        "#define CAT(a,b) a##b\n#define P_CLOSED(x) ((x)+CAT(0xFF,U))\n#define P_PLAIN(x) ((x)+1)\nint strict_declaration;\n",
+    )
+    .unwrap();
+    let scanner = MacroScanner::new().unwrap();
+    for arguments in [["-std=c17", "-Werror"], ["-std=c17", "-pedantic-errors"]] {
+        let owned = arguments.iter().map(|argument| argument.to_string()).collect::<Vec<_>>();
+        let frontend = inspect(&scanner, &header, &owned, None).unwrap();
+        let batch = prepare_expansions(&scanner, &frontend, &["P_CLOSED", "P_PLAIN"]).unwrap();
+        assert!(body(expanded(&batch, "P_CLOSED")).contains(&"0xFFU"), "{arguments:?}");
+        assert!(body(expanded(&batch, "P_PLAIN")).contains(&"1"), "{arguments:?}");
+    }
 }
 
 /// Checks that malformed paste probes cannot swallow a later operand validation.
