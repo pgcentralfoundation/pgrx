@@ -11,6 +11,7 @@
 use crate::{IntoDatum, PgSqlErrorCode, direct_function_call, ereport, pg_sys};
 use alloc::ffi::CString;
 use core::ffi::CStr;
+use core::{ptr, slice};
 
 /// A helper function for Postgres' `regtypein` function to lookup a type by a specific name
 ///
@@ -113,12 +114,19 @@ fn extension_type_oid(typname: &CStr) -> pg_sys::Oid {
         );
     }
 
-    let mut owned = types_named(typname).into_iter().filter(|&oid| {
+    let mut owned = types_named(typname).into_iter().filter(|candidate| {
         // SAFETY: the call takes both OIDs by value and only reads pg_depend.
-        unsafe { pg_sys::getExtensionOfObject(pg_sys::TypeRelationId, oid) == extension }
+        unsafe { pg_sys::getExtensionOfObject(pg_sys::TypeRelationId, candidate.oid) == extension }
     });
     match (owned.next(), owned.next()) {
-        (Some(oid), None) => oid,
+        (Some(TypeCandidate { oid, defined: true }), None) => oid,
+        (Some(TypeCandidate { defined: false, .. }), None) => {
+            ereport!(
+                ERROR,
+                PgSqlErrorCode::ERRCODE_UNDEFINED_OBJECT,
+                format!("type \"{typname_str}\" is only a shell")
+            );
+        }
         (None, _) => {
             ereport!(
                 ERROR,
@@ -138,12 +146,22 @@ fn extension_type_oid(typname: &CStr) -> pg_sys::Oid {
     }
 }
 
-/// The OIDs of the types named `typname`, in every schema
-fn types_named(typname: &CStr) -> Vec<pg_sys::Oid> {
+/// A type with the name being looked up
+#[derive(Clone, Copy)]
+struct TypeCandidate {
+    oid: pg_sys::Oid,
+    /// False for a shell type, which `CREATE TYPE name` makes before the type is defined
+    defined: bool,
+}
+
+/// The types named `typname`, in every schema
+fn types_named(typname: &CStr) -> Vec<TypeCandidate> {
     // SAFETY: TYPENAMENSP's keys are a name, which typname, being NUL-terminated, can be, and a
     // namespace, so searching by the first key lists that name's types in every namespace. The
     // list holds a reference that keeps it and its tuples alive until it is released, and nothing
-    // between the search and the release can raise an ERROR. Each member's tuple is a pg_type row.
+    // between the search and the release can raise an ERROR. The list ends in `n_members` tuple
+    // pointers, which the raw place projection reaches with the list's provenance; it is
+    // non-null and aligned even when the count is zero. Each member's tuple is a pg_type row.
     unsafe {
         let list = pg_sys::SearchSysCacheList(
             pg_sys::SysCacheIdentifier::TYPENAMENSP as _,
@@ -152,15 +170,20 @@ fn types_named(typname: &CStr) -> Vec<pg_sys::Oid> {
             pg_sys::Datum::from(0),
             pg_sys::Datum::from(0),
         );
-        let members = (*list).members.as_slice((*list).n_members as usize);
-        let oids = members
+        let len = usize::try_from((*list).n_members).expect("n_members must be non-negative");
+        let members = slice::from_raw_parts(
+            ptr::addr_of!((*list).members).cast::<*mut pg_sys::CatCTup>(),
+            len,
+        );
+        let candidates = members
             .iter()
             .map(|&member| {
                 let tuple = &raw mut (*member).tuple;
-                (*pg_sys::GETSTRUCT!(tuple).get().cast::<pg_sys::FormData_pg_type>()).oid
+                let form = pg_sys::GETSTRUCT!(tuple).get().cast::<pg_sys::FormData_pg_type>();
+                TypeCandidate { oid: (*form).oid, defined: (*form).typisdefined }
             })
             .collect();
         pg_sys::ReleaseCatCacheList(list);
-        oids
+        candidates
     }
 }

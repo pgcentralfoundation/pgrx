@@ -93,6 +93,18 @@ mod tests {
         Ok(())
     }
 
+    /// Named like the shell type `decoy.zzshell`.
+    struct ZzShell;
+
+    #[pg_test(error = "type \"zzshell\" is only a shell")]
+    fn test_type_oid_rejects_a_shell_type() -> spi::Result<()> {
+        Spi::run("CREATE SCHEMA decoy")?;
+        Spi::run("CREATE TYPE decoy.zzshell")?;
+        Spi::run("ALTER EXTENSION pgrx_unit_tests ADD TYPE decoy.zzshell")?;
+        pgrx::rust_regtypein::<ZzShell>();
+        Ok(())
+    }
+
     #[pg_test]
     fn test_builtin_type_of_the_same_name_is_incompatible() {
         let result = Spi::get_one::<Point>("SELECT '(1,2)'::pg_catalog.point");
