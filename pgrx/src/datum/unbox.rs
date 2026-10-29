@@ -1,7 +1,8 @@
 use super::Datum;
+use super::from::convert_varlena_to_str_memoized;
 use super::uuid::Uuid;
 use crate::prelude::*;
-use crate::varlena::{text_to_rust_str_unchecked, varlena_to_byte_slice};
+use crate::varlena::varlena_to_byte_slice;
 use crate::{Json, JsonB};
 use alloc::ffi::CString;
 use core::ffi::CStr;
@@ -24,6 +25,19 @@ use core::ffi::CStr;
 /// are implementing this in the way that satisfies that lifetime constraint. There isn't really
 /// a good way to constrain lifetimes correctly without forcing from-Datum types to go through a
 /// wrapper type bound by the lifetime of the Datum. And what would you use as the bound, hmm?
+///
+/// If `As<'src>` does not name `'src`, safe code must not be able to read the Datum's memory
+/// through the value that `unbox` returns, because `Vec<T>` and `Array::into_iter` keep such
+/// values after they free the array they unboxed them from. A raw [`pg_sys::Datum`] meets this,
+/// because only `unsafe` code can dereference it, and `PgBox<T>` meets it by unboxing a copy.
+/// [`PgHeapTuple::get_by_index`] relies on the same rule but reads through [`FromDatum`], so the
+/// value that such a type's `from_polymorphic_datum` returns must meet it too, unless the type
+/// sets [`FromDatum::POINTS_INTO_DATUM`] and its `from_datum_in_memory_context` returns a value
+/// that does not read the Datum's memory.
+///
+/// `unbox` must be sound for every value of a type that [`UnboxDatum::can_unbox`] accepts and
+/// that the caller's type comparison matched to `Self`. Override `can_unbox` to reject the types
+/// whose values `unbox` cannot read.
 pub unsafe trait UnboxDatum {
     // TODO: Currently, this doesn't actually get used to identify all the cases where the Datum
     // is actually a pointer type. However, it has been noted that Postgres does yield nullptr
@@ -43,6 +57,19 @@ pub unsafe trait UnboxDatum {
     type As<'src>
     where
         Self: 'src;
+
+    /// Can [`UnboxDatum::unbox`] read a value of a type with this length and pass-by-value
+    /// flag, PostgreSQL's `typlen` and `typbyval`?
+    ///
+    /// [`Array`] asks once, for its element type, before it unboxes any element, and panics if
+    /// the answer is no. The default accepts every type, leaving the check to the type
+    /// comparison that matched the array to `Self`. `PgBox<T>` overrides it, because it copies
+    /// `size_of::<T>()` bytes from each element.
+    #[inline]
+    fn can_unbox(_typlen: i16, _typbyval: bool) -> bool {
+        true
+    }
+
     /// Convert from `Datum<'src>` to `T::As<'src>`
     ///
     /// This should be the direct conversion in each case. It is very unsafe to use directly.
@@ -55,6 +82,8 @@ pub unsafe trait UnboxDatum {
     /// This also should not be used as the primary conversion mechanism if it requires a MemCx,
     /// as this is intended primarily to be used in cases where the datum is guaranteed to be
     /// detoasted already.
+    ///
+    /// The Datum's type must be one that [`UnboxDatum::can_unbox`] accepts.
     unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
     where
         Self: 'src;
@@ -170,6 +199,8 @@ unsafe impl UnboxDatum for f64 {
     }
 }
 
+/// Panics, as `FromDatum` for `&str` does, if the database encoding lets text hold bytes that are
+/// not UTF-8 and the value does.
 unsafe impl UnboxDatum for str {
     type As<'src> = &'src str;
     #[inline]
@@ -177,7 +208,7 @@ unsafe impl UnboxDatum for str {
     where
         Self: 'src,
     {
-        unsafe { text_to_rust_str_unchecked(datum.0.cast_mut_ptr()) }
+        unsafe { convert_varlena_to_str_memoized(datum.0.cast_mut_ptr()) }
     }
 }
 
@@ -189,7 +220,7 @@ unsafe impl UnboxDatum for &str {
     where
         Self: 'src,
     {
-        unsafe { text_to_rust_str_unchecked(datum.0.cast_mut_ptr()) }
+        unsafe { convert_varlena_to_str_memoized(datum.0.cast_mut_ptr()) }
     }
 }
 
@@ -416,15 +447,47 @@ unsafe impl<const P: u32, const S: u32> UnboxDatum for Numeric<P, S> {
     }
 }
 
+/// Unboxing copies `size_of::<T>()` bytes into a new allocation in `CurrentMemoryContext`.
+///
+/// The Datum points to a value inside its source, such as an element of an [`Array`], and a
+/// `PgBox` has no lifetime to keep that source alive. An `Array` frees its detoasted copy when it
+/// drops, so `Vec<PgBox<T>>` and `Array::into_iter` would otherwise return dangling boxes. Each
+/// unbox, including each `Array::get`, makes a new copy that lives until its memory context is
+/// reset or deleted. Writing through the box does not change the source.
+///
+/// [`UnboxDatum::can_unbox`] accepts only a fixed-length type passed by reference whose values
+/// are `size_of::<T>()` bytes, and only if palloc's MAXALIGN alignment suffices for `T`. A copy of
+/// a variable-length value would keep only its first `size_of::<T>()` bytes, and PostgreSQL would
+/// read past it when it received the box back. A pass-by-value Datum holds the value itself, not
+/// a pointer to it.
+// SAFETY: the returned box points to its own allocation, not into the Datum's memory.
 unsafe impl<T> UnboxDatum for PgBox<T, AllocatedByPostgres> {
     #[rustfmt::skip]
     type As<'src> = PgBox<T> where Self: 'src;
+
+    #[inline]
+    fn can_unbox(typlen: i16, typbyval: bool) -> bool {
+        !typbyval
+            && usize::try_from(typlen).is_ok_and(|len| len > 0 && len == size_of::<T>())
+            && align_of::<T>() <= pg_sys::MAXIMUM_ALIGNOF as usize
+    }
+
     #[inline]
     unsafe fn unbox<'src>(d: Datum<'src>) -> Self::As<'src>
     where
         Self: 'src,
     {
-        PgBox::from_datum(d.0, false).unwrap()
+        // SAFETY: the caller passes a Datum of a type that `can_unbox` accepts, so it points to
+        // a value of `size_of::<T>()` initialized bytes; `copy_ptr_into` panics on a null pointer
+        // and copies the bytes without reading them as a `T`. The copy is a palloc chunk, which
+        // `from_pg` may box, aligned to MAXALIGN, which `can_unbox` checked suffices for `T`.
+        // That the bytes are a valid `T` rests on the type comparison that matched the Datum's
+        // type to `T`.
+        unsafe {
+            let copy = crate::PgMemoryContexts::CurrentMemoryContext
+                .copy_ptr_into(d.0.cast_mut_ptr::<T>(), size_of::<T>());
+            PgBox::from_pg(copy)
+        }
     }
 }
 
@@ -449,5 +512,34 @@ unsafe impl UnboxDatum for JsonB {
         Self: 'src,
     {
         JsonB::from_datum(d.0, false).unwrap()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn pgbox_unboxes_only_fixed_length_references_of_its_size() {
+        type Point = PgBox<pg_sys::Point>;
+        assert!(Point::can_unbox(16, false));
+        // Passed by value, so the Datum is not a pointer.
+        assert!(!Point::can_unbox(16, true));
+        assert!(!Point::can_unbox(8, false));
+        assert!(!Point::can_unbox(24, false));
+        // Variable-length and C string types.
+        assert!(!Point::can_unbox(-1, false));
+        assert!(!Point::can_unbox(-2, false));
+        assert!(!PgBox::<()>::can_unbox(0, false));
+
+        // palloc aligns only to MAXALIGN.
+        #[repr(align(32))]
+        struct OverAligned {
+            _bytes: [u8; 32],
+        }
+        assert!(!PgBox::<OverAligned>::can_unbox(32, false));
+
+        // Other types leave the check to their type comparison.
+        assert!(<pg_sys::Datum as UnboxDatum>::can_unbox(-1, false));
     }
 }

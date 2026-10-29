@@ -511,6 +511,85 @@ pub fn extension_sql_file(input: TokenStream) -> TokenStream {
     wrapped(input).unwrap_or_else(|e: syn::Error| e.into_compile_error().into())
 }
 
+/// Name the extension that the calling crate builds, as `cargo pgrx` does: by the stem of the
+/// one `.control` file next to its `Cargo.toml`, counted as `control_files` counts them.
+///
+/// Expands to a `Result<&'static CStr, &'static str>`, whose error says why there is no name.
+/// The expansion includes every `.control` file it counted, so cargo compiles the crate again
+/// when one of them changes or disappears. Stable Rust has no way to make cargo watch the
+/// directory itself, so adding a `.control` file needs some other change before the crate is
+/// compiled again.
+#[doc(hidden)]
+#[proc_macro]
+pub fn __pgrx_extension_name(_input: TokenStream) -> TokenStream {
+    let dir = match std::env::var_os("CARGO_MANIFEST_DIR") {
+        Some(dir) => std::path::PathBuf::from(dir),
+        None => return extension_name_error("CARGO_MANIFEST_DIR is not set".into(), &[]),
+    };
+    let controls = match control_files(&dir) {
+        Ok(controls) => controls,
+        Err(e) => {
+            return extension_name_error(format!("cannot read `{}`: {e}", dir.display()), &[]);
+        }
+    };
+    let [control] = controls.as_slice() else {
+        return extension_name_error(
+            format!("expected one .control file in `{}`, found {}", dir.display(), controls.len()),
+            &controls,
+        );
+    };
+    let Some(name) = control.file_stem().and_then(|stem| stem.to_str()) else {
+        return extension_name_error(
+            format!("`{}` is not named in UTF-8", control.display()),
+            &controls,
+        );
+    };
+    let Ok(name) = CString::new(name) else {
+        return extension_name_error(
+            format!("`{}` has a NUL in its name", control.display()),
+            &controls,
+        );
+    };
+    let name = proc_macro2::Literal::c_string(&name);
+    let track = track_files(&controls);
+    quote! {{
+        #track
+        ::core::result::Result::<&'static ::core::ffi::CStr, &'static str>::Ok(#name)
+    }}
+    .into()
+}
+
+/// The `.control` files in `dir`, counted as cargo-pgrx's `find_control_file` counts them: names
+/// that start with `.`, such as editor lock files, do not count, nor does anything other than a
+/// file or a link to one.
+fn control_files(dir: &std::path::Path) -> std::io::Result<Vec<std::path::PathBuf>> {
+    Ok(std::fs::read_dir(dir)?
+        .flatten()
+        .map(|entry| entry.path())
+        .filter(|path| {
+            path.extension() == Some("control".as_ref())
+                && !path.file_name().is_some_and(|name| name.as_encoded_bytes().starts_with(b"."))
+                && std::fs::metadata(path).is_ok_and(|metadata| metadata.is_file())
+        })
+        .collect())
+}
+
+/// Include each of `files` that has a UTF-8 path, which makes cargo compile the crate again when
+/// one of them changes or disappears.
+fn track_files(files: &[std::path::PathBuf]) -> proc_macro2::TokenStream {
+    let paths = files.iter().filter_map(|path| path.to_str());
+    quote! { #(const _: &[u8] = include_bytes!(#paths);)* }
+}
+
+fn extension_name_error(reason: String, controls: &[std::path::PathBuf]) -> TokenStream {
+    let track = track_files(controls);
+    quote! {{
+        #track
+        ::core::result::Result::<&'static ::core::ffi::CStr, &'static str>::Err(#reason)
+    }}
+    .into()
+}
+
 /// Associated macro for `#[pg_extern]` or `#[macro@pg_operator]`.  Used to set the `SEARCH_PATH` option
 /// on the `CREATE FUNCTION` statement.
 #[proc_macro_attribute]
@@ -816,6 +895,12 @@ enum Animal {
 }
 ```
 
+A type with a lifetime parameter borrows from the Datum it is read from, as `&str` does, and
+each of its lifetimes is the Datum's. An argument borrows for the call, and `Array::iter` returns
+values that borrow the array, so `Vec<T>` and `Array::into_iter` are not available for it. Its
+fields may borrow only for its first lifetime, and a type without one must implement
+`serde::de::DeserializeOwned`.
+
 Optionally accepts the following attributes:
 
 * `inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the type.
@@ -881,6 +966,30 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
         None => quote! {'_},
     };
 
+    // A decoded value can borrow from the varlena, and `cbor_decode` lets the caller pick the
+    // lifetime of that borrow. Pick the type's first lifetime, or require a type that borrows
+    // nothing, so that a field that can only borrow for 'static fails to compile.
+    let cbor_decode = match has_lifetimes {
+        Some(param) => {
+            let lt = &param.lifetime;
+            quote! { ::pgrx::datum::cbor_decode::<#lt, _> }
+        }
+        None => quote! { ::pgrx::datum::cbor_decode_owned },
+    };
+
+    // A value unboxed from a `Datum<'dat>` borrows for 'dat, so `Vec<T>` and `Array::into_iter`,
+    // which need `As<'dat> = T` for every 'dat, cannot keep it after freeing the array.
+    let unboxed = if has_lifetimes.is_some() {
+        let args = generics.params.iter().map(|param| match param {
+            syn::GenericParam::Lifetime(_) => quote! { 'dat },
+            syn::GenericParam::Type(param) => param.ident.to_token_stream(),
+            syn::GenericParam::Const(param) => param.ident.to_token_stream(),
+        });
+        quote! { #name<#(#args),*> }
+    } else {
+        quote! { Self }
+    };
+
     // We need another variant of the params for the ArgAbi impl
     let fcx_lt = syn::Lifetime::new("'fcx", proc_macro2::Span::mixed_site());
     let mut generics_with_fcx = generics.clone();
@@ -893,6 +1002,11 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
             bounds: syn::parse_quote! { #fcx_lt },
         },
     ));
+    // and on 'fcx outliving each lifetime, so that an argument borrows for the call, not 'static
+    for param in generics.lifetimes() {
+        let lt = &param.lifetime;
+        generics_with_fcx.make_where_clause().predicates.push(syn::parse_quote! { #fcx_lt: #lt });
+    }
     let (impl_gens, ty_gens, where_clause) = generics_with_fcx.split_for_impl();
     let mut impl_gens: syn::Generics = syn::parse_quote! { #impl_gens };
     impl_gens
@@ -937,8 +1051,7 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                         if is_null {
                             None
                         } else {
-                            #[allow(deprecated)]
-                            ::pgrx::datum::cbor_decode(datum.cast_mut_ptr())
+                            #cbor_decode(datum.cast_mut_ptr())
                         }
                     }
 
@@ -960,10 +1073,12 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
                     }
                 }
 
+                // SAFETY: `As<'dat>` borrows only for 'dat. `unbox` is for detoasted Datums, such
+                // as array elements, and `cbor_decode` reads those in place.
                 unsafe impl #generics ::pgrx::datum::UnboxDatum for #name #generics {
-                    type As<'dat> = Self where Self: 'dat;
+                    type As<'dat> = #unboxed where Self: 'dat;
                     unsafe fn unbox<'dat>(datum: ::pgrx::datum::Datum<'dat>) -> Self::As<'dat> where Self: 'dat {
-                        <Self as ::pgrx::datum::FromDatum>::from_datum(::core::mem::transmute(datum), false).unwrap()
+                        <#unboxed as ::pgrx::datum::FromDatum>::from_datum(datum.sans_lifetime(), false).unwrap()
                     }
                 }
 
@@ -1049,35 +1164,51 @@ fn impl_postgres_type(ast: DeriveInput) -> syn::Result<proc_macro2::TokenStream>
     if args.contains(&PostgresTypeAttribute::PgBinaryProtocol) {
         // At this time, the `PostgresTypeAttribute` does not impact the way we generate
         // the `recv` and `send` functions.
+        //
+        // Safe code can put any value in an `Internal`, and a Rust caller picks the lifetimes of
+        // the value `recv` returns, so `recv` is unsafe. PostgreSQL meets its contract when it
+        // calls `recv` as the type's receive function, and the `pg_extern` wrapper encodes the
+        // value into a new Datum before it returns.
         stream.extend(quote! {
+            /// Reads a value that `send` wrote.
+            ///
+            /// # Safety
+            ///
+            /// `internal` must point to a `pg_sys::StringInfoData` that nothing else accesses
+            /// during the call, whose `len` is not negative and whose `data` is non-null and
+            /// points to `len` initialized bytes. The value can borrow a copy of those bytes in
+            /// `CurrentMemoryContext`, so its lifetimes must end before that context is reset or
+            /// deleted.
             #[doc(hidden)]
             #[::pgrx::pgrx_macros::pg_extern(immutable, strict, parallel_safe)]
-            pub fn #funcname_recv #generics(
+            pub unsafe fn #funcname_recv #generics(
                 mut internal: ::pgrx::datum::Internal,
             ) -> #name #generics {
+                // SAFETY: the caller passes a StringInfoData that nothing else accesses.
                 let buf = unsafe { internal.get_mut::<::pgrx::pg_sys::StringInfoData>().unwrap() };
 
                 let mut serialized = ::pgrx::StringInfo::new();
 
                 serialized.push_bytes(&[0u8; ::pgrx::pg_sys::VARHDRSZ as usize]); // reserve space for the header
+                // SAFETY: the caller passes a non-null `data` that points to `len` initialized bytes.
                 serialized.push_bytes(unsafe {
                     core::slice::from_raw_parts(
                         buf.data as *const u8,
                         buf.len as usize
                     )
                 });
+                buf.cursor = buf.len;
 
                 let size = serialized.len();
                 let varlena = serialized.into_char_ptr();
 
                 // SAFETY: StringInfo owns the aligned PostgreSQL allocation and initialized
                 // header prefix, and bounds its total size by MaxAllocSize. into_char_ptr
-                // transfers that live allocation without freeing it. Under the fmgr receive
-                // contract, the copied payload is the serialized value decoded below.
-                unsafe{
+                // transfers that live allocation in CurrentMemoryContext without freeing it, and
+                // the caller ends the decoded value's lifetimes before that context frees it.
+                unsafe {
                     ::pgrx::pg_sys::SET_VARSIZE_4B!(varlena as *mut ::pgrx::pg_sys::varlena, size as i32).get();
-                    buf.cursor = buf.len;
-                    ::pgrx::datum::cbor_decode(varlena as *mut ::pgrx::pg_sys::varlena)
+                    #cbor_decode(varlena as *mut ::pgrx::pg_sys::varlena)
                 }
             }
             #[doc(hidden)]
@@ -1653,6 +1784,28 @@ pub fn pg_trigger(attrs: TokenStream, input: TokenStream) -> TokenStream {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    #[cfg(unix)]
+    fn control_files_skip_hidden_names_and_non_files() {
+        use std::os::unix::fs::symlink;
+
+        let dir =
+            std::env::temp_dir().join(format!("pgrx-macros-control-files-{}", std::process::id()));
+        std::fs::create_dir(&dir).unwrap();
+        std::fs::write(dir.join("ext.control"), "").unwrap();
+        std::fs::write(dir.join(".ext.control"), "").unwrap();
+        // An Emacs lock file, a link to a file that does not exist
+        symlink("user@host.1234:5678", dir.join(".#ext.control")).unwrap();
+        symlink("ext.control", dir.join("linked.control")).unwrap();
+        symlink("missing.control", dir.join("dangling.control")).unwrap();
+        std::fs::create_dir(dir.join("directory.control")).unwrap();
+
+        let mut found = control_files(&dir).unwrap();
+        std::fs::remove_dir_all(&dir).unwrap();
+        found.sort();
+        assert_eq!(found, [dir.join("ext.control"), dir.join("linked.control")]);
+    }
 
     #[test]
     fn short_name_unchanged() {

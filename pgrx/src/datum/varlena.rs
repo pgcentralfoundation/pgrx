@@ -8,57 +8,44 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Wrapper for Postgres 'varlena' type, over Rust types of a fixed size (ie, `impl Copy`)
-use crate::{
-    FromDatum, IntoDatum, PgMemoryContexts, StringInfo, pg_sys, rust_regtypein, void_mut_ptr,
-};
+use crate::{FromDatum, IntoDatum, PgMemoryContexts, StringInfo, pg_sys, rust_regtypein};
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
 };
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
-use std::borrow::Cow;
 use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
-use std::marker::PhantomData;
+use std::mem::size_of;
 use std::ops::{Deref, DerefMut};
+use std::{ptr, slice};
 
-struct PallocdVarlena {
-    ptr: *mut pg_sys::varlena,
-    len: usize,
-}
-
-impl Clone for PallocdVarlena {
-    fn clone(&self) -> Self {
-        let len = self.len;
-
-        // A borrowed varlena can point into a tuple, which stores it at its type's alignment
-        // rather than as a palloc chunk. GetMemoryChunkContext reads the header before a
-        // MAXALIGNed chunk, so reject a pointer that cannot be one instead of reading a header
-        // that is not there.
-        assert!(
-            self.ptr.addr().is_multiple_of(pg_sys::MAXIMUM_ALIGNOF as usize),
-            "cannot find the memory context of a varlena that is not MAXALIGNed"
-        );
-
-        // SAFETY: not established. GetMemoryChunkContext requires a palloc chunk, and a
-        // MAXALIGNed varlena borrowed from a tuple passes the check above without being one.
-        let ptr = unsafe {
-            PgMemoryContexts::of(self.ptr as void_mut_ptr)
-                .expect("could not determine owning memory context")
-                .copy_ptr_into(self.ptr as void_mut_ptr, len) as *mut pg_sys::varlena
-        };
-
-        PallocdVarlena { ptr, len }
-    }
-}
-
-/// Wraps a Postgres `varlena *`, presenting it as if it's a Rust type of a fixed size.
+/// A Rust type of a fixed size, stored in PostgreSQL as the payload of a `varlena`.
 ///
-/// The wrapped `varlena *` is behind a Rust `alloc::borrow:Cow` which ensures that in the
-/// common-use case of creating a `PgVarlena` from a Postgres-provided `Datum`, it's not
-/// possible to scribble on that Postgres-allocated memory.
+/// A `PgVarlena<T>` holds its value in Rust. Reading one from a Datum copies the payload into a
+/// Rust heap allocation aligned for `T`, because PostgreSQL places the payload right after a one-
+/// or four-byte header, one or four bytes past the start of the varlena, without aligning it.
+/// `Deref` and `DerefMut` lend references to that copy. The value keeps no pointer into
+/// PostgreSQL memory, so it may outlive the Datum, memory context, or SPI connection it was read
+/// from, and changing it never writes to that Datum. [`PgVarlena::into_pg`] and [`IntoDatum`]
+/// allocate a new varlena holding the value in `CurrentMemoryContext`.
 ///
 /// Generally, `PgVarlena` is meant to be used in conjunction with pgrx's `PostgresType` derive macro
 /// to provide transparent mapping of fixed-size Rust types as Postgres datums.
+///
+/// ## Padding
+///
+/// The payload holds every byte of the value, padding bytes included, as they are. A value read
+/// from a Datum keeps the padding bytes it was read with. A value built in Rust has unspecified
+/// padding: [`PgVarlena::new`], `PgVarlena::from`, `Default`, and assigning a whole `T` through
+/// `DerefMut` (`*v = T { .. }`) copy a typed `T`, which can leave any bytes, such as stale stack
+/// contents, in its padding. PostgreSQL writes those bytes to disk and WAL, and comparisons of
+/// stored bytes, such as `record_image_eq` (`*=`) and `REFRESH MATERIALIZED VIEW CONCURRENTLY`,
+/// then treat equal values as different.
+///
+/// For a type whose stored bytes matter, use a `#[repr(C)]` type without padding, adding
+/// explicit padding fields where alignment would leave gaps. Otherwise start from
+/// [`PgVarlena::new_zeroed`] and write the fields one at a time.
 ///
 /// ## Example
 ///
@@ -81,12 +68,11 @@ impl Clone for PallocdVarlena {
 ///         let mut iter = input.to_str().unwrap().split(',');
 ///         let (a, b, c) = (iter.next(), iter.next(), iter.next());
 ///
-///         let mut result = PgVarlena::<MyType>::new();
-///         result.a = f32::from_str(a.unwrap()).expect("a is not a valid f32");
-///         result.b = f32::from_str(b.unwrap()).expect("b is not a valid f32");
-///         result.c = i64::from_str(c.unwrap()).expect("c is not a valid i64");
-///
-///         result
+///         PgVarlena::from(MyType {
+///             a: f32::from_str(a.unwrap()).expect("a is not a valid f32"),
+///             b: f32::from_str(b.unwrap()).expect("b is not a valid f32"),
+///             c: i64::from_str(c.unwrap()).expect("c is not a valid i64"),
+///         })
 ///     }
 ///
 ///     fn output(&self, buffer: &mut pgrx::StringInfo) {
@@ -96,7 +82,7 @@ impl Clone for PallocdVarlena {
 ///
 /// #[pg_extern]
 /// fn do_a_thing(mut input: PgVarlena<MyType>) -> PgVarlena<MyType> {
-///     input.c += 99;  // performs a copy-on-write
+///     input.c += 99;  // changes the Rust copy; the returned Datum is a new varlena
 ///     input
 /// }
 /// ```
@@ -104,26 +90,30 @@ pub struct PgVarlena<T>
 where
     T: Copy + Sized,
 {
-    leaked: Option<*mut PallocdVarlena>,
-    varlena: Cow<'static, PallocdVarlena>,
-    need_free: bool,
-    __marker: PhantomData<T>,
+    /// Boxed because a typed move of `T` need not keep padding bytes. Moving a `PgVarlena` moves
+    /// only this pointer, so the value's padding bytes change only when a typed value is
+    /// written over them through `DerefMut`.
+    value: Box<T>,
+    /// Payload bytes that followed the `T` in the Datum this value was read from.
+    tail: Box<[u8]>,
 }
 
 impl<T> PgVarlena<T>
 where
     T: Copy + Sized,
 {
-    /// Create a new `PgVarlena` representing a Rust type.  The backing varlena is allocated
-    /// by Postgres and initially zero'd (using `pg_sys::palloc0`).  Unless `.into_pg()` is called,
-    /// the Postgres-allocated memory will follow Rust's drop semantics.
+    /// Create a new `PgVarlena` holding `T::default()`. For a type without a `Default`
+    /// implementation, build the value and convert it with `PgVarlena::from` instead.
+    ///
+    /// The value's padding bytes are unspecified, and [`into_pg`](PgVarlena::into_pg) stores them
+    /// as they are; see [Padding](PgVarlena#padding).
     ///
     /// ## Example
     ///
     /// ```rust,no_run
     /// use pgrx::prelude::*;
     ///
-    /// #[derive(Copy, Clone)]
+    /// #[derive(Copy, Clone, Default)]
     /// struct MyType {
     ///    a: f32,
     ///    b: f32,
@@ -135,104 +125,170 @@ where
     /// v.b = 0.424242;
     /// v.c = 42;
     /// ```
-    pub fn new() -> Self {
-        let size_of = std::mem::size_of::<T>();
-
-        let ptr =
-            unsafe { pg_sys::palloc0(pg_sys::VARHDRSZ as usize + size_of) as *mut pg_sys::varlena };
-
-        // SAFETY: palloc0 provides live aligned storage including the writable header
-        // prefix, with no competing borrow. The short branch checks that its encoded
-        // size fits the one-byte header; the other branch writes the four-byte header.
-        unsafe {
-            if size_of + pg_sys::VARHDRSZ_SHORT as usize <= pg_sys::VARATT_SHORT_MAX as usize {
-                // we can use the short header size
-                pg_sys::SET_VARSIZE_SHORT!(ptr, (size_of + pg_sys::VARHDRSZ_SHORT as usize) as i32)
-                    .get();
-            } else {
-                // gotta use the full 4-byte header
-                pg_sys::SET_VARSIZE_4B!(ptr, (size_of + pg_sys::VARHDRSZ as usize) as i32).get();
-            }
-        }
-
-        PgVarlena {
-            leaked: None,
-            varlena: Cow::Owned(PallocdVarlena {
-                ptr,
-                // SAFETY: The header was initialized above and its allocation remains
-                // live. This reads the encoded length without accessing payload values.
-                len: unsafe { pg_sys::VARSIZE_ANY!(ptr).get() as usize },
-            }),
-            need_free: true,
-            __marker: PhantomData,
-        }
+    pub fn new() -> Self
+    where
+        T: Default,
+    {
+        Self::from(T::default())
     }
 
-    /// Construct a `PgVarlena` from a known-to-be-non-null `pg_sys::Datum`.  As
-    /// `FromDatum for PgVarlena<T> where T: Copy + Sized` is already implemented, it is unlikely
-    /// that this function will need to be called directly.
+    /// Create a new `PgVarlena` whose value is all zero bytes, padding included, as
+    /// `PgVarlena::new` did before it required `T: Default`.
     ///
-    /// The provided datum is automatically detoasted and the returned `PgVarlena` will either
-    /// be considered borrowed or owned based on if detoasting actually needed to allocate memory.
-    /// If it didn't, then we're borrowed, otherwise we're owned.
+    /// This is how to store zero padding for a type that has padding. Writing a field through
+    /// `DerefMut`, such as `v.a = 1`, changes only that field's bytes, so the padding stays zero
+    /// in the payload that [`into_pg`](PgVarlena::into_pg) stores. Assigning a whole `T`, such as
+    /// `*v = T { .. }`, or a field whose own type has padding, copies a typed value and leaves
+    /// that padding unspecified; see [Padding](PgVarlena#padding).
+    ///
+    /// ## Example
+    ///
+    /// ```rust,no_run
+    /// use pgrx::prelude::*;
+    ///
+    /// #[derive(Copy, Clone)]
+    /// #[repr(C)]
+    /// struct Reading {
+    ///     id: u64,
+    ///     flag: u8, // followed by 7 padding bytes
+    /// }
+    ///
+    /// // SAFETY: all-zero bytes are a valid Reading.
+    /// let mut v = unsafe { PgVarlena::<Reading>::new_zeroed() };
+    /// v.id = 7;
+    /// v.flag = 1;
+    /// ```
     ///
     /// ## Safety
     ///
-    /// This function is considered unsafe as it cannot guarantee the provided `pg_sys::Datum` is a
-    /// valid `*mut pg_sys::varlena`.
-    pub unsafe fn from_datum(datum: pg_sys::Datum) -> Self {
-        let ptr = pg_sys::pg_detoast_datum(datum.cast_mut_ptr());
-        // SAFETY: the caller's valid varlena datum was detoasted into live storage
-        // with an initialized header whose size describes the complete allocation.
-        let len = unsafe { pg_sys::VARSIZE_ANY!(ptr).get() as usize };
+    /// All-zero bytes must be a valid value of `T`. That holds for integers, floats, `bool`, and
+    /// raw pointers, and for arrays and structs made only of them. It does not hold for
+    /// references, `NonZero` integers, function pointers, or an enum without a zero
+    /// discriminant, among others.
+    pub unsafe fn new_zeroed() -> Self {
+        // SAFETY: the caller promises that all-zero bytes are a valid T.
+        let value = unsafe { Box::<T>::new_zeroed().assume_init() };
+        PgVarlena { value, tail: Box::default() }
+    }
 
-        if ptr == datum.cast_mut_ptr() {
-            // no detoasting happened so we're using borrowed memory
-            let leaked = Box::leak(Box::new(PallocdVarlena { ptr, len }));
-            PgVarlena {
-                leaked: Some(leaked),
-                varlena: Cow::Borrowed(leaked),
-                need_free: false,
-                __marker: PhantomData,
+    /// Read a `PgVarlena` from a non-null varlena `pg_sys::Datum`. As
+    /// `FromDatum for PgVarlena<T> where T: Copy + Sized` is already implemented, it is unlikely
+    /// that this function will need to be called directly.
+    ///
+    /// The payload is copied into the returned value, which does not borrow `datum`. A compressed
+    /// or external value is first detoasted into a temporary copy in `CurrentMemoryContext`,
+    /// which is freed before returning. Payload bytes after the `T` are kept, and
+    /// [`PgVarlena::into_pg`] writes them back after the value.
+    ///
+    /// ## Safety
+    ///
+    /// `datum` must point to a live varlena, possibly packed, compressed, or external. Its
+    /// payload must start with `size_of::<T>()` bytes that form a valid `T` in this process, for
+    /// the current definition of `T`, and the rest of its payload must be initialized. Bytes
+    /// stored earlier need not qualify, for example when `T` holds a reference or pointer, or
+    /// when its layout or variants have changed since. A four-byte header must be four-byte
+    /// aligned, as PostgreSQL aligns the varlenas it stores and allocates. The call must run on
+    /// the PostgreSQL backend thread.
+    ///
+    /// ## Panics
+    ///
+    /// Panics if the payload is shorter than `T`.
+    pub unsafe fn from_datum(datum: pg_sys::Datum) -> Self {
+        let ptr = datum.cast_mut_ptr::<pg_sys::varlena>();
+        // SAFETY: the caller supplies a live varlena, whose header these macros read.
+        let toasted = unsafe {
+            pg_sys::VARATT_IS_COMPRESSED!(ptr).is_true()
+                || pg_sys::VARATT_IS_EXTERNAL!(ptr).is_true()
+        };
+        if !toasted {
+            // SAFETY: a varlena that is neither compressed nor external holds its whole payload
+            // inline, and the caller promises that payload starts with a valid T.
+            return unsafe { Self::from_inline_varlena(ptr) };
+        }
+        // SAFETY: for a compressed or external varlena, pg_detoast_datum_packed returns a new
+        // plain copy allocated in CurrentMemoryContext, which only this block uses and frees.
+        unsafe {
+            let detoasted = pg_sys::pg_detoast_datum_packed(ptr);
+            let value = Self::from_inline_varlena(detoasted);
+            if detoasted != ptr {
+                pg_sys::pfree(detoasted.cast());
             }
-        } else {
-            // datum was detoasted so we own and need to free it
-            PgVarlena {
-                leaked: None,
-                varlena: Cow::Owned(PallocdVarlena { ptr, len }),
-                need_free: true,
-                __marker: PhantomData,
-            }
+            value
         }
     }
 
-    /// Use when you need to pass the backing `*mut pg_sys::varlena` to a Postgres function.
+    /// Copy the payload of a plain varlena, with a one- or four-byte header.
+    ///
+    /// # Safety
+    ///
+    /// `ptr` must point to a live varlena that is neither compressed nor external, with a
+    /// four-byte-aligned header if the header is four bytes long. Its payload must start with the
+    /// bytes of a valid `T`, and the rest of it must be initialized.
+    unsafe fn from_inline_varlena(ptr: *mut pg_sys::varlena) -> Self {
+        // SAFETY: the caller's live varlena header describes its inline payload. A one-byte
+        // header is read with a byte load, and a four-byte header, which the caller aligns, with
+        // an aligned 32-bit load.
+        let (len, payload) = unsafe {
+            (pg_sys::VARSIZE_ANY_EXHDR!(ptr).get() as usize, pg_sys::VARDATA_ANY!(ptr).get())
+        };
+        let payload = payload.cast::<u8>().cast_const();
+        let size = size_of::<T>();
+        assert!(len >= size, "varlena payload of {len} bytes cannot hold a {size}-byte value");
+
+        let mut value = Box::<T>::new_uninit();
+        // SAFETY: the payload has `len >= size` bytes, all initialized, and cannot overlap the new
+        // Rust allocation. The byte copies need no alignment and keep the payload's padding bytes.
+        // The caller promises the first `size` bytes are a valid T, so `value` holds one after
+        // the copy. The tail slice covers the remaining `len - size` payload bytes, and its
+        // pointer is non-null and aligned for u8 even when that length is zero.
+        let (value, tail) = unsafe {
+            ptr::copy_nonoverlapping(payload, value.as_mut_ptr().cast::<u8>(), size);
+            (value.assume_init(), Box::from(slice::from_raw_parts(payload.add(size), len - size)))
+        };
+        PgVarlena { value, tail }
+    }
+
+    /// Allocate a varlena holding this value in `CurrentMemoryContext`, and return it to pass to a
+    /// Postgres function. The varlena belongs to that memory context; Rust does not free it.
+    ///
+    /// The payload is the bytes of the value, padding bytes included, followed by any payload
+    /// bytes that came after the `T` in the Datum this value was read from. It gets a one-byte
+    /// header when it fits one. Padding of a value built in Rust is unspecified; see
+    /// [Padding](PgVarlena#padding).
     ///
     /// This method is also used by the `IntoDatum for PgVarlena<T> where T: Copy + Sized`
     /// implementation.
-    pub fn into_pg(mut self) -> *mut pg_sys::varlena {
-        // we don't want our varlena to be pfree'd
-        self.need_free = false;
-        self.varlena.ptr
-    }
-}
+    pub fn into_pg(self) -> *mut pg_sys::varlena {
+        let size = size_of::<T>();
+        let payload_len =
+            size.checked_add(self.tail.len()).expect("varlena payload length overflows usize");
+        let short = payload_len <= pg_sys::VARATT_SHORT_MAX as usize - pg_sys::VARHDRSZ_SHORT;
+        let header = if short { pg_sys::VARHDRSZ_SHORT } else { pg_sys::VARHDRSZ as usize };
+        let total = payload_len.checked_add(header).expect("varlena length overflows usize");
 
-/// `pg_sys::pfree` a `PgVarlena` if we allocated it, instead of Postgres
-impl<T> Drop for PgVarlena<T>
-where
-    T: Copy + Sized,
-{
-    fn drop(&mut self) {
-        if self.need_free {
-            unsafe {
-                // safe: self.varlena.ptr will never be null
-                pg_sys::pfree(self.varlena.ptr as void_mut_ptr);
+        // palloc raises an ERROR for any size above MaxAllocSize, so the header length below
+        // fits C `int`.
+        // SAFETY: palloc returns storage aligned for any varlena header, or raises an ERROR
+        // instead of returning NULL.
+        let ptr = unsafe { pg_sys::palloc(total) }.cast::<pg_sys::varlena>();
+
+        // SAFETY: the new allocation holds `total` bytes, a header of the chosen form followed by
+        // `payload_len` bytes, with no other reference to it. A short varlena's `total` is at
+        // most VARATT_SHORT_MAX, which its one-byte header can encode. VARDATA_ANY reads the
+        // header just written, and the byte copies, which need no alignment, cover the
+        // `payload_len` bytes after it. `value` is a valid T, initialized except perhaps for
+        // padding bytes, which an untyped copy may read.
+        unsafe {
+            if short {
+                pg_sys::SET_VARSIZE_SHORT!(ptr, total as i32).get();
+            } else {
+                pg_sys::SET_VARSIZE_4B!(ptr, total as i32).get();
             }
+            let data = pg_sys::VARDATA_ANY!(ptr).get().cast::<u8>();
+            ptr::copy_nonoverlapping(ptr::from_ref::<T>(&self.value).cast::<u8>(), data, size);
+            ptr::copy_nonoverlapping(self.tail.as_ptr(), data.add(size), self.tail.len());
         }
-
-        if let Some(leaked) = self.leaked {
-            unsafe { drop(Box::from_raw(leaked)) }
-        }
+        ptr
     }
 }
 
@@ -302,11 +358,16 @@ where
     T: Copy + Sized,
 {
     fn as_ref(&self) -> &T {
-        unsafe {
-            // safe: ptr will never be null
-            let ptr = pg_sys::VARDATA_ANY!(self.varlena.ptr).get() as *const T;
-            ptr.as_ref().unwrap()
-        }
+        &self.value
+    }
+}
+
+impl<T> AsMut<T> for PgVarlena<T>
+where
+    T: Copy + Sized,
+{
+    fn as_mut(&mut self) -> &mut T {
+        &mut self.value
     }
 }
 
@@ -314,25 +375,21 @@ impl<T> Default for PgVarlena<T>
 where
     T: Default + Copy,
 {
+    /// Create a `PgVarlena` holding `T::default()`, as [`PgVarlena::new`] does. Its padding
+    /// bytes are unspecified; see [Padding](PgVarlena#padding).
     fn default() -> Self {
-        let mut ptr = Self::new();
-        *ptr = T::default();
-        ptr
+        Self::new()
     }
 }
 
-/// Does a copy-on-write if the backing varlena pointer is borrowed
-impl<T> AsMut<T> for PgVarlena<T>
+impl<T> From<T> for PgVarlena<T>
 where
     T: Copy + Sized,
 {
-    fn as_mut(&mut self) -> &mut T {
-        unsafe {
-            // safe: ptr will never be null
-            let varlena = self.varlena.to_mut().ptr;
-            let ptr = pg_sys::VARDATA_ANY!(varlena).get() as *mut T;
-            ptr.as_mut().unwrap()
-        }
+    /// Wrap `value`. A typed `T` carries only its fields, so the padding bytes stored for it
+    /// are unspecified; see [Padding](PgVarlena#padding).
+    fn from(value: T) -> Self {
+        PgVarlena { value: Box::new(value), tail: Box::default() }
     }
 }
 
@@ -358,6 +415,8 @@ where
     }
 }
 
+// The default `from_datum_in_memory_context` suffices: the value copies its payload, so it
+// does not depend on the memory context the Datum lives in.
 impl<T> FromDatum for PgVarlena<T>
 where
     T: Copy + Sized,
@@ -368,28 +427,6 @@ where
         _typoid: pg_sys::Oid,
     ) -> Option<Self> {
         if is_null { None } else { Some(PgVarlena::<T>::from_datum(datum)) }
-    }
-
-    unsafe fn from_datum_in_memory_context(
-        mut memory_context: PgMemoryContexts,
-        datum: pg_sys::Datum,
-        is_null: bool,
-        _typoid: pg_sys::Oid,
-    ) -> Option<Self> {
-        if is_null {
-            None
-        } else {
-            memory_context.switch_to(|_| {
-                // this gets the varlena Datum copied into this memory context
-                let detoasted = pg_sys::pg_detoast_datum_copy(datum.cast_mut_ptr());
-
-                // and we need to unpack it (if necessary), which will decompress it too
-                let varlena = pg_sys::pg_detoast_datum_packed(detoasted);
-
-                // and now we return it as a &str
-                Some(PgVarlena::<T>::from_datum(varlena.into()))
-            })
-        }
     }
 }
 
@@ -416,6 +453,13 @@ where
     varlena as *const pg_sys::varlena
 }
 
+/// Decodes a value that [`cbor_encode`] wrote. Panics if the payload is not a CBOR `T`.
+///
+/// # Safety
+///
+/// `input` must point to a live varlena, which may be toasted. The returned value may borrow from
+/// `input`, or from a detoasted copy allocated in `CurrentMemoryContext`, for `'de`, so both must
+/// stay allocated for `'de`.
 #[doc(hidden)]
 pub unsafe fn cbor_decode<'de, T>(input: *mut pg_sys::varlena) -> T
 where
@@ -429,6 +473,20 @@ where
     };
     let slice = std::slice::from_raw_parts(data as *const u8, len);
     serde_cbor::from_slice(slice).expect("failed to decode CBOR")
+}
+
+/// [`cbor_decode`] for a `T` that borrows nothing from `input`.
+///
+/// # Safety
+///
+/// `input` must point to a live varlena, which may be toasted.
+#[doc(hidden)]
+pub unsafe fn cbor_decode_owned<T>(input: *mut pg_sys::varlena) -> T
+where
+    T: DeserializeOwned,
+{
+    // SAFETY: the caller passes a live varlena, and a `T` that borrows nothing cannot outlive it.
+    unsafe { cbor_decode(input) }
 }
 
 #[doc(hidden)]
@@ -455,4 +513,66 @@ where
     const TYPE_ORIGIN: pgrx_sql_entity_graph::metadata::TypeOrigin = T::TYPE_ORIGIN;
     const ARGUMENT_SQL: Result<SqlMappingRef, ArgumentError> = T::ARGUMENT_SQL;
     const RETURN_SQL: Result<ReturnsRef, ReturnsError> = T::RETURN_SQL;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::PgVarlena;
+    use core::mem::size_of;
+    use core::num::NonZeroU32;
+    use core::{ptr, slice};
+
+    #[test]
+    fn constructors_hold_valid_values() {
+        // A type whose all-zero bytes are not a valid value.
+        assert_eq!(*PgVarlena::from(NonZeroU32::MIN), NonZeroU32::MIN);
+        assert_eq!(*PgVarlena::<&str>::default(), "");
+        assert_eq!(*PgVarlena::<(u8, i64)>::new(), (0, 0));
+        // SAFETY: all-zero bytes are a valid [u32; 4].
+        assert_eq!(*unsafe { PgVarlena::<[u32; 4]>::new_zeroed() }, [0; 4]);
+    }
+
+    /// Fill part of the stack with nonzero bytes, so that padding lost to a typed copy does
+    /// not happen to read as zero.
+    #[inline(never)]
+    fn dirty_stack() {
+        core::hint::black_box([0xa5_u8; 4096]);
+    }
+
+    /// A value started with `new_zeroed` keeps zero padding through field writes and moves, in
+    /// the bytes that `into_pg` copies into the varlena.
+    #[test]
+    fn new_zeroed_keeps_padding_zero_through_field_writes() {
+        /// One field byte, three padding bytes, then four field bytes. Rust may pass it by
+        /// value as two scalars, which drops the padding bytes.
+        #[derive(Copy, Clone)]
+        #[repr(C)]
+        struct Padded {
+            a: u8,
+            b: u32,
+        }
+
+        #[inline(never)]
+        fn build() -> PgVarlena<Padded> {
+            // SAFETY: all-zero bytes are a valid Padded.
+            let mut v = unsafe { PgVarlena::<Padded>::new_zeroed() };
+            v.a = 0xa1;
+            v.b = 0xb2c3_d4e5;
+            v
+        }
+
+        dirty_stack();
+        let v = core::hint::black_box(build());
+        // SAFETY: new_zeroed initialized every byte of the value, the field writes changed
+        // only field bytes, and moving a PgVarlena does not copy the value as a Padded.
+        let bytes = unsafe {
+            slice::from_raw_parts(
+                ptr::from_ref::<Padded>(&v.value).cast::<u8>(),
+                size_of::<Padded>(),
+            )
+        };
+        assert_eq!(bytes[0], 0xa1);
+        assert_eq!(bytes[1..4], [0; 3], "padding bytes");
+        assert_eq!(bytes[4..], 0xb2c3_d4e5_u32.to_ne_bytes());
+    }
 }

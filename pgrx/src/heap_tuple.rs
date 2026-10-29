@@ -337,7 +337,8 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByRust> {
     /// Attribute numbers start at 1, not 0.
     ///
     /// ## Errors
-    /// - return [TryFromDatumError::NoSuchAttributeNumber] if the attribute does not exist
+    /// - return [TryFromDatumError::NoSuchAttributeNumber] if the attribute does not exist or
+    ///   has been dropped
     /// - return [TryFromDatumError::IncompatibleTypes] if the Rust type of the `value` is not
     ///   compatible with the attribute's Postgres type
     pub fn set_by_index<T: IntoDatum>(
@@ -346,7 +347,9 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByRust> {
         value: T,
     ) -> Result<(), TryFromDatumError> {
         unsafe {
-            match self.get_attribute_by_index(attno) {
+            // A dropped attribute's type is InvalidOid, which the checks below would accept for a
+            // `T` whose `type_oid` is also InvalidOid, such as `Array<Array<i32>>`.
+            match self.get_attribute_by_index(attno).filter(|att| !att.is_dropped()) {
                 None => return Err(TryFromDatumError::NoSuchAttributeNumber(attno)),
                 Some(att) => {
                     // if the attribute's type is an array and our incoming value is a composite
@@ -366,15 +369,16 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByRust> {
                             });
                         }
                     } else {
-                        // it's not an array type, so we'll do standard type compatibility checks
-                        let type_oid = T::type_oid();
-                        let composite_type_oid = value.composite_type_oid();
-                        let is_compatible_composite_types = type_oid == pg_sys::RECORDOID
-                            && composite_type_oid == Some(att.atttypid);
-                        if !is_compatible_composite_types && !T::is_compatible_with(att.atttypid) {
+                        // it's not an array type, so we'll do standard type compatibility checks.
+                        // is_compatible_with looks `T`'s type up, as type_oid does, and for a
+                        // PostgresType that is a catalog search by name, so check it first.
+                        let compatible = T::is_compatible_with(att.atttypid)
+                            || (value.composite_type_oid() == Some(att.atttypid)
+                                && T::type_oid() == pg_sys::RECORDOID);
+                        if !compatible {
                             return Err(TryFromDatumError::IncompatibleTypes {
                                 rust_type: std::any::type_name::<T>(),
-                                rust_oid: type_oid,
+                                rust_oid: T::type_oid(),
                                 datum_type: lookup_type_name(att.atttypid),
                                 datum_oid: att.atttypid,
                             });
@@ -445,13 +449,12 @@ impl<'mcx, AllocatedBy: WhoAllocated> IntoDatum for PgHeapTuple<'mcx, AllocatedB
     }
 
     fn is_compatible_with(other: pg_sys::Oid) -> bool {
-        fn is_composite(oid: pg_sys::Oid) -> bool {
-            unsafe {
-                let entry = pg_sys::lookup_type_cache(oid, pg_sys::TYPECACHE_TUPDESC as _);
-                (*entry).typtype as i8 == pg_sys::RELKIND_COMPOSITE_TYPE as i8
+        // SAFETY: get_typtype takes the OID by value and only looks it up. It returns '\0' for an
+        // OID that names no type, where lookup_type_cache would raise an ERROR.
+        Self::type_oid() == other
+            || unsafe {
+                pg_sys::get_typtype(other) == pg_sys::TYPTYPE_COMPOSITE as core::ffi::c_char
             }
-        }
-        Self::type_oid() == other || is_composite(other)
     }
 }
 
@@ -492,45 +495,43 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
 
     /// Returns an iterator over the attributes in this [`PgHeapTuple`].
     ///
-    /// The return value is `(attribute_number: NonZeroUsize, attribute_info: &pg_sys::FormData_pg_attribute)`.
+    /// The return value is `(attribute_number: NonZeroUsize, attribute_info:
+    /// pg_sys::FormData_pg_attribute)`. Each `attribute_info` is a copy, as
+    /// [`PgTupleDesc::get`] returns.
     pub fn attributes(
         &self,
-    ) -> impl std::iter::Iterator<Item = (NonZeroUsize, &pg_sys::FormData_pg_attribute)> {
+    ) -> impl std::iter::Iterator<Item = (NonZeroUsize, pg_sys::FormData_pg_attribute)> {
         self.tupdesc.iter().enumerate().map(|(i, att)| (NonZeroUsize::new(i + 1).unwrap(), att))
     }
 
-    /// Get the attribute information for the specified attribute number.
+    /// Get a copy of the attribute information for the specified attribute number, as
+    /// [`PgTupleDesc::get`] returns it.
     ///
     /// Returns `None` if the attribute number is out of bounds.
     #[inline]
     pub fn get_attribute_by_index(
         &self,
         index: NonZeroUsize,
-    ) -> Option<&pg_sys::FormData_pg_attribute> {
+    ) -> Option<pg_sys::FormData_pg_attribute> {
         self.tupdesc.get(index.get() - 1)
     }
 
-    /// Get the attribute information for the specified attribute, by name.
+    /// Get the number and a copy of the attribute information for the specified attribute, by
+    /// name, as [`PgTupleDesc::get`] returns it.
     ///
     /// Returns `None` if the attribute name is not found.
     pub fn get_attribute_by_name(
         &self,
         name: &str,
-    ) -> Option<(NonZeroUsize, &pg_sys::FormData_pg_attribute)> {
-        for i in 0..self.len() {
-            let i = NonZeroUsize::new(i + 1).unwrap();
-            let att = self.get_attribute_by_index(i).unwrap();
-            if att.name() == name {
-                return Some((i, att));
-            }
-        }
-
-        None
+    ) -> Option<(NonZeroUsize, pg_sys::FormData_pg_attribute)> {
+        self.attributes().find(|(_, att)| att.name() == name)
     }
 
     /// Retrieve the value of the specified attribute, by name.
     ///
     /// Attribute names are case-insensitive.
+    ///
+    /// The value is read as [`PgHeapTuple::get_by_index`] reads it.
     ///
     /// ## Errors
     /// - return [`TryFromDatumError::NoSuchAttributeName`] if the attribute does not exist
@@ -556,10 +557,28 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
     ///
     /// Attribute numbers start at 1, not 0.
     ///
+    /// A dropped attribute reads as `None`, as SQL field selection reads it, even in a row stored
+    /// before the drop that still holds a value.
+    ///
+    /// A `PgBox<T>` is a copy of the attribute's value in `CurrentMemoryContext`, because the
+    /// tuple frees its memory when it drops or when an attribute is set. It reads only an
+    /// attribute whose type is passed by reference with a fixed length of `size_of::<T>()` bytes,
+    /// and only if `T` needs no more than PostgreSQL's `MAXALIGN` alignment, as
+    /// [`UnboxDatum::can_unbox`] decides. Otherwise it returns
+    /// [`TryFromDatumError::IncompatibleTypes`].
+    ///
+    /// A `T` that borrows, such as `&'tup str`, keeps the tuple borrowed, but it can also point
+    /// into a copy that reading allocates in `CurrentMemoryContext`, as `&str` does for a
+    /// compressed or out-of-line value, and `'tup` does not keep that copy alive. Do not use a
+    /// `PgBox<T>` or a borrowed `T` after the context that was current at the call is reset or
+    /// deleted, for example after returning it out of `Spi::connect`.
+    ///
     /// ## Errors
     /// - return [`TryFromDatumError::NoSuchAttributeNumber`] if the attribute does not exist
     /// - return [`TryFromDatumError::IncompatibleTypes`] if the Rust type of the `value` is not
-    ///   compatible with the attribute's Postgres type
+    ///   compatible with the attribute's Postgres type, as `T`'s
+    ///   [`FromDatum::try_from_datum`] or [`FromDatum::try_from_datum_in_memory_context`]
+    ///   decides
     pub fn get_by_index<'tup, T>(
         &'tup self,
         attno: NonZeroUsize,
@@ -567,25 +586,63 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
     where
         T: FromDatum + IntoDatum + UnboxDatum<As<'tup> = T> + 'tup,
     {
+        // tuple descriptor attribute numbers are zero-based
+        let Some(att) = self.tupdesc.get(attno.get() - 1) else {
+            // it's an attribute number outside the bounds of the tuple descriptor
+            return Err(TryFromDatumError::NoSuchAttributeNumber(attno));
+        };
+        // PostgreSQL sets a dropped attribute's type to InvalidOid, so a value that a row stored
+        // before the drop still holds cannot be checked against `T`.
+        if att.is_dropped() {
+            return Ok(None);
+        }
+        // SAFETY: this PgHeapTuple holds a live tuple whose stored attributes have the length,
+        // alignment, and pass-by-value flag of its descriptor's attributes in the same
+        // positions: the tuple was formed with that descriptor or is a stored row of its row
+        // type. The lookup above bounds `attno` by the descriptor's attribute count.
+        // nocachegetattr can write attcacheoff into the descriptor's FormData_pg_attribute array
+        // on PG15-17 and its CompactAttribute array on PG18. PgTupleDesc only copies attributes
+        // out and safe code cannot borrow either array, so no Rust reference aliases the write.
+        let datum = unsafe { heap_getattr_raw(self.tuple.as_ptr(), attno, self.tupdesc.as_ptr()) };
+        let Some(datum) = datum else {
+            return Ok(None);
+        };
+        // A `T` that reads records reads a row-type attribute (a record, a composite type, or a
+        // domain over one) as RECORDOID. Any other attribute keeps its own type, which the try_
+        // conversions below check against `T`. They look `T`'s type up to do so, and for a
+        // PostgresType that is a catalog search by name, so ask `T` for its type here only for a
+        // row type. A row type is variable-length, so a fixed-length attribute skips the
+        // type_is_rowtype lookup too. A NULL, returned above, needs none of these lookups.
+        // SAFETY: type_is_rowtype takes the OID by value and only looks it up.
+        let typoid = if att.attlen == -1
+            && unsafe { pg_sys::type_is_rowtype(att.atttypid) }
+            && T::type_oid() == pg_sys::RECORDOID
+        {
+            pg_sys::RECORDOID
+        } else {
+            att.atttypid
+        };
+        // SAFETY: the datum is this attribute's value, of type `att.atttypid`. It lives as long as
+        // the tuple and descriptor that `self` holds and `'tup` borrows: on PG15.0-15.4, a
+        // missing value points into the descriptor. A `T` that names `'tup` keeps them borrowed.
+        // This does not cover a copy that the conversion allocates in CurrentMemoryContext, such
+        // as a detoasted `&str`: `'tup` does not bound that context, so a borrowed `T` can
+        // outlive the copy it points into. That is a known gap, documented on this method.
+        // Any other `T` must not point into the datum, as UnboxDatum's safety section requires,
+        // unless it sets POINTS_INTO_DATUM, and then from_datum_in_memory_context copies it into
+        // CurrentMemoryContext. `typoid` is RECORDOID only when that type is a row type, whose
+        // values are composite Datums; otherwise it is `att.atttypid`, which both conversions
+        // check against `T` before reading the datum.
         unsafe {
-            // tuple descriptor attribute numbers are zero-based
-            match self.tupdesc.get(attno.get() - 1) {
-                // it's an attribute number outside the bounds of the tuple descriptor
-                None => Err(TryFromDatumError::NoSuchAttributeNumber(attno)),
-
-                // it's a valid attribute number
-                Some(att) => {
-                    let datum = heap_getattr_raw(self.tuple.as_ptr(), attno, self.tupdesc.as_ptr());
-                    if datum.is_none() {
-                        return Ok(None);
-                    }
-                    match T::type_oid() {
-                        record @ pg_sys::RECORDOID => {
-                            T::try_from_datum(datum.unwrap(), false, record)
-                        }
-                        _ => T::try_from_datum(datum.unwrap(), false, att.type_oid().value()),
-                    }
-                }
+            if T::POINTS_INTO_DATUM {
+                T::try_from_datum_in_memory_context(
+                    PgMemoryContexts::CurrentMemoryContext,
+                    datum,
+                    false,
+                    typoid,
+                )
+            } else {
+                T::try_from_datum(datum, false, typoid)
             }
         }
     }

@@ -27,11 +27,11 @@ impl PgVarlenaInOutFuncs for VarlenaType {
         let mut iter = input.to_str().unwrap().split(',');
         let (a, b, c) = (iter.next(), iter.next(), iter.next());
 
-        let mut result = PgVarlena::<VarlenaType>::new();
-        result.a = f32::from_str(a.unwrap()).expect("a is not a valid f32");
-        result.b = f32::from_str(b.unwrap()).expect("b is not a valid f32");
-        result.c = i64::from_str(c.unwrap()).expect("c is not a valid i64");
-        result
+        PgVarlena::from(VarlenaType {
+            a: f32::from_str(a.unwrap()).expect("a is not a valid f32"),
+            b: f32::from_str(b.unwrap()).expect("b is not a valid f32"),
+            c: i64::from_str(c.unwrap()).expect("c is not a valid i64"),
+        })
     }
 
     fn output(&self, buffer: &mut StringInfo) {
@@ -49,18 +49,11 @@ pub enum VarlenaEnumType {
 
 impl PgVarlenaInOutFuncs for VarlenaEnumType {
     fn input(input: &CStr) -> PgVarlena<Self> where {
-        let mut result = PgVarlena::<Self>::new();
-        let s = input.to_str().unwrap();
-        match s {
-            "A" => {
-                *result = VarlenaEnumType::A;
-            }
-            "B" => {
-                *result = VarlenaEnumType::B;
-            }
+        PgVarlena::from(match input.to_str().unwrap() {
+            "A" => VarlenaEnumType::A,
+            "B" => VarlenaEnumType::B,
             _ => panic!("unexpected input"),
-        }
-        result
+        })
     }
 
     fn output(&self, buffer: &mut StringInfo) {
@@ -259,5 +252,40 @@ mod tests {
                 .unwrap();
         assert!(matches!(result, JsonEnumType::E1 { a } if a == 1.0));
         Ok(())
+    }
+
+    /// Writes `value` with its type's send function and reads it back with its receive function,
+    /// as `COPY ... (FORMAT binary)` does.
+    fn binary_round_trip<T: IntoDatum + FromDatum>(value: T) -> T {
+        let typoid = T::type_oid();
+        let datum = value.into_datum().unwrap();
+        let (mut send, mut is_varlena) = (pg_sys::Oid::INVALID, false);
+        let (mut receive, mut ioparam) = (pg_sys::Oid::INVALID, pg_sys::Oid::INVALID);
+        // SAFETY: `datum` is a non-null value of `typoid`, and the receive function gets a
+        // StringInfoData holding the bytes that the send function returned.
+        unsafe {
+            pg_sys::getTypeBinaryOutputInfo(typoid, &mut send, &mut is_varlena);
+            pg_sys::getTypeBinaryInputInfo(typoid, &mut receive, &mut ioparam);
+            let sent = pg_sys::OidSendFunctionCall(send, datum);
+            let sent = Vec::<u8>::from_datum(sent.into(), false).unwrap();
+            let mut buf = pgrx::StringInfo::new();
+            buf.push_bytes(&sent);
+            let buf = buf.into_pg();
+            let datum = pg_sys::OidReceiveFunctionCall(receive, buf, ioparam, -1);
+            assert_eq!((*buf).cursor, (*buf).len, "receive must read every byte");
+            T::from_datum(datum, false).unwrap()
+        }
+    }
+
+    #[pg_test]
+    fn test_binary_protocol_round_trip() {
+        let json = binary_round_trip(JsonType { a: 1.0, b: 2.0, c: 3 });
+        assert_eq!((json.a, json.b, json.c), (1.0, 2.0, 3));
+
+        let custom = binary_round_trip(CustomTextFormatSerializedType { a: 1.0, b: 2.0, c: 3 });
+        assert_eq!((custom.a, custom.b, custom.c), (1.0, 2.0, 3));
+
+        let json_enum = binary_round_trip(JsonEnumType::E2 { b: 2.0 });
+        assert!(matches!(json_enum, JsonEnumType::E2 { b } if b == 2.0));
     }
 }

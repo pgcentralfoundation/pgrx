@@ -592,10 +592,66 @@ mod sql_generator_tests {
 #[pgrx::pg_schema]
 mod tests {
     use pgrx::AllocatedByRust;
-    use pgrx::datum::TryFromDatumError;
+    use pgrx::datum::{Datum, TryFromDatumError, UnboxDatum};
     use pgrx::heap_tuple::PgHeapTupleError;
     use pgrx::prelude::*;
     use std::num::NonZeroUsize;
+
+    /// A Rust type with no SQL type, so `IntoDatum::type_oid` for `PgBox<NotAnSqlType>` raises
+    /// an ERROR.
+    #[derive(Debug)]
+    pub struct NotAnSqlType;
+
+    /// Reads `int4`, but its `try_from_datum` rejects every value, as a type that checks more
+    /// than the type OID there would reject one it cannot read.
+    #[derive(Debug)]
+    pub struct RejectedInt4;
+
+    impl FromDatum for RejectedInt4 {
+        unsafe fn from_polymorphic_datum(
+            _datum: pg_sys::Datum,
+            is_null: bool,
+            _typoid: pg_sys::Oid,
+        ) -> Option<Self> {
+            (!is_null).then_some(RejectedInt4)
+        }
+
+        unsafe fn try_from_datum(
+            _datum: pg_sys::Datum,
+            _is_null: bool,
+            type_oid: pg_sys::Oid,
+        ) -> Result<Option<Self>, TryFromDatumError> {
+            Err(TryFromDatumError::IncompatibleTypes {
+                rust_type: "RejectedInt4",
+                rust_oid: pg_sys::INT4OID,
+                datum_type: String::from("int4"),
+                datum_oid: type_oid,
+            })
+        }
+    }
+
+    impl IntoDatum for RejectedInt4 {
+        fn into_datum(self) -> Option<pg_sys::Datum> {
+            None
+        }
+
+        fn type_oid() -> pg_sys::Oid {
+            pg_sys::INT4OID
+        }
+    }
+
+    // SAFETY: `As` does not name `'src`, and unbox returns a unit value that does not point into
+    // the Datum.
+    unsafe impl UnboxDatum for RejectedInt4 {
+        type As<'src> = RejectedInt4;
+
+        unsafe fn unbox<'src>(_datum: Datum<'src>) -> Self::As<'src>
+        where
+            Self: 'src,
+        {
+            RejectedInt4
+        }
+    }
 
     #[pg_test]
     fn test_gets_name_field() {
@@ -897,18 +953,66 @@ mod tests {
         let tupdesc = pgrx::PgTupleDesc::for_composite_type("Dog").unwrap();
         let mut dog = PgHeapTuple::new_composite_type("Dog").unwrap();
         dog.set_by_name("scritches", 3_i32).unwrap();
-        let tuple = pgrx::htup::composite_row_type_make_tuple(dog.into_composite_datum().unwrap());
+        // SAFETY: into_composite_datum returns a live Dog composite datum.
+        let tuple = unsafe {
+            pgrx::htup::composite_row_type_make_tuple(dog.into_composite_datum().unwrap())
+        };
         (tupdesc, tuple)
+    }
+
+    #[pg_test]
+    fn test_composite_row_type_make_tuple_unpacks_short_header() -> Result<(), spi::Error> {
+        Spi::run(
+            "CREATE TABLE stored_dogs (dog Dog); INSERT INTO stored_dogs VALUES (ROW('Nami', 7));",
+        )?;
+        let tupdesc = pgrx::PgTupleDesc::for_composite_type("Dog").unwrap();
+        Spi::connect(|client| {
+            let row = client.select("SELECT dog FROM stored_dogs", None, &[])?.first();
+            let datum = row.get_datum_by_ordinal(1)?.expect("stored dog is not NULL");
+            // SAFETY: the SPI tuple holding this datum stays live inside the closure.
+            let short_header =
+                unsafe { pg_sys::VARATT_IS_1B!(datum.cast_mut_ptr::<pg_sys::varlena>()).is_true() };
+            // A composite this small is stored with a one-byte varlena header.
+            assert!(short_header, "the stored composite should be packed");
+
+            // SAFETY: `datum` is a live Dog composite datum read from the SPI tuple.
+            let tuple = unsafe { pgrx::htup::composite_row_type_make_tuple(datum) };
+            // SAFETY: the detoasted copy has an ordinary four-byte header.
+            let unpacked_len =
+                unsafe { pg_sys::VARSIZE_ANY!(tuple.t_data.cast::<pg_sys::varlena>()).get() };
+            assert_eq!(tuple.t_len as usize, unpacked_len as usize);
+            // SAFETY: `tuple` is the live Dog row that `tupdesc` describes.
+            let (name, scritches) = unsafe {
+                (
+                    pgrx::htup::heap_getattr::<String, _>(
+                        &tuple,
+                        NonZeroUsize::new(1).unwrap(),
+                        &tupdesc,
+                    ),
+                    pgrx::htup::heap_getattr::<i32, _>(
+                        &tuple,
+                        NonZeroUsize::new(2).unwrap(),
+                        &tupdesc,
+                    ),
+                )
+            };
+            assert_eq!(name.as_deref(), Some("Nami"));
+            assert_eq!(scritches, Some(7));
+            Ok(())
+        })
     }
 
     #[pg_test(error = "no attribute")]
     fn test_htup_heap_getattr_rejects_attno_past_tupdesc() {
         let (tupdesc, tuple) = scritched_dog();
         let scritches = NonZeroUsize::new(2).unwrap();
-        assert_eq!(pgrx::htup::heap_getattr::<i32, _>(&tuple, scritches, &tupdesc), Some(3));
+        // SAFETY: `tuple` is the live Dog row that `tupdesc` describes.
+        let read = unsafe { pgrx::htup::heap_getattr::<i32, _>(&tuple, scritches, &tupdesc) };
+        assert_eq!(read, Some(3));
 
         let past_end = NonZeroUsize::new(3).unwrap();
-        let _ = pgrx::htup::heap_getattr::<i32, _>(&tuple, past_end, &tupdesc);
+        // SAFETY: as above; the attribute number is checked against `tupdesc`.
+        let _ = unsafe { pgrx::htup::heap_getattr::<i32, _>(&tuple, past_end, &tupdesc) };
     }
 
     #[pg_test(error = "no attribute")]
@@ -917,11 +1021,14 @@ mod tests {
         // SAFETY: `tuple` owns this HeapTupleData and outlives the borrowed view.
         let borrowed = unsafe { pgrx::PgBox::<pg_sys::HeapTupleData>::from_pg(tuple.as_ptr()) };
         let scritches = NonZeroUsize::new(2).unwrap();
-        let attr = pgrx::htup::heap_getattr_datum_ex(&borrowed, scritches, &tupdesc);
-        assert_eq!(attr.into_value::<i32>(), 3);
+        // SAFETY: `borrowed` views the live Dog row that `tupdesc` describes.
+        let attr = unsafe { pgrx::htup::heap_getattr_datum_ex(&borrowed, scritches, &tupdesc) };
+        // SAFETY: `attr` is the non-NULL int4 `scritches` of the live row.
+        assert_eq!(unsafe { attr.into_value::<i32>() }, 3);
 
         let past_end = NonZeroUsize::new(3).unwrap();
-        let _ = pgrx::htup::heap_getattr_datum_ex(&borrowed, past_end, &tupdesc);
+        // SAFETY: as above; the attribute number is checked against `tupdesc`.
+        let _ = unsafe { pgrx::htup::heap_getattr_datum_ex(&borrowed, past_end, &tupdesc) };
     }
 
     /// Read a by-value attribute of each width, plus a varlena, from tuples with and without a
@@ -977,7 +1084,254 @@ mod tests {
             assert_eq!(dog.len(), 3);
             assert_eq!(dog.get_by_index::<i32>(scritches)?, Some(7));
             assert_eq!(dog.get_by_index::<i32>(age)?, None);
+
+            let tupdesc = pgrx::PgTupleDesc::for_composite_type("GrowingDog").unwrap();
+            // SAFETY: as above.
+            let tuple = unsafe { pgrx::htup::composite_row_type_make_tuple(datum) };
+            // SAFETY: `tuple` is the live stored row. It was formed before `age` was added, so
+            // each attribute it stores has the length, alignment, and pass-by-value flag of
+            // the attribute in that position of `tupdesc`.
+            unsafe {
+                assert_eq!(
+                    pgrx::htup::heap_getattr::<i32, _>(&tuple, scritches, &tupdesc),
+                    Some(7)
+                );
+                assert_eq!(pgrx::htup::heap_getattr::<i32, _>(&tuple, age, &tupdesc), None);
+            }
             Ok(())
         })
+    }
+
+    /// A row stored before `ALTER TYPE ... DROP ATTRIBUTE` still holds the dropped attribute,
+    /// and the descriptor keeps its length, alignment, and pass-by-value flag, so the
+    /// attributes after it read correctly. `heap_getattr_datum_ex` reads the dropped attribute
+    /// itself without looking up its cleared type, and `get_by_index` reads it as NULL.
+    #[pg_test]
+    fn test_heap_getattr_reads_row_stored_before_a_drop() -> Result<(), spi::Error> {
+        Spi::run(
+            "CREATE TYPE ShrinkingDog AS (name text, collar text, scritches int4);
+             CREATE TABLE shrinking_dogs (dog ShrinkingDog);
+             INSERT INTO shrinking_dogs VALUES (ROW('Nami', 'red', 7));
+             ALTER TYPE ShrinkingDog DROP ATTRIBUTE collar CASCADE;",
+        )?;
+        let scritches = NonZeroUsize::new(3).unwrap();
+        Spi::connect(|client| {
+            let row = client.select("SELECT dog FROM shrinking_dogs", None, &[])?.first();
+            let datum = row.get_datum_by_ordinal(1)?.expect("stored dog is not NULL");
+
+            // SAFETY: `datum` is a live ShrinkingDog composite read from the SPI tuple.
+            let dog = unsafe { PgHeapTuple::from_composite_datum(datum) };
+            assert_eq!(dog.get_by_index::<i32>(scritches)?, Some(7));
+
+            let tupdesc = pgrx::PgTupleDesc::for_composite_type("ShrinkingDog").unwrap();
+            // SAFETY: as above.
+            let tuple = unsafe { pgrx::htup::composite_row_type_make_tuple(datum) };
+            // SAFETY: `tuple` is the live stored row. It was formed before `collar` was
+            // dropped, and `tupdesc` keeps that attribute's length, alignment, and
+            // pass-by-value flag, though not its type, so each stored attribute matches the
+            // attribute in that position of `tupdesc`.
+            let read = unsafe { pgrx::htup::heap_getattr::<i32, _>(&tuple, scritches, &tupdesc) };
+            assert_eq!(read, Some(7));
+
+            // SAFETY: `tuple` owns this HeapTupleData and outlives the borrowed view.
+            let borrowed = unsafe { pgrx::PgBox::<pg_sys::HeapTupleData>::from_pg(tuple.as_ptr()) };
+            let dropped = NonZeroUsize::new(2).unwrap();
+            // SAFETY: as for heap_getattr above.
+            let (collar, scritches) = unsafe {
+                (
+                    pgrx::htup::heap_getattr_datum_ex(&borrowed, dropped, &tupdesc),
+                    pgrx::htup::heap_getattr_datum_ex(&borrowed, scritches, &tupdesc),
+                )
+            };
+            // The dropped attribute has no type, but keeps its stored value's layout.
+            assert!(!collar.is_null);
+            assert_eq!(collar.typoid, PgOid::Invalid);
+            assert_eq!((collar.typlen, collar.typbyval), (-1, false));
+            // get_by_index reads it as NULL. Checking `T` against InvalidOid raised an ERROR,
+            // whether or not `T` reads records.
+            assert_eq!(dog.get_by_index::<String>(dropped)?, None);
+            let as_row = dog.get_by_index::<PgHeapTuple<'_, AllocatedByRust>>(dropped);
+            assert!(matches!(as_row, Ok(None)), "{:?}", as_row.as_ref().err());
+            assert_eq!((scritches.typlen, scritches.typbyval), (4, true));
+            // SAFETY: `scritches` is the non-NULL int4 attribute of the live stored row.
+            assert_eq!(unsafe { scritches.into_value::<i32>() }, 7);
+            Ok(())
+        })
+    }
+
+    /// Reading a NULL attribute returns `Ok(None)` without asking `T` for its type OID, which
+    /// can raise an ERROR. Before converting a value, `get_by_index` asks `T` for its type only
+    /// for a row-type attribute, so only the row-type case catches that lookup moving ahead of
+    /// the NULL check.
+    #[pg_test]
+    fn test_get_by_index_reads_null_without_type_lookup() -> Result<(), spi::Error> {
+        Spi::run("CREATE TYPE HoldsNullInt AS (v int4)")?;
+        Spi::run("CREATE TYPE HoldsNullRow AS (v HoldsNullInt)")?;
+        for query in ["SELECT ROW(NULL)::HoldsNullInt", "SELECT ROW(NULL)::HoldsNullRow"] {
+            let row = Spi::get_one::<PgHeapTuple<'_, AllocatedByRust>>(query)?
+                .expect("the row is not NULL");
+            let read = row.get_by_index::<PgBox<NotAnSqlType>>(NonZeroUsize::new(1).unwrap());
+            assert!(matches!(read, Ok(None)), "{query}: {read:?}");
+        }
+        Ok(())
+    }
+
+    /// `get_by_index` reads a value of `T`'s own type through `T`'s `try_from_datum` as well, so
+    /// a type that rejects a value there also rejects it here.
+    #[pg_test]
+    fn test_get_by_index_reads_own_type_through_try_from_datum() -> Result<(), spi::Error> {
+        let row = Spi::get_one::<PgHeapTuple<'_, AllocatedByRust>>("SELECT ROW(7)")?
+            .expect("the row is not NULL");
+        let read = row.get_by_index::<RejectedInt4>(NonZeroUsize::MIN);
+        assert!(matches!(read, Err(TryFromDatumError::IncompatibleTypes { .. })), "{read:?}");
+        Ok(())
+    }
+
+    /// Reading an `int4` attribute as a composite returns an error instead of reading the
+    /// integer as a pointer to a tuple.
+    #[pg_test]
+    fn test_get_by_index_rejects_scalar_attribute_as_composite() -> Result<(), spi::Error> {
+        Spi::run("CREATE TYPE ProbeIntHolder AS (v int4)")?;
+        let row =
+            Spi::get_one::<PgHeapTuple<'_, AllocatedByRust>>("SELECT ROW(7)::ProbeIntHolder")?
+                .expect("the row is not NULL");
+
+        let by_index =
+            row.get_by_index::<PgHeapTuple<'_, AllocatedByRust>>(NonZeroUsize::new(1).unwrap());
+        let by_name = row.get_by_name::<PgHeapTuple<'_, AllocatedByRust>>("v");
+        for read in [by_index, by_name] {
+            assert!(
+                matches!(
+                    read,
+                    Err(TryFromDatumError::IncompatibleTypes { datum_oid, .. })
+                        if datum_oid == pg_sys::INT4OID
+                ),
+                "{:?}",
+                read.as_ref().err()
+            );
+        }
+        assert_eq!(row.get_by_index::<i32>(NonZeroUsize::new(1).unwrap())?, Some(7));
+        Ok(())
+    }
+
+    /// Composite attributes, including one whose type is a domain over a composite type, still
+    /// read as composites.
+    #[pg_test]
+    fn test_get_by_index_reads_composite_and_domain_attributes() -> Result<(), spi::Error> {
+        Spi::run(
+            "CREATE DOMAIN DomainDog AS Dog;
+             CREATE TYPE DogHolder AS (dog Dog, domain_dog DomainDog);",
+        )?;
+        let row = Spi::get_one::<PgHeapTuple<'_, AllocatedByRust>>(
+            "SELECT ROW(ROW('Nami', 7)::Dog, ROW('Brandy', 3)::DomainDog)::DogHolder",
+        )?
+        .expect("the row is not NULL");
+
+        for (attname, name, scritches) in [("dog", "Nami", 7), ("domain_dog", "Brandy", 3)] {
+            let dog = row
+                .get_by_name::<PgHeapTuple<'_, AllocatedByRust>>(attname)?
+                .expect("the dog is not NULL");
+            assert_eq!(dog.get_by_name::<String>("name")?.as_deref(), Some(name));
+            assert_eq!(dog.get_by_name::<i32>("scritches")?, Some(scritches));
+        }
+        Ok(())
+    }
+
+    /// `scritches` follows the variable-width `name`, so it has no cached offset and reading it
+    /// goes through `nocachegetattr`. On PG15-17 that walk caches the offset of `name` in the
+    /// `FormData_pg_attribute` that the attribute accessors read, so an attribute taken before
+    /// the read must be a copy that keeps its old `attcacheoff`. PG18 caches it in the
+    /// `CompactAttribute` instead, and PG19 caches only the offsets it computes when it builds
+    /// the descriptor, so neither writes a `FormData_pg_attribute`.
+    #[pg_test]
+    fn test_attribute_copies_survive_offset_caching() -> Result<(), spi::Error> {
+        Spi::run("CREATE TYPE CachedDog AS (age int4, name text, scritches int4)")?;
+        let tupdesc = pgrx::PgTupleDesc::for_composite_type("CachedDog").unwrap();
+        #[cfg(any(feature = "pg18", feature = "pg19"))]
+        let desc = tupdesc.as_ptr();
+        let values = [3_i32.into_datum(), "Nami".into_datum(), 7_i32.into_datum()];
+        // SAFETY: each datum is a non-NULL value of the attribute type in its position.
+        let dog = unsafe { PgHeapTuple::from_datums(tupdesc, values) }.unwrap();
+        let name = NonZeroUsize::new(2).unwrap();
+        let scritches = NonZeroUsize::new(3).unwrap();
+        // The `CompactAttribute` offset cache of `name`, which PG18 and later read instead.
+        #[cfg(any(feature = "pg18", feature = "pg19"))]
+        let name_compact_cacheoff = || {
+            // SAFETY: `dog` keeps `desc` live. PG18 and later end the descriptor with one
+            // `CompactAttribute` per attribute, and `name` is the second of three. The raw place
+            // projection reads the field without creating a reference.
+            unsafe {
+                let compact = core::ptr::addr_of!((*desc).compact_attrs)
+                    .cast::<pg_sys::CompactAttribute>()
+                    .add(1);
+                (*compact).attcacheoff
+            }
+        };
+
+        let held = dog.get_attribute_by_index(name).unwrap();
+        let listed = dog.attributes().collect::<Vec<_>>();
+        #[cfg(any(feature = "pg18", feature = "pg19"))]
+        assert_eq!(name_compact_cacheoff(), -1);
+
+        assert_eq!(dog.get_by_index::<i32>(scritches)?, Some(7));
+        let fresh = dog.get_attribute_by_index(name).unwrap();
+
+        #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+        {
+            // nocachegetattr cached `name` at offset 4, after the int4 `age`.
+            assert_eq!(fresh.attcacheoff, 4);
+            assert_eq!(held.attcacheoff, -1);
+            assert_eq!(listed[1].1.attcacheoff, -1);
+        }
+        #[cfg(any(feature = "pg18", feature = "pg19"))]
+        {
+            assert_eq!(format!("{held:?}"), format!("{fresh:?}"));
+            assert_eq!(format!("{:?}", listed[1].1), format!("{fresh:?}"));
+        }
+        #[cfg(feature = "pg18")]
+        assert_eq!(name_compact_cacheoff(), 4);
+        #[cfg(feature = "pg19")]
+        assert_eq!(name_compact_cacheoff(), -1);
+        Ok(())
+    }
+
+    /// Setting a dropped attribute returns `NoSuchAttributeNumber`. Its type is InvalidOid, so
+    /// the type check raised an ERROR for `&str` and accepted a tuple, whose `type_oid` is also
+    /// InvalidOid.
+    #[pg_test]
+    fn test_set_by_index_rejects_dropped_attribute() -> Result<(), spi::Error> {
+        Spi::run(
+            "CREATE TYPE CollarlessDog AS (name text, collar text, scritches int4);
+             ALTER TYPE CollarlessDog DROP ATTRIBUTE collar;",
+        )?;
+        let mut dog = PgHeapTuple::new_composite_type("CollarlessDog").unwrap();
+        let collar = NonZeroUsize::new(2).unwrap();
+        let rejected = Err(TryFromDatumError::NoSuchAttributeNumber(collar));
+        assert_eq!(dog.set_by_index(collar, "red"), rejected);
+        assert_eq!(dog.set_by_index(collar, (Some(1), Some(2))), rejected);
+        Ok(())
+    }
+
+    /// A `PgBox` read from a tuple must be a copy. The tuple frees its memory when an attribute
+    /// is set and when it drops, which an assert-enabled build overwrites with 0x7F bytes, and
+    /// writing through a box that pointed into the tuple would change the tuple.
+    #[pg_test]
+    fn test_get_by_index_copies_pgbox() -> Result<(), spi::Error> {
+        Spi::run("CREATE TYPE PointHolder AS (p point)")?;
+        let point = |x: f64| pg_sys::Point { x, y: -x };
+        let p = NonZeroUsize::new(1).unwrap();
+        let mut holder = PgHeapTuple::new_composite_type("PointHolder").unwrap();
+        holder.set_by_name("p", point(1.0))?;
+
+        let first = holder.get_by_name::<PgBox<pg_sys::Point>>("p")?.expect("NULL point");
+        holder.set_by_name("p", point(2.0))?;
+        assert_eq!(*first, point(1.0));
+
+        let mut second = holder.get_by_index::<PgBox<pg_sys::Point>>(p)?.expect("NULL point");
+        second.x = 3.0;
+        assert_eq!(holder.get_by_index::<pg_sys::Point>(p)?, Some(point(2.0)));
+        drop(holder);
+        assert_eq!(*second, pg_sys::Point { x: 3.0, y: -2.0 });
+        Ok(())
     }
 }

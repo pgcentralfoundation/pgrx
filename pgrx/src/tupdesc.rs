@@ -8,11 +8,12 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Provides a safe wrapper around Postgres' `pg_sys::TupleDescData` struct
-use crate::{PgBox, PgRelation, pg_sys, regtypein, void_mut_ptr};
+use crate::{PgRelation, pg_sys, regtypein, void_mut_ptr};
 
 use pgrx_pg_sys::PgTryBuilder;
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
-use std::ops::Deref;
+use std::mem::ManuallyDrop;
+use std::ptr::{self, NonNull};
 
 /// This struct is passed around within the backend to describe the structure
 /// of tuples.  For tuples coming from on-disk relations, the information is
@@ -45,8 +46,18 @@ use std::ops::Deref;
 /// always have tdrefcount >= 0.
 ///
 /// PGRX's safe wrapper takes care of properly freeing or decrementing reference counts
+///
+/// `PgTupleDesc` does not hand out references to the `pg_sys::TupleDescData` it wraps.
+/// PostgreSQL changes the reference count of a relcache or typcache descriptor whenever code
+/// takes or releases a reference to it, which can happen in any call into PostgreSQL while a
+/// `PgTupleDesc` for it exists, so holding a Rust reference across such a call would be
+/// undefined behavior. Read the header with [`len`](Self::len), [`oid`](Self::oid),
+/// [`typmod`](Self::typmod), [`refcount`](Self::refcount) and
+/// [`constraints`](Self::constraints), which each read the current value of one field, and
+/// pass [`as_ptr`](Self::as_ptr) to PostgreSQL.
 pub struct PgTupleDesc<'a> {
-    tupdesc: Option<PgBox<pg_sys::TupleDescData>>,
+    /// Points to a live descriptor for as long as this value exists.
+    tupdesc: NonNull<pg_sys::TupleDescData>,
     parent: Option<&'a PgRelation>,
     need_release: bool,
     need_pfree: bool,
@@ -64,12 +75,7 @@ impl<'a> PgTupleDesc<'a> {
     /// This method is unsafe as we cannot validate that the provided `pg_sys::TupleDesc` is valid
     /// or requires reference counting.
     pub unsafe fn from_pg<'b>(ptr: pg_sys::TupleDesc) -> PgTupleDesc<'b> {
-        PgTupleDesc {
-            tupdesc: Some(PgBox::from_pg(ptr)),
-            parent: None,
-            need_release: true,
-            need_pfree: false,
-        }
+        PgTupleDesc { tupdesc: non_null(ptr), parent: None, need_release: true, need_pfree: false }
     }
 
     /// Wrap a Postgres-provided `pg_sys::TupleDescData`.
@@ -81,12 +87,7 @@ impl<'a> PgTupleDesc<'a> {
     ///
     /// This method is unsafe as we cannot validate that the provided `pg_sys::TupleDesc` is valid
     pub unsafe fn from_pg_unchecked<'b>(ptr: pg_sys::TupleDesc) -> PgTupleDesc<'b> {
-        PgTupleDesc {
-            tupdesc: Some(PgBox::from_pg(ptr)),
-            parent: None,
-            need_release: false,
-            need_pfree: false,
-        }
+        PgTupleDesc { tupdesc: non_null(ptr), parent: None, need_release: false, need_pfree: false }
     }
 
     /// Wrap a copy of a `pg_sys::TupleDesc`.  This form is not reference counted and the copy is
@@ -96,12 +97,21 @@ impl<'a> PgTupleDesc<'a> {
     ///
     /// ## Safety
     ///
-    /// This method is unsafe as we cannot validate that the provided `pg_sys::TupleDesc` is valid
-    /// or requires reference counting.
+    /// `ptr` must be NULL or point to a live tuple descriptor. The copy is allocated in the
+    /// `CurrentMemoryContext` of this call, so the returned value must not be used or dropped
+    /// after that context is reset or deleted.
+    ///
+    /// ## Panics
+    ///
+    /// Panics if `ptr` is NULL, before reading it.
     pub unsafe fn from_pg_copy<'b>(ptr: pg_sys::TupleDesc) -> PgTupleDesc<'b> {
+        let src = non_null(ptr);
         PgTupleDesc {
-            // SAFETY:  pg_sys::CreateTupleDescCopyConstr will be returning a valid pointer
-            tupdesc: Some(PgBox::from_pg(pg_sys::CreateTupleDescCopyConstr(ptr))),
+            // SAFETY: the caller passes a live descriptor, which non_null checked is not NULL.
+            // CreateTupleDescCopyConstr reads it and returns a new copy palloc'd in
+            // CurrentMemoryContext, which this value owns and frees when it drops. The caller
+            // keeps that context alive for as long as this value exists.
+            tupdesc: non_null(unsafe { pg_sys::CreateTupleDescCopyConstr(src.as_ptr()) }),
             parent: None,
             need_release: false,
             need_pfree: true,
@@ -133,21 +143,14 @@ impl<'a> PgTupleDesc<'a> {
     /// This method is unsafe as we cannot validate that the provided `pg_sys::TupleDesc` is valid
     /// or is actually a copy that requires a `pfree()` on Drop.
     pub unsafe fn from_pg_is_copy<'b>(ptr: pg_sys::TupleDesc) -> PgTupleDesc<'b> {
-        PgTupleDesc {
-            tupdesc: Some(PgBox::from_pg(ptr)),
-            parent: None,
-            need_release: false,
-            need_pfree: true,
-        }
+        PgTupleDesc { tupdesc: non_null(ptr), parent: None, need_release: false, need_pfree: true }
     }
 
     /// wrap the `pg_sys::TupleDesc` contained by the specified `PgRelation`
     pub fn from_relation(parent: &PgRelation) -> PgTupleDesc<'_> {
         PgTupleDesc {
             // SAFETY: parent keeps this initialized relation descriptor alive for the returned borrow.
-            tupdesc: Some(unsafe {
-                PgBox::from_pg(pg_sys::RelationGetDescr!(parent.as_ptr()).get())
-            }),
+            tupdesc: non_null(unsafe { pg_sys::RelationGetDescr!(parent.as_ptr()).get() }),
             parent: Some(parent),
             need_release: false,
             need_pfree: false,
@@ -155,6 +158,9 @@ impl<'a> PgTupleDesc<'a> {
     }
 
     /** Retrieve the tuple description of the shape of a defined composite type
+
+    The descriptor is a copy in `CurrentMemoryContext`, with the limits that
+    [`for_composite_type_by_oid`](Self::for_composite_type_by_oid) describes.
 
     ```rust,no_run
     use pgrx::{prelude::*, PgTupleDesc};
@@ -186,6 +192,10 @@ impl<'a> PgTupleDesc<'a> {
 
     /// Similar to [`PgTupleDesc::for_composite_type()`] but using the type's [`pg_sys::Oid`] instead
     /// of its name.
+    ///
+    /// The descriptor is a copy in the `CurrentMemoryContext` of this call, which the returned
+    /// value frees when it drops. Do not use or drop it after that context is reset or deleted,
+    /// for example after returning it out of `Spi::connect`.
     pub fn for_composite_type_by_oid(typoid: pg_sys::Oid) -> Option<PgTupleDesc<'a>> {
         unsafe {
             if typoid == pg_sys::Oid::INVALID {
@@ -195,6 +205,10 @@ impl<'a> PgTupleDesc<'a> {
             // It's important to make a copy of the tupledesc: https://www.postgresql.org/message-id/flat/24471.1136768659%40sss.pgh.pa.us
             let tuple_desc = pg_sys::lookup_rowtype_tupdesc_copy(typoid, -1);
 
+            // SAFETY: lookup_rowtype_tupdesc_copy returns a live descriptor or raises an ERROR.
+            // from_pg_copy also requires that CurrentMemoryContext outlive the returned value,
+            // which nothing here ensures, because `'a` does not bound that context. That is a
+            // known gap, documented on this function.
             Some(PgTupleDesc::from_pg_copy(tuple_desc))
         }
     }
@@ -204,19 +218,54 @@ impl<'a> PgTupleDesc<'a> {
         self.parent
     }
 
+    /// Return the descriptor pointer to pass to PostgreSQL. This `PgTupleDesc` still owns the
+    /// descriptor, so do not use the pointer after it drops.
+    ///
+    /// Read through the pointer instead of creating a reference to `pg_sys::TupleDescData`
+    /// from it, because PostgreSQL can change the descriptor during calls into it, as
+    /// described on [`PgTupleDesc`].
+    pub fn as_ptr(&self) -> pg_sys::TupleDesc {
+        self.tupdesc.as_ptr()
+    }
+
     /// What is the pg_type oid of this TupleDesc?
     pub fn oid(&self) -> pg_sys::Oid {
-        self.tupdesc.as_ref().unwrap().tdtypeid
+        // SAFETY: self keeps the descriptor live, and the place read copies the field without
+        // creating a reference to the descriptor.
+        unsafe { (*self.as_ptr()).tdtypeid }
     }
 
     /// What is the typemod of this TupleDesc?
     pub fn typmod(&self) -> i32 {
-        self.tupdesc.as_ref().unwrap().tdtypmod
+        // SAFETY: as in `oid`.
+        unsafe { (*self.as_ptr()).tdtypmod }
     }
 
     /// How many attributes do we have?
     pub fn len(&self) -> usize {
-        self.tupdesc.as_ref().unwrap().natts as usize
+        // SAFETY: as in `oid`.
+        let natts = unsafe { (*self.as_ptr()).natts };
+        usize::try_from(natts).expect("natts must be non-negative")
+    }
+
+    /// The descriptor's reference count, or `None` if it is not reference counted.
+    ///
+    /// Relcache and typcache descriptors are reference counted, and PostgreSQL changes the
+    /// count when code takes or releases a reference, including while this `PgTupleDesc`
+    /// exists. Each call reads the current value. A copy, such as one from
+    /// [`for_composite_type`](Self::for_composite_type) or [`clone`](Clone::clone), is not
+    /// reference counted.
+    pub fn refcount(&self) -> Option<u32> {
+        // SAFETY: as in `oid`.
+        let refcount = unsafe { (*self.as_ptr()).tdrefcount };
+        u32::try_from(refcount).ok()
+    }
+
+    /// Return a pointer to the descriptor's constraints, defaults and missing attribute values,
+    /// or null if it has none. They belong to the descriptor.
+    pub fn constraints(&self) -> *mut pg_sys::TupleConstr {
+        // SAFETY: as in `oid`.
+        unsafe { (*self.as_ptr()).constr }
     }
 
     /// Do we have attributes?
@@ -224,122 +273,129 @@ impl<'a> PgTupleDesc<'a> {
         self.len() == 0
     }
 
-    /// Get a numbered attribute.  Attribute numbers are zero-based
-    pub fn get(&self, i: usize) -> Option<&pg_sys::FormData_pg_attribute> {
+    /// Return a copy of attribute `i`, or `None` if `i` is not less than [`len`](Self::len).
+    /// Attribute numbers are zero-based.
+    ///
+    /// The copy holds the attribute's values as of this call. A reference into the descriptor
+    /// would be unsound: PostgreSQL writes to a descriptor's attributes while it is in use, as
+    /// when reading a tuple caches attribute offsets in `attcacheoff` on PostgreSQL 15 through
+    /// 17, and a relcache or typcache descriptor can be in use through other pointers.
+    pub fn get(&self, i: usize) -> Option<pg_sys::FormData_pg_attribute> {
         if i >= self.len() {
-            None
-        } else {
-            let tupdesc = self.tupdesc.as_ref().unwrap().as_ptr();
-            // SAFETY: i is in bounds, and self keeps the descriptor alive for this borrow.
-            let attr = unsafe { tupdesc_attr(tupdesc, i) };
-            // SAFETY: the address is the initialized in-bounds attribute in this descriptor.
-            Some(unsafe { &*attr })
+            return None;
         }
+        // SAFETY: self keeps the descriptor live, i is below its attribute count, and the read
+        // copies the initialized attribute without creating a reference to it.
+        Some(unsafe { tupdesc_attr(self.as_ptr(), i).read() })
     }
 
-    /// Iterate over our attributes
+    /// Iterate over copies of the attributes, in order. Each is read when the iterator reaches
+    /// it, as [`get`](Self::get) reads it.
     pub fn iter(&self) -> TupleDescIterator<'_> {
         TupleDescIterator { tupdesc: self, curr: 0 }
     }
 
     /// Convert this [PgTupleDesc] into a pointer for passing into Postgres.  You are responsible
     /// for releasing or freeing the returned [pg_sys::TupleDescData] pointer.
-    pub fn into_pg(mut self) -> *mut pg_sys::TupleDescData {
-        self.tupdesc.take().unwrap().into_pg()
+    pub fn into_pg(self) -> *mut pg_sys::TupleDescData {
+        ManuallyDrop::new(self).as_ptr()
     }
 }
 
-impl Deref for PgTupleDesc<'_> {
-    type Target = PgBox<pg_sys::TupleDescData>;
-
-    fn deref(&self) -> &Self::Target {
-        self.tupdesc.as_ref().unwrap()
-    }
+/// Wrap a descriptor pointer, panicking on null, which no constructor accepts.
+fn non_null(tupdesc: pg_sys::TupleDesc) -> NonNull<pg_sys::TupleDescData> {
+    NonNull::new(tupdesc).expect("tuple descriptor pointer must not be null")
 }
 
 impl Clone for PgTupleDesc<'_> {
     fn clone(&self) -> Self {
-        let tupdesc = self.tupdesc.as_ref().expect("PgTupleDesc.tupdesc was None");
-        // SAFETY: We assume the previous tupdesc is valid and
+        // SAFETY: self keeps its descriptor live, and
         // pg_sys::CreateTupleDescCopyConstr gives us a fresh copy with reference counters set to -1 (disabled).
-        // This will force the pfree() approach upon drop
-        let tupdesc =
-            unsafe { PgBox::from_pg(pg_sys::CreateTupleDescCopyConstr(tupdesc.as_ptr())) };
-        Self { tupdesc: Some(tupdesc), parent: self.parent, need_release: false, need_pfree: true }
+        // This will force the pfree() approach upon drop. The copy is palloc'd in
+        // CurrentMemoryContext, which the clone's lifetime does not bound, so a clone used or
+        // dropped after that context is reset or deleted reads or frees freed memory. That is the
+        // gap documented on `for_composite_type_by_oid`.
+        let tupdesc = non_null(unsafe { pg_sys::CreateTupleDescCopyConstr(self.as_ptr()) });
+        Self { tupdesc, parent: self.parent, need_release: false, need_pfree: true }
     }
 }
 
 impl Drop for PgTupleDesc<'_> {
     fn drop(&mut self) {
-        if self.tupdesc.is_some() {
-            let tupdesc = self.tupdesc.take().unwrap();
-            if self.need_release {
-                // SAFETY: This owner holds the descriptor reference released by this branch.
-                unsafe { pg_sys::ReleaseTupleDesc!(tupdesc.as_ptr()) }
-            } else if self.need_pfree {
-                unsafe { pg_sys::pfree(tupdesc.as_ptr() as void_mut_ptr) }
-            }
+        let tupdesc = self.as_ptr();
+        if self.need_release {
+            // SAFETY: This owner holds the descriptor reference released by this branch.
+            unsafe { pg_sys::ReleaseTupleDesc!(tupdesc) }
+        } else if self.need_pfree {
+            // SAFETY: This owner holds the palloc'd copy freed by this branch.
+            unsafe { pg_sys::pfree(tupdesc as void_mut_ptr) }
         }
     }
 }
 
-/// Return attribute `i` of `tupdesc`, as `TupleDescAttr(tupdesc, i)` does.
-///
-/// PG15-17 define `TupleDescAttr` as the macro `(&(tupdesc)->attrs[(i)])`, which translates to
-/// pure Rust.
-///
-/// # Safety
-///
-/// `tupdesc` must be live and `i` less than its attribute count.
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-#[inline]
-pub(crate) unsafe fn tupdesc_attr(
-    tupdesc: pg_sys::TupleDesc,
-    i: usize,
-) -> *mut pg_sys::FormData_pg_attribute {
-    // SAFETY: the caller supplies a live descriptor and an index below natts, a C int.
-    unsafe { pg_sys::TupleDescAttr!(tupdesc, i as core::ffi::c_int).get() }
-}
-
-/// Return attribute `i` of `tupdesc`, as `TupleDescAttr(tupdesc, i)` does.
-///
-/// PG18 and PG19 store the `FormData_pg_attribute` array after `natts` `CompactAttribute`s.
-/// Their static inline `TupleDescAttr` returns `&TupleDescAttrAddress(tupdesc)[i]`, where
-/// `TupleDescAttrAddress(desc)` is `(char *) desc + offsetof(TupleDescData, compact_attrs) +
-/// desc->natts * sizeof(CompactAttribute)`. The header undefines that macro right after the
-/// function, so the generated `TupleDescAttr!` is a guarded native call; this per-attribute
-/// lookup computes the address in Rust instead.
-///
-/// # Safety
-///
-/// `tupdesc` must be live and `i` less than its attribute count.
+// On PG18 and PG19 the attribute array starts `natts` compact attributes past `compact_attrs`
+// in a descriptor aligned for `TupleDescData`. It is aligned for `FormData_pg_attribute` if
+// that alignment, the offset, and the compact attribute size are multiples of the attribute
+// alignment. This const item checks that in every build, including `cargo check`.
 #[cfg(any(feature = "pg18", feature = "pg19"))]
+const _: () = {
+    let align = align_of::<pg_sys::FormData_pg_attribute>();
+    assert!(align_of::<pg_sys::TupleDescData>().is_multiple_of(align));
+    assert!(core::mem::offset_of!(pg_sys::TupleDescData, compact_attrs).is_multiple_of(align));
+    assert!(size_of::<pg_sys::CompactAttribute>().is_multiple_of(align));
+};
+
+/// Return a pointer to attribute `i` of `tupdesc`: the address `TupleDescAttr(tupdesc, i)`
+/// returns.
+///
+/// PG15-17 end `TupleDescData` with the flexible array `attrs`, and define `TupleDescAttr` as
+/// the macro `(&(tupdesc)->attrs[(i)])`. PG18 and PG19 end it with `natts` `CompactAttribute`s
+/// in `compact_attrs` and store the `FormData_pg_attribute` array after them. Their static
+/// inline `TupleDescAttr` returns `&TupleDescAttrAddress(tupdesc)[i]`, where
+/// `TupleDescAttrAddress(desc)` is `(char *) desc + offsetof(TupleDescData, compact_attrs) +
+/// desc->natts * sizeof(CompactAttribute)`.
+///
+/// The generated `TupleDescAttr!` is a guarded native call on PG18 and PG19, so this computes
+/// the address in Rust for every version. The pointer is aligned for `FormData_pg_attribute`.
+/// PostgreSQL can write to the attribute while the descriptor is in use, so read fields or
+/// copy the attribute through the pointer instead of holding a reference to it.
+///
+/// # Safety
+///
+/// `tupdesc` must be live and `i` less than its attribute count.
 #[inline]
 pub(crate) unsafe fn tupdesc_attr(
     tupdesc: pg_sys::TupleDesc,
     i: usize,
 ) -> *mut pg_sys::FormData_pg_attribute {
-    // SAFETY: the caller supplies a live descriptor, whose allocation holds natts compact
-    // attributes followed by natts attributes, and an index below natts. The raw place
-    // projection keeps the descriptor's provenance for those trailing arrays.
+    // SAFETY: the caller supplies a live descriptor, allocated with room for its attribute
+    // arrays, and an index below its attribute count. The raw place projections compute
+    // addresses and read natts without creating references, and keep the descriptor's
+    // provenance over its trailing arrays.
     unsafe {
-        let natts = usize::try_from((*tupdesc).natts).expect("natts must be non-negative");
-        let attrs = core::ptr::addr_of_mut!((*tupdesc).compact_attrs)
-            .cast::<pg_sys::CompactAttribute>()
-            .add(natts)
-            .cast::<pg_sys::FormData_pg_attribute>();
-        debug_assert!(attrs.is_aligned());
+        #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+        let attrs = ptr::addr_of_mut!((*tupdesc).attrs).cast::<pg_sys::FormData_pg_attribute>();
+        #[cfg(any(feature = "pg18", feature = "pg19"))]
+        let attrs = {
+            // The const assertion before this function keeps this address aligned.
+            let natts = usize::try_from((*tupdesc).natts).expect("natts must be non-negative");
+            ptr::addr_of_mut!((*tupdesc).compact_attrs)
+                .cast::<pg_sys::CompactAttribute>()
+                .add(natts)
+                .cast::<pg_sys::FormData_pg_attribute>()
+        };
         attrs.add(i)
     }
 }
 
+/// An iterator over copies of a [`PgTupleDesc`]'s attributes, returned by [`PgTupleDesc::iter`].
 pub struct TupleDescIterator<'a> {
     tupdesc: &'a PgTupleDesc<'a>,
     curr: usize,
 }
 
-impl<'a> Iterator for TupleDescIterator<'a> {
-    type Item = &'a pg_sys::FormData_pg_attribute;
+impl Iterator for TupleDescIterator<'_> {
+    type Item = pg_sys::FormData_pg_attribute;
 
     fn next(&mut self) -> Option<Self::Item> {
         let result = self.tupdesc.get(self.curr);
@@ -366,12 +422,7 @@ impl Iterator for TupleDescDataIntoIterator<'_> {
     type Item = pg_sys::FormData_pg_attribute;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let result = match self.tupdesc.get(self.curr) {
-            Some(result) => *result,
-            None => {
-                return None;
-            }
-        };
+        let result = self.tupdesc.get(self.curr)?;
         self.curr += 1;
         Some(result)
     }

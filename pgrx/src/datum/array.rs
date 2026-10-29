@@ -8,7 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![allow(clippy::question_mark)]
-use super::{UnboxDatum, unbox};
+use super::{UnboxDatum, lookup_type_name, unbox};
 use crate::array::{RawArray, Scalar};
 use crate::nullable::{
     BitSliceNulls, IntoNullableIterator, MaybeStrictNulls, NullLayout, Nullable, NullableContainer,
@@ -177,9 +177,21 @@ impl<'mcx, T: UnboxDatum> Array<'mcx, T> {
     ///
     /// This function requires that the RawArray was obtained in a properly-constructed form
     /// (probably from Postgres).
+    ///
+    /// # Panics
+    ///
+    /// Panics if [`UnboxDatum::can_unbox`] rejects the element type.
     pub(crate) unsafe fn deconstruct_from(mut raw: Toast<RawArray>) -> Array<'mcx, T> {
         let oid = raw.oid();
         let elem_layout = Layout::lookup_oid(oid);
+        // Every element unboxes through `T::unbox`, which may rely on this check.
+        if !T::can_unbox(elem_layout.size.as_typlen(), elem_layout.pass == PassBy::Value) {
+            panic!(
+                "cannot unbox elements of type {} as {}",
+                lookup_type_name(oid),
+                core::any::type_name::<T>()
+            );
+        }
         let null_inner = raw
             .nulls_bitslice()
             .map(|nonnull| unsafe { nullable::BitSliceNulls(&*nonnull.as_ptr()) });
@@ -573,12 +585,14 @@ mod casper {
             ptr: *const u8,
         ) -> Option<T::As<'arr>> {
             // This branch is optimized away (because `N` is constant).
+            // Widen the value as PostgreSQL's fetch_att does, so the Datum equals one read from a
+            // tuple: CharGetDatum widens a C char with that type's signedness, and
+            // Int16GetDatum and Int32GetDatum sign-extend. Readers that accept a narrower type,
+            // such as i64 for int4, read a negative value correctly only from that form.
             let datum = match N {
-                // for match with `Datum`, read through that directly to
-                // preserve provenance (may not be relevant but doesn't hurt).
-                1 => pg_sys::Datum::from(byval_read::<u8>(ptr)),
-                2 => pg_sys::Datum::from(byval_read::<u16>(ptr)),
-                4 => pg_sys::Datum::from(byval_read::<u32>(ptr)),
+                1 => pg_sys::Datum::from(byval_read::<pg_sys::__pgrx_c_macros::CCharRepr>(ptr)),
+                2 => pg_sys::Datum::from(byval_read::<i16>(ptr)),
+                4 => pg_sys::Datum::from(byval_read::<i32>(ptr)),
                 8 => pg_sys::Datum::from(byval_read::<u64>(ptr)),
                 _ => unreachable!("`N` must be 1, 2, 4, or 8 (got {N})"),
             };
@@ -981,7 +995,7 @@ where
     }
 
     unsafe fn from_datum_in_memory_context(
-        memory_context: PgMemoryContexts,
+        mut memory_context: PgMemoryContexts,
         datum: pg_sys::Datum,
         is_null: bool,
         typoid: pg_sys::Oid,
@@ -989,8 +1003,21 @@ where
     where
         Self: Sized,
     {
-        Array::<T>::from_datum_in_memory_context(memory_context, datum, is_null, typoid)
-            .map(|array| array.iter_deny_null().collect::<Vec<_>>())
+        // Unbox in `memory_context` too: an element such as a `PgBox` copies itself into
+        // CurrentMemoryContext.
+        // SAFETY: the caller passes a live `memory_context` and a Datum this type can read, on
+        // the backend thread. Nothing here resets the context that `switch_to` restores.
+        unsafe {
+            memory_context.switch_to(|_| {
+                Array::<T>::from_datum_in_memory_context(
+                    PgMemoryContexts::CurrentMemoryContext,
+                    datum,
+                    is_null,
+                    typoid,
+                )
+                .map(|array| array.iter_deny_null().collect::<Vec<_>>())
+            })
+        }
     }
 }
 
@@ -1009,7 +1036,7 @@ where
     }
 
     unsafe fn from_datum_in_memory_context(
-        memory_context: PgMemoryContexts,
+        mut memory_context: PgMemoryContexts,
         datum: pg_sys::Datum,
         is_null: bool,
         typoid: pg_sys::Oid,
@@ -1017,17 +1044,29 @@ where
     where
         Self: Sized,
     {
-        Array::<T>::from_datum_in_memory_context(memory_context, datum, is_null, typoid)
-            .map(|array| array.iter().collect::<Vec<_>>())
+        // SAFETY: as for `Vec<T>`, which this matches except that it keeps NULL elements.
+        unsafe {
+            memory_context.switch_to(|_| {
+                Array::<T>::from_datum_in_memory_context(
+                    PgMemoryContexts::CurrentMemoryContext,
+                    datum,
+                    is_null,
+                    typoid,
+                )
+                .map(|array| array.iter().collect::<Vec<_>>())
+            })
+        }
     }
 }
 
 #[inline]
 /// Converts an iterator into an array datum
 fn array_datum_from_iter<T: IntoDatum>(elements: impl Iterator<Item = T>) -> Option<pg_sys::Datum> {
+    // For a `#[derive(PostgresType)]` type, `type_oid` is a catalog lookup, so look it up once.
+    let element_type = T::type_oid();
     let mut state = unsafe {
         pg_sys::initArrayResult(
-            T::type_oid(),
+            element_type,
             PgMemoryContexts::CurrentMemoryContext.value(),
             // All elements use the same memory context
             false,
@@ -1042,7 +1081,7 @@ fn array_datum_from_iter<T: IntoDatum>(elements: impl Iterator<Item = T>) -> Opt
                 state,
                 datum.unwrap_or(0.into()),
                 isnull,
-                T::type_oid(),
+                element_type,
                 PgMemoryContexts::CurrentMemoryContext.value(),
             );
         }
@@ -1074,11 +1113,6 @@ where
         self.get(0)
             .and_then(|v| v.composite_type_oid().map(|oid| unsafe { pg_sys::get_array_type(oid) }))
     }
-
-    #[inline]
-    fn is_compatible_with(other: pg_sys::Oid) -> bool {
-        Self::type_oid() == other || other == unsafe { pg_sys::get_array_type(T::type_oid()) }
-    }
 }
 
 impl<'a, T> IntoDatum for &'a [T]
@@ -1091,11 +1125,6 @@ where
 
     fn type_oid() -> pg_sys::Oid {
         unsafe { pg_sys::get_array_type(T::type_oid()) }
-    }
-
-    #[inline]
-    fn is_compatible_with(other: pg_sys::Oid) -> bool {
-        Self::type_oid() == other || other == unsafe { pg_sys::get_array_type(T::type_oid()) }
     }
 }
 

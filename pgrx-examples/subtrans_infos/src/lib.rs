@@ -9,10 +9,11 @@ type TransactionId = pg_sys::TransactionId;
 
 /// RAII wrapper for PostgreSQL LWLock to ensure proper release
 ///
-/// This guard acquires a shared lock and releases it when dropped, including while pgrx
-/// unwinds a PostgreSQL ERROR. `errfinish` has reset `InterruptHoldoffCount` to zero by then,
-/// so that release fails `LWLockRelease`'s `RESUME_INTERRUPTS` assertion on assert-enabled
-/// servers.
+/// This guard acquires a shared lock and releases it when dropped, including while a Rust
+/// panic unwinds. A PostgreSQL ERROR is different: `errfinish` resets
+/// `InterruptHoldoffCount` to zero before pgrx turns the error into an unwinding panic, and
+/// `LWLockRelease` would then fail its `RESUME_INTERRUPTS` assertion. The guard leaves the
+/// lock to transaction abort's `LWLockReleaseAll` in that case, as pgrx's own lock guards do.
 struct PgLwLockGuard {
     lock: *mut pg_sys::LWLock,
 }
@@ -40,11 +41,13 @@ impl PgLwLockGuard {
 impl Drop for PgLwLockGuard {
     fn drop(&mut self) {
         // SAFETY: new_shared acquired this live lock for this guard on the backend thread,
-        // and this releases that acquisition once. While a PostgreSQL ERROR unwinds, the
-        // release fails an assertion on assert-enabled servers, as the type's documentation
-        // describes.
+        // which is the only thread that reads InterruptHoldoffCount. LWLockAcquire holds
+        // interrupts, so the count stays positive while the lock is held unless a
+        // PostgreSQL ERROR reset it; transaction abort then releases the lock instead.
         unsafe {
-            pg_sys::LWLockRelease(self.lock);
+            if pg_sys::InterruptHoldoffCount > 0 {
+                pg_sys::LWLockRelease(self.lock);
+            }
         }
     }
 }
@@ -395,6 +398,32 @@ mod tests {
             assert!(!lock.is_null());
             let _guard = super::PgLwLockGuard::new_shared(lock);
         }
+    }
+
+    /// A PostgreSQL ERROR while the guard holds the lock resets InterruptHoldoffCount to 0.
+    /// LWLockRelease in Drop would then decrement it past 0, which assert-enabled servers stop
+    /// in RESUME_INTERRUPTS and other servers let wrap. The guard must leave the lock held for
+    /// transaction abort, so the test checks both before it rethrows the ERROR.
+    #[pg_test(error = "cache lookup failed for type 0")]
+    fn truncation_lock_guard_survives_a_postgres_error() {
+        // SAFETY: pg_test runs in an initialized backend, and the generated pointer names the
+        // permanent XactTruncationLock.
+        let lock = unsafe { pg_sys::XactTruncationLock!().get() };
+        PgTryBuilder::new(|| {
+            // SAFETY: as above. format_type_extended raises an ERROR for type 0, which unwinds
+            // through the guard.
+            unsafe {
+                let _guard = super::PgLwLockGuard::new_shared(lock);
+                pg_sys::format_type_extended(pg_sys::Oid::INVALID, -1, 0);
+            }
+        })
+        .catch_others(|error| {
+            // SAFETY: both reads run on the backend thread, and the lock is permanent.
+            let state = unsafe { (pg_sys::InterruptHoldoffCount, pg_sys::LWLockHeldByMe(lock)) };
+            assert_eq!(state, (0, true), "(InterruptHoldoffCount, LWLockHeldByMe) after the ERROR");
+            error.rethrow()
+        })
+        .execute();
     }
 
     /// Test basic functionality with current transaction ID

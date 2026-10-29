@@ -21,14 +21,14 @@ pub struct FixedF32Array {
 
 impl PgVarlenaInOutFuncs for FixedF32Array {
     fn input(input: &CStr) -> PgVarlena<Self> {
-        let mut result = PgVarlena::<Self>::new();
+        let mut result = FixedF32Array { array: [0.0; 91] };
 
         for (i, value) in input.to_bytes().split(|b| *b == b',').enumerate() {
             result.array[i] =
                 f32::from_str(unsafe { std::str::from_utf8_unchecked(value) }).expect("invalid f32")
         }
 
-        result
+        PgVarlena::from(result)
     }
 
     fn output(&self, buffer: &mut StringInfo) {
@@ -53,7 +53,7 @@ fn fixedf32array_add(
     left: PgVarlena<FixedF32Array>,
     right: PgVarlena<FixedF32Array>,
 ) -> PgVarlena<FixedF32Array> {
-    let mut new = PgVarlena::<FixedF32Array>::new();
+    let mut new = FixedF32Array { array: [0.0; 91] };
     left.array
         .iter()
         .zip(right.array.iter())
@@ -61,5 +61,5 @@ fn fixedf32array_add(
         .zip(new.array.iter_mut())
         .for_each(|(a, b)| *b = a);
 
-    new
+    PgVarlena::from(new)
 }
