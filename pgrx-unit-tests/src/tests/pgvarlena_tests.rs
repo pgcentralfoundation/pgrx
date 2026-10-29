@@ -10,7 +10,7 @@
 use core::ffi::CStr;
 use pgrx::datum::PgVarlena;
 use pgrx::prelude::*;
-use pgrx::{PgVarlenaInOutFuncs, StringInfo};
+use pgrx::{AnyElement, PgVarlenaInOutFuncs, StringInfo};
 
 /// Too large for a one-byte varlena header, so its Datums have the four-byte header that
 /// detoasting leaves in place.
@@ -35,6 +35,85 @@ impl PgVarlenaInOutFuncs for PgVarlenaCounter {
     }
 }
 
+/// Fits a one-byte varlena header, which a table row stores without aligning it.
+#[derive(Copy, Clone, PostgresType)]
+#[bikeshed_postgres_type_manually_impl_from_into_datum]
+#[pgvarlena_inoutfuncs]
+pub struct PgVarlenaSmallCounter {
+    count: i32,
+}
+
+impl PgVarlenaInOutFuncs for PgVarlenaSmallCounter {
+    fn input(input: &CStr) -> PgVarlena<Self> {
+        let count = input.to_str().expect("utf-8").parse().expect("an i32");
+        PgVarlena::from(PgVarlenaSmallCounter { count })
+    }
+
+    fn output(&self, buffer: &mut StringInfo) {
+        buffer.push_str(&self.count.to_string());
+    }
+}
+
+/// Large enough that a table row stores it compressed, or out of line with `STORAGE external`.
+#[derive(Copy, Clone, PostgresType)]
+#[bikeshed_postgres_type_manually_impl_from_into_datum]
+#[pgvarlena_inoutfuncs]
+pub struct PgVarlenaBlob {
+    words: [i64; 300],
+}
+
+impl PgVarlenaInOutFuncs for PgVarlenaBlob {
+    fn input(input: &CStr) -> PgVarlena<Self> {
+        let word = input.to_str().expect("utf-8").parse().expect("an i64");
+        PgVarlena::from(PgVarlenaBlob { words: [word; 300] })
+    }
+
+    fn output(&self, buffer: &mut StringInfo) {
+        buffer.push_str(&self.words[0].to_string());
+    }
+}
+
+/// Change an argument and return the changed count.
+#[pg_extern]
+fn pgvarlena_counter_increment(mut counter: PgVarlena<PgVarlenaCounter>) -> i64 {
+    counter.count += 1;
+    counter.count
+}
+
+/// Change an argument and return the changed count.
+#[pg_extern]
+fn pgvarlena_small_counter_increment(mut counter: PgVarlena<PgVarlenaSmallCounter>) -> i32 {
+    counter.count += 1;
+    counter.count
+}
+
+#[pg_extern]
+fn pgvarlena_blob_sum(blob: PgVarlena<PgVarlenaBlob>) -> i64 {
+    blob.words.iter().sum()
+}
+
+/// How a function receives a varlena argument: its header form, and its address modulo 8.
+#[pg_extern]
+fn pgvarlena_argument_form(value: AnyElement) -> String {
+    // SAFETY: get_typlen takes the OID by value.
+    assert_eq!(unsafe { pg_sys::get_typlen(value.oid()) }, -1, "not a varlena type");
+    let varlena = value.datum().cast_mut_ptr::<pg_sys::varlena>();
+    // SAFETY: a non-NULL argument of a varlena type points to a live varlena, whose first bytes
+    // these macros read.
+    let form = unsafe {
+        if pg_sys::VARATT_IS_EXTERNAL_ONDISK!(varlena).is_true() {
+            "external"
+        } else if pg_sys::VARATT_IS_COMPRESSED!(varlena).is_true() {
+            "compressed"
+        } else if pg_sys::VARATT_IS_1B!(varlena).is_true() {
+            "1b"
+        } else {
+            "4b"
+        }
+    };
+    format!("{form} at {} mod 8", varlena.addr() % 8)
+}
+
 /// Mutate an argument in each row, after the call that read it has returned.
 #[pg_extern]
 fn pgvarlena_counter_series(
@@ -54,7 +133,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_unit_tests;
 
-    use super::PgVarlenaCounter;
+    use super::{PgVarlenaBlob, PgVarlenaCounter, PgVarlenaSmallCounter};
     use core::mem::{align_of, size_of};
     use core::{ptr, slice};
     use pgrx::datum::PgVarlena;
@@ -206,6 +285,44 @@ mod tests {
         assert_eq!(read.words, [0x0102_0304_0506_0708; 32]);
     }
 
+    /// Point an indirect TOAST pointer, such as logical decoding builds for a changed row, at
+    /// `target`.
+    unsafe fn indirect_pointer(target: *mut pg_sys::varlena) -> *mut pg_sys::varlena {
+        let pointer = pg_sys::varatt_indirect { pointer: target };
+        // SAFETY: palloc0 returns room for the external header and the pointer it carries, which
+        // VARDATA_EXTERNAL locates after the tag just written, with no alignment requirement.
+        unsafe {
+            let varlena =
+                pg_sys::palloc0(pg_sys::VARHDRSZ_EXTERNAL + size_of::<pg_sys::varatt_indirect>())
+                    .cast::<pg_sys::varlena>();
+            pg_sys::SET_VARTAG_EXTERNAL!(varlena, pg_sys::vartag_external::VARTAG_INDIRECT as u8)
+                .get();
+            ptr::copy_nonoverlapping(
+                ptr::from_ref(&pointer).cast::<u8>(),
+                pg_sys::VARDATA_EXTERNAL!(varlena).get().cast::<u8>(),
+                size_of::<pg_sys::varatt_indirect>(),
+            );
+            varlena
+        }
+    }
+
+    #[pg_test]
+    fn test_pgvarlena_from_indirect_datum() {
+        let short = PgVarlena::from(Align8 { a: 1.0, b: 2.0, c: 3 }).into_pg();
+        let large = PgVarlena::from(Large { words: [5; 32] }).into_pg();
+        // SAFETY: each indirect pointer points at a live varlena that into_pg allocated.
+        unsafe {
+            let indirect = indirect_pointer(short);
+            assert!(pg_sys::VARATT_IS_EXTERNAL_INDIRECT!(indirect).is_true());
+            let read = PgVarlena::<Align8>::from_datum(indirect.into());
+            assert_eq!(*read, Align8 { a: 1.0, b: 2.0, c: 3 });
+
+            let read = PgVarlena::<Large>::from_datum(indirect_pointer(large).into());
+            assert_eq!(read.words, [5; 32]);
+            assert_eq!(payload::<Large>(large).words, [5; 32]);
+        }
+    }
+
     /// `into_pg` allocates the varlena's size and no more, also when the header is one byte.
     #[pg_test]
     fn test_pgvarlena_into_pg_allocates_the_varlena_size() {
@@ -317,6 +434,91 @@ mod tests {
             "SELECT array_agg(n) FROM pgvarlena_counter_series('5'::PgVarlenaCounter, 3) n",
         )?;
         assert_eq!(rows, Some(vec![6, 7, 8]));
+        Ok(())
+    }
+
+    /// A scan passes a function a pointer into the shared buffer that holds the row. A
+    /// four-byte header after an int4 sits four bytes past a MAXALIGN boundary there, and a
+    /// one-byte header after a bool at an odd address.
+    #[pg_test]
+    fn test_pgvarlena_reads_table_rows() -> Result<(), spi::Error> {
+        Spi::run(
+            "CREATE TABLE pgvarlena_counter_rows \
+             (id int4, counter PgVarlenaCounter, flag bool, small PgVarlenaSmallCounter)",
+        )?;
+        Spi::run("INSERT INTO pgvarlena_counter_rows VALUES (1, '41', true, '41')")?;
+        let form = |column: &str| {
+            Spi::get_one::<String>(&format!(
+                "SELECT pgvarlena_argument_form({column}) FROM pgvarlena_counter_rows"
+            ))
+        };
+        assert_eq!(form("counter")?.as_deref(), Some("4b at 4 mod 8"));
+        assert_eq!(form("small")?.as_deref(), Some("1b at 1 mod 8"));
+
+        assert_eq!(
+            Spi::get_one::<i64>(
+                "SELECT pgvarlena_counter_increment(counter) FROM pgvarlena_counter_rows"
+            )?,
+            Some(42)
+        );
+        assert_eq!(
+            Spi::get_one::<i32>(
+                "SELECT pgvarlena_small_counter_increment(small) FROM pgvarlena_counter_rows"
+            )?,
+            Some(42)
+        );
+        // Changing an argument leaves the row as it was.
+        assert_eq!(
+            Spi::get_two::<String, String>(
+                "SELECT counter::text, small::text FROM pgvarlena_counter_rows"
+            )?,
+            (Some("41".into()), Some("41".into()))
+        );
+
+        // Values read through SPI outlive the connection, whose memory the next query reuses.
+        let counter = Spi::get_one::<PgVarlena<PgVarlenaCounter>>(
+            "SELECT counter FROM pgvarlena_counter_rows",
+        )?
+        .expect("a non-NULL counter");
+        let small = Spi::get_one::<PgVarlena<PgVarlenaSmallCounter>>(
+            "SELECT small FROM pgvarlena_counter_rows",
+        )?
+        .expect("a non-NULL counter");
+        assert_eq!(
+            Spi::get_one::<i64>("SELECT sum(i) FROM generate_series(1, 100) i")?,
+            Some(5050)
+        );
+        assert_eq!((counter.count, small.count), (41, 41));
+        Ok(())
+    }
+
+    /// A large value reaches a function compressed, or with `STORAGE external` as a pointer to
+    /// out-of-line TOAST storage, and reading it detoasts a temporary copy.
+    #[pg_test]
+    fn test_pgvarlena_reads_toasted_table_rows() -> Result<(), spi::Error> {
+        Spi::run("CREATE TABLE pgvarlena_blob_rows (blob PgVarlenaBlob)")?;
+        Spi::run("CREATE TABLE pgvarlena_external_blob_rows (blob PgVarlenaBlob)")?;
+        Spi::run(
+            "ALTER TABLE pgvarlena_external_blob_rows ALTER COLUMN blob SET STORAGE external",
+        )?;
+        for (table, form) in
+            [("pgvarlena_blob_rows", "compressed"), ("pgvarlena_external_blob_rows", "external")]
+        {
+            Spi::run(&format!("INSERT INTO {table} VALUES ('7')"))?;
+            let got = Spi::get_one::<String>(&format!(
+                "SELECT pgvarlena_argument_form(blob) FROM {table}"
+            ))?
+            .expect("a form");
+            assert!(got.starts_with(form), "{table}: {got}");
+            assert_eq!(
+                Spi::get_one::<i64>(&format!("SELECT pgvarlena_blob_sum(blob) FROM {table}"))?,
+                Some(7 * 300)
+            );
+            let blob =
+                Spi::get_one::<PgVarlena<PgVarlenaBlob>>(&format!("SELECT blob FROM {table}"))?
+                    .expect("a non-NULL blob");
+            assert_eq!(blob.words, [7; 300]);
+        }
         Ok(())
     }
 
