@@ -12,7 +12,8 @@
 use super::types::{Lowering, rust_path};
 use crate::{
     BindingCatalog, DeclarationCatalog, DeclarationLinkage, FunctionBinding, FunctionInfo,
-    IntegerKind, RustBindingType, TargetFacts, TypeCategory, TypeInfo, TypeShapeKind,
+    FunctionSignature, IntegerKind, RustBindingType, TargetFacts, TypeCategory, TypeInfo,
+    TypeShapeKind,
 };
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
@@ -66,21 +67,8 @@ pub(super) fn generate(
         let Some(function) = declarations.function_signatures.get(name) else {
             continue;
         };
-        // A char alias's byte layout cannot prove its callable extension
-        // attributes. Let the original C compiler own those calls as it owns
-        // record and enum transport, instead of invoking bindgen's Rust wrapper.
-        let native_transport = matches!(
-            function.signature.result.category,
-            TypeCategory::Record | TypeCategory::Enum | TypeCategory::Integer(IntegerKind::Char)
-        ) || function.signature.parameters.iter().flatten().any(|ty| {
-            matches!(
-                ty.category,
-                TypeCategory::Record
-                    | TypeCategory::Enum
-                    | TypeCategory::Integer(IntegerKind::Char)
-            )
-        });
-        if bindings.functions.contains_key(name) && !native_transport {
+        if bindings.functions.contains_key(name) && native_transport(&function.signature).is_none()
+        {
             continue;
         }
         match adapter(
@@ -107,6 +95,20 @@ pub(super) fn generate(
         }
     }
     Ok(result)
+}
+
+/// Return the first prototype type whose call transport the original C compiler must own.
+///
+/// A char alias's byte layout cannot prove its callable extension attributes, and
+/// record and enum values need validity-aware transport. A call with such a type
+/// therefore uses a generated adapter, never the binding's Rust declaration.
+pub(super) fn native_transport(signature: &FunctionSignature) -> Option<&TypeInfo> {
+    std::iter::once(&signature.result).chain(signature.parameters.iter().flatten()).find(|ty| {
+        matches!(
+            ty.category,
+            TypeCategory::Record | TypeCategory::Enum | TypeCategory::Integer(IntegerKind::Char)
+        )
+    })
 }
 
 /// Validate one declaration and produce matched C/Rust ABI code plus its binding replacement.

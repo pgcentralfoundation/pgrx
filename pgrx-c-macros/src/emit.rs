@@ -83,7 +83,8 @@ pub struct BindingCatalog {
     pub integer_constants: BTreeMap<String, IntegerBinding>,
     /// Definitions available for preserved cross-macro calls in this defining crate.
     pub macros: BTreeSet<String>,
-    /// Actual function binding prototypes and any generated native replacements.
+    /// Actual function binding prototypes. Calls use a generated adapter from
+    /// [`Self::function_adapters`] instead when one exists.
     pub functions: BTreeMap<String, crate::FunctionBinding>,
     /// Binding-owned record constructors and field storage, independent of C layout facts.
     pub records: BTreeMap<String, crate::RecordBinding>,
@@ -113,6 +114,10 @@ pub struct BindingCatalog {
     /// Optional crate-relative guard for native adapters that may call PostgreSQL.
     #[serde(skip)]
     pub ffi_boundary: Option<Vec<String>>,
+    /// Generated native call adapters, populated by batch lowering. A call whose
+    /// prototype needs native transport has no other callable binding.
+    #[serde(skip)]
+    pub function_adapters: BTreeMap<String, crate::FunctionBinding>,
     /// Native-call rejections retained instead of silently using an unverified binding.
     #[serde(skip)]
     pub function_unavailable: BTreeMap<String, String>,
@@ -230,12 +235,21 @@ pub enum EmissionStatus {
 ///
 /// The defining crate must provide the matching semantic support at
 /// `__pgrx_c_macros`. Each emitted string includes a target guard. `$crate` paths
-/// keep the helper bindings valid when that crate is renamed.
+/// keep the helper bindings valid when that crate is renamed. Like
+/// [`emit_with_bindings`], this generates no native adapters.
 pub fn emit(session: &AnalysisSession<'_>, name: &str) -> MacroEmission {
     emit_with_bindings(session, name, &BindingCatalog::default())
 }
 
 /// Emit with verified references to constants and other generated macros.
+///
+/// This returns only the macro's Rust source and generates no native adapters.
+/// A direct call to a function whose prototype passes or returns plain `char`, an
+/// enum or a record by value needs a generated C adapter, because Rust binding
+/// storage cannot prove that call ABI. Such a macro is skipped with
+/// [`SkipReasonCode::Call`] even when `bindings` holds the function, as is a call to
+/// a function without a binding. Use [`generate_with_bindings`] to emit those calls
+/// together with their adapters.
 pub fn emit_with_bindings(
     session: &AnalysisSession<'_>,
     name: &str,
@@ -320,7 +334,7 @@ fn register_adapters(capabilities: &mut BindingCatalog, adapters: &GeneratedAdap
     capabilities.field_unavailable.extend(adapters.fields.unsupported.clone());
     capabilities.offset_capabilities.extend(adapters.fields.offsets.clone());
     capabilities.offset_unavailable.extend(adapters.fields.offset_unsupported.clone());
-    capabilities.functions.extend(adapters.functions.bindings.clone());
+    capabilities.function_adapters.extend(adapters.functions.bindings.clone());
     capabilities.function_unavailable.extend(adapters.functions.unsupported.clone());
 }
 
@@ -687,6 +701,8 @@ fn generated_adapters(
         &frontend.profile().target,
         &profile_identity,
     )?;
+    // Later adapter passes read replacement storage from `functions`. Rendering
+    // instead takes adapters from `function_adapters`; see `register_adapters`.
     capabilities.functions.extend(functions.bindings.clone());
     let callbacks = callbacks::generate(
         frontend.declarations(),

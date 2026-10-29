@@ -567,7 +567,10 @@ return owned reports. No macro signature list is required.
 values, storage representations and declarations for functions, records, enums,
 variables and aliases. It checks every referenced constant value against C before
 emitting a reference; callers must supply the catalog from the defining crate's
-generated bindings.
+generated bindings. It generates no native adapters, so it skips a call whose C
+prototype passes or returns plain `char`, an enum or a record by value. The
+catalog's Rust storage for such a function cannot prove its call ABI, and only a
+generated C adapter can make that call.
 Generators should use `generate_with_bindings` to prepare the macro set and its
 shared adapters together. Its `MacroGeneration` contains the per-macro emissions
 and a `MacroSupportArtifact` with Rust source and optional C source. Include the

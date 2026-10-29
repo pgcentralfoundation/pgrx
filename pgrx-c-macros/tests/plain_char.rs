@@ -22,8 +22,9 @@ mod oracle;
 mod rust_oracle;
 
 use pgrx_c_macros::{
-    AnalysisSession, BindingCatalog, EmissionStatus, FunctionBinding, MacroScanner,
-    RustBindingType, generate_with_bindings, inspect, support_rust_cfg, validate_support_profile,
+    AnalysisSession, BindingCatalog, EmissionStatus, FrontendOutput, FunctionBinding, MacroScanner,
+    RustBindingType, SkipReasonCode, emit, emit_batch_with_bindings, emit_with_bindings,
+    generate_with_bindings, inspect, support_rust_cfg, validate_support_profile,
 };
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -171,6 +172,35 @@ fn non_default_plain_char_profile_matches_native_c() {
     assert_eq!(generated, original);
 }
 
+/// Inspect the native-transport fixture, whose functions take plain `char`.
+fn native_transport_frontend(scanner: &MacroScanner) -> FrontendOutput {
+    let header =
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/native_transport.h");
+    let mut arguments = oracle::native_arguments();
+    arguments.push("-std=c17".into());
+    inspect(scanner, &header, &arguments, None).unwrap()
+}
+
+/// Bind `name` with the shape bindgen's static-function wrappers give an
+/// `int (char)` declaration, whose `c_char` storage cannot prove the call ABI.
+fn char_wrapper_binding(name: &str) -> BindingCatalog {
+    let mut bindings = BindingCatalog::default();
+    bindings.functions.insert(
+        name.into(),
+        FunctionBinding {
+            path: vec![name.into()],
+            parameters: vec![RustBindingType::NativeChar],
+            result: RustBindingType::Integer { signed: true, bits: 32 },
+            abi: "C".into(),
+            variadic: false,
+            link_name: format!("{name}__pgrx_cshim"),
+            guarded: false,
+            uses_cshim: true,
+        },
+    );
+    bindings
+}
+
 /// Refuse a call whose required native-transport adapter was rejected, even when a binding exists.
 ///
 /// The binding's `c_char` storage cannot prove the callee's extension attributes. That is
@@ -179,34 +209,68 @@ fn non_default_plain_char_profile_matches_native_c() {
 fn rejected_native_transport_does_not_fall_back_to_the_binding() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let scanner = MacroScanner::new().unwrap();
-    let header =
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/native_transport.h");
-    let mut arguments = oracle::native_arguments();
-    arguments.push("-std=c17".into());
-    let frontend = inspect(&scanner, &header, &arguments, None).unwrap();
+    let frontend = native_transport_frontend(&scanner);
     let names = ["TRANSPORT_WIDEN"];
     let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
-    // The shape bindgen's static-function wrappers give this declaration.
-    let mut bindings = BindingCatalog::default();
-    bindings.functions.insert(
-        "transport_widen".into(),
-        FunctionBinding {
-            path: vec!["transport_widen".into()],
-            parameters: vec![RustBindingType::NativeChar],
-            result: RustBindingType::Integer { signed: true, bits: 32 },
-            abi: "C".into(),
-            variadic: false,
-            link_name: "transport_widen__pgrx_cshim".into(),
-            guarded: false,
-            uses_cshim: true,
-        },
-    );
+    let bindings = char_wrapper_binding("transport_widen");
     let generation = generate_with_bindings(&session, &names, &bindings).unwrap();
     let [emission] = generation.macros.as_slice() else { panic!("one selected macro") };
     let EmissionStatus::Skipped { reason } = &emission.status else {
         panic!("a rejected native-transport adapter must not fall back to the binding")
     };
     assert!(reason.message.contains("static inline definition"), "{reason:?}");
+}
+
+/// Refuse a native-transport call from single-macro emission, which generates no adapters.
+///
+/// Batch generation calls this function through a generated C adapter. `emit_with_bindings`
+/// returns only Rust, so it has no adapter to call and must not use the binding instead.
+#[test]
+fn single_macro_emission_refuses_native_transport_without_an_adapter() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = native_transport_frontend(&scanner);
+    let name = "TRANSPORT_INLINE_WIDEN";
+    let session = AnalysisSession::prepare(&scanner, &frontend, &[name]).unwrap();
+    let bindings = char_wrapper_binding("transport_inline_widen");
+    // An empty catalog has no binding to fall back to, but reports the same cause.
+    for emission in [emit_with_bindings(&session, name, &bindings), emit(&session, name)] {
+        let EmissionStatus::Skipped { reason } = &emission.status else {
+            panic!("a call that needs native transport must not use the binding: {emission:?}")
+        };
+        assert_eq!(reason.code, SkipReasonCode::Call, "{reason:?}");
+        assert!(
+            reason.message.contains(
+                "transport_inline_widen: C prototype type `char` needs a generated native adapter"
+            ),
+            "{reason:?}"
+        );
+    }
+}
+
+/// Keep calling a native-transport function through its generated adapter in batch generation.
+#[test]
+fn batch_generation_calls_native_transport_through_its_adapter() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = native_transport_frontend(&scanner);
+    let names = ["TRANSPORT_INLINE_WIDEN"];
+    let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
+    let bindings = char_wrapper_binding("transport_inline_widen");
+    let generation = generate_with_bindings(&session, &names, &bindings).unwrap();
+    assert!(
+        generation.support.c_source.contains("(transport_inline_widen)(arg0)"),
+        "the adapter must call the original C function: {}",
+        generation.support.c_source
+    );
+    let batch = emit_batch_with_bindings(&session, &names, &bindings).unwrap();
+    for emission in generation.macros.iter().chain(&batch) {
+        let EmissionStatus::Emitted { rust, .. } = &emission.status else {
+            panic!("the generated adapter makes this call available: {emission:?}")
+        };
+        assert!(rust.contains("$crate::__pgrx_c_generated::Inline_"), "{rust}");
+        assert!(!rust.contains("$crate::transport_inline_widen("), "{rust}");
+    }
 }
 
 /// Keep exact char-helper coverage for each configured installation independent of generated

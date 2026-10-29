@@ -1272,7 +1272,9 @@ byte, but that does not prove a callable ABI: narrow argument/result extension
 attributes also matter. Direct C thunks therefore transport the compiler's
 canonical char scalar. When a declaration needs such a thunk and cannot receive
 one, its rejection refuses the call even if a binding exists; the binding is the
-unproved ABI the thunk replaces. Indirect calls reinterpret only function-pointer storage
+unproved ABI the thunk replaces. Rendering takes such a call only from the
+registered thunks, so single-macro emission, which generates none, refuses it
+too. Indirect calls reinterpret only function-pointer storage
 and invoke the exact original C signature, including its char sign; callers must
 supply an address that actually has that prototype. A differently declared Rust
 callback does not satisfy that obligation merely because its bytes have the same

@@ -938,11 +938,25 @@ impl<'a> Renderer<'a> {
                                 &frontend.declarations().function_signatures[name].signature;
                             // A rejected adapter outranks any binding: adapters are generated
                             // only where no binding exists or its storage cannot prove the ABI.
-                            let binding = match bindings.function_unavailable.get(name) {
-                                Some(reason) => Err(reason.as_str()),
-                                None => bindings.functions.get(name).ok_or(
-                                    "no callable binding or generated C inline shim was emitted",
-                                ),
+                            // Where a prototype needs native transport, only an adapter
+                            // proves it, so no other entry point can fall back to the binding.
+                            let binding = if let Some(reason) =
+                                bindings.function_unavailable.get(name)
+                            {
+                                Err(reason.clone())
+                            } else if let Some(adapter) = bindings.function_adapters.get(name) {
+                                Ok(adapter)
+                            } else if let Some(ty) = super::functions::native_transport(declared)
+                            {
+                                Err(format!(
+                                    "C prototype type `{}` needs a generated native adapter because binding storage cannot prove its call ABI, and this emission has none; generate_with_bindings generates adapters",
+                                    ty.spelling
+                                ))
+                            } else {
+                                bindings.functions.get(name).ok_or_else(|| {
+                                    "no callable binding or generated C inline shim was emitted"
+                                        .to_owned()
+                                })
                             }
                             .map_err(|reason| {
                                 skip(
