@@ -253,11 +253,18 @@ pub(super) fn prove(
             if braced {
                 match failed_probes(&diagnostics, &locations) {
                     Ok(failed) => {
+                        let commented = commented_probes(&diagnostics, &locations);
                         for index in failed {
                             let rejection = if trapped.contains(&index) {
                                 (
                                     ExpansionSkipCode::DynamicBuiltin,
                                     "token pasting invokes an unsupported preprocessing operation"
+                                        .into(),
+                                )
+                            } else if commented.contains(&index) {
+                                (
+                                    ExpansionSkipCode::TokenPaste,
+                                    "token pasting forms a '//' comment under Microsoft extensions"
                                         .into(),
                                 )
                             } else {
@@ -632,6 +639,18 @@ fn trapped_probes(
     trapped
 }
 
+/// Probes that own Clang's error for a paste that forms a `//` comment under Microsoft extensions.
+///
+/// Classification only, like [`trapped_probes`]: [`failed_probes`] still validates every error.
+fn commented_probes(diagnostics: &str, locations: &BTreeMap<String, usize>) -> BTreeSet<usize> {
+    diagnostics
+        .lines()
+        .filter_map(|line| primary(line).ok().flatten())
+        .filter(|error| message_text(error.message) == MICROSOFT_COMMENT_PASTE)
+        .filter_map(|error| locations.get(error.location).copied())
+        .collect()
+}
+
 /// Attribute ordinary errors to their probes and reject global, fatal, or unowned failures.
 pub(super) fn failed_probes(
     diagnostics: &str,
@@ -709,12 +728,15 @@ struct Pass {
     comment_pastes_reported: bool,
 }
 
-/// Clang's error for a paste that forms `//`: an invalid token, or under Microsoft extensions a
-/// comment, which the probe pragmas make an error.
-const COMMENT_PASTE_ERRORS: [&str; 2] = [
-    "pasting formed '//', an invalid preprocessing token",
-    "pasting two '/' tokens into a '//' comment is a Microsoft extension",
-];
+/// Clang's message for a paste that forms a `//` comment under Microsoft extensions, which the
+/// probe pragmas make an error.
+const MICROSOFT_COMMENT_PASTE: &str =
+    "pasting two '/' tokens into a '//' comment is a Microsoft extension";
+
+/// Clang's error for a paste that forms `//`: an invalid token, or a comment under Microsoft
+/// extensions.
+const COMMENT_PASTE_ERRORS: [&str; 2] =
+    ["pasting formed '//', an invalid preprocessing token", MICROSOFT_COMMENT_PASTE];
 
 /// A diagnostic message without the warning option or category Clang may append in brackets.
 fn message_text(message: &str) -> &str {
@@ -1042,6 +1064,25 @@ mod tests {
             "",
         ] {
             assert!(failed_probes(text, &locations()).is_err());
+        }
+    }
+
+    /// Only an owned primary error for a Microsoft comment paste names its probe, whatever option
+    /// annotation follows the message.
+    #[test]
+    fn comment_paste_errors_name_only_their_owned_probes() {
+        let text = format!(
+            "/tmp/probe-1:1:1: error: {MICROSOFT_COMMENT_PASTE} [-Werror,-Wmicrosoft-comment-paste]\n/header.h:1:20: note: expanded from macro 'CAT'\n/tmp/probe-0:1:1: error: pasting formed '//', an invalid preprocessing token\n"
+        );
+        assert_eq!(commented_probes(&text, &locations()), BTreeSet::from([1]));
+        assert_eq!(failed_probes(&text, &locations()).unwrap(), BTreeSet::from([0, 1]));
+        for text in [
+            text.replace("/tmp/probe-1", "/unowned/header.h"),
+            text.replace(": error: pasting two", ": warning: pasting two"),
+            text.replace("pasting two '/' tokens", "pasting two '*' tokens"),
+            format!("/header.h:1:20: note: {MICROSOFT_COMMENT_PASTE}\n"),
+        ] {
+            assert!(!commented_probes(&text, &locations()).contains(&1), "{text}");
         }
     }
 

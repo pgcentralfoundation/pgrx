@@ -673,15 +673,12 @@ fn closed_pastes_that_form_comments_are_refused_under_microsoft_extensions() {
     let explicit = ["-std=c17", "-fms-compatibility", "-fms-extensions"];
     let silenced = ["--target=x86_64-pc-windows-msvc", "-std=c17", "-w"];
     // Without Microsoft extensions `//` is an invalid paste, an error `-w` cannot drop.
-    let unix = ["-std=c17", "-w"];
-    for arguments in [&msvc[..], &explicit, &silenced, &unix] {
+    let no_extensions = ["-std=c17", "-w"];
+    for arguments in [&msvc[..], &explicit, &silenced, &no_extensions] {
         let owned = arguments.iter().map(|argument| argument.to_string()).collect::<Vec<_>>();
         let frontend = inspect(&scanner, &header, &owned, None).unwrap();
         let batch =
             prepare_expansions(&scanner, &frontend, &[&comments[..], &closed].concat()).unwrap();
-        for name in comments {
-            assert_skip(&batch, name, ExpansionSkipCode::TokenPaste);
-        }
         let reported = reports_comment_pastes(&frontend, &directory.0);
         if arguments == silenced {
             let version = &frontend.profile().compiler.version;
@@ -695,6 +692,21 @@ fn closed_pastes_that_form_comments_are_refused_under_microsoft_extensions() {
         } else {
             assert!(reported, "{arguments:?}");
         }
+        let unreported = "Clang does not report token pastes that form '//' comments under these compiler options";
+        for name in comments {
+            if !reported {
+                assert_skip_reason(&batch, name, ExpansionSkipCode::TokenPaste, unreported);
+            } else if arguments == no_extensions {
+                assert_skip(&batch, name, ExpansionSkipCode::TokenPaste);
+            } else {
+                assert_skip_reason(
+                    &batch,
+                    name,
+                    ExpansionSkipCode::TokenPaste,
+                    "token pasting forms a '//' comment under Microsoft extensions",
+                );
+            }
+        }
         if reported {
             assert!(body(expanded(&batch, "P_CLOSED")).contains(&"0xFFU"), "{arguments:?}");
             let synthesized = expanded(&batch, "P_SYNTHESIZED");
@@ -703,12 +715,7 @@ fn closed_pastes_that_form_comments_are_refused_under_microsoft_extensions() {
             );
         } else {
             for name in closed {
-                assert_skip_reason(
-                    &batch,
-                    name,
-                    ExpansionSkipCode::TokenPaste,
-                    "Clang does not report token pastes that form '//' comments under these compiler options",
-                );
+                assert_skip_reason(&batch, name, ExpansionSkipCode::TokenPaste, unreported);
             }
         }
     }
