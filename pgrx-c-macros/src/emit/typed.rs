@@ -19,7 +19,7 @@ use crate::syntax::{
     UnaryOperator,
 };
 use crate::{FrontendOutput, SignedOverflow, TypeCategory, TypeInfo, TypeShapeKind};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Write;
 
 /// The C use-site contract requested for one occurrence of an expression-arena node.
@@ -95,6 +95,9 @@ pub(super) struct Renderer<'a> {
     /// only callable bindings for a prototype that needs native transport.
     /// Single-macro emission has none.
     adapters: Option<&'a super::GeneratedAdapters>,
+    /// Translated inline functions whose calls expand their translation, with their
+    /// panic conditions. Only batch rendering has any.
+    translations: &'a BTreeMap<String, BTreeSet<&'static str>>,
     /// Arena-indexed compiler constant facts, preserving names where bindings permit.
     constants: &'a [Option<&'a ResolvedConstant>],
     /// Shared C identity/native-storage reconciliation for the catalog and generated types.
@@ -124,7 +127,7 @@ impl<'a> Renderer<'a> {
         frontend: &'a FrontendOutput,
         analysis: &'a MacroAnalysis,
         bindings: &'a BindingCatalog,
-        adapters: Option<&'a super::GeneratedAdapters>,
+        generated: super::Generated<'a>,
         constants: &'a [Option<&'a ResolvedConstant>],
         lowering: &'a Lowering<'a>,
         inline_body: bool,
@@ -210,7 +213,8 @@ impl<'a> Renderer<'a> {
             frontend,
             analysis,
             bindings,
-            adapters,
+            adapters: generated.adapters,
+            translations: generated.translations,
             constants,
             lowering,
             floats,
@@ -1250,7 +1254,7 @@ impl<'a> Renderer<'a> {
                                         .map_err(failure)?,
                                 )
                             };
-                            if bindings.inline_translations.contains_key(name.as_str())
+                            if self.translations.contains_key(name.as_str())
                                 && let Some(callee) = super::macro_identifier(name)
                             {
                                 // The real call below converts the translation's value with

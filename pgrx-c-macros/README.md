@@ -597,9 +597,11 @@ emitting a reference; callers must supply the catalog from the defining crate's
 generated bindings. The catalog describes only those bindings: it cannot claim a
 generated callback signature, function address getter, or field or offset
 adapter. `emit_with_bindings` generates none of these, so it skips a macro that
-needs one. It also skips a call whose C prototype passes or returns plain `char`,
-an enum or a record by value. The catalog's Rust storage for such a function
-cannot prove its call ABI, and only a generated C adapter can make that call.
+needs one. Nor can the catalog mark an inline function as translated, so a call
+from `emit_with_bindings` output never expands a translated body. It also skips
+a call whose C prototype passes or returns plain `char`, an enum or a record by
+value. The catalog's Rust storage for such a function cannot prove its call ABI,
+and only a generated C adapter can make that call.
 Output from `emit_with_bindings` can still name a C enum's generated identity,
 which only the support from `generate_with_bindings` defines.
 Generators should use `generate_with_bindings` to prepare the macro set and its

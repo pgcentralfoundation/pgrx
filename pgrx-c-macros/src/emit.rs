@@ -79,9 +79,9 @@ mod types;
 ///
 /// These values are checked against independently resolved C constants before use.
 /// Paths are relative to `$crate`; `macros` contains macros actually emitted there.
-/// The catalog holds no generated capability. Callback signatures, function adapters,
-/// address getters and field or offset adapters, and their refusals, exist only inside
-/// batch generation, so a caller cannot assert one.
+/// The catalog holds no generated state. Callback signatures, function adapters,
+/// address getters, field or offset adapters, their refusals, and the inline functions
+/// a batch translated exist only inside batch generation, so a caller cannot assert one.
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct BindingCatalog {
     /// Crate-relative module containing generated declarations; C typedef names
@@ -109,12 +109,6 @@ pub struct BindingCatalog {
     /// Optional crate-relative guard for native adapters that may call PostgreSQL.
     #[serde(skip)]
     pub ffi_boundary: Option<Vec<String>>,
-    /// Static inline functions emitted as translated bodies in this defining crate, with the
-    /// Rust panic conditions their translation can raise, including those of the
-    /// translations it expands. Calls to them expand that translation instead of calling
-    /// the native binding.
-    #[serde(skip)]
-    pub inline_translations: BTreeMap<String, BTreeSet<&'static str>>,
 }
 
 impl BindingCatalog {
@@ -161,7 +155,8 @@ impl BindingCatalog {
     }
 }
 
-/// A caller's catalog cannot carry a capability that only batch generation establishes.
+/// A caller's catalog cannot carry a capability or inline translation that only batch
+/// generation establishes.
 ///
 /// ```compile_fail
 /// pgrx_c_macros::BindingCatalog::default().callback_capabilities;
@@ -177,6 +172,10 @@ impl BindingCatalog {
 ///
 /// ```compile_fail
 /// pgrx_c_macros::BindingCatalog::default().offset_capabilities;
+/// ```
+///
+/// ```compile_fail
+/// pgrx_c_macros::BindingCatalog::default().inline_translations;
 /// ```
 #[cfg(doctest)]
 pub struct GeneratedCapabilitiesAreNotCatalogInput;
@@ -263,6 +262,10 @@ pub fn emit(session: &AnalysisSession<'_>, name: &str) -> MacroEmission {
 /// a function without a binding. [`generate_with_bindings`] generates these
 /// capabilities when the declarations admit them, and otherwise skips the macro too.
 ///
+/// A call to a static inline function never expands a translated body here. Only
+/// batch generation knows which inline functions it translated, so this output calls
+/// the function as described above.
+///
 /// The source can still name a C enum's generated identity, which only the support
 /// artifact from [`generate_with_bindings`] defines. The defining crate must
 /// include that item, or using the macro fails to compile.
@@ -271,23 +274,23 @@ pub fn emit_with_bindings(
     name: &str,
     bindings: &BindingCatalog,
 ) -> MacroEmission {
-    emit_with_lowering(session, name, bindings, None, &mut None)
+    emit_with_lowering(session, name, bindings, Generated::NONE, &mut None)
 }
 
 /// Apply admission gates before rendering, sharing storage reconciliation across a batch.
 ///
 /// The optional lowering is populated only after a macro survives analysis and ABI
 /// checks, so skipped batches do not build indexes they cannot use. Only batch
-/// generation has `adapters`; a caller's bindings cannot stand in for them.
+/// generation fills `generated`; a caller's bindings cannot stand in for it.
 fn emit_with_lowering<'a>(
     session: &'a AnalysisSession<'_>,
     name: &str,
     bindings: &'a BindingCatalog,
-    adapters: Option<&'a GeneratedAdapters>,
+    generated: Generated<'a>,
     lowering: &mut Option<types::Lowering<'a>>,
 ) -> MacroEmission {
     let mut analysis = session.analyze(name);
-    let mut lowered = lower(session, &analysis, bindings, adapters, lowering);
+    let mut lowered = lower(session, &analysis, bindings, generated, lowering);
     let mut fallback = None;
     // A translated inline function that cannot be rendered is still callable through
     // its guarded native binding. The report keeps the reason the translation failed.
@@ -295,7 +298,7 @@ fn emit_with_lowering<'a>(
         && translated_inline(session, &analysis)
         && let Some(call) = session.analyze_inline_call(name)
     {
-        let call_lowered = lower(session, &call, bindings, adapters, lowering);
+        let call_lowered = lower(session, &call, bindings, generated, lowering);
         if call_lowered.is_ok() {
             fallback = Some(SkipReason { tokens: None, ..reason.clone() });
             analysis = call;
@@ -318,7 +321,7 @@ fn lower<'a>(
     session: &'a AnalysisSession<'_>,
     analysis: &MacroAnalysis,
     bindings: &'a BindingCatalog,
-    adapters: Option<&'a GeneratedAdapters>,
+    generated: Generated<'a>,
     lowering: &mut Option<types::Lowering<'a>>,
 ) -> Result<(String, MacroDocumentation), SkipReason> {
     if let Some(reason) = binding_mismatch(session, analysis, bindings) {
@@ -342,11 +345,11 @@ fn lower<'a>(
         types::Lowering::new(
             session.frontend().declarations(),
             bindings,
-            adapters.map_or(types::GeneratedTypes::NONE, GeneratedAdapters::types),
+            generated.adapters.map_or(types::GeneratedTypes::NONE, GeneratedAdapters::types),
             &session.frontend().profile().target,
         )
     });
-    render(session, analysis, original, &assertions, bindings, adapters, lowering)
+    render(session, analysis, original, &assertions, bindings, generated, lowering)
 }
 
 /// Emit a set of macros, preserving available calls and propagating value mismatches.
@@ -375,14 +378,15 @@ fn emit_prepared_batch(
     bindings: &BindingCatalog,
     adapters: Option<&GeneratedAdapters>,
 ) -> Vec<MacroEmission> {
-    // Each pass borrows one immutable catalog and the generated adapters. Index its
-    // C/Rust storage identities once, after the first macro passes its admission gates.
+    // Each pass borrows one immutable catalog and generated state. Index its C/Rust
+    // storage identities once, after the first macro passes its admission gates.
     let initial = {
+        let generated = Generated { adapters, ..Generated::NONE };
         let mut lowering = None;
         names
             .iter()
             .map(|name| {
-                emit_with_lowering(session, name.as_ref(), bindings, adapters, &mut lowering)
+                emit_with_lowering(session, name.as_ref(), bindings, generated, &mut lowering)
             })
             .collect::<Vec<_>>()
     };
@@ -442,8 +446,9 @@ fn emit_prepared_batch(
         available.macros.remove(name);
     }
     let mut translated = translated_callees(session, &initial, &available.macros);
-    available.inline_translations = translation_panics(&initial, &translated);
-    let finish = |available: &BindingCatalog| {
+    let mut translations = translation_panics(&initial, &translated);
+    let finish = |translations: &BTreeMap<String, BTreeSet<&'static str>>| {
+        let generated = Generated { adapters, translations };
         let mut available_lowering = None;
         let mut emissions = initial
             .iter()
@@ -482,7 +487,13 @@ fn emit_prepared_batch(
                         fallback: None,
                     }
                 } else {
-                    emit_with_lowering(session, name, available, adapters, &mut available_lowering)
+                    emit_with_lowering(
+                        session,
+                        name,
+                        &available,
+                        generated,
+                        &mut available_lowering,
+                    )
                 }
             })
             .collect::<Vec<_>>();
@@ -519,10 +530,9 @@ fn emit_prepared_batch(
     };
     // A translated callee must itself be emitted as a translation; otherwise its callers
     // keep calling the native binding.
-    let mut emissions = finish(&available);
+    let mut emissions = finish(&translations);
     loop {
-        let lost = available
-            .inline_translations
+        let lost = translations
             .keys()
             .filter(|name| {
                 !emissions.iter().any(|emission| {
@@ -537,8 +547,8 @@ fn emit_prepared_batch(
             return emissions;
         }
         translated.retain(|name| !lost.contains(name));
-        available.inline_translations = translation_panics(&initial, &translated);
-        emissions = finish(&available);
+        translations = translation_panics(&initial, &translated);
+        emissions = finish(&translations);
     }
 }
 
@@ -883,6 +893,26 @@ impl GeneratedAdapters {
     }
 }
 
+/// Generated state that rendering reads beside the caller's [`BindingCatalog`].
+///
+/// Only batch emission fills it, so a caller cannot assert any of it. Single-macro
+/// emission renders with [`Generated::NONE`].
+#[derive(Clone, Copy)]
+struct Generated<'a> {
+    /// Capabilities and refusals that batch generation established.
+    adapters: Option<&'a GeneratedAdapters>,
+    /// Static inline functions emitted as translated bodies in this batch, with the
+    /// Rust panic conditions their translation can raise, including those of the
+    /// translations it expands. Calls to them expand that translation instead of
+    /// calling the native binding.
+    translations: &'a BTreeMap<String, BTreeSet<&'static str>>,
+}
+
+impl Generated<'static> {
+    /// No generated capabilities and no inline translations.
+    const NONE: Self = Self { adapters: None, translations: &BTreeMap::new() };
+}
+
 /// Build capability families in dependency order from the planned batch requirements.
 ///
 /// Callback witnesses establish signatures before function thunks are generated;
@@ -1107,7 +1137,7 @@ fn render(
     original: InvocationSource<'_>,
     assertions: &str,
     bindings: &BindingCatalog,
-    adapters: Option<&GeneratedAdapters>,
+    generated: Generated<'_>,
     lowering: &types::Lowering<'_>,
 ) -> Result<(String, MacroDocumentation), SkipReason> {
     let identifier = macro_identifier(&analysis.name).ok_or_else(|| {
@@ -1147,7 +1177,7 @@ fn render(
         session.frontend(),
         analysis,
         bindings,
-        adapters,
+        generated,
         &constants,
         lowering,
         translated,
@@ -1292,7 +1322,7 @@ fn render(
     }
     comment.push_str("\n\n# Safety\n\n");
     comment.push_str(documentation::SAFETY);
-    let failures = panic_conditions(analysis, &bindings.inline_translations);
+    let failures = panic_conditions(analysis, generated.translations);
     if !failures.is_empty() {
         comment.push_str("\n\n# Panics\n\n");
         for failure in failures {

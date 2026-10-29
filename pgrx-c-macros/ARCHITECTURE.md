@@ -157,7 +157,7 @@ different names:
 | `AnalysisSession` | A borrowed frontend plus expansion results, retained integer constants, zero-constant proofs, and the augmented graph. | Emission accepts a coherent session rather than a detached AST. |
 | `Expression` | Arena nodes indexed by `NodeId`, root, token ranges, and optional structured statement body. | One syntax arena supports analysis and all emission contexts. |
 | `MacroAnalysis` | Signature, formal/capture roles, uses, invocation/evaluation contracts, symbolic result types, dependencies, and candidate/skip status. | Candidate analysis is weaker than successful emission. |
-| `BindingCatalog` | Actual crate-relative Rust paths, constant values, aliases, functions, record/enum/variable storage, bitfield metadata, and the FFI guard path. It holds no generated capability or refusal. | Available Rust representations must be validated against C. |
+| `BindingCatalog` | Actual crate-relative Rust paths, constant values, aliases, functions, record/enum/variable storage, bitfield metadata, and the FFI guard path. It holds no generated capability, refusal or inline translation. | Available Rust representations must be validated against C. |
 | `MacroGeneration` | Per-root `MacroEmission` values and one `MacroSupportArtifact` containing Rust and optional C source. | Macros and their required support must be published together. |
 
 The target model includes the C triple, byte order, byte and pointer widths,
@@ -1217,15 +1217,16 @@ This is one final demand recomputation, not an arbitrary fixed-point loop.
 Marker identities come from stable C/declaration/profile facts, so pruning
 support cannot renumber the identities already referenced by emitted macros.
 
-Generated capabilities and their refusals never enter the caller's
-`BindingCatalog`. Rendering reads them from the generated adapters passed beside
-it, so a caller cannot assert a callback signature, function adapter, address
-getter, or field or offset adapter that generation did not create. Single-macro
-emission has none of these and skips a macro that needs one. It can still name a
-C enum's generated identity type in `__pgrx_c_generated`, because that path
-depends only on the enum declaration. Only batch support defines the type, so an
-invocation of such a macro compiles only in a crate that already includes batch
-support for that enum.
+Generated capabilities, their refusals and a batch's inline translations never
+enter the caller's `BindingCatalog`. Rendering reads them from the generated
+state passed beside it, so a caller cannot assert a callback signature, function
+adapter, address getter, field or offset adapter, or inline translation that
+generation did not create. Single-macro emission has none of these. It skips a
+macro that needs one of the adapters, and its calls to inline functions never
+expand a translation. It can still name a C enum's generated identity type in
+`__pgrx_c_generated`, because that path depends only on the enum declaration.
+Only batch support defines the type, so an invocation of such a macro compiles
+only in a crate that already includes batch support for that enum.
 
 All relevant ABI and storage witnesses participate in validation before pruning.
 A rejected or unselected alias still matters when deciding whether one Rust
