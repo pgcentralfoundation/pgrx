@@ -1825,6 +1825,8 @@ reimplementation. Exceeding a limit must produce a recognizable refusal, not
 truncate the source into an apparently successful macro. No limit measures
 elapsed time, so a slow or loaded machine generates the same macros as a fast
 one; a compiler that hangs is left to the surrounding build or CI job timeout.
+A compiler ended by a signal, such as an out-of-memory kill, fails generation
+instead of rejecting the macros it was probing.
 
 | Operation | Current bound |
 | --- | ---: |

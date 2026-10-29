@@ -206,11 +206,7 @@ pub(super) fn prove(
                 &arguments,
                 &["-E", "-P"],
             ) {
-                Err(FrontendError::CompilerFailed { diagnostics, status, .. })
-                    if status.code().is_some() =>
-                {
-                    diagnostics
-                }
+                Err(FrontendError::CompilerFailed { diagnostics, .. }) => diagnostics,
                 Err(FrontendError::OutputLimit(_)) => {
                     reject_all(
                         &mut proof,

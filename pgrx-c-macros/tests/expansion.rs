@@ -12,11 +12,16 @@
 /// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]
 mod oracle;
+/// Write the wrapper compiler that a test kills mid-batch.
+#[cfg(unix)]
+#[path = "support/script.rs"]
+mod script;
 
 use pgrx_c_macros::{
     ActiveProvenance, AnalysisSession, AnalysisStatus, ExpandedMacro, ExpansionBatch,
     ExpansionLimits, ExpansionResult, ExpansionSkipCode, FrontendError, FrontendOutput,
     MacroScanner, SkipReasonCode, inspect, prepare_expansions, prepare_expansions_with_limits,
+    probe_integer_object_constants,
 };
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
@@ -370,6 +375,50 @@ fn expansion_budgets_and_compiler_rejection_are_structured_skips() {
     }
     let batch = prepare_expansions(&scanner, &frontend, &["EXP_BAD_ARITY"]).unwrap();
     assert_skip(&batch, "EXP_BAD_ARITY", ExpansionSkipCode::CompilerRejected);
+}
+
+/// Checks that a compiler ended by a signal, as an out-of-memory kill on a loaded machine would
+/// end it, fails expansion and constant probing instead of rejecting the probed macros.
+#[cfg(unix)]
+#[test]
+fn killed_compilers_fail_instead_of_rejecting_macros() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().unwrap();
+    let directory = Directory::new();
+    let header = directory.0.join("main.h");
+    std::fs::write(
+        &header,
+        "#define EXP_KILLED_CALL(x) ((x) + 1)\n#define EXP_KILLED_VALUE (2 + 3)\n",
+    )
+    .unwrap();
+    let compiler =
+        inspect(&scanner, &header, &[], None).unwrap().profile().compiler.executable.clone();
+    let control = directory.0.join("control");
+    std::fs::create_dir(&control).unwrap();
+    let marker = control.join("kill");
+    let wrapper = control.join("clang");
+    let quote = |path: &Path| format!("'{}'", path.to_str().unwrap().replace('\'', "'\\''"));
+    // Inspection runs the real compiler. Once the marker exists, every symbolic expansion and
+    // typed constant probe run is killed before it can judge its probes. Environment checks
+    // still run, so each failure comes from a probe batch.
+    script::write_script(
+        &wrapper,
+        &format!(
+            "#!/bin/sh\nif [ -e {marker} ]; then\n    case \" $* \" in *\" -E -P \"*|*\" -fsyntax-only \"*) kill -KILL $$ ;; esac\nfi\nexec {compiler} \"$@\"\n",
+            marker = quote(&marker),
+            compiler = quote(&compiler),
+        ),
+    );
+    let frontend = inspect(&scanner, &header, &[], Some(&wrapper)).unwrap();
+    std::fs::write(&marker, "").unwrap();
+    let expansion = prepare_expansions(&scanner, &frontend, &["EXP_KILLED_CALL"]);
+    assert!(
+        matches!(expansion, Err(FrontendError::CompilerTerminated { .. })),
+        "{:?}",
+        expansion.map(|batch| batch.results)
+    );
+    let constants = probe_integer_object_constants(&scanner, &frontend, &["EXP_KILLED_VALUE"]);
+    assert!(matches!(constants, Err(FrontendError::CompilerTerminated { .. })), "{constants:?}");
 }
 
 /// Checks that an over-budget batch skips only the invocations that do not fit, so the

@@ -148,6 +148,18 @@ pub enum FrontendError {
         /// Owned compiler diagnostics associated with this discovery or tool phase.
         diagnostics: String,
     },
+    /// A signal ended a tool phase before it exited, for example an out-of-memory kill on a
+    /// loaded machine. Unlike [`FrontendError::CompilerFailed`], it says nothing about the
+    /// input, so no caller treats it as a rejected probe.
+    #[error("{} was terminated ({status}): {diagnostics}", compiler.display())]
+    CompilerTerminated {
+        /// The executable that was terminated.
+        compiler: PathBuf,
+        /// The status that records the terminating signal.
+        status: ExitStatus,
+        /// Diagnostics the tool wrote before it was terminated.
+        diagnostics: String,
+    },
     /// A compiler output pipe exceeded the bounded capture budget.
     #[error("{} exceeded the {OUTPUT_LIMIT}-byte output limit", .0.display())]
     OutputLimit(
@@ -593,11 +605,17 @@ fn select_compiler(
         format!("clang{}", std::env::consts::EXE_SUFFIX),
     ];
     for candidate in configured.into_iter().chain(adjacent).chain(names.iter().map(Path::new)) {
-        if let Some(executable) = search.resolve(candidate, search_roots)?
-            && let Ok(output) = run_compiler(&executable, &["--version".into()])
-            && version_major(&output.stdout) == Some(major)
-        {
-            return Ok(CompilerSelection { executable, search });
+        let Some(executable) = search.resolve(candidate, search_roots)? else { continue };
+        match run_compiler(&executable, &["--version".into()]) {
+            Ok(output) if version_major(&output.stdout) == Some(major) => {
+                return Ok(CompilerSelection { executable, search });
+            }
+            // A killed version query says nothing about this candidate. Passing over it would
+            // let load select a lower-preference compiler.
+            Err(error @ FrontendError::CompilerTerminated { .. }) => {
+                return Err(search.track(error));
+            }
+            _ => {}
         }
     }
     Err(search.track(FrontendError::CompilerUnavailable(format!(
@@ -1607,10 +1625,8 @@ __pgrx_c_offset_indexed = __builtin_offsetof(struct __pgrx_c_offset_probe, neste
     let offsetof_supported =
         match run_compiler_with_input(compiler, &probe, Some(float_source), None) {
             Ok(_) => offsetof.is_some(),
-            Err(FrontendError::CompilerFailed { diagnostics, status, .. })
-                if status.code().is_some()
-                    && offsetof.is_some()
-                    && only_offsetof_errors(&diagnostics) =>
+            Err(FrontendError::CompilerFailed { diagnostics, .. })
+                if offsetof.is_some() && only_offsetof_errors(&diagnostics) =>
             {
                 false
             }
@@ -2655,6 +2671,8 @@ fn require_native_artifact(path: &Path, kind: &str) -> Result<(), FrontendError>
 /// The owner keeps the witness alive through the call; a growing file above the
 /// shared output budget stops and reaps the child like an overflowing pipe. No time limit
 /// applies, so a compiler slowed by a loaded machine yields the same bindings as on an idle one.
+/// A child ended by a signal is [`FrontendError::CompilerTerminated`], never `CompilerFailed`, so
+/// an out-of-memory kill cannot pass for a probe the compiler rejected.
 fn run_compiler_with_input(
     compiler: &Path,
     arguments: &[String],
@@ -2739,6 +2757,13 @@ fn run_compiler_with_input(
             let stderr = stderr.take().expect("the completed stderr reader supplied its result");
             break if status.success() {
                 Ok(CompilerOutput { stdout, stderr })
+            } else if status.code().is_none() {
+                // Only a Unix signal ends a process without an exit code.
+                Err(FrontendError::CompilerTerminated {
+                    compiler: compiler.into(),
+                    status,
+                    diagnostics: stderr,
+                })
             } else {
                 Err(FrontendError::CompilerFailed {
                     compiler: compiler.into(),
@@ -3358,6 +3383,36 @@ mod tests {
         ));
     }
 
+    /// A tool ended by a signal reports `CompilerTerminated` with what it wrote before the
+    /// signal, and optional probe batches propagate it instead of bisecting. An ordinary
+    /// nonzero exit remains `CompilerFailed`.
+    #[cfg(unix)]
+    #[test]
+    fn signalled_tools_are_terminated_rather_than_failed() {
+        use std::os::unix::process::ExitStatusExt;
+        let shell =
+            |script: &str| run_compiler(Path::new("/bin/sh"), &["-c".into(), script.into()]);
+        let Err(terminated) = shell("printf partial >&2; kill -KILL $$") else {
+            panic!("a killed tool cannot succeed");
+        };
+        assert!(
+            matches!(
+                &terminated,
+                FrontendError::CompilerTerminated { status, diagnostics, .. }
+                    if status.signal() == Some(9) && diagnostics == "partial"
+            ),
+            "{terminated:?}"
+        );
+        assert!(matches!(
+            failure_owners(terminated, "__probe_", &[1]),
+            Err(FrontendError::CompilerTerminated { .. })
+        ));
+        assert!(matches!(
+            shell("exit 3"),
+            Err(FrontendError::CompilerFailed { status, .. }) if status.code() == Some(3)
+        ));
+    }
+
     /// Tool failures name the tool that failed: the archiver runs through the same invocation
     /// path as Clang, and a build log must not blame Clang for an llvm-ar failure.
     #[cfg(unix)]
@@ -3937,6 +3992,24 @@ mod tests {
             );
             let inputs = build_inputs(&[], "", BTreeSet::new(), &selection.search).unwrap();
             assert_ne!(inputs.fingerprints[&configured], rejected_identity);
+        }
+
+        /// Checks a killed version query fails the lookup instead of selecting a lower-preference
+        /// compiler.
+        #[test]
+        fn killed_version_queries_fail_instead_of_selecting_a_fallback() {
+            let fixture = Fixture::new();
+            let configured = fixture.0.join("configured-clang");
+            let adjacent = fixture.0.join("adjacent-clang");
+            script(&configured, "kill -KILL $$");
+            compiler(&adjacent, 21);
+            let Err(FrontendError::WithInputs { error, inputs }) =
+                select_compiler(None, Some(&configured), Some(&adjacent), 21, &[])
+            else {
+                panic!("a killed configured compiler must not yield to the adjacent one");
+            };
+            assert!(matches!(*error, FrontendError::CompilerTerminated { .. }), "{error}");
+            assert!(inputs.fingerprints[&configured].is_some());
         }
 
         /// Checks bare configured names keep path precedence and explicit failures stay strict.
