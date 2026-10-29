@@ -2,7 +2,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-// Write synthetic tools that tests run in place of a compiler, archiver or pg_config.
+// Write synthetic tools that tests run in place of a compiler, archiver, formatter or pg_config.
 
 use std::path::Path;
 use std::process::Command;

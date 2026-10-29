@@ -11,10 +11,13 @@
 
 #![cfg(unix)]
 
+/// Write the synthetic `pg_config` that the nested builds run.
+#[path = "../../pgrx-c-macros/tests/support/script.rs"]
+mod support_script;
+
 use quote::ToTokens;
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs::{self, File};
-use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -514,7 +517,7 @@ static inline int snapshot_native_add(int value) { return value + 13; }
     )
     .unwrap();
     let pg_config = fixture.0.join("pg_config");
-    fs::write(
+    support_script::write_script(
         &pg_config,
         r#"#!/bin/sh
 root=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
@@ -526,9 +529,7 @@ case "$1" in
     *) exit 1 ;;
 esac
 "#,
-    )
-    .unwrap();
-    fs::set_permissions(&pg_config, fs::Permissions::from_mode(0o755)).unwrap();
+    );
     fs::write(
         fixture.0.join("src/lib.rs"),
         format!(

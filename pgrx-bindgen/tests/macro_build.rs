@@ -24,9 +24,12 @@
 
 #![cfg(unix)]
 
+/// Write the synthetic compilers and `pg_config` programs that the nested builds run.
+#[path = "../../pgrx-c-macros/tests/support/script.rs"]
+mod support_script;
+
 use std::collections::BTreeMap;
 use std::fs;
-use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -513,8 +516,7 @@ fn generation_tracks_flags_optional_headers_shadowing_and_unchanged_builds() {
 
 /// Write an executable shell script.
 fn script(path: &Path, body: &str) {
-    fs::write(path, format!("#!/bin/sh\n{body}\n")).unwrap();
-    fs::set_permissions(path, fs::Permissions::from_mode(0o755)).unwrap();
+    support_script::write_script(path, &format!("#!/bin/sh\n{body}\n"));
 }
 
 /// Require a failed build whose diagnostics contain every expected fragment.

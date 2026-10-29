@@ -2697,15 +2697,12 @@ macro_rules! EXAMPLE {
     #[cfg(unix)]
     #[test]
     fn server_include_overrides_own_generated_macros() {
-        use std::os::unix::fs::PermissionsExt;
         let directory = TemporaryDirectory::new();
         let pg_config = directory.0.join("pg_config");
-        fs::write(
+        crate::test_script::write_script(
             &pg_config,
             "#!/bin/sh\ncase \"$1\" in\n--includedir-server) echo /installation/server ;;\n--version) echo 'PostgreSQL 18.4' ;;\n--cppflags) echo ;;\n*) exit 1 ;;\nesac\n",
-        )
-        .unwrap();
-        fs::set_permissions(&pg_config, fs::Permissions::from_mode(0o755)).unwrap();
+        );
         let postgres =
             macro_postgres_config(&PgConfig::new_with_defaults(pg_config), "/override/server/")
                 .unwrap();
@@ -2833,15 +2830,11 @@ macro_rules! EXAMPLE {
         // formatter. Windows exercises its own command-line limit with rustfmt directly.
         #[cfg(unix)]
         let formatter = {
-            use std::os::unix::fs::PermissionsExt;
-
             let proxy = directory.0.join("bounded-rustfmt");
-            fs::write(
+            crate::test_script::write_script(
                 &proxy,
                 "#!/bin/sh\nsize=0\nfor arg; do size=$((size + ${#arg} + 1)); done\nif [ \"$size\" -gt 32767 ]; then echo 'formatter command exceeds process limit' >&2; exit 1; fi\nexec rustfmt \"$@\"\n",
-            )
-            .unwrap();
-            fs::set_permissions(&proxy, fs::Permissions::from_mode(0o700)).unwrap();
+            );
             proxy
         };
         format_macro_files(&paths, &formatter).unwrap();
@@ -2915,12 +2908,9 @@ macro_rules! EXAMPLE {
     /// Build an isolated failing formatter proxy whose stderr is independent of source content.
     #[cfg(unix)]
     fn failing_macro_formatter(directory: &Path, diagnostic: &str) -> PathBuf {
-        use std::os::unix::fs::PermissionsExt;
-
         let formatter = directory.join("fixture-rustfmt");
-        fs::write(&formatter, "#!/bin/sh\ncat \"$0.stderr\" >&2\nexit 1\n").unwrap();
+        crate::test_script::write_script(&formatter, "#!/bin/sh\ncat \"$0.stderr\" >&2\nexit 1\n");
         fs::write(directory.join("fixture-rustfmt.stderr"), diagnostic).unwrap();
-        fs::set_permissions(&formatter, fs::Permissions::from_mode(0o700)).unwrap();
         formatter
     }
 

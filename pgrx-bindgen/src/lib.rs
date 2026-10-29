@@ -13,6 +13,10 @@ use pgrx_pg_config::{
 };
 
 pub mod build;
+/// Write synthetic tools without a descriptor that a concurrently spawned child could inherit.
+#[cfg(all(test, unix))]
+#[path = "../../pgrx-c-macros/tests/support/script.rs"]
+mod test_script;
 
 fn is_for_release() -> bool {
     env_tracked("PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE").as_deref() == Some("1")
