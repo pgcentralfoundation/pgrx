@@ -493,27 +493,36 @@ fn append_poison_pragmas(
 }
 
 /// Require complete boundary evidence for every probe before accepting a paste pass.
+///
+/// `limit` bounds the output from the first probe boundary on, as the authoritative pass bounds
+/// only probe bodies. The output before it is the translation unit's own declarations, which grow
+/// with the inspected headers; the frontend's output limit bounds them.
 fn guard_boundaries(
     output: &str,
     prepared: &[Prepared<'_>],
     selected: &BTreeSet<usize>,
     limit: usize,
 ) -> Result<(), (ExpansionSkipCode, String)> {
-    if output.len() > limit {
-        return Err((
-            ExpansionSkipCode::BudgetExceeded,
-            "braced token-paste validation output exceeds its byte budget".into(),
-        ));
-    }
     let expected = selected
         .iter()
         .flat_map(|&index| [&prepared[index].begin, &prepared[index].end])
         .collect::<Vec<_>>();
     let boundaries = expected.iter().map(|name| name.as_str()).collect::<BTreeSet<_>>();
     let mut at = 0;
-    for line in output.lines() {
-        let line = line.trim();
-        if boundaries.contains(line) {
+    let mut bytes = 0usize;
+    for raw in output.lines() {
+        let line = raw.trim();
+        let boundary = boundaries.contains(line);
+        if at > 0 || boundary {
+            bytes = bytes.saturating_add(raw.len()).saturating_add(1);
+            if bytes > limit {
+                return Err((
+                    ExpansionSkipCode::BudgetExceeded,
+                    "braced token-paste validation output exceeds its byte budget".into(),
+                ));
+            }
+        }
+        if boundary {
             if expected.get(at).is_none_or(|expected| expected.as_str() != line) {
                 return Err((
                     ExpansionSkipCode::UnrecognizedOutput,
@@ -1098,6 +1107,13 @@ mod tests {
             guard_boundaries(&output, &prepared, &selected, output.len() - 1).unwrap_err().0,
             ExpansionSkipCode::BudgetExceeded
         );
+        // Header declarations before the first boundary grow with the environment, not the probes.
+        let header = format!("{}{output}", "int declaration;\n".repeat(1024));
+        assert!(guard_boundaries(&header, &prepared, &selected, output.len()).is_ok());
+        assert!(guard_boundaries(&header, &prepared, &selected, output.len() - 1).is_err());
+        // Bytes after the last boundary still count.
+        let trailing = format!("{output}x\n");
+        assert!(guard_boundaries(&trailing, &prepared, &selected, output.len() + 1).is_err());
     }
 
     /// Checks proof source preserves object invocation and isolates instrumentation.

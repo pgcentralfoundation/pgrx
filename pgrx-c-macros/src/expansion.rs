@@ -182,7 +182,8 @@ pub struct ExpansionLimits {
     /// proof's poison table names every active macro, so it grows with the inspected
     /// environment and is not counted.
     pub source_bytes: usize,
-    /// Maximum preprocessor output size accepted for body extraction.
+    /// Maximum preprocessor output accepted from the probes, excluding the translation unit's own
+    /// declarations before them.
     pub expanded_bytes: usize,
     /// Maximum replacement tokens admitted for any one macro.
     pub macro_tokens: usize,

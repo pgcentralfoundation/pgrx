@@ -579,6 +579,57 @@ fn closed_paste_proof_poisons_environments_larger_than_the_source_budget() {
     assert_skip(&batch, "P_FORGED_CONSTANT", ExpansionSkipCode::TokenPaste);
 }
 
+/// Clang's `-E` output starts with every declaration in the inspected headers, so it grows with
+/// the environment, like the paste proof's poison table. Here the headers alone print more than
+/// the expansion byte budget, yet that budget still bounds only probe output: a closed paste
+/// expands, while an operand paste and a forged constant marker are still refused.
+#[test]
+fn closed_paste_proof_budgets_probe_output_rather_than_header_output() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = Directory::new();
+    let header = directory.0.join("environment.h");
+    // Each filler line prints as eight 66-byte literals.
+    let mut environment = format!(
+        "#define FILL \"{}\"\n#define FILL8 FILL FILL FILL FILL FILL FILL FILL FILL\nstatic const char environment_filler[] =\n",
+        "x".repeat(64)
+    );
+    environment.push_str(&"FILL8\n".repeat(20_000));
+    environment.push_str(";\n");
+    std::fs::write(directory.0.join("fillers.h"), environment).unwrap();
+    std::fs::write(
+        &header,
+        r#"
+#include "fillers.h"
+#define CAT(a,b) a##b
+#define CAT3(a,b,c) a##b##c
+#define DROP(x) 0
+#define PRESCAN(x) DROP(x)
+#define P_CLOSED(x) ((x)+CAT(0xFF,U))
+#define P_OPERAND(x) PRESCAN(CAT(x,_suffix))
+#define P_FORGED_CONSTANT(x) PRESCAN(CAT3(__pgrx_,c_expand_0_,c0))
+"#,
+    )
+    .unwrap();
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &header, &["-std=c17".into()], None).unwrap();
+    let printed = std::process::Command::new(&frontend.profile().compiler.executable)
+        .args(&frontend.profile().arguments)
+        .args(["-E", "-P"])
+        .arg(&header)
+        .output()
+        .unwrap();
+    assert!(printed.status.success());
+    let limit = ExpansionLimits::default().expanded_bytes;
+    // The frontend refuses output over 16 MiB.
+    assert!((limit..16 << 20).contains(&printed.stdout.len()), "{} bytes", printed.stdout.len());
+    let batch =
+        prepare_expansions(&scanner, &frontend, &["P_CLOSED", "P_OPERAND", "P_FORGED_CONSTANT"])
+            .unwrap();
+    assert!(body(expanded(&batch, "P_CLOSED")).contains(&"0xFFU"));
+    assert_skip(&batch, "P_OPERAND", ExpansionSkipCode::TokenPaste);
+    assert_skip(&batch, "P_FORGED_CONSTANT", ExpansionSkipCode::TokenPaste);
+}
+
 /// Checks that malformed paste probes cannot swallow a later operand validation.
 #[test]
 fn malformed_paste_probes_cannot_swallow_a_later_operand_validation() {
