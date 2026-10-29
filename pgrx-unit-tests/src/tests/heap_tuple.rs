@@ -1160,15 +1160,19 @@ mod tests {
     }
 
     /// Reading a NULL attribute returns `Ok(None)` without asking `T` for its type OID, which
-    /// can raise an ERROR.
+    /// can raise an ERROR. Before converting a value, `get_by_index` asks `T` for its type only
+    /// for a row-type attribute, so only the row-type case catches that lookup moving ahead of
+    /// the NULL check.
     #[pg_test]
     fn test_get_by_index_reads_null_without_type_lookup() -> Result<(), spi::Error> {
         Spi::run("CREATE TYPE HoldsNullInt AS (v int4)")?;
-        let row =
-            Spi::get_one::<PgHeapTuple<'_, AllocatedByRust>>("SELECT ROW(NULL)::HoldsNullInt")?
+        Spi::run("CREATE TYPE HoldsNullRow AS (v HoldsNullInt)")?;
+        for query in ["SELECT ROW(NULL)::HoldsNullInt", "SELECT ROW(NULL)::HoldsNullRow"] {
+            let row = Spi::get_one::<PgHeapTuple<'_, AllocatedByRust>>(query)?
                 .expect("the row is not NULL");
-        let read = row.get_by_index::<PgBox<NotAnSqlType>>(NonZeroUsize::new(1).unwrap());
-        assert!(matches!(read, Ok(None)), "{read:?}");
+            let read = row.get_by_index::<PgBox<NotAnSqlType>>(NonZeroUsize::new(1).unwrap());
+            assert!(matches!(read, Ok(None)), "{query}: {read:?}");
+        }
         Ok(())
     }
 
