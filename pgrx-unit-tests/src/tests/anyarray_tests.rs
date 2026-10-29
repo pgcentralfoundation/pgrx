@@ -246,10 +246,14 @@ mod tests {
 
     /// SPI frees a query's results when its connection closes, before `get_one` returns, so it
     /// must copy the array out of them.
+    ///
+    /// The array is longer than 126 bytes, so SPI's tuple keeps its 4-byte header. A short-header
+    /// array would be copied by the detoast in `from_polymorphic_datum` and pass this test even
+    /// without the copy that `from_datum_in_memory_context` makes.
     #[pg_test]
     fn test_anyarray_from_spi_outlives_connection() -> std::result::Result<(), pgrx::spi::Error> {
         let (array, result) = Spi::connect(|client| {
-            let table = client.select("SELECT ARRAY[repeat('x', 40), 'y']", None, &[])?.first();
+            let table = client.select("SELECT ARRAY[repeat('x', 400), 'y']", None, &[])?.first();
             let result = table.get_datum_by_ordinal(1)?.expect("array is NULL");
             let array = table.get_one::<AnyArray>()?.expect("array is NULL");
             Ok::<_, pgrx::spi::Error>((array, result))
@@ -262,7 +266,7 @@ mod tests {
         // palloc'd it; GetMemoryChunkContext reads the header of a palloc'd chunk.
         let context = unsafe { pg_sys::GetMemoryChunkContext(array.datum().cast_mut_ptr()) };
         assert_eq!(context, unsafe { pg_sys::TopTransactionContext });
-        let expected = vec!["x".repeat(40), "y".to_owned()];
+        let expected = vec!["x".repeat(400), "y".to_owned()];
         assert_eq!(array.value::<Vec<String>>(), Ok(Some(expected.clone())));
         let elements = (&array)
             .into_iter()
