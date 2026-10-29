@@ -896,7 +896,7 @@ fn preprocess_prepared<'a>(
                     pending.remove(&index);
                 }
             }
-            Err(FrontendError::OutputLimit(_) | FrontendError::Timeout(_)) => {
+            Err(FrontendError::OutputLimit(_)) => {
                 for &index in &pending {
                     let item = &prepared[index];
                     record_skip(
@@ -904,7 +904,7 @@ fn preprocess_prepared<'a>(
                         &item.definition.name,
                         skip(
                             ExpansionSkipCode::BudgetExceeded,
-                            "symbolic preprocessing exceeded its output or time budget",
+                            "symbolic preprocessing exceeded its output budget",
                             Some(&item.definition.name),
                             frontend,
                         ),

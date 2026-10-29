@@ -211,12 +211,12 @@ pub(super) fn prove(
                 {
                     diagnostics
                 }
-                Err(FrontendError::OutputLimit(_) | FrontendError::Timeout(_)) => {
+                Err(FrontendError::OutputLimit(_)) => {
                     reject_all(
                         &mut proof,
                         &selected,
                         ExpansionSkipCode::BudgetExceeded,
-                        "closed token-paste validation exceeded its output or time budget",
+                        "closed token-paste validation exceeded its output budget",
                     );
                     break 'modes;
                 }

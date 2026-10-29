@@ -1822,11 +1822,12 @@ does not grant permission to ignore those substitution rules.
 
 These limits describe the current implementation and are useful defaults for a
 reimplementation. Exceeding a limit must produce a recognizable refusal, not
-truncate the source into an apparently successful macro.
+truncate the source into an apparently successful macro. No limit measures
+elapsed time, so a slow or loaded machine generates the same macros as a fast
+one; a compiler that hangs is left to the surrounding build or CI job timeout.
 
 | Operation | Current bound |
 | --- | ---: |
-| Production compiler/archiver child duration | 60 seconds |
 | Production captured output limit | 16 MiB per stream |
 | Static inline candidates | 16,384 |
 | Original inline definition text / total retained text | 64 KiB / 16 MiB |

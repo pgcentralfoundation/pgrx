@@ -438,7 +438,6 @@ fn optional_failure(error: &FrontendError) -> bool {
         error,
         FrontendError::CompilerFailed { .. }
             | FrontendError::OutputLimit(_)
-            | FrontendError::Timeout(_)
             | FrontendError::Output(_)
             | FrontendError::Discovery(Error::Diagnostics(_))
     )

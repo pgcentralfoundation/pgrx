@@ -24,7 +24,7 @@ use std::path::{Path, PathBuf};
 use std::process::{Child, Command, ExitStatus, Stdio};
 use std::sync::mpsc;
 use std::thread;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 /// Decode historical flags without losing Windows paths or inventing missing compiler options.
 mod arguments;
@@ -48,8 +48,6 @@ pub(crate) mod zero_constants;
 
 /// Bound compiler pipes and the owned inclusion witness so output cannot exhaust memory or disk.
 const OUTPUT_LIMIT: u64 = 16 * 1024 * 1024;
-/// Bound one tool invocation so failed or stuck compiler phases release their owned child process.
-const COMPILER_TIMEOUT: Duration = Duration::from_secs(60);
 /// Compiler flags that consume a separate value and must be parsed without confusing it with another
 /// input.
 pub(crate) const VALUE_OPTIONS: &[&str] = &[
@@ -154,12 +152,6 @@ pub enum FrontendError {
     #[error("{} exceeded the {OUTPUT_LIMIT}-byte output limit", .0.display())]
     OutputLimit(
         /// The tool executable whose captured output exceeded its byte budget.
-        PathBuf,
-    ),
-    /// The tool invocation exceeded its finite time budget and is reaped.
-    #[error("{} exceeded the 60-second time limit", .0.display())]
-    Timeout(
-        /// The tool executable whose invocation exceeded its time budget.
         PathBuf,
     ),
     /// No acceptable executable could be selected for the loaded libclang release.
@@ -708,8 +700,7 @@ pub(crate) fn normalized_arguments(arguments: &[String]) -> Vec<String> {
 /// driver error; requires [`normalized_arguments`] so no error limit hides an owner. An empty set
 /// means no failure has an owner and the caller bisects: libclang-only failures, and diagnostics
 /// over the output budget, which no error limit bounds but halving the batch reduces. Other
-/// errors are returned, including the time limit, since bisecting it could spend the whole run
-/// budget at a minute per run.
+/// errors are returned.
 fn failure_owners(
     error: FrontendError,
     file: &str,
@@ -2440,7 +2431,7 @@ pub(crate) fn verify_input_files(inputs: &BuildInputs) -> Result<(), FrontendErr
 }
 
 // Read stdout and stderr concurrently so either pipe can fill without blocking Clang.
-// The channel also lets an output limit stop the child without waiting for a timeout.
+// The channel also lets an output limit stop the child before it exits.
 /// Run a driver phase with bounded concurrent output capture so either pipe cannot deadlock the
 /// other.
 pub(crate) fn run_compiler(
@@ -2453,7 +2444,7 @@ pub(crate) fn run_compiler(
 /// Compile and archive generated access primitives under the inspected C flags.
 /// The source must include the same inspected header; callers retain the source
 /// and archive alongside their other generated bindings. Both tools have the
-/// frontend's bounded diagnostics and timeout, and failed children are reaped.
+/// frontend's bounded diagnostics, and failed children are reaped.
 /// Fresh staged outputs are checked before publication; publication errors can
 /// leave the object updated without replacing the archive.
 /// Preprocess with the original flags before compiling the fixed token stream
@@ -2660,9 +2651,10 @@ fn require_native_artifact(path: &Path, kind: &str) -> Result<(), FrontendError>
     Ok(())
 }
 
-/// Feed an optional owned probe while bounding pipes, an optional witness file, and execution time.
+/// Feed an optional owned probe while bounding pipes and an optional witness file.
 /// The owner keeps the witness alive through the call; a growing file above the
-/// shared output budget stops and reaps the child like an overflowing pipe.
+/// shared output budget stops and reaps the child like an overflowing pipe. No time limit
+/// applies, so a compiler slowed by a loaded machine yields the same bindings as on an idle one.
 fn run_compiler_with_input(
     compiler: &Path,
     arguments: &[String],
@@ -2689,7 +2681,7 @@ fn run_compiler_with_input(
     if let Some(source) = source {
         let mut stdin = child.0.stdin.take().expect("piped stdin is present after spawning");
         // The writer owns its bounded probe and pipe. Killing/reaping the compiler on an
-        // error or timeout also closes the reader; no borrowing crosses this thread.
+        // error also closes the reader; no borrowing crosses this thread.
         thread::Builder::new()
             .name("pgrx-c-macros-stdin".into())
             .spawn(move || {
@@ -2703,7 +2695,6 @@ fn run_compiler_with_input(
     start_reader(stdout, true, sender.clone()).map_err(failure)?;
     start_reader(stderr, false, sender.clone()).map_err(failure)?;
     drop(sender);
-    let started = Instant::now();
     let mut stdout = None;
     let mut stderr = None;
     let mut status = None;
@@ -2756,14 +2747,11 @@ fn run_compiler_with_input(
                 })
             };
         }
-        if started.elapsed() >= COMPILER_TIMEOUT {
-            break Err(FrontendError::Timeout(compiler.into()));
-        }
         thread::sleep(Duration::from_millis(10));
     }
 }
 
-/// Own a child process so early returns, diagnostic failures, and time limits still kill and reap it.
+/// Own a child process so early returns and diagnostic failures still kill and reap it.
 struct RunningCompiler(
     /// The child process owned until completion or explicit kill/reap on failure.
     Child,
@@ -2771,8 +2759,8 @@ struct RunningCompiler(
 
 /// Release resources owned by RunningCompiler even when a compiler or proof phase exits early.
 impl Drop for RunningCompiler {
-    /// Kill and reap a still-running compiler so errors and time limits do not leave owned child
-    /// processes behind.
+    /// Kill and reap a still-running compiler so errors do not leave owned child processes
+    /// behind.
     fn drop(&mut self) {
         if self.0.try_wait().ok().flatten().is_none() {
             let _ = self.0.kill();
@@ -3349,7 +3337,7 @@ mod tests {
     }
 
     /// Optional probe batches drop the selected candidates that own a driver error and bisect
-    /// failures without an owner, including oversized diagnostics. A time limit still propagates.
+    /// failures without an owner, including oversized diagnostics. Other errors propagate.
     #[cfg(unix)]
     #[test]
     fn optional_probe_failures_without_owners_bisect() {
@@ -3365,8 +3353,8 @@ mod tests {
         assert_eq!(owners(failed).unwrap(), BTreeSet::from([3]));
         assert!(owners(FrontendError::OutputLimit("clang".into())).unwrap().is_empty());
         assert!(matches!(
-            owners(FrontendError::Timeout("clang".into())),
-            Err(FrontendError::Timeout(_))
+            owners(FrontendError::Environment("changed".into())),
+            Err(FrontendError::Environment(_))
         ));
     }
 
@@ -3387,11 +3375,10 @@ mod tests {
                 status: ExitStatus::from_raw(1 << 8),
                 diagnostics: "llvm-ar: error: unknown format".into(),
             },
-            FrontendError::OutputLimit(tool.clone()),
-            FrontendError::Timeout(tool),
+            FrontendError::OutputLimit(tool),
         ]
         .map(|error| error.to_string());
-        let [io, failed, limit, timeout] = &messages;
+        let [io, failed, limit] = &messages;
         assert!(io.starts_with("could not run /usr/lib/llvm-14/bin/llvm-ar: "), "{io}");
         assert!(
             failed.starts_with("/usr/lib/llvm-14/bin/llvm-ar failed (")
@@ -3399,7 +3386,6 @@ mod tests {
             "{failed}"
         );
         assert!(limit.starts_with("/usr/lib/llvm-14/bin/llvm-ar exceeded the "), "{limit}");
-        assert_eq!(timeout, "/usr/lib/llvm-14/bin/llvm-ar exceeded the 60-second time limit");
         for message in &messages {
             assert!(!message.contains("Clang"), "{message}");
         }
