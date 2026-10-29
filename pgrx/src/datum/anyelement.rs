@@ -63,7 +63,11 @@ impl AnyElement {
     ///
     /// A `T` that borrows, such as `&'a str` or `Array<'a, U>`, points into the value's memory or
     /// into a detoasted copy in `CurrentMemoryContext`. Do not keep it after that memory is freed;
-    /// see [`AnyElement`].
+    /// see [`AnyElement`]. An [`AnyArray`](crate::AnyArray) read from a compressed, out-of-line, or
+    /// short-header array detoasts it into the `CurrentMemoryContext` of this call, and its
+    /// elements point into that copy, so read it in the context where you iterate it. Inside
+    /// [`Spi::connect`](crate::spi::Spi::connect), that context is freed when the connection
+    /// closes.
     ///
     /// # Errors
     ///
