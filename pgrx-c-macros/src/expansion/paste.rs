@@ -8,7 +8,9 @@
 //! identifiers produced by `##` before rescan. Poisoning the final active names
 //! therefore exposes even generated helpers whose eventual expansion is empty.
 //! A separate braced-operand pass rejects a live paste involving an operand,
-//! including a pasted name that argument prescan subsequently erases.
+//! including a pasted name that argument prescan subsequently erases. A paste
+//! that forms `//` is refused through Clang's error for it, so a canary paste
+//! must show that the compiler options leave that error in place.
 
 //! Token pasting is admitted only for closed expansions whose resulting names can be traced
 //! to the inspected environment. Poison instrumentation discovers synthesized dependencies,
@@ -353,6 +355,15 @@ pub(super) fn prove(
                 proof.rejected.entry(index).or_insert(rejection);
             }
             selected.retain(|index| !proof.rejected.contains_key(index));
+            if !pass.comment_pastes_reported {
+                reject_all(
+                    &mut proof,
+                    &selected,
+                    ExpansionSkipCode::TokenPaste,
+                    "Clang does not report token pastes that form '//' comments under these compiler options",
+                );
+                break 'modes;
+            }
             if retry {
                 // An unterminated invocation can swallow later wrappers while the
                 // preprocessor still processes the EOF directive. Only an iteration
@@ -460,9 +471,15 @@ fn source(
     }
     // Instrumentation warnings are scoped off.
     if !braced {
+        append(format!("#define {prefix}paste_canary(left, right) left##right\n").as_bytes())?;
         append(poison)?;
     }
     append(b"#pragma clang diagnostic pop\n")?;
+    if !braced {
+        // Diagnostic state follows the invocation, so the canary is reported exactly when a
+        // probe's paste that forms `//` would be. See `Pass::comment_pastes_reported`.
+        append(format!("# 1 {completion_path:?}\n{prefix}paste_canary(/,/)\n").as_bytes())?;
+    }
     let tags = locations.iter().map(|(tag, &index)| (index, tag)).collect::<BTreeMap<_, _>>();
     for &index in selected {
         let tag = tags[&index];
@@ -732,6 +749,28 @@ struct Pass {
     /// Owned probe failures retained without allowing another candidate’s diagnostics to establish
     /// success.
     failed: BTreeMap<usize, String>,
+    /// Whether Clang reported the canary paste that forms `//`.
+    ///
+    /// Under Microsoft extensions such a paste is a comment, which the probe pragmas make an
+    /// error. Clang 11 and later drop that error under `-w`. A comment that cuts the probe line
+    /// short then goes unreported, and so does one inside a macro argument, which drops the rest
+    /// of the argument and leaves the line intact. Without this report no closed paste is proven.
+    comment_pastes_reported: bool,
+}
+
+/// Clang's error for a paste that forms `//`: an invalid token, or under Microsoft extensions a
+/// comment, which the probe pragmas make an error.
+const COMMENT_PASTE_ERRORS: [&str; 2] = [
+    "pasting formed '//', an invalid preprocessing token",
+    "pasting two '/' tokens into a '//' comment is a Microsoft extension",
+];
+
+/// A diagnostic message without the warning option or category Clang may append in brackets.
+fn message_text(message: &str) -> &str {
+    message
+        .strip_suffix(']')
+        .and_then(|message| message.rsplit_once(" ["))
+        .map_or(message, |(text, _)| text)
 }
 
 /// Extract poison references and owned failures only from a complete, unambiguous diagnostic proof.
@@ -758,11 +797,21 @@ fn parse_proof(
         while end < lines.len() && primary(lines[end])?.is_none() {
             end += 1;
         }
-        if error.location == completion_path && error.message == completion {
-            if completed || end < lines.len() {
-                return Err("Clang token-paste completion witness is repeated or not final".into());
+        if error.location == completion_path {
+            if error.message == completion {
+                if completed || end < lines.len() {
+                    return Err(
+                        "Clang token-paste completion witness is repeated or not final".into()
+                    );
+                }
+                completed = true;
+            } else if COMMENT_PASTE_ERRORS.contains(&message_text(error.message))
+                && !pass.comment_pastes_reported
+            {
+                pass.comment_pastes_reported = true;
+            } else {
+                return Err("Clang reported an unexpected token-paste witness error".into());
             }
-            completed = true;
         } else {
             let index = *locations.get(error.location).ok_or_else(|| {
                 "Clang token-paste error is not owned by a symbolic probe".to_owned()
@@ -951,6 +1000,45 @@ mod tests {
             assert!(parse(&multiple).is_err());
         }
         assert!(parse(COMPLETE).unwrap().pasted.is_empty());
+    }
+
+    /// The canary paste is recorded only when Clang reports it once in the completion file, in
+    /// either spelling and whatever option annotation follows; any other error there refuses
+    /// the proof.
+    #[test]
+    fn proof_records_only_the_reported_comment_paste_canary() {
+        let canary = |message: &str| {
+            format!(
+                "/tmp/complete:1:1: error: {message}\n/tmp/complete:1:1: note: expanded from macro 'CANARY'\n"
+            )
+        };
+        assert!(!parse(COMPLETE).unwrap().comment_pastes_reported);
+        for message in [
+            "pasting formed '//', an invalid preprocessing token",
+            "pasting two '/' tokens into a '//' comment is a Microsoft extension",
+            "pasting two '/' tokens into a '//' comment is a Microsoft extension [-Werror,-Wmicrosoft-comment-paste]",
+            "pasting two '/' tokens into a '//' comment is a Microsoft extension [-Werror,-Wmicrosoft-comment-paste,Lexical or Preprocessor Issue]",
+        ] {
+            let reported = canary(message);
+            let pass = parse(&format!("{reported}{}{COMPLETE}", poison(0, "HELPER"))).unwrap();
+            assert!(pass.comment_pastes_reported, "{message}");
+            assert_eq!(pass.pasted[&0], BTreeSet::from(["HELPER".into()]));
+            assert!(parse(&format!("{reported}{reported}{COMPLETE}")).is_err(), "{message}");
+            assert!(parse(&format!("{COMPLETE}{reported}")).is_err(), "{message}");
+        }
+        for message in [
+            "pasting formed '/*', an invalid preprocessing token",
+            "pasting two '/' tokens into a '//' comment",
+            "[pasting formed '//', an invalid preprocessing token]",
+            "DONE [-Wother]",
+        ] {
+            assert!(parse(&format!("{}{COMPLETE}", canary(message))).is_err(), "{message}");
+        }
+        // The canary's file is the completion file; the same error from a probe is that probe's.
+        let probe = canary(COMMENT_PASTE_ERRORS[1]).replace("/tmp/complete:", "/tmp/probe-1:");
+        let pass = parse(&format!("{probe}{COMPLETE}")).unwrap();
+        assert!(!pass.comment_pastes_reported);
+        assert_eq!(pass.failed.keys().copied().collect::<Vec<_>>(), [1]);
     }
 
     /// Require matched source/caret layouts and one complete identifier before retaining a name.
@@ -1235,6 +1323,19 @@ mod tests {
             assert_eq!(text.contains("#pragma GCC poison ROOT"), !braced);
             assert_eq!(text.contains("#error DONE"), !braced);
             assert_eq!(text.contains("fresh_begin_0\n"), braced);
+            // Only the plain pass reads every diagnostic, so only it carries the canary. It is
+            // defined before the poison table and invoked after the pop, before any probe.
+            assert_eq!(
+                text.contains("#define fresh_paste_canary(left, right) left##right\n"),
+                !braced
+            );
+            assert_eq!(
+                text.contains("diagnostic pop\n# 1 \"/tmp/complete\"\nfresh_paste_canary(/,/)\n# 1 \"/tmp/probe-0\"\n"),
+                !braced
+            );
+            if !braced {
+                assert!(text.find("left##right").unwrap() < text.find("GCC poison").unwrap());
+            }
             // Only the braced pass marks the end of each invocation line; the plain pass poisons
             // that marker.
             assert_eq!(text.contains("\nfresh_paste_entry_1 fresh_paste_tail_1\n"), braced);

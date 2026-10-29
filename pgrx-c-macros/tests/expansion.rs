@@ -15,10 +15,10 @@ mod oracle;
 
 use pgrx_c_macros::{
     ActiveProvenance, AnalysisSession, AnalysisStatus, ExpandedMacro, ExpansionBatch,
-    ExpansionLimits, ExpansionResult, ExpansionSkipCode, FrontendError, MacroScanner,
-    SkipReasonCode, inspect, prepare_expansions, prepare_expansions_with_limits,
+    ExpansionLimits, ExpansionResult, ExpansionSkipCode, FrontendError, FrontendOutput,
+    MacroScanner, SkipReasonCode, inspect, prepare_expansions, prepare_expansions_with_limits,
 };
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 
 /// Serialize libclang-backed inspection within this test process because its safe runtime
@@ -99,6 +99,13 @@ fn assert_skip(batch: &ExpansionBatch, name: &str, code: ExpansionSkipCode) {
     assert_eq!(reason.code, code, "{name}: {}", reason.message);
     assert!(!reason.message.is_empty());
     assert!(!reason.spans.is_empty(), "{name} retains original source provenance");
+}
+
+/// Require the expected structured rejection with its exact reason.
+fn assert_skip_reason(batch: &ExpansionBatch, name: &str, code: ExpansionSkipCode, message: &str) {
+    assert_skip(batch, name, code);
+    let ExpansionResult::Skipped { reason } = &batch.results[name] else { unreachable!() };
+    assert_eq!(reason.message, message, "{name}");
 }
 
 /// Admit identical object replacements from different headers as context while retaining all
@@ -631,51 +638,98 @@ fn closed_paste_proof_budgets_probe_output_rather_than_header_output() {
 }
 
 /// Under Microsoft extensions, which Clang enables by default for MSVC targets, a paste that
-/// forms `//` comments out the rest of the invoking line. A generated macro cannot erase the
-/// code that follows its invocation, so the proof refuses such pastes, including one in a
-/// dependency. Clang reports them as errors through the probe pragmas; under `-w`, which
-/// silences that report, the braced pass finds the invocation line cut short instead.
+/// forms `//` comments out the rest of the invoking line, or inside a macro argument the rest of
+/// that argument. A generated macro cannot erase code, so the proof refuses such pastes,
+/// including one in a dependency. Clang reports them as errors through the probe pragmas. When
+/// those errors are dropped, as `-w` does from Clang 11 on, no closed paste is admitted.
 #[test]
 fn closed_pastes_that_form_comments_are_refused_under_microsoft_extensions() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let directory = Directory::new();
     let header = directory.0.join("comment.h");
-    // In P_ARGUMENT_COMMENT the comment ends with the argument, so the line stays intact and only
-    // the reported error refuses it. Clang 14 to 19 and Apple clang 21 crash on a comment paste
-    // in an argument unless the expansion ends with a function-like macro name, as this one does.
+    // P_ARGUMENT_COMMENT keeps its line and becomes a well-formed expression without `+ 2`.
+    // Clang 14 to 19 and Apple clang 21 crash on a comment paste in an argument unless the
+    // expansion ends with a function-like macro name, as this one does.
     std::fs::write(
         &header,
         r#"
 #define CAT(a,b) a##b
 #define ID(x) x
 #define FUNCTION(x) x
+#define SYNTHESIZED 7
 #define COMMENT_OBJECT CAT(/,/) 3
 #define P_COMMENT(x) ((x) + 1) CAT(/,/) + 2
 #define P_COMMENT_DEPENDENCY(x) ((x) COMMENT_OBJECT + 2)
-#define P_ARGUMENT_COMMENT(x) ((x) + ID(CAT(/,/)) FUNCTION
+#define P_ARGUMENT_COMMENT(x) ((x) + ID(1 CAT(/,/) + 2)) + FUNCTION
 #define P_CLOSED(x) ((x)+CAT(0xFF,U))
+#define P_SYNTHESIZED(x) ((x)+CAT(SYNTHE,SIZED))
 "#,
     )
     .unwrap();
     let scanner = MacroScanner::new().unwrap();
+    let comments = ["P_COMMENT", "P_COMMENT_DEPENDENCY", "P_ARGUMENT_COMMENT"];
+    let closed = ["P_CLOSED", "P_SYNTHESIZED"];
     let msvc = ["--target=x86_64-pc-windows-msvc", "-std=c17"];
     let explicit = ["-std=c17", "-fms-compatibility", "-fms-extensions"];
     let silenced = ["--target=x86_64-pc-windows-msvc", "-std=c17", "-w"];
-    for (arguments, reported) in [(&msvc[..], true), (&explicit, true), (&silenced, false)] {
-        let arguments = arguments.iter().map(|argument| argument.to_string()).collect::<Vec<_>>();
-        let frontend = inspect(&scanner, &header, &arguments, None).unwrap();
-        let line_cut = ["P_COMMENT", "P_COMMENT_DEPENDENCY"];
-        let mut names = vec!["P_CLOSED"];
-        names.extend(line_cut);
-        if reported {
-            names.push("P_ARGUMENT_COMMENT");
-        }
-        let batch = prepare_expansions(&scanner, &frontend, &names).unwrap();
-        assert!(body(expanded(&batch, "P_CLOSED")).contains(&"0xFFU"), "{arguments:?}");
-        for name in &names[1..] {
+    // Without Microsoft extensions `//` is an invalid paste, an error `-w` cannot drop.
+    let unix = ["-std=c17", "-w"];
+    for arguments in [&msvc[..], &explicit, &silenced, &unix] {
+        let owned = arguments.iter().map(|argument| argument.to_string()).collect::<Vec<_>>();
+        let frontend = inspect(&scanner, &header, &owned, None).unwrap();
+        let batch =
+            prepare_expansions(&scanner, &frontend, &[&comments[..], &closed].concat()).unwrap();
+        for name in comments {
             assert_skip(&batch, name, ExpansionSkipCode::TokenPaste);
         }
+        let reported = reports_comment_pastes(&frontend, &directory.0);
+        if arguments == silenced {
+            let version = &frontend.profile().compiler.version;
+            let major = version
+                .split("version ")
+                .nth(1)
+                .and_then(|version| version.split('.').next()?.parse::<u32>().ok());
+            // Clang 6 to 10 keep the error under -w. Apple clang 12.0.0 is based on LLVM 10.
+            let first = if version.starts_with("Apple ") { 13 } else { 11 };
+            assert!(!reported || major.is_none_or(|major| major < first), "{version}");
+        } else {
+            assert!(reported, "{arguments:?}");
+        }
+        if reported {
+            assert!(body(expanded(&batch, "P_CLOSED")).contains(&"0xFFU"), "{arguments:?}");
+            let synthesized = expanded(&batch, "P_SYNTHESIZED");
+            assert!(
+                synthesized.dependencies.iter().any(|dependency| dependency.name == "SYNTHESIZED")
+            );
+        } else {
+            for name in closed {
+                assert_skip_reason(
+                    &batch,
+                    name,
+                    ExpansionSkipCode::TokenPaste,
+                    "Clang does not report token pastes that form '//' comments under these compiler options",
+                );
+            }
+        }
     }
+}
+
+/// Whether the profile's Clang reports a paste that forms `//` when a pragma makes the comment
+/// paste an error, as the paste proof requires before it admits a closed paste.
+fn reports_comment_pastes(frontend: &FrontendOutput, directory: &Path) -> bool {
+    let source = directory.join("canary.c");
+    std::fs::write(
+        &source,
+        "#pragma clang diagnostic error \"-Wmicrosoft-comment-paste\"\n#define CAT(a,b) a##b\nCAT(/,/)\n",
+    )
+    .unwrap();
+    let output = std::process::Command::new(&frontend.profile().compiler.executable)
+        .args(&frontend.profile().arguments)
+        .args(["-E", "-P"])
+        .arg(&source)
+        .output()
+        .unwrap();
+    String::from_utf8_lossy(&output.stderr).contains("error: pasting")
 }
 
 /// Checks that malformed paste probes cannot swallow a later operand validation.
