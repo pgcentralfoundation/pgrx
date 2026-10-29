@@ -560,13 +560,18 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
     /// A dropped attribute reads as `None`, as SQL field selection reads it, even in a row stored
     /// before the drop that still holds a value.
     ///
-    /// A `PgBox<T>` is a copy of the attribute's first `size_of::<T>()` bytes in
-    /// `CurrentMemoryContext`, because the tuple frees its memory when it drops or when an
-    /// attribute is set. A `T` that borrows, such as `&'tup str`, keeps the tuple borrowed, but
-    /// it can also point into a copy that reading allocates in `CurrentMemoryContext`, as `&str`
-    /// does for a compressed or out-of-line value, and `'tup` does not keep that copy alive. Do
-    /// not use a `PgBox<T>` or a borrowed `T` after the context that was current at the call is
-    /// reset or deleted, for example after returning it out of `Spi::connect`.
+    /// A `PgBox<T>` is a copy of the attribute's value in `CurrentMemoryContext`, because the
+    /// tuple frees its memory when it drops or when an attribute is set. It reads only an
+    /// attribute whose type is passed by reference with a fixed length of `size_of::<T>()` bytes,
+    /// and only if `T` needs no more than PostgreSQL's `MAXALIGN` alignment, as
+    /// [`UnboxDatum::can_unbox`] decides. Otherwise it returns
+    /// [`TryFromDatumError::IncompatibleTypes`].
+    ///
+    /// A `T` that borrows, such as `&'tup str`, keeps the tuple borrowed, but it can also point
+    /// into a copy that reading allocates in `CurrentMemoryContext`, as `&str` does for a
+    /// compressed or out-of-line value, and `'tup` does not keep that copy alive. Do not use a
+    /// `PgBox<T>` or a borrowed `T` after the context that was current at the call is reset or
+    /// deleted, for example after returning it out of `Spi::connect`.
     ///
     /// ## Errors
     /// - return [`TryFromDatumError::NoSuchAttributeNumber`] if the attribute does not exist
