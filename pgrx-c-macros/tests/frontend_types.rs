@@ -400,8 +400,18 @@ fn floating_point_modes_that_rust_operators_cannot_preserve_are_rejected() {
         (vec!["-ffp-contract=off", "-ffp-eval-method=double"], "excess precision"),
     ] {
         let options = options.into_iter().map(str::to_owned).collect::<Vec<_>>();
-        let output =
-            inspect(&scanner, &header, &options, None).expect("inspect a supported Clang option");
+        let output = match inspect(&scanner, &header, &options, None) {
+            // Clang 15 added -ffp-eval-method; an older Clang cannot request that mode at all.
+            Err(error)
+                if options.contains(&"-ffp-eval-method=double".to_owned())
+                    && error
+                        .to_string()
+                        .contains("unknown argument: '-ffp-eval-method=double'") =>
+            {
+                continue;
+            }
+            output => output.expect("inspect a supported Clang option"),
+        };
         let error = output
             .profile()
             .supports_float_expressions()

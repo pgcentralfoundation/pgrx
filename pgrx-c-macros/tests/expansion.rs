@@ -671,11 +671,13 @@ fn closed_pastes_that_form_comments_are_refused_under_microsoft_extensions() {
     let scanner = MacroScanner::new().unwrap();
     let comments = ["P_COMMENT", "P_COMMENT_DEPENDENCY", "P_ARGUMENT_COMMENT"];
     let closed = ["P_CLOSED", "P_SYNTHESIZED"];
+    // The other profiles name a non-MSVC target, because a Windows host's default target is MSVC.
     let msvc = ["--target=x86_64-pc-windows-msvc", "-std=c17"];
-    let explicit = ["-std=c17", "-fms-compatibility", "-fms-extensions"];
+    let explicit =
+        ["--target=x86_64-unknown-linux-gnu", "-std=c17", "-fms-compatibility", "-fms-extensions"];
     let silenced = ["--target=x86_64-pc-windows-msvc", "-std=c17", "-w"];
     // Without Microsoft extensions `//` is an invalid paste, an error `-w` cannot drop.
-    let no_extensions = ["-std=c17", "-w"];
+    let no_extensions = ["--target=x86_64-unknown-linux-gnu", "-std=c17", "-w"];
     for arguments in [&msvc[..], &explicit, &silenced, &no_extensions] {
         let owned = arguments.iter().map(|argument| argument.to_string()).collect::<Vec<_>>();
         let frontend = inspect(&scanner, &header, &owned, None).unwrap();

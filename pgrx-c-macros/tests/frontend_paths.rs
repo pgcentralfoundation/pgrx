@@ -367,7 +367,12 @@ fn native_support_requires_fresh_outputs_and_preserves_existing_artifacts_on_too
         let mut changed = profile.clone();
         changed.arguments.push(action.into());
         let error = compile_native_support(&changed, &source, &object, &archive).unwrap_err();
-        assert!(matches!(error, FrontendError::Output(_)), "{action}: {error}");
+        // Clang 15 added -fdriver-only. An older driver rejects it, which must leave the
+        // existing outputs alone too.
+        let rejected = action == "-fdriver-only"
+            && matches!(&error, FrontendError::CompilerFailed { diagnostics, .. }
+                if diagnostics.contains("unknown argument: '-fdriver-only'"));
+        assert!(rejected || matches!(error, FrontendError::Output(_)), "{action}: {error}");
         assert_eq!(std::fs::read(&object).unwrap(), old_object);
         assert_eq!(std::fs::read(&archive).unwrap(), old_archive);
     }
