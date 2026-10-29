@@ -237,7 +237,10 @@ const _: () = {
 ///
 /// </pre></div>
 ///
-/// This calls [`pg_magic_func!()`](pg_magic_func).
+/// This calls [`pg_magic_func!()`](pg_magic_func), which also records the extension that
+/// [`rust_regtypein`](crate::rust_regtypein) looks the library's types up in. That extension is
+/// named by the one `.control` file next to the crate's `Cargo.toml`, counted as `cargo pgrx`
+/// counts them, when the crate compiles.
 #[macro_export]
 macro_rules! pg_module_magic {
     ($($key:ident $(= $value:expr)?),*) => {

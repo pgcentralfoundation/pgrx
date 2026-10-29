@@ -512,42 +512,46 @@ pub fn extension_sql_file(input: TokenStream) -> TokenStream {
 }
 
 /// Name the extension that the calling crate builds, as `cargo pgrx` does: by the stem of the
-/// `.control` file next to its `Cargo.toml`.
+/// one `.control` file next to its `Cargo.toml`, counted as `control_files` counts them.
 ///
 /// Expands to a `Result<&'static CStr, &'static str>`, whose error says why there is no name.
+/// The expansion includes every `.control` file it counted, so cargo compiles the crate again
+/// when one of them changes or disappears. Stable Rust has no way to make cargo watch the
+/// directory itself, so adding a `.control` file needs some other change before the crate is
+/// compiled again.
 #[doc(hidden)]
 #[proc_macro]
 pub fn __pgrx_extension_name(_input: TokenStream) -> TokenStream {
     let dir = match std::env::var_os("CARGO_MANIFEST_DIR") {
         Some(dir) => std::path::PathBuf::from(dir),
-        None => return extension_name_error("CARGO_MANIFEST_DIR is not set".into()),
+        None => return extension_name_error("CARGO_MANIFEST_DIR is not set".into(), &[]),
     };
-    let controls = match std::fs::read_dir(&dir) {
-        Ok(entries) => entries
-            .flatten()
-            .map(|entry| entry.path())
-            .filter(|path| path.extension() == Some("control".as_ref()))
-            .collect::<Vec<_>>(),
+    let controls = match control_files(&dir) {
+        Ok(controls) => controls,
         Err(e) => {
-            return extension_name_error(format!("cannot read `{}`: {e}", dir.display()));
+            return extension_name_error(format!("cannot read `{}`: {e}", dir.display()), &[]);
         }
     };
     let [control] = controls.as_slice() else {
-        return extension_name_error(format!(
-            "expected one .control file in `{}`, found {}",
-            dir.display(),
-            controls.len()
-        ));
+        return extension_name_error(
+            format!("expected one .control file in `{}`, found {}", dir.display(), controls.len()),
+            &controls,
+        );
     };
     let Some(name) = control.file_stem().and_then(|stem| stem.to_str()) else {
-        return extension_name_error(format!("`{}` is not named in UTF-8", control.display()));
+        return extension_name_error(
+            format!("`{}` is not named in UTF-8", control.display()),
+            &controls,
+        );
     };
     let Ok(name) = CString::new(name) else {
-        return extension_name_error(format!("`{}` has a NUL in its name", control.display()));
+        return extension_name_error(
+            format!("`{}` has a NUL in its name", control.display()),
+            &controls,
+        );
     };
     let name = proc_macro2::Literal::c_string(&name);
-    // Depend on the file, so that renaming it rebuilds the crate.
-    let track = control.to_str().map(|path| quote! { const _: &[u8] = include_bytes!(#path); });
+    let track = track_files(&controls);
     quote! {{
         #track
         ::core::result::Result::<&'static ::core::ffi::CStr, &'static str>::Ok(#name)
@@ -555,10 +559,34 @@ pub fn __pgrx_extension_name(_input: TokenStream) -> TokenStream {
     .into()
 }
 
-fn extension_name_error(reason: String) -> TokenStream {
-    quote! {
+/// The `.control` files in `dir`, counted as cargo-pgrx's `find_control_file` counts them: names
+/// that start with `.`, such as editor lock files, do not count, nor does anything other than a
+/// file or a link to one.
+fn control_files(dir: &std::path::Path) -> std::io::Result<Vec<std::path::PathBuf>> {
+    Ok(std::fs::read_dir(dir)?
+        .flatten()
+        .map(|entry| entry.path())
+        .filter(|path| {
+            path.extension() == Some("control".as_ref())
+                && !path.file_name().is_some_and(|name| name.as_encoded_bytes().starts_with(b"."))
+                && std::fs::metadata(path).is_ok_and(|metadata| metadata.is_file())
+        })
+        .collect())
+}
+
+/// Include each of `files` that has a UTF-8 path, which makes cargo compile the crate again when
+/// one of them changes or disappears.
+fn track_files(files: &[std::path::PathBuf]) -> proc_macro2::TokenStream {
+    let paths = files.iter().filter_map(|path| path.to_str());
+    quote! { #(const _: &[u8] = include_bytes!(#paths);)* }
+}
+
+fn extension_name_error(reason: String, controls: &[std::path::PathBuf]) -> TokenStream {
+    let track = track_files(controls);
+    quote! {{
+        #track
         ::core::result::Result::<&'static ::core::ffi::CStr, &'static str>::Err(#reason)
-    }
+    }}
     .into()
 }
 
@@ -1756,6 +1784,28 @@ pub fn pg_trigger(attrs: TokenStream, input: TokenStream) -> TokenStream {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    #[cfg(unix)]
+    fn control_files_skip_hidden_names_and_non_files() {
+        use std::os::unix::fs::symlink;
+
+        let dir =
+            std::env::temp_dir().join(format!("pgrx-macros-control-files-{}", std::process::id()));
+        std::fs::create_dir(&dir).unwrap();
+        std::fs::write(dir.join("ext.control"), "").unwrap();
+        std::fs::write(dir.join(".ext.control"), "").unwrap();
+        // An Emacs lock file, a link to a file that does not exist
+        symlink("user@host.1234:5678", dir.join(".#ext.control")).unwrap();
+        symlink("ext.control", dir.join("linked.control")).unwrap();
+        symlink("missing.control", dir.join("dangling.control")).unwrap();
+        std::fs::create_dir(dir.join("directory.control")).unwrap();
+
+        let mut found = control_files(&dir).unwrap();
+        std::fs::remove_dir_all(&dir).unwrap();
+        found.sort();
+        assert_eq!(found, [dir.join("ext.control"), dir.join("linked.control")]);
+    }
 
     #[test]
     fn short_name_unchanged() {
