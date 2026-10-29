@@ -14,7 +14,7 @@ mod composite_and_array;
 mod handrolled_datum;
 mod inoutfuncs_custom;
 mod json_default;
-mod varlena_zerocopy;
+mod varlena_binary;
 
 pgrx::pg_module_magic!(name, version);
 

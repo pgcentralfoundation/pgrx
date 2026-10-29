@@ -8,17 +8,20 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-//! # Variant 3: zero-copy varlena via `PgVarlenaInOutFuncs`
+//! # Variant 3: fixed binary layout via `PgVarlenaInOutFuncs`
 //!
-//! `#[pgvarlena_inoutfuncs]` makes the type an on-disk fixed binary layout that
-//! Postgres can store directly without serialization. Use this when:
+//! `#[pgvarlena_inoutfuncs]` stores the bytes of a `Copy` struct in a varlena,
+//! with no serialization format. Use this when:
 //!
-//! * The struct is `Copy` and `#[repr(C)]`-compatible.
+//! * The struct is `Copy` and `#[repr(C)]`, and holds plain data: no
+//!   references or pointers.
 //! * You frequently read large numbers of rows and Serde JSON would dominate.
 //! * You're willing to define a textual form for I/O at SQL boundaries.
 //!
-//! The trade-off vs. variant 2 is performance (no parse on read) for cost
-//! (you must hand-write text I/O AND keep the binary layout stable).
+//! Reading a value copies its bytes into an aligned Rust value without
+//! parsing them, and returning one allocates a new varlena. The trade-off vs.
+//! variant 2 is performance (no parse on read) for cost (you must hand-write
+//! text I/O AND keep the binary layout stable).
 //!
 //! Note: `Rgb` is 3 bytes — a tight layout is the whole point of this variant.
 
@@ -30,6 +33,7 @@ use pgrx::{PgVarlenaInOutFuncs, StringInfo};
 #[derive(Copy, Clone, PostgresType)]
 #[bikeshed_postgres_type_manually_impl_from_into_datum]
 #[pgvarlena_inoutfuncs]
+#[repr(C)]
 pub struct Rgb {
     pub r: u8,
     pub g: u8,
@@ -55,7 +59,8 @@ impl PgVarlenaInOutFuncs for Rgb {
 
 #[pg_extern]
 fn rgb_luminance(c: PgVarlena<Rgb>) -> f64 {
-    // Rec. 601 luma — purely a demonstration; arithmetic happens directly on the varlena's fields with no copy or parse.
+    // Rec. 601 luma — purely a demonstration. The fields come from a copy of the
+    // stored bytes, with no parse.
     0.299 * c.r as f64 + 0.587 * c.g as f64 + 0.114 * c.b as f64
 }
 
