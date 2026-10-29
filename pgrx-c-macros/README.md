@@ -573,6 +573,8 @@ adapter. `emit_with_bindings` generates none of these, so it skips a macro that
 needs one. It also skips a call whose C prototype passes or returns plain `char`,
 an enum or a record by value. The catalog's Rust storage for such a function
 cannot prove its call ABI, and only a generated C adapter can make that call.
+Output from `emit_with_bindings` can still name a C enum's generated identity,
+which only the support from `generate_with_bindings` defines.
 Generators should use `generate_with_bindings` to prepare the macro set and its
 shared adapters together. Its `MacroGeneration` contains the per-macro emissions
 and a `MacroSupportArtifact` with Rust source and optional C source. Include the

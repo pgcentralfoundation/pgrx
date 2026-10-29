@@ -1123,7 +1123,11 @@ Generated capabilities and their refusals never enter the caller's
 `BindingCatalog`. Rendering reads them from the generated adapters passed beside
 it, so a caller cannot assert a callback signature, function adapter, address
 getter, or field or offset adapter that generation did not create. Single-macro
-emission has no generated adapters and skips a macro that needs one.
+emission has none of these and skips a macro that needs one. It can still name a
+C enum's generated identity type in `__pgrx_c_generated`, because that path
+depends only on the enum declaration. Only batch support defines the type, so an
+invocation of such a macro compiles only in a crate that already includes batch
+support for that enum.
 
 All relevant ABI and storage witnesses participate in validation before pruning.
 A rejected or unselected alias still matters when deciding whether one Rust
@@ -1746,8 +1750,7 @@ generate(version, extra_arguments):
 
     requests = plan_demands(session, names, bindings)
     adapters = build_validated_adapters_in_dependency_order(requests, bindings)
-    capabilities = bindings_with_registered_adapters(bindings, adapters)
-    emissions = emit_and_propagate_required_failures(session, names, capabilities)
+    emissions = emit_and_propagate_required_failures(session, names, bindings, adapters)
 
     successful_names = names_with_emitted_status(emissions)
     retained = plan_demands(session, successful_names, bindings)

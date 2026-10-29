@@ -243,6 +243,10 @@ pub fn emit(session: &AnalysisSession<'_>, name: &str) -> MacroEmission {
 /// [`SkipReasonCode::Call`] even when `bindings` holds the function, as is a call to
 /// a function without a binding. [`generate_with_bindings`] generates these
 /// capabilities when the declarations admit them, and otherwise skips the macro too.
+///
+/// The source can still name a C enum's generated identity, which only the support
+/// artifact from [`generate_with_bindings`] defines. The defining crate must
+/// include that item, or using the macro fails to compile.
 pub fn emit_with_bindings(
     session: &AnalysisSession<'_>,
     name: &str,
