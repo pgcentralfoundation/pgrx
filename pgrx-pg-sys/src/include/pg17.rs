@@ -69262,3 +69262,7 @@ impl ::core::fmt::Display for XmlSerialize {
         self.display_node().fmt(f)
     }
 }
+#[doc = r" The release generation of these bindings, checked by the documentation snapshot."]
+#[doc(hidden)]
+pub const __PGRX_GENERATION: &str =
+    "3d2e28ab26e9858c6c50b27b0e7f79543d401dea29a12f57e05020f6272c6dcf";

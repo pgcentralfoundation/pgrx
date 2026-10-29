@@ -55,6 +55,9 @@ mod bitfields;
 mod callbacks;
 /// Batch capability selection derived from C expression constraints.
 mod demands;
+/// Documentation shells: each macro's docs, invocation forms and result type.
+mod documentation;
+pub use documentation::{DocumentedResult, MacroDocumentation, documentation_shell_support};
 /// Nominal enum identities and checked bridges to actual binding storage.
 mod enumerations;
 /// Optimization-hint planning that preserves C values and operand effects.
@@ -63,6 +66,8 @@ mod expectation;
 mod fields;
 /// Native C thunks and guarded Rust adapters for callable declarations.
 mod functions;
+/// Generated support identifiers derived from C names.
+mod names;
 /// Lexically ordered statement lowering over the shared expression arena.
 mod statements;
 /// Contextual expression rendering for values, places, size operands, and effects.
@@ -214,6 +219,9 @@ pub enum EmissionStatus {
         rust: String,
         /// Advertised evaluation capability; emission currently produces runtime expressions.
         const_capability: ConstCapability,
+        /// Rustdoc-facing parts used to publish a documentation snapshot.
+        #[serde(skip)]
+        documentation: Box<MacroDocumentation>,
     },
     /// No definition is available; callers must propagate the reason to dependent macros.
     Skipped {
@@ -298,9 +306,11 @@ fn emit_with_lowering<'a>(
             })
     };
     let status = match lowered {
-        Ok(rust) => {
-            EmissionStatus::Emitted { rust, const_capability: ConstCapability::RuntimeOnly }
-        }
+        Ok((rust, documentation)) => EmissionStatus::Emitted {
+            rust,
+            const_capability: ConstCapability::RuntimeOnly,
+            documentation: Box::new(documentation),
+        },
         Err(reason) => EmissionStatus::Skipped { reason },
     };
     MacroEmission { analysis, status }
@@ -574,7 +584,7 @@ fn render_adapters(
     adapters: GeneratedAdapters,
     macros: &[MacroEmission],
 ) -> Result<MacroSupportArtifact, String> {
-    let callback_typedefs = adapters.callbacks.has_typedefs;
+    let callbacks = !adapters.callbacks.typedefs.is_empty();
     let body = format!(
         "{}\n{}\n{}\n{}\n{}",
         adapters.callbacks.rust,
@@ -590,7 +600,7 @@ fn render_adapters(
             "#[doc(hidden)]\n#[allow(non_snake_case, non_camel_case_types)]\npub mod __pgrx_c_generated {{\nuse crate::__pgrx_c_macros as c;\n{body}\n}}\n"
         )
     };
-    if callback_typedefs {
+    if callbacks {
         rust.push_str(
             "/// Explicit callback typedef identities validated against the current C profile.\n\
              #[doc(hidden)]\npub use self::__pgrx_c_generated::__pgrx_c_callbacks;\n",
@@ -651,17 +661,6 @@ impl GeneratedAdapters {
     }
 }
 
-/// Hash compiler-established representations and language modes rather than
-/// installation paths, working directories, environment values or OS versions.
-/// Full input fingerprints still control verification and rebuilds independently.
-fn semantic_target_bytes(target: &crate::TargetFacts) -> Result<Vec<u8>, String> {
-    let mut facts = serde_json::to_value(target).map_err(|error| error.to_string())?;
-    // Calling conventions and layouts are separate compiler witnesses. The
-    // spelling of the target triple adds no representation fact to these IDs.
-    facts.as_object_mut().expect("TargetFacts serializes as an object").remove("triple");
-    serde_json::to_vec(&facts).map_err(|error| error.to_string())
-}
-
 /// Build capability families in dependency order from the planned batch requirements.
 ///
 /// Callback witnesses establish signatures before function thunks are generated;
@@ -672,16 +671,6 @@ fn generated_adapters(
     bindings: &BindingCatalog,
 ) -> Result<GeneratedAdapters, String> {
     let frontend = session.frontend();
-    use sha2::{Digest, Sha256};
-    let target = semantic_target_bytes(&frontend.profile().target)?;
-    let mut hash = Sha256::new();
-    hash.update(target);
-    hash.update(
-        serde_json::to_vec(&frontend.profile().signed_overflow)
-            .map_err(|error| error.to_string())?,
-    );
-    let profile_identity =
-        hash.finalize().iter().map(|byte| format!("{byte:02x}")).collect::<String>();
     let preliminary = callbacks::generate(
         frontend.declarations(),
         bindings,
@@ -697,7 +686,6 @@ fn generated_adapters(
         &requests.functions,
         &requests.called_functions,
         &frontend.profile().target,
-        &profile_identity,
     )?;
     // Later adapter passes read replacement storage from `functions`. Rendering
     // instead receives the generated adapters beside the caller's catalog.
@@ -763,7 +751,6 @@ fn generated_adapters(
             generated,
             &requests.addresses,
             &frontend.profile().target,
-            &profile_identity,
         )?,
         functions,
         callbacks,
@@ -908,7 +895,7 @@ fn render(
     bindings: &BindingCatalog,
     adapters: Option<&GeneratedAdapters>,
     lowering: &types::Lowering<'_>,
-) -> Result<String, SkipReason> {
+) -> Result<(String, MacroDocumentation), SkipReason> {
     let identifier = macro_identifier(&analysis.name).ok_or_else(|| {
         skip(
             analysis,
@@ -974,18 +961,19 @@ fn render(
     if let Some(arguments) = &arguments {
         rust.push_str(&arguments.rust);
     }
-    let mut comment = match original {
+    let title = match original {
         InvocationSource::Macro(_) => format!("C macro {}", analysis.name),
         InvocationSource::Inline(_) => {
             format!("Typed call adapter for C inline function {}", analysis.name)
         }
     };
-    if let Some(span) = &analysis.provenance
-        && let Some(file) = span.file.file_name()
-    {
-        write!(&mut comment, " from {}:{}", file.to_string_lossy(), span.start_line)
-            .expect("String output");
-    }
+    let location = analysis.provenance.as_ref().and_then(|span| {
+        let file = span.file.file_name()?.to_string_lossy();
+        Some(format!("{file}:{}", span.start_line))
+    });
+    // The title and location stay separate so documentation snapshots can merge
+    // the locations of identical definitions from several PostgreSQL versions.
+    let mut comment = String::new();
     let definition = match original {
         InvocationSource::Macro(definition) => definition_comment(definition),
         InvocationSource::Inline(definition) => {
@@ -1001,12 +989,14 @@ fn render(
         )
     })?);
     if matches!(original, InvocationSource::Inline(_)) {
-        comment.push_str("\n\nCalls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.");
+        comment.push_str("\n\n");
+        comment.push_str(documentation::INLINE_CALL);
     }
     if expression.syntax.nodes.iter().any(|node| {
         matches!(node.kind, ExpressionKind::InvocationFile | ExpressionKind::InvocationLine)
     }) {
-        comment.push_str("\n\nInvocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract.");
+        comment.push_str("\n\n");
+        comment.push_str(documentation::INVOCATION_DIAGNOSTICS);
     }
     if expression
         .syntax
@@ -1014,7 +1004,8 @@ fn render(
         .iter()
         .any(|node| matches!(node.kind, ExpressionKind::Stringification { .. }))
     {
-        comment.push_str("\n\nDependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips.");
+        comment.push_str("\n\n");
+        comment.push_str(documentation::STRINGIFICATION);
     }
     if expression.syntax.nodes.iter().any(|node| {
         matches!(node.kind, ExpressionKind::StringLiteral { .. } | ExpressionKind::InvocationFile)
@@ -1022,9 +1013,11 @@ fn render(
         comment.push_str(" String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.");
     }
     if returning {
-        comment.push_str("\n\nC return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.");
+        comment.push_str("\n\n");
+        comment.push_str(documentation::CALLER_RETURNS);
     } else if statement_body.is_some() {
-        comment.push_str("\n\nThis macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.");
+        comment.push_str("\n\n");
+        comment.push_str(documentation::STATEMENTS);
     }
     if local_guard.is_some() {
         comment.push_str(" Caller argument tokens must not mention the macro's C local names, even inside groups: those invocations are rejected because C substitution can capture locals that Rust hygiene would resolve differently. The scope check also inspects forwarded expression fragments and is bounded to 4096 stringified bytes. Matches in fields, paths or strings are conservatively rejected.");
@@ -1066,7 +1059,8 @@ fn render(
         }
         comment.push_str(". Each operand must preserve its C type and place requirements.");
     }
-    comment.push_str("\n\n# Safety\n\nPreserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.");
+    comment.push_str("\n\n# Safety\n\n");
+    comment.push_str(documentation::SAFETY);
     let mut failures = std::collections::BTreeSet::new();
     for node in &expression.syntax.nodes {
         match &node.kind {
@@ -1106,7 +1100,9 @@ fn render(
         }
         comment.push_str("These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.");
     }
-    write_doc_comments(&mut rust, &comment).ok_or_else(|| {
+    let hidden = matches!(analysis.name.as_str(), "_" | "self" | "Self" | "super" | "crate");
+    write_doc_comments(&mut rust, &documentation::comment(&title, location.as_deref(), &comment))
+        .ok_or_else(|| {
         skip(
             analysis,
             SkipReasonCode::BudgetExceeded,
@@ -1114,7 +1110,7 @@ fn render(
             None,
         )
     })?;
-    if matches!(analysis.name.as_str(), "_" | "self" | "Self" | "super" | "crate") {
+    if hidden {
         rust.push_str("#[doc(hidden)]\n");
     }
     write!(&mut rust, "#[macro_export]\nmacro_rules! {identifier} {{\n").expect("String output");
@@ -1123,7 +1119,7 @@ fn render(
         .map(|index| format!("${}", arguments::name(analysis, index)))
         .collect::<Vec<_>>()
         .join(", ");
-    let safety_checks = arguments::render_safety_checks(analysis);
+    let safety_checks = arguments::render_safety_checks(analysis, false);
     writeln!(&mut rust, "(@__pgrx_emit_check_safety; {matcher}) => {{ {safety_checks} }};")
         .expect("String output");
     // A size context forwards an operand's tokens unchanged for its safety checks,
@@ -1258,7 +1254,21 @@ fn render(
             None,
         ));
     }
-    Ok(rust)
+    let documentation = MacroDocumentation {
+        identifier,
+        title,
+        location,
+        body: comment,
+        forms: documentation::documentation_forms(
+            analysis,
+            returning,
+            statement_boundary,
+            explicit_boundary,
+        ),
+        hidden,
+        result: documentation::result(analysis, renderer),
+    };
+    Ok((rust, documentation))
 }
 
 /// Render a compiler-owned expression in the context its C caller requests.
@@ -1912,23 +1922,6 @@ fn macro_identifier(name: &str) -> Option<String> {
 mod tests {
     use super::{MAX_EMISSION_BYTES, definition_comment, rust_identifier, write_doc_comments};
     use crate::{MacroDefinition, MacroKind, Token, TokenKind};
-
-    /// Helper identities ignore deployment triple spelling while retaining
-    /// actual C layout and language facts; input verification remains separate.
-    #[test]
-    fn semantic_identity_ignores_os_versions_but_retains_layout() {
-        let _lock = crate::SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
-        let scanner = crate::MacroScanner::new().expect("libclang required");
-        let header = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("tests/fixtures/emit_scalar.h");
-        let frontend = crate::inspect(&scanner, &header, &[], None).unwrap();
-        let mut target = frontend.profile().target.clone();
-        let identity = super::semantic_target_bytes(&target).unwrap();
-        target.triple = "arm64-apple-darwin99.0.0".into();
-        assert_eq!(identity, super::semantic_target_bytes(&target).unwrap());
-        target.pointer_bits = 32;
-        assert_ne!(identity, super::semantic_target_bytes(&target).unwrap());
-    }
 
     /// Check that large retained C definitions account for both source text and documentation fences.
     #[test]

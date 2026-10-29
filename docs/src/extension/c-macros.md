@@ -501,11 +501,39 @@ whose cast and hexadecimal mask it implements:
 `/* PGRX: ... */` comments explain cases where expansion had to remain instead of
 preserving a symbol or nested macro call.
 
-The checked-in `pgrx-pg-sys/src/include/cmacros/` files are documentation snapshots,
-made with the release-generation installation and target. Their source includes
-target guards; they may describe a different platform from your computer. Use
-your build's `OUT_DIR` bindings, macros, and report when
-checking actual platform values or diagnosing a missing macro.
+The checked-in `pgrx-pg-sys/src/include/cmacros/snapshot/` files are a documentation
+snapshot made with the release-generation installations on docs.rs's target,
+`x86_64-unknown-linux-gnu`. They hold each supported PostgreSQL version's macro
+documentation and generated Rust support, gated by the `pgNN` features. docs.rs uses
+them because it cannot generate macros; ordinary builds never do. A definition that
+changed between versions appears once per version range, next to its other versions.
+Use your build's `OUT_DIR` bindings, macros, and report when checking actual platform
+values or diagnosing a missing macro.
+
+Each snapshot macro is a typed shell. Its arms accept the real macro's invocations and
+have its result type, so an extension that docs.rs compiles can call `.get()` or
+`.into_value()` on a result, but running a shell panics. Documentation builds of other
+targets fail, because the snapshot describes only docs.rs's target. A shell can accept
+code that its real macro rejects. For example, a shell does not require `unsafe` where
+the real macro only calls a native function or compares a value read through a pointer,
+so an `unsafe` block around such a call can warn as unused in a documentation build. A
+shell accepts every invocation its real macro accepts, with the same result type, except
+in these rare cases, where a documentation build can report a type error that an
+ordinary build does not:
+
+- a literal `0` passed as a null pointer through an operand-dependent expression is not
+  a null constant;
+- a dereference of a raw `*mut` pointer, used where the C macro reads its operand's
+  storage, can decay to a `*const` pointer instead of `*mut` when it is spelled other
+  than `*pointer` or `(*pointer)`, such as `((*pointer))`, or when the macro reads
+  more than one operand's storage;
+- a generated macro passed as an operand loses its bitfield and null-constant facts;
+- a generated macro passed where the C macro assigns to, increments, takes the address
+  of, or reads a field of its operand is rejected; pass a place such as `(*pointer).field`
+  instead;
+- an argument that the C macro ignores or only turns into a string must be a Rust
+  expression when another argument follows it;
+- the internal `(@__pgrx_c_native [...])` operand form is not accepted.
 
 ## Understand refusals and runtime limits
 

@@ -53,6 +53,17 @@ enum Task {
     ),
 }
 
+/// What a render writes for one expression tree.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum RenderMode {
+    /// The generated macro's arms.
+    Macro,
+    /// A documentation shell's witness of the value arm's type. Value nodes whose
+    /// helper signature fixes the result type become `type_witness` calls without
+    /// rendering their operands; every other node renders as in `Macro`.
+    Witness,
+}
+
 /// Compiler-established statement local with a hygienic Rust index and reconciled storage.
 struct Local {
     /// Unique generated local name index, separate from the source C identifier.
@@ -89,6 +100,8 @@ pub(super) struct Renderer<'a> {
     locals: BTreeMap<String, Local>,
     /// Per-node branch advice decisions kept separate from actual operand evaluation.
     expectations: Vec<super::expectation::Decision>,
+    /// Whether this renders the macro or a documentation shell's type witness.
+    mode: RenderMode,
 }
 
 /// Lower each expression occurrence under its own C context with shared trusted object facts.
@@ -190,7 +203,41 @@ impl<'a> Renderer<'a> {
             objects,
             locals,
             expectations,
+            mode: RenderMode::Macro,
         }
+    }
+
+    /// Render documentation-shell type witnesses instead of macro arms.
+    ///
+    /// Operands are the shell's `expr` fragments, described as native expressions.
+    /// Callers render only the value root, never through delegation, so a witness
+    /// names no other generated macro's internal arms.
+    pub(super) fn witness(self) -> Self {
+        Self { mode: RenderMode::Witness, ..self }
+    }
+
+    /// Whether a node in `context` closes with a type witness instead of rendering.
+    fn collapses(&self, context: Context) -> bool {
+        self.mode == RenderMode::Witness && matches!(context, Context::Value)
+    }
+
+    /// The descriptor of one parameter occurrence.
+    fn operand(&self, parameter: usize) -> String {
+        arguments::descriptor(self.analysis, parameter, self.mode == RenderMode::Witness)
+    }
+
+    /// Name the marker of a collapsed value whose C type is spelled `spelling`.
+    ///
+    /// An integer typedef whose lowered marker is exactly its kind's marker is named
+    /// through its `__pgrx_c_types` alias, which is the same type by definition. The
+    /// witness text then stays equal across versions in which only the typedef's
+    /// rank changes, such as `AclMode`.
+    fn witness_marker(&self, spelling: &str, lowered: &str) -> String {
+        let spelling = spelling.trim();
+        crate::support_generation::integer_typedef_marker(self.frontend, spelling)
+            .filter(|marker| lowered == format!("{SUPPORT}::{marker}"))
+            .and_then(|_| super::rust_identifier(spelling))
+            .map_or_else(|| lowered.to_owned(), |name| format!("$crate::__pgrx_c_types::{name}"))
     }
 
     /// Allocate hygienic local storage and apply the declared C conversion when an initializer is present.
@@ -378,14 +425,13 @@ impl<'a> Renderer<'a> {
                             tasks.push(Task::Node(operand, context));
                         } else if let ExpressionKind::Parameter { index: parameter } = node.kind {
                             arguments::render_operand(
-                                analysis,
-                                parameter,
                                 if matches!(context, Context::Size) {
                                     ArgumentContext::Size
                                 } else {
                                     ArgumentContext::Discard
                                 },
                                 floats,
+                                &self.operand(parameter),
                                 rust,
                             );
                         } else if matches!(context, Context::Discard) {
@@ -409,7 +455,10 @@ impl<'a> Renderer<'a> {
                                         .field_marker(*base, *indirect, field)
                                         .map_err(failure)?,
                                 };
-                                let checks = arguments::render_safety_checks(analysis);
+                                let checks = arguments::render_safety_checks(
+                                    analysis,
+                                    self.mode == RenderMode::Witness,
+                                );
                                 write!(rust, "{EXPRESSION}::record::size_of_member_type::<{marker}, _>(if false {{ {checks} ::core::option::Option::Some(unsafe {{ ").expect("String output");
                                 tasks.extend([
                                     text(" }) } else { ::core::option::Option::None })"),
@@ -418,7 +467,10 @@ impl<'a> Renderer<'a> {
                                 continue;
                             }
                             let known = self.places[index];
-                            let checks = arguments::render_safety_checks(analysis);
+                            let checks = arguments::render_safety_checks(
+                                analysis,
+                                self.mode == RenderMode::Witness,
+                            );
                             write!(
                                 rust,
                                 "{EXPRESSION}::{}(if false {{ {checks} ::core::option::Option::Some(unsafe {{ ",
@@ -449,8 +501,6 @@ impl<'a> Renderer<'a> {
                         }
                         ExpressionKind::Parameter { index: parameter } => {
                             arguments::render_operand(
-                                analysis,
-                                *parameter,
                                 match context {
                                     Context::Value => ArgumentContext::Value,
                                     Context::Place => ArgumentContext::Place,
@@ -460,6 +510,7 @@ impl<'a> Renderer<'a> {
                                     ),
                                 },
                                 floats,
+                                &self.operand(*parameter),
                                 rust,
                             );
                         }
@@ -525,6 +576,14 @@ impl<'a> Renderer<'a> {
                             }
                         }
                         ExpressionKind::Stringification { parts } => {
+                            // Analysis admits stringification only as an argument of a
+                            // direct void native call, which a witness collapses without
+                            // rendering its arguments or drops as a comma's left operand.
+                            if self.mode == RenderMode::Witness {
+                                return Err(failure(
+                                    "a type witness never renders operand stringification".into(),
+                                ));
+                            }
                             if !matches!(context, Context::Value) {
                                 return Err(skip(
                                     analysis,
@@ -544,8 +603,8 @@ impl<'a> Renderer<'a> {
                                     StringPart::Parameter { index } => {
                                         write!(
                                             rust,
-                                            "$crate::__pgrx_c_operand!(@stringify; ${}), ",
-                                            arguments::name(analysis, *index)
+                                            "$crate::__pgrx_c_operand!(@stringify; {}), ",
+                                            self.operand(*index)
                                         )
                                         .expect("String output");
                                     }
@@ -593,8 +652,15 @@ impl<'a> Renderer<'a> {
                                 failure(format!("{type_name}: unresolved C cast type"))
                             })?;
                             if ty.category == TypeCategory::Void {
-                                rust.push_str("{ ");
-                                tasks.extend([text(" }"), Task::Node(*operand, Context::Discard)]);
+                                if self.collapses(context) {
+                                    rust.push_str("()");
+                                } else {
+                                    rust.push_str("{ ");
+                                    tasks.extend([
+                                        text(" }"),
+                                        Task::Node(*operand, Context::Discard),
+                                    ]);
+                                }
                             } else {
                                 let null =
                                     proved_integer_zero(frontend, analysis, constants, *operand);
@@ -605,7 +671,9 @@ impl<'a> Renderer<'a> {
                                 let (ty, alias) = match lowering.cast_alias(type_name, &ty) {
                                     Some(Ok((alias, lowered))) => (lowered, Some(alias)),
                                     Some(Err(reason)) => {
-                                        super::write_fallback(rust, type_name, &reason);
+                                        if self.mode == RenderMode::Macro {
+                                            super::write_fallback(rust, type_name, &reason);
+                                        }
                                         (lowering.resolve(&ty).map_err(failure)?, None)
                                     }
                                     None => (lowering.resolve(&ty).map_err(failure)?, None),
@@ -616,6 +684,16 @@ impl<'a> Renderer<'a> {
                                 } else if void_null {
                                     write!(rust, "{EXPRESSION}::null::null_void(")
                                         .expect("String output");
+                                }
+                                if self.collapses(context) {
+                                    write_witness(
+                                        rust,
+                                        &self.witness_marker(type_name, &ty.marker),
+                                    );
+                                    if integer_null || void_null {
+                                        tasks.push(text(")"));
+                                    }
+                                    continue;
                                 }
                                 if let Some(alias) = alias {
                                     write!(
@@ -634,6 +712,11 @@ impl<'a> Renderer<'a> {
                                 ]);
                             }
                         }
+                        ExpressionKind::Unary { operator: UnaryOperator::LogicalNot, .. }
+                            if self.collapses(context) =>
+                        {
+                            write_witness(rust, &format!("{SUPPORT}::CInt"));
+                        }
                         ExpressionKind::Unary { operator, operand } => {
                             let helper = match operator {
                                 UnaryOperator::Plus => "positive",
@@ -647,6 +730,20 @@ impl<'a> Renderer<'a> {
                             }
                             rust.push('(');
                             tasks.extend([text(")"), value(*operand)]);
+                        }
+                        ExpressionKind::Binary {
+                            operator:
+                                BinaryOperator::Less
+                                | BinaryOperator::LessEqual
+                                | BinaryOperator::Greater
+                                | BinaryOperator::GreaterEqual
+                                | BinaryOperator::Equal
+                                | BinaryOperator::NotEqual
+                                | BinaryOperator::LogicalAnd
+                                | BinaryOperator::LogicalOr,
+                            ..
+                        } if self.collapses(context) => {
+                            write_witness(rust, &format!("{SUPPORT}::CInt"));
                         }
                         ExpressionKind::Binary { operator, left, right } => {
                             if matches!(
@@ -698,12 +795,11 @@ impl<'a> Renderer<'a> {
                         }
                         ExpressionKind::Comma { left, right } => {
                             rust.push_str("{ ");
-                            tasks.extend([
-                                text(" }"),
-                                value(*right),
-                                text("; "),
-                                Task::Node(*left, Context::Discard),
-                            ]);
+                            tasks.extend([text(" }"), value(*right)]);
+                            // A discarded left operand cannot change the result type.
+                            if self.mode == RenderMode::Macro {
+                                tasks.extend([text("; "), Task::Node(*left, Context::Discard)]);
+                            }
                         }
                         ExpressionKind::Dereference { operand } => {
                             write!(
@@ -858,6 +954,16 @@ impl<'a> Renderer<'a> {
                                         let result = lowering
                                             .resolve(&builtin.signature.result)
                                             .map_err(failure)?;
+                                        if self.collapses(context) {
+                                            write_witness(
+                                                rust,
+                                                &self.witness_marker(
+                                                    &builtin.signature.result.spelling,
+                                                    &result.marker,
+                                                ),
+                                            );
+                                            continue;
+                                        }
                                         write!(rust, "<{} as {EXPRESSION}::CType>::from_storage(<{} as {EXPRESSION}::CType>::into_storage({EXPRESSION}::implicit::<{}, _>(", result.marker, parameter.marker, parameter.marker).expect("String output");
                                         tasks.extend([text(")).swap_bytes())"), value(*argument)]);
                                     }
@@ -875,6 +981,11 @@ impl<'a> Renderer<'a> {
                                             lowering.resolve(&parameters[0]).map_err(failure)?;
                                         let expected_type =
                                             lowering.resolve(&parameters[1]).map_err(failure)?;
+                                        if self.collapses(context) {
+                                            // Both renderings convert the first operand to C long.
+                                            write_witness(rust, &first_type.marker);
+                                            continue;
+                                        }
                                         match self.expectations[index] {
                                             super::expectation::Decision::Static => {
                                                 write!(rust, "{EXPRESSION}::expect({EXPRESSION}::implicit::<{}, _>(", first_type.marker).expect("String output");
@@ -1001,6 +1112,33 @@ impl<'a> Renderer<'a> {
                                 )
                             };
                             let path = rust_path(&binding.path).map_err(failure)?;
+                            // Resolve the last parameter first, as the arguments are
+                            // scheduled, so the first reported failure is unchanged.
+                            let arguments = arguments
+                                .iter()
+                                .zip(parameters)
+                                .zip(&binding.parameters)
+                                .rev()
+                                .map(|((argument, c_parameter), rust_parameter)| {
+                                    lowering
+                                        .resolve_with_storage(c_parameter, rust_parameter)
+                                        .map(|lowered| (*argument, lowered))
+                                })
+                                .collect::<Result<Vec<_>, _>>()
+                                .map_err(failure)?;
+                            if self.collapses(context) {
+                                match &result {
+                                    Some(result) => write_witness(
+                                        rust,
+                                        &self.witness_marker(
+                                            &declared.result.spelling,
+                                            &result.marker,
+                                        ),
+                                    ),
+                                    None => rust.push_str("()"),
+                                }
+                                continue;
+                            }
                             if let Some(result) = &result {
                                 write!(
                                     rust,
@@ -1012,15 +1150,10 @@ impl<'a> Renderer<'a> {
                             }
                             write!(rust, "{path}(").expect("String output");
                             tasks.push(text(")"));
-                            for ((argument, c_parameter), rust_parameter) in
-                                arguments.iter().zip(parameters).zip(&binding.parameters).rev()
-                            {
-                                let lowered = lowering
-                                    .resolve_with_storage(c_parameter, rust_parameter)
-                                    .map_err(failure)?;
+                            for (argument, lowered) in arguments {
                                 tasks.push(text(", "));
                                 tasks.push(text("))"));
-                                tasks.push(value(*argument));
+                                tasks.push(value(argument));
                                 tasks.push(Task::Text(format!("<{} as {EXPRESSION}::CType>::into_storage({EXPRESSION}::implicit::<{}, _>(", lowered.marker, lowered.marker)));
                             }
                         }
@@ -1042,6 +1175,10 @@ impl<'a> Renderer<'a> {
                                 ));
                             }
                             let lowered = lowering.resolve_object_query(&ty).map_err(failure)?;
+                            if self.collapses(context) {
+                                write_witness(rust, &format!("{SUPPORT}::CSize"));
+                                continue;
+                            }
                             write!(
                                 rust,
                                 "{EXPRESSION}::{}::<{}>()",
@@ -1107,7 +1244,14 @@ impl<'a> Renderer<'a> {
                                     }
                                 }
                             }
+                            if self.collapses(context) {
+                                write_witness(rust, &format!("{SUPPORT}::CSize"));
+                                continue;
+                            }
                             write!(rust, "{EXPRESSION}::offset_of::<{marker}, $crate::__pgrx_c_field_marker!(@path; {})>()", path.join(" . ")).expect("String output");
+                        }
+                        ExpressionKind::SizeOfExpression { .. } if self.collapses(context) => {
+                            write_witness(rust, &format!("{SUPPORT}::CSize"));
                         }
                         ExpressionKind::SizeOfExpression { operand } => {
                             tasks.push(Task::Node(*operand, Context::Size));
@@ -1128,6 +1272,10 @@ impl<'a> Renderer<'a> {
                                     if depth == 0 && *is_const { "ReadOnly" } else { "ReadWrite" }
                                 );
                             }
+                            if self.collapses(context) {
+                                write_witness(rust, &marker);
+                                continue;
+                            }
                             write!(rust, "{EXPRESSION}::cast::<{marker}, _>(")
                                 .expect("String output");
                             tasks.extend([text(")"), value(*operand)]);
@@ -1143,6 +1291,10 @@ impl<'a> Renderer<'a> {
                                     "{EXPRESSION}::CPointer<{marker}, {EXPRESSION}::{}>",
                                     if depth == 0 && *is_const { "ReadOnly" } else { "ReadWrite" }
                                 );
+                            }
+                            if self.collapses(context) {
+                                write_witness(rust, &format!("{SUPPORT}::CSize"));
+                                continue;
                             }
                             write!(
                                 rust,
@@ -1186,6 +1338,11 @@ impl<'a> Renderer<'a> {
         }
         Ok(())
     }
+}
+
+/// Close a value with a never-evaluated witness of `marker`'s value type.
+fn write_witness(rust: &mut String, marker: &str) {
+    write!(rust, "{EXPRESSION}::type_witness::<{marker}>()").expect("String output");
 }
 
 /// Identify aggregate volatile access requiring conservative rejection rather than a Rust record load.

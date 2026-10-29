@@ -207,18 +207,29 @@ module scope to preserve private adapter access. Macro definitions receive
 multiline layout before rustfmt, including repetitions and internal token syntax
 that rustfmt leaves untouched. This preserves literal spellings and source comments
 in both library and CLI output. When available, rustfmt also formats the
-documentation snapshots; build output keeps the generator's layout.
+documentation snapshot; build output keeps the generator's layout.
 The report records the C profile, input dependencies, emitted source and explicit
 skip reasons, along with independently resolved constants and their Rust binding
 paths. The active version's macros are exported from `pgrx-pg-sys` and reexported
 at the `pgrx` crate root, so callers can use `pgrx::TYPEALIGN!(...)`.
-Setting `PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1` also writes the module tree
-to `pgrx-pg-sys/src/include/cmacros/pgN/`, alongside the shipped bindings and OIDs. These
-documentation snapshots include the generated adapters. Their target guards
-remain active outside `docsrs`; normal builds regenerate macros for their own C profile.
-Generate release snapshots alongside matching PostgreSQL bindings on the
-selected release target. Their values and layouts describe that target, not the
-build host of a later user.
+Setting `PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1` also writes one documentation
+snapshot to `pgrx-pg-sys/src/include/cmacros/snapshot/`, alongside the shipped bindings
+and OIDs. It covers every configured supported version. Each macro becomes a typed
+shell: it keeps its documentation and invocation forms, and its arms have the real
+macro's result type without its body. The snapshot also ships each version's generated
+Rust support, without C source or native archives, so crates compiled against it under
+docs.rs type-check `.get()`, `.into_value()`, markers and metadata getters as in ordinary
+builds. Shells panic if run. Shells and support items shared by several versions are
+written once behind `cfg(any(feature = ...))`. Only `docsrs` builds use the snapshot;
+normal builds regenerate macros for their own C profile.
+Release generation must run on the single docs.rs target in pgrx-pg-sys's
+`[package.metadata.docs.rs] targets`, and it verifies and formats the merged snapshot
+and bindings before writing anything to `src/include`. Each `pgNN.rs` records a
+generation id that the snapshot asserts, so commit the bindings and the snapshot from
+the same run, with every supported version configured;
+`PGRX_PG_SYS_RELEASE_REQUIRE_ALL_VERSIONS=1` makes a run that misses one fail.
+`tools/docsrs-typecheck.sh` type-checks the docs builds of pgrx-pg-sys and pgrx
+against the committed tree for each version and checks the packaged crate size.
 
 Ordinary bindgen retains its established target, CPPFLAGS and server include
 directories. Its system include directories come from the Clang driver that
@@ -270,11 +281,12 @@ for `PGRX_PG_SYS_EXTRA_TARGET_INFO_PATH` export and
 `PGRX_TARGET_INFO_PATH_PGnn` import. Bundle integrity does not authenticate its
 producer; use trusted artifacts from the same pgrx release and revision.
 
-The docs.rs path uses shipped bindings, macro definitions and generated adapter
-types without requiring PostgreSQL or Clang. Only installation-specific target
-error guards are disabled there. Native interfaces can be type-checked, but
-calling their C symbols still requires the matching native archive. Documentation
-snapshots and handwritten ports are not semantic fallbacks for ordinary builds.
+The docs.rs path uses shipped bindings, typed macro shells and generated adapter
+types without requiring PostgreSQL or Clang. The shipped support keeps its target
+guard, so docs builds work only for the target release generation inspected.
+Native interfaces can be type-checked, but calling their C symbols still requires
+the matching native archive. Documentation snapshots and handwritten ports are not
+semantic fallbacks for ordinary builds.
 
 ### Build diagnostics
 

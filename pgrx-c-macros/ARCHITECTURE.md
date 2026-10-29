@@ -313,8 +313,7 @@ cannot be inferred from a declaration's name or broad type category:
    does not establish that the included definition is available. Retain physical
    source spans, original formals and bounded definition text from that same
    parse. Header contents are copied once per physical source, rather than once
-   per function; the common input fingerprints identify bodies for native adapter
-   hashes, which serialize only the prototype and linkage.
+   per function.
 2. **Bitfield operations.** For each named bitfield whose containing record has
    a usable C spelling, probe unary-plus promotion, assignment-result type and
    promotion, and postfix-result type and
@@ -860,7 +859,10 @@ and stores retain their C allocation, alignment, provenance, initialization,
 and aliasing requirements.
 
 `CExpression<V>` wraps an already evaluated public result. `.get()` extracts
-native storage once; `.into_value()` keeps its tagged C value. A macro returning
+native storage once; `.into_value()` keeps its tagged C value. Documentation
+shells name the same result types with `type_witness::<M>()`, a never-evaluated
+`M::Value`; a compiled proof ties it to each helper whose signature fixes its
+result (section 15). A macro returning
 an integer is therefore not generally used as a bare native Rust integer until
 the caller extracts or converts it. Composition through generated macro syntax
 can retain additional source metadata; an evaluated Rust value boundary must
@@ -1062,7 +1064,7 @@ retain a different fixed branch hint.
 
 The build integration parses the Rust that its current bindgen invocation just
 produced. It must never read checked-in `src/include/pgNN.rs` as target facts;
-those snapshots serve documentation builds and can describe another platform.
+those snapshots serve documentation builds and describe the docs.rs target.
 
 `RustBindingType` represents actual unit, bool, fixed/pointer-sized integers,
 floats, pointers, arrays, functions, nullable `Option`, `ManuallyDrop`,
@@ -1341,7 +1343,8 @@ cross-compilation. This format/tool selection is not evidence of a working
 Windows PostgreSQL backend.
 
 Only the active Cargo PostgreSQL major gets a native archive linked. Release
-generation may still emit Rust snapshots for all configured supported versions.
+generation still inspects every configured supported version to publish the
+documentation snapshot.
 Bindgen static-inline wrappers are emitted unconditionally. When `cshim` is
 enabled, compile it with the wrappers, macro primitives and metadata in one
 translation unit:
@@ -1560,12 +1563,22 @@ Typical output layout is:
  pgrx-pg-sys/src/include/
    pgNN.rs                      # documentation snapshot
    pgNN_oids.rs
-   cmacros/pgNN/...              # same organization, release generation
+   cmacros/snapshot/            # every version's shells and support, release generation
+     mod.rs
+     c.rs
+     utils/
+       mod.rs
+       acl.rs
+     __pgrx_c_support/          # merged support of every version
+       native_0000.rs
+       shared_0000.rs
 ```
 
-Header-relative directories and filenames determine modules. Escape Rust
-keywords and invalid filename characters deterministically, handle sanitized
-name collisions, and reject duplicate exported macro identifiers. Each public
+Header-relative directories and filenames determine modules. A header uses its
+stem (`acl.h` is `acl`); when that collides with a subdirectory, another header
+or a reserved name it uses its whole filename (`port.h` is `port_h`), and only a
+name that is still ambiguous is hex-encoded. Escape Rust keywords, and reject
+duplicate exported macro identifiers. Each public
 macro receives `///` documentation with physical header/line provenance and a
 fenced `text` block containing its normalized original C definition.
 
@@ -1594,18 +1607,163 @@ diagnostic permits unformatted output; genuine formatting/source failures
 remain errors.
 
 Write changed content stably and remove obsolete files only within the owned
-version's generated macro tree. Publish documentation snapshots when
-`PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1` selects release generation. Normal
-builds compile current `OUT_DIR` files; checked-in snapshots are not current
-platform inputs. Documentation compatibility is a separate validation pass.
-Snapshots retain generated adapter modules and typedef exports; only target
-`compile_error!` items are excluded under docsrs. Native interfaces can be
-type-checked without PostgreSQL or Clang, but calling their C symbols still
-requires a matching archive. Documentation layouts remain release-target facts.
+generated macro tree. Normal builds compile current `OUT_DIR` files; the
+checked-in snapshot is not a platform input.
+
+`PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1` also publishes one documentation
+snapshot covering every configured supported version. docs.rs builds have no
+PostgreSQL or Clang, so the snapshot stores each version's generated interface
+instead: a typed shell for each macro, and the exact Rust support that version's
+ordinary build includes. Macro bodies, argument normalizers, C source and native
+archives are left out. Dependents of a docs build then type-check against the
+same result types, trait impls, markers, bridges, callback aliases and metadata
+getters as ordinary builds.
+
+A shell keeps its macro's generated documentation and has one arm per accepted
+invocation form, after the dereference arms described below. A form matches type,
+identifier and member designator operands with the argument normalizer's
+fragments. An argument the real macro never parses, because it is unused or only
+stringified, takes any tokens when it is last, as the normalizer does; otherwise,
+like every evaluated operand, it is an `expr`. Every arm expands to the hidden
+`__pgrx_c_documentation_shell!` with the macro's `DocumentedResult`:
+
+- An expression macro passes a witness of its value arm's type. The witness is
+  the value arm rendered by the same `typed::Renderer`, except that each value
+  node whose runtime helper fixes the result type by its signature becomes
+  `type_witness::<M>()` without rendering its operands. These nodes are casts,
+  comparisons and logical operators, the `sizeof`/`alignof`/`offsetof` family,
+  direct native calls, byte swaps and branch hints. Every other node renders as
+  in the real arm, so member, load and array-decay types still come from the
+  runtime's traits. A comma renders only its right operand, and the witness never
+  delegates to another macro's internal arms. The shell evaluates
+  `if false { finish(witness) } else { panic }`, which has the real macro's
+  `CExpression<V>` type.
+- A statement or empty macro passes a block of type `()`.
+- A body whose every path returns from the caller, and a witness that could not
+  be rendered, keep the diverging placeholder.
+
+Every arm panics if run, and nothing before the panic evaluates an operand.
+Operands are the shell's `expr` fragments, described to `__pgrx_c_operand!` as
+`(@native [$x])`, the classifier's descriptor for a non-literal expression. The
+classifier instead describes a named pointer's dereference, `*pointer` or
+`*(pointer)` inside any number of parentheses, as `(@deref ...)`, which reads a
+place through the pointer and keeps its `*mut` qualification where `@native`
+gives `ReadOnly`. An `expr` fragment cannot be taken apart, so when a witness
+reads exactly one operand `$x` as a place, its shell first has arms matching
+`* $x:ident` and `(* $x:ident)` in each form, whose witness describes `$x` with
+that `(@deref ...)` descriptor.
+Blocks borrow each evaluated operand that their expression does not use, and
+never mention spelling, type, identifier or unused operands. The dead generic
+proof in [`expression/witness.rs`](../pgrx-pg-sys/src/c_macros/expression/witness.rs)
+compiles in every build and ties each collapsed helper's result type to
+`type_witness`, so changing such a signature breaks the build until the collapse
+rule changes. A typedef cast whose lowered marker is exactly its kind's marker
+names the typedef's `__pgrx_c_types` alias, which keeps the witness equal in
+versions where only the typedef's rank changes.
+
+A shell can accept more than its real macro: collapsed operands' trait bounds are
+not checked, local-name guards are absent, and dropped operands are only borrowed.
+A shell also needs no `unsafe` block where every unsafe operation of its real
+macro is collapsed or dropped, such as a native call, a comparison of a member
+read through a pointer, or a statement body; an `unsafe` block around such a call
+warns as unused in docs builds. The oracle pins examples of each.
+It can reject an invocation that its real macro accepts, or give it another type,
+only where its `expr` fragments and the `@native` descriptor replace the argument
+normalizer and classifier:
+
+- a literal `0` passed as a null pointer to an operand-dependent spine is not a
+  null constant;
+- a dereference of a raw `*mut` pointer read as a place becomes `ReadOnly`, so a
+  decayed pointer can be `*const` instead of `*mut`, when it is spelled other
+  than `*pointer` or `(*pointer)`, such as `((*pointer))` or `*(pointer)`, or
+  when the witness reads more than one operand as a place;
+- a nested generated-macro operand loses its bitfield and null metadata;
+- a nested generated macro passed where the C macro assigns to, increments, takes
+  the address of or reads a member of its operand is rejected, because a shell's
+  value is not a place. Pass a native place expression instead;
+- an unused or only stringified argument followed by another argument must be an
+  expression, because a token repetition before a comma would make the matcher
+  ambiguous;
+- `(@__pgrx_c_native [..])` does not match a shell's `$x:expr` forms.
+
+These cause docs-only type errors; shells never run. The documentation oracle
+compiles each case with the real macros and requires its shells to reject it, so
+this list stays accurate.
+
+The support is the source each ordinary build includes: the target guard and ABI
+assertions, the integer bridges and `__pgrx_c_types`, metadata getters with their
+extern declarations, `__pgrx_c_generated` with its field, enum, signature, call,
+callback and address items and layout assertions, and the `__pgrx_c_operand!` and
+`__pgrx_c_field_marker!` macros. The shipped assertions are rechecked when docs.rs
+compiles the snapshot, and the target guard limits docs builds to the target that
+release generation inspected. Docs builds only type-check: a linked build with
+`DOCS_RS=1` fails to link the native getters rather than running a shell.
+
+The snapshot merges versions:
+
+1. A shell whose documentation, forms and result are identical in several
+   versions is written once, gated by `#[cfg(any(feature = "pgNN", ...))]`, and
+   its location names each version's defining line.
+2. Different definitions of one macro sit next to each other in their header's
+   module, so a reader of the source sees how the macro changed.
+3. A header or directory defined by only some versions is gated as a module.
+4. Support is split into items at every inline module, each keeping its leading
+   comments. Items merge per module by their text and their occurrence number in
+   the version, so an item a version repeats is kept, and an item in only some
+   versions is gated to them. Comments after the last root item declare nothing
+   and are dropped, since a gate before them would apply to the next item. A
+   module must be declared identically in every version. Each version's own
+   `__pgrx_c_classify` is dropped; the snapshot root writes one merged
+   availability classifier for `if_c_macro!`.
+5. Selecting each version from the merged tree must reproduce exactly that
+   version's macros, locations and support items in each module, and one macro's
+   gates must be disjoint and cover the versions defining it. Every
+   `$crate::__pgrx_c_generated::X`, `$crate::__pgrx_c_types::X` and `$crate::X!`
+   a shell names must be defined by the support of each version it is gated to.
+   The rendered support must split back into exactly the merged items, each
+   preceded by its own gate.
+6. `include!` and `#[path]` paths are written with `/` on every host. Two snapshot
+   files may not differ only in case, since case-insensitive filesystems check out
+   the snapshot too.
+
+Release generation keeps the committed bindings and snapshot coherent:
+
+- It runs only on the single target named by pgrx-pg-sys's
+  `[package.metadata.docs.rs] targets`, `x86_64-unknown-linux-gnu`, and refuses
+  any other target.
+- Each `pgNN.rs` ends with `__PGRX_GENERATION`, the SHA-256 of its rewritten
+  bindings, and the snapshot root asserts each version's id, so a snapshot
+  generated with different bindings fails docs builds. The id covers only the
+  bindings: two runs that produce the same bindings but different macros pass it.
+- The run requires the active `pgNN` feature's version among those it
+  configures before generating, and every version is generated into `OUT_DIR`
+  first. The snapshot is merged and verified, and it and the bindings are
+  formatted in a staging directory beside `src/include`, before anything there
+  changes, so a failure up to then leaves the committed tree unchanged.
+  Publication rewrites only changed files; an I/O error while publishing can
+  leave the tree partly rewritten.
+- Every version is inspected from its headers. A configured version that
+  `PGRX_TARGET_INFO_PATH_PGNN`, or its target-suffixed spelling, would import fails
+  the run before anything is generated, since a target bundle carries no macro
+  documentation. The error names the spelling that was set.
+- A run that configures only some supported versions still publishes unless
+  `PGRX_PG_SYS_RELEASE_REQUIRE_ALL_VERSIONS=1`, which `prepare-release.sh` sets,
+  makes it fail first. A partial snapshot gates a `compile_error!` to each missing
+  version, and a warning says not to commit it. The snapshot root records each
+  version's count of value, unit, diverging and untyped shells, naming up to 20
+  untyped ones. Every run also reports those counts and the snapshot's bytes and
+  file count as Cargo warnings, which the release scripts' `cargo -q` hides.
+- `tools/docsrs-typecheck.sh` type-checks the docs builds of pgrx-pg-sys and pgrx
+  for each `pgNN` feature of pgrx-pg-sys against the committed tree, and keeps the
+  packaged pgrx-pg-sys within 5 MiB.
+  Like `tools/docsrs-check.sh`, it builds for the docs.rs target, so another host
+  needs that target's standard library and a C compiler for it. CI runs it on
+  x86_64 Linux for every pull request. A pgrx-bindgen unit test keeps the
+  snapshot within 24 MiB raw.
 
 `pgrx-pg-sys/src/include.rs` exposes the `cmacros` selector in
-`src/include/cmacros/mod.rs`, which includes the selected `OUT_DIR` tree or
-documentation snapshot. `#[macro_export]` defines crate-root macro identifiers;
+`src/include/cmacros/mod.rs`, which includes the selected `OUT_DIR` tree or, for
+`docsrs`, the documentation snapshot. `#[macro_export]` defines crate-root macro identifiers;
 header modules reexport those identifiers, their parent modules collect them, and
 `pgrx/src/lib.rs` uses `pub use pg_sys::cmacros::*`. Thus callers can use
 `pgrx::MACRO_NAME!` without caring which header module owns its definition.
@@ -1933,8 +2091,12 @@ cargo test -p pgrx-pg-sys --lib --no-default-features --features pg18,cshim
 The `macro_build` harness also needs the standard library of the cross target
 it picks for the host, as the [crate README](README.md#validation) lists.
 
-Documentation snapshots require their own release/docs.rs validation. Their
-existence is not a substitute for current-platform generation. Tests demonstrate
+The documentation snapshot requires its own release/docs.rs validation.
+`tests/documentation_oracle.rs` compiles real macros and their renamed shells in
+one program, requires one result type for each invocation, and checks that a
+shell panics without evaluating its operands. `tools/docsrs-typecheck.sh` checks
+pgrx-pg-sys and pgrx against each version's committed snapshot on the docs.rs target. The snapshot is not a
+substitute for current-platform generation. Tests demonstrate
 specific properties; neither successful emission nor a finite oracle sample
 proves every possible invocation correct. The type and safety arguments must
 stand independently.
@@ -1977,6 +2139,7 @@ generalized; do not add a macro-name exception.
 | Grammar and symbolic analysis | [`src/syntax.rs`](src/syntax.rs), [`statements.rs`](src/syntax/statements.rs), [`src/analysis.rs`](src/analysis.rs). |
 | Binding representations | [`src/bindings.rs`](src/bindings.rs), [`src/emit/types.rs`](src/emit/types.rs). |
 | Batch lowering and support order | [`src/emit.rs`](src/emit.rs), [`demands.rs`](src/emit/demands.rs). |
+| Documentation shells and witnesses | [`documentation.rs`](src/emit/documentation.rs), [`expression/witness.rs`](../pgrx-pg-sys/src/c_macros/expression/witness.rs), [`macro_snapshot.rs`](../pgrx-bindgen/src/build/macro_snapshot.rs). |
 | Arguments, expressions, statements | [`arguments.rs`](src/emit/arguments.rs), [`typed.rs`](src/emit/typed.rs), [`statements.rs`](src/emit/statements.rs). |
 | Native/nominal capabilities | [`fields.rs`](src/emit/fields.rs), [`bitfields.rs`](src/emit/bitfields.rs), [`functions.rs`](src/emit/functions.rs), [`addresses.rs`](src/emit/addresses.rs), [`callbacks.rs`](src/emit/callbacks.rs), [`enumerations.rs`](src/emit/enumerations.rs). |
 | Readable delegation and layout | [`src/delegation.rs`](src/delegation.rs), [`src/formatting.rs`](src/formatting.rs). |
@@ -2021,11 +2184,26 @@ CPPFLAGS that still apply in a cross build. Those remain trusted, so the
 headers must come from the deployed server's build.
 
 Input content fingerprints determine when compiler facts expire. Generated
-helper names instead hash semantic target representations, callable signatures,
-C overflow policy and layout facts. They do not hash PATH, HOME, working
-directories, compiler installation paths or OS deployment versions. Field
-markers use the original member name, retaining polymorphic projection across
-records without renumbering unrelated fields.
+support names come from the C names they adapt, never from hashes, catalog
+positions, or the build environment:
+
+| Item | Name |
+| --- | --- |
+| Field marker | `Field_<member>` |
+| Bitfield place | `Bitfield_<record>__<member>` |
+| Inline call adapter | `Inline_<function>`, native `__pgrx_inline__fn__<function>` |
+| Function address getter | `Address_<function>`, native `__pgrx_address__fn__<function>` |
+| Callback signature | `Signature_<encoded C function type>` |
+| Enum identity | `EnumIdentity_<encoded C enum type>` |
+
+Native helper names put their role before the C names (`__pgrx_inline__arg0__f`),
+and multi-part names join plain C identifiers with `__`. A part that is not a
+plain identifier, or a type token other than an identifier or number, is
+encoded behind a leading digit, so one generated name identifies exactly one
+combination of parts. Anonymous C type locations keep only the path below
+PostgreSQL's `server` include directory, or the filename, written with `/`, so
+installation prefixes and the host's path separator do not change names.
+Unrelated header changes therefore leave every other generated name unchanged.
 
 The CLI embeds packaged copies of the canonical wrapper headers. A default
 wrapper is published atomically under PGRX_HOME in a directory keyed by its
