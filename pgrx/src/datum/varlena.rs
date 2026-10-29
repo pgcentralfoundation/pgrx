@@ -255,29 +255,25 @@ where
         let size = size_of::<T>();
         let payload_len =
             size.checked_add(self.tail.len()).expect("varlena payload length overflows usize");
-        let total = payload_len
-            .checked_add(pg_sys::VARHDRSZ as usize)
-            .expect("varlena length overflows usize");
+        let short = payload_len <= pg_sys::VARATT_SHORT_MAX as usize - pg_sys::VARHDRSZ_SHORT;
+        let header = if short { pg_sys::VARHDRSZ_SHORT } else { pg_sys::VARHDRSZ as usize };
+        let total = payload_len.checked_add(header).expect("varlena length overflows usize");
 
-        // palloc0 raises an ERROR for any size above MaxAllocSize, so the header lengths
-        // below fit C `int`.
-        // SAFETY: palloc0 returns zeroed storage, aligned for any varlena header, or raises
-        // an ERROR instead of returning NULL.
-        let ptr = unsafe { pg_sys::palloc0(total) }.cast::<pg_sys::varlena>();
+        // palloc raises an ERROR for any size above MaxAllocSize, so the header length below
+        // fits C `int`.
+        // SAFETY: palloc returns storage aligned for any varlena header, or raises an ERROR
+        // instead of returning NULL.
+        let ptr = unsafe { pg_sys::palloc(total) }.cast::<pg_sys::varlena>();
 
-        // SAFETY: the new allocation has room for a four-byte header and `payload_len` bytes,
-        // with no other reference to it. The short branch checks that its encoded size fits
-        // the one-byte header. VARDATA_ANY reads the header just written, and the byte copies
-        // fill exactly `payload_len` bytes after it, with no alignment requirement. `value` is
-        // a valid T, initialized except perhaps for padding bytes, which an untyped copy may
-        // read.
+        // SAFETY: the new allocation holds `total` bytes, a header of the chosen form followed by
+        // `payload_len` bytes, with no other reference to it. A short varlena's `total` is at
+        // most VARATT_SHORT_MAX, which its one-byte header can encode. VARDATA_ANY reads the
+        // header just written, and the byte copies, which need no alignment, cover the
+        // `payload_len` bytes after it. `value` is a valid T, initialized except perhaps for
+        // padding bytes, which an untyped copy may read.
         unsafe {
-            if payload_len + pg_sys::VARHDRSZ_SHORT as usize <= pg_sys::VARATT_SHORT_MAX as usize {
-                pg_sys::SET_VARSIZE_SHORT!(
-                    ptr,
-                    (payload_len + pg_sys::VARHDRSZ_SHORT as usize) as i32
-                )
-                .get();
+            if short {
+                pg_sys::SET_VARSIZE_SHORT!(ptr, total as i32).get();
             } else {
                 pg_sys::SET_VARSIZE_4B!(ptr, total as i32).get();
             }

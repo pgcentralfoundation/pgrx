@@ -206,6 +206,25 @@ mod tests {
         assert_eq!(read.words, [0x0102_0304_0506_0708; 32]);
     }
 
+    /// `into_pg` allocates the varlena's size and no more, also when the header is one byte.
+    #[pg_test]
+    fn test_pgvarlena_into_pg_allocates_the_varlena_size() {
+        // 126 bytes with a one-byte header. Sized for a four-byte header, it would be 129 bytes,
+        // which the allocator rounds to a larger chunk than 126.
+        let varlena = PgVarlena::from([7_u8; 125]).into_pg();
+        // SAFETY: into_pg returned a live varlena, whose header gives its size.
+        unsafe {
+            assert!(pg_sys::VARATT_IS_1B!(varlena).is_true());
+            let size = pg_sys::VARSIZE_ANY!(varlena).get() as usize;
+            assert_eq!(size, 126);
+            let same_size = pg_sys::palloc(size);
+            assert_eq!(
+                pg_sys::GetMemoryChunkSpace(varlena.cast()),
+                pg_sys::GetMemoryChunkSpace(same_size)
+            );
+        }
+    }
+
     #[pg_test]
     fn test_pgvarlena_never_writes_to_its_datum() {
         // A four-byte-header varlena outside any PostgreSQL memory context.
