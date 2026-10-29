@@ -641,7 +641,7 @@ fn closed_paste_proof_budgets_probe_output_rather_than_header_output() {
 /// forms `//` comments out the rest of the invoking line, or inside a macro argument the rest of
 /// that argument. A generated macro cannot erase code, so the proof refuses such pastes,
 /// including one in a dependency. Clang reports them as errors through the probe pragmas. When
-/// those errors are dropped, as `-w` does from Clang 11 on, no closed paste is admitted.
+/// those errors are dropped, as `-w` does from Clang 9 on, no closed paste is admitted.
 #[test]
 fn closed_pastes_that_form_comments_are_refused_under_microsoft_extensions() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -686,8 +686,8 @@ fn closed_pastes_that_form_comments_are_refused_under_microsoft_extensions() {
                 .split("version ")
                 .nth(1)
                 .and_then(|version| version.split('.').next()?.parse::<u32>().ok());
-            // Clang 6 to 10 keep the error under -w. Apple clang 12.0.0 is based on LLVM 10.
-            let first = if version.starts_with("Apple ") { 13 } else { 11 };
+            // Clang 6 to 8 keep the error under -w, and Apple clang 11.0.0 is based on LLVM 8.
+            let first = if version.starts_with("Apple ") { 12 } else { 9 };
             assert!(!reported || major.is_none_or(|major| major < first), "{version}");
         } else {
             assert!(reported, "{arguments:?}");

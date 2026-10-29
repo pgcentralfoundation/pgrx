@@ -722,7 +722,7 @@ struct Pass {
     /// Whether Clang reported the canary paste that forms `//`.
     ///
     /// Under Microsoft extensions such a paste is a comment, which the probe pragmas make an
-    /// error. Clang 11 and later drop that error under `-w`. A comment that cuts the probe line
+    /// error. Clang 9 and later drop that error under `-w`. A comment that cuts the probe line
     /// short then goes unreported, and so does one inside a macro argument, which drops the rest
     /// of the argument and leaves the line intact. Without this report no closed paste is proven.
     comment_pastes_reported: bool,
