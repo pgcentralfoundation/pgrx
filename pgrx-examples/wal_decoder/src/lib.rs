@@ -165,10 +165,12 @@ impl Serialize for Tuple {
             // SAFETY: `attribute` is a loop-local copy of the attribute, and its
             // name is NUL-terminated. quote_identifier returns that pointer when
             // the name needs no quotes, or else a quoted copy palloc'd in
-            // CurrentMemoryContext. Either lives until this iteration ends, and
-            // attname is used only in it: serialize_field asks for a
-            // `&'static str`, but serde_json, the only serializer this example
-            // uses, writes the key before it returns.
+            // CurrentMemoryContext. Either lives until this iteration ends.
+            // serialize_field takes a `&'static str` key, so CStr::from_ptr
+            // gives attname a `'static` lifetime that nothing here justifies: a
+            // Serializer that keeps the key after serialize_field returns would
+            // read the name after it is gone. This example has that known,
+            // unfixed soundness gap.
             let attname = unsafe {
                 CStr::from_ptr(pg_sys::quote_identifier(attribute.attname.data.as_ptr()))
             }
@@ -184,10 +186,11 @@ impl Serialize for Tuple {
             // SAFETY: the reorder buffer keeps tuple and its data alive, desc
             // comes from the open relation, and iteration supplies a valid
             // attribute number. isnull is an initialized exclusive output. On
-            // PG15-17 the call can write attcacheoff into desc's attribute
-            // entries. `attribute`, whose name attname may borrow, is a copy that
-            // iteration returned by value, so no reference into desc is live
-            // across the call.
+            // PG15-18 the call can write attcacheoff into desc's attribute
+            // entries: its FormData_pg_attribute array through PG17 and its
+            // CompactAttribute array on PG18. `attribute`, whose name attname may
+            // borrow, is a copy that iteration returned by value, so no reference
+            // into desc is live across the call.
             let datum =
                 unsafe { pg_sys::heap_getattr(tuple, attnum.into(), desc.as_ptr(), &mut isnull) };
             if isnull {
