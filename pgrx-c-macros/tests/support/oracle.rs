@@ -66,11 +66,13 @@ pub fn run_c(
     compiler.args(["-x", "c"]).args(compiler_arguments).arg("-include").arg(header).arg(&program);
     if execute {
         // Original headers can define unused backend routines with unresolved server
-        // symbols. Remove their unreachable linker sections without changing C input.
+        // symbols, such as pg_checksum_page calling ExceptionalCondition under assertions.
+        // Remove their unreachable linker sections without changing C input. ld64 strips
+        // per symbol; GNU ld drops whole sections, so each definition needs its own.
         #[cfg(target_os = "macos")]
         compiler.arg("-Wl,-dead_strip");
         #[cfg(any(target_os = "linux", all(target_os = "windows", target_env = "gnu")))]
-        compiler.arg("-Wl,--gc-sections");
+        compiler.args(["-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections"]);
         #[cfg(all(target_os = "windows", target_env = "msvc"))]
         compiler.arg("-Wl,/OPT:REF");
         compiler.arg("-o").arg(&executable);
