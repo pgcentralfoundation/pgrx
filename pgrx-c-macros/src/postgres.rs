@@ -692,14 +692,12 @@ mod tests {
     #[cfg(unix)]
     #[test]
     fn system_includes_query_the_selected_driver_for_the_target() {
-        use std::os::unix::fs::PermissionsExt;
         let _lock = crate::SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
         let scanner = MacroScanner::new().expect("libclang must be available");
         let major = crate::frontend::version_major(&clang::get_version()).unwrap();
         let directory = tempfile::tempdir().unwrap();
         let executable = |path: &Path, body: String| {
-            std::fs::write(path, format!("#!/bin/sh\n{body}\n")).unwrap();
-            std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o755)).unwrap();
+            crate::test_script::write_script(path, &format!("#!/bin/sh\n{body}\n"));
         };
         let driver = directory.path().join("clang-driver");
         executable(

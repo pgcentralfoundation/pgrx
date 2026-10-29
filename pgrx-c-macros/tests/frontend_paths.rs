@@ -11,6 +11,10 @@
 
 #![cfg(unix)]
 
+/// Write the failing archivers that native support must survive.
+#[path = "support/script.rs"]
+mod script;
+
 use pgrx_c_macros::{
     ActiveProvenance, AnalysisSession, FrontendError, MacroScanner, compile_native_support, inspect,
 };
@@ -347,7 +351,6 @@ static inline int original_mode(void) {\n\
 /// failure.
 #[test]
 fn native_support_requires_fresh_outputs_and_preserves_existing_artifacts_on_tool_failure() {
-    use std::os::unix::fs::PermissionsExt;
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let directory = Directory::new();
     let header = directory.0.join("native.h");
@@ -382,8 +385,7 @@ fn native_support_requires_fresh_outputs_and_preserves_existing_artifacts_on_too
     let mut changed = profile.clone();
     changed.compiler.executable = compiler;
     for body in ["exit 0", ": > \"$2\"", "ln -s \"$3\" \"$2\""] {
-        std::fs::write(&archiver, format!("#!/bin/sh\n{body}\n")).unwrap();
-        std::fs::set_permissions(&archiver, std::fs::Permissions::from_mode(0o700)).unwrap();
+        script::write_script(&archiver, &format!("#!/bin/sh\n{body}\n"));
         let error = compile_native_support(&changed, &source, &object, &archive).unwrap_err();
         assert!(matches!(error, FrontendError::Output(_)), "{body}: {error}");
         assert_eq!(std::fs::read(&object).unwrap(), old_object);

@@ -21,6 +21,10 @@ mod oracle;
 /// harness.
 #[path = "support/rust_oracle.rs"]
 mod rust_oracle;
+/// Write the synthetic pg_config that installation selection runs.
+#[cfg(unix)]
+#[path = "support/script.rs"]
+mod script;
 
 use pgrx_c_macros::{
     AnalysisSession, EmissionStatus, MacroScanner, emit, inspect, validate_support_profile,
@@ -37,7 +41,6 @@ static SCANNER_LOCK: Mutex<()> = Mutex::new(());
 #[test]
 #[cfg(unix)]
 fn installed_oracle_selection_requires_explicit_configuration() {
-    use std::os::unix::fs::PermissionsExt;
     use std::process::Command;
 
     if std::env::var_os("PGRX_C_MACROS_TEST_SELECTION_PROBE").is_some() {
@@ -101,12 +104,10 @@ fn installed_oracle_selection_requires_explicit_configuration() {
     );
 
     let pg_config = directory.path().join("pg_config");
-    std::fs::write(
+    script::write_script(
         &pg_config,
         "#!/bin/sh\ncase \"$1\" in\n  --version) echo 'PostgreSQL 18.0';;\n  *) exit 1;;\nesac\n",
-    )
-    .unwrap();
-    std::fs::set_permissions(&pg_config, std::fs::Permissions::from_mode(0o700)).unwrap();
+    );
     let mismatch = run(&home, Some("19"), Some(&pg_config));
     assert!(!mismatch.status.success());
     assert!(

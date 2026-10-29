@@ -6,13 +6,17 @@
 
 #![cfg(unix)]
 
+/// Write the synthetic pg_config programs that select fixture server roots.
+#[path = "support/script.rs"]
+mod script;
+
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, DiagnosticSeverity, EmissionStatus, MacroDefinition,
     MacroScanner, PostgresConfig, PostgresError, SkipReasonCode, emit_batch_with_bindings,
     postgres_inline_function_names,
 };
 use pgrx_pg_config::PgConfig;
-use std::os::unix::fs::{PermissionsExt, symlink};
+use std::os::unix::fs::symlink;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -63,8 +67,9 @@ impl TestConfig {
     /// aliases and ownership boundaries.
     fn postgres_with_include_dir(&self, include_dir: &Path) -> PostgresConfig {
         let quoted_include = format!("'{}'", include_dir.to_str().unwrap().replace('\'', "'\\''"));
-        let executable = self.write(
-            "pg_config",
+        let executable = self.home.join("pg_config");
+        script::write_script(
+            &executable,
             &format!(
                 "#!/bin/sh\n\
                  case \"$1\" in\n\
@@ -77,7 +82,6 @@ impl TestConfig {
                  esac\n"
             ),
         );
-        std::fs::set_permissions(&executable, std::fs::Permissions::from_mode(0o700)).unwrap();
         PostgresConfig::from_pg_config(PgConfig::new_with_defaults(executable))
             .expect("self-contained pg_config must resolve without changing the environment")
     }

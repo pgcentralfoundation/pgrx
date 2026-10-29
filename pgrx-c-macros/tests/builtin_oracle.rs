@@ -35,6 +35,10 @@ mod oracle;
     any(target_os = "linux", target_os = "macos"),
 ))]
 mod rust_oracle;
+/// Write the compiler wrapper that rejects a selected witness.
+#[cfg(unix)]
+#[path = "support/script.rs"]
+mod script;
 
 #[cfg(all(
     target_pointer_width = "64",
@@ -692,8 +696,6 @@ fn reject_llvm_witness(
     compiler: &Path,
     rejected: &str,
 ) -> (PathBuf, PathBuf) {
-    use std::os::unix::fs::PermissionsExt;
-
     let wrapper = directory.0.join("clang-wrapper");
     let log = directory.0.join("llvm-runs");
     std::fs::write(&log, "").unwrap();
@@ -739,8 +741,7 @@ exec {compiler} "$@"
     );
     // Only dynamic witnesses fail. Version/resource queries, preprocessing and
     // typed probes retain the authentic compiler and original profile.
-    std::fs::write(&wrapper, script).unwrap();
-    std::fs::set_permissions(&wrapper, std::fs::Permissions::from_mode(0o700)).unwrap();
+    script::write_script(&wrapper, &script);
     (wrapper, log)
 }
 

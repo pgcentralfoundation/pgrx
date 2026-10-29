@@ -7,7 +7,10 @@
 
 #![cfg(all(feature = "cli", unix))]
 
-use std::os::unix::fs::PermissionsExt;
+/// Write the synthetic pg_config and compiler programs that the CLI runs.
+#[path = "support/script.rs"]
+mod script;
+
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -71,8 +74,7 @@ impl TestConfig {
         let script = std::fs::read_to_string(fixture("pg_config.sh"))
             .unwrap()
             .replace("PostgreSQL 18.0", &format!("PostgreSQL {major_version}.0"));
-        std::fs::write(&pg_config, script).unwrap();
-        std::fs::set_permissions(&pg_config, std::fs::Permissions::from_mode(0o700)).unwrap();
+        script::write_script(&pg_config, &script);
         let config_toml = format!(
             "[configs]\npg{major_version} = {}\n",
             serde_json::to_string(&pg_config).unwrap()
@@ -816,12 +818,10 @@ fn compiler_override_wins_and_incompatible_or_empty_recorded_hints_fall_back() {
     let compiler = baseline["profile"]["compiler"]["executable"].as_str().unwrap();
     let wrong = config.home.join("wrong-clang");
     let marker = config.home.join("wrong-clang-invoked");
-    std::fs::write(
+    script::write_script(
         &wrong,
-        format!("#!/bin/sh\ntouch '{}'\nprintf '%s\\n' 'clang version 0.0.0'\n", marker.display()),
-    )
-    .unwrap();
-    std::fs::set_permissions(&wrong, std::fs::Permissions::from_mode(0o700)).unwrap();
+        &format!("#!/bin/sh\ntouch '{}'\nprintf '%s\\n' 'clang version 0.0.0'\n", marker.display()),
+    );
     let hint = format!("CLANG={}", wrong.display());
     let overridden = successful_stdout(
         config

@@ -9,6 +9,11 @@
 //! Clang. The machine check and the layout witness each refuse configurations the other
 //! accepts.
 
+/// Write the synthetic pg_config programs that installation inspection runs.
+#[cfg(unix)]
+#[path = "support/script.rs"]
+mod script;
+
 use pgrx_c_macros::{
     ConfigurationError, LayoutDisagreement, MacroScanner, PostgresError, inspect,
     verify_postgres_configuration,
@@ -200,16 +205,15 @@ fn configuration_requires_the_selected_major_and_required_facts() {
 #[test]
 fn postgres_config_inspection_verifies_the_target_configuration() {
     use pgrx_c_macros::{PostgresConfig, postgres_object_macro_names};
-    use std::os::unix::fs::PermissionsExt;
 
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let scanner = MacroScanner::new().expect("libclang must be available");
     let directory = tempfile::tempdir().unwrap();
     let x86_64 = fixtures().join("x86_64_linux");
     let executable = directory.path().join("pg_config");
-    std::fs::write(
+    script::write_script(
         &executable,
-        format!(
+        &format!(
             "#!/bin/sh\n\
              case \"$1\" in\n\
              --version) echo 'PostgreSQL 18.6' ;;\n\
@@ -219,9 +223,7 @@ fn postgres_config_inspection_verifies_the_target_configuration() {
              esac\n",
             x86_64.display()
         ),
-    )
-    .unwrap();
-    std::fs::set_permissions(&executable, std::fs::Permissions::from_mode(0o700)).unwrap();
+    );
     let postgres =
         PostgresConfig::from_pg_config(pgrx_pg_config::PgConfig::new_with_defaults(executable))
             .unwrap();
@@ -254,7 +256,6 @@ fn postgres_config_inspection_verifies_the_target_configuration() {
 #[test]
 fn universal_macos_installations_describe_each_compiled_slice() {
     use pgrx_c_macros::PostgresConfig;
-    use std::os::unix::fs::PermissionsExt;
 
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     let scanner = MacroScanner::new().expect("libclang must be available");
@@ -268,9 +269,9 @@ fn universal_macos_installations_describe_each_compiled_slice() {
     let directory = tempfile::tempdir().unwrap();
     let pg_config = |cflags: &str| {
         let executable = directory.path().join(format!("pg_config{}", cflags.len()));
-        std::fs::write(
+        script::write_script(
             &executable,
-            format!(
+            &format!(
                 "#!/bin/sh\n\
                  case \"$1\" in\n\
                  --version) echo 'PostgreSQL 18.6' ;;\n\
@@ -281,9 +282,7 @@ fn universal_macos_installations_describe_each_compiled_slice() {
                  esac\n",
                 server.path().display()
             ),
-        )
-        .unwrap();
-        std::fs::set_permissions(&executable, std::fs::Permissions::from_mode(0o700)).unwrap();
+        );
         PostgresConfig::from_pg_config(pgrx_pg_config::PgConfig::new_with_defaults(executable))
             .unwrap()
     };

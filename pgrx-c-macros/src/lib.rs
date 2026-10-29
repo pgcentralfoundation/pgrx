@@ -74,6 +74,10 @@ pub use syntax::{
 mod analysis;
 pub use analysis::*;
 
+/// Write synthetic tools without a descriptor that a concurrently spawned child could inherit.
+#[cfg(all(test, unix))]
+#[path = "../tests/support/script.rs"]
+mod test_script;
 /// Serialize tests using libclang because its wrapper allows only one live runtime handle per
 /// process.
 #[cfg(test)]

@@ -4249,10 +4249,7 @@ printf '%s\n' '#include "..." search starts here:' ' /fake/quoted' \
 
         /// Create a synthetic executable shell script with the given body.
         fn script(path: &Path, body: &str) {
-            fs::write(path, format!("#!/bin/sh\n{body}\n")).unwrap();
-            let mut permissions = fs::metadata(path).unwrap().permissions();
-            permissions.set_mode(0o755);
-            fs::set_permissions(path, permissions).unwrap();
+            crate::test_script::write_script(path, &format!("#!/bin/sh\n{body}\n"));
         }
 
         /// Own an isolated synthetic compiler directory for preference and rebuild-invalidation
