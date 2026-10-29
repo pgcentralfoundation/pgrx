@@ -592,7 +592,7 @@ mod sql_generator_tests {
 #[pgrx::pg_schema]
 mod tests {
     use pgrx::AllocatedByRust;
-    use pgrx::datum::TryFromDatumError;
+    use pgrx::datum::{Datum, TryFromDatumError, UnboxDatum};
     use pgrx::heap_tuple::PgHeapTupleError;
     use pgrx::prelude::*;
     use std::num::NonZeroUsize;
@@ -601,6 +601,57 @@ mod tests {
     /// an ERROR.
     #[derive(Debug)]
     pub struct NotAnSqlType;
+
+    /// Reads `int4`, but its `try_from_datum` rejects every value, as a type that checks more
+    /// than the type OID there would reject one it cannot read.
+    #[derive(Debug)]
+    pub struct RejectedInt4;
+
+    impl FromDatum for RejectedInt4 {
+        unsafe fn from_polymorphic_datum(
+            _datum: pg_sys::Datum,
+            is_null: bool,
+            _typoid: pg_sys::Oid,
+        ) -> Option<Self> {
+            (!is_null).then_some(RejectedInt4)
+        }
+
+        unsafe fn try_from_datum(
+            _datum: pg_sys::Datum,
+            _is_null: bool,
+            type_oid: pg_sys::Oid,
+        ) -> Result<Option<Self>, TryFromDatumError> {
+            Err(TryFromDatumError::IncompatibleTypes {
+                rust_type: "RejectedInt4",
+                rust_oid: pg_sys::INT4OID,
+                datum_type: String::from("int4"),
+                datum_oid: type_oid,
+            })
+        }
+    }
+
+    impl IntoDatum for RejectedInt4 {
+        fn into_datum(self) -> Option<pg_sys::Datum> {
+            None
+        }
+
+        fn type_oid() -> pg_sys::Oid {
+            pg_sys::INT4OID
+        }
+    }
+
+    // SAFETY: `As` does not name `'src`, and unbox returns a unit value that does not point into
+    // the Datum.
+    unsafe impl UnboxDatum for RejectedInt4 {
+        type As<'src> = RejectedInt4;
+
+        unsafe fn unbox<'src>(_datum: Datum<'src>) -> Self::As<'src>
+        where
+            Self: 'src,
+        {
+            RejectedInt4
+        }
+    }
 
     #[pg_test]
     fn test_gets_name_field() {
@@ -1118,6 +1169,17 @@ mod tests {
                 .expect("the row is not NULL");
         let read = row.get_by_index::<PgBox<NotAnSqlType>>(NonZeroUsize::new(1).unwrap());
         assert!(matches!(read, Ok(None)), "{read:?}");
+        Ok(())
+    }
+
+    /// `get_by_index` reads a value of `T`'s own type through `T`'s `try_from_datum` as well, so
+    /// a type that rejects a value there also rejects it here.
+    #[pg_test]
+    fn test_get_by_index_reads_own_type_through_try_from_datum() -> Result<(), spi::Error> {
+        let row = Spi::get_one::<PgHeapTuple<'_, AllocatedByRust>>("SELECT ROW(7)")?
+            .expect("the row is not NULL");
+        let read = row.get_by_index::<RejectedInt4>(NonZeroUsize::MIN);
+        assert!(matches!(read, Err(TryFromDatumError::IncompatibleTypes { .. })), "{read:?}");
         Ok(())
     }
 

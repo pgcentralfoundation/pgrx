@@ -570,7 +570,9 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
     /// ## Errors
     /// - return [`TryFromDatumError::NoSuchAttributeNumber`] if the attribute does not exist
     /// - return [`TryFromDatumError::IncompatibleTypes`] if the Rust type of the `value` is not
-    ///   compatible with the attribute's Postgres type
+    ///   compatible with the attribute's Postgres type, as `T`'s
+    ///   [`FromDatum::try_from_datum`] or [`FromDatum::try_from_datum_in_memory_context`]
+    ///   decides
     pub fn get_by_index<'tup, T>(
         &'tup self,
         attno: NonZeroUsize,
@@ -599,23 +601,21 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
         let Some(datum) = datum else {
             return Ok(None);
         };
-        // Ask T for its type only now: for a PostgresType, that is a catalog lookup by name,
-        // which can raise an ERROR and is not needed to return a NULL.
-        let rust_oid = T::type_oid();
-        let typoid = match rust_oid {
-            // A `T` that reads records reads a row-type attribute (a record, a composite type,
-            // or a domain over one) as RECORDOID. Any other attribute keeps its own type, which
-            // is checked against `T` below.
-            // SAFETY: type_is_rowtype takes the OID by value and only looks it up.
-            pg_sys::RECORDOID if unsafe { pg_sys::type_is_rowtype(att.atttypid) } => {
-                pg_sys::RECORDOID
-            }
-            _ => att.atttypid,
+        // A `T` that reads records reads a row-type attribute (a record, a composite type, or a
+        // domain over one) as RECORDOID. Any other attribute keeps its own type, which the try_
+        // conversions below check against `T`. They look `T`'s type up to do so, and for a
+        // PostgresType that is a catalog search by name, so ask `T` for its type here only for a
+        // row type. A row type is variable-length, so a fixed-length attribute skips the
+        // type_is_rowtype lookup too. A NULL, returned above, needs none of these lookups.
+        // SAFETY: type_is_rowtype takes the OID by value and only looks it up.
+        let typoid = if att.attlen == -1
+            && unsafe { pg_sys::type_is_rowtype(att.atttypid) }
+            && T::type_oid() == pg_sys::RECORDOID
+        {
+            pg_sys::RECORDOID
+        } else {
+            att.atttypid
         };
-        // The try_ conversions check `typoid` against `T`, and look `T`'s type up again to do
-        // so. `typoid` names a type, because the attribute is not dropped, and they accept a
-        // value of `T`'s own type, so convert that without them.
-        let own_type = typoid == rust_oid;
         // SAFETY: the datum is this attribute's value, of type `att.atttypid`. It lives as long as
         // the tuple and descriptor that `self` holds and `'tup` borrows: on PG15.0-15.4, a
         // missing value points into the descriptor. A `T` that names `'tup` keeps them borrowed.
@@ -625,15 +625,18 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
         // Any other `T` must not point into the datum, as UnboxDatum's safety section requires,
         // unless it sets POINTS_INTO_DATUM, and then from_datum_in_memory_context copies it into
         // CurrentMemoryContext. `typoid` is RECORDOID only when that type is a row type, whose
-        // values are composite Datums; otherwise it is `att.atttypid`. It is either `T`'s own
-        // type or checked against `T` by the try_ conversions before they read the datum.
+        // values are composite Datums; otherwise it is `att.atttypid`, which both conversions
+        // check against `T` before reading the datum.
         unsafe {
-            let context = PgMemoryContexts::CurrentMemoryContext;
-            match (T::POINTS_INTO_DATUM, own_type) {
-                (true, true) => Ok(T::from_datum_in_memory_context(context, datum, false, typoid)),
-                (true, false) => T::try_from_datum_in_memory_context(context, datum, false, typoid),
-                (false, true) => Ok(T::from_polymorphic_datum(datum, false, typoid)),
-                (false, false) => T::try_from_datum(datum, false, typoid),
+            if T::POINTS_INTO_DATUM {
+                T::try_from_datum_in_memory_context(
+                    PgMemoryContexts::CurrentMemoryContext,
+                    datum,
+                    false,
+                    typoid,
+                )
+            } else {
+                T::try_from_datum(datum, false, typoid)
             }
         }
     }
