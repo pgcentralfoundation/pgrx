@@ -77,6 +77,9 @@ impl AnyElement {
     /// # Panics
     ///
     /// `Vec<U>` panics if the array contains a NULL; read `Vec<Option<U>>` or `Array<U>` instead.
+    /// `Array<PgBox<U>>` and `Vec<PgBox<U>>` panic unless the element type is passed by reference
+    /// with a fixed length of `size_of::<U>()` bytes; see
+    /// [`UnboxDatum::can_unbox`](crate::datum::UnboxDatum::can_unbox).
     /// `&str` and `String` panic, in a database whose encoding is not UTF-8, if the text is not
     /// valid UTF-8 or, for most encodings, not ASCII. [`IntoDatum::type_oid`] can raise an ERROR
     /// for some `T`; see [`FromDatum::try_from_datum`].
