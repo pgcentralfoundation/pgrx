@@ -131,6 +131,36 @@ mod tests {
         Ok(())
     }
 
+    /// PostgreSQL 17 and later make a table's row type a member of the table's extension, and
+    /// earlier versions do not. The lookup skips the row type on every version.
+    #[pg_test]
+    fn test_type_oid_ignores_an_extension_table_of_the_same_name() -> spi::Result<()> {
+        let complex = regtype("complex");
+        Spi::run("CREATE SCHEMA decoy")?;
+        Spi::run("CREATE TABLE decoy.complex (r float8, i float8)")?;
+        Spi::run("ALTER EXTENSION pgrx_unit_tests ADD TABLE decoy.complex")?;
+        assert_eq!(PgBox::<Complex>::type_oid(), complex);
+        Ok(())
+    }
+
+    /// Named like the type `decoy_b._zzelem` and the array type of `decoy_a.zzelem`.
+    struct _ZzElem;
+
+    /// PostgreSQL 17 and later make the array type of an extension's type a member of the
+    /// extension too, and earlier versions do not. The lookup skips the array type on every
+    /// version.
+    #[pg_test]
+    fn test_type_oid_ignores_an_extension_array_type_of_the_same_name() -> spi::Result<()> {
+        Spi::run("CREATE SCHEMA decoy_a")?;
+        Spi::run("CREATE TYPE decoy_a.zzelem AS (a int)")?;
+        Spi::run("ALTER EXTENSION pgrx_unit_tests ADD TYPE decoy_a.zzelem")?;
+        Spi::run("CREATE SCHEMA decoy_b")?;
+        Spi::run("CREATE TYPE decoy_b._zzelem AS (b int)")?;
+        Spi::run("ALTER EXTENSION pgrx_unit_tests ADD TYPE decoy_b._zzelem")?;
+        assert_eq!(pgrx::rust_regtypein::<_ZzElem>(), regtype("decoy_b._zzelem"));
+        Ok(())
+    }
+
     /// Named like the shell type `decoy.zzshell`.
     struct ZzShell;
 

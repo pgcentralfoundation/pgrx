@@ -35,7 +35,10 @@ pub fn regtypein(type_name: &str) -> pg_sys::Oid {
 ///   a built-in type, so it names the type of that name in `pg_catalog`.
 /// - Any other type names a type that belongs to this library's extension, in whatever schema it
 ///   is. The extension is the one named by the `.control` file next to the crate's `Cargo.toml`,
-///   which [`pg_module_magic!`] records.
+///   which [`pg_module_magic!`] records. The row type of a table, view or other relation that is
+///   not a composite type, and the array type that PostgreSQL makes for each type, do not count.
+///   PostgreSQL 17 and later make those members of the extension too, and earlier versions do
+///   not.
 ///
 /// A type that another extension or plain SQL creates does not belong to this library's
 /// extension, so this function does not find it. Name such a type with [`regtypein`] instead,
@@ -133,7 +136,7 @@ fn extension_type_oid(typname: &CStr) -> pg_sys::Oid {
     }
 
     match owned_types(extension, types_named(typname)).as_slice() {
-        [TypeCandidate { oid, defined: true }] => *oid,
+        [TypeCandidate { oid, defined: true, .. }] => *oid,
         [TypeCandidate { defined: false, .. }] => {
             ereport!(
                 ERROR,
@@ -166,6 +169,28 @@ struct TypeCandidate {
     oid: pg_sys::Oid,
     /// False for a shell type, which `CREATE TYPE name` makes before the type is defined
     defined: bool,
+    /// The relation whose row type this is, if it is one
+    relation: pg_sys::Oid,
+    /// The element type, if this is an array type
+    element: pg_sys::Oid,
+}
+
+impl TypeCandidate {
+    /// Whether PostgreSQL made this type for another object: the row type of a relation that is
+    /// not a composite type, or the array type of its element type. PostgreSQL 17 and later
+    /// make such a type a member of the other object's extension, and earlier versions do not.
+    /// No Rust type names one, so the lookup skips them on every version.
+    fn is_dependent(&self) -> bool {
+        // SAFETY: both functions take an OID by value and only read the catalogs. They return
+        // zero when there is no such relation or array type.
+        unsafe {
+            (self.relation != pg_sys::Oid::INVALID
+                && pg_sys::get_rel_relkind(self.relation)
+                    != pg_sys::RELKIND_COMPOSITE_TYPE as c_char)
+                || (self.element != pg_sys::Oid::INVALID
+                    && pg_sys::get_array_type(self.element) == self.oid)
+        }
+    }
 }
 
 /// The types named `typname`, in every schema
@@ -194,7 +219,12 @@ fn types_named(typname: &CStr) -> Vec<TypeCandidate> {
             .map(|&member| {
                 let tuple = &raw mut (*member).tuple;
                 let form = pg_sys::GETSTRUCT!(tuple).get().cast::<pg_sys::FormData_pg_type>();
-                TypeCandidate { oid: (*form).oid, defined: (*form).typisdefined }
+                TypeCandidate {
+                    oid: (*form).oid,
+                    defined: (*form).typisdefined,
+                    relation: (*form).typrelid,
+                    element: (*form).typelem,
+                }
             })
             .collect();
         pg_sys::ReleaseCatCacheList(list);
@@ -210,8 +240,8 @@ const CHECKS_BEFORE_LISTING: usize = 4;
 /// debug build of PostgreSQL 18, checking a candidate took about as long as listing 85 members.
 const MEMBERS_PER_CHECK: usize = 64;
 
-/// The `candidates` that belong to `extension`, or the first two found, which are enough to
-/// make the name ambiguous.
+/// The `candidates` that belong to `extension`, other than [dependent] ones, or the first two
+/// found, which are enough to make the name ambiguous.
 ///
 /// There are two ways to find them, and either can be slow. Looking up each candidate's
 /// extension costs a pg_depend index scan per candidate, and the candidates include every type
@@ -221,7 +251,9 @@ const MEMBERS_PER_CHECK: usize = 64;
 /// which are all that a name shared by a few types needs, this alternates between the two, one
 /// candidate at a time and [`MEMBERS_PER_CHECK`] members at a time, and stops when either is
 /// complete. That takes at most about twice as long as the faster way alone, plus those first
-/// checks.
+/// checks. Only a candidate found to belong to the extension is checked for being dependent.
+///
+/// [dependent]: TypeCandidate::is_dependent
 fn owned_types(extension: pg_sys::Oid, mut candidates: Vec<TypeCandidate>) -> Vec<TypeCandidate> {
     candidates.sort_unstable_by_key(|candidate| candidate.oid.to_u32());
     let (mut checked, mut listed) = (Vec::new(), Vec::new());
@@ -231,7 +263,7 @@ fn owned_types(extension: pg_sys::Oid, mut candidates: Vec<TypeCandidate>) -> Ve
             // SAFETY: the call takes both OIDs by value and only reads pg_depend.
             let owner =
                 unsafe { pg_sys::getExtensionOfObject(pg_sys::TypeRelationId, candidate.oid) };
-            if owner == extension {
+            if owner == extension && !candidate.is_dependent() {
                 checked.push(*candidate);
             }
             if checked.len() == 2 || i + 1 == candidates.len() {
@@ -250,7 +282,9 @@ fn owned_types(extension: pg_sys::Oid, mut candidates: Vec<TypeCandidate>) -> Ve
                     continue;
                 };
                 let member = member.to_u32();
-                if let Ok(j) = candidates.binary_search_by_key(&member, |c| c.oid.to_u32()) {
+                if let Ok(j) = candidates.binary_search_by_key(&member, |c| c.oid.to_u32())
+                    && !candidates[j].is_dependent()
+                {
                     listed.push(candidates[j]);
                     if listed.len() == 2 {
                         break 'search listed;
