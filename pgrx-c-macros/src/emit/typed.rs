@@ -11,7 +11,7 @@
 //! copying large rendered subtrees.
 
 use super::arguments::{self, ArgumentContext};
-use super::types::{EXPRESSION, Lowering, rust_path};
+use super::types::{EXPRESSION, LoweredType, Lowering, rust_path};
 use super::{BindingCatalog, MAX_EMISSION_BYTES, SUPPORT, binary_helper, render_expression, skip};
 use crate::analysis::{MacroAnalysis, ResolvedConstant, SkipReason, SkipReasonCode};
 use crate::syntax::{
@@ -19,7 +19,7 @@ use crate::syntax::{
     UnaryOperator,
 };
 use crate::{FrontendOutput, SignedOverflow, TypeCategory, TypeInfo, TypeShapeKind};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Write;
 
 /// The C use-site contract requested for one occurrence of an expression-arena node.
@@ -64,6 +64,15 @@ enum RenderMode {
     Witness,
 }
 
+/// The value a declared local starts with.
+#[derive(Clone, Copy)]
+pub(super) enum Initializer<'a> {
+    /// A C initializer expression, evaluated at the declaration.
+    Expression(NodeId),
+    /// A Rust binding holding a value the macro already evaluated.
+    Evaluated(&'a str),
+}
+
 /// Compiler-established statement local with a hygienic Rust index and reconciled storage.
 struct Local {
     /// Unique generated local name index, separate from the source C identifier.
@@ -86,12 +95,19 @@ pub(super) struct Renderer<'a> {
     /// only callable bindings for a prototype that needs native transport.
     /// Single-macro emission has none.
     adapters: Option<&'a super::GeneratedAdapters>,
+    /// Translated inline functions whose calls expand their translation, with their
+    /// panic conditions. Only batch rendering has any.
+    translations: &'a BTreeMap<String, BTreeSet<&'static str>>,
     /// Arena-indexed compiler constant facts, preserving names where bindings permit.
     constants: &'a [Option<&'a ResolvedConstant>],
     /// Shared C identity/native-storage reconciliation for the catalog and generated types.
     lowering: &'a Lowering<'a>,
     /// Whether the selected profile permits the floating expression combinations in this macro.
     floats: bool,
+    /// Whether the selected profile permits floating values outside composed arithmetic.
+    float_values: bool,
+    /// Whether this is a translated inline function's body, which holds no caller tokens.
+    inline_body: bool,
     /// Arena-indexed addressability facts propagated once through groups and member chains.
     places: Vec<bool>,
     /// Compiler-proved object types; unresolved caller families intentionally remain None.
@@ -111,9 +127,10 @@ impl<'a> Renderer<'a> {
         frontend: &'a FrontendOutput,
         analysis: &'a MacroAnalysis,
         bindings: &'a BindingCatalog,
-        adapters: Option<&'a super::GeneratedAdapters>,
+        generated: super::Generated<'a>,
         constants: &'a [Option<&'a ResolvedConstant>],
         lowering: &'a Lowering<'a>,
+        inline_body: bool,
     ) -> Self {
         let expression = analysis.expression.as_ref().expect("candidate expression");
         let locals = expression
@@ -161,7 +178,8 @@ impl<'a> Renderer<'a> {
                 }
             )
         });
-        let floats = frontend.profile().supports_float_values().is_ok()
+        let float_values = frontend.profile().supports_float_values().is_ok();
+        let floats = float_values
             && (!(multiplication && addition)
                 || frontend.profile().supports_float_expressions().is_ok());
         // Children precede their parents in the expression arena. One pass
@@ -195,10 +213,13 @@ impl<'a> Renderer<'a> {
             frontend,
             analysis,
             bindings,
-            adapters,
+            adapters: generated.adapters,
+            translations: generated.translations,
             constants,
             lowering,
             floats,
+            float_values,
+            inline_body,
             places,
             objects,
             locals,
@@ -240,11 +261,105 @@ impl<'a> Renderer<'a> {
             .map_or_else(|| lowered.to_owned(), |name| format!("$crate::__pgrx_c_types::{name}"))
     }
 
+    /// A witness of a value of the C type `declared`, whose runtime marker is `marker`.
+    pub(super) fn value_witness(&self, declared: &TypeInfo, marker: &str) -> String {
+        let mut rust = String::new();
+        write_witness(&mut rust, &self.witness_marker(&declared.spelling, marker));
+        rust
+    }
+
+    /// A witness of a call's result, of the C type `declared` lowered to `result`, or `()`
+    /// for a void call.
+    fn call_witness(&self, declared: &TypeInfo, result: Option<&LoweredType>) -> String {
+        result.map_or_else(|| "()".into(), |result| self.value_witness(declared, &result.marker))
+    }
+
+    /// Dead checks of the caller's operands, for a size witness that wraps generated
+    /// operations in `unsafe` and for a compiled operand that may reach one.
+    ///
+    /// A translated inline function evaluates its arguments in its match scrutinee, outside
+    /// generated `unsafe`, so its body holds no caller tokens to check. Its checks would
+    /// only reject operands, such as one whose temporary still borrows a local, and each
+    /// translated caller in a chain would multiply them.
+    fn caller_checks(&self) -> String {
+        if self.inline_body {
+            String::new()
+        } else {
+            arguments::render_safety_checks(self.analysis, self.mode == RenderMode::Witness)
+        }
+    }
+
+    /// Refuse a body that declares, computes or accesses a floating value the profile for
+    /// its composed arithmetic rejects. Each value use checks that profile, and the types of
+    /// a translated function's body do not depend on its caller, so no call would compile.
+    ///
+    /// Every floating value starts at a node of floating type: a local, a declaration, a
+    /// literal, a cast, a call, or an object reached through a member, an index or a
+    /// dereference. Analysis defers the type of such an access, and of a call through a
+    /// pointer it cannot resolve, so the compiler-proved object type of a deferred node
+    /// must be established, and not floating, for the body to be translated. Only an
+    /// address, a string, and a node that takes the type of an operand checked on its
+    /// own are deferred without that proof.
+    pub(super) fn check_own_floats(&self) -> Result<(), SkipReason> {
+        use crate::analysis::TypeExpression;
+        if self.floats {
+            return Ok(());
+        }
+        let expression = self.analysis.expression.as_ref().expect("candidate expression");
+        let floating = |ty: &TypeInfo| ty.category == TypeCategory::Floating;
+        let mut nodes = expression.syntax.nodes.iter().zip(&expression.types).zip(&self.objects);
+        if !(self.locals.values().any(|local| floating(&local.ty))
+            || nodes.any(|((node, ty), object)| match (object, ty) {
+                (Some(object), _) => floating(object),
+                (None, TypeExpression::External { ty }) => floating(ty),
+                (None, TypeExpression::Deferred) => !matches!(
+                    node.kind,
+                    ExpressionKind::AddressOf { .. }
+                        | ExpressionKind::StringLiteral { .. }
+                        | ExpressionKind::Stringification { .. }
+                        | ExpressionKind::InvocationFile
+                        | ExpressionKind::Group { .. }
+                        | ExpressionKind::Assignment { .. }
+                        | ExpressionKind::Update { .. }
+                        | ExpressionKind::Comma { .. }
+                ),
+                (None, _) => false,
+            }))
+        {
+            return Ok(());
+        }
+        let profile = self.frontend.profile();
+        let reason = profile
+            .supports_float_values()
+            .and_then(|()| profile.supports_float_expressions())
+            .err()
+            .unwrap_or_default();
+        Err(skip(
+            self.analysis,
+            SkipReasonCode::UnsupportedProfile,
+            format!("floating values in this body's arithmetic are not supported: {reason}"),
+            None,
+        ))
+    }
+
+    /// Lower a translated function's argument for its parameter's initialization.
+    ///
+    /// Converting the argument to its parameter type is a call boundary, not part of the
+    /// body's composed arithmetic, so it uses the profile for single floating values that a
+    /// native call's arguments use.
+    pub(super) fn render_argument(
+        &self,
+        root: NodeId,
+        rust: &mut String,
+    ) -> Result<(), SkipReason> {
+        self.render_profiled(root, Context::Value, self.float_values, rust)
+    }
+
     /// Allocate hygienic local storage and apply the declared C conversion when an initializer is present.
     pub(super) fn declare_local(
         &self,
         name: &str,
-        initializer: Option<NodeId>,
+        initializer: Option<Initializer<'_>>,
         rust: &mut String,
     ) -> Result<(), SkipReason> {
         let local = self.locals.get(name).ok_or_else(|| {
@@ -266,7 +381,10 @@ impl<'a> Renderer<'a> {
         .expect("String output");
         if let Some(initializer) = initializer {
             rust.push_str("let __pgrx_c_initializer = ");
-            self.render(initializer, Context::Value, rust)?;
+            match initializer {
+                Initializer::Expression(node) => self.render(node, Context::Value, rust)?,
+                Initializer::Evaluated(binding) => rust.push_str(binding),
+            }
             write!(rust, "; /* SAFETY: this raw place addresses the new, aligned local slot; initialization writes without reading its previous bytes or creating a reference. */ #[allow(unused_unsafe)] unsafe {{ {EXPRESSION}::assign({EXPRESSION}::place::<{}>(::core::ptr::addr_of_mut!(__pgrx_c_local{}).cast::<{}>()), __pgrx_c_initializer); }} ", lowered.marker, local.index, lowered.storage).expect("String output");
         }
         Ok(())
@@ -316,7 +434,7 @@ impl<'a> Renderer<'a> {
             }
             rust.push_str("] ");
         }
-        rust.push_str("), ");
+        write!(rust, "[{}]), ", self.caller_checks()).expect("String output");
     }
 
     /// Argument substitution can make a callee's dynamic expectation fixed.
@@ -349,14 +467,19 @@ impl<'a> Renderer<'a> {
         context: Context,
         rust: &mut String,
     ) -> Result<(), SkipReason> {
-        let (frontend, analysis, bindings, constants, lowering, floats) = (
-            self.frontend,
-            self.analysis,
-            self.bindings,
-            self.constants,
-            self.lowering,
-            self.floats,
-        );
+        self.render_profiled(root, context, self.floats, rust)
+    }
+
+    /// Lower one arena root under an explicit floating-point profile.
+    fn render_profiled(
+        &self,
+        root: NodeId,
+        context: Context,
+        floats: bool,
+        rust: &mut String,
+    ) -> Result<(), SkipReason> {
+        let (frontend, analysis, bindings, constants, lowering) =
+            (self.frontend, self.analysis, self.bindings, self.constants, self.lowering);
         let expression = analysis.expression.as_ref().expect("candidate expression");
         let policy = match analysis.signed_overflow {
             SignedOverflow::Undefined => "Undefined",
@@ -455,10 +578,7 @@ impl<'a> Renderer<'a> {
                                         .field_marker(*base, *indirect, field)
                                         .map_err(failure)?,
                                 };
-                                let checks = arguments::render_safety_checks(
-                                    analysis,
-                                    self.mode == RenderMode::Witness,
-                                );
+                                let checks = self.caller_checks();
                                 write!(rust, "{EXPRESSION}::record::size_of_member_type::<{marker}, _>(if false {{ {checks} ::core::option::Option::Some(unsafe {{ ").expect("String output");
                                 tasks.extend([
                                     text(" }) } else { ::core::option::Option::None })"),
@@ -467,10 +587,7 @@ impl<'a> Renderer<'a> {
                                 continue;
                             }
                             let known = self.places[index];
-                            let checks = arguments::render_safety_checks(
-                                analysis,
-                                self.mode == RenderMode::Witness,
-                            );
+                            let checks = self.caller_checks();
                             write!(
                                 rust,
                                 "{EXPRESSION}::{}(if false {{ {checks} ::core::option::Option::Some(unsafe {{ ",
@@ -851,6 +968,32 @@ impl<'a> Renderer<'a> {
                             };
                             let direct_place = self.places[*base];
                             if !*indirect && !direct_place && matches!(context, Context::Value) {
+                                // The record is copied, so an array member would decay into a
+                                // pointer into that copy, and the runtime admits no such member.
+                                // A translated body's types do not depend on its caller, so an
+                                // unproved member type would fail every call.
+                                match &self.objects[index] {
+                                    Some(object)
+                                        if !matches!(
+                                            object.category,
+                                            TypeCategory::Integer(_)
+                                                | TypeCategory::Floating
+                                                | TypeCategory::Pointer
+                                                | TypeCategory::Record
+                                                | TypeCategory::Enum
+                                        ) =>
+                                    {
+                                        return Err(failure(format!(
+                                            "{field}: an array member of a record value would decay into a pointer into a copy"
+                                        )));
+                                    }
+                                    None if self.inline_body => {
+                                        return Err(failure(format!(
+                                            "{field}: the type of a record value's member is not established, so it may be an array"
+                                        )));
+                                    }
+                                    _ => {}
+                                }
                                 write!(rust, "{EXPRESSION}::member::<{marker}, _>(")
                                     .expect("String output");
                                 tasks.extend([text(")"), value(*base)]);
@@ -1057,9 +1200,9 @@ impl<'a> Renderer<'a> {
                             // proves it, so no other entry point can fall back to the binding.
                             let binding = if let Some(reason) = self
                                 .adapters
-                                .and_then(|adapters| adapters.functions.unsupported.get(name))
+                                .and_then(|adapters| adapters.functions.call_refusal(name))
                             {
-                                Err(reason.clone())
+                                Err(reason.to_owned())
                             } else if let Some(adapter) = self
                                 .adapters
                                 .and_then(|adapters| adapters.functions.bindings.get(name))
@@ -1111,6 +1254,47 @@ impl<'a> Renderer<'a> {
                                         .map_err(failure)?,
                                 )
                             };
+                            if self.translations.contains_key(name.as_str())
+                                && let Some(callee) = super::macro_identifier(name)
+                            {
+                                // The real call below converts the translation's value with
+                                // `implicit`, or is `()` for a void function.
+                                if self.collapses(context) {
+                                    rust.push_str(
+                                        &self.call_witness(&declared.result, result.as_ref()),
+                                    );
+                                    continue;
+                                }
+                                // A witness names no other generated macro's internal arms.
+                                if self.mode == RenderMode::Witness {
+                                    return Err(failure(
+                                        "a type witness renders a translated inline call only as a value"
+                                            .into(),
+                                    ));
+                                }
+                                // The translation evaluates each argument once in its match
+                                // scrutinee and converts it to its parameter type, as the call
+                                // does. It expands only the argument's value: its body holds
+                                // no argument tokens for checks to cover, so expanding any
+                                // other alternative, the checks included, is an error.
+                                const VALUE_ONLY: &str = "::core::compile_error!(\"a translated C function argument is only a value\")";
+                                if let Some(result) = &result {
+                                    write!(rust, "{EXPRESSION}::implicit::<{}, _>(", result.marker)
+                                        .expect("String output");
+                                    tasks.push(text(")"));
+                                }
+                                write!(rust, "$crate::{callee}!(@__pgrx_emit_value; ")
+                                    .expect("String output");
+                                tasks.push(text(")"));
+                                for argument in arguments.iter().rev() {
+                                    tasks.push(Task::Text(format!(
+                                        "] [{VALUE_ONLY}] [{VALUE_ONLY}] [{VALUE_ONLY}] [{VALUE_ONLY}]), "
+                                    )));
+                                    tasks.push(value(*argument));
+                                    tasks.push(text("(@compiled ["));
+                                }
+                                continue;
+                            }
                             let path = rust_path(&binding.path).map_err(failure)?;
                             // Resolve the last parameter first, as the arguments are
                             // scheduled, so the first reported failure is unchanged.
@@ -1127,16 +1311,9 @@ impl<'a> Renderer<'a> {
                                 .collect::<Result<Vec<_>, _>>()
                                 .map_err(failure)?;
                             if self.collapses(context) {
-                                match &result {
-                                    Some(result) => write_witness(
-                                        rust,
-                                        &self.witness_marker(
-                                            &declared.result.spelling,
-                                            &result.marker,
-                                        ),
-                                    ),
-                                    None => rust.push_str("()"),
-                                }
+                                rust.push_str(
+                                    &self.call_witness(&declared.result, result.as_ref()),
+                                );
                                 continue;
                             }
                             if let Some(result) = &result {

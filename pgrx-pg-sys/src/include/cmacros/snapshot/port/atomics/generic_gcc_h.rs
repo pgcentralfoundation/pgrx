@@ -291,7 +291,7 @@ macro_rules! pg_atomic_fetch_sub_u64_impl {
         )
     };
 }
-/// Typed call adapter for C inline function pg_atomic_init_flag_impl from generic-gcc.h:150 (PostgreSQL 15–17), generic-gcc.h:148 (PostgreSQL 18), generic-gcc.h:147 (PostgreSQL 19)
+/// C inline function pg_atomic_init_flag_impl from generic-gcc.h:150 (PostgreSQL 15–17), generic-gcc.h:148 (PostgreSQL 18), generic-gcc.h:147 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -302,7 +302,7 @@ macro_rules! pg_atomic_fetch_sub_u64_impl {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -314,15 +314,13 @@ macro_rules! pg_atomic_fetch_sub_u64_impl {
 #[macro_export]
 macro_rules! pg_atomic_init_flag_impl {
     ($ptr:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$ptr;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$ptr;
+            ()
+        })
     };
 }
-/// Typed call adapter for C inline function pg_atomic_unlocked_test_flag_impl from generic-gcc.h:132 (PostgreSQL 15–17), generic-gcc.h:130 (PostgreSQL 18), generic-gcc.h:129 (PostgreSQL 19)
+/// C inline function pg_atomic_unlocked_test_flag_impl from generic-gcc.h:132 (PostgreSQL 15–17), generic-gcc.h:130 (PostgreSQL 18), generic-gcc.h:129 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -333,26 +331,18 @@ macro_rules! pg_atomic_init_flag_impl {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pg_atomic_unlocked_test_flag_impl {
     ($ptr:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$ptr;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };

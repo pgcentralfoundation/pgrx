@@ -42,6 +42,9 @@ macro_rules! __pgrx_c_field_marker {
     (EndRecPtr) => {
         $crate::__pgrx_c_generated::Field_EndRecPtr
     };
+    (ExecProcNode) => {
+        $crate::__pgrx_c_generated::Field_ExecProcNode
+    };
     (FreezeLimit) => {
         $crate::__pgrx_c_generated::Field_FreezeLimit
     };
@@ -134,6 +137,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (_vtable_offset) => {
         $crate::__pgrx_c_generated::Field__vtable_offset
+    };
+    (abbrev_full_comparator) => {
+        $crate::__pgrx_c_generated::Field_abbrev_full_comparator
     };
     (abbreviate) => {
         $crate::__pgrx_c_generated::Field_abbreviate
@@ -921,6 +927,9 @@ macro_rules! __pgrx_c_field_marker {
     (backward) => {
         $crate::__pgrx_c_generated::Field_backward
     };
+    (bank_locks) => {
+        $crate::__pgrx_c_generated::Field_bank_locks
+    };
     (base_slot_size) => {
         $crate::__pgrx_c_generated::Field_base_slot_size
     };
@@ -1194,6 +1203,9 @@ macro_rules! __pgrx_c_field_marker {
     (bufferEmptyingQueue) => {
         $crate::__pgrx_c_generated::Field_bufferEmptyingQueue
     };
+    (bufferdesc) => {
+        $crate::__pgrx_c_generated::Field_bufferdesc
+    };
     (buffering_mode) => {
         $crate::__pgrx_c_generated::Field_buffering_mode
     };
@@ -1407,6 +1419,9 @@ macro_rules! __pgrx_c_field_marker {
     (checksum_failures) => {
         $crate::__pgrx_c_generated::Field_checksum_failures
     };
+    (chgParam) => {
+        $crate::__pgrx_c_generated::Field_chgParam
+    };
     (childLocks) => {
         $crate::__pgrx_c_generated::Field_childLocks
     };
@@ -1481,6 +1496,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (clauses) => {
         $crate::__pgrx_c_generated::Field_clauses
+    };
+    (clear) => {
+        $crate::__pgrx_c_generated::Field_clear
     };
     (clear_dead_marking) => {
         $crate::__pgrx_c_generated::Field_clear_dead_marking
@@ -1674,6 +1692,9 @@ macro_rules! __pgrx_c_field_marker {
     (committime) => {
         $crate::__pgrx_c_generated::Field_committime
     };
+    (comparator) => {
+        $crate::__pgrx_c_generated::Field_comparator
+    };
     (con_relid) => {
         $crate::__pgrx_c_generated::Field_con_relid
     };
@@ -1812,6 +1833,9 @@ macro_rules! __pgrx_c_field_marker {
     (content) => {
         $crate::__pgrx_c_generated::Field_content
     };
+    (content_lock) => {
+        $crate::__pgrx_c_generated::Field_content_lock
+    };
     (context) => {
         $crate::__pgrx_c_generated::Field_context
     };
@@ -1853,6 +1877,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (copiedOrder) => {
         $crate::__pgrx_c_generated::Field_copiedOrder
+    };
+    (copy_minimal_tuple) => {
+        $crate::__pgrx_c_generated::Field_copy_minimal_tuple
     };
     (copy_src) => {
         $crate::__pgrx_c_generated::Field_copy_src
@@ -2082,6 +2109,9 @@ macro_rules! __pgrx_c_field_marker {
     (custom_scan_tlist) => {
         $crate::__pgrx_c_generated::Field_custom_scan_tlist
     };
+    (cv) => {
+        $crate::__pgrx_c_generated::Field_cv
+    };
     (cvWaitLink) => {
         $crate::__pgrx_c_generated::Field_cvWaitLink
     };
@@ -2219,6 +2249,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (decode_buffer_size) => {
         $crate::__pgrx_c_generated::Field_decode_buffer_size
+    };
+    (decode_queue_head) => {
+        $crate::__pgrx_c_generated::Field_decode_queue_head
     };
     (deduplicate) => {
         $crate::__pgrx_c_generated::Field_deduplicate
@@ -2366,6 +2399,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (distinct_pathkeys) => {
         $crate::__pgrx_c_generated::Field_distinct_pathkeys
+    };
+    (dlist) => {
+        $crate::__pgrx_c_generated::Field_dlist
     };
     (dno) => {
         $crate::__pgrx_c_generated::Field_dno
@@ -2622,6 +2658,12 @@ macro_rules! __pgrx_c_field_marker {
     (eoh_context) => {
         $crate::__pgrx_c_generated::Field_eoh_context
     };
+    (eoh_ro_ptr) => {
+        $crate::__pgrx_c_generated::Field_eoh_ro_ptr
+    };
+    (eoh_rw_ptr) => {
+        $crate::__pgrx_c_generated::Field_eoh_rw_ptr
+    };
     (eol_type) => {
         $crate::__pgrx_c_generated::Field_eol_type
     };
@@ -2648,6 +2690,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (er_magic) => {
         $crate::__pgrx_c_generated::Field_er_magic
+    };
+    (er_tupdesc) => {
+        $crate::__pgrx_c_generated::Field_er_tupdesc
     };
     (er_tupdesc_id) => {
         $crate::__pgrx_c_generated::Field_er_tupdesc_id
@@ -2762,6 +2807,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (eval_processed) => {
         $crate::__pgrx_c_generated::Field_eval_processed
+    };
+    (evalfunc) => {
+        $crate::__pgrx_c_generated::Field_evalfunc
     };
     (evaltrans_cache) => {
         $crate::__pgrx_c_generated::Field_evaltrans_cache
@@ -2937,6 +2985,9 @@ macro_rules! __pgrx_c_field_marker {
     (fields) => {
         $crate::__pgrx_c_generated::Field_fields
     };
+    (file) => {
+        $crate::__pgrx_c_generated::Field_file
+    };
     (file_encoding) => {
         $crate::__pgrx_c_generated::Field_file_encoding
     };
@@ -2963,6 +3014,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (finalrteperminfos) => {
         $crate::__pgrx_c_generated::Field_finalrteperminfos
+    };
+    (finish_bulk_insert) => {
+        $crate::__pgrx_c_generated::Field_finish_bulk_insert
     };
     (finished) => {
         $crate::__pgrx_c_generated::Field_finished
@@ -3332,6 +3386,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (full_join_clauses) => {
         $crate::__pgrx_c_generated::Field_full_join_clauses
+    };
+    (func) => {
+        $crate::__pgrx_c_generated::Field_func
     };
     (funcOid) => {
         $crate::__pgrx_c_generated::Field_funcOid
@@ -4047,8 +4104,26 @@ macro_rules! __pgrx_c_field_marker {
     (indexParams) => {
         $crate::__pgrx_c_generated::Field_indexParams
     };
+    (index_build_range_scan) => {
+        $crate::__pgrx_c_generated::Field_index_build_range_scan
+    };
     (index_cleanup) => {
         $crate::__pgrx_c_generated::Field_index_cleanup
+    };
+    (index_delete_tuples) => {
+        $crate::__pgrx_c_generated::Field_index_delete_tuples
+    };
+    (index_fetch_begin) => {
+        $crate::__pgrx_c_generated::Field_index_fetch_begin
+    };
+    (index_fetch_end) => {
+        $crate::__pgrx_c_generated::Field_index_fetch_end
+    };
+    (index_fetch_reset) => {
+        $crate::__pgrx_c_generated::Field_index_fetch_reset
+    };
+    (index_validate_scan) => {
+        $crate::__pgrx_c_generated::Field_index_validate_scan
     };
     (indexarg) => {
         $crate::__pgrx_c_generated::Field_indexarg
@@ -4392,8 +4467,14 @@ macro_rules! __pgrx_c_field_marker {
     (ioss_VMBuffer) => {
         $crate::__pgrx_c_generated::Field_ioss_VMBuffer
     };
+    (iov_base) => {
+        $crate::__pgrx_c_generated::Field_iov_base
+    };
     (iov_len) => {
         $crate::__pgrx_c_generated::Field_iov_len
+    };
+    (ip_blkid) => {
+        $crate::__pgrx_c_generated::Field_ip_blkid
     };
     (ip_posid) => {
         $crate::__pgrx_c_generated::Field_ip_posid
@@ -4493,6 +4574,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (is_complete) => {
         $crate::__pgrx_c_generated::Field_is_complete
+    };
+    (is_current_xact_tuple) => {
+        $crate::__pgrx_c_generated::Field_is_current_xact_tuple
     };
     (is_default) => {
         $crate::__pgrx_c_generated::Field_is_default
@@ -4781,6 +4865,12 @@ macro_rules! __pgrx_c_field_marker {
     };
     (knowndeletable) => {
         $crate::__pgrx_c_generated::Field_knowndeletable
+    };
+    (kw_offsets) => {
+        $crate::__pgrx_c_generated::Field_kw_offsets
+    };
+    (kw_string) => {
+        $crate::__pgrx_c_generated::Field_kw_string
     };
     (l) => {
         $crate::__pgrx_c_generated::Field_l
@@ -5343,6 +5433,9 @@ macro_rules! __pgrx_c_field_marker {
     (match_size_good) => {
         $crate::__pgrx_c_generated::Field_match_size_good
     };
+    (materialize) => {
+        $crate::__pgrx_c_generated::Field_materialize
+    };
     (materialize_inner) => {
         $crate::__pgrx_c_generated::Field_materialize_inner
     };
@@ -5654,6 +5747,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (mt_resultOidAttno) => {
         $crate::__pgrx_c_generated::Field_mt_resultOidAttno
+    };
+    (multi_insert) => {
+        $crate::__pgrx_c_generated::Field_multi_insert
     };
     (multidims) => {
         $crate::__pgrx_c_generated::Field_multidims
@@ -7188,6 +7284,9 @@ macro_rules! __pgrx_c_field_marker {
     (parallel_workers) => {
         $crate::__pgrx_c_generated::Field_parallel_workers
     };
+    (parallelscan_reinitialize) => {
+        $crate::__pgrx_c_generated::Field_parallelscan_reinitialize
+    };
     (paramExecTypes) => {
         $crate::__pgrx_c_generated::Field_paramExecTypes
     };
@@ -7364,6 +7463,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (pd_lower) => {
         $crate::__pgrx_c_generated::Field_pd_lower
+    };
+    (pd_lsn) => {
+        $crate::__pgrx_c_generated::Field_pd_lsn
     };
     (pd_pagesize_version) => {
         $crate::__pgrx_c_generated::Field_pd_pagesize_version
@@ -8013,6 +8115,9 @@ macro_rules! __pgrx_c_field_marker {
     (rd_isvalid) => {
         $crate::__pgrx_c_generated::Field_rd_isvalid
     };
+    (rd_locator) => {
+        $crate::__pgrx_c_generated::Field_rd_locator
+    };
     (rd_newRelfilelocatorSubid) => {
         $crate::__pgrx_c_generated::Field_rd_newRelfilelocatorSubid
     };
@@ -8048,6 +8153,9 @@ macro_rules! __pgrx_c_field_marker {
     };
     (rd_statvalid) => {
         $crate::__pgrx_c_generated::Field_rd_statvalid
+    };
+    (rd_tableam) => {
+        $crate::__pgrx_c_generated::Field_rd_tableam
     };
     (rd_toastoid) => {
         $crate::__pgrx_c_generated::Field_rd_toastoid
@@ -8240,6 +8348,36 @@ macro_rules! __pgrx_c_field_marker {
     };
     (relationType) => {
         $crate::__pgrx_c_generated::Field_relationType
+    };
+    (relation_copy_data) => {
+        $crate::__pgrx_c_generated::Field_relation_copy_data
+    };
+    (relation_copy_for_cluster) => {
+        $crate::__pgrx_c_generated::Field_relation_copy_for_cluster
+    };
+    (relation_estimate_size) => {
+        $crate::__pgrx_c_generated::Field_relation_estimate_size
+    };
+    (relation_fetch_toast_slice) => {
+        $crate::__pgrx_c_generated::Field_relation_fetch_toast_slice
+    };
+    (relation_needs_toast_table) => {
+        $crate::__pgrx_c_generated::Field_relation_needs_toast_table
+    };
+    (relation_nontransactional_truncate) => {
+        $crate::__pgrx_c_generated::Field_relation_nontransactional_truncate
+    };
+    (relation_set_new_filelocator) => {
+        $crate::__pgrx_c_generated::Field_relation_set_new_filelocator
+    };
+    (relation_size) => {
+        $crate::__pgrx_c_generated::Field_relation_size
+    };
+    (relation_toast_am) => {
+        $crate::__pgrx_c_generated::Field_relation_toast_am
+    };
+    (relation_vacuum) => {
+        $crate::__pgrx_c_generated::Field_relation_vacuum
     };
     (relations) => {
         $crate::__pgrx_c_generated::Field_relations
@@ -8847,6 +8985,9 @@ macro_rules! __pgrx_c_field_marker {
     (rs_prefetch_block) => {
         $crate::__pgrx_c_generated::Field_rs_prefetch_block
     };
+    (rs_rd) => {
+        $crate::__pgrx_c_generated::Field_rs_rd
+    };
     (rs_startblock) => {
         $crate::__pgrx_c_generated::Field_rs_startblock
     };
@@ -8940,8 +9081,26 @@ macro_rules! __pgrx_c_field_marker {
     (scanBehind) => {
         $crate::__pgrx_c_generated::Field_scanBehind
     };
+    (scan_analyze_next_block) => {
+        $crate::__pgrx_c_generated::Field_scan_analyze_next_block
+    };
+    (scan_analyze_next_tuple) => {
+        $crate::__pgrx_c_generated::Field_scan_analyze_next_tuple
+    };
+    (scan_begin) => {
+        $crate::__pgrx_c_generated::Field_scan_begin
+    };
+    (scan_end) => {
+        $crate::__pgrx_c_generated::Field_scan_end
+    };
     (scan_key) => {
         $crate::__pgrx_c_generated::Field_scan_key
+    };
+    (scan_rescan) => {
+        $crate::__pgrx_c_generated::Field_scan_rescan
+    };
+    (scan_set_tidrange) => {
+        $crate::__pgrx_c_generated::Field_scan_set_tidrange
     };
     (scanbuflen) => {
         $crate::__pgrx_c_generated::Field_scanbuflen
@@ -10446,6 +10605,9 @@ macro_rules! __pgrx_c_field_marker {
     (tts_tableOid) => {
         $crate::__pgrx_c_generated::Field_tts_tableOid
     };
+    (tts_tupleDescriptor) => {
+        $crate::__pgrx_c_generated::Field_tts_tupleDescriptor
+    };
     (ttype) => {
         $crate::__pgrx_c_generated::Field_ttype
     };
@@ -10461,8 +10623,32 @@ macro_rules! __pgrx_c_field_marker {
     (tupleOffset) => {
         $crate::__pgrx_c_generated::Field_tupleOffset
     };
+    (tuple_complete_speculative) => {
+        $crate::__pgrx_c_generated::Field_tuple_complete_speculative
+    };
+    (tuple_delete) => {
+        $crate::__pgrx_c_generated::Field_tuple_delete
+    };
+    (tuple_insert) => {
+        $crate::__pgrx_c_generated::Field_tuple_insert
+    };
+    (tuple_insert_speculative) => {
+        $crate::__pgrx_c_generated::Field_tuple_insert_speculative
+    };
+    (tuple_lock) => {
+        $crate::__pgrx_c_generated::Field_tuple_lock
+    };
+    (tuple_satisfies_snapshot) => {
+        $crate::__pgrx_c_generated::Field_tuple_satisfies_snapshot
+    };
     (tuple_table) => {
         $crate::__pgrx_c_generated::Field_tuple_table
+    };
+    (tuple_tid_valid) => {
+        $crate::__pgrx_c_generated::Field_tuple_tid_valid
+    };
+    (tuple_update) => {
+        $crate::__pgrx_c_generated::Field_tuple_update
     };
     (tupledata) => {
         $crate::__pgrx_c_generated::Field_tupledata

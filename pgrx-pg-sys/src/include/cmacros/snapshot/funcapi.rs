@@ -34,7 +34,7 @@ macro_rules! HeapTupleGetDatum {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleGetDatum from funcapi.h:229 (PostgreSQL 16–19)
+/// C inline function HeapTupleGetDatum from funcapi.h:229 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline Datum
@@ -45,7 +45,7 @@ macro_rules! HeapTupleGetDatum {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -60,13 +60,7 @@ macro_rules! HeapTupleGetDatum {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tuple;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLong,
-                            $crate::__pgrx_c_bindings::Datum
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::Datum>()
             }
         )
     };

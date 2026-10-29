@@ -157,7 +157,7 @@ different names:
 | `AnalysisSession` | A borrowed frontend plus expansion results, retained integer constants, zero-constant proofs, and the augmented graph. | Emission accepts a coherent session rather than a detached AST. |
 | `Expression` | Arena nodes indexed by `NodeId`, root, token ranges, and optional structured statement body. | One syntax arena supports analysis and all emission contexts. |
 | `MacroAnalysis` | Signature, formal/capture roles, uses, invocation/evaluation contracts, symbolic result types, dependencies, and candidate/skip status. | Candidate analysis is weaker than successful emission. |
-| `BindingCatalog` | Actual crate-relative Rust paths, constant values, aliases, functions, record/enum/variable storage, bitfield metadata, and the FFI guard path. It holds no generated capability or refusal. | Available Rust representations must be validated against C. |
+| `BindingCatalog` | Actual crate-relative Rust paths, constant values, aliases, functions, record/enum/variable storage, bitfield metadata, and the FFI guard path. It holds no generated capability, refusal or inline translation. | Available Rust representations must be validated against C. |
 | `MacroGeneration` | Per-root `MacroEmission` values and one `MacroSupportArtifact` containing Rust and optional C source. | Macros and their required support must be published together. |
 
 The target model includes the C triple, byte order, byte and pointer widths,
@@ -219,6 +219,14 @@ every disagreement. The machine check is the only evidence for ISA-dependent
 declaration shapes such as `pg_popcount32`; the layout check separates ABIs
 that share a machine name. Headers without `PG_VERSION_NUM`, such as synthetic
 fixtures, are not checked.
+
+Preprocessed output and macro dumps are read from the compiler as UTF-8 and are
+never converted, since a replacement character would change a literal that
+analysis compares or compiles. A macro definition that is not UTF-8 fails inspection with
+an error. A string or character literal that is not fails, with an error, the
+symbolic expansion and the native support compilation, which preprocess the
+whole unit. Comments and skipped text are not part of that output, so they may
+hold any bytes.
 
 ### Compiler agreement
 
@@ -311,9 +319,45 @@ cannot be inferred from a declaration's name or broad type category:
    definition and agreement on linkage, inline status, result, parameters,
    variadic status, and calling convention. A declaration with braces nearby
    does not establish that the included definition is available. Retain physical
-   source spans, original formals and bounded definition text from that same
-   parse. Header contents are copied once per physical source, rather than once
-   per function.
+   source spans and original formals from that same parse, and bounded
+   definition text from the header's file, read once per physical source rather
+   than once per function. Definition text whose comments or skipped text are
+   not UTF-8 is documented lossily, and since libclang spells tokens lossily,
+   the function keeps only its native call. The body's tokens are also
+   retained without conditional directives and the branches they skipped. A
+   directive extends to the end of its logical line, after line splices and
+   comments, including a closing directive at the end of a skipped range. Token
+   spellings are compared without their line splices, which libclang keeps. Any
+   other directive, a `#` that does not start a line, a token outside the
+   compiler's statements other than `;`, a trigraph, or a carriage return
+   outside a CR-LF line end leaves no body. A
+   token that names a macro must have a top-level expansion record at that
+   position; that macro, and every macro its replacement list names, must have
+   its last definition before the expansion and still be active at the end of
+   the unit. Undefinitions are not recorded, so this is what proves the
+   end-of-unit expansion identical, unless a `pop_macro` pragma restored a
+   definition that was undefined or replaced at the body. libclang records no
+   pragmas, so the text of every file in the unit is searched after removing its
+   line splices, and so is every command-line `-D` definition, since a
+   `_Pragma` in one pops wherever it is expanded. A name that a pop pragma names
+   leaves no body. A pop whose operand is not a plain string leaves no body that
+   names a macro, and so does a `??/` trigraph or a carriage return outside a
+   CR-LF line end in any of that text, since either could splice a pragma's name
+   in a way the search does not model.
+   A pop whose name token pasting forms has no such text, so the active
+   definition must also be that last definition, by location, and a name the
+   body expands must have used it. That check does not reach a name that only
+   another macro's replacement names and that was not a macro at the body, so
+   such a pasted pop is not detected. A macro name without a record is admitted
+   only inside the arguments of an expanded function-like invocation, which
+   dropped or stringified it, and only when it is unchanged since that
+   invocation. Nested expansions are not recorded, so a name inactive at the end
+   must never have been defined as a macro.
+   Token pasting and invocation-dependent builtins such as `__LINE__` leave no
+   body. A file and offset name a place in the file's first entry, and libclang
+   reports skipped ranges for that entry only. Expansion records from a later
+   entry of a file are ignored, and a definition in a later entry leaves no body,
+   whether or not Clang considers the file include-guarded.
 2. **Bitfield operations.** For each named bitfield whose containing record has
    a usable C spelling, probe unary-plus promotion, assignment-result type and
    promotion, and postfix-result type and
@@ -447,6 +491,36 @@ C macro wins a name collision. A private immutable root map feeds protected
 outside the declared identifier namespace. Original formals and physical source
 are retained separately for reporting and documentation. No preprocessing of a
 synthetic definition or per-function translation unit is needed.
+
+A retained body also yields a private statement root:
+`NAME(holes) do { T p = (hole); ...; body } while (0)`. Each parameter is a local
+initialized from its hole, so arguments are evaluated once and converted as in a
+call, and parameters share the body's outer scope as in C. A root that names
+macros is expanded like a macro invocation, after the original header, without
+retaining object macros as binding constants. Its tokens are replayed with a
+space between each pair, so a root whose macros reach token pasting or
+stringification is not expanded. When the analyzer admits the root
+with exactly the function's parameters, the body is emitted as an expression:
+`match (arguments...) { (bound...) => body }`. All arguments are evaluated, left
+to right, before the body runs, and Rust keeps their temporaries alive until the
+match ends, as a call keeps them until its statement ends. The parameter locals
+are then initialized from the bound values. In a value-returning function every
+path must return, and `return` breaks out of a labeled block, converted to the
+result type; a void body has no `return` and evaluates to `()`. Rust hygiene keeps
+caller tokens from seeing the locals, so no local-name guard applies. A body the
+analyzer or renderer refuses falls back to the call root. A renderer refusal is
+kept as the emission's `fallback` reason in the report, without the token range
+that would index the translated body. Demand planning covers the call root of
+every translated function, since rendering may fall back to it; the final
+support is planned from the roots actually emitted.
+
+A generated call to a translated function expands its macro with compiled value
+operands instead of calling the native binding. Functions that reach themselves
+through such calls keep the binding, since the expansion would not terminate. If
+a callee's final rendering is not a translation, its callers are rendered again
+with the binding. A caller's documented panic conditions include those of each
+translation it expands, and only a native or indirect call adds the guarded call
+conditions.
 
 The normal native capability path preserves prototype conversions, qualifiers,
 original C result identity and guard boundaries. Function operands evaluate once;
@@ -887,6 +961,15 @@ native float values. `__FLT_EVAL_METHOD__` is the only excess-precision witness,
 so caller `-D`/`-U` options cannot name it, the other `__FLT_*`, `__DBL_*` or
 `__LDBL_*` facts, `__FAST_MATH__`, or `__FINITE_MATH_ONLY__`.
 
+A macro that both multiplies and adds checks every value against the composed
+profile, so a floating argument fails to compile when contraction is not
+disabled. A translated inline function's own types do not depend on its caller:
+a body with a floating local or value under that profile keeps the native call.
+That includes a floating object read or written through a member, an index or
+a dereference, and such an access or a call whose type analysis leaves
+unestablished. Its arguments are converted to the parameter types as a call
+converts them, so they use the native value profile.
+
 Verified byte-swap builtins lower to Rust operations with the C result identity.
 Branch hints lower to Rust support with cold paths while preserving C operand
 evaluation and result identity. Compute fixed-value and projected-expectation
@@ -1032,12 +1115,25 @@ recover readable calls only when equivalence is proved:
 
 A recovered bare/grouped formal forwards its existing argument descriptor.
 For a composite recovered argument, construct
-`(@compiled [value] [place] [read_place] [size])`: each bracket contains Rust
-*token source*, not a value computed during normalization. The callee selects
+`(@compiled [value] [place] [read_place] [size] [checks])`: each bracket contains
+Rust *token source*, not a value computed during normalization. The callee selects
 only the context demanded by its enclosing C operator. Unsupported alternatives
 contain a context-local `compile_error!`; discard evaluates the value alternative
 for effects and ignores its result. This preserves repeated substitutions,
-places, and unevaluated operands without creating eager temporaries.
+places, and unevaluated operands without creating eager temporaries. A `sizeof`
+witness wraps generated operations in `unsafe`, so it also expands dead checks of
+each caller operand; for a compiled argument those are the checks bracket, the
+producing macro's own checks of its caller operands. They are always well typed
+and do not depend on whether any alternative could be rendered. A call to a
+translated inline function passes the same descriptor with only a value
+alternative; every other bracket, the checks bracket included, holds a
+`compile_error!`. A translated function evaluates its arguments in its match
+scrutinee, outside generated `unsafe`, so its body holds no caller tokens and
+expands nothing but each value. Its size witnesses check nothing. Checks there
+would only reject operands, such as one whose temporary still borrows a local,
+and would multiply along a chain of translated calls. A macro whose size witness
+wraps a translated call in `unsafe` checks its own operands, as for any other
+generated operation.
 
 ```text
  BUFFERALIGN(LEN) --> TYPEALIGN(ALIGNOF_BUFFER, (LEN))
@@ -1121,15 +1217,16 @@ This is one final demand recomputation, not an arbitrary fixed-point loop.
 Marker identities come from stable C/declaration/profile facts, so pruning
 support cannot renumber the identities already referenced by emitted macros.
 
-Generated capabilities and their refusals never enter the caller's
-`BindingCatalog`. Rendering reads them from the generated adapters passed beside
-it, so a caller cannot assert a callback signature, function adapter, address
-getter, or field or offset adapter that generation did not create. Single-macro
-emission has none of these and skips a macro that needs one. It can still name a
-C enum's generated identity type in `__pgrx_c_generated`, because that path
-depends only on the enum declaration. Only batch support defines the type, so an
-invocation of such a macro compiles only in a crate that already includes batch
-support for that enum.
+Generated capabilities, their refusals and a batch's inline translations never
+enter the caller's `BindingCatalog`. Rendering reads them from the generated
+state passed beside it, so a caller cannot assert a callback signature, function
+adapter, address getter, field or offset adapter, or inline translation that
+generation did not create. Single-macro emission has none of these. It skips a
+macro that needs one of the adapters, and its calls to inline functions never
+expand a translation. It can still name a C enum's generated identity type in
+`__pgrx_c_generated`, because that path depends only on the enum declaration.
+Only batch support defines the type, so an invocation of such a macro compiles
+only in a crate that already includes batch support for that enum.
 
 All relevant ABI and storage witnesses participate in validation before pruning.
 A rejected or unselected alias still matters when deciding whether one Rust
@@ -1160,7 +1257,11 @@ provisional identity/storage markers so nested callback prototypes can be
 reconciled, then validate candidates and propagate failed nested dependencies
 through a reverse queue before emitting final call capabilities. Provisional
 markers are internal reconciliation evidence, not permission to call an
-unvalidated prototype.
+unvalidated prototype. Callbacks are reconciled again after native call thunks
+are generated, since a thunk's C-unwind function type is another witness. Only
+the second pass's signatures are emitted, so address getters, fields and enums
+use its markers alone: a type whose witnesses then disagree has no signature,
+and its function's address is refused.
 
 Physical function-pointer implementations share selected ABI/arity families,
 without a fixed arity ceiling, but nominal C identities do not merge merely
@@ -1239,6 +1340,11 @@ relationships require structural validation, not name-based guesses.
 Member markers are shared by name, so a rejected projection is recorded under its
 `record::member` key. When analysis knows the owner record, emission reports that
 rejection instead of borrowing the marker another record's accepted member supplies.
+A member of a record value, such as a call's result, is read from a copy of the
+record. An array member would decay into a pointer into that copy, so emission
+refuses one. A translated inline function's own types do not depend on its
+caller, so its body also keeps the native call when such a member's type is not
+established.
 
 Generate a bitfield capability with this sequence:
 
@@ -1632,12 +1738,17 @@ like every evaluated operand, it is an `expr`. Every arm expands to the hidden
   node whose runtime helper fixes the result type by its signature becomes
   `type_witness::<M>()` without rendering its operands. These nodes are casts,
   comparisons and logical operators, the `sizeof`/`alignof`/`offsetof` family,
-  direct native calls, byte swaps and branch hints. Every other node renders as
-  in the real arm, so member, load and array-decay types still come from the
-  runtime's traits. A comma renders only its right operand, and the witness never
-  delegates to another macro's internal arms. The shell evaluates
-  `if false { finish(witness) } else { panic }`, which has the real macro's
-  `CExpression<V>` type.
+  direct native calls, calls to translated inline functions, byte swaps and
+  branch hints. A call's witness is its declared result, or `()` for a void
+  function. Every other node renders as in the real arm, so member, load and
+  array-decay types still come from the runtime's traits. A comma renders only
+  its right operand, and the witness never delegates to another macro's
+  internal arms, so it never names a translated callee's value arm. The shell
+  evaluates `if false { finish(witness) } else { panic }`, which has the real
+  macro's `CExpression<V>` type.
+- A translated inline function body passes `type_witness::<M>()` for its result
+  marker `M`, or `()` for a void function, in a block that borrows every
+  argument, which the real body evaluates once before it runs.
 - A statement or empty macro passes a block of type `()`.
 - A body whose every path returns from the caller, and a witness that could not
   be rendered, keep the diverging placeholder.
@@ -1657,16 +1768,17 @@ never mention spelling, type, identifier or unused operands. The dead generic
 proof in [`expression/witness.rs`](../pgrx-pg-sys/src/c_macros/expression/witness.rs)
 compiles in every build and ties each collapsed helper's result type to
 `type_witness`, so changing such a signature breaks the build until the collapse
-rule changes. A typedef cast whose lowered marker is exactly its kind's marker
-names the typedef's `__pgrx_c_types` alias, which keeps the witness equal in
-versions where only the typedef's rank changes.
+rule changes. A typedef cast, or a call or translated body whose declared
+result is a typedef, whose lowered marker is exactly its kind's marker names the
+typedef's `__pgrx_c_types` alias, which keeps the witness equal in versions
+where only the typedef's rank changes.
 
 A shell can accept more than its real macro: collapsed operands' trait bounds are
 not checked, local-name guards are absent, and dropped operands are only borrowed.
 A shell also needs no `unsafe` block where every unsafe operation of its real
 macro is collapsed or dropped, such as a native call, a comparison of a member
-read through a pointer, or a statement body; an `unsafe` block around such a call
-warns as unused in docs builds. The oracle pins examples of each.
+read through a pointer, a statement body or a translated inline function body;
+an `unsafe` block around such a call warns as unused in docs builds. The oracle pins examples of each.
 It can reject an invocation that its real macro accepts, or give it another type,
 only where its `expr` fragments and the `@native` descriptor replace the argument
 normalizer and classifier:

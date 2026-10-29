@@ -144,7 +144,7 @@ macro_rules! TAS_SPIN {
         )
     };
 }
-/// Typed call adapter for C inline function init_spin_delay from s_lock.h:1094 (PostgreSQL 15), s_lock.h:851 (PostgreSQL 16), s_lock.h:831 (PostgreSQL 17), s_lock.h:739 (PostgreSQL 18), s_lock.h:737 (PostgreSQL 19)
+/// C inline function init_spin_delay from s_lock.h:1094 (PostgreSQL 15), s_lock.h:851 (PostgreSQL 16), s_lock.h:831 (PostgreSQL 17), s_lock.h:739 (PostgreSQL 18), s_lock.h:737 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -161,15 +161,11 @@ macro_rules! TAS_SPIN {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! init_spin_delay {
     ($status:expr, $file:expr, $line:expr, $func:expr $(,)?) => {
@@ -179,7 +175,7 @@ macro_rules! init_spin_delay {
                 let _ = &$file;
                 let _ = &$line;
                 let _ = &$func;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+                ()
             }
         )
     };

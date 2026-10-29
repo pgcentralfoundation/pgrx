@@ -2,7 +2,7 @@
 // C macros from pgstat_kind.h.
 
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pgstat_is_kind_builtin from pgstat_kind.h:60 (PostgreSQL 18), pgstat_kind.h:61 (PostgreSQL 19)
+/// C inline function pgstat_is_kind_builtin from pgstat_kind.h:60 (PostgreSQL 18), pgstat_kind.h:61 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -13,32 +13,24 @@
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pgstat_is_kind_builtin {
     ($kind:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$kind;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function pgstat_is_kind_custom from pgstat_kind.h:66 (PostgreSQL 18), pgstat_kind.h:67 (PostgreSQL 19)
+/// C inline function pgstat_is_kind_custom from pgstat_kind.h:66 (PostgreSQL 18), pgstat_kind.h:67 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -49,26 +41,18 @@ macro_rules! pgstat_is_kind_builtin {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pgstat_is_kind_custom {
     ($kind:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$kind;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };

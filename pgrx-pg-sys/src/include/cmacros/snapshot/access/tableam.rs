@@ -49,7 +49,7 @@ macro_rules! table_beginscan {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_beginscan from tableam.h:906 (PostgreSQL 16), tableam.h:913 (PostgreSQL 17), tableam.h:874 (PostgreSQL 18)
+/// C inline function table_beginscan from tableam.h:906 (PostgreSQL 16), tableam.h:913 (PostgreSQL 17), tableam.h:874 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -64,7 +64,7 @@ macro_rules! table_beginscan {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -72,7 +72,7 @@ macro_rules! table_beginscan {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_beginscan {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr $(,)?) => {
@@ -82,15 +82,13 @@ macro_rules! table_beginscan {
                 let _ = &$snapshot;
                 let _ = &$nkeys;
                 let _ = &$key;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::__pgrx_c_bindings::TableScanDescData
-                            >,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TableScanDescData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
@@ -144,8 +142,8 @@ macro_rules! table_beginscan {
         )
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_beginscan_analyze from tableam.h:987 (PostgreSQL 15), tableam.h:1003 (PostgreSQL 16), tableam.h:1013 (PostgreSQL 17), tableam.h:972 (PostgreSQL 18)
+#[cfg(feature = "pg15")]
+/// Typed call adapter for C inline function table_beginscan_analyze from tableam.h:987 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -182,6 +180,46 @@ macro_rules! table_beginscan_analyze {
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         >>()
                 )
+            }
+        )
+    };
+}
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C inline function table_beginscan_analyze from tableam.h:1003 (PostgreSQL 16), tableam.h:1013 (PostgreSQL 17), tableam.h:972 (PostgreSQL 18)
+///
+/// ```c
+/// static inline TableScanDesc
+/// table_beginscan_analyze(Relation rel)
+/// {
+/// 	uint32		flags = SO_TYPE_ANALYZE;
+///
+/// 	return rel->rd_tableam->scan_begin(rel, NULL, 0, NULL, NULL, flags);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! table_beginscan_analyze {
+    ($rel:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TableScanDescData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
@@ -229,8 +267,8 @@ macro_rules! table_beginscan_analyze {
         )
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg16"))]
-/// Typed call adapter for C inline function table_beginscan_bm from tableam.h:935 (PostgreSQL 15), tableam.h:951 (PostgreSQL 16)
+#[cfg(feature = "pg15")]
+/// Typed call adapter for C inline function table_beginscan_bm from tableam.h:935 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -275,8 +313,52 @@ macro_rules! table_beginscan_bm {
         )
     };
 }
+#[cfg(feature = "pg16")]
+/// C inline function table_beginscan_bm from tableam.h:951 (PostgreSQL 16)
+///
+/// ```c
+/// static inline TableScanDesc
+/// table_beginscan_bm(Relation rel, Snapshot snapshot,
+/// 				   int nkeys, struct ScanKeyData *key)
+/// {
+/// 	uint32		flags = SO_TYPE_BITMAPSCAN | SO_ALLOW_PAGEMODE;
+///
+/// 	return rel->rd_tableam->scan_begin(rel, snapshot, nkeys, key, NULL, flags);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! table_beginscan_bm {
+    ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$snapshot;
+                let _ = &$nkeys;
+                let _ = &$key;
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TableScanDescData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
+            }
+        )
+    };
+}
 #[cfg(feature = "pg17")]
-/// Typed call adapter for C inline function table_beginscan_bm from tableam.h:958 (PostgreSQL 17)
+/// C inline function table_beginscan_bm from tableam.h:958 (PostgreSQL 17)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -293,7 +375,7 @@ macro_rules! table_beginscan_bm {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -301,7 +383,7 @@ macro_rules! table_beginscan_bm {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_beginscan_bm {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr, $need_tuple:expr $(,)?) => {
@@ -312,21 +394,19 @@ macro_rules! table_beginscan_bm {
                 let _ = &$nkeys;
                 let _ = &$key;
                 let _ = &$need_tuple;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::__pgrx_c_bindings::TableScanDescData
-                            >,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TableScanDescData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
 }
 #[cfg(feature = "pg18")]
-/// Typed call adapter for C inline function table_beginscan_bm from tableam.h:919 (PostgreSQL 18)
+/// C inline function table_beginscan_bm from tableam.h:919 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -341,7 +421,7 @@ macro_rules! table_beginscan_bm {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -349,7 +429,7 @@ macro_rules! table_beginscan_bm {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_beginscan_bm {
     ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr $(,)?) => {
@@ -359,15 +439,13 @@ macro_rules! table_beginscan_bm {
                 let _ = &$snapshot;
                 let _ = &$nkeys;
                 let _ = &$key;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::__pgrx_c_bindings::TableScanDescData
-                            >,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TableScanDescData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
@@ -420,8 +498,8 @@ macro_rules! table_beginscan_bm {
         )
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_beginscan_sampling from tableam.h:951 (PostgreSQL 15), tableam.h:967 (PostgreSQL 16), tableam.h:977 (PostgreSQL 17), tableam.h:936 (PostgreSQL 18)
+#[cfg(feature = "pg15")]
+/// Typed call adapter for C inline function table_beginscan_sampling from tableam.h:951 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -482,6 +560,70 @@ macro_rules! table_beginscan_sampling {
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         >>()
                 )
+            }
+        )
+    };
+}
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C inline function table_beginscan_sampling from tableam.h:967 (PostgreSQL 16), tableam.h:977 (PostgreSQL 17), tableam.h:936 (PostgreSQL 18)
+///
+/// ```c
+/// static inline TableScanDesc
+/// table_beginscan_sampling(Relation rel, Snapshot snapshot,
+/// 						 int nkeys, struct ScanKeyData *key,
+/// 						 bool allow_strat, bool allow_sync,
+/// 						 bool allow_pagemode)
+/// {
+/// 	uint32		flags = SO_TYPE_SAMPLESCAN;
+///
+/// 	if (allow_strat)
+/// 		flags |= SO_ALLOW_STRAT;
+/// 	if (allow_sync)
+/// 		flags |= SO_ALLOW_SYNC;
+/// 	if (allow_pagemode)
+/// 		flags |= SO_ALLOW_PAGEMODE;
+///
+/// 	return rel->rd_tableam->scan_begin(rel, snapshot, nkeys, key, NULL, flags);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! table_beginscan_sampling {
+    (
+        $rel:expr,
+        $snapshot:expr,
+        $nkeys:expr,
+        $key:expr,
+        $allow_strat:expr,
+        $allow_sync:expr,
+        $allow_pagemode:expr $(,)?
+    ) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$snapshot;
+                let _ = &$nkeys;
+                let _ = &$key;
+                let _ = &$allow_strat;
+                let _ = &$allow_sync;
+                let _ = &$allow_pagemode;
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TableScanDescData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
@@ -555,8 +697,8 @@ macro_rules! table_beginscan_sampling {
         )
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_beginscan_strat from tableam.h:914 (PostgreSQL 15), tableam.h:930 (PostgreSQL 16), tableam.h:937 (PostgreSQL 17), tableam.h:898 (PostgreSQL 18)
+#[cfg(feature = "pg15")]
+/// Typed call adapter for C inline function table_beginscan_strat from tableam.h:914 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -605,6 +747,58 @@ macro_rules! table_beginscan_strat {
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         >>()
                 )
+            }
+        )
+    };
+}
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C inline function table_beginscan_strat from tableam.h:930 (PostgreSQL 16), tableam.h:937 (PostgreSQL 17), tableam.h:898 (PostgreSQL 18)
+///
+/// ```c
+/// static inline TableScanDesc
+/// table_beginscan_strat(Relation rel, Snapshot snapshot,
+/// 					  int nkeys, struct ScanKeyData *key,
+/// 					  bool allow_strat, bool allow_sync)
+/// {
+/// 	uint32		flags = SO_TYPE_SEQSCAN | SO_ALLOW_PAGEMODE;
+///
+/// 	if (allow_strat)
+/// 		flags |= SO_ALLOW_STRAT;
+/// 	if (allow_sync)
+/// 		flags |= SO_ALLOW_SYNC;
+///
+/// 	return rel->rd_tableam->scan_begin(rel, snapshot, nkeys, key, NULL, flags);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! table_beginscan_strat {
+    ($rel:expr, $snapshot:expr, $nkeys:expr, $key:expr, $allow_strat:expr, $allow_sync:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$snapshot;
+                let _ = &$nkeys;
+                let _ = &$key;
+                let _ = &$allow_strat;
+                let _ = &$allow_sync;
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TableScanDescData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
@@ -664,8 +858,8 @@ macro_rules! table_beginscan_strat {
         )
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_beginscan_tid from tableam.h:974 (PostgreSQL 15), tableam.h:990 (PostgreSQL 16), tableam.h:1000 (PostgreSQL 17), tableam.h:959 (PostgreSQL 18)
+#[cfg(feature = "pg15")]
+/// Typed call adapter for C inline function table_beginscan_tid from tableam.h:974 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -703,6 +897,47 @@ macro_rules! table_beginscan_tid {
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         >>()
                 )
+            }
+        )
+    };
+}
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C inline function table_beginscan_tid from tableam.h:990 (PostgreSQL 16), tableam.h:1000 (PostgreSQL 17), tableam.h:959 (PostgreSQL 18)
+///
+/// ```c
+/// static inline TableScanDesc
+/// table_beginscan_tid(Relation rel, Snapshot snapshot)
+/// {
+/// 	uint32		flags = SO_TYPE_TIDSCAN;
+///
+/// 	return rel->rd_tableam->scan_begin(rel, snapshot, 0, NULL, NULL, flags);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! table_beginscan_tid {
+    ($rel:expr, $snapshot:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$snapshot;
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TableScanDescData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
@@ -751,8 +986,8 @@ macro_rules! table_beginscan_tid {
         )
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_beginscan_tidrange from tableam.h:1064 (PostgreSQL 15), tableam.h:1084 (PostgreSQL 16), tableam.h:1089 (PostgreSQL 17), tableam.h:1048 (PostgreSQL 18)
+#[cfg(feature = "pg15")]
+/// Typed call adapter for C inline function table_beginscan_tidrange from tableam.h:1064 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline TableScanDesc
@@ -800,6 +1035,57 @@ macro_rules! table_beginscan_tidrange {
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         >>()
                 )
+            }
+        )
+    };
+}
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C inline function table_beginscan_tidrange from tableam.h:1084 (PostgreSQL 16), tableam.h:1089 (PostgreSQL 17), tableam.h:1048 (PostgreSQL 18)
+///
+/// ```c
+/// static inline TableScanDesc
+/// table_beginscan_tidrange(Relation rel, Snapshot snapshot,
+/// 						 ItemPointer mintid,
+/// 						 ItemPointer maxtid)
+/// {
+/// 	TableScanDesc sscan;
+/// 	uint32		flags = SO_TYPE_TIDRANGESCAN | SO_ALLOW_PAGEMODE;
+///
+/// 	sscan = rel->rd_tableam->scan_begin(rel, snapshot, 0, NULL, NULL, flags);
+///
+/// 	/* Set the range of TIDs to scan */
+/// 	sscan->rs_rd->rd_tableam->scan_set_tidrange(sscan, mintid, maxtid);
+///
+/// 	return sscan;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! table_beginscan_tidrange {
+    ($rel:expr, $snapshot:expr, $mintid:expr, $maxtid:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                let _ = &$snapshot;
+                let _ = &$mintid;
+                let _ = &$maxtid;
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TableScanDescData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
@@ -859,7 +1145,7 @@ macro_rules! table_beginscan_tidrange {
         )
     };
 }
-/// Typed call adapter for C inline function table_endscan from tableam.h:998 (PostgreSQL 15), tableam.h:1014 (PostgreSQL 16), tableam.h:1024 (PostgreSQL 17), tableam.h:983 (PostgreSQL 18), tableam.h:1060 (PostgreSQL 19)
+/// C inline function table_endscan from tableam.h:998 (PostgreSQL 15), tableam.h:1014 (PostgreSQL 16), tableam.h:1024 (PostgreSQL 17), tableam.h:983 (PostgreSQL 18), tableam.h:1060 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -870,7 +1156,7 @@ macro_rules! table_beginscan_tidrange {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -882,16 +1168,14 @@ macro_rules! table_beginscan_tidrange {
 #[macro_export]
 macro_rules! table_endscan {
     ($scan:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$scan;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$scan;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_finish_bulk_insert from tableam.h:1573 (PostgreSQL 15), tableam.h:1597 (PostgreSQL 16), tableam.h:1602 (PostgreSQL 17), tableam.h:1561 (PostgreSQL 18)
+/// C inline function table_finish_bulk_insert from tableam.h:1573 (PostgreSQL 15), tableam.h:1597 (PostgreSQL 16), tableam.h:1602 (PostgreSQL 17), tableam.h:1561 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -904,7 +1188,7 @@ macro_rules! table_endscan {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -916,17 +1200,15 @@ macro_rules! table_endscan {
 #[macro_export]
 macro_rules! table_finish_bulk_insert {
     ($rel:expr, $options:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$rel;
-                let _ = &$options;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$rel;
+            let _ = &$options;
+            ()
+        })
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_finish_bulk_insert from tableam.h:1664 (PostgreSQL 19)
+/// C inline function table_finish_bulk_insert from tableam.h:1664 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -939,7 +1221,7 @@ macro_rules! table_finish_bulk_insert {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -951,17 +1233,15 @@ macro_rules! table_finish_bulk_insert {
 #[macro_export]
 macro_rules! table_finish_bulk_insert {
     ($rel:expr, $options:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$rel;
-                let _ = &$options;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$rel;
+            let _ = &$options;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_index_build_range_scan from tableam.h:1787 (PostgreSQL 15), tableam.h:1812 (PostgreSQL 16), tableam.h:1815 (PostgreSQL 17), tableam.h:1774 (PostgreSQL 18)
+/// C inline function table_index_build_range_scan from tableam.h:1787 (PostgreSQL 15), tableam.h:1812 (PostgreSQL 16), tableam.h:1815 (PostgreSQL 17), tableam.h:1774 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline double
@@ -992,7 +1272,7 @@ macro_rules! table_finish_bulk_insert {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1029,17 +1309,15 @@ macro_rules! table_index_build_range_scan {
                 let _ = &$callback;
                 let _ = &$callback_state;
                 let _ = &$scan;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CDouble
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CDouble
+                >()
             }
         )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_index_build_range_scan from tableam.h:1881 (PostgreSQL 19)
+/// C inline function table_index_build_range_scan from tableam.h:1881 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline double
@@ -1070,7 +1348,7 @@ macro_rules! table_index_build_range_scan {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1107,17 +1385,15 @@ macro_rules! table_index_build_range_scan {
                 let _ = &$callback;
                 let _ = &$callback_state;
                 let _ = &$scan;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CDouble
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CDouble
+                >()
             }
         )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_index_build_scan from tableam.h:1754 (PostgreSQL 15), tableam.h:1779 (PostgreSQL 16), tableam.h:1782 (PostgreSQL 17), tableam.h:1741 (PostgreSQL 18)
+/// C inline function table_index_build_scan from tableam.h:1754 (PostgreSQL 15), tableam.h:1779 (PostgreSQL 16), tableam.h:1782 (PostgreSQL 17), tableam.h:1741 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline double
@@ -1145,7 +1421,7 @@ macro_rules! table_index_build_range_scan {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1153,7 +1429,7 @@ macro_rules! table_index_build_range_scan {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_index_build_scan {
     (
@@ -1176,17 +1452,15 @@ macro_rules! table_index_build_scan {
                 let _ = &$callback;
                 let _ = &$callback_state;
                 let _ = &$scan;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CDouble
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CDouble
+                >()
             }
         )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_index_build_scan from tableam.h:1848 (PostgreSQL 19)
+/// C inline function table_index_build_scan from tableam.h:1848 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline double
@@ -1214,7 +1488,7 @@ macro_rules! table_index_build_scan {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1222,7 +1496,7 @@ macro_rules! table_index_build_scan {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! table_index_build_scan {
     (
@@ -1245,16 +1519,14 @@ macro_rules! table_index_build_scan {
                 let _ = &$callback;
                 let _ = &$callback_state;
                 let _ = &$scan;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CDouble
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CDouble
+                >()
             }
         )
     };
 }
-/// Typed call adapter for C inline function table_index_delete_tuples from tableam.h:1332 (PostgreSQL 15), tableam.h:1356 (PostgreSQL 16), tableam.h:1361 (PostgreSQL 17), tableam.h:1320 (PostgreSQL 18), tableam.h:1411 (PostgreSQL 19)
+/// C inline function table_index_delete_tuples from tableam.h:1332 (PostgreSQL 15), tableam.h:1356 (PostgreSQL 16), tableam.h:1361 (PostgreSQL 17), tableam.h:1320 (PostgreSQL 18), tableam.h:1411 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TransactionId
@@ -1265,7 +1537,7 @@ macro_rules! table_index_build_scan {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1281,19 +1553,15 @@ macro_rules! table_index_delete_tuples {
             @value {
                 let _ = &$rel;
                 let _ = &$delstate;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedInt,
-                            $crate::__pgrx_c_bindings::TransactionId
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_types::TransactionId
+                >()
             }
         )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_index_fetch_begin from tableam.h:1168 (PostgreSQL 15), tableam.h:1192 (PostgreSQL 16), tableam.h:1197 (PostgreSQL 17), tableam.h:1156 (PostgreSQL 18)
+/// C inline function table_index_fetch_begin from tableam.h:1168 (PostgreSQL 15), tableam.h:1192 (PostgreSQL 16), tableam.h:1197 (PostgreSQL 17), tableam.h:1156 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline IndexFetchTableData *
@@ -1304,7 +1572,7 @@ macro_rules! table_index_delete_tuples {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1319,15 +1587,13 @@ macro_rules! table_index_fetch_begin {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$rel;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::__pgrx_c_bindings::IndexFetchTableData
-                            >,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::IndexFetchTableData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
@@ -1383,7 +1649,7 @@ macro_rules! table_index_fetch_begin {
         )
     };
 }
-/// Typed call adapter for C inline function table_index_fetch_end from tableam.h:1187 (PostgreSQL 15), tableam.h:1211 (PostgreSQL 16), tableam.h:1216 (PostgreSQL 17), tableam.h:1175 (PostgreSQL 18), tableam.h:1274 (PostgreSQL 19)
+/// C inline function table_index_fetch_end from tableam.h:1187 (PostgreSQL 15), tableam.h:1211 (PostgreSQL 16), tableam.h:1216 (PostgreSQL 17), tableam.h:1175 (PostgreSQL 18), tableam.h:1274 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1394,7 +1660,7 @@ macro_rules! table_index_fetch_begin {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1406,15 +1672,13 @@ macro_rules! table_index_fetch_begin {
 #[macro_export]
 macro_rules! table_index_fetch_end {
     ($scan:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$scan;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$scan;
+            ()
+        })
     };
 }
-/// Typed call adapter for C inline function table_index_fetch_reset from tableam.h:1178 (PostgreSQL 15), tableam.h:1202 (PostgreSQL 16), tableam.h:1207 (PostgreSQL 17), tableam.h:1166 (PostgreSQL 18), tableam.h:1265 (PostgreSQL 19)
+/// C inline function table_index_fetch_reset from tableam.h:1178 (PostgreSQL 15), tableam.h:1202 (PostgreSQL 16), tableam.h:1207 (PostgreSQL 17), tableam.h:1166 (PostgreSQL 18), tableam.h:1265 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1425,7 +1689,7 @@ macro_rules! table_index_fetch_end {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1437,12 +1701,10 @@ macro_rules! table_index_fetch_end {
 #[macro_export]
 macro_rules! table_index_fetch_reset {
     ($scan:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$scan;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$scan;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
@@ -1501,7 +1763,7 @@ macro_rules! table_index_fetch_tuple {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_index_fetch_tuple from tableam.h:1304 (PostgreSQL 19)
+/// C inline function table_index_fetch_tuple from tableam.h:1304 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1518,7 +1780,7 @@ macro_rules! table_index_fetch_tuple {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1538,17 +1800,13 @@ macro_rules! table_index_fetch_tuple {
                 let _ = &$slot;
                 let _ = &$call_again;
                 let _ = &$all_dead;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_index_validate_scan from tableam.h:1818 (PostgreSQL 15), tableam.h:1843 (PostgreSQL 16), tableam.h:1846 (PostgreSQL 17), tableam.h:1805 (PostgreSQL 18)
+/// C inline function table_index_validate_scan from tableam.h:1818 (PostgreSQL 15), tableam.h:1843 (PostgreSQL 16), tableam.h:1846 (PostgreSQL 17), tableam.h:1805 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -1567,7 +1825,7 @@ macro_rules! table_index_fetch_tuple {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1586,13 +1844,13 @@ macro_rules! table_index_validate_scan {
                 let _ = &$index_info;
                 let _ = &$snapshot;
                 let _ = &$state;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+                ()
             }
         )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_index_validate_scan from tableam.h:1912 (PostgreSQL 19)
+/// C inline function table_index_validate_scan from tableam.h:1912 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1611,7 +1869,7 @@ macro_rules! table_index_validate_scan {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1630,13 +1888,13 @@ macro_rules! table_index_validate_scan {
                 let _ = &$index_info;
                 let _ = &$snapshot;
                 let _ = &$state;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+                ()
             }
         )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_multi_insert from tableam.h:1433 (PostgreSQL 15), tableam.h:1457 (PostgreSQL 16), tableam.h:1462 (PostgreSQL 17), tableam.h:1421 (PostgreSQL 18)
+/// C inline function table_multi_insert from tableam.h:1433 (PostgreSQL 15), tableam.h:1457 (PostgreSQL 16), tableam.h:1462 (PostgreSQL 17), tableam.h:1421 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -1649,7 +1907,7 @@ macro_rules! table_index_validate_scan {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1669,13 +1927,13 @@ macro_rules! table_multi_insert {
                 let _ = &$cid;
                 let _ = &$options;
                 let _ = &$bistate;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+                ()
             }
         )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_multi_insert from tableam.h:1512 (PostgreSQL 19)
+/// C inline function table_multi_insert from tableam.h:1512 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1688,7 +1946,7 @@ macro_rules! table_multi_insert {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1708,12 +1966,12 @@ macro_rules! table_multi_insert {
                 let _ = &$cid;
                 let _ = &$options;
                 let _ = &$bistate;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+                ()
             }
         )
     };
 }
-/// Typed call adapter for C inline function table_parallelscan_reinitialize from tableam.h:1150 (PostgreSQL 15), tableam.h:1174 (PostgreSQL 16), tableam.h:1179 (PostgreSQL 17), tableam.h:1138 (PostgreSQL 18), tableam.h:1225 (PostgreSQL 19)
+/// C inline function table_parallelscan_reinitialize from tableam.h:1150 (PostgreSQL 15), tableam.h:1174 (PostgreSQL 16), tableam.h:1179 (PostgreSQL 17), tableam.h:1138 (PostgreSQL 18), tableam.h:1225 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1724,7 +1982,7 @@ macro_rules! table_multi_insert {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1736,17 +1994,15 @@ macro_rules! table_multi_insert {
 #[macro_export]
 macro_rules! table_parallelscan_reinitialize {
     ($rel:expr, $pscan:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$rel;
-                let _ = &$pscan;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$rel;
+            let _ = &$pscan;
+            ()
+        })
     };
 }
 #[cfg(feature = "pg15")]
-/// Typed call adapter for C inline function table_relation_copy_data from tableam.h:1628 (PostgreSQL 15)
+/// C inline function table_relation_copy_data from tableam.h:1628 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline void
@@ -1757,7 +2013,7 @@ macro_rules! table_parallelscan_reinitialize {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1769,17 +2025,15 @@ macro_rules! table_parallelscan_reinitialize {
 #[macro_export]
 macro_rules! table_relation_copy_data {
     ($rel:expr, $newrnode:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$rel;
-                let _ = &$newrnode;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$rel;
+            let _ = &$newrnode;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function table_relation_copy_data from tableam.h:1653 (PostgreSQL 16), tableam.h:1658 (PostgreSQL 17), tableam.h:1617 (PostgreSQL 18), tableam.h:1720 (PostgreSQL 19)
+/// C inline function table_relation_copy_data from tableam.h:1653 (PostgreSQL 16), tableam.h:1658 (PostgreSQL 17), tableam.h:1617 (PostgreSQL 18), tableam.h:1720 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1790,7 +2044,7 @@ macro_rules! table_relation_copy_data {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1802,17 +2056,15 @@ macro_rules! table_relation_copy_data {
 #[macro_export]
 macro_rules! table_relation_copy_data {
     ($rel:expr, $newrlocator:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$rel;
-                let _ = &$newrlocator;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$rel;
+            let _ = &$newrlocator;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_relation_copy_for_cluster from tableam.h:1655 (PostgreSQL 15), tableam.h:1680 (PostgreSQL 16), tableam.h:1685 (PostgreSQL 17), tableam.h:1644 (PostgreSQL 18)
+/// C inline function table_relation_copy_for_cluster from tableam.h:1655 (PostgreSQL 15), tableam.h:1680 (PostgreSQL 16), tableam.h:1685 (PostgreSQL 17), tableam.h:1644 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -1835,7 +2087,7 @@ macro_rules! table_relation_copy_data {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1870,13 +2122,13 @@ macro_rules! table_relation_copy_for_cluster {
                 let _ = &$num_tuples;
                 let _ = &$tups_vacuumed;
                 let _ = &$tups_recently_dead;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+                ()
             }
         )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_relation_copy_for_cluster from tableam.h:1749 (PostgreSQL 19)
+/// C inline function table_relation_copy_for_cluster from tableam.h:1749 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1901,7 +2153,7 @@ macro_rules! table_relation_copy_for_cluster {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1938,12 +2190,12 @@ macro_rules! table_relation_copy_for_cluster {
                 let _ = &$num_tuples;
                 let _ = &$tups_vacuumed;
                 let _ = &$tups_recently_dead;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+                ()
             }
         )
     };
 }
-/// Typed call adapter for C inline function table_relation_estimate_size from tableam.h:1916 (PostgreSQL 15), tableam.h:1941 (PostgreSQL 16), tableam.h:1944 (PostgreSQL 17), tableam.h:1903 (PostgreSQL 18), tableam.h:2010 (PostgreSQL 19)
+/// C inline function table_relation_estimate_size from tableam.h:1916 (PostgreSQL 15), tableam.h:1941 (PostgreSQL 16), tableam.h:1944 (PostgreSQL 17), tableam.h:1903 (PostgreSQL 18), tableam.h:2010 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1957,7 +2209,7 @@ macro_rules! table_relation_copy_for_cluster {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1976,13 +2228,13 @@ macro_rules! table_relation_estimate_size {
                 let _ = &$pages;
                 let _ = &$tuples;
                 let _ = &$allvisfrac;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+                ()
             }
         )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_relation_fetch_toast_slice from tableam.h:1895 (PostgreSQL 15), tableam.h:1920 (PostgreSQL 16), tableam.h:1923 (PostgreSQL 17), tableam.h:1882 (PostgreSQL 18)
+/// C inline function table_relation_fetch_toast_slice from tableam.h:1895 (PostgreSQL 15), tableam.h:1920 (PostgreSQL 16), tableam.h:1923 (PostgreSQL 17), tableam.h:1882 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -1998,7 +2250,7 @@ macro_rules! table_relation_estimate_size {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2025,13 +2277,13 @@ macro_rules! table_relation_fetch_toast_slice {
                 let _ = &$sliceoffset;
                 let _ = &$slicelength;
                 let _ = &$result;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+                ()
             }
         )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_relation_fetch_toast_slice from tableam.h:1989 (PostgreSQL 19)
+/// C inline function table_relation_fetch_toast_slice from tableam.h:1989 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -2047,7 +2299,7 @@ macro_rules! table_relation_fetch_toast_slice {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2074,12 +2326,12 @@ macro_rules! table_relation_fetch_toast_slice {
                 let _ = &$sliceoffset;
                 let _ = &$slicelength;
                 let _ = &$result;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+                ()
             }
         )
     };
 }
-/// Typed call adapter for C inline function table_relation_needs_toast_table from tableam.h:1856 (PostgreSQL 15), tableam.h:1881 (PostgreSQL 16), tableam.h:1884 (PostgreSQL 17), tableam.h:1843 (PostgreSQL 18), tableam.h:1950 (PostgreSQL 19)
+/// C inline function table_relation_needs_toast_table from tableam.h:1856 (PostgreSQL 15), tableam.h:1881 (PostgreSQL 16), tableam.h:1884 (PostgreSQL 17), tableam.h:1843 (PostgreSQL 18), tableam.h:1950 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2090,7 +2342,7 @@ macro_rules! table_relation_fetch_toast_slice {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2105,16 +2357,12 @@ macro_rules! table_relation_needs_toast_table {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$rel;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
-/// Typed call adapter for C inline function table_relation_nontransactional_truncate from tableam.h:1616 (PostgreSQL 15), tableam.h:1641 (PostgreSQL 16), tableam.h:1646 (PostgreSQL 17), tableam.h:1605 (PostgreSQL 18), tableam.h:1708 (PostgreSQL 19)
+/// C inline function table_relation_nontransactional_truncate from tableam.h:1616 (PostgreSQL 15), tableam.h:1641 (PostgreSQL 16), tableam.h:1646 (PostgreSQL 17), tableam.h:1605 (PostgreSQL 18), tableam.h:1708 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -2125,7 +2373,7 @@ macro_rules! table_relation_needs_toast_table {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2137,16 +2385,14 @@ macro_rules! table_relation_needs_toast_table {
 #[macro_export]
 macro_rules! table_relation_nontransactional_truncate {
     ($rel:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$rel;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$rel;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function table_relation_set_new_filelocator from tableam.h:1623 (PostgreSQL 16), tableam.h:1628 (PostgreSQL 17), tableam.h:1587 (PostgreSQL 18), tableam.h:1690 (PostgreSQL 19)
+/// C inline function table_relation_set_new_filelocator from tableam.h:1623 (PostgreSQL 16), tableam.h:1628 (PostgreSQL 17), tableam.h:1587 (PostgreSQL 18), tableam.h:1690 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -2163,7 +2409,7 @@ macro_rules! table_relation_nontransactional_truncate {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2182,13 +2428,13 @@ macro_rules! table_relation_set_new_filelocator {
                 let _ = &$persistence;
                 let _ = &$freezeXid;
                 let _ = &$minmulti;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+                ()
             }
         )
     };
 }
 #[cfg(feature = "pg15")]
-/// Typed call adapter for C inline function table_relation_set_new_filenode from tableam.h:1599 (PostgreSQL 15)
+/// C inline function table_relation_set_new_filenode from tableam.h:1599 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline void
@@ -2204,7 +2450,7 @@ macro_rules! table_relation_set_new_filelocator {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2223,12 +2469,12 @@ macro_rules! table_relation_set_new_filenode {
                 let _ = &$persistence;
                 let _ = &$freezeXid;
                 let _ = &$minmulti;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+                ()
             }
         )
     };
 }
-/// Typed call adapter for C inline function table_relation_size from tableam.h:1847 (PostgreSQL 15), tableam.h:1872 (PostgreSQL 16), tableam.h:1875 (PostgreSQL 17), tableam.h:1834 (PostgreSQL 18), tableam.h:1941 (PostgreSQL 19)
+/// C inline function table_relation_size from tableam.h:1847 (PostgreSQL 15), tableam.h:1872 (PostgreSQL 16), tableam.h:1875 (PostgreSQL 17), tableam.h:1834 (PostgreSQL 18), tableam.h:1941 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline uint64
@@ -2239,7 +2485,7 @@ macro_rules! table_relation_set_new_filenode {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2255,16 +2501,12 @@ macro_rules! table_relation_size {
             @value {
                 let _ = &$rel;
                 let _ = &$forkNumber;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_types::uint64
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::uint64>()
             }
         )
     };
 }
-/// Typed call adapter for C inline function table_relation_toast_am from tableam.h:1866 (PostgreSQL 15), tableam.h:1891 (PostgreSQL 16), tableam.h:1894 (PostgreSQL 17), tableam.h:1853 (PostgreSQL 18), tableam.h:1960 (PostgreSQL 19)
+/// C inline function table_relation_toast_am from tableam.h:1866 (PostgreSQL 15), tableam.h:1891 (PostgreSQL 16), tableam.h:1894 (PostgreSQL 17), tableam.h:1853 (PostgreSQL 18), tableam.h:1960 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Oid
@@ -2275,7 +2517,7 @@ macro_rules! table_relation_size {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2290,19 +2532,13 @@ macro_rules! table_relation_toast_am {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$rel;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedInt,
-                            $crate::__pgrx_c_bindings::Oid
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::Oid>()
             }
         )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_relation_vacuum from tableam.h:1684 (PostgreSQL 15), tableam.h:1709 (PostgreSQL 16), tableam.h:1714 (PostgreSQL 17), tableam.h:1673 (PostgreSQL 18)
+/// C inline function table_relation_vacuum from tableam.h:1684 (PostgreSQL 15), tableam.h:1709 (PostgreSQL 16), tableam.h:1714 (PostgreSQL 17), tableam.h:1673 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -2314,7 +2550,7 @@ macro_rules! table_relation_toast_am {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2331,13 +2567,13 @@ macro_rules! table_relation_vacuum {
                 let _ = &$rel;
                 let _ = &$params;
                 let _ = &$bstrategy;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+                ()
             }
         )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_relation_vacuum from tableam.h:1780 (PostgreSQL 19)
+/// C inline function table_relation_vacuum from tableam.h:1780 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -2349,7 +2585,7 @@ macro_rules! table_relation_vacuum {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2366,13 +2602,13 @@ macro_rules! table_relation_vacuum {
                 let _ = &$rel;
                 let _ = &$params;
                 let _ = &$bstrategy;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+                ()
             }
         )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_rescan from tableam.h:1007 (PostgreSQL 15), tableam.h:1023 (PostgreSQL 16), tableam.h:1033 (PostgreSQL 17), tableam.h:992 (PostgreSQL 18)
+/// C inline function table_rescan from tableam.h:1007 (PostgreSQL 15), tableam.h:1023 (PostgreSQL 16), tableam.h:1033 (PostgreSQL 17), tableam.h:992 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -2384,7 +2620,7 @@ macro_rules! table_relation_vacuum {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2396,17 +2632,15 @@ macro_rules! table_relation_vacuum {
 #[macro_export]
 macro_rules! table_rescan {
     ($scan:expr, $key:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$scan;
-                let _ = &$key;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$scan;
+            let _ = &$key;
+            ()
+        })
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_rescan from tableam.h:1069 (PostgreSQL 19)
+/// C inline function table_rescan from tableam.h:1069 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -2417,7 +2651,7 @@ macro_rules! table_rescan {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2429,17 +2663,15 @@ macro_rules! table_rescan {
 #[macro_export]
 macro_rules! table_rescan {
     ($scan:expr, $key:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$scan;
-                let _ = &$key;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$scan;
+            let _ = &$key;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_rescan_set_params from tableam.h:1022 (PostgreSQL 15), tableam.h:1038 (PostgreSQL 16), tableam.h:1048 (PostgreSQL 17), tableam.h:1007 (PostgreSQL 18)
+/// C inline function table_rescan_set_params from tableam.h:1022 (PostgreSQL 15), tableam.h:1038 (PostgreSQL 16), tableam.h:1048 (PostgreSQL 17), tableam.h:1007 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -2453,7 +2685,7 @@ macro_rules! table_rescan {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2472,13 +2704,13 @@ macro_rules! table_rescan_set_params {
                 let _ = &$allow_strat;
                 let _ = &$allow_sync;
                 let _ = &$allow_pagemode;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+                ()
             }
         )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_rescan_set_params from tableam.h:1083 (PostgreSQL 19)
+/// C inline function table_rescan_set_params from tableam.h:1083 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -2492,7 +2724,7 @@ macro_rules! table_rescan_set_params {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2511,7 +2743,7 @@ macro_rules! table_rescan_set_params {
                 let _ = &$allow_strat;
                 let _ = &$allow_sync;
                 let _ = &$allow_pagemode;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+                ()
             }
         )
     };
@@ -2555,7 +2787,7 @@ macro_rules! table_rescan_tidrange {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
-/// Typed call adapter for C inline function table_scan_analyze_next_block from tableam.h:1699 (PostgreSQL 15), tableam.h:1724 (PostgreSQL 16)
+/// C inline function table_scan_analyze_next_block from tableam.h:1699 (PostgreSQL 15), tableam.h:1724 (PostgreSQL 16)
 ///
 /// ```c
 /// static inline bool
@@ -2568,7 +2800,7 @@ macro_rules! table_rescan_tidrange {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2585,17 +2817,13 @@ macro_rules! table_scan_analyze_next_block {
                 let _ = &$scan;
                 let _ = &$blockno;
                 let _ = &$bstrategy;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function table_scan_analyze_next_block from tableam.h:1729 (PostgreSQL 17), tableam.h:1688 (PostgreSQL 18), tableam.h:1795 (PostgreSQL 19)
+/// C inline function table_scan_analyze_next_block from tableam.h:1729 (PostgreSQL 17), tableam.h:1688 (PostgreSQL 18), tableam.h:1795 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2606,7 +2834,7 @@ macro_rules! table_scan_analyze_next_block {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2622,17 +2850,13 @@ macro_rules! table_scan_analyze_next_block {
             @value {
                 let _ = &$scan;
                 let _ = &$stream;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_scan_analyze_next_tuple from tableam.h:1717 (PostgreSQL 15), tableam.h:1742 (PostgreSQL 16), tableam.h:1745 (PostgreSQL 17), tableam.h:1704 (PostgreSQL 18)
+/// C inline function table_scan_analyze_next_tuple from tableam.h:1717 (PostgreSQL 15), tableam.h:1742 (PostgreSQL 16), tableam.h:1745 (PostgreSQL 17), tableam.h:1704 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline bool
@@ -2647,7 +2871,7 @@ macro_rules! table_scan_analyze_next_block {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2666,17 +2890,13 @@ macro_rules! table_scan_analyze_next_tuple {
                 let _ = &$liverows;
                 let _ = &$deadrows;
                 let _ = &$slot;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_scan_analyze_next_tuple from tableam.h:1811 (PostgreSQL 19)
+/// C inline function table_scan_analyze_next_tuple from tableam.h:1811 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2691,7 +2911,7 @@ macro_rules! table_scan_analyze_next_tuple {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2709,11 +2929,7 @@ macro_rules! table_scan_analyze_next_tuple {
                 let _ = &$liverows;
                 let _ = &$deadrows;
                 let _ = &$slot;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -2872,7 +3088,7 @@ macro_rules! table_scan_bitmap_next_tuple {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_scan_bitmap_next_tuple from tableam.h:2038 (PostgreSQL 19)
+/// C inline function table_scan_bitmap_next_tuple from tableam.h:2038 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2891,7 +3107,7 @@ macro_rules! table_scan_bitmap_next_tuple {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2910,11 +3126,7 @@ macro_rules! table_scan_bitmap_next_tuple {
                 let _ = &$recheck;
                 let _ = &$lossy_pages;
                 let _ = &$exact_pages;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -3201,7 +3413,7 @@ macro_rules! table_scan_sample_next_block {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_scan_sample_next_block from tableam.h:2061 (PostgreSQL 19)
+/// C inline function table_scan_sample_next_block from tableam.h:2061 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -3213,7 +3425,7 @@ macro_rules! table_scan_sample_next_block {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -3229,11 +3441,7 @@ macro_rules! table_scan_sample_next_block {
             @value {
                 let _ = &$scan;
                 let _ = &$scanstate;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -3287,7 +3495,7 @@ macro_rules! table_scan_sample_next_tuple {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_scan_sample_next_tuple from tableam.h:2076 (PostgreSQL 19)
+/// C inline function table_scan_sample_next_tuple from tableam.h:2076 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -3301,7 +3509,7 @@ macro_rules! table_scan_sample_next_tuple {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -3318,16 +3526,12 @@ macro_rules! table_scan_sample_next_tuple {
                 let _ = &$scan;
                 let _ = &$scanstate;
                 let _ = &$slot;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
-/// Typed call adapter for C inline function table_tuple_complete_speculative from tableam.h:1411 (PostgreSQL 15), tableam.h:1435 (PostgreSQL 16), tableam.h:1440 (PostgreSQL 17), tableam.h:1399 (PostgreSQL 18), tableam.h:1490 (PostgreSQL 19)
+/// C inline function table_tuple_complete_speculative from tableam.h:1411 (PostgreSQL 15), tableam.h:1435 (PostgreSQL 16), tableam.h:1440 (PostgreSQL 17), tableam.h:1399 (PostgreSQL 18), tableam.h:1490 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -3340,7 +3544,7 @@ macro_rules! table_scan_sample_next_tuple {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -3358,13 +3562,13 @@ macro_rules! table_tuple_complete_speculative {
                 let _ = &$slot;
                 let _ = &$specToken;
                 let _ = &$succeeded;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+                ()
             }
         )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_tuple_delete from tableam.h:1467 (PostgreSQL 15), tableam.h:1491 (PostgreSQL 16), tableam.h:1496 (PostgreSQL 17), tableam.h:1455 (PostgreSQL 18)
+/// C inline function table_tuple_delete from tableam.h:1467 (PostgreSQL 15), tableam.h:1491 (PostgreSQL 16), tableam.h:1496 (PostgreSQL 17), tableam.h:1455 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline TM_Result
@@ -3379,7 +3583,7 @@ macro_rules! table_tuple_complete_speculative {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -3410,20 +3614,18 @@ macro_rules! table_tuple_delete {
                 let _ = &$wait;
                 let _ = &$tmfd;
                 let _ = &$changingPart;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CEnumObject<
-                            $crate::__pgrx_c_generated::EnumIdentity_enum__TM_Result,
-                            $crate::__pgrx_c_macros::CUnsignedInt,
-                            u32
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CEnumObject<
+                        $crate::__pgrx_c_generated::EnumIdentity_enum__TM_Result,
+                        $crate::__pgrx_c_macros::CUnsignedInt,
+                        u32
+                    >>()
             }
         )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_tuple_delete from tableam.h:1552 (PostgreSQL 19)
+/// C inline function table_tuple_delete from tableam.h:1552 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TM_Result
@@ -3438,7 +3640,7 @@ macro_rules! table_tuple_delete {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -3469,14 +3671,12 @@ macro_rules! table_tuple_delete {
                 let _ = &$crosscheck;
                 let _ = &$wait;
                 let _ = &$tmfd;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CEnumObject<
-                            $crate::__pgrx_c_generated::EnumIdentity_enum__TM_Result,
-                            $crate::__pgrx_c_macros::CUnsignedInt,
-                            u32
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CEnumObject<
+                        $crate::__pgrx_c_generated::EnumIdentity_enum__TM_Result,
+                        $crate::__pgrx_c_macros::CUnsignedInt,
+                        u32
+                    >>()
             }
         )
     };
@@ -3531,7 +3731,7 @@ macro_rules! table_tuple_fetch_row_version {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_tuple_insert from tableam.h:1378 (PostgreSQL 15), tableam.h:1402 (PostgreSQL 16), tableam.h:1407 (PostgreSQL 17), tableam.h:1366 (PostgreSQL 18)
+/// C inline function table_tuple_insert from tableam.h:1378 (PostgreSQL 15), tableam.h:1402 (PostgreSQL 16), tableam.h:1407 (PostgreSQL 17), tableam.h:1366 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -3544,7 +3744,7 @@ macro_rules! table_tuple_fetch_row_version {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -3563,13 +3763,13 @@ macro_rules! table_tuple_insert {
                 let _ = &$cid;
                 let _ = &$options;
                 let _ = &$bistate;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+                ()
             }
         )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_tuple_insert from tableam.h:1457 (PostgreSQL 19)
+/// C inline function table_tuple_insert from tableam.h:1457 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -3582,7 +3782,7 @@ macro_rules! table_tuple_insert {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -3601,13 +3801,13 @@ macro_rules! table_tuple_insert {
                 let _ = &$cid;
                 let _ = &$options;
                 let _ = &$bistate;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+                ()
             }
         )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_tuple_insert_speculative from tableam.h:1397 (PostgreSQL 15), tableam.h:1421 (PostgreSQL 16), tableam.h:1426 (PostgreSQL 17), tableam.h:1385 (PostgreSQL 18)
+/// C inline function table_tuple_insert_speculative from tableam.h:1397 (PostgreSQL 15), tableam.h:1421 (PostgreSQL 16), tableam.h:1426 (PostgreSQL 17), tableam.h:1385 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -3622,7 +3822,7 @@ macro_rules! table_tuple_insert {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -3642,13 +3842,13 @@ macro_rules! table_tuple_insert_speculative {
                 let _ = &$options;
                 let _ = &$bistate;
                 let _ = &$specToken;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+                ()
             }
         )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_tuple_insert_speculative from tableam.h:1476 (PostgreSQL 19)
+/// C inline function table_tuple_insert_speculative from tableam.h:1476 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -3663,7 +3863,7 @@ macro_rules! table_tuple_insert_speculative {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -3683,12 +3883,12 @@ macro_rules! table_tuple_insert_speculative {
                 let _ = &$options;
                 let _ = &$bistate;
                 let _ = &$specToken;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+                ()
             }
         )
     };
 }
-/// Typed call adapter for C inline function table_tuple_lock from tableam.h:1558 (PostgreSQL 15), tableam.h:1582 (PostgreSQL 16), tableam.h:1587 (PostgreSQL 17), tableam.h:1546 (PostgreSQL 18), tableam.h:1649 (PostgreSQL 19)
+/// C inline function table_tuple_lock from tableam.h:1558 (PostgreSQL 15), tableam.h:1582 (PostgreSQL 16), tableam.h:1587 (PostgreSQL 17), tableam.h:1546 (PostgreSQL 18), tableam.h:1649 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TM_Result
@@ -3704,7 +3904,7 @@ macro_rules! table_tuple_insert_speculative {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -3737,19 +3937,17 @@ macro_rules! table_tuple_lock {
                 let _ = &$wait_policy;
                 let _ = &$flags;
                 let _ = &$tmfd;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CEnumObject<
-                            $crate::__pgrx_c_generated::EnumIdentity_enum__TM_Result,
-                            $crate::__pgrx_c_macros::CUnsignedInt,
-                            u32
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CEnumObject<
+                        $crate::__pgrx_c_generated::EnumIdentity_enum__TM_Result,
+                        $crate::__pgrx_c_macros::CUnsignedInt,
+                        u32
+                    >>()
             }
         )
     };
 }
-/// Typed call adapter for C inline function table_tuple_satisfies_snapshot from tableam.h:1311 (PostgreSQL 15), tableam.h:1335 (PostgreSQL 16), tableam.h:1340 (PostgreSQL 17), tableam.h:1299 (PostgreSQL 18), tableam.h:1390 (PostgreSQL 19)
+/// C inline function table_tuple_satisfies_snapshot from tableam.h:1311 (PostgreSQL 15), tableam.h:1335 (PostgreSQL 16), tableam.h:1340 (PostgreSQL 17), tableam.h:1299 (PostgreSQL 18), tableam.h:1390 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -3761,7 +3959,7 @@ macro_rules! table_tuple_lock {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -3778,16 +3976,12 @@ macro_rules! table_tuple_satisfies_snapshot {
                 let _ = &$rel;
                 let _ = &$slot;
                 let _ = &$snapshot;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
-/// Typed call adapter for C inline function table_tuple_tid_valid from tableam.h:1290 (PostgreSQL 15), tableam.h:1314 (PostgreSQL 16), tableam.h:1319 (PostgreSQL 17), tableam.h:1278 (PostgreSQL 18), tableam.h:1369 (PostgreSQL 19)
+/// C inline function table_tuple_tid_valid from tableam.h:1290 (PostgreSQL 15), tableam.h:1314 (PostgreSQL 16), tableam.h:1319 (PostgreSQL 17), tableam.h:1278 (PostgreSQL 18), tableam.h:1369 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -3798,7 +3992,7 @@ macro_rules! table_tuple_satisfies_snapshot {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -3814,17 +4008,13 @@ macro_rules! table_tuple_tid_valid {
             @value {
                 let _ = &$scan;
                 let _ = &$tid;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
 #[cfg(feature = "pg15")]
-/// Typed call adapter for C inline function table_tuple_update from tableam.h:1511 (PostgreSQL 15)
+/// C inline function table_tuple_update from tableam.h:1511 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline TM_Result
@@ -3841,7 +4031,7 @@ macro_rules! table_tuple_tid_valid {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -3876,20 +4066,18 @@ macro_rules! table_tuple_update {
                 let _ = &$tmfd;
                 let _ = &$lockmode;
                 let _ = &$update_indexes;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CEnumObject<
-                            $crate::__pgrx_c_generated::EnumIdentity_enum__TM_Result,
-                            $crate::__pgrx_c_macros::CUnsignedInt,
-                            u32
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CEnumObject<
+                        $crate::__pgrx_c_generated::EnumIdentity_enum__TM_Result,
+                        $crate::__pgrx_c_macros::CUnsignedInt,
+                        u32
+                    >>()
             }
         )
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function table_tuple_update from tableam.h:1535 (PostgreSQL 16), tableam.h:1540 (PostgreSQL 17), tableam.h:1499 (PostgreSQL 18)
+/// C inline function table_tuple_update from tableam.h:1535 (PostgreSQL 16), tableam.h:1540 (PostgreSQL 17), tableam.h:1499 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline TM_Result
@@ -3906,7 +4094,7 @@ macro_rules! table_tuple_update {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -3941,20 +4129,18 @@ macro_rules! table_tuple_update {
                 let _ = &$tmfd;
                 let _ = &$lockmode;
                 let _ = &$update_indexes;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CEnumObject<
-                            $crate::__pgrx_c_generated::EnumIdentity_enum__TM_Result,
-                            $crate::__pgrx_c_macros::CUnsignedInt,
-                            u32
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CEnumObject<
+                        $crate::__pgrx_c_generated::EnumIdentity_enum__TM_Result,
+                        $crate::__pgrx_c_macros::CUnsignedInt,
+                        u32
+                    >>()
             }
         )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function table_tuple_update from tableam.h:1601 (PostgreSQL 19)
+/// C inline function table_tuple_update from tableam.h:1601 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TM_Result
@@ -3972,7 +4158,7 @@ macro_rules! table_tuple_update {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -4009,14 +4195,12 @@ macro_rules! table_tuple_update {
                 let _ = &$tmfd;
                 let _ = &$lockmode;
                 let _ = &$update_indexes;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CEnumObject<
-                            $crate::__pgrx_c_generated::EnumIdentity_enum__TM_Result,
-                            $crate::__pgrx_c_macros::CUnsignedInt,
-                            u32
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CEnumObject<
+                        $crate::__pgrx_c_generated::EnumIdentity_enum__TM_Result,
+                        $crate::__pgrx_c_macros::CUnsignedInt,
+                        u32
+                    >>()
             }
         )
     };

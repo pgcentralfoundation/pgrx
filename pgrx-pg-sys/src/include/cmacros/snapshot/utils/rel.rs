@@ -228,8 +228,43 @@ macro_rules! RelationCloseSmgr {
         )
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function RelationCloseSmgr from rel.h:581 (PostgreSQL 17), rel.h:592 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg17", feature = "pg18"))]
+/// C inline function RelationCloseSmgr from rel.h:581 (PostgreSQL 17), rel.h:592 (PostgreSQL 18)
+///
+/// ```c
+/// static inline void
+/// RelationCloseSmgr(Relation relation)
+/// {
+/// 	if (relation->rd_smgr != NULL)
+/// 	{
+/// 		smgrunpin(relation->rd_smgr);
+/// 		smgrclose(relation->rd_smgr);
+/// 		relation->rd_smgr = NULL;
+/// 	}
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! RelationCloseSmgr {
+    ($relation:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$relation;
+            ()
+        })
+    };
+}
+#[cfg(feature = "pg19")]
+/// Typed call adapter for C inline function RelationCloseSmgr from rel.h:592 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -856,8 +891,51 @@ macro_rules! RelationGetSmgr {
         )
     };
 }
-#[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function RelationGetSmgr from rel.h:566 (PostgreSQL 17), rel.h:577 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg17", feature = "pg18"))]
+/// C inline function RelationGetSmgr from rel.h:566 (PostgreSQL 17), rel.h:577 (PostgreSQL 18)
+///
+/// ```c
+/// static inline SMgrRelation
+/// RelationGetSmgr(Relation rel)
+/// {
+/// 	if (unlikely(rel->rd_smgr == NULL))
+/// 	{
+/// 		rel->rd_smgr = smgropen(rel->rd_locator, rel->rd_backend);
+/// 		smgrpin(rel->rd_smgr);
+/// 	}
+/// 	return rel->rd_smgr;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! RelationGetSmgr {
+    ($rel:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$rel;
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::SMgrRelationData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
+            }
+        )
+    };
+}
+#[cfg(feature = "pg19")]
+/// Typed call adapter for C inline function RelationGetSmgr from rel.h:577 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline SMgrRelation
@@ -2186,7 +2264,8 @@ macro_rules! RelationNeedsWAL {
         )
     };
 }
-/// C macro RelationSetTargetBlock from rel.h:594 (PostgreSQL 15), rel.h:609 (PostgreSQL 16), rel.h:608 (PostgreSQL 17), rel.h:619 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg19"))]
+/// C macro RelationSetTargetBlock from rel.h:594 (PostgreSQL 15), rel.h:609 (PostgreSQL 16), rel.h:619 (PostgreSQL 19)
 ///
 /// ```text
 /// #define RelationSetTargetBlock( relation , targblock ) do { RelationGetSmgr ( relation ) -> smgr_targblock = ( targblock ) ; } while ( 0 )
@@ -2202,6 +2281,32 @@ macro_rules! RelationNeedsWAL {
 /// # Panics
 ///
 /// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! RelationSetTargetBlock {
+    ($relation:expr, $targblock:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$relation;
+            let _ = &$targblock;
+        })
+    };
+}
+#[cfg(any(feature = "pg17", feature = "pg18"))]
+/// C macro RelationSetTargetBlock from rel.h:608 (PostgreSQL 17), rel.h:619 (PostgreSQL 18)
+///
+/// ```text
+/// #define RelationSetTargetBlock( relation , targblock ) do { RelationGetSmgr ( relation ) -> smgr_targblock = ( targblock ) ; } while ( 0 )
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_statements!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! RelationSetTargetBlock {
     ($relation:expr, $targblock:expr $(,)?) => {

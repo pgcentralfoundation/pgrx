@@ -33,6 +33,7 @@
 
 use clang::{Clang, EntityKind, EntityVisitResult, Index};
 use serde::{Deserialize, Serialize};
+use std::borrow::Cow;
 use std::fmt;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -625,30 +626,48 @@ fn collect_macro_inventory(
 /// A token's spelling without line splices.
 ///
 /// libclang spells punctuation, literals and comments from the source buffer, so they keep a
-/// splice inside them, and a token that follows a splice begins at its backslash. As in Clang,
-/// a backslash followed by optional blanks (space, tab, vertical tab, form feed) and a line
-/// end (LF, CR, CR-LF or LF-CR) is removed. Removal is one pass, so a backslash that precedes
-/// a removed splice is kept.
-fn unspliced(spelling: String) -> String {
-    if !spelling.contains('\\') {
-        return spelling;
+/// splice inside them, and a token that follows a splice begins at its backslash.
+pub(crate) fn unspliced(spelling: String) -> String {
+    match without_splices(spelling.as_bytes()) {
+        Cow::Borrowed(_) => spelling,
+        // Only ASCII bytes are removed, and none is part of a multibyte sequence.
+        Cow::Owned(bytes) => String::from_utf8(bytes).expect("removing ASCII keeps UTF-8"),
     }
-    let mut result = String::with_capacity(spelling.len());
-    let mut rest = spelling.as_str();
-    while let Some(at) = rest.find('\\') {
-        result.push_str(&rest[..at]);
-        let after = &rest[at + 1..];
-        let line = after.trim_start_matches([' ', '\t', '\x0b', '\x0c']);
-        match ["\r\n", "\n\r", "\n", "\r"].into_iter().find_map(|end| line.strip_prefix(end)) {
-            Some(next) => rest = next,
+}
+
+/// Source text without line splices. Removal is one pass, so a backslash that precedes a
+/// removed splice is kept. The text need not be UTF-8.
+pub(crate) fn without_splices(text: &[u8]) -> Cow<'_, [u8]> {
+    if !text.contains(&b'\\') {
+        return Cow::Borrowed(text);
+    }
+    let mut result = Vec::with_capacity(text.len());
+    let mut rest = text;
+    while let Some(at) = rest.iter().position(|&byte| byte == b'\\') {
+        result.extend_from_slice(&rest[..at]);
+        match splice_length(&rest[at..]) {
+            Some(length) => rest = &rest[at + length..],
             None => {
-                result.push('\\');
-                rest = after;
+                result.push(b'\\');
+                rest = &rest[at + 1..];
             }
         }
     }
-    result.push_str(rest);
-    result
+    result.extend_from_slice(rest);
+    Cow::Owned(result)
+}
+
+/// The length of the line splice that starts `text`, if one does.
+///
+/// As in Clang, a splice is a backslash followed by optional blanks (space, tab, vertical
+/// tab, form feed) and a line end (LF, CR, CR-LF or LF-CR).
+pub(crate) fn splice_length(text: &[u8]) -> Option<usize> {
+    let after = text.strip_prefix(b"\\")?;
+    let blanks =
+        after.iter().take_while(|&&byte| matches!(byte, b' ' | b'\t' | b'\x0b' | b'\x0c')).count();
+    let line = &after[blanks..];
+    let ends: [&[u8]; 4] = [b"\r\n", b"\n\r", b"\n", b"\r"];
+    ends.into_iter().find(|end| line.starts_with(end)).map(|end| 1 + blanks + end.len())
 }
 
 /// Copy the physical spelling location used for diagnostics and provenance ownership checks.
@@ -708,9 +727,19 @@ mod tests {
             ("\\", "\\"),
             ("\\\\\n\n", "\\\n"),
             ("\\\n\\\n#", "#"),
+            ("\\ \t\r\n#", "#"),
+            ("%\\\n:", "%:"),
+            ("\"a\\\\\nb\"", "\"a\\b\""),
         ] {
             assert_eq!(unspliced(raw.into()), clean, "{raw:?}");
         }
+    }
+
+    /// Source bytes need not be UTF-8, and text without a backslash is borrowed.
+    #[test]
+    fn without_splices_keeps_other_bytes() {
+        assert_eq!(without_splices(b"\xe9\\\n\xff\\\r\0"), &b"\xe9\xff\0"[..]);
+        assert!(matches!(without_splices(b"\xe9 \n"), Cow::Borrowed(_)));
     }
 
     /// A parse failure names its errors with their locations, skips warnings and notes, and

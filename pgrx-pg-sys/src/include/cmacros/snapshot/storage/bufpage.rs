@@ -103,7 +103,7 @@ macro_rules! PageClearAllVisible {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function PageClearAllVisible from bufpage.h:436 (PostgreSQL 16–17), bufpage.h:439 (PostgreSQL 18), bufpage.h:464 (PostgreSQL 19)
+/// C inline function PageClearAllVisible from bufpage.h:436 (PostgreSQL 16–17), bufpage.h:439 (PostgreSQL 18), bufpage.h:464 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -114,7 +114,7 @@ macro_rules! PageClearAllVisible {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -122,16 +122,14 @@ macro_rules! PageClearAllVisible {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageClearAllVisible {
     ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$page;
+            ()
+        })
     };
 }
 #[cfg(feature = "pg15")]
@@ -202,7 +200,7 @@ macro_rules! PageClearFull {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function PageClearFull from bufpage.h:420 (PostgreSQL 16–17), bufpage.h:423 (PostgreSQL 18), bufpage.h:448 (PostgreSQL 19)
+/// C inline function PageClearFull from bufpage.h:420 (PostgreSQL 16–17), bufpage.h:423 (PostgreSQL 18), bufpage.h:448 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -213,7 +211,7 @@ macro_rules! PageClearFull {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -221,16 +219,14 @@ macro_rules! PageClearFull {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageClearFull {
     ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$page;
+            ()
+        })
     };
 }
 #[cfg(feature = "pg15")]
@@ -301,7 +297,7 @@ macro_rules! PageClearHasFreeLinePointers {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function PageClearHasFreeLinePointers from bufpage.h:404 (PostgreSQL 16–17), bufpage.h:407 (PostgreSQL 18), bufpage.h:432 (PostgreSQL 19)
+/// C inline function PageClearHasFreeLinePointers from bufpage.h:404 (PostgreSQL 16–17), bufpage.h:407 (PostgreSQL 18), bufpage.h:432 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -312,7 +308,7 @@ macro_rules! PageClearHasFreeLinePointers {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -320,16 +316,14 @@ macro_rules! PageClearHasFreeLinePointers {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageClearHasFreeLinePointers {
     ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$page;
+            ()
+        })
     };
 }
 /// C macro PageClearPrunable from bufpage.h:399 (PostgreSQL 15), bufpage.h:452 (PostgreSQL 16–17), bufpage.h:455 (PostgreSQL 18), bufpage.h:486 (PostgreSQL 19)
@@ -511,7 +505,7 @@ macro_rules! PageGetContents {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function PageGetContents from bufpage.h:254 (PostgreSQL 16–17), bufpage.h:258 (PostgreSQL 18), bufpage.h:282 (PostgreSQL 19)
+/// C inline function PageGetContents from bufpage.h:254 (PostgreSQL 16–17), bufpage.h:258 (PostgreSQL 18), bufpage.h:282 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline char *
@@ -522,7 +516,7 @@ macro_rules! PageGetContents {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -530,23 +524,18 @@ macro_rules! PageGetContents {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageGetContents {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CChar,
-                                ::core::ffi::c_char
-                            >,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::CChar,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
@@ -763,7 +752,7 @@ macro_rules! PageGetItemId {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function PageGetItemId from bufpage.h:240 (PostgreSQL 16–17), bufpage.h:244 (PostgreSQL 18), bufpage.h:268 (PostgreSQL 19)
+/// C inline function PageGetItemId from bufpage.h:240 (PostgreSQL 16–17), bufpage.h:244 (PostgreSQL 18), bufpage.h:268 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline ItemId
@@ -774,7 +763,7 @@ macro_rules! PageGetItemId {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -782,7 +771,7 @@ macro_rules! PageGetItemId {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageGetItemId {
     ($page:expr, $offsetNumber:expr $(,)?) => {
@@ -790,15 +779,13 @@ macro_rules! PageGetItemId {
             @value {
                 let _ = &$page;
                 let _ = &$offsetNumber;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::__pgrx_c_bindings::ItemIdData
-                            >,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::ItemIdData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
@@ -887,7 +874,7 @@ macro_rules! PageGetLSN {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
-/// Typed call adapter for C inline function PageGetLSN from bufpage.h:383 (PostgreSQL 16–17)
+/// C inline function PageGetLSN from bufpage.h:383 (PostgreSQL 16–17)
 ///
 /// ```c
 /// static inline XLogRecPtr
@@ -898,7 +885,7 @@ macro_rules! PageGetLSN {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -906,24 +893,22 @@ macro_rules! PageGetLSN {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageGetLSN {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_types::XLogRecPtr
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_types::XLogRecPtr
+                >()
             }
         )
     };
 }
 #[cfg(feature = "pg18")]
-/// Typed call adapter for C inline function PageGetLSN from bufpage.h:386 (PostgreSQL 18)
+/// C inline function PageGetLSN from bufpage.h:386 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline XLogRecPtr
@@ -934,7 +919,7 @@ macro_rules! PageGetLSN {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -942,24 +927,22 @@ macro_rules! PageGetLSN {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageGetLSN {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_types::XLogRecPtr
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_types::XLogRecPtr
+                >()
             }
         )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function PageGetLSN from bufpage.h:410 (PostgreSQL 19)
+/// C inline function PageGetLSN from bufpage.h:410 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline XLogRecPtr
@@ -970,7 +953,7 @@ macro_rules! PageGetLSN {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -978,18 +961,16 @@ macro_rules! PageGetLSN {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageGetLSN {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_types::XLogRecPtr
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_types::XLogRecPtr
+                >()
             }
         )
     };
@@ -1115,7 +1096,7 @@ macro_rules! PageGetMaxOffsetNumber {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
-/// Typed call adapter for C inline function PageGetMaxOffsetNumber from bufpage.h:369 (PostgreSQL 16–17)
+/// C inline function PageGetMaxOffsetNumber from bufpage.h:369 (PostgreSQL 16–17)
 ///
 /// ```c
 /// static inline OffsetNumber
@@ -1131,7 +1112,7 @@ macro_rules! PageGetMaxOffsetNumber {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1139,24 +1120,22 @@ macro_rules! PageGetMaxOffsetNumber {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageGetMaxOffsetNumber {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_types::OffsetNumber
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_types::OffsetNumber
+                >()
             }
         )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function PageGetMaxOffsetNumber from bufpage.h:372 (PostgreSQL 18), bufpage.h:396 (PostgreSQL 19)
+/// C inline function PageGetMaxOffsetNumber from bufpage.h:372 (PostgreSQL 18), bufpage.h:396 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline OffsetNumber
@@ -1172,7 +1151,7 @@ macro_rules! PageGetMaxOffsetNumber {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1180,18 +1159,16 @@ macro_rules! PageGetMaxOffsetNumber {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageGetMaxOffsetNumber {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_types::OffsetNumber
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_types::OffsetNumber
+                >()
             }
         )
     };
@@ -1259,7 +1236,7 @@ macro_rules! PageGetPageLayoutVersion {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
-/// Typed call adapter for C inline function PageGetPageLayoutVersion from bufpage.h:283 (PostgreSQL 16–17)
+/// C inline function PageGetPageLayoutVersion from bufpage.h:283 (PostgreSQL 16–17)
 ///
 /// ```c
 /// static inline uint8
@@ -1270,7 +1247,7 @@ macro_rules! PageGetPageLayoutVersion {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1278,24 +1255,20 @@ macro_rules! PageGetPageLayoutVersion {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageGetPageLayoutVersion {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_types::uint8
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::uint8>()
             }
         )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function PageGetPageLayoutVersion from bufpage.h:287 (PostgreSQL 18), bufpage.h:311 (PostgreSQL 19)
+/// C inline function PageGetPageLayoutVersion from bufpage.h:287 (PostgreSQL 18), bufpage.h:311 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline uint8
@@ -1306,7 +1279,7 @@ macro_rules! PageGetPageLayoutVersion {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1314,18 +1287,14 @@ macro_rules! PageGetPageLayoutVersion {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageGetPageLayoutVersion {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_types::uint8
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::uint8>()
             }
         )
     };
@@ -1365,7 +1334,7 @@ macro_rules! PageGetPageSize {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
-/// Typed call adapter for C inline function PageGetPageSize from bufpage.h:273 (PostgreSQL 16–17)
+/// C inline function PageGetPageSize from bufpage.h:273 (PostgreSQL 16–17)
 ///
 /// ```c
 /// static inline Size
@@ -1376,7 +1345,7 @@ macro_rules! PageGetPageSize {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1384,26 +1353,20 @@ macro_rules! PageGetPageSize {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageGetPageSize {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLong,
-                            usize
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::Size>()
             }
         )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function PageGetPageSize from bufpage.h:277 (PostgreSQL 18), bufpage.h:301 (PostgreSQL 19)
+/// C inline function PageGetPageSize from bufpage.h:277 (PostgreSQL 18), bufpage.h:301 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Size
@@ -1414,7 +1377,7 @@ macro_rules! PageGetPageSize {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1422,26 +1385,20 @@ macro_rules! PageGetPageSize {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageGetPageSize {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLong,
-                            usize
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::Size>()
             }
         )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function PageGetPruneXid from bufpage.h:470 (PostgreSQL 19)
+/// C inline function PageGetPruneXid from bufpage.h:470 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TransactionId
@@ -1452,7 +1409,7 @@ macro_rules! PageGetPageSize {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1460,20 +1417,16 @@ macro_rules! PageGetPageSize {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageGetPruneXid {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedInt,
-                            $crate::__pgrx_c_bindings::TransactionId
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_types::TransactionId
+                >()
             }
         )
     };
@@ -1517,7 +1470,7 @@ macro_rules! PageGetSpecialPointer {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
-/// Typed call adapter for C inline function PageGetSpecialPointer from bufpage.h:336 (PostgreSQL 16–17)
+/// C inline function PageGetSpecialPointer from bufpage.h:336 (PostgreSQL 16–17)
 ///
 /// ```c
 /// static inline char *
@@ -1529,7 +1482,7 @@ macro_rules! PageGetSpecialPointer {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1537,23 +1490,18 @@ macro_rules! PageGetSpecialPointer {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageGetSpecialPointer {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CChar,
-                                ::core::ffi::c_char
-                            >,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::CChar,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
@@ -1671,7 +1619,7 @@ macro_rules! PageGetSpecialSize {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
-/// Typed call adapter for C inline function PageGetSpecialSize from bufpage.h:313 (PostgreSQL 16–17)
+/// C inline function PageGetSpecialSize from bufpage.h:313 (PostgreSQL 16–17)
 ///
 /// ```c
 /// static inline uint16
@@ -1682,7 +1630,7 @@ macro_rules! PageGetSpecialSize {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1690,24 +1638,20 @@ macro_rules! PageGetSpecialSize {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageGetSpecialSize {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_types::uint16
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::uint16>()
             }
         )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function PageGetSpecialSize from bufpage.h:317 (PostgreSQL 18), bufpage.h:341 (PostgreSQL 19)
+/// C inline function PageGetSpecialSize from bufpage.h:317 (PostgreSQL 18), bufpage.h:341 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline uint16
@@ -1718,7 +1662,7 @@ macro_rules! PageGetSpecialSize {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1726,18 +1670,14 @@ macro_rules! PageGetSpecialSize {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageGetSpecialSize {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_types::uint16
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::uint16>()
             }
         )
     };
@@ -1805,7 +1745,7 @@ macro_rules! PageHasFreeLinePointers {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
-/// Typed call adapter for C inline function PageHasFreeLinePointers from bufpage.h:394 (PostgreSQL 16–17)
+/// C inline function PageHasFreeLinePointers from bufpage.h:394 (PostgreSQL 16–17)
 ///
 /// ```c
 /// static inline bool
@@ -1816,7 +1756,7 @@ macro_rules! PageHasFreeLinePointers {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1824,24 +1764,20 @@ macro_rules! PageHasFreeLinePointers {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageHasFreeLinePointers {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function PageHasFreeLinePointers from bufpage.h:397 (PostgreSQL 18), bufpage.h:422 (PostgreSQL 19)
+/// C inline function PageHasFreeLinePointers from bufpage.h:397 (PostgreSQL 18), bufpage.h:422 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1852,7 +1788,7 @@ macro_rules! PageHasFreeLinePointers {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1860,18 +1796,14 @@ macro_rules! PageHasFreeLinePointers {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageHasFreeLinePointers {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -1939,7 +1871,7 @@ macro_rules! PageIsAllVisible {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
-/// Typed call adapter for C inline function PageIsAllVisible from bufpage.h:426 (PostgreSQL 16–17)
+/// C inline function PageIsAllVisible from bufpage.h:426 (PostgreSQL 16–17)
 ///
 /// ```c
 /// static inline bool
@@ -1950,7 +1882,7 @@ macro_rules! PageIsAllVisible {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1958,24 +1890,20 @@ macro_rules! PageIsAllVisible {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageIsAllVisible {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function PageIsAllVisible from bufpage.h:429 (PostgreSQL 18), bufpage.h:454 (PostgreSQL 19)
+/// C inline function PageIsAllVisible from bufpage.h:429 (PostgreSQL 18), bufpage.h:454 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1986,7 +1914,7 @@ macro_rules! PageIsAllVisible {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1994,18 +1922,14 @@ macro_rules! PageIsAllVisible {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageIsAllVisible {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -2043,7 +1967,7 @@ macro_rules! PageIsEmpty {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
-/// Typed call adapter for C inline function PageIsEmpty from bufpage.h:220 (PostgreSQL 16–17)
+/// C inline function PageIsEmpty from bufpage.h:220 (PostgreSQL 16–17)
 ///
 /// ```c
 /// static inline bool
@@ -2054,7 +1978,7 @@ macro_rules! PageIsEmpty {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2062,24 +1986,20 @@ macro_rules! PageIsEmpty {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageIsEmpty {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function PageIsEmpty from bufpage.h:224 (PostgreSQL 18), bufpage.h:248 (PostgreSQL 19)
+/// C inline function PageIsEmpty from bufpage.h:224 (PostgreSQL 18), bufpage.h:248 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2090,7 +2010,7 @@ macro_rules! PageIsEmpty {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2098,18 +2018,14 @@ macro_rules! PageIsEmpty {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageIsEmpty {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -2177,7 +2093,7 @@ macro_rules! PageIsFull {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
-/// Typed call adapter for C inline function PageIsFull from bufpage.h:410 (PostgreSQL 16–17)
+/// C inline function PageIsFull from bufpage.h:410 (PostgreSQL 16–17)
 ///
 /// ```c
 /// static inline bool
@@ -2188,7 +2104,7 @@ macro_rules! PageIsFull {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2196,24 +2112,20 @@ macro_rules! PageIsFull {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageIsFull {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function PageIsFull from bufpage.h:413 (PostgreSQL 18), bufpage.h:438 (PostgreSQL 19)
+/// C inline function PageIsFull from bufpage.h:413 (PostgreSQL 18), bufpage.h:438 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2224,7 +2136,7 @@ macro_rules! PageIsFull {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2232,18 +2144,14 @@ macro_rules! PageIsFull {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageIsFull {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -2281,7 +2189,7 @@ macro_rules! PageIsNew {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17"))]
-/// Typed call adapter for C inline function PageIsNew from bufpage.h:230 (PostgreSQL 16–17)
+/// C inline function PageIsNew from bufpage.h:230 (PostgreSQL 16–17)
 ///
 /// ```c
 /// static inline bool
@@ -2292,7 +2200,7 @@ macro_rules! PageIsNew {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2300,24 +2208,20 @@ macro_rules! PageIsNew {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageIsNew {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function PageIsNew from bufpage.h:234 (PostgreSQL 18), bufpage.h:258 (PostgreSQL 19)
+/// C inline function PageIsNew from bufpage.h:234 (PostgreSQL 18), bufpage.h:258 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2328,7 +2232,7 @@ macro_rules! PageIsNew {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2336,18 +2240,14 @@ macro_rules! PageIsNew {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageIsNew {
     ($page:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -2479,7 +2379,7 @@ macro_rules! PageSetAllVisible {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function PageSetAllVisible from bufpage.h:431 (PostgreSQL 16–17), bufpage.h:434 (PostgreSQL 18), bufpage.h:459 (PostgreSQL 19)
+/// C inline function PageSetAllVisible from bufpage.h:431 (PostgreSQL 16–17), bufpage.h:434 (PostgreSQL 18), bufpage.h:459 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -2490,7 +2390,7 @@ macro_rules! PageSetAllVisible {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2498,16 +2398,14 @@ macro_rules! PageSetAllVisible {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageSetAllVisible {
     ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$page;
+            ()
+        })
     };
 }
 #[cfg(feature = "pg15")]
@@ -2574,7 +2472,7 @@ macro_rules! PageSetFull {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function PageSetFull from bufpage.h:415 (PostgreSQL 16–17), bufpage.h:418 (PostgreSQL 18), bufpage.h:443 (PostgreSQL 19)
+/// C inline function PageSetFull from bufpage.h:415 (PostgreSQL 16–17), bufpage.h:418 (PostgreSQL 18), bufpage.h:443 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -2585,7 +2483,7 @@ macro_rules! PageSetFull {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2593,16 +2491,14 @@ macro_rules! PageSetFull {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageSetFull {
     ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$page;
+            ()
+        })
     };
 }
 #[cfg(feature = "pg15")]
@@ -2669,7 +2565,7 @@ macro_rules! PageSetHasFreeLinePointers {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function PageSetHasFreeLinePointers from bufpage.h:399 (PostgreSQL 16–17), bufpage.h:402 (PostgreSQL 18), bufpage.h:427 (PostgreSQL 19)
+/// C inline function PageSetHasFreeLinePointers from bufpage.h:399 (PostgreSQL 16–17), bufpage.h:402 (PostgreSQL 18), bufpage.h:427 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -2680,7 +2576,7 @@ macro_rules! PageSetHasFreeLinePointers {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2688,16 +2584,14 @@ macro_rules! PageSetHasFreeLinePointers {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageSetHasFreeLinePointers {
     ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$page;
+            ()
+        })
     };
 }
 #[cfg(feature = "pg15")]
@@ -2805,7 +2699,7 @@ macro_rules! PageSetLSN {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function PageSetLSN from bufpage.h:416 (PostgreSQL 19)
+/// C inline function PageSetLSN from bufpage.h:416 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -2816,7 +2710,7 @@ macro_rules! PageSetLSN {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2824,17 +2718,15 @@ macro_rules! PageSetLSN {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageSetLSN {
     ($page:expr, $lsn:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                let _ = &$lsn;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$page;
+            let _ = &$lsn;
+            ()
+        })
     };
 }
 #[cfg(feature = "pg15")]
@@ -2957,7 +2849,8 @@ macro_rules! PageSetPageSizeAndVersion {
         )
     };
 }
-/// C macro PageSetPrunable from bufpage.h:392 (PostgreSQL 15), bufpage.h:445 (PostgreSQL 16–17), bufpage.h:448 (PostgreSQL 18), bufpage.h:479 (PostgreSQL 19)
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C macro PageSetPrunable from bufpage.h:392 (PostgreSQL 15), bufpage.h:445 (PostgreSQL 16–17), bufpage.h:448 (PostgreSQL 18)
 ///
 /// ```text
 /// #define PageSetPrunable( page , xid ) do { Assert ( TransactionIdIsNormal ( xid ) ) ; if ( ! TransactionIdIsValid ( ( ( PageHeader ) ( page ) ) -> pd_prune_xid ) || TransactionIdPrecedes ( xid , ( ( PageHeader ) ( page ) ) -> pd_prune_xid ) ) ( ( PageHeader ) ( page ) ) -> pd_prune_xid = ( xid ) ; } while ( 0 )
@@ -2973,6 +2866,32 @@ macro_rules! PageSetPageSizeAndVersion {
 /// # Panics
 ///
 /// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! PageSetPrunable {
+    ($page:expr, $xid:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(@unit {
+            let _ = &$page;
+            let _ = &$xid;
+        })
+    };
+}
+#[cfg(feature = "pg19")]
+/// C macro PageSetPrunable from bufpage.h:479 (PostgreSQL 19)
+///
+/// ```text
+/// #define PageSetPrunable( page , xid ) do { Assert ( TransactionIdIsNormal ( xid ) ) ; if ( ! TransactionIdIsValid ( ( ( PageHeader ) ( page ) ) -> pd_prune_xid ) || TransactionIdPrecedes ( xid , ( ( PageHeader ) ( page ) ) -> pd_prune_xid ) ) ( ( PageHeader ) ( page ) ) -> pd_prune_xid = ( xid ) ; } while ( 0 )
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_statements!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageSetPrunable {
     ($page:expr, $xid:expr $(,)?) => {
@@ -3387,7 +3306,7 @@ macro_rules! PageXLogRecPtrSet {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function PageXLogRecPtrSet from bufpage.h:130 (PostgreSQL 19)
+/// C inline function PageXLogRecPtrSet from bufpage.h:130 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -3398,7 +3317,7 @@ macro_rules! PageXLogRecPtrSet {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -3406,17 +3325,15 @@ macro_rules! PageXLogRecPtrSet {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PageXLogRecPtrSet {
     ($ptr:expr, $lsn:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$ptr;
-                let _ = &$lsn;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$ptr;
+            let _ = &$lsn;
+            ()
+        })
     };
 }
 pub use PageAddItem;

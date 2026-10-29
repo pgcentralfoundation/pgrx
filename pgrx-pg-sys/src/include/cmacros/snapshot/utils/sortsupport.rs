@@ -2,7 +2,7 @@
 // C macros from sortsupport.h.
 
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function ApplyInt32SortComparator from sortsupport.h:301 (PostgreSQL 15–18)
+/// C inline function ApplyInt32SortComparator from sortsupport.h:301 (PostgreSQL 15–18)
 ///
 /// ```c
 /// static inline int
@@ -41,7 +41,7 @@
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -49,7 +49,7 @@
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ApplyInt32SortComparator {
     ($datum1:expr, $isNull1:expr, $datum2:expr, $isNull2:expr, $ssup:expr $(,)?) => {
@@ -60,17 +60,13 @@ macro_rules! ApplyInt32SortComparator {
                 let _ = &$datum2;
                 let _ = &$isNull2;
                 let _ = &$ssup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CInt
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CInt>()
             }
         )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function ApplySignedSortComparator from sortsupport.h:266 (PostgreSQL 15–18)
+/// C inline function ApplySignedSortComparator from sortsupport.h:266 (PostgreSQL 15–18)
 ///
 /// ```c
 /// static inline int
@@ -109,7 +105,7 @@ macro_rules! ApplyInt32SortComparator {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -117,7 +113,7 @@ macro_rules! ApplyInt32SortComparator {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ApplySignedSortComparator {
     ($datum1:expr, $isNull1:expr, $datum2:expr, $isNull2:expr, $ssup:expr $(,)?) => {
@@ -128,16 +124,12 @@ macro_rules! ApplySignedSortComparator {
                 let _ = &$datum2;
                 let _ = &$isNull2;
                 let _ = &$ssup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CInt
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CInt>()
             }
         )
     };
 }
-/// Typed call adapter for C inline function ApplySortAbbrevFullComparator from sortsupport.h:340 (PostgreSQL 15–18), sortsupport.h:237 (PostgreSQL 19)
+/// C inline function ApplySortAbbrevFullComparator from sortsupport.h:340 (PostgreSQL 15–18), sortsupport.h:237 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline int
@@ -175,7 +167,7 @@ macro_rules! ApplySignedSortComparator {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -183,7 +175,7 @@ macro_rules! ApplySignedSortComparator {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ApplySortAbbrevFullComparator {
     ($datum1:expr, $isNull1:expr, $datum2:expr, $isNull2:expr, $ssup:expr $(,)?) => {
@@ -194,16 +186,12 @@ macro_rules! ApplySortAbbrevFullComparator {
                 let _ = &$datum2;
                 let _ = &$isNull2;
                 let _ = &$ssup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CInt
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CInt>()
             }
         )
     };
 }
-/// Typed call adapter for C inline function ApplySortComparator from sortsupport.h:199 (PostgreSQL 15–19)
+/// C inline function ApplySortComparator from sortsupport.h:199 (PostgreSQL 15–19)
 ///
 /// ```c
 /// static inline int
@@ -241,7 +229,7 @@ macro_rules! ApplySortAbbrevFullComparator {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -249,7 +237,7 @@ macro_rules! ApplySortAbbrevFullComparator {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ApplySortComparator {
     ($datum1:expr, $isNull1:expr, $datum2:expr, $isNull2:expr, $ssup:expr $(,)?) => {
@@ -260,17 +248,13 @@ macro_rules! ApplySortComparator {
                 let _ = &$datum2;
                 let _ = &$isNull2;
                 let _ = &$ssup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CInt
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CInt>()
             }
         )
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// Typed call adapter for C inline function ApplyUnsignedSortComparator from sortsupport.h:232 (PostgreSQL 15–18)
+/// C inline function ApplyUnsignedSortComparator from sortsupport.h:232 (PostgreSQL 15–18)
 ///
 /// ```c
 /// static inline int
@@ -308,7 +292,7 @@ macro_rules! ApplySortComparator {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -316,7 +300,7 @@ macro_rules! ApplySortComparator {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ApplyUnsignedSortComparator {
     ($datum1:expr, $isNull1:expr, $datum2:expr, $isNull2:expr, $ssup:expr $(,)?) => {
@@ -327,11 +311,7 @@ macro_rules! ApplyUnsignedSortComparator {
                 let _ = &$datum2;
                 let _ = &$isNull2;
                 let _ = &$ssup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CInt
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CInt>()
             }
         )
     };

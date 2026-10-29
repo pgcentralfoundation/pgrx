@@ -79,9 +79,9 @@ mod types;
 ///
 /// These values are checked against independently resolved C constants before use.
 /// Paths are relative to `$crate`; `macros` contains macros actually emitted there.
-/// The catalog holds no generated capability. Callback signatures, function adapters,
-/// address getters and field or offset adapters, and their refusals, exist only inside
-/// batch generation, so a caller cannot assert one.
+/// The catalog holds no generated state. Callback signatures, function adapters,
+/// address getters, field or offset adapters, their refusals, and the inline functions
+/// a batch translated exist only inside batch generation, so a caller cannot assert one.
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct BindingCatalog {
     /// Crate-relative module containing generated declarations; C typedef names
@@ -155,7 +155,8 @@ impl BindingCatalog {
     }
 }
 
-/// A caller's catalog cannot carry a capability that only batch generation establishes.
+/// A caller's catalog cannot carry a capability or inline translation that only batch
+/// generation establishes.
 ///
 /// ```compile_fail
 /// pgrx_c_macros::BindingCatalog::default().callback_capabilities;
@@ -171,6 +172,10 @@ impl BindingCatalog {
 ///
 /// ```compile_fail
 /// pgrx_c_macros::BindingCatalog::default().offset_capabilities;
+/// ```
+///
+/// ```compile_fail
+/// pgrx_c_macros::BindingCatalog::default().inline_translations;
 /// ```
 #[cfg(doctest)]
 pub struct GeneratedCapabilitiesAreNotCatalogInput;
@@ -207,6 +212,11 @@ pub struct MacroEmission {
     pub analysis: MacroAnalysis,
     /// Lowering result under the binding catalog and C profile used for this generation.
     pub status: EmissionStatus,
+    /// Why a static inline function's translated definition was not emitted, when the
+    /// emitted macro calls the original function instead. It has no token range: that
+    /// would index the translated body, while `analysis` is the call's.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fallback: Option<SkipReason>,
 }
 
 /// Either reviewable Rust source or a structured explanation of why lowering was rejected.
@@ -252,6 +262,10 @@ pub fn emit(session: &AnalysisSession<'_>, name: &str) -> MacroEmission {
 /// a function without a binding. [`generate_with_bindings`] generates these
 /// capabilities when the declarations admit them, and otherwise skips the macro too.
 ///
+/// A call to a static inline function never expands a translated body here. Only
+/// batch generation knows which inline functions it translated, so this output calls
+/// the function as described above.
+///
 /// The source can still name a C enum's generated identity, which only the support
 /// artifact from [`generate_with_bindings`] defines. The defining crate must
 /// include that item, or using the macro fails to compile.
@@ -260,51 +274,37 @@ pub fn emit_with_bindings(
     name: &str,
     bindings: &BindingCatalog,
 ) -> MacroEmission {
-    emit_with_lowering(session, name, bindings, None, &mut None)
+    emit_with_lowering(session, name, bindings, Generated::NONE, &mut None)
 }
 
 /// Apply admission gates before rendering, sharing storage reconciliation across a batch.
 ///
 /// The optional lowering is populated only after a macro survives analysis and ABI
 /// checks, so skipped batches do not build indexes they cannot use. Only batch
-/// generation has `adapters`; a caller's bindings cannot stand in for them.
+/// generation fills `generated`; a caller's bindings cannot stand in for it.
 fn emit_with_lowering<'a>(
     session: &'a AnalysisSession<'_>,
     name: &str,
     bindings: &'a BindingCatalog,
-    adapters: Option<&'a GeneratedAdapters>,
+    generated: Generated<'a>,
     lowering: &mut Option<types::Lowering<'a>>,
 ) -> MacroEmission {
-    let analysis = session.analyze(name);
-    let lowered = if let Some(reason) = binding_mismatch(session, &analysis, bindings) {
-        Err(reason)
-    } else if let AnalysisStatus::Skipped { reason } = &analysis.status {
-        Err(reason.clone())
-    } else {
-        let original = match session.frontend().environment().active.get(name) {
-            Some(active) => InvocationSource::Macro(&active.definition),
-            None => InvocationSource::Inline(
-                session
-                    .inline_definition(name)
-                    .expect("analyzed native roots retain their compiler-proven definition"),
-            ),
-        };
-        support_abi_assertions(session.frontend().profile())
-            .map_err(|error| {
-                skip(&analysis, SkipReasonCode::UnsupportedProfile, error.to_string(), None)
-            })
-            .and_then(|assertions| {
-                let lowering = lowering.get_or_insert_with(|| {
-                    types::Lowering::new(
-                        session.frontend().declarations(),
-                        bindings,
-                        adapters.map_or(types::GeneratedTypes::NONE, GeneratedAdapters::types),
-                        &session.frontend().profile().target,
-                    )
-                });
-                render(session, &analysis, original, &assertions, bindings, adapters, lowering)
-            })
-    };
+    let mut analysis = session.analyze(name);
+    let mut lowered = lower(session, &analysis, bindings, generated, lowering);
+    let mut fallback = None;
+    // A translated inline function that cannot be rendered is still callable through
+    // its guarded native binding. The report keeps the reason the translation failed.
+    if let Err(reason) = &lowered
+        && translated_inline(session, &analysis)
+        && let Some(call) = session.analyze_inline_call(name)
+    {
+        let call_lowered = lower(session, &call, bindings, generated, lowering);
+        if call_lowered.is_ok() {
+            fallback = Some(SkipReason { tokens: None, ..reason.clone() });
+            analysis = call;
+            lowered = call_lowered;
+        }
+    }
     let status = match lowered {
         Ok((rust, documentation)) => EmissionStatus::Emitted {
             rust,
@@ -313,7 +313,43 @@ fn emit_with_lowering<'a>(
         },
         Err(reason) => EmissionStatus::Skipped { reason },
     };
-    MacroEmission { analysis, status }
+    MacroEmission { analysis, status, fallback }
+}
+
+/// Check bindings and render one analyzed root.
+fn lower<'a>(
+    session: &'a AnalysisSession<'_>,
+    analysis: &MacroAnalysis,
+    bindings: &'a BindingCatalog,
+    generated: Generated<'a>,
+    lowering: &mut Option<types::Lowering<'a>>,
+) -> Result<(String, MacroDocumentation), SkipReason> {
+    if let Some(reason) = binding_mismatch(session, analysis, bindings) {
+        return Err(reason);
+    }
+    if let AnalysisStatus::Skipped { reason } = &analysis.status {
+        return Err(reason.clone());
+    }
+    let original = match session.frontend().environment().active.get(&analysis.name) {
+        Some(active) => InvocationSource::Macro(&active.definition),
+        None => InvocationSource::Inline(
+            session
+                .inline_definition(&analysis.name)
+                .expect("analyzed native roots retain their compiler-proven definition"),
+        ),
+    };
+    let assertions = support_abi_assertions(session.frontend().profile()).map_err(|error| {
+        skip(analysis, SkipReasonCode::UnsupportedProfile, error.to_string(), None)
+    })?;
+    let lowering = lowering.get_or_insert_with(|| {
+        types::Lowering::new(
+            session.frontend().declarations(),
+            bindings,
+            generated.adapters.map_or(types::GeneratedTypes::NONE, GeneratedAdapters::types),
+            &session.frontend().profile().target,
+        )
+    });
+    render(session, analysis, original, &assertions, bindings, generated, lowering)
 }
 
 /// Emit a set of macros, preserving available calls and propagating value mismatches.
@@ -327,7 +363,7 @@ pub fn emit_batch_with_bindings(
     names: &[impl AsRef<str>],
     bindings: &BindingCatalog,
 ) -> Result<Vec<MacroEmission>, String> {
-    let requests = demands::plan(session, names, bindings);
+    let requests = demands::plan(session, &renderable(session, names), bindings);
     let adapters = generated_adapters(session, &requests, bindings)?;
     Ok(emit_prepared_batch(session, names, bindings, Some(&adapters)))
 }
@@ -342,14 +378,15 @@ fn emit_prepared_batch(
     bindings: &BindingCatalog,
     adapters: Option<&GeneratedAdapters>,
 ) -> Vec<MacroEmission> {
-    // Each pass borrows one immutable catalog and the generated adapters. Index its
-    // C/Rust storage identities once, after the first macro passes its admission gates.
+    // Each pass borrows one immutable catalog and generated state. Index its C/Rust
+    // storage identities once, after the first macro passes its admission gates.
     let initial = {
+        let generated = Generated { adapters, ..Generated::NONE };
         let mut lowering = None;
         names
             .iter()
             .map(|name| {
-                emit_with_lowering(session, name.as_ref(), bindings, adapters, &mut lowering)
+                emit_with_lowering(session, name.as_ref(), bindings, generated, &mut lowering)
             })
             .collect::<Vec<_>>()
     };
@@ -408,74 +445,265 @@ fn emit_prepared_batch(
     for name in roots.keys().map(String::as_str).chain(impacted.keys().copied()) {
         available.macros.remove(name);
     }
-    let mut available_lowering = None;
-    let mut emissions = initial
-        .into_iter()
-        .map(|emission| {
-            let name = &emission.analysis.name;
-            let failure = if let Some(impact) = impacted.get(name.as_str()) {
-                Some((impact.dependency.as_str(), impact.root.as_str()))
-            } else if roots.contains_key(name) {
-                // A wrapper may independently see the same folded constant.
-                // Prefer its direct dependency as the explanation where possible.
-                graph.dependencies(name).find_map(|dependency| {
-                    if dependency != name && roots.contains_key(dependency) {
-                        Some((dependency, dependency))
-                    } else {
-                        impacted.get(dependency).and_then(|impact| {
-                            (impact.root != *name).then_some((dependency, impact.root.as_str()))
-                        })
+    let mut translated = translated_callees(session, &initial, &available.macros);
+    let mut translations = translation_panics(&initial, &translated);
+    let finish = |translations: &BTreeMap<String, BTreeSet<&'static str>>| {
+        let generated = Generated { adapters, translations };
+        let mut available_lowering = None;
+        let mut emissions = initial
+            .iter()
+            .map(|emission| {
+                let name = &emission.analysis.name;
+                let failure = if let Some(impact) = impacted.get(name.as_str()) {
+                    Some((impact.dependency.as_str(), impact.root.as_str()))
+                } else if roots.contains_key(name) {
+                    // A wrapper may independently see the same folded constant.
+                    // Prefer its direct dependency as the explanation where possible.
+                    graph.dependencies(name).find_map(|dependency| {
+                        if dependency != name && roots.contains_key(dependency) {
+                            Some((dependency, dependency))
+                        } else {
+                            impacted.get(dependency).and_then(|impact| {
+                                (impact.root != *name).then_some((dependency, impact.root.as_str()))
+                            })
+                        }
+                    })
+                } else {
+                    None
+                };
+                if let Some((dependency, root)) = failure {
+                    let reason =
+                        dependency_skip(&emission.analysis, dependency, root, &roots[root]);
+                    MacroEmission {
+                        analysis: emission.analysis.clone(),
+                        status: EmissionStatus::Skipped { reason },
+                        fallback: None,
                     }
+                } else if roots.contains_key(name) {
+                    let reason = roots[name].clone();
+                    MacroEmission {
+                        analysis: emission.analysis.clone(),
+                        status: EmissionStatus::Skipped { reason },
+                        fallback: None,
+                    }
+                } else {
+                    emit_with_lowering(
+                        session,
+                        name,
+                        &available,
+                        generated,
+                        &mut available_lowering,
+                    )
+                }
+            })
+            .collect::<Vec<_>>();
+        // If a final rendering hits an output limit, reject its dependents too rather
+        // than leaving a preserved call to a macro whose definition is absent.
+        let late = emissions
+            .iter()
+            .filter_map(|emission| match &emission.status {
+                EmissionStatus::Skipped { reason }
+                    if available.macros.contains(&emission.analysis.name) =>
+                {
+                    Some((emission.analysis.name.clone(), reason.clone()))
+                }
+                _ => None,
+            })
+            .collect::<BTreeMap<_, _>>();
+        let impacts = graph.impacts(&late.keys().collect::<Vec<_>>());
+        let impacted =
+            impacts.iter().map(|impact| (impact.name.as_str(), impact)).collect::<BTreeMap<_, _>>();
+        for emission in &mut emissions {
+            if let Some(impact) = impacted.get(emission.analysis.name.as_str()) {
+                emission.status = EmissionStatus::Skipped {
+                    reason: dependency_skip(
+                        &emission.analysis,
+                        &impact.dependency,
+                        &impact.root,
+                        &late[&impact.root],
+                    ),
+                };
+                emission.fallback = None;
+            }
+        }
+        emissions
+    };
+    // A translated callee must itself be emitted as a translation; otherwise its callers
+    // keep calling the native binding.
+    let mut emissions = finish(&translations);
+    loop {
+        let lost = translations
+            .keys()
+            .filter(|name| {
+                !emissions.iter().any(|emission| {
+                    emission.analysis.name == **name
+                        && matches!(emission.status, EmissionStatus::Emitted { .. })
+                        && translated_inline(session, &emission.analysis)
                 })
-            } else {
-                None
-            };
-            if let Some((dependency, root)) = failure {
-                let reason = dependency_skip(&emission.analysis, dependency, root, &roots[root]);
-                MacroEmission {
-                    analysis: emission.analysis,
-                    status: EmissionStatus::Skipped { reason },
-                }
-            } else if roots.contains_key(name) {
-                let reason = roots[name].clone();
-                MacroEmission {
-                    analysis: emission.analysis,
-                    status: EmissionStatus::Skipped { reason },
-                }
-            } else {
-                emit_with_lowering(session, name, &available, adapters, &mut available_lowering)
-            }
-        })
-        .collect::<Vec<_>>();
-    // If a final rendering hits an output limit, reject its dependents too rather
-    // than leaving a preserved call to a macro whose definition is absent.
-    let late = emissions
+            })
+            .cloned()
+            .collect::<Vec<_>>();
+        if lost.is_empty() {
+            return emissions;
+        }
+        translated.retain(|name| !lost.contains(name));
+        translations = translation_panics(&initial, &translated);
+        emissions = finish(&translations);
+    }
+}
+
+/// Analyses a batch can render for these roots, for demand planning.
+///
+/// A translated inline function that cannot be rendered falls back to its native call
+/// root, so its plan covers that call root as well as the translated body.
+fn renderable(session: &AnalysisSession<'_>, names: &[impl AsRef<str>]) -> Vec<MacroAnalysis> {
+    let mut analyses = Vec::with_capacity(names.len());
+    for name in names {
+        let analysis = session.analyze(name.as_ref());
+        let call = translated_inline(session, &analysis)
+            .then(|| session.analyze_inline_call(name.as_ref()))
+            .flatten();
+        analyses.push(analysis);
+        analyses.extend(call);
+    }
+    analyses
+}
+
+/// Whether an analysis translates a static inline function's own definition.
+fn translated_inline(session: &AnalysisSession<'_>, analysis: &MacroAnalysis) -> bool {
+    session.inline_definition(&analysis.name).is_some()
+        && analysis
+            .expression
+            .as_ref()
+            .is_some_and(|expression| expression.syntax.statement_body.is_some())
+}
+
+/// Translated inline functions whose calls can expand their translation, each after the
+/// functions it calls.
+///
+/// A function that reaches itself through such calls keeps its native binding for them,
+/// since expanding it would never terminate.
+fn translated_callees(
+    session: &AnalysisSession<'_>,
+    emissions: &[MacroEmission],
+    available: &BTreeSet<String>,
+) -> Vec<String> {
+    let translated = emissions
         .iter()
-        .filter_map(|emission| match &emission.status {
-            EmissionStatus::Skipped { reason }
-                if available.macros.contains(&emission.analysis.name) =>
-            {
-                Some((emission.analysis.name.clone(), reason.clone()))
-            }
-            _ => None,
+        .filter(|emission| {
+            available.contains(&emission.analysis.name)
+                && matches!(emission.status, EmissionStatus::Emitted { .. })
+                && translated_inline(session, &emission.analysis)
         })
+        .map(|emission| &emission.analysis)
+        .collect::<Vec<_>>();
+    let index = translated
+        .iter()
+        .enumerate()
+        .map(|(index, analysis)| (analysis.name.as_str(), index))
         .collect::<BTreeMap<_, _>>();
-    let impacts = graph.impacts(&late.keys().collect::<Vec<_>>());
-    let impacted =
-        impacts.iter().map(|impact| (impact.name.as_str(), impact)).collect::<BTreeMap<_, _>>();
-    for emission in &mut emissions {
-        if let Some(impact) = impacted.get(emission.analysis.name.as_str()) {
-            emission.status = EmissionStatus::Skipped {
-                reason: dependency_skip(
-                    &emission.analysis,
-                    &impact.dependency,
-                    &impact.root,
-                    &late[&impact.root],
-                ),
-            };
+    let mut graph = petgraph::graph::DiGraph::<(), ()>::with_capacity(translated.len(), 0);
+    let nodes = translated.iter().map(|_| graph.add_node(())).collect::<Vec<_>>();
+    for (caller, analysis) in translated.iter().enumerate() {
+        for callee in direct_calls(analysis) {
+            if let Some(&callee) = index.get(callee) {
+                graph.add_edge(nodes[caller], nodes[callee], ());
+            }
         }
     }
-    emissions
+    // Components come in reverse topological order, so callees precede their callers.
+    petgraph::algo::tarjan_scc(&graph)
+        .into_iter()
+        .filter(|component| {
+            component.len() == 1 && !graph.contains_edge(component[0], component[0])
+        })
+        .map(|component| translated[component[0].index()].name.clone())
+        .collect()
+}
+
+/// The panic conditions of each translation in `translated`, which lists every function
+/// after the translated functions it calls.
+fn translation_panics(
+    emissions: &[MacroEmission],
+    translated: &[String],
+) -> BTreeMap<String, BTreeSet<&'static str>> {
+    let analyses = emissions
+        .iter()
+        .map(|emission| (emission.analysis.name.as_str(), &emission.analysis))
+        .collect::<BTreeMap<_, _>>();
+    let mut panics = BTreeMap::new();
+    for name in translated {
+        let conditions = panic_conditions(analyses[name.as_str()], &panics);
+        panics.insert(name.clone(), conditions);
+    }
+    panics
+}
+
+/// Rust panic conditions of an analyzed expression's operations, as documentation text.
+///
+/// A call that expands a translation has that translation's conditions; any other call
+/// is an indirect or guarded native call.
+fn panic_conditions(
+    analysis: &MacroAnalysis,
+    translations: &BTreeMap<String, BTreeSet<&'static str>>,
+) -> BTreeSet<&'static str> {
+    let nodes = analysis.expression.as_ref().map_or(&[][..], |expression| &expression.syntax.nodes);
+    let mut conditions = BTreeSet::new();
+    for node in nodes {
+        match &node.kind {
+            ExpressionKind::Binary { operator, .. }
+            | ExpressionKind::Assignment { operator: Some(operator), .. } => match operator {
+                BinaryOperator::Divide | BinaryOperator::Remainder => {
+                    conditions.insert("Integer division/remainder rejects zero divisors and signed MIN / -1 overflow.");
+                }
+                BinaryOperator::ShiftLeft | BinaryOperator::ShiftRight => {
+                    conditions.insert("Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain.");
+                }
+                BinaryOperator::Add | BinaryOperator::Subtract | BinaryOperator::Multiply => {
+                    conditions.insert("Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds.");
+                }
+                _ => {}
+            },
+            ExpressionKind::Unary { operator: UnaryOperator::Negate, .. }
+            | ExpressionKind::Update { .. } => {
+                conditions.insert("Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping.");
+            }
+            ExpressionKind::Cast { .. } | ExpressionKind::TypeParameterCast { .. } => {
+                conditions.insert("Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant.");
+            }
+            ExpressionKind::Call { callee, .. } => {
+                match direct_callee(nodes, *callee).and_then(|name| translations.get(name)) {
+                    Some(translation) => conditions.extend(translation),
+                    None => {
+                        conditions.insert("Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors.");
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+    conditions
+}
+
+/// Names of the functions an analyzed expression calls directly.
+fn direct_calls(analysis: &MacroAnalysis) -> impl Iterator<Item = &str> {
+    let nodes = analysis.expression.as_ref().map_or(&[][..], |expression| &expression.syntax.nodes);
+    nodes.iter().filter_map(move |node| {
+        let ExpressionKind::Call { callee, .. } = node.kind else { return None };
+        direct_callee(nodes, callee)
+    })
+}
+
+/// The name of the function a call's callee names, through any grouping.
+fn direct_callee(nodes: &[crate::syntax::ExpressionNode], callee: NodeId) -> Option<&str> {
+    let mut callee = callee;
+    while let ExpressionKind::Group { operand } = nodes[callee].kind {
+        callee = operand;
+    }
+    match &nodes[callee].kind {
+        ExpressionKind::Identifier { name } => Some(name.as_str()),
+        _ => None,
+    }
 }
 
 /// Generate Rust support when the selected macros need no native C artifact.
@@ -549,15 +777,19 @@ pub fn generate_with_bindings(
     names: &[impl AsRef<str>],
     bindings: &BindingCatalog,
 ) -> Result<MacroGeneration, String> {
-    let requests = demands::plan(session, names, bindings);
+    let requests = demands::plan(session, &renderable(session, names), bindings);
     let mut adapters = generated_adapters(session, &requests, bindings)?;
     let macros = emit_prepared_batch(session, names, bindings, Some(&adapters));
-    let admitted = macros
-        .iter()
-        .filter(|emission| matches!(emission.status, EmissionStatus::Emitted { .. }))
-        .map(|emission| emission.analysis.name.as_str())
-        .collect::<Vec<_>>();
-    let final_requests = demands::plan(session, &admitted, bindings);
+    // Plan the support from the analyses actually emitted: a translated inline function
+    // may have fallen back to its call root.
+    let final_requests = demands::plan(
+        session,
+        macros
+            .iter()
+            .filter(|emission| matches!(emission.status, EmissionStatus::Emitted { .. }))
+            .map(|emission| &emission.analysis),
+        bindings,
+    );
     if final_requests != requests {
         // Rejected roots cannot retain support that no emitted macro can use.
         // Marker identities depend on C/ABI facts, not the requested root set.
@@ -661,6 +893,26 @@ impl GeneratedAdapters {
     }
 }
 
+/// Generated state that rendering reads beside the caller's [`BindingCatalog`].
+///
+/// Only batch emission fills it, so a caller cannot assert any of it. Single-macro
+/// emission renders with [`Generated::NONE`].
+#[derive(Clone, Copy)]
+struct Generated<'a> {
+    /// Capabilities and refusals that batch generation established.
+    adapters: Option<&'a GeneratedAdapters>,
+    /// Static inline functions emitted as translated bodies in this batch, with the
+    /// Rust panic conditions their translation can raise, including those of the
+    /// translations it expands. Calls to them expand that translation instead of
+    /// calling the native binding.
+    translations: &'a BTreeMap<String, BTreeSet<&'static str>>,
+}
+
+impl Generated<'static> {
+    /// No generated capabilities and no inline translations.
+    const NONE: Self = Self { adapters: None, translations: &BTreeMap::new() };
+}
+
 /// Build capability families in dependency order from the planned batch requirements.
 ///
 /// Callback witnesses establish signatures before function thunks are generated;
@@ -699,17 +951,9 @@ fn generated_adapters(
         &requests.functions,
         &requests.callbacks,
     )?;
-    // Later adapter passes see the signatures of both callback passes, the final pass
-    // taking precedence. Rendering sees only the final pass.
-    let mut callback_markers = preliminary.markers;
-    callback_markers.extend(callbacks.markers.clone());
-    let mut callback_unavailable = preliminary.unsupported;
-    callback_unavailable.extend(callbacks.unsupported.clone());
-    let generated = types::GeneratedTypes {
-        callbacks: &callback_markers,
-        callback_unavailable: &callback_unavailable,
-        ..types::GeneratedTypes::NONE
-    };
+    // Only the second pass's signatures are emitted. A thunk can make a type's witnesses
+    // disagree, so a first-pass marker must not reach a later adapter.
+    let generated = callbacks.types();
     let mut required_types = requests.types.values().cloned().collect::<Vec<_>>();
     required_types.extend(callbacks.required_types.iter().cloned());
     let mut enum_requests = enumerations::EnumRequests {
@@ -893,7 +1137,7 @@ fn render(
     original: InvocationSource<'_>,
     assertions: &str,
     bindings: &BindingCatalog,
-    adapters: Option<&GeneratedAdapters>,
+    generated: Generated<'_>,
     lowering: &types::Lowering<'_>,
 ) -> Result<(String, MacroDocumentation), SkipReason> {
     let identifier = macro_identifier(&analysis.name).ok_or_else(|| {
@@ -913,8 +1157,6 @@ fn render(
             None,
         )
     })?;
-    let empty =
-        matches!(expression.syntax.nodes[expression.syntax.root].kind, ExpressionKind::Empty);
     let mut constants = vec![None; expression.syntax.nodes.len()];
     for constant in &expression.constants {
         constants[constant.node] = Some(constant);
@@ -927,15 +1169,26 @@ fn render(
             Some(expression.syntax.nodes[node].tokens),
         ));
     }
+    // A translated inline function is a statement body whose returns yield the macro's
+    // value; it is emitted as an expression macro with the function's result type.
+    let translated = matches!(original, InvocationSource::Inline(_))
+        && expression.syntax.statement_body.is_some();
     let renderer = typed::Renderer::new(
         session.frontend(),
         analysis,
         bindings,
-        adapters,
+        generated,
         &constants,
         lowering,
+        translated,
     );
-    let statement_body = expression.syntax.statement_body.as_ref();
+    let inline_body = translated.then(|| inline_result(session, analysis, lowering)).transpose()?;
+    // A translated void body has no return, so its root expression is empty, but the
+    // body itself is the macro's value.
+    let empty = inline_body.is_none()
+        && matches!(expression.syntax.nodes[expression.syntax.root].kind, ExpressionKind::Empty);
+    let statement_body =
+        expression.syntax.statement_body.as_ref().filter(|_| inline_body.is_none());
     let returning = statement_body.is_some_and(|body| body.return_tokens.is_some());
     let statement_boundary = statement_body.is_some_and(|body| body.requires_boundary);
     let normalizer = arguments.as_ref().map(|arguments| arguments.normalizer.as_str());
@@ -950,7 +1203,9 @@ fn render(
             format!("$crate::{normalizer}!(@collect {mode} [{prefix}]; $($raw)*)")
         }
     };
-    let value = if statement_body.is_some() {
+    let value = if let Some(result) = &inline_body {
+        statements::render_inline(session, analysis, &renderer, result.marker())?
+    } else if statement_body.is_some() {
         statements::render(session, analysis, bindings, &renderer, None)?
     } else if empty {
         String::new()
@@ -963,6 +1218,9 @@ fn render(
     }
     let title = match original {
         InvocationSource::Macro(_) => format!("C macro {}", analysis.name),
+        InvocationSource::Inline(_) if inline_body.is_some() => {
+            format!("C inline function {}", analysis.name)
+        }
         InvocationSource::Inline(_) => {
             format!("Typed call adapter for C inline function {}", analysis.name)
         }
@@ -988,7 +1246,10 @@ fn render(
             None,
         )
     })?);
-    if matches!(original, InvocationSource::Inline(_)) {
+    if inline_body.is_some() {
+        comment.push_str("\n\n");
+        comment.push_str(documentation::INLINE_BODY);
+    } else if matches!(original, InvocationSource::Inline(_)) {
         comment.push_str("\n\n");
         comment.push_str(documentation::INLINE_CALL);
     }
@@ -1022,8 +1283,8 @@ fn render(
     if local_guard.is_some() {
         comment.push_str(" Caller argument tokens must not mention the macro's C local names, even inside groups: those invocations are rejected because C substitution can capture locals that Rust hygiene would resolve differently. The scope check also inspects forwarded expression fragments and is bounded to 4096 stringified bytes. Matches in fields, paths or strings are conservatively rejected.");
     }
-    let explicit_boundary =
-        analysis.invocation == crate::InvocationContract::ExplicitExpressionBoundary;
+    let explicit_boundary = inline_body.is_none()
+        && analysis.invocation == crate::InvocationContract::ExplicitExpressionBoundary;
     let boundary_error = if statement_boundary {
         Some(
             "this C replacement requires an explicit braced invocation: use @__pgrx_c_statement; before its arguments",
@@ -1061,37 +1322,7 @@ fn render(
     }
     comment.push_str("\n\n# Safety\n\n");
     comment.push_str(documentation::SAFETY);
-    let mut failures = std::collections::BTreeSet::new();
-    for node in &expression.syntax.nodes {
-        match &node.kind {
-            ExpressionKind::Binary { operator, .. }
-            | ExpressionKind::Assignment { operator: Some(operator), .. } => match operator {
-                crate::BinaryOperator::Divide | crate::BinaryOperator::Remainder => {
-                    failures.insert("Integer division/remainder rejects zero divisors and signed MIN / -1 overflow.");
-                }
-                crate::BinaryOperator::ShiftLeft | crate::BinaryOperator::ShiftRight => {
-                    failures.insert("Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain.");
-                }
-                crate::BinaryOperator::Add
-                | crate::BinaryOperator::Subtract
-                | crate::BinaryOperator::Multiply => {
-                    failures.insert("Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds.");
-                }
-                _ => {}
-            },
-            ExpressionKind::Unary { operator: crate::UnaryOperator::Negate, .. }
-            | ExpressionKind::Update { .. } => {
-                failures.insert("Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping.");
-            }
-            ExpressionKind::Cast { .. } | ExpressionKind::TypeParameterCast { .. } => {
-                failures.insert("Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant.");
-            }
-            ExpressionKind::Call { .. } => {
-                failures.insert("Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors.");
-            }
-            _ => {}
-        }
-    }
+    let failures = panic_conditions(analysis, generated.translations);
     if !failures.is_empty() {
         comment.push_str("\n\n# Panics\n\n");
         for failure in failures {
@@ -1194,6 +1425,17 @@ fn render(
                 "::core::compile_error!(\"an empty C macro has no expression operand\")".into()
             } else if mode == "value" {
                 value.clone()
+            } else if let Some(result) = &inline_body {
+                match (context, result) {
+                    (typed::Context::Discard, _) => format!("{{ let _ = {value}; }}"),
+                    (typed::Context::Size, InlineResult::Void) => {
+                        "compile_error!(\"a void C function call has no size\")".into()
+                    }
+                    (typed::Context::Size, InlineResult::Value { marker, .. }) => {
+                        format!("{SUPPORT}::expression::size_of::<{marker}>()")
+                    }
+                    _ => "compile_error!(\"a C function call result is not an lvalue\")".into(),
+                }
             } else {
                 match render_body(session, analysis, bindings, &renderer, context) {
                     Ok(body) => body,
@@ -1266,9 +1508,55 @@ fn render(
             explicit_boundary,
         ),
         hidden,
-        result: documentation::result(analysis, renderer),
+        result: documentation::result(analysis, renderer, inline_body.as_ref()),
     };
     Ok((rust, documentation))
+}
+
+/// The C result of a translated inline function body.
+enum InlineResult<'a> {
+    /// A void function, whose body evaluates to `()`.
+    Void,
+    /// A function that returns a value of its declared C type.
+    Value {
+        /// The function's declared C return type.
+        declared: &'a crate::TypeInfo,
+        /// The runtime marker of that type.
+        marker: String,
+    },
+}
+
+impl InlineResult<'_> {
+    /// The runtime marker of the returned value, or `None` for a void function.
+    fn marker(&self) -> Option<&str> {
+        match self {
+            Self::Void => None,
+            Self::Value { marker, .. } => Some(marker),
+        }
+    }
+}
+
+/// Resolve a translated inline function's C return type.
+fn inline_result<'a>(
+    session: &'a AnalysisSession<'_>,
+    analysis: &MacroAnalysis,
+    lowering: &types::Lowering<'_>,
+) -> Result<InlineResult<'a>, SkipReason> {
+    let refuse = |message: String| skip(analysis, SkipReasonCode::UnsupportedType, message, None);
+    let function = session
+        .frontend()
+        .declarations()
+        .function_signatures
+        .get(&analysis.name)
+        .ok_or_else(|| refuse("inline function has no compiler prototype".into()))?;
+    if function.signature.result.category == crate::TypeCategory::Void {
+        return Ok(InlineResult::Void);
+    }
+    let declared = &function.signature.result;
+    lowering
+        .resolve(declared)
+        .map(|lowered| InlineResult::Value { declared, marker: lowered.marker })
+        .map_err(refuse)
 }
 
 /// Render a compiler-owned expression in the context its C caller requests.
@@ -1921,7 +2209,7 @@ fn macro_identifier(name: &str) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::{MAX_EMISSION_BYTES, definition_comment, rust_identifier, write_doc_comments};
-    use crate::{MacroDefinition, MacroKind, Token, TokenKind};
+    use crate::{MacroDefinition, MacroKind, SkipReasonCode, Token, TokenKind};
 
     /// Check that large retained C definitions account for both source text and documentation fences.
     #[test]
@@ -1998,6 +2286,74 @@ mod tests {
         let before = rust.clone();
         assert!(write_doc_comments(&mut rust, &"\n".repeat(MAX_EMISSION_BYTES / 4)).is_none());
         assert_eq!(rust, before);
+    }
+
+    /// An identity-only adapter has no call wrapper. If a call to its function reaches
+    /// rendering without demand planning seeing it, the call is refused. It resolves
+    /// neither to the wrapper the adapter does not define nor to a bindgen binding that
+    /// cannot prove a native-transport signature's ABI.
+    #[test]
+    fn calls_do_not_resolve_to_identity_only_adapters() {
+        let _lock = crate::SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        let scanner = crate::MacroScanner::new().expect("libclang must be available");
+        let directory = tempfile::tempdir().unwrap();
+        let header = directory.path().join("identity.h");
+        std::fs::write(
+            &header,
+            "static inline int IdentityOnly(int value) { return value + 1; }\n\
+             static inline int CharWiden(char value) { return value; }\n\
+             #define IDENTITY_ADDRESS() (&IdentityOnly)\n\
+             #define IDENTITY_CALL(value) IdentityOnly(value)\n\
+             #define WIDEN_ADDRESS() (&CharWiden)\n\
+             #define WIDEN_CALL(value) CharWiden(value)\n",
+        )
+        .unwrap();
+        // A fixed target keeps the support profile and calling convention independent of the host.
+        let frontend =
+            crate::inspect(&scanner, &header, &["--target=x86_64-unknown-linux-gnu".into()], None)
+                .unwrap();
+        let addresses = ["IDENTITY_ADDRESS", "WIDEN_ADDRESS"];
+        let calls = ["IDENTITY_CALL", "WIDEN_CALL"];
+        let session =
+            crate::AnalysisSession::prepare(&scanner, &frontend, &[addresses, calls].concat())
+                .unwrap();
+        // IdentityOnly has no binding. CharWiden has the shape bindgen's static-function
+        // wrappers give it, which cannot prove plain char's callable extension attributes.
+        let mut bindings = super::BindingCatalog::default();
+        bindings.functions.insert(
+            "CharWiden".into(),
+            crate::FunctionBinding {
+                path: vec!["CharWiden".into()],
+                parameters: vec![crate::RustBindingType::NativeChar],
+                result: crate::RustBindingType::Integer { signed: true, bits: 32 },
+                abi: "C".into(),
+                variadic: false,
+                link_name: "CharWiden__pgrx_cshim".into(),
+                guarded: false,
+                uses_cshim: true,
+            },
+        );
+        // Plan only the address uses, as if planning had missed the calls.
+        let requests =
+            super::demands::plan(&session, &super::renderable(&session, &addresses), &bindings);
+        let adapters = super::generated_adapters(&session, &requests, &bindings).unwrap();
+        for name in ["IdentityOnly", "CharWiden"] {
+            assert!(adapters.functions.identities.contains(name), "{name}");
+            assert!(adapters.functions.bindings.contains_key(name), "{name}");
+            assert!(!adapters.functions.rust.contains(&format!("Inline_{name}")), "{name}");
+        }
+        let emissions = super::emit_prepared_batch(&session, &calls, &bindings, Some(&adapters));
+        assert_eq!(emissions.len(), calls.len());
+        for (emission, name) in emissions.iter().zip(["IdentityOnly", "CharWiden"]) {
+            let super::EmissionStatus::Skipped { reason } = &emission.status else {
+                panic!("{} rendered a call to {name}: {emission:?}", emission.analysis.name);
+            };
+            assert_eq!(reason.code, SkipReasonCode::Call, "{reason:?}");
+            assert!(
+                reason.message.contains(&format!("{name}: only an address witness")),
+                "{reason:?}"
+            );
+        }
     }
 
     /// Check raw keyword handling while keeping macro names separate from operand metavariable rules.
