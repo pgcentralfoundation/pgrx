@@ -478,6 +478,21 @@ mod tests {
         );
     }
 
+    /// `concat` has a single `VARIADIC "any"` parameter.
+    #[pg_test]
+    fn test_variadic_function() {
+        let result = fn_call::<String>("pg_catalog.concat", &[&Arg::Value("a")]);
+        assert_eq!(Err(FnCallError::UnsupportedArgumentModes), result);
+        let message = FnCallError::UnsupportedArgumentModes.to_string();
+        assert!(message.contains("VARIADIC"), "{message}");
+    }
+
+    /// fn_call passes no `ReturnSetInfo`, so a set-returning function raises an ERROR.
+    #[pg_test(error = "set-valued function called in context that cannot accept a set")]
+    fn test_set_returning_function() {
+        let _ = fn_call::<i32>("pg_catalog.generate_series", &[&Arg::Value(1), &Arg::Value(2)]);
+    }
+
     #[pg_test]
     fn unknown_function() {
         let result = fn_call::<()>("undefined_function", &[]);
