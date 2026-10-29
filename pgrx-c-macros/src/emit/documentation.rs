@@ -92,10 +92,11 @@ pub enum DocumentedResult {
 
 /// Define the macros that documentation shells use.
 ///
-/// Every shell arm expands to `__pgrx_c_documentation_shell!`, and each paragraph in
-/// [`SHARED_PARAGRAPHS`] is defined once for shell doc comments. Include this once in
-/// the crate that defines the shells rendered by [`MacroDocumentation::render_shell`],
-/// together with that crate's generated support and runtime.
+/// Every shell arm expands to `__pgrx_c_documentation_shell!`, and each documentation
+/// paragraph that many shells repeat is defined once as a hidden macro for their doc
+/// comments. Include this once in the crate that defines the shells rendered by
+/// [`MacroDocumentation::render_shell`], together with that crate's generated support
+/// and runtime.
 pub fn documentation_shell_support() -> String {
     let mut rust = String::from(
         "/// Expansion of every documentation-snapshot shell. Real C macros are generated for each build.\n\
