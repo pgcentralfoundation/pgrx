@@ -71,6 +71,9 @@ pub(super) struct Renderer<'a> {
     analysis: &'a MacroAnalysis,
     /// Fresh binding symbols and generated capabilities used for hygienic references.
     bindings: &'a BindingCatalog,
+    /// Generated native call adapters, the only callable bindings for a prototype
+    /// that needs native transport. Callers cannot supply these.
+    adapters: &'a BTreeMap<String, crate::FunctionBinding>,
     /// Arena-indexed compiler constant facts, preserving names where bindings permit.
     constants: &'a [Option<&'a ResolvedConstant>],
     /// Shared C identity/native-storage reconciliation for the immutable capability catalog.
@@ -94,6 +97,7 @@ impl<'a> Renderer<'a> {
         frontend: &'a FrontendOutput,
         analysis: &'a MacroAnalysis,
         bindings: &'a BindingCatalog,
+        adapters: &'a BTreeMap<String, crate::FunctionBinding>,
         constants: &'a [Option<&'a ResolvedConstant>],
         lowering: &'a Lowering<'a>,
     ) -> Self {
@@ -177,6 +181,7 @@ impl<'a> Renderer<'a> {
             frontend,
             analysis,
             bindings,
+            adapters,
             constants,
             lowering,
             floats,
@@ -944,12 +949,12 @@ impl<'a> Renderer<'a> {
                                 bindings.function_unavailable.get(name)
                             {
                                 Err(reason.clone())
-                            } else if let Some(adapter) = bindings.function_adapters.get(name) {
+                            } else if let Some(adapter) = self.adapters.get(name) {
                                 Ok(adapter)
                             } else if let Some(ty) = super::functions::native_transport(declared)
                             {
                                 Err(format!(
-                                    "C prototype type `{}` needs a generated native adapter because binding storage cannot prove its call ABI, and this emission has none; generate_with_bindings generates adapters",
+                                    "C prototype type `{}` needs a generated native adapter because binding storage cannot prove its call ABI, and this emission has none",
                                     ty.spelling
                                 ))
                             } else {

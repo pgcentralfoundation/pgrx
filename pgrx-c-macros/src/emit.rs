@@ -83,8 +83,8 @@ pub struct BindingCatalog {
     pub integer_constants: BTreeMap<String, IntegerBinding>,
     /// Definitions available for preserved cross-macro calls in this defining crate.
     pub macros: BTreeSet<String>,
-    /// Actual function binding prototypes. Calls use a generated adapter from
-    /// [`Self::function_adapters`] instead when one exists.
+    /// Actual function binding prototypes. Calls use a generated native adapter
+    /// instead when one exists, and never one of these for a prototype that needs one.
     pub functions: BTreeMap<String, crate::FunctionBinding>,
     /// Binding-owned record constructors and field storage, independent of C layout facts.
     pub records: BTreeMap<String, crate::RecordBinding>,
@@ -114,10 +114,6 @@ pub struct BindingCatalog {
     /// Optional crate-relative guard for native adapters that may call PostgreSQL.
     #[serde(skip)]
     pub ffi_boundary: Option<Vec<String>>,
-    /// Generated native call adapters, populated by batch lowering. A call whose
-    /// prototype needs native transport has no other callable binding.
-    #[serde(skip)]
-    pub function_adapters: BTreeMap<String, crate::FunctionBinding>,
     /// Native-call rejections retained instead of silently using an unverified binding.
     #[serde(skip)]
     pub function_unavailable: BTreeMap<String, String>,
@@ -248,24 +244,26 @@ pub fn emit(session: &AnalysisSession<'_>, name: &str) -> MacroEmission {
 /// enum or a record by value needs a generated C adapter, because Rust binding
 /// storage cannot prove that call ABI. Such a macro is skipped with
 /// [`SkipReasonCode::Call`] even when `bindings` holds the function, as is a call to
-/// a function without a binding. Use [`generate_with_bindings`] to emit those calls
-/// together with their adapters.
+/// a function without a binding. [`generate_with_bindings`] generates the adapter
+/// when the declaration admits one, and otherwise skips the call too.
 pub fn emit_with_bindings(
     session: &AnalysisSession<'_>,
     name: &str,
     bindings: &BindingCatalog,
 ) -> MacroEmission {
-    emit_with_lowering(session, name, bindings, &mut None)
+    emit_with_lowering(session, name, bindings, &BTreeMap::new(), &mut None)
 }
 
 /// Apply admission gates before rendering, sharing storage reconciliation across a batch.
 ///
 /// The optional lowering is populated only after a macro survives analysis and ABI
-/// checks, so skipped batches do not build indexes they cannot use.
+/// checks, so skipped batches do not build indexes they cannot use. `adapters` holds
+/// only native call adapters this crate generated, never caller-supplied bindings.
 fn emit_with_lowering<'a>(
     session: &'a AnalysisSession<'_>,
     name: &str,
     bindings: &'a BindingCatalog,
+    adapters: &BTreeMap<String, crate::FunctionBinding>,
     lowering: &mut Option<types::Lowering<'a>>,
 ) -> MacroEmission {
     let analysis = session.analyze(name);
@@ -294,7 +292,7 @@ fn emit_with_lowering<'a>(
                         &session.frontend().profile().target,
                     )
                 });
-                render(session, &analysis, original, &assertions, bindings, lowering)
+                render(session, &analysis, original, &assertions, bindings, adapters, lowering)
             })
     };
     let status = match lowered {
@@ -321,10 +319,13 @@ pub fn emit_batch_with_bindings(
     let requests = demands::plan(session, names, bindings);
     let adapters = generated_adapters(session, &requests, bindings)?;
     register_adapters(&mut capabilities, &adapters);
-    Ok(emit_prepared_batch(session, names, &capabilities))
+    Ok(emit_prepared_batch(session, names, &capabilities, &adapters.functions.bindings))
 }
 
 /// Install verified capabilities and their rejection reasons into one rendering catalog.
+///
+/// Function adapters stay outside the catalog, so a binding from the caller can
+/// never stand in for one; rendering receives them separately.
 fn register_adapters(capabilities: &mut BindingCatalog, adapters: &GeneratedAdapters) {
     capabilities.callback_capabilities.extend(adapters.callbacks.markers.clone());
     capabilities.callback_unavailable.extend(adapters.callbacks.unsupported.clone());
@@ -334,7 +335,6 @@ fn register_adapters(capabilities: &mut BindingCatalog, adapters: &GeneratedAdap
     capabilities.field_unavailable.extend(adapters.fields.unsupported.clone());
     capabilities.offset_capabilities.extend(adapters.fields.offsets.clone());
     capabilities.offset_unavailable.extend(adapters.fields.offset_unsupported.clone());
-    capabilities.function_adapters.extend(adapters.functions.bindings.clone());
     capabilities.function_unavailable.extend(adapters.functions.unsupported.clone());
 }
 
@@ -346,6 +346,7 @@ fn emit_prepared_batch(
     session: &AnalysisSession<'_>,
     names: &[impl AsRef<str>],
     bindings: &BindingCatalog,
+    adapters: &BTreeMap<String, crate::FunctionBinding>,
 ) -> Vec<MacroEmission> {
     // Each pass borrows one immutable capability catalog. Index its C/Rust
     // storage identities once, after the first macro passes its admission gates.
@@ -353,7 +354,9 @@ fn emit_prepared_batch(
         let mut lowering = None;
         names
             .iter()
-            .map(|name| emit_with_lowering(session, name.as_ref(), bindings, &mut lowering))
+            .map(|name| {
+                emit_with_lowering(session, name.as_ref(), bindings, adapters, &mut lowering)
+            })
             .collect::<Vec<_>>()
     };
     let mut roots = initial
@@ -446,7 +449,7 @@ fn emit_prepared_batch(
                     status: EmissionStatus::Skipped { reason },
                 }
             } else {
-                emit_with_lowering(session, name, &available, &mut available_lowering)
+                emit_with_lowering(session, name, &available, adapters, &mut available_lowering)
             }
         })
         .collect::<Vec<_>>();
@@ -556,7 +559,7 @@ pub fn generate_with_bindings(
     let mut adapters = generated_adapters(session, &requests, bindings)?;
     let mut capabilities = bindings.clone();
     register_adapters(&mut capabilities, &adapters);
-    let macros = emit_prepared_batch(session, names, &capabilities);
+    let macros = emit_prepared_batch(session, names, &capabilities, &adapters.functions.bindings);
     let admitted = macros
         .iter()
         .filter(|emission| matches!(emission.status, EmissionStatus::Emitted { .. }))
@@ -702,7 +705,7 @@ fn generated_adapters(
         &profile_identity,
     )?;
     // Later adapter passes read replacement storage from `functions`. Rendering
-    // instead takes adapters from `function_adapters`; see `register_adapters`.
+    // instead receives adapters separately; see `register_adapters`.
     capabilities.functions.extend(functions.bindings.clone());
     let callbacks = callbacks::generate(
         frontend.declarations(),
@@ -890,6 +893,7 @@ fn render(
     original: InvocationSource<'_>,
     assertions: &str,
     bindings: &BindingCatalog,
+    adapters: &BTreeMap<String, crate::FunctionBinding>,
     lowering: &types::Lowering<'_>,
 ) -> Result<String, SkipReason> {
     let identifier = macro_identifier(&analysis.name).ok_or_else(|| {
@@ -923,8 +927,14 @@ fn render(
             Some(expression.syntax.nodes[node].tokens),
         ));
     }
-    let renderer =
-        typed::Renderer::new(session.frontend(), analysis, bindings, &constants, lowering);
+    let renderer = typed::Renderer::new(
+        session.frontend(),
+        analysis,
+        bindings,
+        adapters,
+        &constants,
+        lowering,
+    );
     let statement_body = expression.syntax.statement_body.as_ref();
     let returning = statement_body.is_some_and(|body| body.return_tokens.is_some());
     let statement_boundary = statement_body.is_some_and(|body| body.requires_boundary);
