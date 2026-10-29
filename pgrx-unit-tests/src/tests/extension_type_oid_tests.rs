@@ -143,6 +143,20 @@ mod tests {
         Ok(())
     }
 
+    /// With this many same-named tables, the lookup finds the extension's types by listing its
+    /// members, which skips the extension table's row type separately. PostgreSQL 15 and 16 do
+    /// not list that row type, so only PostgreSQL 17 and later can catch a missing skip there.
+    #[pg_test]
+    fn test_type_oid_ignores_an_extension_table_among_many_of_the_same_name() -> spi::Result<()> {
+        let complex = regtype("complex");
+        add_same_named_tables()?;
+        Spi::run("CREATE SCHEMA decoy")?;
+        Spi::run("CREATE TABLE decoy.complex (r float8, i float8)")?;
+        Spi::run("ALTER EXTENSION pgrx_unit_tests ADD TABLE decoy.complex")?;
+        assert_eq!(PgBox::<Complex>::type_oid(), complex);
+        Ok(())
+    }
+
     /// Named like the type `decoy_b._zzelem` and the array type of `decoy_a.zzelem`.
     struct _ZzElem;
 
