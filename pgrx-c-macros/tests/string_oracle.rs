@@ -18,8 +18,9 @@ mod oracle;
 mod rust_oracle;
 
 use pgrx_c_macros::{
-    AnalysisSession, BindingCatalog, EmissionStatus, FrontendOutput, MacroScanner, SkipReasonCode,
-    emit_batch_with_bindings, emit_support_artifact_with_bindings, emit_with_bindings, inspect,
+    AnalysisSession, BindingCatalog, EmissionStatus, FrontendOutput, MacroScanner, PostgresConfig,
+    SkipReasonCode, emit_batch_with_bindings, emit_support_artifact_with_bindings,
+    emit_with_bindings, inspect,
 };
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -321,7 +322,8 @@ fn main() {{
 /// `-DUSE_ASSERT_CHECKING` enables assertions in installations configured without them, because
 /// configure leaves the setting commented out in `pg_config.h`. Meson writes an active
 /// `#undef USE_ASSERT_CHECKING` instead, which overrides the command line, so meson-built
-/// installations such as PostgreSQL 17 for Windows compare the unasserted branch.
+/// installations such as PostgreSQL 17 for Windows compare the unasserted branch. The expected
+/// branch comes from the installed header, so a profile that lost the definition fails here.
 #[test]
 fn postgres_varlena_assertions_match_original_headers() {
     let installations = installed::configured();
@@ -343,7 +345,12 @@ fn postgres_varlena_assertions_match_original_headers() {
             arguments
         };
         let frontend = installed::inspect(&scanner, &postgres, &arguments);
-        let asserted = frontend.environment().active.contains_key("USE_ASSERT_CHECKING");
+        let asserted = assertions_survive_installed_config(&postgres);
+        assert_eq!(
+            frontend.environment().active.contains_key("USE_ASSERT_CHECKING"),
+            asserted,
+            "PG{major} profile must enable assertions unless pg_config.h undefines them"
+        );
         let defined =
             frontend.inventory().macros.iter().any(|definition| definition.name == "VARTAG_SIZE");
         // PG19 replaced these varlena macros with static inline functions.
@@ -479,4 +486,40 @@ fn main() {{
             "PG{major} native assertion must preserve condition, source site and operand counts"
         );
     }
+}
+
+/// Read the installation's `pg_config.h`, independently of the profile under test, and report
+/// whether a command-line `USE_ASSERT_CHECKING` definition survives it.
+fn assertions_survive_installed_config(postgres: &PostgresConfig) -> bool {
+    let path = postgres.pg_config().includedir_server().unwrap().join("pg_config.h");
+    let header = std::fs::read_to_string(&path)
+        .unwrap_or_else(|error| panic!("read {}: {error}", path.display()));
+    assertion_definition_survives(&header)
+}
+
+/// Report whether a command-line `USE_ASSERT_CHECKING` definition survives `pg_config.h`, whose
+/// last active `#define` or `#undef` of the name decides.
+fn assertion_definition_survives(pg_config_h: &str) -> bool {
+    let mut asserted = true;
+    for line in pg_config_h.lines() {
+        let Some(directive) = line.trim_start().strip_prefix('#') else { continue };
+        let mut words = directive.split_ascii_whitespace();
+        match (words.next(), words.next()) {
+            (Some("define"), Some("USE_ASSERT_CHECKING")) => asserted = true,
+            (Some("undef"), Some("USE_ASSERT_CHECKING")) => asserted = false,
+            _ => {}
+        }
+    }
+    asserted
+}
+
+/// Configure comments out the setting unless assertions are enabled; meson writes an active
+/// `#undef` when they are off, as PostgreSQL 17 for Windows does.
+#[test]
+fn assertion_branch_follows_the_installed_pg_config_spelling() {
+    assert!(assertion_definition_survives("/* #undef USE_ASSERT_CHECKING */\n"));
+    assert!(assertion_definition_survives("#define USE_ASSERT_CHECKING 1\r\n"));
+    assert!(!assertion_definition_survives("#undef USE_ASSERT_CHECKING\r\n"));
+    assert!(!assertion_definition_survives("  #  undef USE_ASSERT_CHECKING\n"));
+    assert!(assertion_definition_survives("#undef USE_ASSERT_CHECKING_EXTRA\n"));
 }
