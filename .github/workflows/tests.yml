@@ -4,9 +4,7 @@ on:
   push:
     branches:
       - develop
-  pull_request:
-    branches:
-      - develop
+  pull_request: {}
 
 env:
   # NB: Don't modify `RUSTFLAGS` here, since it would override the ones
@@ -192,6 +190,30 @@ jobs:
             postgresql-$PG_VER \
             postgresql-server-dev-$PG_VER
 
+      # Generated C macros are checked against the server headers' target, so
+      # the aarch64 cross build needs headers configured for aarch64. Fetch the
+      # arm64 build of the installed postgresql-server-dev package from PGDG.
+      - name: Fetch aarch64 PostgreSQL server headers for the cross build
+        id: arm64-headers
+        run: |
+          set -eu
+          repo=https://apt.postgresql.org/pub/repos/apt
+          cn="$(. /etc/os-release && echo "$VERSION_CODENAME")"
+          want="$(dpkg-query -W -f='${Version}' "postgresql-server-dev-$PG_VER")"
+          deb=""
+          for dist in "$cn-pgdg/main" "$cn-pgdg/$PG_VER" "$cn-pgdg-snapshot/main" "$cn-pgdg-snapshot/$PG_VER"; do
+            deb="$(curl -fsSL "$repo/dists/$dist/binary-arm64/Packages.gz" 2>/dev/null | gunzip \
+              | awk -v p="postgresql-server-dev-$PG_VER" -v v="$want" \
+                  '$1=="Package:"{k=$2} $1=="Version:"{ver=$2} !found && $1=="Filename:" && k==p && ver==v {print $2; found=1}' || true)"
+            [ -n "$deb" ] && break
+          done
+          test -n "$deb" || { echo "no arm64 postgresql-server-dev-$PG_VER $want in PGDG"; exit 1; }
+          curl -fsSL -o "$RUNNER_TEMP/pg-server-dev-arm64.deb" "$repo/$deb"
+          dpkg-deb -x "$RUNNER_TEMP/pg-server-dev-arm64.deb" "$RUNNER_TEMP/pg-arm64"
+          server="$RUNNER_TEMP/pg-arm64/usr/include/postgresql/$PG_VER/server"
+          grep -q 'on aarch64' "$server/pg_config.h" || { echo "fetched headers are not aarch64"; exit 1; }
+          echo "server=$server" >> "$GITHUB_OUTPUT"
+
       - name: pg_config details
         run: |
           echo ""
@@ -241,7 +263,31 @@ jobs:
             --features "pg$PG_VER" \
             --no-default-features
 
+      # The workspace run above disables pgrx-c-macros' default `cli` feature.
+      - name: Run pgrx-c-macros CLI tests
+        run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --package pgrx-c-macros --test cli
+
+      # PGDG's server-dev package installs clang 15, and the steps above load the newest
+      # libclang, so only this step covers Ubuntu 22.04's own clang 14. Its own target directory
+      # keeps the changed LIBCLANG_PATH from rebuilding the other steps' crates.
+      - name: Run pgrx-c-macros tests against clang 14
+        if: matrix.postgres == 18 && matrix.rust == null
+        env:
+          LIBCLANG_PATH: /usr/lib/llvm-14/lib
+          CLANG_PATH: /usr/bin/clang-14
+        run: CARGO_TARGET_DIR="$(pwd)/target-clang14" cargo test --package pgrx-c-macros
+
+      # These build isolated fixture crates with synthetic headers, so one job covers them.
+      - name: Run binding build harnesses
+        if: matrix.postgres == 18 && matrix.rust == null
+        run: |
+          CARGO_TARGET_DIR="$(pwd)/target" cargo test --package pgrx-bindgen \
+            --test macro_build --test shipped_macros -- --include-ignored --test-threads=1
+
+      # Only this step sees the target headers; tests above check that builds without them refuse.
       - name: Check that cross-compiled pgrx-unit-tests can build
+        env:
+          PGRX_INCLUDEDIR_SERVER_aarch64_unknown_linux_gnu: ${{ steps.arm64-headers.outputs.server }}
         run: |
           cargo build --tests \
             --features "pg$PG_VER" \
@@ -394,6 +440,15 @@ jobs:
 
       - name: Run 'cargo pgrx init' against system-level ${{ matrix.postgres }}
         run: cargo pgrx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
+
+      # aarch64 Linux is an unsigned-char target, so this covers C char
+      # semantics in generated macros and Datum conversions that x86_64 cannot.
+      - name: Run pgrx-unit-tests
+        run: |
+          cargo test \
+            --features "pg$PG_VER" \
+            --no-default-features \
+            --package pgrx-unit-tests --lib
 
       # Reproduces the pglinter 0.18.0 failure mode: release build with LTO
       # off and many codegen units, where `.pgrxsc` retention depends on
@@ -634,6 +689,15 @@ jobs:
       - name: Run tests
         run: cargo test --all --features "pg$PG_VER pg_test cshim proptest" --no-default-features
 
+      # This test compiles only on macOS. It builds both slices of a universal installation, so
+      # it needs the other slice's standard library. Its synthetic headers make one job enough.
+      - name: Run universal macOS binding build harness
+        if: matrix.postgresql == 16
+        run: |
+          rustup target add aarch64-apple-darwin x86_64-apple-darwin
+          cargo test --package pgrx-bindgen --test macro_build \
+            universal_macos_installations_build_both_slices -- --include-ignored --exact --test-threads=1
+
       - name: Print sccache stats
         run: sccache --show-stats
 
@@ -652,6 +716,8 @@ jobs:
       PG_VER: ${{ matrix.postgresql }}
 
     strategy:
+      # Windows runs are slow to repeat, so one version's failure should not hide the other's.
+      fail-fast: false
       matrix:
         os: [ "windows-2022" ]
         postgresql: [ 15, 17 ]
@@ -712,7 +778,7 @@ jobs:
         run: cargo pgrx init --pg$env:PG_VER=download
 
       - name: Run tests
-        run: cargo test --all --no-default-features --features "pg$env:PG_VER pg_test cshim proptest" --all-targets
+        run: cargo test --all --no-default-features --features "pg$env:PG_VER pg_test cshim proptest" --all-targets --no-fail-fast
 
       - name: Print sccache stats
         run: sccache --show-stats

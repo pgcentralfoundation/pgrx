@@ -30,6 +30,9 @@ version = "=0.19.3"
 [profile.dev]
 panic = "unwind"
 
+[profile.dev.build-override]
+opt-level = 3
+
 [profile.release]
 panic = "unwind"
 opt-level = 3
