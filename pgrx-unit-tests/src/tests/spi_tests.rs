@@ -443,8 +443,8 @@ mod tests {
         assert!(Spi::get_one::<i32>("SELECT NULL::integer").unwrap().is_none());
     }
 
-    /// PostgreSQL sign-extends a 4-byte value it reads from a tuple into a Datum, so an xid of
-    /// 2^31 or more has its high bits set there, but not when an array element is read.
+    /// PostgreSQL sign-extends a 4-byte value that it reads into a Datum, and pgrx now does the
+    /// same for an array element, so an xid of 2^31 or more has its high bits set in both.
     #[pg_test]
     fn test_xid_above_2_pow_31() -> Result<(), spi::Error> {
         let xid = pg_sys::TransactionId::from_inner(3_000_000_000);
