@@ -17,16 +17,20 @@ mod support_script;
 
 use quote::ToTokens;
 use std::collections::{BTreeMap, BTreeSet};
-use std::fs::{self, File};
+use std::fs;
+use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Distinguish fixtures created by concurrent tests. The clock alone does not: macOS reports
 /// microseconds, so two tests starting together can name the same directory, and the first to
 /// finish removes the other's files.
 static NEXT: AtomicU64 = AtomicU64::new(0);
+/// Maximum captured output of one consumer process, so a runaway writer cannot exhaust test
+/// resources.
+const OUTPUT_LIMIT: u64 = 16 << 20;
 
 /// Own an isolated consumer or header tree whose generated artifacts can be inspected without
 /// mutating the repository.
@@ -81,32 +85,35 @@ impl Fixture {
         assert_eq!(self.successful_output(command, phase), "12\n", "{phase} macro invocation");
     }
 
-    /// Run a bounded consumer process and reject partial output or failures before interpreting
-    /// its generated behavior.
+    /// Run a consumer process with bounded output and reject partial output or failures before
+    /// interpreting its generated behavior. Its stderr stays in `{phase}.stderr` for the
+    /// diagnostics checks.
+    ///
+    /// No time limit applies, so a slow machine cannot fail a correct build. A stream that passes
+    /// the output limit is closed rather than Cargo killed: Cargo's next write fails, and it
+    /// waits for the compilers it started before exiting, so none is left writing into the
+    /// fixture that `Fixture::drop` removes.
     fn successful_output(&self, command: &mut Command, phase: &str) -> String {
-        let paths =
-            [self.0.join(format!("{phase}.stdout")), self.0.join(format!("{phase}.stderr"))];
         let mut child = command
             .stdin(Stdio::null())
-            .stdout(File::create(&paths[0]).unwrap())
-            .stderr(File::create(&paths[1]).unwrap())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
             .spawn()
             .expect("start isolated test process");
-        let deadline = Instant::now() + Duration::from_secs(300);
-        let status = loop {
-            let oversized = paths.iter().any(|path| fs::metadata(path).unwrap().len() > 16 << 20);
-            if oversized || Instant::now() >= deadline {
-                let _ = child.kill();
-                let _ = child.wait();
-                panic!("{phase} exceeded its time or output limit");
-            }
-            if let Some(status) = child.try_wait().expect("wait for test process") {
-                break status;
-            }
-            std::thread::sleep(Duration::from_millis(20));
+        let stdout = child.stdout.take().expect("piped test process stdout");
+        let stderr = child.stderr.take().expect("piped test process stderr");
+        let (stdout, stderr) = std::thread::scope(|scope| {
+            let stderr = scope.spawn(move || capture(stderr));
+            (capture(stdout), stderr.join().expect("read test process stderr"))
+        });
+        let status = child.wait().expect("wait for test process");
+        let (Some(stdout), Some(stderr)) = (stdout, stderr) else {
+            panic!("{phase} exceeded its output limit");
         };
-        assert!(status.success(), "{phase} failed:\n{}", fs::read_to_string(&paths[1]).unwrap());
-        fs::read_to_string(&paths[0]).unwrap()
+        let stderr = String::from_utf8(stderr).unwrap();
+        fs::write(self.0.join(format!("{phase}.stderr")), &stderr).unwrap();
+        assert!(status.success(), "{phase} failed:\n{stderr}");
+        String::from_utf8(stdout).unwrap()
     }
 
     /// Require the isolated generated file to agree with rustfmt's final representation.
@@ -262,6 +269,14 @@ impl Fixture {
         }
         report
     }
+}
+
+/// Read a stream to its end, or `None` once it passes [`OUTPUT_LIMIT`]. Returning drops the
+/// pipe, so a writer past the limit fails its next write instead of filling memory or disk.
+fn capture(stream: impl Read) -> Option<Vec<u8>> {
+    let mut bytes = Vec::new();
+    stream.take(OUTPUT_LIMIT + 1).read_to_end(&mut bytes).expect("read test process output");
+    (bytes.len() as u64 <= OUTPUT_LIMIT).then_some(bytes)
 }
 
 /// Read the complete generated Rust leaf map for snapshot and stable-write comparisons.

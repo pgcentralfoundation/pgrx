@@ -7,18 +7,18 @@
 // the validated production helper; this module also serves library unit tests without
 // depending on an external crate name.
 //
-// Every compiler and consumer has bounded runtime and captured output in owned temporary
-// files. Cross-target checks stop at metadata and explicitly report missing Rust target
-// libraries, while native comparisons execute the actual emitted macros and support.
+// Every compiler and consumer has bounded captured output and works in owned temporary
+// directories; elapsed time is not limited. Cross-target checks stop at metadata and explicitly
+// report missing Rust target libraries, while native comparisons execute the actual emitted
+// macros and support.
 
-use std::fs::{self, File};
+use std::fs;
+use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+use std::time::{SystemTime, UNIX_EPOCH};
 
-/// Maximum compiler or consumer runtime before the oracle kills a stalled process.
-const TIMEOUT: Duration = Duration::from_secs(30);
 /// Maximum captured output size, keeping failed or malformed compiler probes from exhausting
 /// test resources.
 const OUTPUT_LIMIT: u64 = 8 * 1024 * 1024;
@@ -117,7 +117,7 @@ fn run_rust_linked_with_arguments(
         .arg(&native)
         .arg("-o")
         .arg(&object);
-    run_bounded(&mut compiler, &directory.0, "compile_native");
+    run_tool(&mut compiler, "compile_native");
     let rust = directory.0.join("linked.rs");
     let executable = directory.0.join(format!("linked{}", std::env::consts::EXE_SUFFIX));
     fs::write(&rust, source).expect("write emitted Rust call oracle");
@@ -137,8 +137,8 @@ fn run_rust_linked_with_arguments(
     compiler.args(["-C", "link-arg=-Wl,--gc-sections"]);
     #[cfg(all(target_os = "windows", target_env = "msvc"))]
     compiler.args(["-C", "link-arg=/OPT:REF"]);
-    run_bounded(&mut compiler, &directory.0, "compile_linked");
-    run_bounded(&mut Command::new(executable), &directory.0, "execute_linked")
+    run_tool(&mut compiler, "compile_linked");
+    run_tool(&mut Command::new(executable), "execute_linked")
 }
 
 /// Type-check emitted Rust for an actual cross-target profile when that Rust target's standard
@@ -165,7 +165,7 @@ pub fn check_rust_with_cfg(source: &str, configurations: &[String], rust_target:
         .arg(&program)
         .arg("-o")
         .arg(directory.0.join("cross.rmeta"));
-    run_bounded(&mut compiler, &directory.0, "check_cross_target");
+    run_tool(&mut compiler, "check_cross_target");
     true
 }
 
@@ -181,7 +181,7 @@ pub fn reject_rust(source: &str) -> String {
         .arg(&rust)
         .arg("-o")
         .arg(directory.0.join("rejected.rmeta"));
-    let (status, stdout, stderr) = run_process(&mut compiler, &directory.0, "reject");
+    let (status, stdout, stderr) = run_process(&mut compiler, "reject");
     assert!(!status.success(), "invalid macro invocation compiled: {stdout}");
     stderr
 }
@@ -208,22 +208,15 @@ pub fn reject_c_invocation(
         .arg("-include")
         .arg(header)
         .arg(&c);
-    let (status, stdout, stderr) = run_process(&mut compiler, &directory.0, "reject_c");
+    let (status, stdout, stderr) = run_process(&mut compiler, "reject_c");
     assert!(!status.success(), "invalid original C invocation compiled: {stdout}");
     stderr
 }
 
-/// Resolve a read-only tool input using the same process and output bounds as the oracle.
-pub fn run_tool(command: &mut Command, phase: &str) -> String {
-    let directory = TemporaryDirectory::new();
-    run_bounded(command, &directory.0, phase)
-}
-
-/// Require a tool to reject an input under the oracle's process and output bounds.
+/// Require a tool to reject an input under the oracle's output bound.
 #[allow(dead_code)]
 pub fn reject_tool(command: &mut Command, phase: &str) -> String {
-    let directory = TemporaryDirectory::new();
-    let (status, stdout, stderr) = run_process(command, &directory.0, phase);
+    let (status, stdout, stderr) = run_process(command, phase);
     assert!(
         !status.success(),
         "Rust oracle {phase} unexpectedly succeeded ({status}):\n{stderr}\n{stdout}"
@@ -231,53 +224,48 @@ pub fn reject_tool(command: &mut Command, phase: &str) -> String {
     stderr
 }
 
-/// Run a compiler or consumer with output and time limits, rejecting failures instead of
+/// Run a compiler, consumer or read-only tool with bounded output, rejecting failures instead of
 /// comparing partial observations.
-fn run_bounded(command: &mut Command, directory: &Path, phase: &str) -> String {
-    let (status, stdout, stderr) = run_process(command, directory, phase);
+pub fn run_tool(command: &mut Command, phase: &str) -> String {
+    let (status, stdout, stderr) = run_process(command, phase);
     assert!(status.success(), "Rust oracle {phase} failed ({status}):\n{stderr}\n{stdout}");
     stdout
 }
 
-/// Capture exit status and bounded output in owned files, killing a stalled oracle before it
-/// can exhaust the test run.
-fn run_process(
-    command: &mut Command,
-    directory: &Path,
-    phase: &str,
-) -> (std::process::ExitStatus, String, String) {
-    let stdout_path = directory.join(format!("{phase}.stdout"));
-    let stderr_path = directory.join(format!("{phase}.stderr"));
+/// Capture exit status and bounded output.
+///
+/// No time limit applies, so a slow machine cannot fail a correct run. A stream that passes the
+/// output limit is closed rather than its process killed: the next write fails, and the tool
+/// exits through its own error handling, which waits for any linker it started. No process is
+/// left writing into a directory that the caller removes.
+fn run_process(command: &mut Command, phase: &str) -> (std::process::ExitStatus, String, String) {
     let mut child = command
         .stdin(Stdio::null())
-        .stdout(File::create(&stdout_path).expect("create Rust oracle stdout"))
-        .stderr(File::create(&stderr_path).expect("create Rust oracle stderr"))
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
         .spawn()
         .unwrap_or_else(|error| panic!("could not {phase} the Rust oracle: {error}"));
-    let deadline = Instant::now() + TIMEOUT;
-    let status = loop {
-        let oversized = [&stdout_path, &stderr_path]
-            .iter()
-            .any(|path| fs::metadata(path).is_ok_and(|metadata| metadata.len() > OUTPUT_LIMIT));
-        if oversized || Instant::now() >= deadline {
-            let _ = child.kill();
-            let _ = child.wait();
-            panic!("Rust oracle {phase} exceeded its time or output limit");
-        }
-        match child.try_wait().expect("wait for Rust oracle") {
-            Some(status) => break status,
-            None => std::thread::sleep(Duration::from_millis(10)),
-        }
+    let stdout = child.stdout.take().expect("piped Rust oracle stdout");
+    let stderr = child.stderr.take().expect("piped Rust oracle stderr");
+    let (stdout, stderr) = std::thread::scope(|scope| {
+        let stderr = scope.spawn(move || capture(stderr));
+        (capture(stdout), stderr.join().expect("read Rust oracle stderr"))
+    });
+    let status = child.wait().expect("wait for Rust oracle");
+    let (Some(stdout), Some(stderr)) = (stdout, stderr) else {
+        panic!("Rust oracle {phase} exceeded its output limit");
     };
-    for path in [&stdout_path, &stderr_path] {
-        assert!(
-            fs::metadata(path).expect("inspect Rust oracle output").len() <= OUTPUT_LIMIT,
-            "Rust oracle {phase} exceeded its output limit"
-        );
-    }
-    let stdout = fs::read_to_string(stdout_path).expect("read Rust oracle stdout");
-    let stderr = fs::read_to_string(stderr_path).expect("read Rust oracle stderr");
+    let stdout = String::from_utf8(stdout).expect("read Rust oracle stdout");
+    let stderr = String::from_utf8(stderr).expect("read Rust oracle stderr");
     (status, stdout, stderr)
+}
+
+/// Read a stream to its end, or `None` once it passes [`OUTPUT_LIMIT`]. Returning drops the
+/// pipe, so a writer past the limit fails its next write instead of filling memory or disk.
+fn capture(stream: impl Read) -> Option<Vec<u8>> {
+    let mut bytes = Vec::new();
+    stream.take(OUTPUT_LIMIT + 1).read_to_end(&mut bytes).expect("read Rust oracle output");
+    (bytes.len() as u64 <= OUTPUT_LIMIT).then_some(bytes)
 }
 
 /// Own isolated compiler inputs and outputs so oracle runs cannot reuse stale artifacts or

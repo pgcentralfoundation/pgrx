@@ -6,18 +6,17 @@
 // semantic oracle. Native runs execute bounded programs; cross-target proofs use compiler
 // static assertions and require neither a foreign linker nor a PostgreSQL backend.
 //
-// Captured output and elapsed time are limited independently, and owned temporary directories
-// release compiler artifacts on success and failure. macOS SDK lookup is explicit so header
-// inspection and execution can share the same effective native environment.
+// Captured output is limited, elapsed time is not, and owned temporary directories release
+// compiler artifacts on success and failure. macOS SDK lookup is explicit so header inspection
+// and execution can share the same effective native environment.
 
-use std::fs::{self, File};
+use std::fs;
+use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+use std::time::{SystemTime, UNIX_EPOCH};
 
-/// Maximum compiler or consumer runtime before the oracle kills a stalled process.
-const TIMEOUT: Duration = Duration::from_secs(30);
 /// Maximum captured output size, keeping failed or malformed compiler probes from exhausting
 /// test resources.
 const OUTPUT_LIMIT: u64 = 8 * 1024 * 1024;
@@ -31,9 +30,7 @@ static NEXT_DIRECTORY: AtomicU64 = AtomicU64::new(0);
 pub fn native_arguments() -> Vec<String> {
     #[cfg(target_os = "macos")]
     {
-        let directory = TemporaryDirectory::new();
-        let sdk =
-            run_bounded(Command::new("xcrun").arg("--show-sdk-path"), &directory.0, "SDK lookup");
+        let sdk = run_bounded(Command::new("xcrun").arg("--show-sdk-path"), "SDK lookup");
         let sdk = sdk.trim();
         assert!(!sdk.is_empty() && Path::new(sdk).is_dir(), "expected an installed macOS SDK");
         vec!["-isysroot".into(), sdk.into()]
@@ -79,50 +76,46 @@ pub fn run_c(
     } else {
         compiler.arg("-fsyntax-only");
     }
-    let output = run_bounded(&mut compiler, &directory.0, "compile");
-    if execute {
-        run_bounded(&mut Command::new(executable), &directory.0, "execute")
-    } else {
-        output
-    }
+    let output = run_bounded(&mut compiler, "compile");
+    if execute { run_bounded(&mut Command::new(executable), "execute") } else { output }
 }
 
-/// Run a compiler or consumer with output and time limits, rejecting failures instead of
-/// comparing partial observations.
-fn run_bounded(command: &mut Command, directory: &Path, phase: &str) -> String {
-    let stdout_path = directory.join(format!("{phase}.stdout"));
-    let stderr_path = directory.join(format!("{phase}.stderr"));
+/// Run a compiler or consumer with bounded output, rejecting failures instead of comparing
+/// partial observations.
+///
+/// No time limit applies, so a slow machine cannot fail a correct run. A stream that passes the
+/// output limit is closed rather than its process killed: the next write fails, and the tool
+/// exits through its own error handling, which waits for any linker it started. No process is
+/// left writing into a directory that the caller removes.
+fn run_bounded(command: &mut Command, phase: &str) -> String {
     let mut child = command
         .stdin(Stdio::null())
-        .stdout(File::create(&stdout_path).expect("create oracle stdout"))
-        .stderr(File::create(&stderr_path).expect("create oracle stderr"))
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
         .spawn()
         .unwrap_or_else(|error| panic!("could not {phase} the C oracle: {error}"));
-    let deadline = Instant::now() + TIMEOUT;
-    let status = loop {
-        let oversized = [&stdout_path, &stderr_path]
-            .iter()
-            .any(|path| fs::metadata(path).is_ok_and(|metadata| metadata.len() > OUTPUT_LIMIT));
-        if oversized || Instant::now() >= deadline {
-            let _ = child.kill();
-            let _ = child.wait();
-            panic!("C oracle {phase} exceeded its time or output limit");
-        }
-        match child.try_wait().expect("wait for C oracle") {
-            Some(status) => break status,
-            None => std::thread::sleep(Duration::from_millis(10)),
-        }
+    let stdout = child.stdout.take().expect("piped C oracle stdout");
+    let stderr = child.stderr.take().expect("piped C oracle stderr");
+    let (stdout, stderr) = std::thread::scope(|scope| {
+        let stderr = scope.spawn(move || capture(stderr));
+        (capture(stdout), stderr.join().expect("read C oracle stderr"))
+    });
+    let status = child.wait().expect("wait for C oracle");
+    let (Some(stdout), Some(stderr)) = (stdout, stderr) else {
+        panic!("C oracle {phase} exceeded its output limit");
     };
-    for path in [&stdout_path, &stderr_path] {
-        assert!(
-            fs::metadata(path).expect("inspect oracle output").len() <= OUTPUT_LIMIT,
-            "C oracle {phase} exceeded its output limit"
-        );
-    }
-    let stdout = fs::read_to_string(stdout_path).expect("read oracle stdout");
-    let stderr = fs::read_to_string(stderr_path).expect("read oracle stderr");
+    let stdout = String::from_utf8(stdout).expect("read oracle stdout");
+    let stderr = String::from_utf8(stderr).expect("read oracle stderr");
     assert!(status.success(), "C oracle {phase} failed ({status}):\n{stderr}\n{stdout}");
     stdout
+}
+
+/// Read a stream to its end, or `None` once it passes [`OUTPUT_LIMIT`]. Returning drops the
+/// pipe, so a writer past the limit fails its next write instead of filling memory or disk.
+fn capture(stream: impl Read) -> Option<Vec<u8>> {
+    let mut bytes = Vec::new();
+    stream.take(OUTPUT_LIMIT + 1).read_to_end(&mut bytes).expect("read C oracle output");
+    (bytes.len() as u64 <= OUTPUT_LIMIT).then_some(bytes)
 }
 
 /// Own isolated compiler inputs and outputs so oracle runs cannot reuse stale artifacts or

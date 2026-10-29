@@ -1855,8 +1855,8 @@ truncate the source into an apparently successful macro.
 | Support fragment split threshold | 256 KiB, at complete items |
 | Target bundle member / total bytes | 128 MiB / 512 MiB |
 | Target bundle manifest / entries / path depth | 4 MiB / 8,192 / 64 components |
-| Ordinary C/Rust oracle child duration / output | 30 seconds / 8 MiB |
-| Shipping integration child duration / output | 300 seconds / 16 MiB |
+| Ordinary C/Rust oracle child output | 8 MiB per stream |
+| Shipping integration child output | 16 MiB per stream |
 
 Header preprocessing is a substantial fixed cost. Batch expansion, constant
 probes, and declaration collection so that cost does not multiply by the number

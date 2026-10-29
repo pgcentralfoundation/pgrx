@@ -26,21 +26,19 @@ use pgrx_c_macros::{
     InvocationContract, MacroEmission, MacroScanner, ParameterOrigin, SkipReasonCode, emit,
     emit_support_with_bindings, inspect,
 };
-use std::fs::{self, File};
+use std::fs;
+use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::process::{Command, ExitStatus, Stdio};
 use std::sync::Mutex;
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Serialize libclang-backed inspection within this test process because its safe runtime
 /// permits one active owner.
 static SCANNER_LOCK: Mutex<()> = Mutex::new(());
 /// Allocate process-local unique directory suffixes for concurrent isolated oracle runs.
 static NEXT_DIRECTORY: AtomicU64 = AtomicU64::new(0);
-/// Bound downstream compiler and consumer runtime so invalid fixtures cannot hang a normal test
-/// run.
-const PROCESS_TIMEOUT: Duration = Duration::from_secs(30);
 /// Maximum captured output size, keeping failed or malformed compiler probes from exhausting
 /// test resources.
 const OUTPUT_LIMIT: u64 = 1024 * 1024;
@@ -267,7 +265,7 @@ fn doc_commented_definition_keeps_unexpanded_calls_parameters_and_fenced_comment
         .unwrap();
     let mut rustdoc = Command::new("rustdoc");
     rustdoc.args(["--edition=2024", "--test"]).arg(&library);
-    let (status, stdout, stderr) = run_bounded(&mut rustdoc, &directory.0, "documented");
+    let (status, stdout, stderr) = run_bounded(&mut rustdoc, "documented");
     assert!(status.success(), "rustdoc failed ({status}):\n{stderr}\n{stdout}");
     assert!(stdout.contains("running 0 tests"), "C documentation must not create Rust doctests");
 }
@@ -304,14 +302,14 @@ fn actual_support_and_emitted_macros_compile_in_a_renamed_downstream_crate() {
         .arg(&library)
         .arg("-o")
         .arg(&rlib);
-    run_success(&mut compile_library, &directory.0, "library");
+    run_success(&mut compile_library, "library");
 
     let consumer = directory.0.join("consumer.rs");
     let executable = directory.0.join("consumer");
     fs::write(&consumer, include_str!("fixtures/emit_consumer.rs")).unwrap();
     let mut compile_consumer = downstream_command(&consumer, &rlib, &executable);
-    run_success(&mut compile_consumer, &directory.0, "consumer");
-    run_success(&mut Command::new(&executable), &directory.0, "execute");
+    run_success(&mut compile_consumer, "consumer");
+    run_success(&mut Command::new(&executable), "execute");
 
     // C validates facts about the original header, independently of the Rust tree.
     // Type facts are integer constant expressions; floating value checks execute
@@ -367,7 +365,7 @@ int main(void) {
         )
         .unwrap();
         let mut compiler = downstream_command(&rejected, &rlib, &directory.0.join(label));
-        let (status, _, stderr) = run_bounded(&mut compiler, &directory.0, label);
+        let (status, _, stderr) = run_bounded(&mut compiler, label);
         assert!(!status.success(), "unsupported {input} must fail compilation");
         assert!(
             stderr.contains("IntoExpression") || stderr.contains("AllowedProfile"),
@@ -381,7 +379,7 @@ int main(void) {
     )
     .unwrap();
     let mut compiler = downstream_command(&non_const, &rlib, &directory.0.join("const"));
-    let (status, _, stderr) = run_bounded(&mut compiler, &directory.0, "const");
+    let (status, _, stderr) = run_bounded(&mut compiler, "const");
     assert!(!status.success());
     assert!(
         stderr.contains("non-const"),
@@ -422,7 +420,7 @@ fn atomic_argument_rules_reject_unparenthesized_multi_token_substitutions() {
         .arg(&library)
         .arg("-o")
         .arg(&rlib);
-    run_success(&mut compile_library, &directory.0, "atomic_library");
+    run_success(&mut compile_library, "atomic_library");
 
     let accepted = directory.0.join("accepted.rs");
     fs::write(
@@ -439,12 +437,8 @@ fn main() {
     )
     .unwrap();
     let executable = directory.0.join("accepted");
-    run_success(
-        &mut downstream_command(&accepted, &rlib, &executable),
-        &directory.0,
-        "atomic_accepted",
-    );
-    run_success(&mut Command::new(&executable), &directory.0, "atomic_execute");
+    run_success(&mut downstream_command(&accepted, &rlib, &executable), "atomic_accepted");
+    run_success(&mut Command::new(&executable), "atomic_execute");
 
     for (label, argument) in [
         ("operator", "1_i32 << 1_i32"),
@@ -458,7 +452,7 @@ fn main() {
         )
         .unwrap();
         let mut compiler = downstream_command(&rejected, &rlib, &directory.0.join(label));
-        let (status, _, stderr) = run_bounded(&mut compiler, &directory.0, label);
+        let (status, _, stderr) = run_bounded(&mut compiler, label);
         assert!(!status.success(), "ungrouped multi-token argument {argument} must fail");
         assert!(
             stderr.contains("invocation contract")
@@ -483,48 +477,43 @@ fn downstream_command(source: &Path, library: &Path, executable: &Path) -> Comma
 }
 
 /// Require a bounded downstream tool invocation to succeed and return its recorded stdout.
-fn run_success(command: &mut Command, directory: &Path, phase: &str) {
-    let (status, stdout, stderr) = run_bounded(command, directory, phase);
+fn run_success(command: &mut Command, phase: &str) {
+    let (status, stdout, stderr) = run_bounded(command, phase);
     assert!(status.success(), "{phase} failed ({status}):\n{stderr}\n{stdout}");
 }
 
-/// Run a compiler or consumer with output and time limits, rejecting failures instead of
-/// comparing partial observations.
-fn run_bounded(
-    command: &mut Command,
-    directory: &Path,
-    phase: &str,
-) -> (ExitStatus, String, String) {
-    let stdout_path = directory.join(format!("{phase}.stdout"));
-    let stderr_path = directory.join(format!("{phase}.stderr"));
+/// Run a compiler or consumer with bounded output and return its status and output.
+///
+/// No time limit applies, so a slow machine cannot fail a correct run. A stream that passes the
+/// output limit is closed rather than its process killed: the next write fails, and the tool
+/// exits through its own error handling, which waits for any linker it started. No process is
+/// left writing into a directory that the caller removes.
+fn run_bounded(command: &mut Command, phase: &str) -> (ExitStatus, String, String) {
     let mut child = command
         .stdin(Stdio::null())
-        .stdout(File::create(&stdout_path).unwrap())
-        .stderr(File::create(&stderr_path).unwrap())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
         .spawn()
         .unwrap_or_else(|error| panic!("could not start {phase}: {error}"));
-    let deadline = Instant::now() + PROCESS_TIMEOUT;
-    let status = loop {
-        let oversized = [&stdout_path, &stderr_path]
-            .iter()
-            .any(|path| fs::metadata(path).is_ok_and(|metadata| metadata.len() > OUTPUT_LIMIT));
-        if oversized || Instant::now() >= deadline {
-            let _ = child.kill();
-            let _ = child.wait();
-            panic!("{phase} exceeded its time or output limit");
-        }
-        if let Some(status) = child.try_wait().expect("wait for test child") {
-            break status;
-        }
-        std::thread::sleep(Duration::from_millis(10));
+    let stdout = child.stdout.take().expect("piped test child stdout");
+    let stderr = child.stderr.take().expect("piped test child stderr");
+    let (stdout, stderr) = std::thread::scope(|scope| {
+        let stderr = scope.spawn(move || capture(stderr));
+        (capture(stdout), stderr.join().expect("read test child stderr"))
+    });
+    let status = child.wait().expect("wait for test child");
+    let (Some(stdout), Some(stderr)) = (stdout, stderr) else {
+        panic!("{phase} exceeded its output limit");
     };
-    for path in [&stdout_path, &stderr_path] {
-        assert!(
-            fs::metadata(path).unwrap().len() <= OUTPUT_LIMIT,
-            "{phase} output exceeded its bound"
-        );
-    }
-    (status, fs::read_to_string(stdout_path).unwrap(), fs::read_to_string(stderr_path).unwrap())
+    (status, String::from_utf8(stdout).unwrap(), String::from_utf8(stderr).unwrap())
+}
+
+/// Read a stream to its end, or `None` once it passes [`OUTPUT_LIMIT`]. Returning drops the
+/// pipe, so a writer past the limit fails its next write instead of filling memory or disk.
+fn capture(stream: impl Read) -> Option<Vec<u8>> {
+    let mut bytes = Vec::new();
+    stream.take(OUTPUT_LIMIT + 1).read_to_end(&mut bytes).expect("read test child output");
+    (bytes.len() as u64 <= OUTPUT_LIMIT).then_some(bytes)
 }
 
 /// Own isolated compiler inputs and outputs so oracle runs cannot reuse stale artifacts or
