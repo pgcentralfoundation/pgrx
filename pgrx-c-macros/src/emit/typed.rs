@@ -1196,21 +1196,13 @@ impl<'a> Renderer<'a> {
                             // proves it, so no other entry point can fall back to the binding.
                             let binding = if let Some(reason) = self
                                 .adapters
-                                .and_then(|adapters| adapters.functions.unsupported.get(name))
+                                .and_then(|adapters| adapters.functions.call_refusal(name))
                             {
-                                Err(reason.clone())
-                            } else if let Some(adapter) = self.adapters.and_then(|adapters| {
-                                // An identity-only adapter has no call wrapper, so a call
-                                // must not resolve to it. Demand planning already marks
-                                // every function a renderable root calls, fallback call
-                                // roots included, so this only guards a call that planning
-                                // did not see.
-                                adapters
-                                    .functions
-                                    .bindings
-                                    .get(name)
-                                    .filter(|_| !adapters.functions.identities.contains(name))
-                            }) {
+                                Err(reason.to_owned())
+                            } else if let Some(adapter) = self
+                                .adapters
+                                .and_then(|adapters| adapters.functions.bindings.get(name))
+                            {
                                 Ok(adapter)
                             } else if let Some(ty) = super::functions::native_transport(declared)
                             {

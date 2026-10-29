@@ -2259,8 +2259,9 @@ mod tests {
     }
 
     /// An identity-only adapter has no call wrapper. If a call to its function reaches
-    /// rendering without demand planning seeing it, the call is refused rather than
-    /// resolved to the wrapper the adapter does not define.
+    /// rendering without demand planning seeing it, the call is refused. It resolves
+    /// neither to the wrapper the adapter does not define nor to a bindgen binding that
+    /// cannot prove a native-transport signature's ABI.
     #[test]
     fn calls_do_not_resolve_to_identity_only_adapters() {
         let _lock = crate::SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -2270,32 +2271,59 @@ mod tests {
         std::fs::write(
             &header,
             "static inline int IdentityOnly(int value) { return value + 1; }\n\
+             static inline int CharWiden(char value) { return value; }\n\
              #define IDENTITY_ADDRESS() (&IdentityOnly)\n\
-             #define IDENTITY_CALL(value) IdentityOnly(value)\n",
+             #define IDENTITY_CALL(value) IdentityOnly(value)\n\
+             #define WIDEN_ADDRESS() (&CharWiden)\n\
+             #define WIDEN_CALL(value) CharWiden(value)\n",
         )
         .unwrap();
         // A fixed target keeps the support profile and calling convention independent of the host.
         let frontend =
             crate::inspect(&scanner, &header, &["--target=x86_64-unknown-linux-gnu".into()], None)
                 .unwrap();
-        let names = ["IDENTITY_ADDRESS", "IDENTITY_CALL"];
-        let session = crate::AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
-        let bindings = super::BindingCatalog::default();
-        // Plan only the address use, as if planning had missed the call.
+        let addresses = ["IDENTITY_ADDRESS", "WIDEN_ADDRESS"];
+        let calls = ["IDENTITY_CALL", "WIDEN_CALL"];
+        let session =
+            crate::AnalysisSession::prepare(&scanner, &frontend, &[addresses, calls].concat())
+                .unwrap();
+        // IdentityOnly has no binding. CharWiden has the shape bindgen's static-function
+        // wrappers give it, which cannot prove plain char's callable extension attributes.
+        let mut bindings = super::BindingCatalog::default();
+        bindings.functions.insert(
+            "CharWiden".into(),
+            crate::FunctionBinding {
+                path: vec!["CharWiden".into()],
+                parameters: vec![crate::RustBindingType::NativeChar],
+                result: crate::RustBindingType::Integer { signed: true, bits: 32 },
+                abi: "C".into(),
+                variadic: false,
+                link_name: "CharWiden__pgrx_cshim".into(),
+                guarded: false,
+                uses_cshim: true,
+            },
+        );
+        // Plan only the address uses, as if planning had missed the calls.
         let requests =
-            super::demands::plan(&session, &super::renderable(&session, &names[..1]), &bindings);
+            super::demands::plan(&session, &super::renderable(&session, &addresses), &bindings);
         let adapters = super::generated_adapters(&session, &requests, &bindings).unwrap();
-        assert!(adapters.functions.identities.contains("IdentityOnly"));
-        assert!(adapters.functions.bindings.contains_key("IdentityOnly"));
-        assert!(!adapters.functions.rust.contains("Inline_IdentityOnly"));
-        let emissions =
-            super::emit_prepared_batch(&session, &names[1..], &bindings, Some(&adapters));
-        let [emission] = &emissions[..] else { panic!("one emission: {emissions:?}") };
-        let super::EmissionStatus::Skipped { reason } = &emission.status else {
-            panic!("IDENTITY_CALL rendered a call to the identity-only adapter of IdentityOnly");
-        };
-        assert_eq!(reason.code, SkipReasonCode::Call, "{reason:?}");
-        assert!(reason.message.contains("IdentityOnly: no callable binding"), "{reason:?}");
+        for name in ["IdentityOnly", "CharWiden"] {
+            assert!(adapters.functions.identities.contains(name), "{name}");
+            assert!(adapters.functions.bindings.contains_key(name), "{name}");
+            assert!(!adapters.functions.rust.contains(&format!("Inline_{name}")), "{name}");
+        }
+        let emissions = super::emit_prepared_batch(&session, &calls, &bindings, Some(&adapters));
+        assert_eq!(emissions.len(), calls.len());
+        for (emission, name) in emissions.iter().zip(["IdentityOnly", "CharWiden"]) {
+            let super::EmissionStatus::Skipped { reason } = &emission.status else {
+                panic!("{} rendered a call to {name}: {emission:?}", emission.analysis.name);
+            };
+            assert_eq!(reason.code, SkipReasonCode::Call, "{reason:?}");
+            assert!(
+                reason.message.contains(&format!("{name}: only an address witness")),
+                "{reason:?}"
+            );
+        }
     }
 
     /// Check raw keyword handling while keeping macro names separate from operand metavariable rules.

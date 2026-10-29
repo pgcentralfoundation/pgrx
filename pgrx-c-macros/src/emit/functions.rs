@@ -36,6 +36,21 @@ pub(super) struct FunctionAdapters {
     pub unsupported: BTreeMap<String, String>,
 }
 
+impl FunctionAdapters {
+    /// Why a call to `name` is refused: its adapter was rejected, or only an address
+    /// witness was generated, with no call wrapper. Its function may still have a bindgen
+    /// binding, which cannot prove the native-transport signatures that get adapters.
+    /// Demand planning marks every function a renderable root calls, so the second case
+    /// only guards a call that planning did not see.
+    pub fn call_refusal(&self, name: &str) -> Option<&str> {
+        self.unsupported.get(name).map(String::as_str).or_else(|| {
+            self.identities
+                .contains(name)
+                .then_some("only an address witness was generated, with no call wrapper")
+        })
+    }
+}
+
 /// Emit required thunks for static inline declarations and ABI-sensitive value transport.
 ///
 /// Each adapter is named after its C function. One build links one profile's
