@@ -23,12 +23,12 @@ use std::{ptr, slice};
 /// A Rust type of a fixed size, stored in PostgreSQL as the payload of a `varlena`.
 ///
 /// A `PgVarlena<T>` holds its value in Rust. Reading one from a Datum copies the payload into a
-/// Rust heap allocation aligned for `T`, because PostgreSQL places the payload one or four bytes
-/// past the varlena header without aligning it, and `Deref` and `DerefMut` lend references to
-/// that copy. The value keeps no pointer into PostgreSQL memory, so it may outlive the Datum,
-/// memory context, or SPI connection it was read from, and changing it never writes to that
-/// Datum. [`PgVarlena::into_pg`] and [`IntoDatum`] allocate a new varlena holding the value in
-/// `CurrentMemoryContext`.
+/// Rust heap allocation aligned for `T`, because PostgreSQL places the payload right after a one-
+/// or four-byte header, one or four bytes past the start of the varlena, without aligning it.
+/// `Deref` and `DerefMut` lend references to that copy. The value keeps no pointer into
+/// PostgreSQL memory, so it may outlive the Datum, memory context, or SPI connection it was read
+/// from, and changing it never writes to that Datum. [`PgVarlena::into_pg`] and [`IntoDatum`]
+/// allocate a new varlena holding the value in `CurrentMemoryContext`.
 ///
 /// Generally, `PgVarlena` is meant to be used in conjunction with pgrx's `PostgresType` derive macro
 /// to provide transparent mapping of fixed-size Rust types as Postgres datums.
@@ -182,9 +182,13 @@ where
     ///
     /// ## Safety
     ///
-    /// `datum` must point to a live varlena, possibly packed, compressed, or external, whose
-    /// payload starts with the bytes of a valid `T`, such as a value that
-    /// `PgVarlena::<T>::into_pg` produced. The call must run on the PostgreSQL backend thread.
+    /// `datum` must point to a live varlena, possibly packed, compressed, or external. Its
+    /// payload must start with `size_of::<T>()` bytes that form a valid `T` in this process, for
+    /// the current definition of `T`, and the rest of its payload must be initialized. Bytes
+    /// stored earlier need not qualify, for example when `T` holds a reference or pointer, or
+    /// when its layout or variants have changed since. A four-byte header must be four-byte
+    /// aligned, as PostgreSQL aligns the varlenas it stores and allocates. The call must run on
+    /// the PostgreSQL backend thread.
     ///
     /// ## Panics
     ///
@@ -217,10 +221,13 @@ where
     ///
     /// # Safety
     ///
-    /// `ptr` must point to a live varlena that is neither compressed nor external and whose
-    /// payload starts with the bytes of a valid `T`.
+    /// `ptr` must point to a live varlena that is neither compressed nor external, with a
+    /// four-byte-aligned header if the header is four bytes long. Its payload must start with the
+    /// bytes of a valid `T`, and the rest of it must be initialized.
     unsafe fn from_inline_varlena(ptr: *mut pg_sys::varlena) -> Self {
-        // SAFETY: the caller's live varlena header describes its inline payload.
+        // SAFETY: the caller's live varlena header describes its inline payload. A one-byte
+        // header is read with a byte load, and a four-byte header, which the caller aligns, with
+        // an aligned 32-bit load.
         let (len, payload) = unsafe {
             (pg_sys::VARSIZE_ANY_EXHDR!(ptr).get() as usize, pg_sys::VARDATA_ANY!(ptr).get())
         };
@@ -229,7 +236,7 @@ where
         assert!(len >= size, "varlena payload of {len} bytes cannot hold a {size}-byte value");
 
         let mut value = Box::<T>::new_uninit();
-        // SAFETY: the payload has `len >= size` initialized bytes and cannot overlap the new
+        // SAFETY: the payload has `len >= size` bytes, all initialized, and cannot overlap the new
         // Rust allocation. The byte copies need no alignment and keep the payload's padding bytes.
         // The caller promises the first `size` bytes are a valid T, so `value` holds one after
         // the copy. The tail slice covers the remaining `len - size` payload bytes, and its
