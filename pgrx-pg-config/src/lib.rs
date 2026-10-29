@@ -1069,19 +1069,35 @@ fn compiler_flags_from_known_properties_preserve_the_recorded_value() {
     );
 }
 
+/// Runs `query` against a pg_config that is the shell script `script`.
+///
+/// Tests run on parallel threads. A process forked by one test keeps every file another test
+/// has open for writing until it execs, and executing such a file fails with ETXTBSY, so one
+/// lock is held from writing a script until its process has exited.
+#[cfg(all(test, unix))]
+fn with_pg_config_script<T>(script: &str, query: impl FnOnce(PgConfig) -> T) -> T {
+    use std::os::unix::fs::PermissionsExt;
+    use std::sync::Mutex;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    static SCRIPTS: Mutex<()> = Mutex::new(());
+    let _running = SCRIPTS.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
+    let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
+    let path = std::env::temp_dir().join(format!("pgrx-pg-config-{}-{nonce}", std::process::id()));
+    std::fs::write(&path, script).unwrap();
+    std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
+    let result = query(PgConfig::new_with_defaults(path.clone()));
+    std::fs::remove_file(path).unwrap();
+    result
+}
+
 /// Preserve invalid native Unix flag bytes for explicit rejection by UTF-8 compiler consumers.
 #[cfg(unix)]
 #[test]
 fn optional_compiler_flags_do_not_lossily_rewrite_native_bytes() {
-    use std::os::unix::fs::PermissionsExt;
-    use std::time::{SystemTime, UNIX_EPOCH};
-    let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
-    let path =
-        std::env::temp_dir().join(format!("pgrx-pg-config-bytes-{}-{nonce}", std::process::id()));
-    std::fs::write(&path, "#!/bin/sh\nprintf '\\377\\n'\n").unwrap();
-    std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
-    let flags = PgConfig::new_with_defaults(path.clone()).optional_cflags().unwrap().unwrap();
-    std::fs::remove_file(path).unwrap();
+    let flags = with_pg_config_script("#!/bin/sh\nprintf '\\377\\n'\n", |config| {
+        config.optional_cflags().unwrap().unwrap()
+    });
     assert!(flags.to_str().is_none(), "invalid bytes must remain unavailable as UTF-8 flags");
 }
 
@@ -1090,19 +1106,10 @@ fn optional_compiler_flags_do_not_lossily_rewrite_native_bytes() {
 #[cfg(unix)]
 #[test]
 fn failed_pg_config_queries_do_not_accept_partial_stdout() {
-    use std::os::unix::fs::PermissionsExt;
-    use std::time::{SystemTime, UNIX_EPOCH};
-
-    let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
-    let path = std::env::temp_dir().join(format!("pgrx-pg-config-{}-{nonce}", std::process::id()));
-    std::fs::write(
-        &path,
+    let result = with_pg_config_script(
         "#!/bin/sh\nprintf 'partial flags\\n'\nprintf 'query failed\\n' >&2\nexit 7\n",
-    )
-    .unwrap();
-    std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
-    let result = PgConfig::new_with_defaults(path.clone()).cflags();
-    std::fs::remove_file(path).unwrap();
+        |config| config.cflags(),
+    );
     let error = result.expect_err("nonzero pg_config status must reject its stdout").to_string();
     assert!(error.contains("--cflags"), "{error}");
     assert!(error.contains("7"), "{error}");
