@@ -562,11 +562,11 @@ impl<'mcx, AllocatedBy: WhoAllocated> PgHeapTuple<'mcx, AllocatedBy> {
     ///
     /// A `PgBox<T>` is a copy of the attribute's first `size_of::<T>()` bytes in
     /// `CurrentMemoryContext`, because the tuple frees its memory when it drops or when an
-    /// attribute is set. A `T` that borrows, such as `&'tup str`, keeps the tuple borrowed.
-    /// Such a `T` can also point into a copy that reading allocates in `CurrentMemoryContext`,
-    /// as `&str` does for a compressed or out-of-line value, and `'tup` does not keep that copy
-    /// alive. Do not use it after that context is reset or deleted, for example after returning
-    /// it out of `Spi::connect`.
+    /// attribute is set. A `T` that borrows, such as `&'tup str`, keeps the tuple borrowed, but
+    /// it can also point into a copy that reading allocates in `CurrentMemoryContext`, as `&str`
+    /// does for a compressed or out-of-line value, and `'tup` does not keep that copy alive. Do
+    /// not use a `PgBox<T>` or a borrowed `T` after the context that was current at the call is
+    /// reset or deleted, for example after returning it out of `Spi::connect`.
     ///
     /// ## Errors
     /// - return [`TryFromDatumError::NoSuchAttributeNumber`] if the attribute does not exist
