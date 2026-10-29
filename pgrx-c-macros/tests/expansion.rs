@@ -630,6 +630,54 @@ fn closed_paste_proof_budgets_probe_output_rather_than_header_output() {
     assert_skip(&batch, "P_FORGED_CONSTANT", ExpansionSkipCode::TokenPaste);
 }
 
+/// Under Microsoft extensions, which Clang enables by default for MSVC targets, a paste that
+/// forms `//` comments out the rest of the invoking line. A generated macro cannot erase the
+/// code that follows its invocation, so the proof refuses such pastes, including one in a
+/// dependency. Clang reports them as errors through the probe pragmas; under `-w`, which
+/// silences that report, the braced pass finds the invocation line cut short instead.
+#[test]
+fn closed_pastes_that_form_comments_are_refused_under_microsoft_extensions() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let directory = Directory::new();
+    let header = directory.0.join("comment.h");
+    // In P_ARGUMENT_COMMENT the comment ends with the argument, so the line stays intact and only
+    // the reported error refuses it. Clang 14 to 19 and Apple clang 21 crash on a comment paste
+    // in an argument unless the expansion ends with a function-like macro name, as this one does.
+    std::fs::write(
+        &header,
+        r#"
+#define CAT(a,b) a##b
+#define ID(x) x
+#define FUNCTION(x) x
+#define COMMENT_OBJECT CAT(/,/) 3
+#define P_COMMENT(x) ((x) + 1) CAT(/,/) + 2
+#define P_COMMENT_DEPENDENCY(x) ((x) COMMENT_OBJECT + 2)
+#define P_ARGUMENT_COMMENT(x) ((x) + ID(CAT(/,/)) FUNCTION
+#define P_CLOSED(x) ((x)+CAT(0xFF,U))
+"#,
+    )
+    .unwrap();
+    let scanner = MacroScanner::new().unwrap();
+    let msvc = ["--target=x86_64-pc-windows-msvc", "-std=c17"];
+    let explicit = ["-std=c17", "-fms-compatibility", "-fms-extensions"];
+    let silenced = ["--target=x86_64-pc-windows-msvc", "-std=c17", "-w"];
+    for (arguments, reported) in [(&msvc[..], true), (&explicit, true), (&silenced, false)] {
+        let arguments = arguments.iter().map(|argument| argument.to_string()).collect::<Vec<_>>();
+        let frontend = inspect(&scanner, &header, &arguments, None).unwrap();
+        let line_cut = ["P_COMMENT", "P_COMMENT_DEPENDENCY"];
+        let mut names = vec!["P_CLOSED"];
+        names.extend(line_cut);
+        if reported {
+            names.push("P_ARGUMENT_COMMENT");
+        }
+        let batch = prepare_expansions(&scanner, &frontend, &names).unwrap();
+        assert!(body(expanded(&batch, "P_CLOSED")).contains(&"0xFFU"), "{arguments:?}");
+        for name in &names[1..] {
+            assert_skip(&batch, name, ExpansionSkipCode::TokenPaste);
+        }
+    }
+}
+
 /// Checks that malformed paste probes cannot swallow a later operand validation.
 #[test]
 fn malformed_paste_probes_cannot_swallow_a_later_operand_validation() {

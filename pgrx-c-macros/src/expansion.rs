@@ -34,7 +34,10 @@ pub(crate) use constants::retain_integer_constants;
 pub use constants::{ObjectIntegerConstants, probe_integer_object_constants};
 
 /// Probe-only diagnostic policy that accepts source markers and makes invalid token pasting an error.
-const PROBE_PRAGMAS: &str = "\n\n#pragma clang diagnostic ignored \"-Wgnu-line-marker\"\n#pragma clang diagnostic error \"-Winvalid-token-paste\"\n";
+///
+/// Microsoft extensions turn a paste that forms `//` into a comment that discards the rest of the
+/// invoking line. Every Clang from 6 on has the `-Wmicrosoft-comment-paste` group.
+const PROBE_PRAGMAS: &str = "\n\n#pragma clang diagnostic ignored \"-Wgnu-line-marker\"\n#pragma clang diagnostic error \"-Winvalid-token-paste\"\n#pragma clang diagnostic error \"-Wmicrosoft-comment-paste\"\n";
 
 /// Reserved prefix seed used to choose collision-free expansion marker names.
 const NAMESPACE: &str = "__pgrx_c_expand_";
