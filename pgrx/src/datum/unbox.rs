@@ -514,3 +514,30 @@ unsafe impl UnboxDatum for JsonB {
         JsonB::from_datum(d.0, false).unwrap()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn pgbox_unboxes_only_fixed_length_references_of_its_size() {
+        type Point = PgBox<pg_sys::Point>;
+        assert!(Point::can_unbox(16, false));
+        // Passed by value, so the Datum is not a pointer.
+        assert!(!Point::can_unbox(16, true));
+        assert!(!Point::can_unbox(8, false));
+        assert!(!Point::can_unbox(24, false));
+        // Variable-length and C string types.
+        assert!(!Point::can_unbox(-1, false));
+        assert!(!Point::can_unbox(-2, false));
+        assert!(!PgBox::<()>::can_unbox(0, false));
+
+        // palloc aligns only to MAXALIGN.
+        #[repr(align(32))]
+        struct OverAligned([u8; 32]);
+        assert!(!PgBox::<OverAligned>::can_unbox(32, false));
+
+        // Other types leave the check to their type comparison.
+        assert!(<pg_sys::Datum as UnboxDatum>::can_unbox(-1, false));
+    }
+}
