@@ -7,9 +7,7 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-// Polyfill while #![feature(strict_provenance)] is unstable
 use crate::NullableDatum;
-use std::ptr::NonNull;
 
 /// Postgres defines the "Datum" type as uintptr_t, so bindgen decides it is usize.
 /// Normally, this would be fine, except Postgres uses it more like void*:
@@ -53,6 +51,20 @@ struct DatumBlob {
 ///
 /// For all intents and purposes, Postgres counts as `unsafe` code that may be relying
 /// on you communicating pointers correctly to it. Do not play games with your database.
+///
+/// ## Integer conversions and provenance
+///
+/// C code can store a pointer in a `Datum` integer and later turn that integer back into a
+/// pointer. The integer conversions here follow Rust's exposed-provenance model to keep that
+/// round trip valid: [`Datum::value`] and `usize::from(datum)` expose the provenance of the
+/// pointer they convert, and `Datum::from` an integer (`usize`, or a narrower integer type,
+/// which converts through `usize`) uses [`core::ptr::with_exposed_provenance_mut`]. So do
+/// `u64` and `i64` with 64-bit pointers; with 32-bit pointers, `Datum::from` either of them
+/// pallocs a copy of the value and returns a pointer to it. A pass-by-reference Datum that
+/// went through an integer may therefore be dereferenced again, under the usual requirements
+/// for the memory it points to. Keeping the `Datum` or pointer
+/// itself is still better where possible: exposed provenance limits the compiler's alias
+/// analysis, and tools such as Miri check it less strictly.
 #[repr(transparent)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Datum(*mut DatumBlob);
@@ -60,9 +72,12 @@ pub struct Datum(*mut DatumBlob);
 impl Datum {
     /// Assume the datum is a value and extract the bits from
     /// the memory address, interpreting them as an integer.
+    ///
+    /// This exposes the provenance of a pointer Datum, so `Datum::from(datum.value())` may be
+    /// dereferenced wherever `datum` could be.
     #[inline]
     pub fn value(self) -> usize {
-        self.0.addr()
+        self.0.expose_provenance()
     }
 
     #[inline]
@@ -85,16 +100,20 @@ impl Datum {
 }
 
 impl From<usize> for Datum {
+    /// Takes the provenance exposed for the address `val`, if any, as a C integer-to-pointer
+    /// conversion does. See [Integer conversions and provenance](Datum#integer-conversions-and-provenance).
     #[inline]
     fn from(val: usize) -> Datum {
-        Datum(NonNull::<DatumBlob>::dangling().as_ptr().with_addr(val))
+        Datum(core::ptr::with_exposed_provenance_mut(val))
     }
 }
 
 impl From<Datum> for usize {
+    /// Exposes the provenance of a pointer Datum, so `Datum::from` the result may be
+    /// dereferenced again.
     #[inline]
     fn from(val: Datum) -> usize {
-        val.0.addr()
+        val.0.expose_provenance()
     }
 }
 
@@ -258,5 +277,35 @@ mod test {
         let val = usize::MAX;
         let datum = Datum::from(val);
         assert_eq!(datum.value(), val);
+    }
+
+    /// A pointer Datum that goes through an integer must still be dereferenceable, as it is in
+    /// C. Natively this passes even when the conversions drop provenance; run it under Miri
+    /// with a configured version's feature, as in
+    /// `cargo +nightly miri test -p pgrx-pg-sys --features pg18 --lib datum`, to check
+    /// provenance itself. Each conversion gets its own allocation: Miri lets a pointer built
+    /// from an integer use any provenance exposed for its allocation, so a shared allocation
+    /// would pass if only one of the conversions exposed it.
+    #[test]
+    fn pointer_round_trips_through_integers() {
+        let round_trips: &[fn(Datum) -> Datum] = &[
+            |datum| Datum::from(usize::from(datum)),
+            |datum| Datum::from(datum.value()),
+            // With 32-bit pointers, Datum::from(u64) pallocs a copy instead.
+            #[cfg(target_pointer_width = "64")]
+            |datum| Datum::from(datum.value() as u64),
+        ];
+
+        for (value, round_trip) in (0x5a5a_5a5a_u64..).zip(round_trips) {
+            let target = Box::into_raw(Box::new(value));
+            let rebuilt = round_trip(Datum::from(target));
+            assert_eq!(rebuilt.cast_mut_ptr::<u64>(), target);
+            // SAFETY: `target` is live until the Box is rebuilt below, and this conversion
+            // exposed and then reused its provenance.
+            assert_eq!(unsafe { *rebuilt.cast_mut_ptr::<u64>() }, value);
+            // SAFETY: `target` came from Box::into_raw and is released once, through the
+            // rebuilt pointer.
+            drop(unsafe { Box::from_raw(rebuilt.cast_mut_ptr::<u64>()) });
+        }
     }
 }

@@ -184,7 +184,9 @@ mod tests {
 
     use super::{NullError, NullStrict, same_name};
     use pgrx::prelude::*;
-    use pgrx::{IntoDatum, direct_pg_extern_function_call};
+    use pgrx::{
+        IntoDatum, direct_pg_extern_function_call, direct_pg_extern_function_call_as_datum,
+    };
 
     #[test]
     fn make_idea_happy() {
@@ -241,6 +243,26 @@ mod tests {
             direct_pg_extern_function_call::<f32>(super::takes_f32_wrapper, &[input.into_datum()]);
         let result = result.expect("result is NULL");
         assert!(result.eq(&input));
+    }
+
+    /// PostgreSQL compares by-value Datums bit for bit, so an `f32` Datum, whether built with
+    /// `into_datum` or returned from a function, must match `Float4GetDatum`, which
+    /// sign-extends the bits of a negative value.
+    #[pg_test]
+    fn test_f32_datum_matches_float4_get_datum() {
+        for input in [1.5_f32, -1.5, -0.0, f32::MIN, f32::NEG_INFINITY, -f32::NAN] {
+            // SAFETY: a guarded native call on the backend thread.
+            let expected = unsafe { pg_sys::Float4GetDatum(input) };
+            assert_eq!(input.into_datum(), Some(expected), "into_datum({input})");
+            // SAFETY: takes_f32 accepts one non-NULL float4 argument.
+            let returned = unsafe {
+                direct_pg_extern_function_call_as_datum(
+                    super::takes_f32_wrapper,
+                    &[input.into_datum()],
+                )
+            };
+            assert_eq!(returned, Some(expected), "takes_f32({input})");
+        }
     }
 
     #[pg_test]

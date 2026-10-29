@@ -8,7 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use pgrx::prelude::*;
-use pgrx::{PgRelation, PgXactCallbackEvent, check_for_interrupts, info, register_xact_callback};
+use pgrx::{PgRelation, PgXactCallbackEvent, info, register_xact_callback};
 use std::fs::File;
 use std::io::{Read, Write};
 use std::panic::catch_unwind;
@@ -98,7 +98,9 @@ fn http(url: &str) -> String {
 #[pg_extern]
 fn loop_forever() {
     loop {
-        check_for_interrupts!();
+        // SAFETY: pg_extern runs on PostgreSQL's initialized backend thread;
+        // ProcessInterrupts is called through its generated error guard.
+        unsafe { pg_sys::CHECK_FOR_INTERRUPTS!() };
     }
 }
 

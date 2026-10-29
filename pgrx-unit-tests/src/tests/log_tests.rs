@@ -67,7 +67,9 @@ mod tests {
 
     #[pg_test]
     fn test_check_for_interrupts() {
-        check_for_interrupts!();
+        // SAFETY: pg_test runs on PostgreSQL's initialized backend thread;
+        // ProcessInterrupts is called through its generated error guard.
+        unsafe { pg_sys::CHECK_FOR_INTERRUPTS!() };
     }
 
     #[pg_test(error = "ereport error")]

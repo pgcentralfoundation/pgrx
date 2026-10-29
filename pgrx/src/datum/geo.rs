@@ -18,7 +18,7 @@
 //! more information on the geometric types.
 use std::{mem, ptr};
 
-use crate::{FromDatum, IntoDatum, PgMemoryContexts, pg_sys, set_varsize_4b};
+use crate::{FromDatum, IntoDatum, PgMemoryContexts, pg_sys};
 
 // Copy types
 
@@ -224,7 +224,10 @@ impl IntoDatum for Path {
         unsafe {
             let path =
                 PgMemoryContexts::CurrentMemoryContext.palloc(total_size).cast::<pg_sys::PATH>();
-            set_varsize_4b(path.cast(), varlena_size);
+            // SAFETY: the fresh, aligned PostgreSQL allocation exclusively owns this header.
+            // geo_varlena_size bounds the complete allocation and its C int length; this
+            // macro initializes the header without reading its previous contents.
+            pg_sys::SET_VARSIZE_4B!(path.cast::<pg_sys::varlena>(), varlena_size).get();
             (*path).npts = num_points as i32;
             (*path).closed = self.closed as i32;
             (*path).dummy = 0;
@@ -310,7 +313,10 @@ impl IntoDatum for Polygon {
         unsafe {
             let polygon =
                 PgMemoryContexts::CurrentMemoryContext.palloc(total_size).cast::<pg_sys::POLYGON>();
-            set_varsize_4b(polygon.cast(), varlena_size);
+            // SAFETY: the fresh, aligned PostgreSQL allocation exclusively owns this header.
+            // geo_varlena_size bounds the complete allocation and its C int length; this
+            // macro initializes the header without reading its previous contents.
+            pg_sys::SET_VARSIZE_4B!(polygon.cast::<pg_sys::varlena>(), varlena_size).get();
             (*polygon).npts = num_points as i32;
             let points = (*polygon).p.as_mut_slice(num_points);
             for (i, point) in self.points.iter().enumerate() {
@@ -351,7 +357,7 @@ impl FromDatum for Polygon {
 }
 
 fn geo_varlena_size(num_points: usize, header_size: usize) -> (usize, i32) {
-    const VARLENA_4B_MAX_SIZE: usize = 0x3fff_ffff;
+    const VARLENA_4B_MAX_SIZE: usize = pg_sys::MaxAllocSize as usize;
 
     let points_size =
         num_points.checked_mul(mem::size_of::<Point>()).expect("geometric datum is too large");

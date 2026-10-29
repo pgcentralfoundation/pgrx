@@ -42,7 +42,7 @@
 - **Automatic PostgreSQL C Macro Translation**
    + On verified target C profiles, pgrx automatically transpiles nearly all of PostgreSQL's function-style C `#define` macros into Rust `macro_rules!` macros during binding generation
    + Use them through `pgrx::`, with C semantics determined by the selected PostgreSQL installation, compiler flags, and target
-   + Call macros with their original C names and `!`
+   + Call macros with their original C names and `!`; handwritten function-style macro helpers have been removed
    + See [Using PostgreSQL C macros](docs/src/extension/c-macros.md) for extension examples and the [transpiler architecture](pgrx-c-macros/ARCHITECTURE.md) for implementation details
 - **Safety First**
    + Translates Rust `panic!`s into Postgres `ERROR`s that abort the transaction, not the process

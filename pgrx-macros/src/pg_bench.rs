@@ -155,14 +155,14 @@ fn expand_pg_bench(func: ItemFn, args: PgBenchArgs) -> syn::Result<proc_macro2::
                         match result {
                             Ok(value) => {
                                 ::pgrx::pg_sys::ReleaseCurrentSubTransaction();
-                                ::pgrx::pg_sys::MemoryContextSwitchTo(old_context);
+                                ::pgrx::pg_sys::MemoryContextSwitchTo!(old_context).get();
                                 ::pgrx::pg_sys::CurrentResourceOwner = old_resource_owner;
                                 Ok(value)
                             }
                             Err(error) => {
-                                ::pgrx::pg_sys::MemoryContextSwitchTo(old_context);
+                                ::pgrx::pg_sys::MemoryContextSwitchTo!(old_context).get();
                                 ::pgrx::pg_sys::RollbackAndReleaseCurrentSubTransaction();
-                                ::pgrx::pg_sys::MemoryContextSwitchTo(old_context);
+                                ::pgrx::pg_sys::MemoryContextSwitchTo!(old_context).get();
                                 ::pgrx::pg_sys::CurrentResourceOwner = old_resource_owner;
                                 Err(error)
                             }

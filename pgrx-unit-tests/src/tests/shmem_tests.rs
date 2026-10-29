@@ -44,7 +44,7 @@ mod tests {
         // Hold lock
         let _lock = LWLOCK.exclusive();
         // Call into pg_guarded postgres function which internally reports an error
-        unsafe { pg_sys::format_type_extended(pg_sys::InvalidOid, -1, 0) };
+        unsafe { pg_sys::format_type_extended(pg_sys::Oid::INVALID, -1, 0) };
     }
 
     #[pg_test]
@@ -75,5 +75,25 @@ mod tests {
             *lock = i + 1;
             drop(lock);
         }
+    }
+
+    /// Uses its own lock: `test_spinlock` may hold the shared one from another backend.
+    #[cfg(all(feature = "cshim", not(feature = "pg19")))]
+    #[pg_test]
+    pub fn test_spinlock_is_locked() {
+        let spinlock = pgrx::spinlock::PgSpinLock::new(0_usize);
+        assert!(!spinlock.is_locked());
+        let lock = spinlock.lock();
+        assert!(spinlock.is_locked());
+        drop(lock);
+        assert!(!spinlock.is_locked());
+    }
+
+    #[cfg(all(feature = "cshim", not(feature = "pg19")))]
+    #[pg_test]
+    pub fn test_spinlock_is_locked_panics_off_the_backend_thread() {
+        let spinlock = pgrx::spinlock::PgSpinLock::new(0_usize);
+        let off_thread = std::thread::scope(|s| s.spawn(|| spinlock.is_locked()).join());
+        assert!(off_thread.is_err(), "is_locked read the lock off the backend thread");
     }
 }

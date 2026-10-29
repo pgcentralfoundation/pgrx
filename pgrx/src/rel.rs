@@ -17,25 +17,6 @@ use pgrx_sql_entity_graph::metadata::{
 use std::ops::Deref;
 use std::os::raw::c_char;
 
-macro_rules! pgstat_count_impl {
-    ($name:ident, $new_field:ident, $old_field:ident) => {
-        pub fn $name(&mut self) {
-            if self.should_count_relation() {
-                let info = self.pgstat_info;
-
-                #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-                unsafe {
-                    (*info).counts.$new_field += 1;
-                }
-                #[cfg(feature = "pg15")]
-                unsafe {
-                    (*info).t_counts.$old_field += 1;
-                }
-            }
-        }
-    };
-}
-
 pub struct PgRelation {
     boxed: PgBox<pg_sys::RelationData>,
     need_close: bool,
@@ -162,24 +143,21 @@ impl PgRelation {
     ///
     /// Note that the name is only unique within the containing namespace.
     pub fn name(&self) -> &str {
-        let rd_rel = unsafe { self.boxed.rd_rel.as_ref() }.unwrap();
-        name_data_to_str(&rd_rel.relname)
+        name_data_to_str(&self.class_form().relname)
     }
 
     /// RelationGetRelid
     ///          Returns the OID of the relation
     #[inline]
     pub fn oid(&self) -> pg_sys::Oid {
-        let rel = &self.boxed;
-        rel.rd_id
+        // SAFETY: the relation stays open and initialized for this access.
+        pg_sys::Oid::from(unsafe { pg_sys::RelationGetRelid!(self.boxed.as_ptr()).get() })
     }
 
     /// RelationGetNamespace
     ///            Returns the rel's namespace OID.
     pub fn namespace_oid(&self) -> pg_sys::Oid {
-        // SAFETY: we know self.boxed and its members are correct as we created it
-        let rd_rel: PgBox<pg_sys::FormData_pg_class> = unsafe { PgBox::from_pg(self.boxed.rd_rel) };
-        rd_rel.relnamespace
+        self.class_form().relnamespace
     }
 
     /// What is the name of the namespace in which this relation is located?
@@ -216,7 +194,7 @@ impl PgRelation {
         };
 
         list.iter_oid()
-            .filter(|oid| *oid != pg_sys::InvalidOid)
+            .filter(|oid| *oid != pg_sys::Oid::INVALID)
             .map(|oid| unsafe { PgRelation::with_lock(oid, lockmode) })
             .collect::<Vec<PgRelation>>()
             .into_iter()
@@ -240,64 +218,65 @@ impl PgRelation {
         PgTupleDesc::from_relation(self)
     }
 
+    /// Borrow the catalog row for as long as this relation keeps its storage live.
+    fn class_form(&self) -> &pg_sys::FormData_pg_class {
+        // SAFETY: Construction requires an open Relation with an aligned initialized
+        // rd_rel catalog row. Borrowing self keeps that resource live and permits a
+        // shared read; the raw projection transfers no ownership. NULL remains an error.
+        unsafe {
+            pg_sys::RelationGetForm!(self.boxed.as_ptr()).get().as_ref().expect("rd_rel is NULL")
+        }
+    }
+
     /// Number of tuples in this relation (not always up-to-date)
     pub fn reltuples(&self) -> Option<f32> {
-        let reltuples = unsafe { self.boxed.rd_rel.as_ref() }.expect("rd_rel is NULL").reltuples;
+        let reltuples = self.class_form().reltuples;
 
         if reltuples == 0f32 { None } else { Some(reltuples) }
     }
 
     pub fn is_table(&self) -> bool {
-        let rd_rel: &pg_sys::FormData_pg_class =
-            unsafe { self.boxed.rd_rel.as_ref().expect("rd_rel is NULL") };
+        let rd_rel = self.class_form();
         rd_rel.relkind == pg_sys::RELKIND_RELATION as c_char
     }
 
     pub fn is_matview(&self) -> bool {
-        let rd_rel: &pg_sys::FormData_pg_class =
-            unsafe { self.boxed.rd_rel.as_ref().expect("rd_rel is NULL") };
+        let rd_rel = self.class_form();
         rd_rel.relkind == pg_sys::RELKIND_MATVIEW as c_char
     }
 
     pub fn is_index(&self) -> bool {
-        let rd_rel: &pg_sys::FormData_pg_class =
-            unsafe { self.boxed.rd_rel.as_ref().expect("rd_rel is NULL") };
+        let rd_rel = self.class_form();
         rd_rel.relkind == pg_sys::RELKIND_INDEX as c_char
     }
 
     pub fn is_view(&self) -> bool {
-        let rd_rel: &pg_sys::FormData_pg_class =
-            unsafe { self.boxed.rd_rel.as_ref().expect("rd_rel is NULL") };
+        let rd_rel = self.class_form();
         rd_rel.relkind == pg_sys::RELKIND_VIEW as c_char
     }
 
     pub fn is_sequence(&self) -> bool {
-        let rd_rel: &pg_sys::FormData_pg_class =
-            unsafe { self.boxed.rd_rel.as_ref().expect("rd_rel is NULL") };
+        let rd_rel = self.class_form();
         rd_rel.relkind == pg_sys::RELKIND_SEQUENCE as c_char
     }
 
     pub fn is_composite_type(&self) -> bool {
-        let rd_rel: &pg_sys::FormData_pg_class =
-            unsafe { self.boxed.rd_rel.as_ref().expect("rd_rel is NULL") };
+        let rd_rel = self.class_form();
         rd_rel.relkind == pg_sys::RELKIND_COMPOSITE_TYPE as c_char
     }
 
     pub fn is_foreign_table(&self) -> bool {
-        let rd_rel: &pg_sys::FormData_pg_class =
-            unsafe { self.boxed.rd_rel.as_ref().expect("rd_rel is NULL") };
+        let rd_rel = self.class_form();
         rd_rel.relkind == pg_sys::RELKIND_FOREIGN_TABLE as c_char
     }
 
     pub fn is_partitioned_table(&self) -> bool {
-        let rd_rel: &pg_sys::FormData_pg_class =
-            unsafe { self.boxed.rd_rel.as_ref().expect("rd_rel is NULL") };
+        let rd_rel = self.class_form();
         rd_rel.relkind == pg_sys::RELKIND_PARTITIONED_TABLE as c_char
     }
 
     pub fn is_toast_value(&self) -> bool {
-        let rd_rel: &pg_sys::FormData_pg_class =
-            unsafe { self.boxed.rd_rel.as_ref().expect("rd_rel is NULL") };
+        let rd_rel = self.class_form();
         rd_rel.relkind == pg_sys::RELKIND_TOASTVALUE as c_char
     }
 
@@ -307,41 +286,50 @@ impl PgRelation {
         self
     }
 
-    #[inline(always)]
-    fn should_count_relation(&mut self) -> bool {
-        if !self.pgstat_info.is_null() {
-            return true;
-        }
-
-        if self.pgstat_enabled {
-            unsafe {
-                pg_sys::pgstat_assoc_relation(self.as_ptr());
-                assert!(!self.pgstat_info.is_null());
-                return true;
-            }
-        }
-
-        false
+    /// Record a heap scan in this relation's PostgreSQL statistics.
+    pub fn count_heap_scan(&mut self) {
+        // SAFETY: this initialized relation stays open while PostgreSQL updates its statistics.
+        unsafe { pg_sys::pgstat_count_heap_scan!(self.boxed.as_ptr()) }
     }
 
-    pgstat_count_impl!(count_heap_scan, numscans, t_numscans);
-    pgstat_count_impl!(count_heap_getnext, tuples_returned, t_tuples_returned);
-    pgstat_count_impl!(count_heap_fetch, tuples_fetched, t_tuples_fetched);
-    pgstat_count_impl!(count_index_scan, numscans, t_numscans);
-    pgstat_count_impl!(count_buffer_read, blocks_fetched, t_blocks_fetched);
-    pgstat_count_impl!(count_buffer_hit, blocks_hit, t_blocks_hit);
+    /// Record a heap getnext in this relation's PostgreSQL statistics.
+    pub fn count_heap_getnext(&mut self) {
+        // SAFETY: this initialized relation stays open while PostgreSQL updates its statistics.
+        unsafe { pg_sys::pgstat_count_heap_getnext!(self.boxed.as_ptr()) }
+    }
 
+    /// Record a heap fetch in this relation's PostgreSQL statistics.
+    pub fn count_heap_fetch(&mut self) {
+        // SAFETY: this initialized relation stays open while PostgreSQL updates its statistics.
+        unsafe { pg_sys::pgstat_count_heap_fetch!(self.boxed.as_ptr()) }
+    }
+
+    /// Record an index scan in this relation's PostgreSQL statistics.
+    pub fn count_index_scan(&mut self) {
+        // SAFETY: this initialized relation stays open while PostgreSQL updates its statistics.
+        unsafe { pg_sys::pgstat_count_index_scan!(self.boxed.as_ptr()) }
+    }
+
+    /// Record a buffer read in this relation's PostgreSQL statistics.
+    pub fn count_buffer_read(&mut self) {
+        // SAFETY: this initialized relation stays open while PostgreSQL updates its statistics.
+        unsafe { pg_sys::pgstat_count_buffer_read!(self.boxed.as_ptr()) }
+    }
+
+    /// Record a buffer hit in this relation's PostgreSQL statistics.
+    pub fn count_buffer_hit(&mut self) {
+        // SAFETY: this initialized relation stays open while PostgreSQL updates its statistics.
+        unsafe { pg_sys::pgstat_count_buffer_hit!(self.boxed.as_ptr()) }
+    }
+
+    /// Add returned index tuples to this relation's PostgreSQL statistics.
     pub fn count_index_tuples(&mut self, n: i64) {
-        if self.should_count_relation() {
-            let info = self.pgstat_info;
-            #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-            unsafe {
-                (*info).counts.tuples_returned += n;
-            }
-            #[cfg(feature = "pg15")]
-            unsafe {
-                (*info).t_counts.t_tuples_returned += n;
-            }
+        // SAFETY: this initialized relation stays open while PostgreSQL updates its statistics.
+        unsafe {
+            pg_sys::pgstat_count_index_tuples!(
+                self.boxed.as_ptr(),
+                pg_sys::__pgrx_c_macros::CValue::<pg_sys::__pgrx_c_types::int64>::new(n as _)
+            )
         }
     }
 }
@@ -349,7 +337,7 @@ impl PgRelation {
 impl Clone for PgRelation {
     /// Same as calling `PgRelation::with_lock(AccessShareLock)` on the underlying relation id
     fn clone(&self) -> Self {
-        unsafe { PgRelation::with_lock(self.rd_id, pg_sys::AccessShareLock as pg_sys::LOCKMODE) }
+        unsafe { PgRelation::with_lock(self.oid(), pg_sys::AccessShareLock as pg_sys::LOCKMODE) }
     }
 }
 
