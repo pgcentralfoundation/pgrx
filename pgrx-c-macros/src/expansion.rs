@@ -182,8 +182,9 @@ pub struct ExpansionLimits {
     /// Maximum selected macro candidates admitted to one expansion batch.
     pub macros: usize,
     /// Maximum instrumented source bytes allocated for a bounded expansion pass. The token-paste
-    /// proof's poison table names every active macro, so it grows with the inspected
-    /// environment and is not counted.
+    /// proof's poison table is not counted. It names every active macro, which inspection
+    /// bounded, and each prepared probe's names, which `macros` bounds along with the invocation
+    /// bytes already charged here.
     pub source_bytes: usize,
     /// Maximum preprocessor output accepted from the probes, excluding the translation unit's own
     /// declarations before them.

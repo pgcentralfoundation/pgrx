@@ -397,9 +397,10 @@ fn reject_all(
 /// Construct bounded paste instrumentation while preserving original object/function invocation
 /// shapes.
 ///
-/// `limit` bounds everything except the poison table. The table names every active macro and a
-/// constant marker for each, so it grows with the inspected environment, mostly its system
-/// headers, rather than with the batch. Inspection already bounded that environment.
+/// `limit` bounds everything except the poison table. The table names every active macro, a
+/// constant marker for each, and each prepared probe's markers, boundaries, wrapper and tail.
+/// Inspection already bounded the active macros, mostly from system headers. The probe names are
+/// bounded by `limits.macros` and by the invocation budget that preparation charged for them.
 #[allow(clippy::too_many_arguments)]
 fn source(
     original: &[u8],
