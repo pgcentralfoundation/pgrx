@@ -1072,20 +1072,26 @@ fn compiler_flags_from_known_properties_preserve_the_recorded_value() {
 /// Runs `query` against a pg_config that is the shell script `script`.
 ///
 /// Tests run on parallel threads. A process forked by one test keeps every file another test
-/// has open for writing until it execs, and executing such a file fails with ETXTBSY, so one
-/// lock is held from writing a script until its process has exited.
+/// has open for writing until it execs, and executing such a file fails with ETXTBSY on Linux.
+/// A short-lived shell writes the script, so this process never holds a descriptor that a
+/// concurrently forked child could inherit.
 #[cfg(all(test, unix))]
 fn with_pg_config_script<T>(script: &str, query: impl FnOnce(PgConfig) -> T) -> T {
-    use std::os::unix::fs::PermissionsExt;
-    use std::sync::Mutex;
-    use std::time::{SystemTime, UNIX_EPOCH};
+    use std::sync::atomic::{AtomicU64, Ordering};
 
-    static SCRIPTS: Mutex<()> = Mutex::new(());
-    let _running = SCRIPTS.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
-    let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
-    let path = std::env::temp_dir().join(format!("pgrx-pg-config-{}-{nonce}", std::process::id()));
-    std::fs::write(&path, script).unwrap();
-    std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700)).unwrap();
+    static NEXT: AtomicU64 = AtomicU64::new(0);
+    let path = std::env::temp_dir().join(format!(
+        "pgrx-pg-config-{}-{}",
+        std::process::id(),
+        NEXT.fetch_add(1, Ordering::Relaxed)
+    ));
+    let status = Command::new("/bin/sh")
+        .args(["-c", r#"printf '%s' "$2" > "$1" && chmod 700 "$1""#, "sh"])
+        .arg(&path)
+        .arg(script)
+        .status()
+        .unwrap();
+    assert!(status.success(), "could not write {}", path.display());
     let result = query(PgConfig::new_with_defaults(path.clone()));
     std::fs::remove_file(path).unwrap();
     result
