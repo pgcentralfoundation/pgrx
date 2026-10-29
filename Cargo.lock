@@ -2330,8 +2330,11 @@ dependencies = [
  "pgrx-bindgen",
  "pgrx-macros",
  "pgrx-sql-entity-graph",
+ "proc-macro2",
+ "quote",
  "serde",
  "serde_json",
+ "syn",
 ]
 
 [[package]]

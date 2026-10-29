@@ -57,7 +57,10 @@ cee-scape = "0.2"
 pgrx-bindgen.workspace = true
 
 [dev-dependencies]
+proc-macro2.workspace = true
+quote.workspace = true
 serde_json.workspace = true
+syn.workspace = true
 
 [lints.rust]
 # we allow improper_ctypes just to eliminate these warnings:
