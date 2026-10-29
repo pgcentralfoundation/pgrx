@@ -689,6 +689,15 @@ jobs:
       - name: Run tests
         run: cargo test --all --features "pg$PG_VER pg_test cshim proptest" --no-default-features
 
+      # This test compiles only on macOS. It builds both slices of a universal installation, so
+      # it needs the other slice's standard library. Its synthetic headers make one job enough.
+      - name: Run universal macOS binding build harness
+        if: matrix.postgresql == 16
+        run: |
+          rustup target add aarch64-apple-darwin x86_64-apple-darwin
+          cargo test --package pgrx-bindgen --test macro_build \
+            universal_macos_installations_build_both_slices -- --include-ignored --exact --test-threads=1
+
       - name: Print sccache stats
         run: sccache --show-stats
 
