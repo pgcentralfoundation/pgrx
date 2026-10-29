@@ -93,6 +93,44 @@ mod tests {
         Ok(())
     }
 
+    /// Add tables named `complex`, each in its own schema, whose row types share the extension
+    /// type's name. After the first few, the lookup lists 64 of the extension's members for each
+    /// same-named type it checks, so with this many it finishes by listing the members.
+    fn add_same_named_tables() -> spi::Result<()> {
+        let members = Spi::get_one::<i64>(
+            "SELECT count(*) FROM pg_depend WHERE refclassid = 'pg_extension'::regclass \
+             AND refobjid = (SELECT oid FROM pg_extension WHERE extname = 'pgrx_unit_tests')",
+        )?
+        .expect("a count");
+        let tables = members / 16 + 2;
+        Spi::run(&format!(
+            "DO $$ BEGIN FOR i IN 1..{tables} LOOP \
+               EXECUTE format('CREATE SCHEMA same_name_%s', i); \
+               EXECUTE format('CREATE TABLE same_name_%s.complex (a int)', i); \
+             END LOOP; END $$"
+        ))
+    }
+
+    #[pg_test]
+    fn test_type_oid_ignores_many_same_named_tables() -> spi::Result<()> {
+        let complex = regtype("complex");
+        add_same_named_tables()?;
+        assert_eq!(PgBox::<Complex>::type_oid(), complex);
+        Ok(())
+    }
+
+    #[pg_test(
+        error = "more than one type named \"complex\" belongs to extension \"pgrx_unit_tests\""
+    )]
+    fn test_type_oid_rejects_two_extension_types_among_many_of_one_name() -> spi::Result<()> {
+        add_same_named_tables()?;
+        Spi::run("CREATE SCHEMA decoy")?;
+        Spi::run("CREATE TYPE decoy.complex AS (r float8, i float8)")?;
+        Spi::run("ALTER EXTENSION pgrx_unit_tests ADD TYPE decoy.complex")?;
+        PgBox::<Complex>::type_oid();
+        Ok(())
+    }
+
     /// Named like the shell type `decoy.zzshell`.
     struct ZzShell;
 

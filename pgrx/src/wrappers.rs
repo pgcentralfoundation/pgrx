@@ -10,7 +10,7 @@
 //! Provides safe wrapper functions around some of Postgres' useful functions.
 use crate::{IntoDatum, PgSqlErrorCode, direct_function_call, ereport, pg_sys};
 use alloc::ffi::CString;
-use core::ffi::CStr;
+use core::ffi::{CStr, c_char};
 use core::{ptr, slice};
 
 /// A helper function for Postgres' `regtypein` function to lookup a type by a specific name
@@ -114,27 +114,23 @@ fn extension_type_oid(typname: &CStr) -> pg_sys::Oid {
         );
     }
 
-    let mut owned = types_named(typname).into_iter().filter(|candidate| {
-        // SAFETY: the call takes both OIDs by value and only reads pg_depend.
-        unsafe { pg_sys::getExtensionOfObject(pg_sys::TypeRelationId, candidate.oid) == extension }
-    });
-    match (owned.next(), owned.next()) {
-        (Some(TypeCandidate { oid, defined: true }), None) => oid,
-        (Some(TypeCandidate { defined: false, .. }), None) => {
+    match owned_types(extension, types_named(typname)).as_slice() {
+        [TypeCandidate { oid, defined: true }] => *oid,
+        [TypeCandidate { defined: false, .. }] => {
             ereport!(
                 ERROR,
                 PgSqlErrorCode::ERRCODE_UNDEFINED_OBJECT,
                 format!("type \"{typname_str}\" is only a shell")
             );
         }
-        (None, _) => {
+        [] => {
             ereport!(
                 ERROR,
                 PgSqlErrorCode::ERRCODE_UNDEFINED_OBJECT,
                 format!("type \"{typname_str}\" does not belong to extension \"{extname_str}\"")
             );
         }
-        (Some(_), Some(_)) => {
+        [_, _, ..] => {
             ereport!(
                 ERROR,
                 PgSqlErrorCode::ERRCODE_DUPLICATE_OBJECT,
@@ -185,5 +181,150 @@ fn types_named(typname: &CStr) -> Vec<TypeCandidate> {
             .collect();
         pg_sys::ReleaseCatCacheList(list);
         candidates
+    }
+}
+
+/// How many candidates [`owned_types`] checks before it starts listing the extension's members,
+/// whose scan costs about as much to start as checking a candidate.
+const CHECKS_BEFORE_LISTING: usize = 4;
+
+/// How many of the extension's members [`owned_types`] lists for each candidate it checks. In a
+/// debug build of PostgreSQL 18, checking a candidate took about as long as listing 85 members.
+const MEMBERS_PER_CHECK: usize = 64;
+
+/// The `candidates` that belong to `extension`, or the first two found, which are enough to
+/// make the name ambiguous.
+///
+/// There are two ways to find them, and either can be slow. Looking up each candidate's
+/// extension costs a pg_depend index scan per candidate, and the candidates include every type
+/// of the name in every schema, such as the row type of every table of that name. Listing the
+/// extension's members costs a pg_depend row per member, and a large extension has thousands.
+/// Neither count is known in advance. So after the first [`CHECKS_BEFORE_LISTING`] candidates,
+/// which are all that a name shared by a few types needs, this alternates between the two, one
+/// candidate at a time and [`MEMBERS_PER_CHECK`] members at a time, and stops when either is
+/// complete. That takes at most about twice as long as the faster way alone, plus those first
+/// checks.
+fn owned_types(extension: pg_sys::Oid, mut candidates: Vec<TypeCandidate>) -> Vec<TypeCandidate> {
+    candidates.sort_unstable_by_key(|candidate| candidate.oid.to_u32());
+    let (mut checked, mut listed) = (Vec::new(), Vec::new());
+    let mut members = None;
+    let owned = 'search: {
+        for (i, candidate) in candidates.iter().enumerate() {
+            // SAFETY: the call takes both OIDs by value and only reads pg_depend.
+            let owner =
+                unsafe { pg_sys::getExtensionOfObject(pg_sys::TypeRelationId, candidate.oid) };
+            if owner == extension {
+                checked.push(*candidate);
+            }
+            if checked.len() == 2 || i + 1 == candidates.len() {
+                break 'search checked;
+            }
+            if i + 1 < CHECKS_BEFORE_LISTING {
+                continue;
+            }
+
+            let members = members.get_or_insert_with(|| ExtensionMembers::begin(extension));
+            for _ in 0..MEMBERS_PER_CHECK {
+                let Some(member) = members.next() else {
+                    break 'search listed;
+                };
+                let Some(member) = member else {
+                    continue;
+                };
+                let member = member.to_u32();
+                if let Ok(j) = candidates.binary_search_by_key(&member, |c| c.oid.to_u32()) {
+                    listed.push(candidates[j]);
+                    if listed.len() == 2 {
+                        break 'search listed;
+                    }
+                }
+            }
+        }
+        Vec::new()
+    };
+    if let Some(members) = members {
+        members.end();
+    }
+    owned
+}
+
+/// A scan of the pg_depend rows that refer to an extension, which include the rows that
+/// `getExtensionOfObject` reads from the member's side
+///
+/// `end` closes the scan. There is no `Drop`, because after an ERROR the transaction abort closes
+/// it, and PostgreSQL must not be called while the ERROR unwinds.
+struct ExtensionMembers {
+    depend: pg_sys::Relation,
+    scan: pg_sys::SysScanDesc,
+}
+
+impl ExtensionMembers {
+    fn begin(extension: pg_sys::Oid) -> Self {
+        // SAFETY: table_open returns an open pg_depend or raises an ERROR. ScanKeyInit fills
+        // every field of each key. The keys match the three columns of pg_depend's
+        // (refclassid, refobjid, refobjsubid) index, as getExtensionType's scan does, and
+        // systable_beginscan copies them before returning. A NULL snapshot scans with the
+        // catalog snapshot. Transaction abort closes the scan and the relation if an ERROR
+        // interrupts the scan before `end`.
+        unsafe {
+            let depend = pg_sys::table_open(pg_sys::DependRelationId, pg_sys::AccessShareLock as _);
+            let mut keys = [pg_sys::ScanKeyData::default(); 3];
+            let columns = [
+                (
+                    pg_sys::Anum_pg_depend_refclassid,
+                    pg_sys::F_OIDEQ,
+                    pg_sys::ExtensionRelationId.into(),
+                ),
+                (pg_sys::Anum_pg_depend_refobjid, pg_sys::F_OIDEQ, extension.into()),
+                (pg_sys::Anum_pg_depend_refobjsubid, pg_sys::F_INT4EQ, pg_sys::Datum::from(0_i32)),
+            ];
+            for (key, (column, procedure, argument)) in keys.iter_mut().zip(columns) {
+                pg_sys::ScanKeyInit(
+                    key,
+                    column as _,
+                    pg_sys::BTEqualStrategyNumber as _,
+                    procedure.into(),
+                    argument,
+                );
+            }
+            let scan = pg_sys::systable_beginscan(
+                depend,
+                pg_sys::DependReferenceIndexId.into(),
+                true,
+                ptr::null_mut(),
+                keys.len() as _,
+                keys.as_mut_ptr(),
+            );
+            ExtensionMembers { depend, scan }
+        }
+    }
+
+    fn end(self) {
+        // SAFETY: begin opened both, and nothing has closed them.
+        unsafe {
+            pg_sys::systable_endscan(self.scan);
+            pg_sys::table_close(self.depend, pg_sys::AccessShareLock as _);
+        }
+    }
+}
+
+impl Iterator for ExtensionMembers {
+    /// For each row, the type it makes a member of the extension, if it does
+    type Item = Option<pg_sys::Oid>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        // SAFETY: the scan is open until `end`, which takes self. systable_getnext returns NULL
+        // after the last row, or a pg_depend tuple that stays valid until the next call. The
+        // field reads go through the raw row pointer, which GETSTRUCT aligns for the row.
+        unsafe {
+            let tuple = pg_sys::systable_getnext(self.scan);
+            if tuple.is_null() {
+                return None;
+            }
+            let row = pg_sys::GETSTRUCT!(tuple).get().cast::<pg_sys::FormData_pg_depend>();
+            let member_type = (*row).classid == pg_sys::TypeRelationId
+                && (*row).deptype == pg_sys::DependencyType::DEPENDENCY_EXTENSION as c_char;
+            Some(member_type.then(|| (*row).objid))
+        }
     }
 }
