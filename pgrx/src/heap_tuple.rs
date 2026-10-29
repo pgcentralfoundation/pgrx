@@ -369,15 +369,16 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByRust> {
                             });
                         }
                     } else {
-                        // it's not an array type, so we'll do standard type compatibility checks
-                        let type_oid = T::type_oid();
-                        let composite_type_oid = value.composite_type_oid();
-                        let is_compatible_composite_types = type_oid == pg_sys::RECORDOID
-                            && composite_type_oid == Some(att.atttypid);
-                        if !is_compatible_composite_types && !T::is_compatible_with(att.atttypid) {
+                        // it's not an array type, so we'll do standard type compatibility checks.
+                        // is_compatible_with looks `T`'s type up, as type_oid does, and for a
+                        // PostgresType that is a catalog search by name, so check it first.
+                        let compatible = T::is_compatible_with(att.atttypid)
+                            || (value.composite_type_oid() == Some(att.atttypid)
+                                && T::type_oid() == pg_sys::RECORDOID);
+                        if !compatible {
                             return Err(TryFromDatumError::IncompatibleTypes {
                                 rust_type: std::any::type_name::<T>(),
-                                rust_oid: type_oid,
+                                rust_oid: T::type_oid(),
                                 datum_type: lookup_type_name(att.atttypid),
                                 datum_oid: att.atttypid,
                             });
