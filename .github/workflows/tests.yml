@@ -267,6 +267,16 @@ jobs:
       - name: Run pgrx-c-macros CLI tests
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --package pgrx-c-macros --test cli
 
+      # PGDG's server-dev package installs clang 15, and the steps above load the newest
+      # libclang, so only this step covers Ubuntu 22.04's own clang 14. Its own target directory
+      # keeps the changed LIBCLANG_PATH from rebuilding the other steps' crates.
+      - name: Run pgrx-c-macros tests against clang 14
+        if: matrix.postgres == 18 && matrix.rust == null
+        env:
+          LIBCLANG_PATH: /usr/lib/llvm-14/lib
+          CLANG_PATH: /usr/bin/clang-14
+        run: CARGO_TARGET_DIR="$(pwd)/target-clang14" cargo test --package pgrx-c-macros
+
       # These build isolated fixture crates with synthetic headers, so one job covers them.
       - name: Run binding build harnesses
         if: matrix.postgres == 18 && matrix.rust == null
