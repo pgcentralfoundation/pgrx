@@ -4,6 +4,11 @@
 
 //! Compare immutable C strings, dependency stringification and invocation diagnostics with C.
 
+#![cfg_attr(
+    not(target_os = "macos"),
+    allow(unused_mut, reason = "only macOS adds its SDK path to the compiler arguments")
+)]
+
 /// Collect fresh bindgen facts using the production binding reconciler.
 #[path = "../../pgrx-bindgen/src/build/binding_symbols.rs"]
 mod binding_symbols;

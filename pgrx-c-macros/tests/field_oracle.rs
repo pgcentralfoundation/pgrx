@@ -17,6 +17,10 @@
     any(target_arch = "x86_64", target_arch = "aarch64"),
     any(target_os = "linux", target_os = "macos"),
 ))]
+#![cfg_attr(
+    not(target_os = "macos"),
+    allow(unused_mut, reason = "only macOS adds its SDK path to the compiler arguments")
+)]
 
 /// Run original C headers through the bounded independent oracle harness.
 #[path = "support/oracle.rs"]

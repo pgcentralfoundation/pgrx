@@ -4,6 +4,11 @@
 
 //! Check independent object-constant proofs, diagnostic isolation and coherent inputs.
 
+#![cfg_attr(
+    not(target_os = "macos"),
+    allow(unused_mut, reason = "only macOS adds its SDK path to the compiler arguments")
+)]
+
 /// Run original C expressions independently of the API's typed proof sources.
 #[path = "support/oracle.rs"]
 mod oracle;

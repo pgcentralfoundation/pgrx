@@ -11,6 +11,11 @@
 //! Generated consumers use the runtime's Linux/macOS host family and still validate
 //! the inspected C ABI. Frontend, parser, and pre-emission rejection checks remain portable.
 
+#![cfg_attr(
+    not(target_os = "macos"),
+    allow(unused_mut, reason = "only macOS adds its SDK path to the compiler arguments")
+)]
+
 /// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
 /// in production generation.
 #[path = "../../pgrx-bindgen/src/build/binding_symbols.rs"]
