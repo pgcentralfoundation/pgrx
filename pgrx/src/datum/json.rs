@@ -7,6 +7,10 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+#![allow(
+    unused_unsafe,
+    reason = "docs.rs builds replace generated C macros with shells, some of which need no unsafe"
+)]
 use crate::{
     FromDatum, IntoDatum, direct_function_call, direct_function_call_as_datum, pg_sys, void_mut_ptr,
 };

@@ -8,6 +8,10 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 #![allow(clippy::question_mark)]
+#![allow(
+    unused_unsafe,
+    reason = "docs.rs builds replace generated C macros with shells, some of which need no unsafe"
+)]
 use super::{UnboxDatum, lookup_type_name, unbox};
 use crate::array::{RawArray, Scalar};
 use crate::nullable::{

@@ -8,6 +8,10 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Provides a safe wrapper around Postgres' `pg_sys::RelationData` struct
+#![allow(
+    unused_unsafe,
+    reason = "docs.rs builds replace generated C macros with shells, some of which need no unsafe"
+)]
 use crate::{FromDatum, IntoDatum, PgTupleDesc, direct_function_call, name_data_to_str, pg_sys};
 use core::ffi::CStr;
 use core::ptr::NonNull;

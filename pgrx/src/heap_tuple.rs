@@ -10,6 +10,10 @@
 //! Provides a safe interface to Postgres `HeapTuple` objects.
 //!
 //! [`PgHeapTuple`]s also describe composite types as defined by [`pgrx::composite_type!()`][crate::composite_type].
+#![allow(
+    unused_unsafe,
+    reason = "docs.rs builds replace generated C macros with shells, some of which need no unsafe"
+)]
 use crate::datum::{UnboxDatum, lookup_type_name};
 use crate::{AllocatedByPostgres, AllocatedByRust, heap_getattr_raw, pg_sys};
 
