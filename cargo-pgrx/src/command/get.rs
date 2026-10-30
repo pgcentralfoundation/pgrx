@@ -149,12 +149,11 @@ fn determine_git_hash() -> eyre::Result<Option<String>> {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, unix))]
 mod tests {
     use super::find_control_file;
 
     #[test]
-    #[cfg(unix)]
     fn find_control_file_counts_one_visible_file() {
         use std::os::unix::fs::symlink;
 
