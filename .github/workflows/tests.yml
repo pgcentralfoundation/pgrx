@@ -296,7 +296,7 @@ jobs:
           MIRI_TOOLCHAIN: nightly-2026-10-29
         run: |
           unset RUSTC_WRAPPER
-          rustup toolchain install "$MIRI_TOOLCHAIN" --component miri,rust-src
+          rustup toolchain install "$MIRI_TOOLCHAIN" --component miri,rust-src,rustfmt
           cargo "+$MIRI_TOOLCHAIN" miri test --package pgrx-pg-sys \
             --features "pg$PG_VER" --no-default-features --lib datum
           MIRIFLAGS=-Zmiri-strict-provenance cargo "+$MIRI_TOOLCHAIN" miri test --package pgrx \
@@ -454,6 +454,10 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
           key: pgrx-arm64-cargo-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+
+      # pgrx-pg-sys's build script formats the bindings it generates with rustfmt.
+      - name: Install rustfmt
+        run: rustup component add rustfmt
 
       - name: Install cargo-pgrx
         run: cargo install --path cargo-pgrx/ --debug --force --locked

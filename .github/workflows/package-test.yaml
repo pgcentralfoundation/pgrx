@@ -80,8 +80,11 @@ jobs:
           sudo apt-get update -y -qq --fix-missing
           sudo apt-get install -y postgresql-$PG_VER postgresql-server-dev-$PG_VER
 
+      # pgrx-pg-sys's build script formats the bindings it generates with rustfmt.
       - name: Rustup
-        run: $TOOL_DIR/rustup.sh nightly
+        run: |
+          $TOOL_DIR/rustup.sh nightly
+          rustup component add rustfmt --toolchain nightly
 
       - name: Report version
         run: |
