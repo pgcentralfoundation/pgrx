@@ -629,7 +629,7 @@ fn make_relative_extdir(_: PathBuf) -> PathBuf {
     "share/extension".into()
 }
 
-fn format_display_path(path: &Path, target_dir: &Path) -> String {
+pub(crate) fn format_display_path(path: &Path, target_dir: &Path) -> String {
     target_dir
         .parent()
         .and_then(|parent| path.strip_prefix(parent).ok())

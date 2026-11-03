@@ -934,6 +934,106 @@ This places the extension assets in `./package/opt/my_extension/`. An absolute p
 directory. If you omit `--prefix-dir`, the layout follows `pg_config`. On Windows, the package layout uses `lib` and
 `share/extension` regardless of this option.
 
+### Building RPM and DEB packages
+
+`cargo pgrx package` can also build distribution packages from the packaged
+files. Add an empty `[package.metadata.rpm]` or `[package.metadata.deb]` section
+to your extension's `Cargo.toml`:
+
+```toml
+[package]
+name = "my_extension"
+version = "1.0.0"
+description = "My Great Extension"
+license = "MIT"
+authors = ["Me, Myself & I"]
+
+[package.metadata.rpm]
+
+[package.metadata.deb]
+```
+
+The matching `.rpm` or `.deb` file is written to the output directory. Each
+section builds one package for the Postgres version selected by `pg_config`.
+An empty section uses the default specs below. The `description`, `license`,
+and first `authors` entry of `[package]` fill in the package fields of the same
+name, so `cargo pgrx package` reports an error if one of them is missing.
+
+The default RPM specs are compatible with the PGDG Postgres packages:
+
+```toml
+name = "${NAME}_${PG_MAJOR_VERSION}"
+version = "${VERSION}"
+arch = "${ARCH}"
+description = "${DESCRIPTION}"
+license = "${LICENSE}"
+maintainer = "${MAINTAINER}"
+depends = ["postgresql${PG_MAJOR_VERSION}-server"]
+files = [
+  { source = "${BUILD_BASE_PATH}/${PG_PKGLIBDIR}/${NAME}.so", dest = "/usr/pgsql-${PG_MAJOR_VERSION}/lib/${NAME}.so", mode = "0755" },
+]
+dirs = [
+  { source = "${BUILD_BASE_PATH}/${PG_SHAREDIR}/extension/", dest = "/usr/pgsql-${PG_MAJOR_VERSION}/share/extension/" },
+]
+```
+
+To build RPM packages compatibles with the SUSE or RHEL Postgres packages, you would have to
+adapt the filepaths in the `files`  and `dirs` entries.
+
+The default DEB specs are compatible with the Debian AND the PGDG Postgres packages:
+
+```toml
+name = "postgresql-${PG_MAJOR_VERSION}-${DEB_NAME}"
+version = "${VERSION}"
+arch = "${ARCH}"
+description = "${DESCRIPTION}"
+license = "${LICENSE}"
+maintainer = "${MAINTAINER}"
+depends = ["postgresql-${PG_MAJOR_VERSION}"]
+files = [
+  { source = "${BUILD_BASE_PATH}/${PG_PKGLIBDIR}/${NAME}.so", dest = "/usr/lib/postgresql/${PG_MAJOR_VERSION}/lib/${NAME}.so", mode = "0644" },
+]
+dirs = [
+  { source = "${BUILD_BASE_PATH}/${PG_SHAREDIR}/extension/", dest = "/usr/share/postgresql/${PG_MAJOR_VERSION}/extension/" },
+]
+```
+
+Any key set in your section replaces the default value for that key as a whole.
+For example, this RPM adds a dependency and installs into Fedora's Postgres
+layout instead of PGDG's:
+
+```toml
+[package.metadata.rpm]
+depends = ["postgresql-server", "postgis"]
+files = [
+  { source = "${BUILD_BASE_PATH}/${PG_PKGLIBDIR}/${NAME}.so", dest = "/usr/lib64/pgsql/${NAME}.so", mode = "0755" },
+]
+dirs = [
+  { source = "${BUILD_BASE_PATH}/${PG_SHAREDIR}/extension/", dest = "/usr/share/pgsql/extension/" },
+]
+```
+
+String values in these sections can use the following variables:
+
+| Variable              | Value                                                   |
+|-----------------------|---------------------------------------------------------|
+| `${NAME}`             | the crate name                                          |
+| `${DEB_NAME}`         | the crate name in lowercase with `_` replaced by `-`    |
+| `${VERSION}`          | the crate version                                       |
+| `${DESCRIPTION}`      | the crate description                                   |
+| `${LICENSE}`          | the crate license                                       |
+| `${MAINTAINER}`       | the first entry of the crate's `authors`                |
+| `${ARCH}`             | the host architecture, such as `x86_64` or `aarch64`    |
+| `${PG_MAJOR_VERSION}` | the Postgres major version, such as `17`                |
+| `${PG_PKGLIBDIR}`     | `pg_config --pkglibdir`                                 |
+| `${PG_SHAREDIR}`      | `pg_config --sharedir`                                  |
+| `${BUILD_BASE_PATH}`  | the output directory that holds the packaged files      |
+
+These are not environment variables. Only the names above are recognized.
+
+An unknown variable or an unterminated `${` is an error. See
+[pgrx-examples/packaging](../pgrx-examples/packaging/) for a complete extension.
+
 ## Inspect your Extension Schema
 
 If you just want to look at the full extension schema that pgrx will generate, use

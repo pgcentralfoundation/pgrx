@@ -1,0 +1,52 @@
+#LICENSE Portions Copyright 2019-2021 ZomboDB, LLC.
+#LICENSE
+#LICENSE Portions Copyright 2021-2023 Technology Concepts & Design, Inc.
+#LICENSE
+#LICENSE Portions Copyright 2023-2023 PgCentral Foundation, Inc. <contact@pgcentral.org>
+#LICENSE
+#LICENSE All rights reserved.
+#LICENSE
+#LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+
+[package]
+name = "packaging"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license = "MIT"
+authors = ["pgrx contributors"]
+description = "Build RPM and DEB packages with `cargo pgrx package`"
+publish = false
+
+# Empty sections build an RPM or a DEB with default specifications, compatible
+# with PGDG packages. The default specs are based on `name`, `description`,
+# `license` and the first `authors` entry from the [package] section above.
+[package.metadata.rpm]
+
+# Any entry in a section will override the default specs
+# see the arx-pack manfiest for the complete list of valid entries
+# https://docs.rs/arx-pack/latest/arx_pack/struct.Manifest.html
+[package.metadata.deb]
+description = "This is a debian package !"
+depends = ["postgresql-${PG_MAJOR_VERSION}", "postgresql-${PG_MAJOR_VERSION}-postgis-3"]
+
+[lib]
+crate-type = ["cdylib"]
+
+[features]
+default = ["pg13"]
+pg13 = ["pgrx/pg13", "pgrx-tests/pg13"]
+pg14 = ["pgrx/pg14", "pgrx-tests/pg14"]
+pg15 = ["pgrx/pg15", "pgrx-tests/pg15"]
+pg16 = ["pgrx/pg16", "pgrx-tests/pg16"]
+pg17 = ["pgrx/pg17", "pgrx-tests/pg17"]
+pg18 = ["pgrx/pg18", "pgrx-tests/pg18"]
+pg19 = ["pgrx/pg19", "pgrx-tests/pg19"]
+pg_test = []
+
+[dependencies]
+pgrx = { path = "../../pgrx" }
+
+[dev-dependencies]
+pgrx-tests = { path = "../../pgrx-tests" }
+
