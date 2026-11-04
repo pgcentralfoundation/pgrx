@@ -808,6 +808,27 @@ When tests fail, the path to the `regression.diffs` file is always shown. Use `-
 - `pg_regress` uses `psql` to run each test and literally diffs the output against the expected output file.  pgrx does two things to help eliminate noise in the test output.  The first is it sets `client_min_messages=warning` when starting the Postgres instance and it also passes `-v VERBOSITY=terse` through to `psql`.
 - In a workspace with a single pgrx extension crate, `--package` is auto-detected — no need to specify it manually
 
+### Version-Specific Tests
+
+A test that uses a feature only some Postgres versions have can say which versions it runs on with a comment on its own line in the `.sql` file:
+
+```sql
+-- pgrx-regress-skip pg15 pg16
+```
+
+```sql
+-- pgrx-regress-only pg17 pg18
+```
+
+On any other version, the test is not run and is reported as skipped with its directive, such as `SKIP merge_returning (skip pg15 pg16)`. It needs no expected output there, `--add` refuses to bootstrap it, `--auto` never promotes its output, and `--dry-run` lists it as skipped.
+
+- Each directive takes one or more labels such as `pg17`. A malformed label is an error, while a well-formed label for a version pgrx doesn't support is accepted, so the directive keeps working as supported versions change.
+- If a test has several directive lines, only the last one applies.
+- A skipped test must not create objects that other tests depend on, since those tests then fail on the versions where it is skipped.
+- Don't use a directive in `setup.sql`.  The other tests usually depend on it, and they would run against an empty database where it is skipped.
+
+`pg_regress` also accepts variant expected files, `test_name_0.out` through `test_name_9.out`, and passes a test that matches any of them.  That suits output that differs between versions, but nothing ties a variant to a version: any version passes when its output matches any variant.  See [Variant Comparison Files](https://www.postgresql.org/docs/current/regress-variant.html).
+
 ### Diffing `psql` Output?
 
 Yes, Postgres' `pg_regress` tool plays each `test_name.sql` file through `psql`, captures the full output, and diffs that output against the test's corresponding `test_name.out` file.  It's a good idea for your tests to avoid variability in their output.
