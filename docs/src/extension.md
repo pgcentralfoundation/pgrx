@@ -7,4 +7,5 @@
 - [Testing Extensions with PGRX](./extension/test.md)
 - [Memory Checking](./extension/test/memory-checking.md)
 - [Installing a PGRX Extension](./extension/install.md)
+- [Packaging a PGRX Extension](./extension/package.md)
 - [Schema configuration](./extension/schema.md)
