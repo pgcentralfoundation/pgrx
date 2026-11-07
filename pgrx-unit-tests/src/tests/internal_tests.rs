@@ -63,4 +63,23 @@ mod tests {
         assert_eq!(*inner, 5);
         assert!(val.initialized());
     }
+
+    // PostgreSQL passes a null pointer that is not SQL NULL for some `internal` arguments, such
+    // as the second argument of an aggregate deserialization function.
+    #[pg_test]
+    fn internal_not_null_zero_datum_is_uninitialized() {
+        let null = || unsafe { Internal::from_datum(pg_sys::Datum::null(), false) }.unwrap();
+
+        let val = null();
+        assert!(!val.initialized());
+        assert!(unsafe { val.get::<i32>() }.is_none());
+        assert_eq!(val.unwrap(), Some(pg_sys::Datum::null()));
+
+        let mut val = null();
+        let inner = unsafe { val.get_or_insert_default::<i32>() };
+        assert_eq!(*inner, 0);
+        *inner = 5;
+        assert!(val.initialized());
+        assert_eq!(unsafe { val.get::<i32>() }, Some(&5));
+    }
 }
