@@ -34,7 +34,6 @@ syn.workspace = true
 thiserror.workspace = true
 
 convert_case = "0.11.0"
-petgraph = "0.8.3"
 unescape = "0.1.0" # for escaped-character-handling
 
 # colorized sql output
