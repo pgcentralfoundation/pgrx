@@ -12,7 +12,7 @@ same harness when the extension's test setup and features are configured.
 cargo pgrx test [OPTIONS] [PG_VERSION] [TESTNAME]...
 ```
 
-`PG_VERSION` accepts `pg13` through `pg19`, or `all`, and can come from the
+`PG_VERSION` accepts `pg15` through `pg19`, or `all`, and can come from the
 environment variable of the same name. Without a selector, version resolution
 uses explicit PostgreSQL features or the manifest's defaults. A first positional
 argument that is not a recognized version is treated as a test filter.

@@ -16,7 +16,7 @@ server running; shut down task-owned instances when finished.
 cargo pgrx run [OPTIONS] [PG_VERSION] [DBNAME]
 ```
 
-`PG_VERSION` accepts `pg13` through `pg19`, with `PG_VERSION` as an environment
+`PG_VERSION` accepts `pg15` through `pg19`, with `PG_VERSION` as an environment
 fallback. Otherwise the CLI uses a PostgreSQL feature supplied explicitly or in
 the manifest's defaults. `DBNAME` defaults to the extension name. If the first
 positional argument is not a recognized version and no second argument is given,

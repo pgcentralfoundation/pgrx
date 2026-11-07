@@ -50,18 +50,6 @@ macro_rules! pg_shmem_init {
     ($var:ident = $e:expr) => {
         $crate::pg_sys::submodules::thread_check::check_active_thread();
 
-        #[cfg(any(feature = "pg13", feature = "pg14"))]
-        unsafe {
-            $crate::shmem::PgSharedMemoryInitialization::on_shmem_request(&$var);
-        }
-
-        #[cfg(any(
-            feature = "pg15",
-            feature = "pg16",
-            feature = "pg17",
-            feature = "pg18",
-            feature = "pg19"
-        ))]
         unsafe {
             static mut PREV_SHMEM_REQUEST_HOOK: Option<unsafe extern "C-unwind" fn()> = None;
             PREV_SHMEM_REQUEST_HOOK = $crate::pg_sys::shmem_request_hook;
@@ -197,7 +185,6 @@ pub trait PgSharedMemoryInitialization {
     /// # Safety
     ///
     /// * Be called from inside PostgreSQL `shmem_request_hook`.
-    /// * For PostgreSQL 13, 14, it could be called at any time.
     unsafe fn on_shmem_request(&'static self);
 
     /// # Safety

@@ -49,9 +49,8 @@ fn return_vec_of_customtype() -> Vec<SomeStruct> {
 }
 ```
 
-In general this is only necessary when returning a `Vec<T: PostgresType>`.  In this situation, pgrx needs to know that type's
-`oid` (from the `pg_catalog.pg_type` system catalog) and as such, the schema in which that type lives must be on that
-function's `search_path`.
+pgrx itself does not need it to find a `#[derive(PostgresType)]` type's `oid`, for example when returning a
+`Vec<T: PostgresType>`: it looks for the type among the types that belong to the extension, in whatever schema they are.
 
 ### Relocatable extensions
 

@@ -94,13 +94,19 @@ Do this *in order*:
 - [ ] Inform other maintainers of intent to publish a release
 - [ ] Assign an appropriate value to `NEW_RELEASE_VERSION`
 - [ ] Draft release notes for `${NEW_RELEASE_VERSION}`
-- [ ] Run `./update-versions.sh "${NEW_RELEASE_VERSION}"`
-    - This will update the visible bindings of `pgrx-pg-sys/src/pg*.rs`
+- [ ] On `x86_64-unknown-linux-gnu`, with every supported PostgreSQL version configured, run
+  `PGRX_PG_SYS_RELEASE_REQUIRE_ALL_VERSIONS=1 ./update-versions.sh "${NEW_RELEASE_VERSION}"`
+    - This will update the visible bindings of `pgrx-pg-sys/src/include/pg*.rs` and the C
+      macro documentation snapshot
     - The visible bindings are for reference, [docs][pgrx@docs.rs], and tools
     - Actual users of the library rebuild the bindings from scratch
 - [ ] Run `./upgrade-deps.sh`
+- [ ] Stage new snapshot files with `git add -A pgrx-pg-sys/src/include`, because
+  `git commit -a` skips untracked files
 - [ ] Push the resulting diffs to *develop*
 - [ ] Run `./publish.sh` to push the new version to [pgrx@crates.io]
+    - Off `x86_64-unknown-linux-gnu`, its docs.rs checks need that target's standard library
+      and a C compiler for it; see [Releases](./contributing/release.md)
     - If there was an error during publishing:
     - [ ] fix the error source
     - [ ] push any resulting diffs to *develop*

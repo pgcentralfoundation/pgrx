@@ -38,8 +38,6 @@ impl Action {
 
     // This is a simple COMMIT Statement
     pub fn commit(txn: PgBox<pg_sys::ReorderBufferTXN>, change_count: i64) -> Self {
-        #[cfg(any(feature = "pg13", feature = "pg14"))]
-        let committed = txn.commit_time;
         #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
         let committed = unsafe { txn.xact_time.commit_time };
         // Postgres 19 made the `xact_time` union anonymous
@@ -141,7 +139,7 @@ struct DecodingState {
 // A Tuple describes the values of a table row before or after a change
 struct Tuple {
     rel: pgrx::PgRelation,
-    #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
+    #[cfg(any(feature = "pg15", feature = "pg16"))]
     data: PgBox<pg_sys::ReorderBufferTupleBuf>,
     #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
     data: PgBox<pg_sys::HeapTupleData>,
@@ -164,24 +162,41 @@ impl Serialize for Tuple {
             if self.data.is_null() {
                 continue;
             }
+            // SAFETY: `attribute` is a loop-local copy of the attribute, and its
+            // name is NUL-terminated. quote_identifier returns that pointer when
+            // the name needs no quotes, or else a quoted copy palloc'd in
+            // CurrentMemoryContext. Either lives until this iteration ends.
+            // serialize_field takes a `&'static str` key, so CStr::from_ptr
+            // gives attname a `'static` lifetime that nothing here justifies: a
+            // Serializer that keeps the key after serialize_field returns would
+            // read the name after it is gone. This example has that known,
+            // unfixed soundness gap.
             let attname = unsafe {
                 CStr::from_ptr(pg_sys::quote_identifier(attribute.attname.data.as_ptr()))
             }
             .to_str()
             .unwrap();
+            let (attnum, atttypid) = (attribute.attnum, attribute.atttypid);
 
-            #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
+            #[cfg(any(feature = "pg15", feature = "pg16"))]
             let tuple = unsafe { &raw mut (*self.data.as_ptr()).tuple };
             #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
             let tuple = self.data.as_ptr();
 
-            let datum = unsafe {
-                pg_sys::heap_getattr(tuple, attribute.attnum.into(), desc.as_ptr(), &mut isnull)
-            };
+            // SAFETY: the reorder buffer keeps tuple and its data alive, desc
+            // comes from the open relation, and iteration supplies a valid
+            // attribute number. isnull is an initialized exclusive output. On
+            // PG15-18 the call can write attcacheoff into desc's attribute
+            // entries: its FormData_pg_attribute array through PG17 and its
+            // CompactAttribute array on PG18. `attribute`, whose name attname may
+            // borrow, is a copy that iteration returned by value, so no reference
+            // into desc is live across the call.
+            let datum =
+                unsafe { pg_sys::heap_getattr(tuple, attnum.into(), desc.as_ptr(), &mut isnull) };
             if isnull {
                 continue;
             }
-            match attribute.atttypid {
+            match atttypid {
                 pg_sys::INT4OID => {
                     let value = unsafe { i32::from_datum(datum, isnull) };
                     serde_state.serialize_field(attname, &(value.unwrap()))?

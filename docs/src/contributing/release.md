@@ -1,3 +1,8 @@
+Run `prepare-release.sh` on `x86_64-unknown-linux-gnu`, the docs.rs target in
+`pgrx-pg-sys/Cargo.toml`. It regenerates the committed bindings and the C macro
+documentation snapshot for that target, and it fails unless every supported
+PostgreSQL version is configured.
+
 ```shell
 PGRX_HOME=/tmp/pgrx-release ./prepare-release.sh NEW_VERSION_NUMBER
 ```
@@ -15,3 +20,12 @@ git switch develop
 git pull origin/develop
 ./publish.sh
 ```
+
+Before publishing, `publish.sh` type-checks pgrx and pgrx-pg-sys as docs.rs builds them
+for `x86_64-unknown-linux-gnu`, for every PostgreSQL version. On another host, this needs that target's standard
+library for both the default and nightly toolchains, and a C compiler for it, because
+cee-scape compiles C. For example, on macOS run
+`rustup target add x86_64-unknown-linux-gnu` and
+`rustup +nightly target add x86_64-unknown-linux-gnu`, then set
+`CC_x86_64_unknown_linux_gnu=clang` and
+`CFLAGS_x86_64_unknown_linux_gnu=--sysroot=<an x86_64 Linux sysroot>`.

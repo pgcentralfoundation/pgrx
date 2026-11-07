@@ -73,6 +73,9 @@ impl Aggregate<CountChanges> for CountChanges {
             None => return current,
         };
 
+        // SAFETY: the aggregate wrapper supplies live fcinfo and datum inputs
+        // on the backend thread. AggCheckCallContext establishes the aggregate
+        // context, which owns the state and copied by-reference datums.
         unsafe {
             // Transition functions run with CurrentMemoryContext set to a *short-lived* per-tuple context. Anything we need on the next row (the state struct AND the copied Datum) must instead be allocated n the long-lived aggregate context obtained here.
             let mut agg_ctx: pg_sys::MemoryContext = core::ptr::null_mut();

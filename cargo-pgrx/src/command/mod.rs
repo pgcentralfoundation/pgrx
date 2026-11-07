@@ -32,6 +32,28 @@ pub(crate) mod test;
 pub(crate) mod upgrade;
 pub(crate) mod version;
 
+fn reject_removed_pg_version(label: Option<&str>) -> eyre::Result<()> {
+    if let Some(label @ ("pg13" | "pg14")) = label {
+        return Err(eyre::eyre!(
+            "Postgres `{label}` is no longer supported by pgrx; use pg15 through pg19"
+        ));
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn retired_version_labels_are_rejected_without_reclassifying_other_arguments() {
+        for label in ["pg13", "pg14"] {
+            assert!(super::reject_removed_pg_version(Some(label)).is_err());
+        }
+        for label in [None, Some("pg15"), Some("pg19"), Some("pg99"), Some("my_database")] {
+            assert!(super::reject_removed_pg_version(label).is_ok());
+        }
+    }
+}
+
 // Build a ureq::Agent by the given url. Requests from this agent are proxied if we have
 // set the HTTPS_PROXY/HTTP_PROXY environment variables. This agent uses the platform's
 // certificate store to validate HTTPS connections, which works better with corporate proxies

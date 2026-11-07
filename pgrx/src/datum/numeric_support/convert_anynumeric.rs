@@ -72,16 +72,6 @@ macro_rules! anynumeric_from_float {
 
             #[inline]
             fn try_from(value: $ty) -> Result<Self, Self::Error> {
-                // these versions of Postgres can't represent +/-Infinity as a NUMERIC
-                // so we run through a PgTryBuilder to ask Postgres to do the conversion which will
-                // simply return the proper Error
-                #[cfg(feature = "pg13")]
-                {
-                    if value.is_infinite() {
-                        return from_primitive_helper::<_, 0, 0>(value, $func).map(|n| n.into());
-                    }
-                }
-
                 Ok(call_numeric_func($func.into(), &[value.into_datum()]))
             }
         }

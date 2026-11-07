@@ -16,13 +16,8 @@ pub mod be {
         pub static mut MyProcPort: *mut Port;
     }
 
-    /// #define SCRAM_MAX_KEY_LEN          PG_SHA256_DIGEST_LENGTH
-    /// #define PG_SHA256_DIGEST_LENGTH    32
-    #[cfg(any(feature = "pg18", feature = "pg19"))]
-    const SCRAM_MAX_KEY_LEN: usize = 32;
-
-    /// Port for Postgres 13..=16
-    #[cfg(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16"))]
+    /// Port for Postgres 15..=16
+    #[cfg(any(feature = "pg15", feature = "pg16"))]
     #[repr(C)]
     pub struct Port {
         pub sock: crate::pgsocket,
@@ -49,7 +44,7 @@ pub mod be {
         // This should be `*mut crate::HbaLine` if we ever bind that
         hba: *mut core::ffi::c_void,
 
-        #[cfg(any(feature = "pg14", feature = "pg15"))]
+        #[cfg(feature = "pg15")]
         authn_id: *const core::ffi::c_char,
 
         default_keepalives_idle: core::ffi::c_int,
@@ -66,7 +61,6 @@ pub mod be {
 
         ssl_in_use: bool,
         peer_cn: *mut core::ffi::c_char,
-        #[cfg(any(feature = "pg14", feature = "pg15", feature = "pg16"))]
         peer_dn: *mut core::ffi::c_char,
         peer_cert_valid: bool,
     }
@@ -178,8 +172,8 @@ pub mod be {
         keepalives_count: core::ffi::c_int,
         tcp_user_timeout: core::ffi::c_int,
 
-        scram_ClientKey: [u8; SCRAM_MAX_KEY_LEN],
-        scram_ServerKey: [u8; SCRAM_MAX_KEY_LEN],
+        scram_ClientKey: [u8; crate::SCRAM_MAX_KEY_LEN as usize],
+        scram_ServerKey: [u8; crate::SCRAM_MAX_KEY_LEN as usize],
         has_scram_keys: bool,
 
         // as if ENABLE_GSS == false && ENABLE_SSPI == false

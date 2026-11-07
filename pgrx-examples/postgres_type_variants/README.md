@@ -9,7 +9,7 @@ plus `PostgresEnum` and the `PostgresEq`/`Ord`/`Hash` derive chain.
 |---|---|---|---|
 | `json_default.rs` | `#[derive(PostgresType, Serialize, Deserialize)]` | Serde JSON | The shape is JSON-friendly; you're prototyping; you don't need a custom textual form. |
 | `inoutfuncs_custom.rs` | `#[derive(PostgresType)] #[inoutfuncs]` + `impl InOutFuncs` | Custom text via `&CStr` / `StringInfo` | The SQL surface should look like a domain syntax (`"3+4i"`, `"R5C7"`). |
-| `varlena_zerocopy.rs` | `#[derive(PostgresType)] #[pgvarlena_inoutfuncs]` + `impl PgVarlenaInOutFuncs` | Fixed binary on disk; custom text at SQL boundary | High-volume reads; tight binary layout pays off; you can guarantee `#[repr(C)]`-stable fields. |
+| `varlena_binary.rs` | `#[derive(PostgresType)] #[pgvarlena_inoutfuncs]` + `impl PgVarlenaInOutFuncs` | Fixed binary on disk, copied without parsing on read; custom text at SQL boundary | High-volume reads; tight binary layout pays off; you can guarantee `#[repr(C)]`-stable fields. |
 | `handrolled_datum.rs` | None — manual `FromDatum`/`IntoDatum` + `extension_sql!` | Whatever you write | You need full control over the SQL representation, alignment, or storage class; or you're studying what the derive generates. |
 
 ## Related derives

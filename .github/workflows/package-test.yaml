@@ -3,14 +3,13 @@ name: verify package can build
 on:
   push:
     branches: [ develop ]
-  pull_request:
-    branches: [ develop ]
+  pull_request: {}
 
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
   TOOL_DIR: ./tools
-  PG_VER: 14
+  PG_VER: 15
 
 jobs:
   ubuntu:
@@ -81,8 +80,11 @@ jobs:
           sudo apt-get update -y -qq --fix-missing
           sudo apt-get install -y postgresql-$PG_VER postgresql-server-dev-$PG_VER
 
+      # pgrx-pg-sys's build script formats the bindings it generates with rustfmt.
       - name: Rustup
-        run: $TOOL_DIR/rustup.sh nightly
+        run: |
+          $TOOL_DIR/rustup.sh nightly
+          rustup component add rustfmt --toolchain nightly
 
       - name: Report version
         run: |
@@ -101,6 +103,7 @@ jobs:
               cargo +nightly package \
                   --allow-dirty \
                   -p pgrx-pg-config \
+                  -p pgrx-c-macros \
                   -p pgrx-bindgen \
                   -p pgrx-sql-entity-graph \
                   -p pgrx-macros \
@@ -113,3 +116,18 @@ jobs:
 
       - name: Verify docs.rs build path
         run: ./tools/docsrs-check.sh
+
+  docsrs:
+    name: docs.rs type-check
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: "v1-pgrx--docsrs-typecheck"
+
+      # docs.rs builds need neither PostgreSQL nor libclang. This checks every supported
+      # version against the committed bindings and C macro snapshot on docs.rs's target.
+      - name: Type-check the docs.rs builds of pgrx-pg-sys and pgrx
+        run: ./tools/docsrs-typecheck.sh
