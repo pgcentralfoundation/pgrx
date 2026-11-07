@@ -1,0 +1,1 @@
+CREATE FUNCTION "shout"("message" TEXT) RETURNS TEXT STRICT LANGUAGE c AS 'MODULE_PATHNAME', 'shout_wrapper';

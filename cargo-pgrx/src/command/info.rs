@@ -25,21 +25,21 @@ pub(crate) enum Subcommand {
     ///
     /// cargo pgrx info path 15 #=> ~/.pgrx/15.2/pgrx-install
     Path {
-        /// Postgres version (12, 13, 14, 15...)
+        /// Postgres version (15, 16, 17, 18, or 19)
         pg_ver: String,
     },
     /// Print path to pg_config for a base version of Postgres
     ///
     /// cargo pgrx info pg-config 15 #=> ~/.pgrx/15.2/pgrx-install/bin/pg_config
     PgConfig {
-        /// Postgres version (12, 13, 14, 15...)
+        /// Postgres version (15, 16, 17, 18, or 19)
         pg_ver: String,
     },
     /// Print specific version for a base Postgres version
     ///
     /// cargo pgrx info version 15 #=> 15.2
     Version {
-        /// Postgres version (12, 13, 14, 15...)
+        /// Postgres version (15, 16, 17, 18, or 19)
         pg_ver: String,
     },
 }
@@ -56,7 +56,7 @@ impl CommandExecute for Info {
                         .get(&version(pg_ver))?
                         .parent_path()
                         .parent()
-                        .ok_or(eyre::Error::msg("can't get path"))?
+                        .ok_or_else(|| eyre::Error::msg("can't get path"))?
                         .display()
                 );
             }
@@ -66,7 +66,7 @@ impl CommandExecute for Info {
                     config
                         .get(&version(pg_ver))?
                         .path()
-                        .ok_or(eyre::Error::msg("can't get path"))?
+                        .ok_or_else(|| eyre::Error::msg("can't get path"))?
                         .display()
                 );
             }

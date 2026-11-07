@@ -22,7 +22,7 @@ use std::path::PathBuf;
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Connect {
-    /// Do you want to run against pg13, pg14, pg15, pg16, pg17, pg18, or pg19?
+    /// Do you want to run against pg15, pg16, pg17, pg18, or pg19?
     #[clap(env = "PG_VERSION")]
     pg_version: Option<String>,
     /// The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
@@ -46,12 +46,14 @@ pub(crate) struct Connect {
 impl CommandExecute for Connect {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(mut self) -> eyre::Result<()> {
+        super::reject_removed_pg_version(self.pg_version.as_deref())?;
         let pgrx = Pgrx::from_config()?;
 
-        let (package_manifest, package_manifest_path) = get_package_manifest(
+        let (package_manifest, package_manifest_path, _) = get_package_manifest(
             &Features::default(),
             self.package.as_deref(),
             self.manifest_path.as_deref(),
+            &[],
         )?;
         let (pg_config, _pg_version) = match pg_config_and_version(
             &pgrx,
@@ -77,7 +79,7 @@ impl CommandExecute for Connect {
                 // We should infer from package
                 get_property(&package_manifest_path, "extname")
                     .wrap_err("could not determine extension name")?
-                    .ok_or(eyre!("extname not found in control file"))?
+                    .ok_or_else(|| eyre!("extname not found in control file"))?
             }
         };
 

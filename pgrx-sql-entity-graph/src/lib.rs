@@ -65,6 +65,7 @@ pub(crate) mod extern_args;
 pub(crate) mod finfo;
 #[macro_use]
 pub(crate) mod fmt;
+pub(crate) mod graph;
 pub mod lifetimes;
 pub mod metadata;
 pub(crate) mod pg_extern;

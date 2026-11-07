@@ -306,7 +306,7 @@ impl<T, AllocatedBy: WhoAllocated> PgBox<T, AllocatedBy> {
 
             // SAFETY:  we just allocated `node` and the trait bound on `T` ensures that it'll have
             // the `type_` field
-            (ptr as *mut _ as *mut pg_sys::Node).as_mut().unwrap_unchecked().type_ = node_tag;
+            pg_sys::NodeSetTag!(ptr.cast::<pg_sys::Node>(), node_tag).get();
             node
         }
     }

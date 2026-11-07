@@ -822,7 +822,7 @@ impl<'a> EntryReader<'a> {
                 let sql = match self.read_argument_sql_owned()? {
                     Ok(crate::metadata::SqlMapping::As(sql)) => sql,
                     Ok(other) => {
-                        bail!("invalid SQL declaration mapping in schema entry: {other:?}")
+                        bail!("invalid SQL declaration mapping in schema entry: {other:?}");
                     }
                     Err(err) => return Err(err.into()),
                 };

@@ -24,7 +24,7 @@ use std::process::Stdio;
 #[derive(clap::Args, Debug, Clone)]
 #[clap(author)]
 pub(crate) struct Start {
-    /// The Postgres version to stop (pg13, pg14, pg15, pg16, pg17, pg18, pg19, or all)
+    /// The Postgres version to start (pg15, pg16, pg17, pg18, pg19, or all)
     #[clap(env = "PG_VERSION")]
     pg_version: Option<String>,
     #[clap(from_global, action = ArgAction::Count)]
@@ -50,10 +50,11 @@ impl CommandExecute for Start {
             pgrx: &Pgrx,
             postgresql_conf: &HashMap<String, String>,
         ) -> eyre::Result<()> {
-            let (package_manifest, _) = get_package_manifest(
+            let (package_manifest, _, _) = get_package_manifest(
                 &clap_cargo::Features::default(),
                 me.package.as_deref(),
                 me.manifest_path.as_deref(),
+                &[],
             )?;
 
             let (pg_config, _) =
@@ -61,10 +62,11 @@ impl CommandExecute for Start {
 
             start_postgres(&pg_config, postgresql_conf, me.valgrind)
         }
-        let (package_manifest, _) = get_package_manifest(
+        let (package_manifest, _, _) = get_package_manifest(
             &clap_cargo::Features::default(),
             self.package.as_deref(),
             self.manifest_path.as_deref(),
+            &[],
         )?;
 
         let postgresql_conf = collect_postgresql_conf_settings(&self.postgresql_conf)?;

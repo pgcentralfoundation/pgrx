@@ -28,4 +28,25 @@ mod tests {
             );
         }
     }
+
+    /// `LockBuffer` became `static inline` in PG19. Like every static inline function's wrapper,
+    /// pgrx compiles it with or without the C shim, so portable code can call it on every version.
+    #[pg_test]
+    fn test_lock_buffer() {
+        // SAFETY: pg_class always has a block 0. The buffer stays pinned while it is locked and
+        // unlocked, and the relation stays open until the buffer is released.
+        unsafe {
+            let lockmode = pg_sys::AccessShareLock as pg_sys::LOCKMODE;
+            let relation = pg_sys::table_open(pg_sys::RelationRelationId, lockmode);
+            let buffer = pg_sys::ReadBuffer(relation, 0);
+            pg_sys::LockBuffer(buffer, pg_sys::BUFFER_LOCK_SHARE as _);
+            #[cfg(feature = "pg19")]
+            assert!(pg_sys::BufferIsLockedByMeInMode(buffer, pg_sys::BUFFER_LOCK_SHARE));
+            pg_sys::LockBuffer(buffer, pg_sys::BUFFER_LOCK_UNLOCK as _);
+            #[cfg(feature = "pg19")]
+            assert!(!pg_sys::BufferIsLockedByMe(buffer));
+            pg_sys::ReleaseBuffer(buffer);
+            pg_sys::table_close(relation, lockmode);
+        }
+    }
 }

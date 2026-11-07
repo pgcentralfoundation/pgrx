@@ -50,24 +50,12 @@ macro_rules! pg_shmem_init {
     ($var:ident = $e:expr) => {
         $crate::pg_sys::submodules::thread_check::check_active_thread();
 
-        #[cfg(any(feature = "pg13", feature = "pg14"))]
-        unsafe {
-            $crate::shmem::PgSharedMemoryInitialization::on_shmem_request(&$var);
-        }
-
-        #[cfg(any(
-            feature = "pg15",
-            feature = "pg16",
-            feature = "pg17",
-            feature = "pg18",
-            feature = "pg19"
-        ))]
         unsafe {
             static mut PREV_SHMEM_REQUEST_HOOK: Option<unsafe extern "C-unwind" fn()> = None;
-            PREV_SHMEM_REQUEST_HOOK = pg_sys::shmem_request_hook;
-            pg_sys::shmem_request_hook = Some(on_shmem_request);
+            PREV_SHMEM_REQUEST_HOOK = $crate::pg_sys::shmem_request_hook;
+            $crate::pg_sys::shmem_request_hook = Some(on_shmem_request);
 
-            #[pg_guard]
+            #[$crate::pg_guard]
             unsafe extern "C-unwind" fn on_shmem_request() {
                 unsafe {
                     if let Some(i) = PREV_SHMEM_REQUEST_HOOK {
@@ -82,10 +70,10 @@ macro_rules! pg_shmem_init {
 
         unsafe {
             static mut PREV_SHMEM_STARTUP_HOOK: Option<unsafe extern "C-unwind" fn()> = None;
-            PREV_SHMEM_STARTUP_HOOK = pg_sys::shmem_startup_hook;
-            pg_sys::shmem_startup_hook = Some(on_shmem_startup);
+            PREV_SHMEM_STARTUP_HOOK = $crate::pg_sys::shmem_startup_hook;
+            $crate::pg_sys::shmem_startup_hook = Some(on_shmem_startup);
 
-            #[pg_guard]
+            #[$crate::pg_guard]
             #[forbid(unsafe_op_in_unsafe_fn)]
             unsafe extern "C-unwind" fn on_shmem_startup() {
                 unsafe {
@@ -197,7 +185,6 @@ pub trait PgSharedMemoryInitialization {
     /// # Safety
     ///
     /// * Be called from inside PostgreSQL `shmem_request_hook`.
-    /// * For PostgreSQL 13, 14, it could be called at any time.
     unsafe fn on_shmem_request(&'static self);
 
     /// # Safety

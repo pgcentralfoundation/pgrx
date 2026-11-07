@@ -29,13 +29,72 @@ fn display_uuid(uuid: Uuid) -> String {
     format!("{uuid}")
 }
 
+// Exercises `Array::<Uuid>::as_slice()`, which is only available because `Uuid: Scalar`.
+#[pg_extern]
+fn uuid_array_first_via_slice(arr: Array<'_, Uuid>) -> Option<Uuid> {
+    arr.as_slice().ok().and_then(|s| s.first().copied())
+}
+
+// Round-trips the whole slice back into an array, exercising the `&[Uuid]` layout both ways.
+#[pg_extern]
+fn uuid_array_roundtrip_via_slice(arr: Array<'_, Uuid>) -> Vec<Uuid> {
+    arr.as_slice().unwrap().to_vec()
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_unit_tests;
+    use core::ptr::NonNull;
+    use pgrx::array::{Element, Scalar};
+    use pgrx::callconv::DatumPass;
     use pgrx::datum::Uuid;
+    use pgrx::layout::PassBy;
     use pgrx::prelude::*;
+
+    // Covers every part of the `Element`/`Scalar` impls for `Uuid` that does not need a live
+    // array: the associated OID, the pass-by-ref convention, and the identity `point_from` cast.
+    #[pg_test]
+    fn test_uuid_scalar_and_element_impls() {
+        // Scalar: statically-known OID must be `uuid`.
+        assert_eq!(<Uuid as Scalar>::OID, pg_sys::UUIDOID);
+
+        // DatumPass: 16 bytes > size_of::<Datum>() (8), so it must be by-reference.
+        assert!(matches!(<Uuid as DatumPass>::PASS, PassBy::Ref));
+
+        // Element::point_from must be a plain identity cast (no header, no endian offset).
+        let uuid = Uuid::from_bytes(super::TEST_UUID_V4);
+        let ptr = NonNull::from(&uuid).cast::<u8>();
+        let pointed = unsafe { <Uuid as Element>::point_from(ptr) };
+        assert_eq!(pointed.as_ptr() as usize, ptr.as_ptr() as usize);
+        // The default point_from_align4 / borrow_unchecked must observe the same bytes.
+        let borrowed = unsafe { <Uuid as Element>::borrow_unchecked::<'_>(ptr) };
+        assert_eq!(borrowed, &uuid);
+    }
+
+    #[pg_test]
+    fn test_uuid_array_first_via_slice() {
+        let result = Spi::get_one::<bool>(
+            "SELECT uuid_array_first_via_slice(\
+                ARRAY['123e4567-e89b-12d3-a456-426614174000'::uuid, \
+                      '00000000-0000-0000-0000-000000000001'::uuid]) \
+             = '123e4567-e89b-12d3-a456-426614174000'::uuid;",
+        );
+        assert_eq!(result, Ok(Some(true)));
+    }
+
+    #[pg_test]
+    fn test_uuid_array_roundtrip_via_slice() {
+        let result = Spi::get_one::<bool>(
+            "SELECT uuid_array_roundtrip_via_slice(\
+                ARRAY['123e4567-e89b-12d3-a456-426614174000'::uuid, \
+                      '00000000-0000-0000-0000-000000000001'::uuid]) \
+             = ARRAY['123e4567-e89b-12d3-a456-426614174000'::uuid, \
+                     '00000000-0000-0000-0000-000000000001'::uuid];",
+        );
+        assert_eq!(result, Ok(Some(true)));
+    }
 
     #[pg_test]
     fn test_display_uuid() {

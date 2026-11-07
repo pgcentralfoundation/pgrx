@@ -1,0 +1,124 @@
+//! Expose the selected PostgreSQL version's generated C macro module tree.
+//!
+//! Ordinary builds include freshly generated modules from OUT_DIR, reflecting the
+//! current installation, compiler flags, and target. Documentation builds use the
+//! snapshot stored beside this selector instead. It holds every supported version's
+//! macro documentation, gated by the `pgNN` features, with arms that only show the
+//! accepted invocations. Reexports make macro definitions and their hidden adapters
+//! available through pgrx-pg-sys and ultimately the pgrx crate root.
+
+// PostgreSQL macros are generated from the selected installation for builds.
+// Documentation uses the snapshot alongside this module.
+#![allow(nonstandard_style, unused_parens, unused_braces, unused_imports, clippy::all)]
+
+/// Label Rust operands with their original C scalar or pointee identity before
+/// generated macros apply C promotion and conversion rules. A Rust alias or
+/// binding constant's storage type alone cannot establish that identity.
+///
+/// Bindgen stores C `char *` as `*mut c_char`, which is the same Rust type as
+/// `*mut i8` or `*mut u8`. Those raw pointers keep the `signed char *` or
+/// `unsigned char *` identity, so tag a plain-char pointer such as `Page` with
+/// `Pointer::<CChar>::new(page)`, or `Pointer::<CChar, ReadOnly>` for a
+/// `*const c_char`. Tagging reads nothing and grants no access.
+pub mod c {
+    pub use crate::__pgrx_c_macros::expression::{CDouble, CFloat, Pointer, ReadOnly, ReadWrite};
+    pub use crate::__pgrx_c_macros::{
+        CBool, CChar, CInt, CInt128, CLong, CLongLong, CPtrDiff, CShort, CSignedChar, CSize,
+        CUnsignedChar, CUnsignedInt, CUnsignedInt128, CUnsignedLong, CUnsignedLongLong,
+        CUnsignedShort, CValue,
+    };
+}
+
+/// Include items only when this installation and compiler profile emitted the
+/// named C macro. Availability can change across PostgreSQL versions or builds;
+/// the body is removed before Rust resolves names when generation refused it.
+///
+/// ```ignore
+/// pgrx::if_c_macro! { CHECK_FOR_INTERRUPTS {
+///     unsafe fn check_interrupts() { pgrx::CHECK_FOR_INTERRUPTS!(); }
+/// }}
+/// ```
+#[macro_export]
+macro_rules! if_c_macro {
+    ($name:ident { $($items:tt)* }) => {
+        $crate::__pgrx_c_classify!(@if_available $name { $($items)* });
+    };
+}
+
+pub use crate::if_c_macro;
+
+/// Compile fresh PG15 macro tree from OUT_DIR for the selected installation and target.
+#[cfg(all(feature = "pg15", not(docsrs)))]
+mod pg15 {
+    //! Compile fresh PG15 macro tree from OUT_DIR for the selected installation and target.
+    //!
+    //! Keep header modules and hidden native adapters in this versioned scope.
+    //! The selector forwards their exports to pg_sys, while macro expansions
+    //! retain the defining crate through `$crate`.
+
+    include!(concat!(env!("OUT_DIR"), "/cmacros/pg15/mod.rs"));
+}
+#[cfg(all(feature = "pg15", not(docsrs)))]
+pub use pg15::*;
+
+/// Compile fresh PG16 macro tree from OUT_DIR for the selected installation and target.
+#[cfg(all(feature = "pg16", not(docsrs)))]
+mod pg16 {
+    //! Compile fresh PG16 macro tree from OUT_DIR for the selected installation and target.
+    //!
+    //! Keep header modules and hidden native adapters in this versioned scope.
+    //! The selector forwards their exports to pg_sys, while macro expansions
+    //! retain the defining crate through `$crate`.
+
+    include!(concat!(env!("OUT_DIR"), "/cmacros/pg16/mod.rs"));
+}
+#[cfg(all(feature = "pg16", not(docsrs)))]
+pub use pg16::*;
+
+/// Compile fresh PG17 macro tree from OUT_DIR for the selected installation and target.
+#[cfg(all(feature = "pg17", not(docsrs)))]
+mod pg17 {
+    //! Compile fresh PG17 macro tree from OUT_DIR for the selected installation and target.
+    //!
+    //! Keep header modules and hidden native adapters in this versioned scope.
+    //! The selector forwards their exports to pg_sys, while macro expansions
+    //! retain the defining crate through `$crate`.
+
+    include!(concat!(env!("OUT_DIR"), "/cmacros/pg17/mod.rs"));
+}
+#[cfg(all(feature = "pg17", not(docsrs)))]
+pub use pg17::*;
+
+/// Compile fresh PG18 macro tree from OUT_DIR for the selected installation and target.
+#[cfg(all(feature = "pg18", not(docsrs)))]
+mod pg18 {
+    //! Compile fresh PG18 macro tree from OUT_DIR for the selected installation and target.
+    //!
+    //! Keep header modules and hidden native adapters in this versioned scope.
+    //! The selector forwards their exports to pg_sys, while macro expansions
+    //! retain the defining crate through `$crate`.
+
+    include!(concat!(env!("OUT_DIR"), "/cmacros/pg18/mod.rs"));
+}
+#[cfg(all(feature = "pg18", not(docsrs)))]
+pub use pg18::*;
+
+/// Compile fresh PG19 macro tree from OUT_DIR for the selected installation and target.
+#[cfg(all(feature = "pg19", not(docsrs)))]
+mod pg19 {
+    //! Compile fresh PG19 macro tree from OUT_DIR for the selected installation and target.
+    //!
+    //! Keep header modules and hidden native adapters in this versioned scope.
+    //! The selector forwards their exports to pg_sys, while macro expansions
+    //! retain the defining crate through `$crate`.
+
+    include!(concat!(env!("OUT_DIR"), "/cmacros/pg19/mod.rs"));
+}
+#[cfg(all(feature = "pg19", not(docsrs)))]
+pub use pg19::*;
+
+/// Document every supported version's generated macros without generating them.
+#[cfg(docsrs)]
+mod snapshot;
+#[cfg(docsrs)]
+pub use snapshot::*;

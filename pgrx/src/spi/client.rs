@@ -194,7 +194,7 @@ impl<'conn> SpiClient<'conn> {
         use pgrx_pg_sys::AsPgCStr;
 
         let ptr = NonNull::new(unsafe { pg_sys::SPI_cursor_find(name.as_pg_cstr()) })
-            .ok_or(SpiError::CursorNotFound(name.to_string()))?;
+            .ok_or_else(|| SpiError::CursorNotFound(name.to_string()))?;
         Ok(SpiCursor { ptr, __marker: PhantomData })
     }
 }

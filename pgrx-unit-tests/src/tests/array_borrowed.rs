@@ -216,7 +216,7 @@ mod tests {
             });
             let result = FlatArray::<i64>::new_zeroed_in(
                 // this is just under the element limit, but it remains too big to allocate
-                [0x3fffffff / size_of::<pg_sys::Datum>() - 1],
+                [pg_sys::MaxArraySize as usize - 1],
                 true,
                 memcx,
             );

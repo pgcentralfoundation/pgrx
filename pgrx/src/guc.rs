@@ -97,7 +97,6 @@ bitflags! {
         const UNIT_MIN = pg_sys::GUC_UNIT_MIN as i32;
         /// Include in `EXPLAIN` output
         const EXPLAIN = pg_sys::GUC_EXPLAIN as i32;
-        #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
         /// `RUNTIME_COMPUTED` is intended for runtime-computed GUCs that are only available via
         /// `postgres -C` if the server is not running
         const RUNTIME_COMPUTED = pg_sys::GUC_RUNTIME_COMPUTED as i32;
@@ -175,7 +174,9 @@ pub unsafe trait GucEnum: Copy + Send + Sync {
 /// [`GucValue::Raw`] must be `Send` and `Sync`, or it's a pointer type.
 pub unsafe trait GucValue {
     type Raw: Copy;
+    type RawConst: Copy;
     unsafe fn from_raw(raw: Self::Raw) -> Self;
+    unsafe fn from_raw_const(raw: Self::RawConst) -> Self;
     type BootVal: Copy + Send + Sync;
 }
 
@@ -188,6 +189,13 @@ pub struct GucSetting<T: GucValue> {
 unsafe impl<T: GucValue> Sync for GucSetting<T> {}
 
 impl<T: GucValue> GucSetting<T> {
+    /// Returns the setting's current value.
+    ///
+    /// # Panics
+    ///
+    /// Panics if called from any thread other than the one pgrx treats as the
+    /// active Postgres thread, even though `GucSetting` is `Sync`. Read the
+    /// value on that thread and pass it to any thread you spawn.
     pub fn get(&self) -> T {
         pg_sys::submodules::thread_check::check_active_thread();
         unsafe { GucValue::from_raw(self.value.get()) }
@@ -200,7 +208,11 @@ impl<T: GucValue> GucSetting<T> {
 
 unsafe impl GucValue for bool {
     type Raw = bool;
+    type RawConst = bool;
     unsafe fn from_raw(raw: Self::Raw) -> Self {
+        raw
+    }
+    unsafe fn from_raw_const(raw: Self::RawConst) -> Self {
         raw
     }
     type BootVal = ();
@@ -213,7 +225,11 @@ impl GucSetting<bool> {
 
 unsafe impl GucValue for i32 {
     type Raw = i32;
+    type RawConst = i32;
     unsafe fn from_raw(raw: Self::Raw) -> Self {
+        raw
+    }
+    unsafe fn from_raw_const(raw: Self::RawConst) -> Self {
         raw
     }
     type BootVal = ();
@@ -226,7 +242,11 @@ impl GucSetting<i32> {
 
 unsafe impl GucValue for f64 {
     type Raw = f64;
+    type RawConst = f64;
     unsafe fn from_raw(raw: Self::Raw) -> Self {
+        raw
+    }
+    unsafe fn from_raw_const(raw: Self::RawConst) -> Self {
         raw
     }
     type BootVal = ();
@@ -239,7 +259,11 @@ impl GucSetting<f64> {
 
 unsafe impl GucValue for Option<CString> {
     type Raw = *mut std::ffi::c_char;
+    type RawConst = *const std::ffi::c_char;
     unsafe fn from_raw(raw: Self::Raw) -> Self {
+        if raw.is_null() { None } else { Some(CStr::from_ptr(raw).to_owned()) }
+    }
+    unsafe fn from_raw_const(raw: Self::RawConst) -> Self {
         if raw.is_null() { None } else { Some(CStr::from_ptr(raw).to_owned()) }
     }
     type BootVal = ();
@@ -259,7 +283,11 @@ impl GucSetting<Option<CString>> {
 
 unsafe impl<T: GucEnum> GucValue for T {
     type Raw = i32;
+    type RawConst = i32;
     unsafe fn from_raw(raw: Self::Raw) -> Self {
+        T::from_ordinal(raw)
+    }
+    unsafe fn from_raw_const(raw: Self::RawConst) -> Self {
         T::from_ordinal(raw)
     }
     type BootVal = T;

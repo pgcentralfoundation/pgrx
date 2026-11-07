@@ -119,7 +119,8 @@ macro_rules! impl_borrow_fixed_len {
 impl_borrow_fixed_len! {
     i8, i16, i32, i64, bool, f32, f64,
     pg_sys::Oid, pg_sys::Point,
-    Date, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone
+    Date, Time, TimeWithTimeZone, Timestamp, TimestampWithTimeZone,
+    Uuid
 }
 
 /// It is rare to pass CStr via Datums, but not unheard of

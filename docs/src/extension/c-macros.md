@@ -1,0 +1,774 @@
+# Using PostgreSQL C Macros
+
+pgrx generates Rust `macro_rules!` versions of supported PostgreSQL function-like
+C macros and adapters for supported PostgreSQL static inline functions. You can
+call both directly as `pgrx::NAME!(...)` in an extension.
+They follow the selected headers' C arithmetic, casts, evaluation, and storage
+rules, including where those rules differ from Rust's native operators.
+
+Start with an extension configured for your PostgreSQL version. The main examples
+below use PostgreSQL 18. Unless an example defines a function, place its statements inside
+one of your Rust functions or tests.
+
+## Migrate handwritten helper calls
+
+pgrx's handwritten C macro helpers have been removed. Call the generated macro
+with its original PostgreSQL name and extract the result at the Rust boundary:
+
+| Previous call | Generated call |
+| --- | --- |
+| `pg_sys::TransactionIdIsNormal(xid)` | `pgrx::TransactionIdIsNormal!(xid).get() != 0` |
+| `pgrx::varsize_any(ptr)` | `pgrx::VARSIZE_ANY!(ptr).get() as usize` |
+| `pgrx::vardata_any(ptr)` | `pgrx::VARDATA_ANY!(ptr).get()` |
+| `pgrx::set_varsize(ptr, len)` | `pgrx::SET_VARSIZE!(ptr, len)` |
+| `check_for_interrupts!()` | `pgrx::CHECK_FOR_INTERRUPTS!()` |
+
+Keep the caller's length checks, resource lifetimes, and backend-thread
+restrictions. For example, `VARSIZE_ANY!` reads raw storage, and
+`CHECK_FOR_INTERRUPTS!` accesses backend state and can raise a PostgreSQL error.
+A generated macro that reads storage or backend state needs an `unsafe` block
+even where the helper it replaces was safe. In particular, `check_for_interrupts!()`,
+`pg_sys::elog::interrupt_pending()`, `pgrx::htup::heap_tuple_header_get_datum_length`,
+`pgrx::itemptr::item_pointer_set_all`, and `FcInfo::srf_is_initialized` were safe,
+while `CHECK_FOR_INTERRUPTS!`, `INTERRUPTS_PENDING_CONDITION!`,
+`HeapTupleHeaderGetDatumLength!`, `ItemPointerSet!`, and `SRF_IS_FIRSTCALL!` are
+not. `ItemPointerSet!` can also be a native call that panics off the backend
+thread, depending on the version, the build and libclang; the safe
+`u64_to_item_pointer` and `new_item_pointer` build an item pointer in Rust instead.
+On Windows,
+`INTERRUPTS_PENDING_CONDITION!` also dispatches queued signals through
+`pgwin32_dispatch_queued_signals`, where `interrupt_pending()` only read
+`InterruptPending`.
+
+Statement macros yield `()`, so they do not need `.get()`. Return macros return
+from the enclosing Rust function or closure; replace the complete return site.
+
+The old `pgrx::is_a` helper accepted NULL. Preserve that short-circuit before
+loading a tag with `nodeTag!`, or call `PgNode::is_a` on a reference; a generated
+C field access requires valid storage. Application-level ownership and error
+adapters retain their Rust contracts.
+
+PostgreSQL sometimes changes a macro into a static inline function. The
+generator keeps the `NAME!(...)` interface available in both cases, so callers
+do not need version checks merely because the C name became a function. For
+example, `VARDATA_ANY!(ptr).get()` works across PG15–19. When a function's body
+uses only constructs the generator supports, and no macro it uses is defined
+again later in the headers, even identically, the generated macro translates that
+body to Rust, as it would a macro's. Otherwise it calls the original C function
+through the checked native binding. Generated macros that call a translated
+function run its translation too. Either way, temporaries created by the
+arguments, such as the `CString` behind an `as_ptr()` argument, stay alive until
+the function returns, as in a call. Native wrappers are built even when the
+public `cshim` feature is disabled.
+
+Which bodies are translated depends on the PostgreSQL build and on the libclang
+that inspects it, not only on the PostgreSQL version. For example, `Assert` in
+an `--enable-cassert` build reports its file and line, so a body that uses it
+keeps the native call. A call that needs no `unsafe` with one installation can
+therefore need it with another. When one call must build against several
+installations, keep its `unsafe` block and allow `unused_unsafe`, as [the
+`DatumGetInt32` example](#choose-the-c-identity-of-an-input) does.
+
+Every native call goes through pgrx's FFI guard, which checks the thread and
+calls `sigsetjmp` each time. Where PostgreSQL defines a static inline function,
+`pg_sys::NAME(...)` is now that guarded binding rather than a Rust port. For
+example, `pg_sys::MemoryContextSwitchTo` and `pg_sys::heap_getattr` used to be
+Rust and are now guarded native calls. `MemoryContextSwitchTo!` translates to
+Rust on PG15–19. Whether another macro does depends on the version, the build and
+libclang; the build's generated documentation and `pgNN_macro_report.json` say
+whether it translates the body or calls the native function.
+
+A function parameter applies C's assignment rules, which are stricter than the
+explicit casts inside many macros. Pass each operand with the parameter's C
+type. In particular, tag a bindgen `char *` such as `pg_sys::Page` with
+`Pointer::<CChar>`, as described [below](#choose-the-c-identity-of-an-input);
+`PageGetItem!(Pointer::<CChar>::new(page), item_id)` then works whether
+`PageGetItem` is a macro (PG15) or a function taking `Page` (PG16 and later).
+
+The selected header still determines argument and result types. A size result
+can change from C `int` to `size_t`; `.get() as usize` is an explicit Rust size
+conversion in either case. For predicates that change from C `int` to `bool`,
+use `.is_true()` to obtain a Rust condition with C's zero/null semantics. A
+function adapter evaluates each argument once, while a C macro keeps its
+original argument repetition. Generated docs distinguish the two and show the
+original definition. Genuine signature changes can still require caller changes.
+
+Generated macros are runtime code. The removed `const fn` ports
+`pg_sys::TYPEALIGN` and `pg_sys::MAXALIGN` have no `const` replacement; in a
+constant, compute the alignment in Rust, for example
+`len.next_multiple_of(pg_sys::MAXIMUM_ALIGNOF as usize)`.
+
+### Other removed helpers
+
+Other Rust ports of PostgreSQL macros and inline functions were removed as well.
+Call the generated macro with the PostgreSQL name instead. Several removed
+helpers checked their input. The generated replacements follow the C, which
+checks nothing or checks only in assert-enabled builds, so make the check
+yourself where the input is not already known to be valid.
+
+| Removed | Generated replacement | Check the removed helper made |
+| --- | --- | --- |
+| The other `pgrx` varlena helpers: `set_varsize_4b`, `set_varsize_1b`, `set_varsize_short`, `varsize`, `varsize_4b`, `varsize_1b`, `varsize_any_exhdr`, `varsize_external`, `vardata_1b`, `vardata_4b`, `vardata_4b_c`, `vardata_1b_e`, `varatt_is_1b`, `varatt_is_1b_e`, `varatt_is_4b`, `varatt_is_4b_u`, `varatt_is_4b_c`, `varatt_not_pad_byte`, `vartag_1b_e`, `vartag_external`, `vartag_is_expanded`, `vartag_size` | The upper-case macro, such as `VARSIZE_ANY_EXHDR!` | `vartag_size` panicked on an unknown tag. Given one, `VARTAG_SIZE!` aborts an assert-enabled server and otherwise returns 1 on PG15 and 0 on PG16–19, so check the tag first |
+| `pgrx::pg_arg_is_null`, `pg_getarg_datum`, `pg_getarg_datum_raw` | `PG_ARGISNULL!(n, fcinfo)`, `PG_GETARG_DATUM!(n, fcinfo)`, or the checked `pgrx::fcinfo::pg_get_nullable_datum(fcinfo, n)` | Non-NULL `fcinfo` and `n < nargs` |
+| `pgrx::pg_get_collation`, `pg_return_null`, `pg_return_void` | `PG_GET_COLLATION!`, `PG_RETURN_NULL!`, `PG_RETURN_VOID!` | `pg_get_collation` and `pg_return_null` required a non-NULL `fcinfo` |
+| `pgrx::srf_is_first_call`, `srf_first_call_init`, `srf_per_call_setup`, `srf_return_next`, `srf_return_done` | `SRF_IS_FIRSTCALL!`, `SRF_FIRSTCALL_INIT!`, `SRF_PERCALL_SETUP!`, `SRF_RETURN_NEXT!`, `SRF_RETURN_DONE!` | None. The removed `srf_return_next` and `srf_return_done` only updated the call state; `SRF_RETURN_NEXT!(funcctx, result, fcinfo)` and `SRF_RETURN_DONE!` also return from the calling function |
+| `FcInfo::srf_is_initialized`, `init_multi_func_call`, `srf_return_next`, `srf_return_done` | The same macros, given `FcInfo::as_mut_ptr()`. `srf_is_initialized` is the negation of `SRF_IS_FIRSTCALL!`, so replace `fcinfo.srf_is_initialized()` with `!SRF_IS_FIRSTCALL!(fcinfo.as_mut_ptr()).is_true()` | None; the return macros return as in the row above |
+| `RetAbi::finish_call_fcinfo` | None. pgrx never called it; remove overrides | — |
+| `pgrx::htup::heap_tuple_header_get_datum_length`, `heap_tuple_get_datum`, `heap_tuple_header_get_type_id`, `heap_tuple_header_get_typmod` | `HeapTupleHeaderGetDatumLength!`, `HeapTupleGetDatum!` or the guarded `pg_sys::HeapTupleHeaderGetDatum((*tuple).t_data)`, which returns a `pg_sys::Datum`, `HeapTupleHeaderGetTypeId!`, `HeapTupleHeaderGetTypMod!` | Non-NULL header, except `heap_tuple_get_datum`, which checked nothing |
+| `pgrx::itemptr::item_pointer_get_block_number`, `item_pointer_get_offset_number` | `ItemPointerGetBlockNumber!`, `ItemPointerGetOffsetNumber!` | Asserted a valid item pointer in every build |
+| `pgrx::itemptr::item_pointer_get_block_number_no_check`, `item_pointer_get_offset_number_no_check`, `item_pointer_set_all`, `item_pointer_is_valid` | `ItemPointerGetBlockNumberNoCheck!`, `ItemPointerGetOffsetNumberNoCheck!`, `ItemPointerSet!`, `ItemPointerIsValid!`; or the safe `item_pointer_get_both`, `u64_to_item_pointer`, and `new_item_pointer` | None |
+| `pgrx::trigger_support::called_as_trigger`, `trigger_fired_by_insert` and the other `trigger_fired_*` helpers | `CALLED_AS_TRIGGER!`, `TRIGGER_FIRED_BY_INSERT!`, and so on | `called_as_trigger` required a non-NULL `fcinfo` |
+| `pgrx::nodes::is_a` | `nodeTag!` or `PgNode::is_a` | Accepted NULL |
+| `pgrx::tupdesc::release_tupdesc(tupdesc)` | `ReleaseTupleDesc!(tupdesc)` | None |
+| `pg_sys::rt_fetch`, `pg_sys::planner_rt_fetch` | `rt_fetch!`, `planner_rt_fetch!` | Panicked on a non-pointer list or an index out of bounds |
+| PG15 page and buffer ports, such as `pg_sys::PageGetItem`, `BufferGetPage`, `BufferGetPageSize`, and `BufferIsValid`; `pg_sys::BufferGetBlock` and `BufferIsLocal` | The macro with the same name | `BufferIsValid` and `BufferGetPageSize` asserted a valid buffer |
+| `pg_sys::PageIsValid` | `PageIsValid!` on PG15; PostgreSQL 16 removed the macro, so test `!page.is_null()` | None |
+| `pg_sys::PageGetSpecialPointer` on PG15, PG18, and PG19; `pg_sys::PageValidateSpecialPointer` | `PageGetSpecialPointer!`, `PageValidateSpecialPointer!` | Asserted a valid page and special pointer |
+| `pg_sys::GETSTRUCT`, `pg_sys::heap_tuple_get_struct::<T>(htup)` | `GETSTRUCT!(htup).get().cast::<T>()` | `heap_tuple_get_struct` returned NULL for a NULL tuple |
+| `pg_sys::GetMemoryChunkContext` on PG15, `pg_sys::MemoryContextIsValid` | The guarded `pg_sys::GetMemoryChunkContext` binding, `MemoryContextIsValid!` | PG15's port asserted a non-NULL, MAXALIGNed pointer and a valid context |
+| `pg_sys::heap_getattr` and the `pg_sys::htup` module: `HeapTupleHeaderIsHeapOnly`, `HeapTupleHeaderIsHotUpdated`, `HeapTupleHeaderXminInvalid`, `HeapTupleHeaderFrozen`, `HeapTupleGetRawCommandId`, `HeapTupleHeaderGetRawXmin`, `HeapTupleHeaderGetXmin`, `HeapTupleHeaderGetNatts`, `HeapTupleNoNulls` | `heap_getattr!` or the guarded `pg_sys::heap_getattr` binding; the macro with the same name, except `HeapTupleHeaderXminFrozen!` and `HeapTupleHeaderGetRawCommandId!` | `heap_getattr` panicked on an attribute number past the descriptor when the tuple had no NULLs |
+| `pg_sys::type_is_array`, `TransactionIdIsNormal`, and PG19's `TransactionIdPrecedes`, `TransactionIdPrecedesOrEquals`, `TransactionIdFollows`, `TransactionIdFollowsOrEquals` | The macro with the same name; the PG19 comparisons also remain guarded bindings | None |
+| `pg_sys::IndexBuildHeapScan` | `table_index_build_scan!`, with `allow_sync` and `progress` set to true | Non-NULL relation and table access method |
+| `pg_sys::elog::interrupt_pending()` | `INTERRUPTS_PENDING_CONDITION!().get() != 0` | None |
+
+C macros that read an implicit `fcinfo` variable take it as their last argument,
+as in `PG_ARGISNULL!(n, fcinfo)`. The `.get()` of a macro that yields a C `Datum`,
+such as `PG_GETARG_DATUM!` or `HeapTupleGetDatum!`, is an integer that exposes the
+pointer's provenance. `pg_sys::Datum::from(..get() as usize)` takes that
+provenance back, as a C cast from `Datum` to a pointer does, so Rust may read
+through the result. For a function argument, `pg_get_nullable_datum` also checks
+the argument index and returns the pointer without the integer round trip.
+
+PostgreSQL 16 turned the tree walkers and mutators into macros that cast their
+callback. On PG16 and later, `pg_sys::expression_tree_walker`,
+`pg_sys::expression_tree_mutator`, and the other walkers and mutators exist only
+as generated macros. The removed pgrx wrappers existed for the walkers on PG16
+and later and for `expression_tree_mutator` on PG18 and PG19. Call the `_impl`
+function the macros expand to, such as `pg_sys::expression_tree_walker_impl`, or
+the macro with the callback wrapper shown
+[below](#keep-postgresql-calls-on-the-backend-thread). PG15 keeps the functions,
+so code that supports both needs a `cfg` split.
+
+### Changed constants and version-specific items
+
+`pg_sys::InvalidOid` is now the bindgen `u32` constant rather than an `Oid`; use
+`pg_sys::Oid::INVALID` where an `Oid` is required. Likewise,
+`InvalidTransactionId`, `BootstrapTransactionId`, `FrozenTransactionId`,
+`FirstNormalTransactionId`, and `MaxTransactionId` are now `u32`; use the
+matching `pg_sys::TransactionId` constants, such as `TransactionId::FIRST_NORMAL`.
+`pg_sys::VARHDRSZ` is now C `int` (`i32`) instead of `usize`, so convert it
+explicitly where you need a size. `pg_sys::SizeOfPageHeaderData` is now a
+`usize` constant rather than a `const fn`; drop the call parentheses.
+
+`pg_sys::get_pg_version_string()` is not available on MSVC builds for PG15 and
+PG16, where bindgen cannot read `PG_VERSION_STR`. The removed fallback returned
+a synthesized string. `PgSqlErrorCode::ERRCODE_SNAPSHOT_TOO_OLD` exists only for
+PG15 and PG16, because later PostgreSQL headers no longer define it.
+`pgrx::pg_magic_func_support::default_magic` is no longer a `const fn`.
+
+### Other API changes
+
+`IntoDatum for i8` widens SQL `"char"` the way PostgreSQL's `CharGetDatum` does,
+and so does an `i8` returned from a `#[pg_extern]` function. On targets where C
+`char` is unsigned, such as Linux AArch64, `(-1_i8).into_datum()` now holds `0xFF`
+instead of all one bits. `FromDatum for i8` reads both as `-1`.
+
+`IntoDatum for f32`, and an `f32` returned from a `#[pg_extern]` function, now
+store the bits as PostgreSQL's `Float4GetDatum` does: as a C `int32`,
+sign-extended to the Datum's width. With 64-bit pointers, the Datum of a negative
+`f32` now has its upper 32 bits set instead of clear. `FromDatum for f32` reads
+both forms.
+
+`pg_sys::Datum`'s integer conversions now follow Rust's exposed-provenance
+rules. `Datum::value()` and `usize::from(datum)` expose a pointer's provenance,
+and `Datum::from` an integer uses `core::ptr::with_exposed_provenance_mut`, so a
+pointer Datum that goes through an integer may be dereferenced again. Before,
+the rebuilt Datum had no provenance. With 32-bit pointers, `Datum::from` a `u64`
+or `i64` still pallocs a copy of the value and returns a pointer to it.
+
+## Call an expression macro
+
+Use the original C name, including its capitalization. For example, check whether
+a transaction ID is outside PostgreSQL's special transaction ID range:
+
+```rust
+use pgrx::pg_sys;
+
+let xid = pg_sys::TransactionId::from_inner(3);
+let is_normal = pgrx::TransactionIdIsNormal!(xid).get() != 0;
+assert!(is_normal);
+```
+
+`TransactionId` already has a verified C identity, so it can be passed directly.
+The comparison produces C `int` zero or one. Extract that integer with `.get()`
+and compare it with zero, or use `.is_true()` when you need a Rust `bool`:
+
+```rust
+let is_normal = pgrx::TransactionIdIsNormal!(xid).is_true();
+```
+
+Expression macros return an already evaluated C expression wrapper. `.get()`
+extracts its native Rust storage; `.into_value()` keeps the tagged C value:
+
+```rust
+use pgrx::{cmacros::c::CValue, pg_sys};
+
+let rounded = pgrx::BUFFERALIGN!(33_u32);
+let bytes = rounded.get();
+assert!(bytes >= 33);
+
+let tagged: CValue<pg_sys::__pgrx_c_types::uintptr_t> = rounded.into_value();
+assert_eq!(tagged.get(), bytes);
+```
+
+The wrapper does not rerun the macro when you extract it. `BUFFERALIGN` uses the
+selected installation's alignment, so avoid assuming one fixed alignment across
+builds. A pointer result extracts a raw pointer. A raw aggregate result extracts
+`MaybeUninit<R>`; extraction alone does not prove that every field is initialized
+or that the bytes form a valid Rust `R`.
+
+## Choose the C identity of an input
+
+Fixed-width Rust inputs such as `i32` and `u32` have an established C identity in
+the supported target profile. Use explicit Rust suffixes when inference would
+otherwise be unclear. pgrx's `pg_sys::Oid`, `TransactionId`, and `Datum` inputs also
+have generated bridges that verify their C typedefs and Rust representations.
+
+Raw `i64`, `u64`, and `isize` are ambiguous. `usize` represents C `size_t`, whose
+rank is verified for the selected target. On LP64 it is usually `unsigned long`.
+C `unsigned long` and
+`unsigned long long` can both occupy a Rust `u64` while having different ranks in
+C's arithmetic conversions. A Rust type alias does not recover that distinction.
+For a C typedef, use its generated identity from `pg_sys::__pgrx_c_types` rather
+than assuming that one primitive width always corresponds to `long`:
+
+```rust
+use pgrx::{cmacros::c::CValue, pg_sys};
+
+let input_len = 1024_usize;
+let capacity = pgrx::PGLZ_MAX_OUTPUT!(
+    CValue::<pg_sys::__pgrx_c_types::size_t>::new(input_len as _)
+).get() as usize;
+assert_eq!(capacity, 1028);
+```
+
+This supplies C `size_t` identity, including its rank on the selected target.
+The macro follows unsigned C overflow rules; it does not saturate. Validate
+application limits before using its result as an allocation size.
+
+Plain C `char` also needs an explicit `CValue<CChar>` tag. The inspected compiler
+selects its signedness and promotion, independently of Rust's native
+`core::ffi::c_char` alias. Generated bridges verify compatible one-byte storage.
+Raw `i8` and `u8` inputs retain the distinct C `signed char` and `unsigned char`
+identities even when one shares plain `char`'s storage.
+
+For example, this fails to compile:
+
+```rust,compile_fail
+let size = 33_u64;
+let _ = pgrx::BUFFERALIGN!(size);
+```
+
+Use a C marker when you know the intended original C type:
+
+```rust
+use pgrx::cmacros::c::{CUnsignedLong, CUnsignedLongLong, CValue};
+
+let size = CValue::<CUnsignedLong>::new(33 as _);
+let aligned = pgrx::BUFFERALIGN!(size).get();
+assert!(aligned >= 33);
+
+let privileges = CValue::<CUnsignedLongLong>::new(1_u64);
+let grant_options = pgrx::ACL_GRANT_OPTION_FOR!(privileges).get();
+assert_eq!(grant_options, 0x1_0000_0000_u64);
+```
+
+`CValue::new` labels the supplied representation; it does not infer the C type
+from its magnitude. Select a marker from the C declaration or the macro's
+documented invocation requirements. The public input vocabulary lives in
+`pgrx::cmacros::c` (also `pg_sys::cmacros::c`).
+
+Plain-char pointers need a tag as well. Bindgen stores C `char *`, including
+`Page` and C strings, as `*mut c_char`, which Rust cannot distinguish from
+`*mut i8` or `*mut u8`. Tag such a pointer with `Pointer::<CChar>`, or with
+`Pointer::<CChar, ReadOnly>` for a `*const c_char`. The tag reads nothing and
+grants no access. Unlike a cast, it still requires a plain-char pointee, so a
+pointer to another type is rejected:
+
+```rust
+use core::ffi::c_void;
+use pgrx::{cmacros::c::{CChar, Pointer}, pg_sys};
+
+/// Locate an item's tuple data on a page.
+///
+/// # Safety
+/// page must be a live, pinned, initialized page that contains item_id, and the
+/// caller must run on the PostgreSQL backend thread.
+unsafe fn item_data(page: pg_sys::Page, item_id: pg_sys::ItemId) -> *mut c_void {
+    // SAFETY: the caller establishes the page, item, and backend-thread contract.
+    // PG19 returns void * instead of Item, so the result is cast for both.
+    unsafe { pgrx::PageGetItem!(Pointer::<CChar>::new(page), item_id).get().cast() }
+}
+```
+
+A pointer extracted with `.get()` needs the same tag before it is passed back to
+a generated macro; `.into_value()` keeps it. `Pointer::<CChar>::new` takes the
+inspected plain-char storage. If build flags give plain `char` a different
+signedness from Rust's `c_char`, that storage is the other byte type, and the
+binding pointer needs `.cast()` before tagging.
+
+Binding constants need the same care: bindgen can store a positive C `int`
+constant in a Rust `u32`. A direct caller operand follows that Rust storage
+type unless you supply the original C identity. For example, label `BLCKSZ`
+as C `int` before comparing it with a negative C `int`:
+
+```rust
+use pgrx::{cmacros::c::{CInt, CValue}, pg_sys};
+
+let block_size = CValue::<CInt>::new(i32::try_from(pg_sys::BLCKSZ).unwrap());
+assert_eq!(pgrx::Min!(block_size, -1_i32).get(), -1);
+```
+
+The transpiler preserves the C identity of binding references *inside* a macro
+definition. It cannot infer that an arbitrary Rust path at the call site denotes
+the original C constant; paths can be renamed or shadowed.
+
+If you already have a `Datum`, pass it as a `Datum`. A known pass-by-value int32
+Datum can be decoded with the same invocation on PG15–19:
+
+```rust
+use pgrx::pg_sys;
+
+/// Decode a Datum known by the caller to contain a pass-by-value int32.
+///
+/// # Safety
+/// Call on the PostgreSQL backend thread with a valid int4 Datum.
+#[allow(unused_unsafe, reason = "this conversion is pure wherever it is translated")]
+unsafe fn read_pass_by_value_int32(datum: pg_sys::Datum) -> i32 {
+    // SAFETY: The caller supplies a Datum containing an initialized int32;
+    // execute this within the PostgreSQL backend thread.
+    unsafe { pgrx::DatumGetInt32!(datum).get() }
+}
+```
+
+The caller must know what the Datum contains. A Datum that carries a pointer is
+not an int32 just because its address can be converted to integer bits.
+For versions that define `DatumGetInt32` as a static inline function, the
+generator translates its body, so the conversion stays pure Rust. The ordinary
+function binding is also available when you want its exact native Rust signature.
+An inline function the generator calls natively needs the unsafe block, so the
+narrow lint allowance keeps this shared call quiet where it is pure.
+
+## Compose macros before extracting Rust values
+
+Pass generated macro invocations directly to other generated macros:
+
+```rust
+let privileges =
+    pgrx::ACL_OPTION_TO_PRIVS!(pgrx::ACL_GRANT_OPTION_FOR!(1_u32)).get();
+assert_eq!(privileges, 1_u64);
+```
+
+The outer macro can request the inner macro's value, addressable storage, or
+unevaluated size context as required by the original C expression. The internal
+entry arms you may see in generated source implement those contexts; they do not
+add ordinary C arguments.
+
+For an intermediate value, keep its C identity with `.into_value()`:
+
+```rust
+let grant_options = pgrx::ACL_GRANT_OPTION_FOR!(1_u32).into_value();
+let privileges = pgrx::ACL_OPTION_TO_PRIVS!(grant_options).get();
+assert_eq!(privileges, 1_u64);
+```
+
+Extracting `grant_options` with `.get()` would produce a raw `u64`, which needs a
+new explicit C tag before being passed back to a generated macro. The evaluated
+wrapper or tagged value retains a value's C type, but does not retain its place
+or all source-only properties. In particular, an integer constant expression
+equal to zero can be a C null-pointer constant; storing an evaluated zero in a
+variable does not give that variable the same capability. Preserve the generated
+macro invocation syntax when that source distinction matters, or supply a typed
+Rust null pointer where appropriate.
+
+C macro substitution also controls evaluation. Repeated occurrences can evaluate
+an argument repeatedly; unused arguments do not evaluate; logical and conditional
+branches remain lazy. Do not assume function-style evaluate-once behavior merely
+because the invocation looks like a function call.
+
+## Mutate storage with an explicit safety argument
+
+Macros that load or mutate raw storage require an `unsafe` context. This also
+applies to a generated assignment to an ordinary Rust local, because the C place
+operations have explicit unsafe access contracts:
+
+```rust
+use pgrx::pg_sys;
+
+let mut xid = pg_sys::TransactionId::from_inner(u32::MAX);
+// SAFETY: xid is initialized, aligned, owned, and exclusively writable.
+// This macro performs scalar operations and does not access backend state.
+unsafe { pgrx::TransactionIdAdvance!(xid) };
+assert_eq!(xid.into_inner(), 3);
+```
+
+`TransactionIdAdvance` is a statement macro: it executes its statements in order
+and yields `()`. Do not append `.get()` or pass it as an expression operand to
+another generated macro.
+
+A field operation need not initialize an entire struct. Keep partial storage as
+`MaybeUninit` and use raw pointers until you can establish Rust validity:
+
+```rust
+use pgrx::pg_sys;
+
+let mut storage = core::mem::MaybeUninit::<pg_sys::Node>::uninit();
+let node = storage.as_mut_ptr();
+// SAFETY: node points to live, aligned, exclusively writable storage.
+// NodeSetTag initializes type_; nodeTag reads that initialized field.
+// Neither operation creates a reference or materializes a complete Node.
+unsafe {
+    pgrx::NodeSetTag!(node, pg_sys::NodeTag::T_Invalid);
+    // The tag's integer type follows the C enum's compatible type, which differs
+    // between targets, so compare it with an untyped literal (T_Invalid is 0).
+    assert_eq!(pgrx::nodeTag!(node).get(), 0);
+}
+```
+
+For real PostgreSQL objects, establish the allocation's lifetime, bounds,
+alignment, initialization of every field read, and aliasing rules. Account for
+memory-context resets, tuple ownership, buffer pins, or whichever resource keeps
+the object alive. A non-null pointer alone proves none of those conditions.
+
+## Use return macros in the caller
+
+A macro whose original C body contains `return` returns from the enclosing Rust
+function or closure. Call it directly:
+
+```rust
+use pgrx::pg_sys;
+
+/// Return an existing Datum without decoding its contents.
+fn return_existing_datum(value: pg_sys::Datum) -> pg_sys::Datum {
+    pgrx::PG_RETURN_DATUM!(value);
+}
+```
+
+Do not add an outer `return` or `.get()`: the generated macro performs the return
+and applies C assignment conversion to the function's result. Ordinary Rust
+cleanup runs on that return. If the enclosing native Rust result has an ambiguous
+C identity, the documented explicit form is:
+
+```text
+MACRO!(@__pgrx_c_return_as [CMarker]; arguments...)
+```
+
+Some C macros reference identifiers supplied implicitly by their C callers.
+Rust callers supply those operands explicitly after the original formals. For
+example, the generated `PG_RETURN_NULL!` takes `fcinfo`, even though its original
+C signature has no arguments. Its documentation lists the required captures;
+its write to `fcinfo` still requires the caller's pointer safety argument.
+
+## Follow explicit invocation boundaries
+
+Some C replacements are unparenthesized and can interact with surrounding C
+operators. Their generated documentation requires `@__pgrx_c_expression;`, which
+chooses the meaning of a parenthesized C invocation. For example, assigning a WAL
+segment number from a position immediately after the previous segment:
+
+```rust
+use pgrx::cmacros::c::{CUnsignedLongLong, CValue};
+
+let position = CValue::<CUnsignedLongLong>::new(32_u64 * 1024 * 1024);
+let mut segment = CValue::<CUnsignedLongLong>::new(0_u64);
+// SAFETY: segment is initialized, aligned, owned, and exclusively writable.
+// The segment size is positive; this invocation uses only unsigned arithmetic.
+unsafe {
+    let result = pgrx::XLByteToPrevSeg!(
+        @__pgrx_c_expression;
+        position, segment, 16_i32 * 1024 * 1024
+    );
+    assert_eq!(result.get(), 1_u64);
+}
+assert_eq!(segment.get(), 1_u64);
+```
+
+Unbraced conditional statement replacements can similarly require:
+
+```text
+MACRO!(@__pgrx_c_statement; arguments...)
+```
+
+That form chooses a braced C invocation and prevents a caller's `else` from
+changing the macro's control flow. Put an explicit return marker after the
+statement boundary if both are required. An ungrouped C formal may also require
+one atomic token tree, such as a variable name or a parenthesized expression.
+Read each generated macro's invocation documentation before adapting its call.
+
+Stringified dependency diagnostics, such as an assertion inside another macro,
+combine the original C diagnostic template with `stringify!` spelling of the
+tokens supplied to the outer Rust invocation. The generator retains those
+tokens before forwarding expression fragments. Rust suffixes, paths and casts
+remain Rust spelling; this contract does not recover the corresponding C
+operand text. Invocation-sensitive `__FILE__` and `__LINE__` refer to the Rust
+call site. Unsupported uses that require exact C preprocessing spelling or an
+unproved array extent still produce a diagnostic instead of guessed code.
+
+## Keep PostgreSQL calls on the backend thread
+
+A generated macro can read backend globals or call PostgreSQL functions. Its
+FFI adapters preserve pgrx's PostgreSQL error guard, but the caller must still
+satisfy the original function's backend-thread, resource, pointer, and callback
+requirements. For example, an interrupt checkpoint belongs in a backend call:
+
+```rust
+/// Check interrupts during a SQL call on the PostgreSQL backend thread.
+///
+/// # Safety
+/// Rust callers must run in the initialized backend on its permitted thread,
+/// with invariants valid if PostgreSQL raises ERROR.
+#[pgrx::pg_extern]
+unsafe fn interrupt_checkpoint() {
+    // SAFETY: PostgreSQL invokes this function in the initialized backend.
+    // No transient invariant needs repair if an interrupt raises ERROR.
+    unsafe { pgrx::CHECK_FOR_INTERRUPTS!() }
+}
+```
+
+Do not execute this example in a standalone Rust unit test or on a Rust worker
+thread. Use pgrx's `#[pg_test]` harness for tests that need backend state. Keep
+invariants valid before a call that can raise `ERROR`; do not rely on a destructor
+restoring them. Rust callbacks invoked by PostgreSQL also need the appropriate
+pgrx callback guard. See [FFI Error Handling](../ffi-error-handling.md).
+
+Supply a callback's C typedef identity explicitly when a Rust function-pointer
+alias could correspond to several C types. For PG16 and later, a raw parse-tree
+walker uses the generated `tree_walker_callback` wrapper:
+
+```rust
+use core::ffi::c_void;
+use pgrx::pg_sys;
+
+/// Visit a raw parse-tree child without reading it or the unused context.
+#[pgrx::pg_guard]
+extern "C-unwind" fn visit_child(_node: *mut pg_sys::Node, _context: *mut c_void) -> bool {
+    false
+}
+
+/// Walk a raw parse tree during a PostgreSQL backend call.
+///
+/// # Safety
+/// tree must be a live initialized raw parse tree accepted by PostgreSQL, with
+/// valid child-node storage for the call. The caller runs on the backend thread.
+unsafe fn visit_children(tree: *mut pg_sys::Node) -> bool {
+    let callback: pg_sys::tree_walker_callback = Some(visit_child);
+    // SAFETY: the caller provides the live tree and backend-thread contract.
+    // The guarded callback ignores its context, so a NULL context is valid.
+    unsafe {
+        pgrx::raw_expression_tree_walker!(
+            tree,
+            pg_sys::__pgrx_c_callbacks::tree_walker_callback::new(callback),
+            core::ptr::null_mut::<c_void>()
+        ).get()
+    }
+}
+```
+
+The wrapper checks the exact generated callback storage and supplies its C
+identity without changing the ABI. It does not establish the callback's pointer,
+thread, or PostgreSQL error-handling obligations. PG15 exposes the older native
+walker declaration instead of this macro; use that version's function binding.
+
+## Find macros and inspect the selected build
+
+From a pgrx source checkout, the library's CLI can list the PostgreSQL
+function-like macros included by pgrx's version-specific wrapper header:
+
+```sh
+cargo run -p pgrx-c-macros -- list pg18
+cargo run -p pgrx-c-macros -- list pg18 --name ACL_GRANT_OPTION_FOR
+cargo run -p pgrx-c-macros -- analyze pg18 --name BUFFERALIGN --format json
+```
+
+The version is the first positional argument after the command, using the same
+installation resolution as cargo-pgrx. `list` is a discovery inventory and can
+contain repeated definitions. Analysis uses the final active definitions; a
+candidate analysis is not yet proof that emission will succeed with your Rust
+bindings. Standalone CLI emission also lacks the build's complete binding
+catalog, so the normal extension build is the authority for available exports.
+
+`pgrx-pg-sys` generates macros alongside its fresh bindgen bindings during a
+normal build. The selected installation's C flags, target ABI, active definitions,
+and available Rust bindings determine the result. Generation tracks those inputs
+so a change causes the affected build outputs to be regenerated. It requires a
+Clang executable compatible with the libclang used for inspection.
+
+The current build's `pgrx-pg-sys` `OUT_DIR` contains a tree such as:
+
+```text
+out/
+  pg18.rs
+  pg18_macro_report.json
+  cmacros/
+    pg18/
+      mod.rs
+      c.rs
+      utils/acl.rs
+      access/transam.rs
+      __pgrx_c_support/...
+```
+
+Header paths determine the macro files. Read the generated Rustdoc for the
+original C definition, physical header and line span, operand names, and any
+special invocation contract. Recognizable literals such as `0xFFFFFFFF`, verified
+type aliases such as `AclMode`, and available binding symbols remain visible in
+the translation. For example, `ACL_GRANT_OPTION_FOR!` documents the C expression
+whose cast and hexadecimal mask it implements:
+
+```c
+#define ACL_GRANT_OPTION_FOR(privs) \
+    (((AclMode) (privs) & 0xFFFFFFFF) << 32)
+```
+
+`/* PGRX: ... */` comments explain cases where expansion had to remain instead of
+preserving a symbol or nested macro call.
+
+The checked-in `pgrx-pg-sys/src/include/cmacros/snapshot/` files are a documentation
+snapshot made with the release-generation installations on docs.rs's target,
+`x86_64-unknown-linux-gnu`. They hold each supported PostgreSQL version's macro
+documentation and generated Rust support, gated by the `pgNN` features. docs.rs uses
+them because it cannot generate macros; ordinary builds never do. A definition that
+changed between versions appears once per version range, next to its other versions.
+Use your build's `OUT_DIR` bindings, macros, and report when checking actual platform
+values or diagnosing a missing macro.
+
+Each snapshot macro is a typed shell. Its arms accept the real macro's invocations and
+have its result type, so an extension that docs.rs compiles can call `.get()` or
+`.into_value()` on a result, but running a shell panics. Documentation builds of other
+targets fail, because the snapshot describes only docs.rs's target. A shell can accept
+code that its real macro rejects. For example, a shell does not require `unsafe` where
+the real macro only calls a native function, compares a value read through a pointer,
+or runs a translated inline function body, so an `unsafe` block around such a call can
+warn as unused in a documentation build. A shell accepts every invocation its real
+macro accepts, with the same result type, except in these rare cases, where a
+documentation build can report a type error that an ordinary build does not:
+
+- a literal `0` passed as a null pointer through an operand-dependent expression is not
+  a null constant;
+- a dereference of a raw `*mut` pointer, used where the C macro reads its operand's
+  storage, can decay to a `*const` pointer instead of `*mut` when it is spelled other
+  than `*pointer` or `(*pointer)`, such as `((*pointer))`, or when the macro reads
+  more than one operand's storage;
+- a generated macro passed as an operand loses its bitfield and null-constant facts;
+- a generated macro passed where the C macro assigns to, increments, takes the address
+  of, or reads a field of its operand is rejected; pass a place such as `(*pointer).field`
+  instead;
+- an argument that the C macro ignores or only turns into a string must be a Rust
+  expression when another argument follows it;
+- the internal `(@__pgrx_c_native [...])` operand form is not accepted.
+
+## Understand refusals and runtime limits
+
+Generated macro support currently reports `RuntimeOnly`: these macros are not
+promised to work in `const` initializers or enum discriminants. The runtime
+uses compiler-verified LP64, LLP64, and ILP32 profiles, with either plain-char
+signedness and byte order. This includes unsigned-char Linux AArch64 and
+Windows. The compiler proves integer ranks, alignment, and relevant native
+calling conventions separately; an unmodeled ABI option still causes a refusal.
+
+Every `pgrx-pg-sys` build generates its C macros unless it imports a complete
+target bundle. If Clang cannot be found, the headers do not describe the target,
+inspection fails, or the native support archive does not compile, the build
+stops. The error names the PostgreSQL version, the target, the server headers,
+the source of the PostgreSQL metadata and the cause.
+
+Individual macros can still be skipped, and the set of macros varies with the
+PostgreSQL version and headers. Use the public availability wrapper to compile
+an item only when its macro exists, before Rust resolves the macro name:
+
+```rust
+pgrx::if_c_macro! { CHECK_FOR_INTERRUPTS {
+    /// Check interrupts on the PostgreSQL backend thread.
+    ///
+    /// # Safety
+    /// The caller must be on the permitted backend thread.
+    unsafe fn check_interrupts() {
+        unsafe { pgrx::CHECK_FOR_INTERRUPTS!(); }
+    }
+}}
+```
+
+Generation needs a GNU-style Clang driver whose major version matches the loaded
+`libclang`, and the target's C library headers. The same inspected profile
+compiles native accessors, inline wrappers and, with the `cshim` feature, the C
+shim into one archive. The archiver comes from the driver's LLVM release:
+`llvm-ar-<major>` beside a `clang-<major>` driver, then `llvm-ar` beside the
+driver, then `llvm-ar` beside the driver's resolved path, such as Debian's
+`/usr/lib/llvm-<major>/bin`. Windows targets prefer an adjacent `llvm-lib` and
+otherwise use `llvm-ar --format=coff`. Without an LLVM archiver, other targets
+use the system `ar`, which may not index objects built for another machine.
+A driver that loads a default configuration file, as Gentoo's Clang does, is
+refused because the file's options appear in no recorded profile; set
+`CLANG_NO_DEFAULT_CONFIG=1` or pass `--no-default-config` in
+`BINDGEN_EXTRA_CLANG_ARGS` to build without it.
+
+The CLI and the binding build decode recorded CFLAGS before CPPFLAGS; ordinary
+bindgen retains its established CPPFLAGS invocation. GNU
+flags retain shell quoting; MSVC flags preserve Windows quoting and
+backslashes and translate only known options. Unknown semantic options fail.
+Stock MSVC `pg_config` may report `not recorded`; that exact value contributes
+no flags. The inspected profile then describes the installed headers and
+explicit binding arguments, without recovering absent server build settings.
+
+Before generating anything, pgrx checks that the server headers were configured
+for the Clang target. The machine named in `PG_VERSION_STR` must match the
+target's architecture and operating system, and its C library and ARM float ABI
+when it names them; meson and Windows builds name neither. The sizes, alignments,
+byte order and major version in `pg_config.h` must match the target compiler
+and the selected `pgNN` feature. Headers configured for another machine are
+refused, even when every layout fact agrees: x86_64 and aarch64 Linux headers
+declare some PostgreSQL symbols with different shapes. A universal macOS
+installation such as Postgres.app builds each slice named by `-arch` in its
+CFLAGS from the same headers, so either slice is accepted; Cargo's target
+replaces the `-arch` flags in the profile.
+
+A cross build therefore needs server headers configured for the target. Select
+them with `PGRX_INCLUDEDIR_SERVER_PGNN_<target>` and keep the host's `pg_config`,
+describe the target with `PGRX_PG_CONFIG_AS_ENV`, or import a
+[complete target bundle](build/cross-compile.md#import-a-complete-target-bundle)
+through `PGRX_TARGET_INFO_PATH_PGNN`. When Cargo's host and target differ, a
+`pg_config` program contributes only PostgreSQL's functional CFLAGS
+(`-fno-strict-aliasing`, `-fwrapv` and `-fexcess-precision=standard`); the report
+lists the rest under `cflags_dropped`. See
+[the cross-compilation guide](build/cross-compile.md#postgresql-headers-and-metadata-for-the-target)
+for each path, the checks, and what remains trusted. Raw bindings alone and
+checked-in documentation snapshots cannot substitute for the target's inspected
+macro and native support.
+
+Unsupported grammar, unproved types or access rules, preprocessing constructs,
+and exhausted bounds produce skips rather than guessed code. If bindgen and
+Clang disagree on a referenced constant's value, generation skips the macro and
+affected dependents. The build writes `pgNN_macro_report.json` even when macro
+diagnostics are quiet. To enable macro-generation Cargo warnings, rebuild your
+extension with exactly `PGRX_MACRO_DEBUG=1`:
+
+```sh
+PGRX_MACRO_DEBUG=1 cargo build
+```
+
+Only exactly `1` enables these warnings; unset or `PGRX_MACRO_DEBUG=0` keeps them
+quiet. This setting controls normal build diagnostics; the CLI still prints the
+reports you request. Inspect the report and enabled warnings for the exact
+reason. A missing `NAME!` can also mean that the selected headers no longer
+define `NAME` as a function-like macro.
+
+At a call site, Rust's trait checks reject incompatible operands. Those checks
+do not prove a raw pointer safe or validate PostgreSQL resource ownership. The
+supported invocation rules exclude undefined C operations, later changes to the
+inspected macro environment, and caller-local shadowing of bound C symbols.
+Macros introducing C locals also reject argument tokens that could capture those
+local names under C substitution.
+
+For the generation pipeline, C semantic model, native adapters, and validation
+strategy, see the crate's
+[architecture reference](https://github.com/pgcentralfoundation/pgrx/blob/develop/pgrx-c-macros/ARCHITECTURE.md).

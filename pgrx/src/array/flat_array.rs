@@ -9,14 +9,13 @@ use crate::pgrx_sql_entity_graph::metadata::{
     array_return_sql,
 };
 use crate::toast::{Toast, Toasty};
-use crate::{layout, pg_sys, varlena};
+use crate::{layout, pg_sys};
 use bitvec::ptr::{self as bitptr, BitPtr, BitPtrError, Const, Mut};
 use bitvec::slice::{self as bitslice, BitSlice};
 use core::iter::{ExactSizeIterator, FusedIterator};
 use core::marker::PhantomData;
 use core::{ffi, mem, ptr, slice};
 
-use super::port;
 use super::{Element, RawArray, Scalar};
 
 /** `pg_sys::ArrayType` and its unsized varlena
@@ -55,7 +54,8 @@ where
     ///
     /// This will be between `0` and `pg_sys::MAXDIM`.
     pub fn ndims(&self) -> usize {
-        self.head.ndim as _
+        // SAFETY: FlatArray's reference guarantees its initialized ArrayType header.
+        unsafe { pg_sys::ARR_NDIM!(&raw const self.head).get() as usize }
     }
 
     /// Does the array contain nulls?
@@ -82,8 +82,8 @@ pub enum ArrayAllocError {
     OutOfMemory,
 }
 
-const MAX_ALLOC_SIZE: usize = 0x3fffffff;
-const MAX_ARRAY_SIZE: usize = MAX_ALLOC_SIZE / size_of::<pg_sys::Datum>();
+const MAX_ALLOC_SIZE: usize = pg_sys::MaxAllocSize as usize;
+const MAX_ARRAY_SIZE: usize = pg_sys::MaxArraySize as usize;
 const MAX_DIMS: usize = pg_sys::MAXDIM as usize;
 // COMPAT: this has to be the last field of ArrayType
 const _ARRAY_TYPE_IS_PADDING_FREE: () = assert!(
@@ -110,6 +110,8 @@ where
             return FlatArray::new_empty(memcx);
         }
         const { assert!(N <= MAX_DIMS) };
+        let native_ndims =
+            ffi::c_int::try_from(ndims).map_err(|_| ArrayAllocError::TooManyElems)?;
 
         let dims_size = size_of::<ffi::c_int>() * ndims;
         let mut dim_ints = [0 as ffi::c_int; N];
@@ -117,7 +119,7 @@ where
             if dsize == 0 {
                 return Err(ArrayAllocError::ZeroLenDim);
             } else {
-                *dint = dsize as ffi::c_int;
+                *dint = ffi::c_int::try_from(dsize).map_err(|_| ArrayAllocError::TooManyElems)?;
             }
         }
         let mut product = 1 as ffi::c_int;
@@ -140,22 +142,33 @@ where
             return Err(ArrayAllocError::TooManyElems);
         }
 
-        let null_size = if has_nulls { nelems.div_ceil(8) } else { 0 };
-
-        let prefix_size = base_size + dims_size * 2 + null_size;
+        // ARR_OVERHEAD_WITHNULLS adds seven to its C int element count before division.
+        // Check that arithmetic explicitly before invoking the original generated expression.
+        product.checked_add(7).ok_or(ArrayAllocError::TooManyElems)?;
+        let prefix_size = if has_nulls {
+            pg_sys::ARR_OVERHEAD_WITHNULLS!(native_ndims, product).get() as usize
+        } else {
+            pg_sys::ARR_OVERHEAD_NONULLS!(native_ndims).get() as usize
+        };
         const MAX_ELEM_ALIGN: usize = pg_sys::MAXIMUM_ALIGNOF as _;
         const { assert!(align_of::<T>() <= MAX_ELEM_ALIGN) };
-        let prefix_size = prefix_size.next_multiple_of(MAX_ELEM_ALIGN);
-        let size = prefix_size + size_of::<T>() * nelems;
+        let size = size_of::<T>()
+            .checked_mul(nelems)
+            .and_then(|tail| prefix_size.checked_add(tail))
+            .ok_or(ArrayAllocError::TooManyBytes)?;
         if size > MAX_ALLOC_SIZE {
             return Err(ArrayAllocError::TooManyBytes);
         }
 
-        let dataoffset = if has_nulls { prefix_size as ffi::c_int } else { 0 };
+        let dataoffset = if has_nulls {
+            ffi::c_int::try_from(prefix_size).map_err(|_| ArrayAllocError::TooManyBytes)?
+        } else {
+            0
+        };
         let elemtype = <T as Scalar>::OID;
         let tail_size = size - base_size;
 
-        let ptr = alloc_zeroed_head(memcx, tail_size, ndims as i32, dataoffset, elemtype)?;
+        let ptr = alloc_zeroed_head(memcx, tail_size, native_ndims, dataoffset, elemtype)?;
         // SAFETY: we allocated enough for our dimensions and lbounds
         unsafe {
             ptr.byte_add(base_size).cast().write(dim_ints);
@@ -211,7 +224,12 @@ where
         let arr = self;
         let index = 0;
         let offset = 0;
-        let align = Layout::lookup_oid(self.head.elemtype).align;
+        // SAFETY: self borrows an aligned initialized ArrayType header. from_ref
+        // preserves its provenance, and the macro reads only the scalar element Oid.
+        let align = Layout::lookup_oid(pg_sys::Oid::from(unsafe {
+            pg_sys::ARR_ELEMTYPE!(core::ptr::from_ref(&self.head)).get()
+        }))
+        .align;
 
         ArrayIter { data, nulls, nelems, arr, index, offset, align }
     }
@@ -261,7 +279,7 @@ where
         } else {
             let elements = self.nelems();
             // SAFETY: We start with a valid ArrayType
-            let data_ptr = unsafe { port::ARR_DATA_PTR(&raw mut self.head as _) };
+            let data_ptr = unsafe { pg_sys::ARR_DATA_PTR!(&raw mut self.head).get().cast::<u8>() };
             // SAFETY: Sound if the bound of `T: Scalar` holds and there are no nulls
             Some(unsafe { slice::from_raw_parts_mut(data_ptr.cast(), elements) })
         }
@@ -274,7 +292,7 @@ where
         // SAFETY: This obtains the nulls pointer from a function that must either
         // return a null pointer or a pointer to a valid null bitmap.
         unsafe {
-            let nulls_ptr = port::ARR_NULLBITMAP(ptr::addr_of!(self.head).cast_mut());
+            let nulls_ptr = pg_sys::ARR_NULLBITMAP!(ptr::addr_of!(self.head).cast_mut()).get();
             ptr::slice_from_raw_parts(nulls_ptr, len).as_ref()
         }
     }
@@ -304,12 +322,13 @@ fn alloc_zeroed_head(
     unsafe {
         // COMPAT: write ArrayType so fields must be initialized even if ArrayType changes
         // SAFETY: _ARRAY_TYPE_IS_PADDING_FREE means we will not deinitialize any bytes
-        ptr.cast().write(pg_sys::ArrayType {
-            vl_len_: varlena::encode_vlen_4b(nbytes as i32) as i32,
-            dataoffset,
-            ndim,
-            elemtype,
-        })
+        ptr.cast().write(pg_sys::ArrayType { vl_len_: 0, dataoffset, ndim, elemtype });
+        // SAFETY: The initialized ArrayType is aligned and its allocation contains nbytes.
+        pg_sys::SET_VARSIZE_4B!(
+            ptr.cast::<pg_sys::ArrayType>().as_ptr(),
+            pg_sys::__pgrx_c_macros::CValue::<pg_sys::__pgrx_c_types::Size>::new(nbytes as _)
+        )
+        .get();
     }
     Ok(ptr::NonNull::slice_from_raw_parts(ptr, tail_size))
 }
@@ -318,8 +337,9 @@ unsafe impl<T: ?Sized> BorrowDatum for FlatArray<'_, T> {
     const PASS: layout::PassBy = layout::PassBy::Ref;
     unsafe fn point_from(ptr: ptr::NonNull<u8>) -> ptr::NonNull<Self> {
         unsafe {
-            let len =
-                varlena::varsize_any(ptr.as_ptr().cast()) - mem::size_of::<pg_sys::ArrayType>();
+            // SAFETY: Element::point_from requires the initialized, complete varlena allocation.
+            let size = pg_sys::VARSIZE_ANY!(ptr.as_ptr().cast::<pg_sys::varlena>()).get() as usize;
+            let len = size - mem::size_of::<pg_sys::ArrayType>();
             ptr::NonNull::new_unchecked(
                 ptr::slice_from_raw_parts_mut(ptr.as_ptr(), len) as *mut Self
             )

@@ -10,7 +10,7 @@
 
 [package]
 name = "pgrx-unit-tests"
-version = "0.19.1"
+version = "0.19.3"
 authors.workspace = true
 license.workspace = true
 description = "Internal pgrx test extension"
@@ -26,8 +26,6 @@ crate-type = ["cdylib"]
 
 [features]
 default = ["proptest"]
-pg13 = ["pgrx/pg13", "pgrx-tests/pg13"]
-pg14 = ["pgrx/pg14", "pgrx-tests/pg14"]
 pg15 = ["pgrx/pg15", "pgrx-tests/pg15"]
 pg16 = ["pgrx/pg16", "pgrx-tests/pg16"]
 pg17 = ["pgrx/pg17", "pgrx-tests/pg17"]
@@ -60,11 +58,11 @@ rand = "0.10.1"
 [dependencies.pgrx]
 path = "../pgrx"
 default-features = false
-version = "=0.19.1"
+version = "=0.19.3"
 
 [dependencies.pgrx-tests]
 path = "../pgrx-tests"
-version = "=0.19.1"
+version = "=0.19.3"
 
 [dev-dependencies]
 trybuild = "1.0.116"

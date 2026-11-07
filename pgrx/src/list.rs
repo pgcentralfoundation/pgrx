@@ -207,7 +207,14 @@ impl<T: Enlist> ListHead<'_, T> {
         list: NonNull<pg_sys::List>,
         _memcx: &'cx MemCx<'_>,
     ) -> Option<ListHead<'cx, T>> {
-        (T::LIST_TAG == (*list.as_ptr()).type_).then_some(ListHead { list, _type: PhantomData })
+        // SAFETY: the caller establishes that this non-null pointer's node tag is initialized and live.
+        (T::LIST_TAG
+            == unsafe {
+                pg_sys::__pgrx_c_macros::expression_result::return_value::<pg_sys::NodeTag, _>(
+                    pg_sys::nodeTag!(list.as_ptr()).into_value(),
+                )
+            })
+        .then_some(ListHead { list, _type: PhantomData })
     }
 }
 

@@ -7,12 +7,13 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+use pgrx::lwlock::dsm::DsmLwLockTranche;
+use pgrx::lwlock::scan::ParallelScanLwLockTranche;
 use pgrx::prelude::*;
-use pgrx::{PgAtomic, PgLwLock, pg_shmem_init};
-use std::sync::atomic::AtomicBool;
-
 #[cfg(feature = "cshim")]
 use pgrx::spinlock::PgSpinLock;
+use pgrx::{PgAtomic, PgLwLock, pg_shmem_init};
+use std::sync::atomic::AtomicBool;
 
 static ATOMIC: PgAtomic<AtomicBool> = unsafe { PgAtomic::new(c"pgrx_unit_tests_atomic") };
 static LWLOCK: PgLwLock<bool> = unsafe { PgLwLock::new(c"pgrx_unit_tests_lwlock") };
@@ -21,20 +22,32 @@ static LWLOCK: PgLwLock<bool> = unsafe { PgLwLock::new(c"pgrx_unit_tests_lwlock"
 static SPINLOCK: PgAtomic<PgSpinLock<usize>> =
     unsafe { PgAtomic::new(c"pgrx_unit_tests_spinlock") };
 
+static DSMLWLOCK: DsmLwLockTranche = DsmLwLockTranche::new(c"pgrx_tests_dsm_lwlock");
+static SCANLWLOCK: ParallelScanLwLockTranche =
+    ParallelScanLwLockTranche::new(c"pgrx_tests_scan_lwlock");
+
 #[pg_guard]
 pub extern "C-unwind" fn _PG_init() {
     // This ensures that this functionality works across PostgreSQL versions
     pg_shmem_init!(ATOMIC);
     pg_shmem_init!(LWLOCK);
+
     #[cfg(feature = "cshim")]
     pg_shmem_init!(SPINLOCK = PgSpinLock::new(0));
+
+    pg_shmem_init!(DSMLWLOCK);
+    pg_shmem_init!(SCANLWLOCK);
 }
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgrx::pg_schema]
 mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_unit_tests;
 
+    use pgrx::lwlock::dsm::DsmLwLock;
+    use pgrx::lwlock::dsm::DsmLwLockHandle;
+    use pgrx::lwlock::scan::ParallelScanLwLock;
     use pgrx::prelude::*;
 
     #[pg_test]
@@ -44,7 +57,7 @@ mod tests {
         // Hold lock
         let _lock = LWLOCK.exclusive();
         // Call into pg_guarded postgres function which internally reports an error
-        unsafe { pg_sys::format_type_extended(pg_sys::InvalidOid, -1, 0) };
+        unsafe { pg_sys::format_type_extended(pg_sys::Oid::INVALID, -1, 0) };
     }
 
     #[pg_test]
@@ -75,5 +88,157 @@ mod tests {
             *lock = i + 1;
             drop(lock);
         }
+    }
+
+    /// Uses its own lock: `test_spinlock` may hold the shared one from another backend.
+    #[cfg(all(feature = "cshim", not(feature = "pg19")))]
+    #[pg_test]
+    pub fn test_spinlock_is_locked() {
+        let spinlock = pgrx::spinlock::PgSpinLock::new(0_usize);
+        assert!(!spinlock.is_locked());
+        let lock = spinlock.lock();
+        assert!(spinlock.is_locked());
+        drop(lock);
+        assert!(!spinlock.is_locked());
+    }
+
+    #[cfg(all(feature = "cshim", not(feature = "pg19")))]
+    #[pg_test]
+    pub fn test_spinlock_is_locked_panics_off_the_backend_thread() {
+        let spinlock = pgrx::spinlock::PgSpinLock::new(0_usize);
+        let off_thread = std::thread::scope(|s| s.spawn(|| spinlock.is_locked()).join());
+        assert!(off_thread.is_err(), "is_locked read the lock off the backend thread");
+    }
+
+    /// The segment is owned by the transaction resource owner and gets detached on transaction end.
+    /// In an ordinary use case, we would expect a single, statically allocated shared memory area.
+    /// In the case of concurrent tests, a statically allocated shared memory area would be
+    /// re-initialized by `LWLockInitialize` while another backend is holding it.
+    /// Therefore, here we create a private DSM segment for each test to guarantee that it is
+    /// initialized exactly once.
+    fn provide_dsm_for_test(size: usize) -> *mut std::ffi::c_void {
+        // SAFETY: `dsm_create` raises an ERROR instead of returning an invalid segment.
+        unsafe { pg_sys::dsm_segment_address(pg_sys::dsm_create(size, 0)) }
+    }
+
+    fn init_dsm_lwlock() -> DsmLwLockHandle<bool> {
+        use super::DSMLWLOCK;
+        let data: bool = false;
+        unsafe {
+            let shmem = provide_dsm_for_test(DsmLwLock::<bool>::mem_size());
+            DSMLWLOCK.init(shmem, &data)
+        }
+    }
+
+    #[pg_test]
+    #[should_panic(expected = "dynamic shared memory is not aligned")]
+    pub fn dsm_test_init_rejects_misaligned_memory() {
+        use super::DSMLWLOCK;
+        let data: bool = false;
+        unsafe {
+            let shmem = provide_dsm_for_test(DsmLwLock::<bool>::mem_size() + 1);
+            DSMLWLOCK.init(shmem.byte_add(1), &data);
+        }
+    }
+
+    #[pg_test]
+    #[should_panic(expected = "cache lookup failed for type 0")]
+    pub fn dsm_test_behaves_normally_when_elog_while_holding_lock() {
+        let handle = init_dsm_lwlock();
+        let _lock = handle.exclusive();
+        // Call into pg_guarded postgres function which internally reports an error
+        unsafe { pg_sys::format_type_extended(pg_sys::Oid::INVALID, -1, 0) };
+    }
+
+    #[pg_test]
+    pub fn dsm_test_lock_is_released_on_drop() {
+        let handle = init_dsm_lwlock();
+        let lock = handle.exclusive();
+        drop(lock);
+        let _lock = handle.exclusive();
+    }
+
+    #[pg_test]
+    pub fn dsm_test_lock_is_released_on_unwind() {
+        let handle = init_dsm_lwlock();
+        let _res = std::panic::catch_unwind(|| {
+            let _lock = handle.exclusive();
+            panic!("get out")
+        });
+        let _lock = handle.exclusive();
+    }
+
+    fn init_scan_lwlock() -> ParallelScanLwLock<bool> {
+        use super::SCANLWLOCK;
+        let data: bool = false;
+        let mut lock = SCANLWLOCK.lock_for(data);
+        unsafe {
+            let shmem = provide_dsm_for_test(ParallelScanLwLock::<bool>::mem_size());
+            lock.initialize_dsm_and_register_leader(shmem);
+        }
+        lock
+    }
+
+    #[pg_test]
+    #[should_panic(expected = "cache lookup failed for type 0")]
+    pub fn scan_test_behaves_normally_when_elog_while_holding_lock() {
+        let mut handle = init_scan_lwlock();
+        let _lock = handle.exclusive();
+        // Call into pg_guarded postgres function which internally reports an error
+        unsafe { pg_sys::format_type_extended(pg_sys::Oid::INVALID, -1, 0) };
+    }
+
+    #[pg_test]
+    pub fn scan_test_lock_is_released_on_drop() {
+        let mut handle = init_scan_lwlock();
+        let lock = handle.exclusive();
+        drop(lock);
+        let _lock = handle.exclusive();
+    }
+
+    #[pg_test]
+    pub fn scan_test_lock_is_released_on_unwind() {
+        let mut handle = init_scan_lwlock();
+        let handle_ref = std::panic::AssertUnwindSafe(&handle);
+        let _res = std::panic::catch_unwind(|| {
+            let _lock = handle_ref.share();
+            panic!("get out")
+        });
+        let _lock = handle.exclusive();
+    }
+
+    #[pg_test]
+    pub fn scan_test_local_value_moves_to_shared_memory() {
+        use super::SCANLWLOCK;
+        use pgrx::lwlock::scan::ParallelScanLwLockShareGuard;
+        let mut lock = SCANLWLOCK.lock_for(1_i64);
+        *lock.exclusive() += 1;
+        assert!(matches!(lock.share(), ParallelScanLwLockShareGuard::Local(_)));
+        unsafe {
+            let shmem = provide_dsm_for_test(ParallelScanLwLock::<i64>::mem_size());
+            lock.initialize_dsm_and_register_leader(shmem);
+        }
+        assert!(matches!(lock.share(), ParallelScanLwLockShareGuard::Shared(_)));
+        assert_eq!(*lock.share(), 2);
+        *lock.exclusive() += 1;
+        assert_eq!(*lock.share(), 3);
+    }
+
+    #[pg_test]
+    #[should_panic(expected = "DSM LWLock already initialized")]
+    pub fn scan_test_rejects_second_initialization() {
+        let mut lock = init_scan_lwlock();
+        unsafe {
+            let shmem = provide_dsm_for_test(ParallelScanLwLock::<bool>::mem_size());
+            lock.initialize_dsm_and_register_leader(shmem);
+        }
+    }
+
+    #[pg_test]
+    #[should_panic(expected = "uninitialized DSM LWLock tranche")]
+    pub fn dsm_test_uninitialized_tranche_panics() {
+        static UNINITIALIZED: pgrx::lwlock::dsm::DsmLwLockTranche =
+            pgrx::lwlock::dsm::DsmLwLockTranche::new(c"pgrx_tests_uninitialized_tranche");
+        UNINITIALIZED.tranche_id();
     }
 }

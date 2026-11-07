@@ -8,7 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use cargo_toml::{Dependency, DepsSet, Manifest};
-use crates_index::SparseIndex;
+use crates_index::{HashKind, SparseIndex, sparse};
 use eyre::eyre;
 use semver::VersionReq;
 use std::collections::HashSet;
@@ -54,14 +54,21 @@ impl CommandExecute for Upgrade {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let path = self.manifest_path.map_or_else(|| PathBuf::from("./Cargo.toml"), |p| p.clone());
-        let path = find_manifest_file(&path.canonicalize()?, self.package.as_ref())?;
+        let path = path
+            .canonicalize()
+            .map_err(|e| eyre!("Error opening manifest {path:?}: {e} (see --manifest-path)"))?;
+        let path = find_manifest_file(&path, self.package.as_ref())?;
 
         let version = if let Some(v) = self.to {
             TargetVersion::Match(v)
-        } else if self.include_prereleases {
-            TargetVersion::DiscoverPrerelease
         } else {
-            TargetVersion::DiscoverReleased
+            // crates-index defaults to the cache directory name Cargo used before 1.85.
+            let index = SparseIndex::from_url_with_hash_kind(sparse::URL, &HashKind::Stable)?;
+            if self.include_prereleases {
+                TargetVersion::DiscoverPrerelease(index)
+            } else {
+                TargetVersion::DiscoverReleased(index)
+            }
         };
 
         let updated = process_manifest_file(&path, &version)?;
@@ -77,8 +84,8 @@ impl CommandExecute for Upgrade {
 
 #[derive(Debug)]
 enum TargetVersion {
-    DiscoverPrerelease,
-    DiscoverReleased,
+    DiscoverPrerelease(SparseIndex),
+    DiscoverReleased(SparseIndex),
     Match(VersionReq),
 }
 
@@ -227,21 +234,15 @@ fn update_manifest_section<T: toml_edit::TableLike + ?Sized>(
             continue;
         }
 
-        let index = match dependency {
-            Dependency::Inherited(_) => continue,
-            Dependency::Simple(_) => SparseIndex::new_cargo_default()?,
-            Dependency::Detailed(detail) => {
-                if let Some(registry) = &detail.registry {
-                    unimplemented!("custom registry {registry:?}")
-                } else {
-                    SparseIndex::new_cargo_default()?
-                }
-            }
-        };
+        if let Dependency::Detailed(detail) = dependency
+            && let Some(registry) = &detail.registry
+        {
+            unimplemented!("custom registry {registry:?}")
+        }
 
         let strategy: Rewrite = match target {
             TargetVersion::Match(req) => Rewrite::Replace(req.to_string()),
-            TargetVersion::DiscoverPrerelease => {
+            TargetVersion::DiscoverPrerelease(index) => {
                 let krate = index.crate_from_cache(crate_name)?;
                 let highest = krate.highest_version();
                 let bare = (!highest.is_yanked())
@@ -252,7 +253,7 @@ fn update_manifest_section<T: toml_edit::TableLike + ?Sized>(
                     .to_owned();
                 Rewrite::SwapBareVersion(bare)
             }
-            TargetVersion::DiscoverReleased => {
+            TargetVersion::DiscoverReleased(index) => {
                 let krate = index.crate_from_cache(crate_name)?;
                 let highest = krate.highest_normal_version();
                 let bare = highest
@@ -484,5 +485,280 @@ mod tests {
     fn parse_to_defaults_to_none() {
         let parsed = Wrap::try_parse_from(["pgrx"]).unwrap();
         assert_eq!(parsed.inner.to, None);
+    }
+
+    #[test]
+    fn parse_flags_default_to_off() {
+        let upgrade = Wrap::try_parse_from(["pgrx"]).unwrap().inner;
+        assert!(!upgrade.include_prereleases && !upgrade.dry_run);
+        assert!(upgrade.manifest_path.is_none() && upgrade.package.is_none());
+    }
+
+    #[test]
+    fn parse_accepts_every_flag() {
+        let args = ["pgrx", "--include-prereleases", "-n", "-m", "a/Cargo.toml", "-p", "pkg"];
+        let upgrade = Wrap::try_parse_from(args).unwrap().inner;
+        assert!(upgrade.include_prereleases && upgrade.dry_run);
+        assert_eq!(upgrade.manifest_path, Some("a/Cargo.toml".into()));
+        assert_eq!(upgrade.package.as_deref(), Some("pkg"));
+    }
+
+    // Version discovery reads a fake crates.io index cache from a temporary Cargo home.
+    use crate::CommandExecute;
+    use crates_index::{HashKind, SparseIndex, sparse};
+    use std::path::Path;
+
+    const CURRENT_INDEX_DIR: &str = "index.crates.io-1949cf8c6b5b557f";
+    const LEGACY_INDEX_DIR: &str = "index.crates.io-6f17d22bba15001f";
+
+    /// 0.19.4 is yanked and 0.20.0-beta.1 is a prerelease, so 0.19.3 is the latest normal release.
+    const RELEASES: &[(&str, bool)] = &[
+        ("0.18.1", false),
+        ("0.19.2", false),
+        ("0.19.3", false),
+        ("0.19.4", true),
+        ("0.20.0-beta.1", false),
+    ];
+
+    const PGRX_CRATES: [&str; 5] =
+        ["pgrx", "pgrx-macros", "pgrx-pg-sys", "pgrx-pg-config", "pgrx-tests"];
+
+    const PGRX_ONLY: &str =
+        "[package]\nname = \"ext\"\nversion = \"0.1.0\"\n\n[dependencies]\npgrx = \"=0.18.1\"\n";
+
+    const FULL_MANIFEST: &str = r#"# keep this comment
+[package]
+name = "ext"
+version = "0.1.0"
+
+[dependencies]
+pgrx = "=0.18.1"
+pgrx-macros = "~0.18.1"
+pgrx-pg-sys = { version = "0.18.1", default-features = false }
+renamed = { package = "pgrx-pg-config", version = "^0.18" }
+serde_json = "1.0.100"
+
+[dev-dependencies]
+pgrx-tests = "=0.18.1"
+"#;
+
+    /// Write `name`'s entry in the file format Cargo uses for its sparse index cache.
+    fn write_index_entry(
+        cargo_home: &Path,
+        index_dir: &str,
+        name: &str,
+        releases: &[(&str, bool)],
+    ) {
+        let mut entry = vec![3u8]; // cache format version
+        entry.extend_from_slice(&2u32.to_le_bytes()); // index format version
+        entry.extend_from_slice(b"etag:test\0");
+        for (vers, yanked) in releases {
+            let cksum = "0".repeat(64);
+            let json = format!(
+                r#"{{"name":"{name}","vers":"{vers}","deps":[],"cksum":"{cksum}","features":{{}},"yanked":{yanked}}}"#
+            );
+            entry.extend_from_slice(format!("{vers}\0{json}\0").as_bytes());
+        }
+        let dir = cargo_home.join("registry/index").join(index_dir).join(".cache");
+        let dir = dir.join(&name[..2]).join(&name[2..4]);
+        fs::create_dir_all(&dir).unwrap();
+        fs::write(dir.join(name), entry).unwrap();
+    }
+
+    /// A Cargo home whose `index_dir` index has `releases` of every pgrx crate.
+    fn cargo_home_with(index_dir: &str, releases: &[(&str, bool)]) -> tempfile::TempDir {
+        let home = tempfile::tempdir().unwrap();
+        for name in PGRX_CRATES {
+            write_index_entry(home.path(), index_dir, name, releases);
+        }
+        home
+    }
+
+    /// The index `cargo pgrx upgrade` opens, but rooted at `cargo_home`.
+    fn index_in(cargo_home: &Path) -> SparseIndex {
+        SparseIndex::with_path_and_hash_kind(cargo_home, sparse::URL, &HashKind::Stable).unwrap()
+    }
+
+    fn released_in(cargo_home: &Path) -> super::TargetVersion {
+        super::TargetVersion::DiscoverReleased(index_in(cargo_home))
+    }
+
+    fn prerelease_in(cargo_home: &Path) -> super::TargetVersion {
+        super::TargetVersion::DiscoverPrerelease(index_in(cargo_home))
+    }
+
+    fn upgraded(manifest: &str, target: &super::TargetVersion) -> eyre::Result<String> {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("Cargo.toml");
+        fs::write(&path, manifest).unwrap();
+        super::process_manifest_file(&path, target).map(|updated| updated.to_string())
+    }
+
+    /// Check that `FULL_MANIFEST` was rewritten using `RELEASES`, leaving unrelated lines alone.
+    fn assert_upgraded_to_0_19_3(manifest: &str) {
+        for expected in [
+            r#"pgrx = "=0.19.3""#,
+            r#"pgrx-macros = "~0.19.3""#,
+            r#"pgrx-pg-sys = { version = "0.19.3", default-features = false }"#,
+            r#"renamed = { package = "pgrx-pg-config", version = "^0.19.3" }"#,
+            r#"pgrx-tests = "=0.19.3""#,
+            r#"serde_json = "1.0.100""#,
+            "# keep this comment",
+        ] {
+            assert!(manifest.contains(expected), "missing `{expected}` in:\n{manifest}");
+        }
+        for stale in ["0.18", "0.19.2", "0.19.4", "0.20.0", "beta"] {
+            assert!(!manifest.contains(stale), "unexpected `{stale}` in:\n{manifest}");
+        }
+    }
+
+    /// Check that `FULL_MANIFEST` was rewritten by `--to =0.19.3`, which replaces every operator.
+    fn assert_pinned_to_0_19_3(manifest: &str) {
+        for expected in [
+            r#"pgrx = "=0.19.3""#,
+            r#"pgrx-macros = "=0.19.3""#,
+            r#"pgrx-pg-sys = { version = "=0.19.3", default-features = false }"#,
+            r#"renamed = { package = "pgrx-pg-config", version = "=0.19.3" }"#,
+            r#"pgrx-tests = "=0.19.3""#,
+            r#"serde_json = "1.0.100""#,
+            "# keep this comment",
+        ] {
+            assert!(manifest.contains(expected), "missing `{expected}` in:\n{manifest}");
+        }
+        assert!(!manifest.contains("0.18"), "unexpected `0.18` in:\n{manifest}");
+    }
+
+    #[test]
+    fn discover_released_picks_the_highest_normal_release() {
+        let home = cargo_home_with(CURRENT_INDEX_DIR, RELEASES);
+        let updated = upgraded(FULL_MANIFEST, &released_in(home.path())).unwrap();
+        assert_upgraded_to_0_19_3(&updated);
+    }
+
+    #[test]
+    fn discover_prerelease_picks_the_highest_version() {
+        let home = cargo_home_with(CURRENT_INDEX_DIR, RELEASES);
+        let updated = upgraded(PGRX_ONLY, &prerelease_in(home.path())).unwrap();
+        assert!(updated.contains(r#"pgrx = "=0.20.0-beta.1""#), "unexpected manifest:\n{updated}");
+    }
+
+    #[test]
+    fn discover_prerelease_rejects_a_yanked_highest_version() {
+        let home = cargo_home_with(CURRENT_INDEX_DIR, &[("0.19.3", false), ("0.19.4", true)]);
+
+        let err = upgraded(PGRX_ONLY, &prerelease_in(home.path())).unwrap_err().to_string();
+        assert!(err.contains("0.19.4") && err.contains("is yanked"), "unexpected error: {err}");
+
+        let updated = upgraded(PGRX_ONLY, &released_in(home.path())).unwrap();
+        assert!(updated.contains(r#"pgrx = "=0.19.3""#), "unexpected manifest:\n{updated}");
+    }
+
+    #[test]
+    fn discover_released_requires_a_normal_release() {
+        let home =
+            cargo_home_with(CURRENT_INDEX_DIR, &[("0.20.0-beta.1", false), ("0.19.4", true)]);
+        let err = upgraded(PGRX_ONLY, &released_in(home.path())).unwrap_err().to_string();
+        assert!(err.contains("No released version"), "unexpected error: {err}");
+    }
+
+    #[test]
+    fn discover_names_the_missing_cache_entry() {
+        let home = tempfile::tempdir().unwrap();
+        let err = upgraded(PGRX_ONLY, &released_in(home.path())).unwrap_err().to_string();
+        assert!(err.contains(CURRENT_INDEX_DIR) && err.contains("pgrx"), "unexpected error: {err}");
+    }
+
+    #[test]
+    fn discover_ignores_the_pre_1_85_cache_directory() {
+        let home = cargo_home_with(LEGACY_INDEX_DIR, RELEASES);
+        let err = upgraded(PGRX_ONLY, &released_in(home.path())).unwrap_err().to_string();
+        assert!(err.contains(CURRENT_INDEX_DIR), "unexpected error: {err}");
+        assert!(!err.contains(LEGACY_INDEX_DIR), "unexpected error: {err}");
+    }
+
+    #[test]
+    fn discover_uses_the_current_directory_when_both_exist() {
+        let home = cargo_home_with(CURRENT_INDEX_DIR, RELEASES);
+        for name in PGRX_CRATES {
+            write_index_entry(home.path(), LEGACY_INDEX_DIR, name, &[("0.18.1", false)]);
+        }
+        let updated = upgraded(FULL_MANIFEST, &released_in(home.path())).unwrap();
+        assert_upgraded_to_0_19_3(&updated);
+    }
+
+    #[test]
+    fn discover_rejects_a_corrupt_cache_entry() {
+        let home = tempfile::tempdir().unwrap();
+        write_index_entry(home.path(), CURRENT_INDEX_DIR, "pgrx", RELEASES);
+        let entry = home.path().join("registry/index").join(CURRENT_INDEX_DIR);
+        fs::write(entry.join(".cache/pg/rx/pgrx"), b"\x03not an index entry").unwrap();
+
+        assert!(upgraded(PGRX_ONLY, &released_in(home.path())).is_err());
+    }
+
+    #[test]
+    fn discover_updates_workspace_dependencies() {
+        let home = cargo_home_with(CURRENT_INDEX_DIR, RELEASES);
+        let manifest = "[workspace]\nmembers = []\n\n[workspace.dependencies]\npgrx = \"=0.18.1\"\npgrx-tests = \"^0.18\"\n";
+        let updated = upgraded(manifest, &released_in(home.path())).unwrap();
+        assert!(updated.contains(r#"pgrx = "=0.19.3""#), "unexpected manifest:\n{updated}");
+        assert!(updated.contains(r#"pgrx-tests = "^0.19.3""#), "unexpected manifest:\n{updated}");
+    }
+
+    #[test]
+    fn match_target_needs_no_cache() {
+        let target = super::TargetVersion::Match(VersionReq::parse("=0.19.3").unwrap());
+        let updated = upgraded(FULL_MANIFEST, &target).unwrap();
+        assert_pinned_to_0_19_3(&updated);
+    }
+
+    fn upgrade_of(manifest: &Path, to: Option<&str>, dry_run: bool) -> super::Upgrade {
+        super::Upgrade {
+            to: to.map(|to| VersionReq::parse(to).unwrap()),
+            manifest_path: Some(manifest.to_owned()),
+            include_prereleases: false,
+            package: None,
+            dry_run,
+        }
+    }
+
+    #[test]
+    fn execute_writes_the_manifest_unless_dry_run() {
+        let dir = tempfile::tempdir().unwrap();
+        let manifest = dir.path().join("Cargo.toml");
+        fs::write(&manifest, FULL_MANIFEST).unwrap();
+
+        upgrade_of(&manifest, Some("=0.19.3"), true).execute().unwrap();
+        assert_eq!(fs::read_to_string(&manifest).unwrap(), FULL_MANIFEST, "dry run must not write");
+
+        upgrade_of(&manifest, Some("=0.19.3"), false).execute().unwrap();
+        assert_pinned_to_0_19_3(&fs::read_to_string(&manifest).unwrap());
+    }
+
+    #[test]
+    fn execute_names_a_missing_manifest() {
+        let dir = tempfile::tempdir().unwrap();
+        let manifest = dir.path().join("nope/Cargo.toml");
+
+        let err = upgrade_of(&manifest, Some("=0.19.3"), true).execute().unwrap_err().to_string();
+        assert!(err.contains("Error opening manifest") && err.contains("nope/Cargo.toml"), "{err}");
+        assert!(err.contains("--manifest-path"), "{err}");
+    }
+
+    #[test]
+    fn execute_selects_a_package_in_a_workspace() {
+        let dir = tempfile::tempdir().unwrap();
+        let member = dir.path().join("member");
+        fs::create_dir_all(member.join("src")).unwrap();
+        fs::write(dir.path().join("Cargo.toml"), "[workspace]\nmembers = [\"member\"]\n").unwrap();
+        fs::write(member.join("src/lib.rs"), "").unwrap();
+        fs::write(member.join("Cargo.toml"), FULL_MANIFEST.replace("\"ext\"", "\"member\""))
+            .unwrap();
+
+        let mut upgrade = upgrade_of(&dir.path().join("Cargo.toml"), Some("=0.19.3"), false);
+        upgrade.package = Some("member".into());
+        upgrade.execute().unwrap();
+
+        assert_pinned_to_0_19_3(&fs::read_to_string(member.join("Cargo.toml")).unwrap());
     }
 }

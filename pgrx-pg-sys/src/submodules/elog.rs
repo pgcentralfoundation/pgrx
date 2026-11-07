@@ -102,18 +102,10 @@ impl PgLogLevel {
     #[doc(hidden)]
     #[inline]
     pub fn is_interesting(&self) -> bool {
-        #[cfg(not(feature = "pg13"))]
-        {
-            unsafe { crate::message_level_is_interesting(*self as _) }
-        }
-        #[cfg(feature = "pg13")]
-        {
-            let level = *self as i32;
-            unsafe {
-                level >= crate::PGERROR as i32
-                    || level >= crate::log_min_messages
-                    || level >= crate::client_min_messages
-            }
+        unsafe {
+            // SAFETY: PgLogLevel supplies a valid log level, and the generated binding guards
+            // the backend thread and PostgreSQL error boundary.
+            crate::message_level_is_interesting(*self as _)
         }
     }
 }
@@ -434,12 +426,6 @@ macro_rules! ereport {
     };
 }
 
-/// Is an interrupt pending?
-#[inline]
-pub fn interrupt_pending() -> bool {
-    unsafe { crate::InterruptPending != 0 }
-}
-
 /// Send some kind of message to Postgres similar to the ereport macro, while specifying
 /// a text domain, analogous to Postgres' `ereport_domain` C macro.
 ///
@@ -577,20 +563,6 @@ macro_rules! ereport_domain {
                 .set_domain($domain)
                 $(.set_detail($detail))?
                 .report($loglevel);
-        }
-    };
-}
-
-/// If an interrupt is pending (perhaps a user-initiated "cancel query" message to this backend),
-/// this will safely abort the current transaction
-#[macro_export]
-macro_rules! check_for_interrupts {
-    () => {
-        #[allow(unused_unsafe)]
-        unsafe {
-            if $crate::InterruptPending != 0 {
-                $crate::ProcessInterrupts();
-            }
         }
     };
 }

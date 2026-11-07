@@ -15,7 +15,7 @@ mod tests {
     use pgrx::prelude::*;
 
     fn from_helper<T: FromDatum>(d: pg_sys::Datum) -> Option<T> {
-        unsafe { T::from_polymorphic_datum(d, false, pg_sys::InvalidOid) }
+        unsafe { T::from_polymorphic_datum(d, false, pg_sys::Oid::INVALID) }
     }
 
     #[pg_test]

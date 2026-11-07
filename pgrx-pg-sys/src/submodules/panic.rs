@@ -22,7 +22,7 @@ use std::panic::{
 
 use crate::elog::PgLogLevel;
 use crate::errcodes::PgSqlErrorCode;
-use crate::{AsPgCStr, MemoryContextSwitchTo, pfree};
+use crate::{AsPgCStr, pfree};
 
 /// Indicates that something can be reported as a Postgres ERROR, if that's what it might represent.
 pub trait ErrorReportable {
@@ -157,13 +157,19 @@ impl ErrorReportWithLevel {
             PgLogLevel::ERROR => panic_any(self),
 
             // FATAL and PANIC are reported directly to Postgres -- they abort the process
-            PgLogLevel::FATAL | PgLogLevel::PANIC => {
+            PgLogLevel::FATAL | PgLogLevel::PANIC => unsafe {
+                crate::InterruptHoldoffCount += 1;
                 do_ereport(self);
                 unreachable!()
-            }
+            },
 
             // Everything else (INFO, WARN, LOG, DEBUG, etc) are reported to Postgres too but they only emit messages
-            _ => do_ereport(self),
+            _ => unsafe {
+                crate::InterruptHoldoffCount += 1;
+                do_ereport(self);
+                assert!(crate::InterruptHoldoffCount > 0);
+                crate::InterruptHoldoffCount -= 1;
+            },
         }
     }
 
@@ -390,6 +396,7 @@ impl CaughtError {
 #[derive(Debug)]
 enum GuardAction<R> {
     Return(R),
+    ReThrow,
     Report(ErrorReportWithLevel),
 }
 
@@ -431,8 +438,20 @@ where
 {
     match unsafe { run_guarded(AssertUnwindSafe(f)) } {
         GuardAction::Return(r) => r,
+        GuardAction::ReThrow => {
+            #[cfg_attr(target_os = "windows", link(name = "postgres"))]
+            unsafe extern "C-unwind" {
+                fn pg_re_throw() -> !;
+            }
+            unsafe {
+                crate::CurrentMemoryContext = crate::ErrorContext;
+                pg_re_throw()
+            }
+        }
         GuardAction::Report(ereport) => {
-            do_ereport(ereport);
+            unsafe {
+                do_ereport(ereport);
+            }
             unreachable!("pgrx reported a CaughtError that wasn't raised at ERROR or above");
         }
     }
@@ -447,11 +466,10 @@ where
     match catch_unwind(f) {
         Ok(v) => GuardAction::Return(v),
         Err(e) => match downcast_panic_payload(e) {
-            CaughtError::PostgresError(ereport) => {
-                // Postgres raised this error via longjmp, which pg_guard_ffi_boundary caught
-                // and converted into a Rust panic.  downcast_panic_payload already attached the
-                // Rust backtrace from the panic hook, so just report it through do_ereport.
-                GuardAction::Report(ereport)
+            CaughtError::PostgresError(_) => {
+                // Return to the caller to rethrow the original Postgres ErrorData unchanged.  We
+                // can't do it here because this function has non-POF frames.
+                GuardAction::ReThrow
             }
             CaughtError::ErrorReport(ereport) | CaughtError::RustPanic { ereport, .. } => {
                 GuardAction::Report(ereport)
@@ -468,8 +486,8 @@ pub(crate) fn downcast_panic_payload(e: Box<dyn Any + Send>) -> CaughtError {
 
         // For PostgresErrors (originating from a pg_sys FFI longjmp caught by
         // pg_guard_ffi_boundary), the panic hook captured a Rust backtrace into
-        // PANIC_LOCATION.  Attach it now so callers (PgTryBuilder, run_guarded,
-        // etc.) can include it in the ERROR's DETAIL line.
+        // PANIC_LOCATION.  Attach it now so PgTryBuilder catch handlers can inspect it without
+        // changing the original Postgres error that will be rethrown.
         if let CaughtError::PostgresError(ref mut ereport) = caught {
             if ereport.inner.location.backtrace.is_none() {
                 let panic_location = take_panic_location();
@@ -537,7 +555,7 @@ pub(crate) fn downcast_panic_payload(e: Box<dyn Any + Send>) -> CaughtError {
 /// We localize the definition of the various `err*()` functions involved in reporting a Postgres
 /// error (and purposely exclude them from `build.rs`) to ensure users can't get into trouble
 /// trying to roll their own error handling.
-fn do_ereport(ereport: ErrorReportWithLevel) {
+unsafe fn do_ereport(ereport: ErrorReportWithLevel) {
     const PERCENT_S: &CStr = c"%s";
     const DEFAULT_DOMAIN: *const ::std::os::raw::c_char = std::ptr::null_mut();
 
@@ -592,10 +610,10 @@ fn do_ereport(ereport: ErrorReportWithLevel) {
             // that Postgres will clean up for us in the event of an ERROR, and we know it'll live long
             // enough for Postgres to use `file` and `funcname`, which it expects to be `const char *`s
 
-            let prev_cxt = MemoryContextSwitchTo(crate::ErrorContext);
+            let prev_cxt = crate::MemoryContextSwitchTo(crate::ErrorContext);
             let file = ereport.file().as_pg_cstr();
             let funcname = ereport.function_name().as_pg_cstr();
-            MemoryContextSwitchTo(prev_cxt);
+            crate::MemoryContextSwitchTo(prev_cxt);
 
             // do not leak the Rust `ErrorReportWithLocation` instance
             drop(ereport);

@@ -46,6 +46,7 @@ Commands:
   cross         Commands having to do with cross-compilation. (Experimental)
   upgrade       Upgrade pgrx crate versions in `Cargo.toml`. Defaults to latest
   regress       Run the regression test suite for this crate
+  migrate       Manage extension SQL migrations and upgrade scripts
   help          Print this message or the help of the given subcommand(s)
 
 Options:
@@ -54,11 +55,42 @@ Options:
   -V, --version     Print version
 ```
 
+### Passing Flags to Cargo
+
+`cargo pgrx install`, `package`, `run`, `test`, `bench`, `regress`, and `schema` accept a repeatable
+`--cargo <FLAG>` option. These flags are forwarded to every Cargo invocation made by the command, including
+the initial `cargo metadata` call.
+
+To install an extension from a parent directory using the extension's Cargo configuration:
+
+```console
+$ cargo pgrx install --manifest-path child/Cargo.toml --cargo=--config=child/.cargo/config.toml
+```
+
+This makes the child's registry, source, or proxy configuration available during dependency resolution and builds.
+You can also supply Cargo configuration inline:
+
+```console
+$ cargo pgrx install --cargo='--config=net.offline=true'
+```
+
+Repeat `--cargo` to pass multiple flags, or group them in a quoted string:
+
+```console
+$ cargo pgrx install --cargo=--offline --cargo=--frozen
+$ cargo pgrx install --cargo "--offline --frozen"
+```
+
+Each `--cargo` value is split on ASCII whitespace. Paths and values containing spaces are unsupported, even when quoted.
+Use flags accepted by every Cargo command invoked, including `cargo metadata`. `PGRX_BUILD_FLAGS` applies only to build
+commands and does not reach `cargo metadata`.
+
 ## Environment Variables
 
 - `PGRX_HOME` - Defaults to "${HOME}/.pgrx/" if not set.
 - `PGRX_BUILD_FLAGS` - If set during `cargo pgrx run/test/install/package/bench`, these additional flags are passed to `cargo build` while building the extension
 - `PGRX_BUILD_VERBOSE` - Set to true to enable verbose "build.rs" output -- useful for debugging build issues
+- `PGRX_NO_ASSEMBLE_UNRELEASED` - Set to true to make `cargo pgrx install` leave out unreleased SQL fragments, like `--no-assemble-unreleased`. `cargo pgrx test --no-assemble-unreleased` sets it for the install the test framework runs.
 - `HTTPS_PROXY` - If set during `cargo pgrx init`, it will download the Postgres sources using these proxy settings. For more details refer to the [env_proxy crate documentation](https://docs.rs/env_proxy/*/env_proxy/fn.for_url.html).
 - `PGRX_IGNORE_RUST_VERSIONS` - Set to true to disable the `rustc` version check we have when performing schema generation (schema generation requires the same version of `rustc` be used to build `cargo-pgrx` as the crate in question).
 - `CARGO_PGRX_DISABLE_GC_SECTIONS_WORKAROUND` - Set to any value to stop `cargo-pgrx` from injecting `-C link-arg=-Wl,--no-gc-sections` on non-macOS Unix cdylib builds. By default, `cargo-pgrx` passes this flag to `cargo rustc --lib -- ...` only for cdylib-producing invocations: `cargo pgrx install`, `cargo pgrx package`, and the non-`--test` path of `cargo pgrx schema`. This prevents GNU `ld --gc-sections` from dropping the `.pgrxsc` section where the embedded SQL schema metadata lives, a problem that surfaces on non-LTO builds (notably aarch64 Linux) as `no embedded pgrx schema section found`. The workaround is intentionally not applied to `cargo pgrx test` / `cargo pgrx schema --test` because those also link a test binary whose undefined Postgres `extern "C"` references are expected to be GC'd away. Disable this only if you are explicitly managing final link arguments yourself and understand the retention contract.
@@ -67,57 +99,11 @@ Options:
 
 ```console
 $ cargo pgrx init
-   Discovered Postgres v12.16, v13.12, v14.9, v15.4, v16.0
-  Downloading Postgres v14.9 from https://ftp.postgresql.org/pub/source/v14.9/postgresql-14.9.tar.bz2
-  Downloading Postgres v15.4 from https://ftp.postgresql.org/pub/source/v15.4/postgresql-15.4.tar.bz2
-  Downloading Postgres v12.16 from https://ftp.postgresql.org/pub/source/v12.16/postgresql-12.16.tar.bz2
-  Downloading Postgres v13.12 from https://ftp.postgresql.org/pub/source/v13.12/postgresql-13.12.tar.bz2
-  Downloading Postgres v16.0 from https://ftp.postgresql.org/pub/source/v16.0/postgresql-16.0.tar.bz2
-     Removing /home/you/.pgrx/12.16_unpack
-     Removing /home/you/.pgrx/14.9_unpack
-    Untarring Postgres v12.16 to /home/you/.pgrx/12.16_unpack
-    Untarring Postgres v14.9 to /home/you/.pgrx/14.9_unpack
-     Removing /home/you/.pgrx/15.4_unpack
-    Untarring Postgres v15.4 to /home/you/.pgrx/15.4_unpack
-     Removing /home/you/.pgrx/16.0_unpack
-    Untarring Postgres v16.0 to /home/you/.pgrx/16.0_unpack
-     Removing /home/you/.pgrx/13.12_unpack
-    Untarring Postgres v13.12 to /home/you/.pgrx/13.12_unpack
-     Removing /home/you/.pgrx/12.16
-     Removing /home/you/.pgrx/14.9
-     Renaming /home/you/.pgrx/12.16_unpack/postgresql-12.16 -> /home/you/.pgrx/12.16
-  Configuring Postgres v12.16
-     Renaming /home/you/.pgrx/14.9_unpack/postgresql-14.9 -> /home/you/.pgrx/14.9
-  Configuring Postgres v14.9
-     Removing /home/you/.pgrx/15.4
-     Renaming /home/you/.pgrx/15.4_unpack/postgresql-15.4 -> /home/you/.pgrx/15.4
-  Configuring Postgres v15.4
-     Removing /home/you/.pgrx/16.0
-     Renaming /home/you/.pgrx/16.0_unpack/postgresql-16.0 -> /home/you/.pgrx/16.0
-  Configuring Postgres v16.0
-     Removing /home/you/.pgrx/13.12
-     Renaming /home/you/.pgrx/13.12_unpack/postgresql-13.12 -> /home/you/.pgrx/13.12
-  Configuring Postgres v13.12
-    Compiling Postgres v16.0
-    Compiling Postgres v12.16
-    Compiling Postgres v14.9
-    Compiling Postgres v15.4
-    Compiling Postgres v13.12
-   Installing Postgres v12.16 to /home/you/.pgrx/12.16/pgrx-install
-   Installing Postgres v13.12 to /home/you/.pgrx/13.12/pgrx-install
-   Installing Postgres v14.9 to /home/you/.pgrx/14.9/pgrx-install
-   Installing Postgres v15.4 to /home/you/.pgrx/15.4/pgrx-install
-   Installing Postgres v16.0 to /home/you/.pgrx/16.0/pgrx-install
-   Validating /home/you/.pgrx/12.16/pgrx-install/bin/pg_config
-   Validating /home/you/.pgrx/13.12/pgrx-install/bin/pg_config
-   Validating /home/you/.pgrx/14.9/pgrx-install/bin/pg_config
-   Validating /home/you/.pgrx/15.4/pgrx-install/bin/pg_config
-   Validating /home/you/.pgrx/16.0/pgrx-install/bin/pg_config
 ```
 
 `cargo pgrx init` is required to be run once to properly configure the `pgrx` development environment.
 
-As shown by the screenshot above, it downloads the latest releases of supported Postgres versions,
+It downloads the latest releases of supported Postgres versions,
 configures them for debugging, compiles them with assertions, and installs them to "${PGRX_HOME}".
 These include all [`contrib`] extensions and tools included with Postgres.
 Other `cargo pgrx` commands such as `run` and `test` will manage and use these installations on
@@ -153,10 +139,12 @@ However, if the "path to pg_config" is the literal string `download`, then cargo
 and compile that version of Postgres for you. When any `"--pg${VER}"` option is specified,
 these are the **only** versions of Postgres that cargo-pgrx will manage for you.
 
-You'll also want to make sure you have the "postgresql-server-dev" package installed for each version you want to manage yourself. If you need to customize the configuration of the Postgres build, you can use `--configure-flag` to pass optins to the `configure` script. For example, you could use `--configure-flag=--with-ssl=openssl` to enable SSL support or `--configure-flag=--with-libraries=/path/to/libs` to use a non-standard location for dependency libraries. This flag can be used multiple times to pass multiple configuration options.
+You'll also want to make sure you have the "postgresql-server-dev" package installed for each version you want to manage yourself. If you need to customize the configuration of the Postgres build, you can use `--configure-flag` to pass options to the `configure` script. For example, you could use `--configure-flag=--with-ssl=openssl` to enable SSL support or `--configure-flag=--with-libraries=/path/to/libs` to use a non-standard location for dependency libraries. This flag can be used multiple times to pass multiple configuration options.
 
 Once complete, `cargo pgrx init` also creates "${PGRX_HOME}/config.toml" which describes where to
 find each version's `pg_config` tool.
+Entries for unsupported PostgreSQL versions are ignored when loading this configuration.
+Their installations and database directories are left intact.
 
 If a new minor Postgres version is released in the future you can simply run `cargo pgrx init [args]` again, and your local version will be updated, preserving all existing databases and configuration.
 
@@ -167,11 +155,7 @@ Initialize pgrx development environment for the first time
 Usage: cargo pgrx init [OPTIONS]
 
 Options:
-      --pg13 <PG13>                            If installed locally, the path to PG13's `pgconfig` tool, or `download`
-                                               to have pgrx download/compile/install it [env: PG13_PG_CONFIG=]
   -v, --verbose...                             Enable info logs, -vv for debug, -vvv for trace
-      --pg14 <PG14>                            If installed locally, the path to PG14's `pgconfig` tool, or `download`
-                                               to have pgrx download/compile/install it [env: PG14_PG_CONFIG=]
       --pg15 <PG15>                            If installed locally, the path to PG15's `pgconfig` tool, or `download`
                                                to have pgrx download/compile/install it [env: PG15_PG_CONFIG=]
       --pg16 <PG16>                            If installed locally, the path to PG16's `pgconfig` tool, or `download`
@@ -199,6 +183,8 @@ Cargo.toml  example.control  sql  src
 ```
 
 `cargo pgrx new <extname>` is an easy way to get started creating a new extension. It's similar to `cargo new <name>`, but does the additional things necessary to support building a Rust Postgres extension.
+
+The extension's name is the name of the one `.control` file next to `Cargo.toml`. `cargo pgrx` ignores files whose names start with `.`, such as editor lock files, and stops with an error if it finds more than one `.control` file.
 
 If you'd like to create a "background worker" instead, specify the `--bgworker` argument.
 
@@ -231,32 +217,32 @@ OPTIONS:
 
 ```console
 $ cargo pgrx status all
-Postgres v12 is stopped
-Postgres v13 is stopped
-Postgres v14 is stopped
 Postgres v15 is stopped
 Postgres v16 is stopped
+Postgres v17 is stopped
+Postgres v18 is stopped
+Postgres v19 is stopped
 
 $ cargo pgrx start all
-    Starting Postgres v12 on port 28812
-    Starting Postgres v13 on port 28813
-    Starting Postgres v14 on port 28814
     Starting Postgres v15 on port 28815
     Starting Postgres v16 on port 28816
+    Starting Postgres v17 on port 28817
+    Starting Postgres v18 on port 28818
+    Starting Postgres v19 on port 28819
 
 $ cargo pgrx status all
-Postgres v12 is running
-Postgres v13 is running
-Postgres v14 is running
 Postgres v15 is running
 Postgres v16 is running
+Postgres v17 is running
+Postgres v18 is running
+Postgres v19 is running
 
 $ cargo pgrx stop all
-    Stopping Postgres v12
-    Stopping Postgres v13
-    Stopping Postgres v14
     Stopping Postgres v15
     Stopping Postgres v16
+    Stopping Postgres v17
+    Stopping Postgres v18
+    Stopping Postgres v19
 ```
 
 `cargo pgrx` has three commands for managing Postgres installations: `start`, `stop`, and `status`.
@@ -266,7 +252,7 @@ in terms of an extension's `pg{MAJOR}` features in its Cargo.toml, except for `c
 
 When starting a Postgres instance, `pgrx` starts it on port `28800 + PG_MAJOR_VERSION`, so
 Postgres 15 runs on `28815`, 16 on `28816`, etc. Additionally, the first time any of these are
-started, it will initialize `PGDATA` directories in `"${PGRX_HOME}"/data-{12,13,14,15,16}`.
+started, it will initialize `PGDATA` directories in `"${PGRX_HOME}"/data-{15,16,17,18,19}`.
 Doing so allows `pgrx` to manage either Postgres versions it installed or ones already on your
 computer, and ensure that the `pgrx` managed versions don't interfere with what might already
 be running. The locale of the instance is `C.UTF-8` (or equivalently, a locale of `C` with a
@@ -281,23 +267,23 @@ However, you probably just want the `cargo pgrx run` command.
 ## Compiling and Running Your Extension
 
 ```console
-$ cargo pgrx run pg13
+$ cargo pgrx run pg15
 building extension with features ``
 "cargo" "build" "--message-format=json-render-diagnostics"
     Finished dev [unoptimized + debuginfo] target(s) in 0.06s
 
 installing extension
-     Copying control file to /home/ana/.pgrx/13.5/pgrx-install/share/postgresql/extension/strings.control
-     Copying shared library to /home/ana/.pgrx/13.5/pgrx-install/lib/postgresql/strings.so
+     Copying control file to /home/ana/.pgrx/15.4/pgrx-install/share/postgresql/extension/strings.control
+     Copying shared library to /home/ana/.pgrx/15.4/pgrx-install/lib/postgresql/strings.so
     Building for SQL generation with features ``
     Finished dev [unoptimized + debuginfo] target(s) in 0.07s
  Discovering SQL entities
   Discovered 6 SQL entities: 0 schemas (0 unique), 6 functions, 0 types, 0 enums, 0 sqls, 0 ords, 0 hashes, 0 aggregates
-     Writing SQL entities to /home/ana/.pgrx/13.5/pgrx-install/share/postgresql/extension/strings--0.1.0.sql
+     Writing SQL entities to /home/ana/.pgrx/15.4/pgrx-install/share/postgresql/extension/strings--0.1.0.sql
     Finished installing strings
-    Starting Postgres v13 on port 28813
+    Starting Postgres v15 on port 28815
     Re-using existing database strings
-psql (13.5)
+psql (15.4)
 Type "help" for help.
 
 strings=# DROP EXTENSION strings;
@@ -323,7 +309,7 @@ strings=# select strings.to_lowercase('PGRX');
 (1 row)
 ```
 
-`cargo pgrx run <pg13 | pg14 | pg15 | pg16 | pg17>` is the primary interface into compiling and interactively testing/using your extension during development.
+`cargo pgrx run <pg15 | pg16 | pg17 | pg18 | pg19>` is the primary interface into compiling and interactively testing/using your extension during development.
 
 The very first time you execute `cargo pgrx run pgXX`, it needs to compile not only your extension, but pgrx itself, along with all its dependencies. Depending on your computer, this could take a bit of time (`pgrx` is nearly 200k lines of Rust when counting the generated bindings for Postgres). Afterwards, however (as seen in the above screenshot), it's fairly fast.
 
@@ -345,7 +331,7 @@ Compile/install extension to a pgrx-managed Postgres instance and start psql
 Usage: cargo pgrx run [OPTIONS] [PG_VERSION] [DBNAME]
 
 Arguments:
-  [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, pg17, pg18, or pg19? [env: PG_VERSION=]
+  [PG_VERSION]  Do you want to run against pg15, pg16, pg17, pg18, or pg19? [env: PG_VERSION=]
   [DBNAME]      The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
 
 Options:
@@ -359,6 +345,8 @@ Options:
   -F, --features <FEATURES>            Space-separated list of features to activate
       --pgcli                          Use an existing `pgcli` on the $PATH [env: PGRX_PGCLI=]
       --install-only                   Install without running
+      --cargo <FLAG>                   Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
+      --no-assemble-unreleased         Don't assemble unreleased SQL fragments into the installed extension
   -h, --help                           Print help
   -V, --version                        Print version
 ```
@@ -368,7 +356,7 @@ Options:
 ```console
 $ cargo pgrx connect
     Re-using existing database strings
-psql (13.5)
+psql (15.4)
 Type "help" for help.
 
 strings=# select strings.to_lowercase('PGRX');
@@ -381,7 +369,7 @@ strings=#
 ```
 
 If you'd simply like to connect to a managed version of Postgres without re-compiling and installing
-your extension, use `cargo pgrx connect <pg13 | pg14 | pg15 | pg16 | pg17>`.
+your extension, use `cargo pgrx connect <pg15 | pg16 | pg17 | pg18 | pg19>`.
 
 This command will use the default database named for your extension, or you can specify another
 database name as the final argument.
@@ -396,7 +384,7 @@ Connect, via psql, to a Postgres instance
 Usage: cargo pgrx connect [OPTIONS] [PG_VERSION] [DBNAME]
 
 Arguments:
-  [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, pg17, pg18, or pg19? [env: PG_VERSION=]
+  [PG_VERSION]  Do you want to run against pg15, pg16, pg17, pg18, or pg19? [env: PG_VERSION=]
   [DBNAME]      The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name [env: DBNAME=]
 
 Options:
@@ -417,13 +405,13 @@ building extension with features ``
     Finished dev [unoptimized + debuginfo] target(s) in 0.06s
 
 installing extension
-     Copying control file to /usr/share/postgresql/13/extension/strings.control
-     Copying shared library to /usr/lib/postgresql/13/lib/strings.so
+     Copying control file to /usr/share/postgresql/15/extension/strings.control
+     Copying shared library to /usr/lib/postgresql/15/lib/strings.so
     Building for SQL generation with features ``
     Finished dev [unoptimized + debuginfo] target(s) in 0.06s
  Discovering SQL entities
   Discovered 6 SQL entities: 0 schemas (0 unique), 6 functions, 0 types, 0 enums, 0 sqls, 0 ords, 0 hashes, 0 aggregates
-     Writing SQL entities to /usr/share/postgresql/13/extension/strings--0.1.0.sql
+     Writing SQL entities to /usr/share/postgresql/15/extension/strings--0.1.0.sql
     Finished installing strings
 ```
 
@@ -455,6 +443,8 @@ Options:
       --all-features                   Activate all available features
       --no-default-features            Do not activate the `default` feature
   -F, --features <FEATURES>            Space-separated list of features to activate
+      --cargo <FLAG>                   Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
+      --no-assemble-unreleased         Don't assemble unreleased SQL fragments into the installed extension [env: PGRX_NO_ASSEMBLE_UNRELEASED=]
   -h, --help                           Print help
   -V, --version                        Print version
 ```
@@ -473,13 +463,13 @@ building extension with features ` pg_test`
     Finished dev [unoptimized + debuginfo] target(s) in 0.06s
 
 installing extension
-     Copying control file to /home/ana/.pgrx/13.5/pgrx-install/share/postgresql/extension/spi.control
-     Copying shared library to /home/ana/.pgrx/13.5/pgrx-install/lib/postgresql/spi.so
+     Copying control file to /home/ana/.pgrx/15.4/pgrx-install/share/postgresql/extension/spi.control
+     Copying shared library to /home/ana/.pgrx/15.4/pgrx-install/lib/postgresql/spi.so
     Building for SQL generation with features ` pg_test`
     Finished test [unoptimized + debuginfo] target(s) in 0.07s
  Discovering SQL entities
   Discovered 11 SQL entities: 1 schemas (1 unique), 8 functions, 0 types, 0 enums, 2 sqls, 0 ords, 0 hashes, 0 aggregates
-     Writing SQL entities to /home/ana/.pgrx/13.5/pgrx-install/share/postgresql/extension/spi--0.0.0.sql
+     Writing SQL entities to /home/ana/.pgrx/15.4/pgrx-install/share/postgresql/extension/spi--0.0.0.sql
     Finished installing spi
 test tests::pg_test_spi_query_by_id_direct ... ok
 test tests::pg_test_spi_query_by_id_via_spi ... ok
@@ -514,7 +504,7 @@ Run the test suite for this crate
 Usage: cargo pgrx test [OPTIONS] [PG_VERSION] [TESTNAME]...
 
 Arguments:
-  [PG_VERSION]  Do you want to run against pg13, pg14, pg15, pg16, pg17, pg18, pg19, or all? [env: PG_VERSION=]
+  [PG_VERSION]  Do you want to run against pg15, pg16, pg17, pg18, pg19, or all? [env: PG_VERSION=]
   [TESTNAME]... If specified, only run tests containing any of these strings in their names
 
 Options:
@@ -529,6 +519,8 @@ Options:
       --all-features                   Activate all available features
       --no-default-features            Do not activate the `default` feature
   -F, --features <FEATURES>            Space-separated list of features to activate
+      --cargo <FLAG>                   Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
+      --no-assemble-unreleased         Don't assemble unreleased SQL fragments into the extension under test
   -h, --help                           Print help
   -V, --version                        Print version
 ```
@@ -671,6 +663,10 @@ Options:
   -F, --features <FEATURES>
           Space-separated list of features to activate
       --target <TARGET>
+      --cargo <FLAG>
+          Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
+      --no-assemble-unreleased
+          Don't assemble unreleased SQL fragments into the installed extension
       --postgresql-conf <POSTGRESQL_CONF>
           Custom `postgresql.conf` settings in the form of `key=value`
   -h, --help
@@ -696,6 +692,8 @@ Key flags:
 | `-v` / `--verbose` | Print regression diffs to stderr on failure                                                  |
 | `--dry-run` | Print what would happen without doing it                                                     |
 | `--repeat <N>` | Run the entire configuration N times (default: 1)                                            |
+| `--cargo <FLAG>` | Forward extra Cargo flags (repeatable; see [Passing Flags to Cargo](#passing-flags-to-cargo)) |
+| `--no-assemble-unreleased` | Don't assemble unreleased SQL fragments into the installed extension |
 | `-p` / `--package <name>` | Package to build (auto-detected in workspaces with a single pgrx extension)                  |
 | `[PG_VERSION]` | Postgres version (e.g., `pg18`). Optional — defaults to Cargo.toml's default feature         |
 
@@ -772,6 +770,27 @@ When tests fail, the path to the `regression.diffs` file is always shown. Use `-
 - `pg_regress` uses `psql` to run each test and literally diffs the output against the expected output file.  pgrx does two things to help eliminate noise in the test output.  The first is it sets `client_min_messages=warning` when starting the Postgres instance and it also passes `-v VERBOSITY=terse` through to `psql`.
 - In a workspace with a single pgrx extension crate, `--package` is auto-detected — no need to specify it manually
 
+### Version-Specific Tests
+
+A test that uses a feature only some Postgres versions have can say which versions it runs on with a comment on its own line in the `.sql` file:
+
+```sql
+-- pgrx-regress-skip pg15 pg16
+```
+
+```sql
+-- pgrx-regress-only pg17 pg18
+```
+
+On any other version, the test is not run and is reported as skipped with its directive, such as `SKIP merge_returning (skip pg15 pg16)`. It needs no expected output there, `--add` refuses to bootstrap it, `--auto` never promotes its output, and `--dry-run` lists it as skipped.
+
+- Each directive takes one or more labels such as `pg17`. A malformed label is an error, while a well-formed label for a version pgrx doesn't support is accepted, so the directive keeps working as supported versions change.
+- If a test has several directive lines, only the last one applies.
+- A skipped test must not create objects that other tests depend on, since those tests then fail on the versions where it is skipped.
+- Don't use a directive in `setup.sql`.  The other tests usually depend on it, and they would run against an empty database where it is skipped.
+
+`pg_regress` also accepts variant expected files, `test_name_0.out` through `test_name_9.out`, and passes a test that matches any of them.  That suits output that differs between versions, but nothing ties a variant to a version: any version passes when its output matches any variant.  See [Variant Comparison Files](https://www.postgresql.org/docs/current/regress-variant.html).
+
 ### Diffing `psql` Output?
 
 Yes, Postgres' `pg_regress` tool plays each `test_name.sql` file through `psql`, captures the full output, and diffs that output against the test's corresponding `test_name.out` file.  It's a good idea for your tests to avoid variability in their output.
@@ -835,13 +854,13 @@ building extension with features ``
     Finished release [optimized] target(s) in 0.07s
 
 installing extension
-     Copying control file to target/release/spi-pg13/usr/share/postgresql/13/extension/spi.control
-     Copying shared library to target/release/spi-pg13/usr/lib/postgresql/13/lib/spi.so
+     Copying control file to target/release/spi-pg15/usr/share/postgresql/15/extension/spi.control
+     Copying shared library to target/release/spi-pg15/usr/lib/postgresql/15/lib/spi.so
     Building for SQL generation with features ``
     Finished release [optimized] target(s) in 0.07s
  Discovering SQL entities
   Discovered 8 SQL entities: 0 schemas (0 unique), 6 functions, 0 types, 0 enums, 2 sqls, 0 ords, 0 hashes, 0 aggregates
-     Writing SQL entities to target/release/spi-pg13/usr/share/postgresql/13/extension/spi--0.0.0.sql
+     Writing SQL entities to target/release/spi-pg15/usr/share/postgresql/15/extension/spi--0.0.0.sql
     Finished installing spi
 ```
 
@@ -849,13 +868,14 @@ installing extension
 `./target/[debug | release]/extension_name-PGVER` using the Postgres installation path information from the `pg_config`
 tool on your `$PATH`.
 
-The intent is that you'd then change into that directory and build a tarball or a .deb or .rpm package.
+The intent is that you'd then change into that directory and build a tarball or other package. On Linux,
+`cargo pgrx package` can also build a .deb or .rpm package for you, as described in
+[Building RPM and DEB packages](#building-rpm-and-deb-packages).
 
 The directory structure `cargo pgrx package` creates starts at the root of the filesystem, as a package-manager installed
 version of Postgres is likely to split `pg_config --pkglibdir` and `pg_config --sharedir` into different base paths.
 
-(In the example screenshot above, `cargo pgrx package` was used to build a directory structure using my manually installed
-version of Postgres 12.)
+The example above uses a manually installed PostgreSQL 15 installation.
 
 This command could be useful from Dockerfiles, for example, to automate building installation packages for various Linux
 distributions or MacOS Postgres installations.
@@ -878,9 +898,152 @@ Options:
       --all-features                   Activate all available features
       --no-default-features            Do not activate the `default` feature
   -F, --features <FEATURES>            Space-separated list of features to activate
+      --cargo <FLAG>                   Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
+      --assemble-unreleased            Assemble unreleased SQL fragments into the package instead of refusing to build it
+      --no-assemble-unreleased         Build the package without unreleased SQL fragments instead of refusing to build it
+      --prefix-dir <PREFIX_DIR>        The directory within out_dir to put extension assets (default is based on pg_config path)
   -h, --help                           Print help
   -V, --version                        Print version
 ```
+
+### Extension Artifact Placement
+
+On Unix, `--prefix-dir <PREFIX_DIR>` overrides the installation paths obtained from `pg_config`, placing the control file,
+SQL files, and shared library in the same directory within the package output. Use `--out-dir` to choose the package output
+directory:
+
+```console
+$ cargo pgrx package --out-dir ./package --prefix-dir /opt/my_extension
+```
+
+This places the extension assets in `./package/opt/my_extension/`. An absolute prefix is made relative to the package output
+directory. If you omit `--prefix-dir`, the layout follows `pg_config`. On Windows, the package layout uses `lib` and
+`share/extension` regardless of this option.
+
+### Building RPM and DEB packages
+
+On Linux, `cargo pgrx package` can also build distribution packages from the
+packaged files. Add an empty `[package.metadata.rpm]` or `[package.metadata.deb]`
+section to your extension's `Cargo.toml`:
+
+```toml
+[package]
+name = "my_extension"
+version = "1.0.0"
+description = "My Great Extension"
+license = "MIT"
+authors = ["Me, Myself & I"]
+
+[package.metadata.rpm]
+
+[package.metadata.deb]
+```
+
+The matching `.rpm` or `.deb` file is written to the output directory. Each
+section builds one package for the Postgres version selected by `pg_config`.
+An empty section uses the default specs below. The `description`, `license`,
+and first `authors` entry of `[package]` fill in the package fields of the same
+name, so `cargo pgrx package` reports an error if one of them is missing. On
+other platforms, `cargo pgrx package` prints a warning and skips these packages.
+`cargo pgrx install --sudo` never builds them.
+
+The default RPM specs are compatible with the PGDG Postgres packages:
+
+```toml
+name = "${NAME}_${PG_MAJOR_VERSION}"
+version = "${VERSION}"
+arch = "${ARCH}"
+description = "${DESCRIPTION}"
+license = "${LICENSE}"
+maintainer = "${MAINTAINER}"
+depends = ["postgresql${PG_MAJOR_VERSION}-server"]
+files = [
+  { source = "${BUILD_BASE_PATH}/${PG_PKGLIBDIR}/${LIB_FILE}", dest = "/usr/pgsql-${PG_MAJOR_VERSION}/lib/${LIB_FILE}", mode = "0755" },
+]
+dirs = [
+  { source = "${BUILD_BASE_PATH}/${PG_SHAREDIR}/extension/", dest = "/usr/pgsql-${PG_MAJOR_VERSION}/share/extension/" },
+]
+```
+
+To build RPM packages compatible with the SUSE or RHEL Postgres packages, adapt the
+paths in the `files` and `dirs` entries.
+
+The default DEB specs are compatible with both the Debian and the PGDG Postgres packages:
+
+```toml
+name = "postgresql-${PG_MAJOR_VERSION}-${DEB_NAME}"
+version = "${VERSION}"
+arch = "${ARCH}"
+description = "${DESCRIPTION}"
+license = "${LICENSE}"
+maintainer = "${MAINTAINER}"
+depends = ["postgresql-${PG_MAJOR_VERSION}"]
+files = [
+  { source = "${BUILD_BASE_PATH}/${PG_PKGLIBDIR}/${LIB_FILE}", dest = "/usr/lib/postgresql/${PG_MAJOR_VERSION}/lib/${LIB_FILE}", mode = "0644" },
+]
+dirs = [
+  { source = "${BUILD_BASE_PATH}/${PG_SHAREDIR}/extension/", dest = "/usr/share/postgresql/${PG_MAJOR_VERSION}/extension/" },
+]
+```
+
+Any key set in your section replaces the default value for that key as a whole.
+For example, this RPM adds a dependency and installs into Fedora's Postgres
+layout instead of PGDG's:
+
+```toml
+[package.metadata.rpm]
+depends = ["postgresql-server", "postgis"]
+files = [
+  { source = "${BUILD_BASE_PATH}/${PG_PKGLIBDIR}/${LIB_FILE}", dest = "/usr/lib64/pgsql/${LIB_FILE}", mode = "0755" },
+]
+dirs = [
+  { source = "${BUILD_BASE_PATH}/${PG_SHAREDIR}/extension/", dest = "/usr/share/pgsql/extension/" },
+]
+```
+
+String values in these sections can use the following variables:
+
+| Variable              | Value                                                   |
+|-----------------------|---------------------------------------------------------|
+| `${NAME}`             | the crate name                                          |
+| `${DEB_NAME}`         | the crate name in lowercase with `_` replaced by `-`    |
+| `${LIB_FILE}`         | the file name of the extension's shared library         |
+| `${VERSION}`          | the crate version with each `-` replaced by `~`         |
+| `${DESCRIPTION}`      | the crate description                                   |
+| `${LICENSE}`          | the crate license                                       |
+| `${MAINTAINER}`       | the first entry of the crate's `authors`                |
+| `${ARCH}`             | the `--target` or host architecture, such as `x86_64`   |
+| `${PG_MAJOR_VERSION}` | the Postgres major version, such as `17`                |
+| `${PG_PKGLIBDIR}`     | `pg_config --pkglibdir`                                 |
+| `${PG_SHAREDIR}`      | `pg_config --sharedir`                                  |
+| `${BUILD_BASE_PATH}`  | the output directory that holds the packaged files      |
+
+These are not environment variables. Only the names above are recognized.
+
+`${LIB_FILE}` is the file `cargo pgrx package` installed. It follows the extension's
+control file, so it can differ from `${NAME}` for a crate with a hyphenated name or a
+versioned shared library. `${VERSION}` replaces `-` because RPM rejects it in a version
+and Debian would sort `1.0.0-rc.1` after `1.0.0`. Both sort `1.0.0~rc.1` before `1.0.0`.
+
+`${ARCH}` is the first part of a `--target` triple. If the package format doesn't
+recognize it, as with `powerpc64le`, set `arch` in your section.
+
+The default `files` and `dirs` expect the layout from `pg_config`. If you pass
+`--prefix-dir`, override both keys with paths under `${BUILD_BASE_PATH}`.
+
+`dirs` packages every file it finds, and `cargo pgrx package` does not clear the output
+directory between runs. Delete that directory before a release so SQL files from older
+versions are not shipped.
+
+Packages are unsigned, and the RPM release number is always `1`.
+
+`cargo deb` reads `[package.metadata.deb]` too, with different rules, so a section written
+for it can stop `cargo pgrx package` with an error. For example, `depends = "$auto"` is
+rejected here.
+
+An unknown variable or an unterminated `${` is an error. See
+[pgrx-examples/packaging](../pgrx-examples/packaging/) for a complete extension, and
+[the packaging chapter](../docs/src/extension/package.md) of the book for a walkthrough.
 
 ## Inspect your Extension Schema
 
@@ -894,7 +1057,7 @@ Generate extension schema files
 Usage: cargo pgrx schema [OPTIONS] [ARGS]...
 
 Arguments:
-  [ARGS]...  First arg may be a PostgreSQL version label (`pg13`..`pg19`).
+  [ARGS]...  First arg may be a PostgreSQL version label (`pg15`..`pg19`).
              Remaining args are SQL item names to emit (functions, types,
              enums, operators, aggregates, triggers, schemas, extension_sql
              blocks). When item names are given, only those items and their
@@ -919,6 +1082,7 @@ Options:
       --skip-build                     Skip building a fresh extension shared object
       --no-alter-extension             Don't emit `ALTER EXTENSION ... ADD ...` statements when
                                        extracting specific items (see "Attaching Slices" below)
+      --cargo <FLAG>                   Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
   -h, --help                           Print help
   -V, --version                        Print version
 ```
@@ -979,7 +1143,7 @@ block's `file:line` so the user knows which objects to attach by hand.
 
 ## Extension Version Upgrade Scripts
 
-When creating a pgrx extension using `cargo pgrx new foo`, the new extension template directory tree includes a 
+When creating a pgrx extension using `cargo pgrx new foo`, the new extension template directory tree includes a
 directory named `./sql`:
 
 ```shell
@@ -996,7 +1160,7 @@ $ tree
 
 It is in this directory that you would **manually** create extension version upgrade scripts.  The files you create should
 be named in the manner prescribed by the [Postgres Extension Updates documentation](https://www.postgresql.org/docs/current/extend-extensions.html#EXTEND-EXTENSIONS-UPDATES).
-Generally that format is `foo--oldver--newver.sql`.  For example, `foo--1.0.0--1.0.1.sql`.  
+Generally that format is `foo--oldver--newver.sql`.  For example, `foo--1.0.0--1.0.1.sql`.
 
 When a user runs `ALTER EXTENSION foo UPDATE;` in a database with the `foo` extension, Postgres will build a graph of
 upgrade scripts to run, starting with the currently installed version and ending with the `default_version` defined in
@@ -1005,10 +1169,38 @@ the extensions `.control` file.  Postgres will then execute the scripts along th
 It is your responsibility to hand-write these extension upgrade scripts in whatever manner would allow Postgres to update
 your extension from one version to the next.  pgrx has no ability to auto-generate these scripts.
 
-While pgrx does not generate these upgrade scripts, it does know about them and all pgrx commands (`cargo pgrx test/run/install/package/bench`) 
-that generate extension artifacts will automatically copy these files, and only these files, from the `./sql` directory 
+While pgrx does not generate these upgrade scripts, it does know about them and all pgrx commands (`cargo pgrx test/run/install/package/bench`)
+that generate extension artifacts will automatically copy these files, and only these files, from the `./sql` directory
 to their final destination as dictated by `pg_config`.
 
+### SQL Fragments (Optional)
+
+Instead of editing one upgrade script per release, a package can keep its upgrade SQL as fragments:
+one small file per change, assembled into the upgrade script when you cut a release. Fragments help
+when several pull requests change the schema at once, or when fixes are backported to stable
+branches. Nothing changes until a package opts in from its `Cargo.toml`:
+
+```toml
+[package.metadata.pgrx]
+unreleased-sql-dir = "sql/unreleased"
+```
+
+With fragments enabled, `cargo pgrx install`, `run`, `test`, `regress` and `bench` assemble them into
+a temporary upgrade script in Postgres's extension directory, so `ALTER EXTENSION ... UPDATE` works on
+a development database. Each takes `--no-assemble-unreleased` to leave them out. `cargo pgrx package`
+refuses to build while fragments are waiting, unless you pass `--assemble-unreleased` or
+`--no-assemble-unreleased`.
+
+| Command | Purpose |
+|---|---|
+| `cargo pgrx migrate info [VERSION]` | Show what assembling would do; `--json` prints it as JSON |
+| `cargo pgrx migrate assemble [VERSION]` | Write `sql/<ext>--<prev>--<target>.sql` from the fragments and delete them. Also takes `--prev-version`, `--preserve-fragments`, `--allow-empty`, `--update-control`, `--output-dir`, `--dry-run` and `--json` |
+| `cargo pgrx migrate check` | Check fragments for dependency cycles and undeclared dependencies. Also takes `--base <REF>`, `--deny-mixed-objects` and `--format` (`text`, `json` or `github`) |
+
+The [Upgrading Extensions](https://github.com/pgcentralfoundation/pgrx/blob/develop/docs/src/upgrades.md)
+chapter of the pgrx book explains when fragments are worth it and how to release with them, and the
+[`migration_fragments` example](https://github.com/pgcentralfoundation/pgrx/tree/develop/pgrx-examples/migration_fragments)
+is a working project.
 
 ## Information about pgrx-managed development environment
 

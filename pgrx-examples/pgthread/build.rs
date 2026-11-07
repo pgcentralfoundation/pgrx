@@ -6,7 +6,7 @@ use std::path::PathBuf;
 fn main() -> Result<ExitCode, Box<dyn std::error::Error>> {
     println!("cargo:rerun-if-changed=c_ext/c_ext.c");
     println!("cargo:rerun-if-changed=c_ext/Makefile");
-    for feature in ["PG13", "PG14", "PG15", "PG16", "PG17", "PG18"] {
+    for feature in ["PG15", "PG16", "PG17", "PG18", "PG19"] {
         println!("cargo:rerun-if-env-changed=CARGO_FEATURE_{feature}");
     }
 

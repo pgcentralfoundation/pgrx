@@ -10,13 +10,14 @@
 use crate::CommandExecute;
 use crate::cargo::CargoProfile;
 use crate::command::get::{find_control_file, get_property};
+use crate::command::migrate::{UnreleasedFragmentMode, plan_unreleased_fragments};
 use crate::command::sudo_install::SudoInstall;
 use crate::manifest::{PgVersionSource, display_version_info};
 use cargo_metadata::{CrateType, Message as CargoMessage};
 use cargo_toml::Manifest;
 use eyre::{WrapErr, eyre};
 use owo_colors::OwoColorize;
-use pgrx_pg_config::{PgConfig, Pgrx, cargo::PgrxManifestExt, get_target_dir};
+use pgrx_pg_config::{PgConfig, Pgrx, cargo::PgrxManifestExt};
 use std::collections::HashMap;
 use std::fs;
 use std::io::BufReader;
@@ -57,6 +58,12 @@ pub(crate) struct Install {
     pub(crate) features: clap_cargo::Features,
     #[clap(long)]
     pub(crate) target: Option<String>,
+    /// Don't assemble unreleased SQL fragments into the installed extension
+    #[clap(long, env = "PGRX_NO_ASSEMBLE_UNRELEASED")]
+    pub(crate) no_assemble_unreleased: bool,
+    /// Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
+    #[clap(long = "cargo", value_name = "FLAG", allow_hyphen_values = true)]
+    pub(crate) cargo: Vec<String>,
     #[clap(from_global, action = ArgAction::Count)]
     pub(crate) verbose: u8,
 }
@@ -72,8 +79,10 @@ impl CommandExecute for Install {
             return sudo_install.execute();
         }
 
-        let metadata = crate::metadata::metadata(&self.features, self.manifest_path.as_deref())
-            .wrap_err("couldn't get cargo metadata")?;
+        let cargo_flags = std::mem::take(&mut self.cargo);
+        let metadata =
+            crate::metadata::metadata(&self.features, self.manifest_path.as_deref(), &cargo_flags)
+                .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(self.manifest_path.as_deref(), &metadata)?;
         let package_manifest_path =
             crate::manifest::manifest_path(&metadata, self.package.as_deref())
@@ -100,6 +109,7 @@ impl CommandExecute for Install {
         );
 
         display_version_info(&pg_config, &PgVersionSource::PgConfig(pg_config.label()?));
+        let unreleased_mode = UnreleasedFragmentMode::for_development(self.no_assemble_unreleased);
         install_extension(
             self.manifest_path.as_deref(),
             self.package.as_deref(),
@@ -110,6 +120,10 @@ impl CommandExecute for Install {
             None,
             &self.features,
             self.target.as_deref(),
+            unreleased_mode,
+            metadata.target_directory.as_std_path(),
+            &cargo_flags,
+            None,
         )?;
         Ok(())
     }
@@ -147,18 +161,28 @@ pub(crate) fn install_extension(
     base_directory: Option<PathBuf>,
     features: &clap_cargo::Features,
     target: Option<&str>,
+    unreleased_mode: UnreleasedFragmentMode,
+    target_dir: &Path,
+    cargo_flags: &[String],
+    prefix_directory: Option<PathBuf>,
 ) -> eyre::Result<Vec<PathBuf>> {
     let mut output_tracking = Vec::new();
 
     let manifest = Manifest::from_path(package_manifest_path)?;
     let (control_file, extname) = find_control_file(package_manifest_path)?;
 
-    let versioned_so = get_property(package_manifest_path, "module_pathname")?.is_none();
+    let unreleased_fragments = plan_unreleased_fragments(
+        &manifest,
+        package_manifest_path,
+        &extname,
+        unreleased_mode,
+        cargo_flags,
+    )?;
 
     let build_manifest_path =
         manifest_path_for_build(user_manifest_path, user_package, package_manifest_path);
     let build_command_output =
-        build_extension(build_manifest_path, user_package, profile, features, target)?;
+        build_extension(build_manifest_path, user_package, profile, features, target, cargo_flags)?;
     let build_command_bytes = build_command_output.stdout;
     let build_command_reader = BufReader::new(build_command_bytes.as_slice());
     let build_command_stream = CargoMessage::parse_stream(build_command_reader);
@@ -168,14 +192,26 @@ pub(crate) fn install_extension(
     println!("{} extension", "  Installing".bold().green());
     let shlibpath = find_library_file(&manifest, package_manifest_path, &build_command_messages)?;
 
+    let relative_extdir = if let Some(prefix_directory) = prefix_directory.as_ref() {
+        make_relative_extdir(prefix_directory.to_path_buf())
+    } else {
+        make_relative_extdir(pg_config.extension_dir()?)
+    };
+
+    let relative_pkglibdir = if let Some(prefix_directory) = prefix_directory.as_ref() {
+        make_relative_pkglibdir(prefix_directory.to_path_buf())
+    } else {
+        make_relative_pkglibdir(pg_config.pkglibdir()?)
+    };
+
     let extdir = if let Some(base_directory) = base_directory.as_ref() {
-        base_directory.join(make_relative_extdir(pg_config.extension_dir()?))
+        base_directory.join(relative_extdir)
     } else {
         pg_config.extension_dir()?
     };
 
     let pkglibdir = if let Some(base_directory) = base_directory.as_ref() {
-        base_directory.join(make_relative_pkglibdir(pg_config.pkglibdir()?))
+        base_directory.join(relative_pkglibdir)
     } else {
         pg_config.pkglibdir()?
     };
@@ -192,27 +228,14 @@ pub(crate) fn install_extension(
             true,
             package_manifest_path,
             &mut output_tracking,
+            target_dir,
+            cargo_flags,
         )?;
     }
 
     {
-        let so_name = if versioned_so {
-            let extver = get_version(package_manifest_path)?;
-            // note: versioned so-name format must agree with pgrx-utils
-            format!("{extname}-{extver}")
-        } else {
-            extname.clone()
-        };
-        // Since Postgres 16, the shared library extension on macOS is `dylib`, not `so`.
-        // Ref https://github.com/postgres/postgres/commit/b55f62abb2c2e07dfae99e19a2b3d7ca9e58dc1a
-        let so_suffix = if cfg!(target_os = "macos") && pg_config.major_version().unwrap() < 16 {
-            ".so"
-        } else {
-            std::env::consts::DLL_SUFFIX
-        };
-        let filename = format!("{so_name}{so_suffix}");
-
-        let dest = pkglibdir.join(&filename);
+        let dest =
+            pkglibdir.join(shared_library_filename(package_manifest_path, pg_config, cargo_flags)?);
 
         // Remove the existing shared libraries if present. This is a workaround for an
         // issue highlighted by the following apple documentation:
@@ -234,6 +257,8 @@ pub(crate) fn install_extension(
             false,
             package_manifest_path,
             &mut output_tracking,
+            target_dir,
+            cargo_flags,
         )?;
     }
 
@@ -245,13 +270,48 @@ pub(crate) fn install_extension(
         is_test,
         features,
         target,
+        target_dir,
         &extdir,
         true,
+        &mut output_tracking,
+        cargo_flags,
+    )?;
+
+    unreleased_fragments.apply(
+        package_manifest_path,
+        &extname,
+        &extdir,
+        target_dir,
+        cargo_flags,
         &mut output_tracking,
     )?;
 
     println!("{} installing {}", "    Finished".bold().green(), extname);
     Ok(output_tracking)
+}
+
+/// The file name of the extension's shared library in `pkglibdir`.
+pub(crate) fn shared_library_filename(
+    package_manifest_path: &Path,
+    pg_config: &PgConfig,
+    cargo_flags: &[String],
+) -> eyre::Result<String> {
+    let (_, extname) = find_control_file(package_manifest_path)?;
+    let so_name = if get_property(package_manifest_path, "module_pathname")?.is_none() {
+        let extver = get_version(package_manifest_path, cargo_flags)?;
+        // note: versioned so-name format must agree with pgrx-utils
+        format!("{extname}-{extver}")
+    } else {
+        extname
+    };
+    // Since Postgres 16, the shared library extension on macOS is `dylib`, not `so`.
+    // Ref https://github.com/postgres/postgres/commit/b55f62abb2c2e07dfae99e19a2b3d7ca9e58dc1a
+    let so_suffix = if cfg!(target_os = "macos") && pg_config.major_version()? < 16 {
+        ".so"
+    } else {
+        std::env::consts::DLL_SUFFIX
+    };
+    Ok(format!("{so_name}{so_suffix}"))
 }
 
 fn copy_file(
@@ -261,10 +321,12 @@ fn copy_file(
     do_filter: bool,
     package_manifest_path: &Path,
     output_tracking: &mut Vec<PathBuf>,
+    target_dir: &Path,
+    cargo_flags: &[String],
 ) -> eyre::Result<()> {
     let Some(dest_dir) = dest.parent() else {
         // what fresh hell could ever cause such an error?
-        eyre::bail!("no directory to copy to: {}", dest.display())
+        eyre::bail!("no directory to copy to: {}", dest.display());
     };
     match dest_dir.try_exists() {
         Ok(false) => fs::create_dir_all(dest_dir).wrap_err_with(|| {
@@ -276,13 +338,18 @@ fn copy_file(
         })?,
     };
 
-    println!("{} {} to {}", "     Copying".bold().green(), msg, format_display_path(&dest)?.cyan());
+    println!(
+        "{} {} to {}",
+        "     Copying".bold().green(),
+        msg,
+        format_display_path(&dest, target_dir).cyan()
+    );
 
     if do_filter {
         // we want to filter the contents of the file we're to copy
         let input = fs::read_to_string(src)
             .wrap_err_with(|| format!("failed to read `{}`", src.display()))?;
-        let input = filter_contents(package_manifest_path, input)?;
+        let input = filter_contents(package_manifest_path, input, cargo_flags)?;
 
         fs::write(&dest, input).wrap_err_with(|| {
             format!("failed writing `{}` to `{}`", src.display(), dest.display())
@@ -303,6 +370,7 @@ pub(crate) fn build_extension(
     profile: &CargoProfile,
     features: &clap_cargo::Features,
     target: Option<&str>,
+    cargo_flags: &[String],
 ) -> eyre::Result<std::process::Output> {
     let flags = std::env::var("PGRX_BUILD_FLAGS").unwrap_or_default();
 
@@ -338,6 +406,10 @@ pub(crate) fn build_extension(
     command.arg("--message-format=json-render-diagnostics");
 
     for arg in flags.split_ascii_whitespace() {
+        command.arg(arg);
+    }
+
+    for arg in crate::metadata::split_cargo_flags(cargo_flags) {
         command.arg(arg);
     }
 
@@ -385,13 +457,15 @@ fn copy_sql_files(
     is_test: bool,
     features: &clap_cargo::Features,
     target: Option<&str>,
+    target_dir: &Path,
     extdir: &Path,
     skip_build: bool,
     output_tracking: &mut Vec<PathBuf>,
+    cargo_flags: &[String],
 ) -> eyre::Result<()> {
     let (_, extname) = find_control_file(package_manifest_path)?;
     {
-        let version = get_version(package_manifest_path)?;
+        let version = get_version(package_manifest_path, cargo_flags)?;
         let filename = format!("{extname}--{version}.sql");
         let dest = extdir.join(filename);
 
@@ -403,6 +477,7 @@ fn copy_sql_files(
             is_test,
             features,
             target,
+            target_dir,
             Some(&dest),
             None,
             None,
@@ -412,6 +487,7 @@ fn copy_sql_files(
             // explicit ALTER EXTENSION would be redundant.
             false,
             output_tracking,
+            cargo_flags,
         )?;
     }
 
@@ -432,6 +508,8 @@ fn copy_sql_files(
                     true,
                     package_manifest_path,
                     output_tracking,
+                    target_dir,
+                    cargo_flags,
                 )?;
             }
         }
@@ -482,7 +560,7 @@ pub(crate) fn find_library_file(
 
 static CARGO_VERSION: OnceLock<MemoizeKeyValue> = OnceLock::new();
 
-pub(crate) fn get_version(manifest_path: &Path) -> eyre::Result<String> {
+pub(crate) fn get_version(manifest_path: &Path, cargo_flags: &[String]) -> eyre::Result<String> {
     let path_string = manifest_path.to_owned();
 
     if let Some(version) =
@@ -494,8 +572,12 @@ pub(crate) fn get_version(manifest_path: &Path) -> eyre::Result<String> {
     let version = match get_property(manifest_path, "default_version")? {
         Some(v) => {
             if v == "@CARGO_VERSION@" {
-                let metadata = crate::metadata::metadata(&Default::default(), Some(manifest_path))
-                    .wrap_err("couldn't get cargo metadata")?;
+                let metadata = crate::metadata::metadata(
+                    &Default::default(),
+                    Some(manifest_path),
+                    cargo_flags,
+                )
+                .wrap_err("couldn't get cargo metadata")?;
                 crate::metadata::validate(Some(manifest_path), &metadata)?;
                 let manifest_path = crate::manifest::manifest_path(&metadata, None)
                     .wrap_err("Couldn't get manifest path")?;
@@ -578,16 +660,20 @@ fn make_relative_extdir(_: PathBuf) -> PathBuf {
     "share/extension".into()
 }
 
-pub(crate) fn format_display_path(path: &Path) -> eyre::Result<String> {
-    let out = path
-        .strip_prefix(get_target_dir()?.parent().unwrap())
+pub(crate) fn format_display_path(path: &Path, target_dir: &Path) -> String {
+    target_dir
+        .parent()
+        .and_then(|parent| path.strip_prefix(parent).ok())
         .unwrap_or(path)
         .display()
-        .to_string();
-    Ok(out)
+        .to_string()
 }
 
-fn filter_contents(manifest_path: &Path, mut input: String) -> eyre::Result<String> {
+pub(crate) fn filter_contents(
+    manifest_path: &Path,
+    mut input: String,
+    cargo_flags: &[String],
+) -> eyre::Result<String> {
     if input.contains("@GIT_HASH@") {
         // avoid doing this if we don't actually have the token
         // the project might not be a git repo so running `git`
@@ -595,7 +681,7 @@ fn filter_contents(manifest_path: &Path, mut input: String) -> eyre::Result<Stri
         input = input.replace("@GIT_HASH@", &get_git_hash(manifest_path)?);
     }
 
-    input = input.replace("@CARGO_VERSION@", &get_version(manifest_path)?);
+    input = input.replace("@CARGO_VERSION@", &get_version(manifest_path, cargo_flags)?);
 
     Ok(input)
 }

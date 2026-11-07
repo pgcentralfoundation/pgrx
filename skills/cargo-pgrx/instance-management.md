@@ -1,62 +1,68 @@
-# Instance management commands
+# Instance management
 
-These commands manage pgrx-managed Postgres instances. Each Postgres version
-gets its own instance with its own data directory and port.
+Managed instances use `$PGRX_HOME/data-<major>`, `$PGRX_HOME/<major>.log`, and
+`base_port + major`. These are separate from the backend test harness's clusters.
+For agent worktrees, use [a private home](init.md#private-pgrx_home-for-agent-worktrees)
+and stop the instances the task starts.
 
-## cargo pgrx start [pgXX]
-
-Starts a pgrx-managed Postgres instance.
-
-```bash
-cargo pgrx start pg18        # start Postgres 18
-cargo pgrx start             # start default version
-cargo pgrx start all         # start all configured versions
-```
-
-Flags: `--package`, `--manifest-path`, `--postgresql-conf <K=V>`, `--valgrind`
-
-## cargo pgrx stop [pgXX]
-
-Stops a pgrx-managed Postgres instance.
+## start
 
 ```bash
-cargo pgrx stop pg18         # stop Postgres 18
-cargo pgrx stop              # stop default version
-cargo pgrx stop all          # stop all running instances
+cargo pgrx start pg18
+cargo pgrx start pg18 --postgresql-conf shared_buffers=256MB
+cargo pgrx start all
 ```
 
-Flags: `--package`, `--manifest-path`
+Starts a stopped instance, creating its cluster if needed. An already running
+instance is left running, so new configuration settings require a restart.
+With no version, selection uses the chosen extension's default PostgreSQL
+feature. `all` selects versions present in both its features and the active
+pgrx configuration.
 
-## cargo pgrx status [pgXX]
+Options: `--package`, `--manifest-path`, repeatable `--postgresql-conf <K=V>`,
+and `--valgrind`. Package metadata is needed even with an explicit version.
 
-Checks whether a pgrx-managed Postgres instance is running.
+## stop
 
 ```bash
-cargo pgrx status pg18       # is Postgres 18 running?
-cargo pgrx status            # check default version
+cargo pgrx stop pg18
+cargo pgrx stop all
 ```
 
-Flags: `--package`, `--manifest-path`
+Uses `pg_ctl stop -m fast` for the selected managed cluster. An already stopped
+instance is accepted. Version and package selection follow `start`, including
+the manifest/configuration intersection for `all`. Options: `--package` and
+`--manifest-path`.
 
-## cargo pgrx connect [pgXX] [dbname]
+This does not stop arbitrary PostgreSQL processes or pgrx-tests clusters. Never
+change to the user's default home as a way to clean up a private worktree.
 
-Opens a `psql` session to a running pgrx-managed Postgres instance.
-Unlike `cargo pgrx run`, this does NOT compile or install the extension.
+## status
 
 ```bash
-cargo pgrx connect pg18          # connect to default database
-cargo pgrx connect pg18 mydb     # connect to specific database
-cargo pgrx connect --pgcli       # use pgcli instead of psql
+cargo pgrx status pg18
+cargo pgrx status
 ```
 
-Flags: `--package`, `--manifest-path`, `--pgcli`, `--valgrind`
+Reports whether managed instances are running. With no version, it checks all
+configured versions, unless `PG_VERSION` selects one. Although `--package` and
+`--manifest-path` are accepted, status does not use them to choose a default
+version or filter the configured instances.
 
-## When to use
+## connect
 
-- `start`/`stop`: managing Postgres instances independently of build/test
-- `status`: checking instance state before running commands
-- `connect`: connecting to an already-running instance without rebuilding
-  the extension
+```bash
+cargo pgrx connect pg18
+cargo pgrx connect pg18 mydb
+cargo pgrx connect pg18 mydb --pgcli
+```
 
-Most developers rarely use these directly -- `cargo pgrx run` and
-`cargo pgrx test` handle instance lifecycle automatically.
+Starts the managed server if needed, creates the database if missing, and opens
+`psql` or `pgcli`. It does not rebuild or install the extension, but it is not a
+read-only status command. The database defaults to the extension name; `DBNAME`
+can supply it. `PG_VERSION` can supply the version, and an unrecognized first
+positional value can be interpreted as a database name.
+
+Options: `--package`, `--manifest-path`, `--pgcli` (also `PGRX_PGCLI`), and
+`--valgrind`. Valgrind affects server startup, not an already running server.
+Exiting the client leaves the server running; stop temporary instances when done.

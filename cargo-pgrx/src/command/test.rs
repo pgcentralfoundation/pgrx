@@ -9,7 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use cargo_toml::Manifest;
 use eyre::Context;
-use pgrx_pg_config::{PgConfig, Pgrx, get_target_dir};
+use pgrx_pg_config::{PgConfig, Pgrx};
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
 
@@ -21,7 +21,7 @@ use crate::manifest::{get_package_manifest, pg_config_and_version};
 #[derive(clap::Args, Debug, Clone)]
 #[clap(author)]
 pub(crate) struct Test {
-    /// Do you want to run against pg13, pg14, pg15, pg16, pg17, pg18, pg19, or all?
+    /// Do you want to run against pg15, pg16, pg17, pg18, pg19, or all?
     #[clap(env = "PG_VERSION")]
     pg_version: Option<String>,
     /// If specified, only run tests containing any of these strings in their names
@@ -50,6 +50,12 @@ pub(crate) struct Test {
     pgdata: Option<PathBuf>,
     #[clap(flatten)]
     features: clap_cargo::Features,
+    /// Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
+    #[clap(long = "cargo", value_name = "FLAG", allow_hyphen_values = true)]
+    cargo: Vec<String>,
+    /// Don't assemble unreleased SQL fragments into the extension under test
+    #[clap(long)]
+    no_assemble_unreleased: bool,
     #[clap(from_global, action = clap::ArgAction::Count)]
     verbose: u8,
 }
@@ -63,6 +69,7 @@ impl CommandExecute for Test {
             pgrx: &Pgrx,
             package_manifest: &Manifest,
             package_manifest_path: &Path,
+            target_dir: &Path,
         ) -> eyre::Result<()> {
             let mut features = me.features.clone();
             let (pg_config, _pg_version) = pg_config_and_version(
@@ -87,35 +94,45 @@ impl CommandExecute for Test {
                 &me.testnames,
                 me.runas,
                 me.pgdata,
+                target_dir,
+                &me.cargo,
+                me.no_assemble_unreleased,
             )?;
 
             Ok(())
         }
 
-        let (package_manifest, package_manifest_path) = get_package_manifest(
+        let (package_manifest, package_manifest_path, target_dir) = get_package_manifest(
             &self.features,
             self.package.as_deref(),
             self.manifest_path.as_deref(),
+            &self.cargo,
         )?;
         let pgrx = Pgrx::from_config()?;
 
         (self.pg_version, self.testnames) =
             resolve_test_args(self.pg_version.take(), self.testnames, |arg| {
                 arg == "all" || pgrx.is_feature_flag(arg)
-            });
+            })?;
 
         if self.pg_version.as_deref() == Some("all") {
             // run the tests for **all** the Postgres versions we know about
             for v in crate::manifest::all_pg_in_both_tomls(&package_manifest, &pgrx) {
                 let mut versioned_test = self.clone();
                 versioned_test.pg_version = Some(v?.label()?);
-                perform(versioned_test, &pgrx, &package_manifest, &package_manifest_path)?;
+                perform(
+                    versioned_test,
+                    &pgrx,
+                    &package_manifest,
+                    &package_manifest_path,
+                    &target_dir,
+                )?;
             }
 
             Ok(())
         } else {
             // attempt to run the test for the Postgres version `run_test()` will figure out
-            perform(self, &pgrx, &package_manifest, &package_manifest_path)
+            perform(self, &pgrx, &package_manifest, &package_manifest_path, &target_dir)
         }
     }
 }
@@ -125,7 +142,7 @@ impl CommandExecute for Test {
     testnames = tracing::field::Empty,
     ?profile,
 ))]
-pub fn test_extension(
+pub(crate) fn test_extension(
     pg_config: &PgConfig,
     package_manifest_path: &Path,
     profile: &CargoProfile,
@@ -134,6 +151,9 @@ pub fn test_extension(
     testnames: &[String],
     runas: Option<String>,
     pgdata: Option<PathBuf>,
+    target_dir: &Path,
+    cargo_flags: &[String],
+    no_assemble_unreleased: bool,
 ) -> eyre::Result<()> {
     #[cfg(target_os = "windows")]
     if runas.is_some() {
@@ -143,8 +163,6 @@ pub fn test_extension(
     if !testnames.is_empty() {
         tracing::Span::current().record("testnames", tracing::field::display(&testnames.join(",")));
     }
-    let target_dir = get_target_dir()?;
-
     let mut command = crate::cargo::cargo();
 
     let no_default_features_arg = features.no_default_features;
@@ -157,13 +175,24 @@ pub fn test_extension(
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .arg("test")
-        .env("CARGO_TARGET_DIR", &target_dir)
+        .env("CARGO_TARGET_DIR", target_dir)
         .env("PGRX_FEATURES", features_arg.clone())
         .env("PGRX_NO_DEFAULT_FEATURES", if no_default_features_arg { "true" } else { "false" })
         .env("PGRX_ALL_FEATURES", if features.all_features { "true" } else { "false" })
         .env("PGRX_BUILD_PROFILE", profile.name())
         .env("PGRX_NO_SCHEMA", if no_schema { "true" } else { "false" });
+
+    // The `--cargo` passthrough reaches every cargo invocation; here, `cargo test`.
+    for arg in crate::metadata::split_cargo_flags(cargo_flags) {
+        command.arg(arg);
+    }
+
     apply_resolved_manifest_to_test_command(&mut command, package_manifest_path);
+
+    // The test framework runs `cargo pgrx install` itself, which reads this.
+    if no_assemble_unreleased {
+        command.env("PGRX_NO_ASSEMBLE_UNRELEASED", "true");
+    }
 
     if let Some(runas) = runas {
         command.env("CARGO_PGRX_TEST_RUNAS", runas);
@@ -211,18 +240,19 @@ fn resolve_test_args<F>(
     pg_version: Option<String>,
     mut testnames: Vec<String>,
     is_pg_selector: F,
-) -> (Option<String>, Vec<String>)
+) -> eyre::Result<(Option<String>, Vec<String>)>
 where
     F: FnOnce(&str) -> bool,
 {
-    match pg_version {
+    super::reject_removed_pg_version(pg_version.as_deref())?;
+    Ok(match pg_version {
         Some(first) if is_pg_selector(&first) => (Some(first), testnames),
         Some(first) => {
             testnames.insert(0, first);
             (None, testnames)
         }
         None => (None, testnames),
-    }
+    })
 }
 
 fn apply_test_filters_to_command(command: &mut std::process::Command, testnames: &[String]) {
@@ -304,7 +334,8 @@ mod tests {
             Some("test_a".to_string()),
             strings(&["test_b", "test_n"]),
             |arg| arg == "all" || arg == "pg18",
-        );
+        )
+        .unwrap();
 
         assert_eq!(pg_version, None);
         assert_eq!(testnames, strings(&["test_a", "test_b", "test_n"]));
@@ -316,10 +347,20 @@ mod tests {
             Some("pg18".to_string()),
             strings(&["test_a", "test_b"]),
             |arg| arg == "all" || arg == "pg18",
-        );
+        )
+        .unwrap();
 
         assert_eq!(pg_version.as_deref(), Some("pg18"));
         assert_eq!(testnames, strings(&["test_a", "test_b"]));
+    }
+
+    #[test]
+    fn resolve_test_args_rejects_removed_versions_before_test_filter_fallback() {
+        for label in ["pg13", "pg14"] {
+            let err = super::resolve_test_args(Some(label.into()), vec![], |_| false)
+                .expect_err("removed versions must not become test filters");
+            assert!(err.to_string().contains("no longer supported"));
+        }
     }
 
     #[test]

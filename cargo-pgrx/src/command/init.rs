@@ -47,12 +47,6 @@ static PROCESS_ENV_DENYLIST: &[&str] = &[
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Init {
-    /// If installed locally, the path to PG13's `pgconfig` tool, or `download` to have pgrx download/compile/install it
-    #[clap(env = "PG13_PG_CONFIG", long)]
-    pg13: Option<String>,
-    /// If installed locally, the path to PG14's `pgconfig` tool, or `download` to have pgrx download/compile/install it
-    #[clap(env = "PG14_PG_CONFIG", long)]
-    pg14: Option<String>,
     /// If installed locally, the path to PG15's `pgconfig` tool, or `download` to have pgrx download/compile/install it
     #[clap(env = "PG15_PG_CONFIG", long)]
     pg15: Option<String>,
@@ -113,12 +107,6 @@ impl CommandExecute for Init {
 
         let mut versions = HashMap::new();
 
-        if let Some(ref version) = self.pg13 {
-            versions.insert("pg13", version.clone());
-        }
-        if let Some(ref version) = self.pg14 {
-            versions.insert("pg14", version.clone());
-        }
         if let Some(ref version) = self.pg15 {
             versions.insert("pg15", version.clone());
         }
@@ -659,7 +647,7 @@ fn validate_pg_config(pg_config: &PgConfig) -> eyre::Result<()> {
     Ok(())
 }
 
-fn write_config(pg_configs: &Vec<PgConfig>, init: &Init) -> eyre::Result<()> {
+fn write_config(pg_configs: &[PgConfig], init: &Init) -> eyre::Result<()> {
     let config_path = Pgrx::config_toml()?;
     let mut config = match std::fs::read_to_string(&config_path) {
         Ok(file) => toml::from_str::<ConfigToml>(&file)?,
@@ -675,9 +663,10 @@ fn write_config(pg_configs: &Vec<PgConfig>, init: &Init) -> eyre::Result<()> {
     config.base_port = init.base_port;
     config.base_testing_port = init.base_testing_port;
     for pg_config in pg_configs {
-        config
-            .configs
-            .insert(pg_config.label()?, pg_config.path().ok_or(eyre!("no path for pg_config"))?);
+        config.configs.insert(
+            pg_config.label()?,
+            pg_config.path().ok_or_else(|| eyre!("no path for pg_config"))?,
+        );
     }
 
     let mut file = File::create(&config_path)?;

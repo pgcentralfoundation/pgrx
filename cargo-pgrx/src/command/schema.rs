@@ -16,7 +16,7 @@ use cargo_toml::Manifest;
 use eyre::WrapErr;
 use owo_colors::OwoColorize;
 use pgrx_pg_config::cargo::PgrxManifestExt;
-use pgrx_pg_config::{Pgrx, get_target_dir, is_supported_major_version};
+use pgrx_pg_config::{Pgrx, is_supported_major_version};
 use pgrx_sql_entity_graph::section::decode_entities;
 use pgrx_sql_entity_graph::{ControlFile, PgrxSql, SqlGraphEntity};
 use std::path::{Path, PathBuf};
@@ -36,7 +36,7 @@ pub(crate) struct Schema {
     test: bool,
     /// Positional arguments.
     ///
-    /// The first may be a PostgreSQL version label (`pg13`..`pg19`); every
+    /// The first may be a PostgreSQL version label (`pg15`..`pg19`); every
     /// remaining value is an SQL item name to emit (functions, types,
     /// enums, operators, aggregates, triggers, schemas, extension_sql
     /// blocks). Only those items and their transitive dependencies are
@@ -74,6 +74,9 @@ pub(crate) struct Schema {
     /// already-installed extension.
     #[clap(long)]
     no_alter_extension: bool,
+    /// Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
+    #[clap(long = "cargo", value_name = "FLAG", allow_hyphen_values = true)]
+    cargo: Vec<String>,
 }
 
 impl CommandExecute for Schema {
@@ -90,13 +93,14 @@ impl CommandExecute for Schema {
             }
         };
 
-        let (pg_version, items) = split_positional_args(&self.args);
+        let (pg_version, items) = split_positional_args(&self.args)?;
 
         let pgrx = Pgrx::from_config()?;
-        let (package_manifest, package_manifest_path) = get_package_manifest(
+        let (package_manifest, package_manifest_path, target_dir) = get_package_manifest(
             &self.features,
             self.package.as_deref(),
             self.manifest_path.as_deref(),
+            &self.cargo,
         )?;
         // This does meaningful mutation, unfortunately
         let (_pg_config, _pg_version) = pg_config_and_version(
@@ -121,6 +125,7 @@ impl CommandExecute for Schema {
             self.test,
             &self.features,
             self.target.as_deref(),
+            &target_dir,
             self.out.as_deref(),
             self.dot.as_deref(),
             log_level,
@@ -128,6 +133,7 @@ impl CommandExecute for Schema {
             items,
             attach,
             &mut vec![],
+            &self.cargo,
         )
     }
 }
@@ -139,7 +145,8 @@ impl CommandExecute for Schema {
 /// is consumed as `pg_version`; everything after it (or everything, if
 /// there is no version) flows through as item names. `None` items means
 /// the caller supplied no names at all — as distinct from an empty slice.
-fn split_positional_args(args: &[String]) -> (Option<String>, Option<&[String]>) {
+fn split_positional_args(args: &[String]) -> eyre::Result<(Option<String>, Option<&[String]>)> {
+    super::reject_removed_pg_version(args.first().map(String::as_str))?;
     let (pg_version, rest) = if let Some((first, rest)) = args.split_first()
         && let Some(major) = first.strip_prefix("pg")
         && let Ok(major) = major.parse::<u16>()
@@ -149,7 +156,7 @@ fn split_positional_args(args: &[String]) -> (Option<String>, Option<&[String]>)
     } else {
         (None, args)
     };
-    (pg_version, (!rest.is_empty()).then_some(rest))
+    Ok((pg_version, (!rest.is_empty()).then_some(rest)))
 }
 
 #[tracing::instrument(level = "error", skip_all, fields(
@@ -167,6 +174,7 @@ pub(crate) fn generate_schema_for_cli(
     is_test: bool,
     features: &clap_cargo::Features,
     target: Option<&str>,
+    target_dir: &Path,
     path: Option<&Path>,
     dot: Option<&Path>,
     log_level: Option<String>,
@@ -174,6 +182,7 @@ pub(crate) fn generate_schema_for_cli(
     items: Option<&[String]>,
     attach: bool,
     output_tracking: &mut Vec<PathBuf>,
+    cargo_flags: &[String],
 ) -> eyre::Result<()> {
     let manifest = Manifest::from_path(package_manifest_path)?;
     let features_arg = features.features.join(" ");
@@ -189,7 +198,8 @@ pub(crate) fn generate_schema_for_cli(
         .std_streams([cargo::Stdio::Null, cargo::Stdio::Null, cargo::Stdio::Inherit])
         .manifest_path(user_manifest_path.map(|p| p.to_owned()))
         .log_level(log_level)
-        .features(features.clone());
+        .features(features.clone())
+        .cargo_flags(cargo_flags);
 
     if !skip_build {
         // NB:  The only path where this happens is via the command line using `cargo pgrx schema`
@@ -199,6 +209,7 @@ pub(crate) fn generate_schema_for_cli(
         package_manifest_path,
         profile,
         target,
+        target_dir,
         path,
         dot,
         items,
@@ -213,6 +224,7 @@ pub(crate) fn generate_schema_implicit(
     package_manifest_path: &Path,
     profile: &CargoProfile,
     target: Option<&str>,
+    target_dir: &Path,
     path: Option<&Path>,
     dot: Option<&Path>,
     items: Option<&[String]>,
@@ -237,7 +249,7 @@ pub(crate) fn generate_schema_implicit(
         tracing::info!(dot = %dot_path.display(), "Writing Graphviz DOT");
     }
 
-    let lib_so_data = load_section_data(profile, &lib_filename, target)?;
+    let lib_so_data = load_section_data(profile, &lib_filename, target, target_dir)?;
     let section_entities = decode_section_entities(&lib_so_data)?;
     report_entity_counts(&section_entities);
 
@@ -302,8 +314,9 @@ fn load_section_data(
     profile: &CargoProfile,
     lib_filename: &str,
     target: Option<&str>,
+    target_dir: &Path,
 ) -> eyre::Result<Vec<u8>> {
-    let mut lib_so = get_target_dir()?;
+    let mut lib_so = target_dir.to_path_buf();
     if let Some(target) = target {
         lib_so.push(target);
     }
@@ -411,10 +424,43 @@ fn first_build(
 
 #[cfg(test)]
 mod tests {
-    use super::{decode_section_entities, split_positional_args};
+    use super::{Schema, decode_section_entities, split_positional_args};
+    use clap::Parser;
 
     fn strs(args: &[&str]) -> Vec<String> {
         args.iter().map(|s| (*s).to_owned()).collect()
+    }
+
+    /// Mirror the real CLI shape so `Schema`'s `from_global` verbose resolves.
+    #[derive(Parser)]
+    struct Cli {
+        #[arg(short = 'v', long, action = clap::ArgAction::Count, global = true)]
+        verbose: u8,
+        #[command(subcommand)]
+        cmd: Cmd,
+    }
+
+    #[derive(clap::Subcommand)]
+    enum Cmd {
+        Schema(Schema),
+    }
+
+    /// `cargo pgrx schema` builds too, so it must expose repeatable `--cargo`
+    /// (forwarded to `cargo metadata` and the schema-gen build).
+    #[test]
+    fn schema_parses_repeatable_cargo_flags() {
+        let cli = Cli::try_parse_from([
+            "cargo-pgrx",
+            "schema",
+            "--cargo",
+            "--offline",
+            "--cargo",
+            "--config=child/.cargo/config.toml",
+        ])
+        .expect("schema should parse repeatable --cargo flags");
+        let Cmd::Schema(schema) = cli.cmd;
+
+        assert_eq!(schema.cargo, vec!["--offline", "--config=child/.cargo/config.toml"]);
     }
 
     #[test]
@@ -430,7 +476,7 @@ mod tests {
     #[test]
     fn empty_args_yield_no_version_and_no_items() {
         let args = strs(&[]);
-        let (pg, items) = split_positional_args(&args);
+        let (pg, items) = split_positional_args(&args).unwrap();
         assert!(pg.is_none());
         assert!(items.is_none());
     }
@@ -438,7 +484,7 @@ mod tests {
     #[test]
     fn version_alone_is_captured() {
         let args = strs(&["pg18"]);
-        let (pg, items) = split_positional_args(&args);
+        let (pg, items) = split_positional_args(&args).unwrap();
         assert_eq!(pg.as_deref(), Some("pg18"));
         assert!(items.is_none());
     }
@@ -446,7 +492,7 @@ mod tests {
     #[test]
     fn version_followed_by_items() {
         let args = strs(&["pg18", "sum_vec", "MyType", "==="]);
-        let (pg, items) = split_positional_args(&args);
+        let (pg, items) = split_positional_args(&args).unwrap();
         assert_eq!(pg.as_deref(), Some("pg18"));
         assert_eq!(items, Some(&["sum_vec".to_owned(), "MyType".to_owned(), "===".to_owned()][..]));
     }
@@ -454,7 +500,7 @@ mod tests {
     #[test]
     fn items_only_without_version() {
         let args = strs(&["sum_vec", "MyType", "==="]);
-        let (pg, items) = split_positional_args(&args);
+        let (pg, items) = split_positional_args(&args).unwrap();
         assert!(pg.is_none());
         assert_eq!(items, Some(&["sum_vec".to_owned(), "MyType".to_owned(), "===".to_owned()][..]));
     }
@@ -462,8 +508,18 @@ mod tests {
     #[test]
     fn first_arg_that_looks_like_version_but_isnt_is_an_item() {
         let args = strs(&["pgfoo", "sum_vec"]);
-        let (pg, items) = split_positional_args(&args);
+        let (pg, items) = split_positional_args(&args).unwrap();
         assert!(pg.is_none());
         assert_eq!(items, Some(&["pgfoo".to_owned(), "sum_vec".to_owned()][..]));
+    }
+
+    #[test]
+    fn removed_versions_do_not_become_schema_items() {
+        for label in ["pg13", "pg14"] {
+            let args = strs(&[label, "sum_vec"]);
+            let err = split_positional_args(&args)
+                .expect_err("removed versions must not become SQL item names");
+            assert!(err.to_string().contains("no longer supported"));
+        }
     }
 }
