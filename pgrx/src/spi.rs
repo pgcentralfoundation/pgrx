@@ -51,6 +51,9 @@ pub enum SpiOkCodes {
     TdRegister = pg_sys::SPI_OK_TD_REGISTER as i32,
     /// Added in Postgres 15
     Merge = pg_sys::SPI_OK_MERGE as i32,
+    /// `MERGE ... RETURNING`, added in Postgres 17
+    #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
+    MergeReturning = pg_sys::SPI_OK_MERGE_RETURNING as i32,
 }
 
 /// These match the Postgres `#define`d constants prefixed `SPI_ERROR_*` that you can find in `pg_sys`.
@@ -165,6 +168,8 @@ impl TryFrom<libc::c_int> for SpiOkCodes {
             value if value == pg_sys::SPI_OK_REL_UNREGISTER as i32 => Ok(Self::RelUnregister),
             value if value == pg_sys::SPI_OK_TD_REGISTER as i32 => Ok(Self::TdRegister),
             value if value == pg_sys::SPI_OK_MERGE as i32 => Ok(Self::Merge),
+            #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
+            value if value == pg_sys::SPI_OK_MERGE_RETURNING as i32 => Ok(Self::MergeReturning),
             _ => Err(Err(UnknownVariant)),
         }
     }
@@ -349,9 +354,11 @@ impl Spi {
     /// While inside the provided closure, code executes under a short-lived "SPI Memory Context",
     /// and Postgres will completely free that context when this function is finished.
     ///
-    /// pgrx' SPI API endeavors to return Datum values from functions like `::get_one()` that are
-    /// automatically copied into the into the `CurrentMemoryContext` at the time of this
-    /// function call.
+    /// Values that functions like `::get_one()` return outlive the connection. A value that
+    /// would point into the query's results, such as a `&str`, an `Array`, a `PgBox<T>`, an
+    /// `AnyElement`, or an `AnyArray`, is copied into the parent of the memory context that is
+    /// current when it is read. Inside the closure that parent is `TopTransactionContext`, so
+    /// each such copy stays allocated until the transaction ends.
     ///
     /// # Examples
     ///
@@ -391,9 +398,11 @@ impl Spi {
     /// While inside the provided closure, code executes under a short-lived "SPI Memory Context",
     /// and Postgres will completely free that context when this function is finished.
     ///
-    /// pgrx' SPI API endeavors to return Datum values from functions like `::get_one()` that are
-    /// automatically copied into the into the `CurrentMemoryContext` at the time of this
-    /// function call.
+    /// Values that functions like `::get_one()` return outlive the connection. A value that
+    /// would point into the query's results, such as a `&str`, an `Array`, a `PgBox<T>`, an
+    /// `AnyElement`, or an `AnyArray`, is copied into the parent of the memory context that is
+    /// current when it is read. Inside the closure that parent is `TopTransactionContext`, so
+    /// each such copy stays allocated until the transaction ends.
     ///
     /// # Examples
     ///

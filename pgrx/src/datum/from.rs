@@ -9,6 +9,7 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! for converting a pg_sys::Datum and a corresponding "is_null" bool into a typed Option
 #![allow(clippy::manual_map, clippy::map_clone, clippy::into_iter_on_ref)]
+use super::UnboxDatum;
 use crate::{
     AllocatedByPostgres, IntoDatum, PgBox, PgMemoryContexts, pg_sys, varlena, varlena_to_byte_slice,
 };
@@ -45,6 +46,17 @@ pub enum TryFromDatumError {
 pub trait FromDatum: Sized {
     /// Should a type OID be fetched when calling `from_datum`?
     const GET_TYPOID: bool = false;
+
+    /// Can safe code read the Datum's memory through the value that `from_polymorphic_datum`
+    /// returns, although the value has no lifetime that keeps that memory alive?
+    ///
+    /// Code that can free the Datum's memory while the value lives reads such a type with
+    /// [`FromDatum::from_datum_in_memory_context`], which must then return a value that does not
+    /// read the Datum's memory, such as a copy.
+    /// [`PgHeapTuple::get_by_index`](crate::heap_tuple::PgHeapTuple::get_by_index) does, because
+    /// a tuple frees its memory when it drops or when an attribute is set. A raw
+    /// [`pg_sys::Datum`] leaves this `false`, because only `unsafe` code can dereference it.
+    const POINTS_INTO_DATUM: bool = false;
 
     /// ## Safety
     ///
@@ -85,7 +97,10 @@ pub trait FromDatum: Sized {
     ///
     /// ## Safety
     ///
-    /// Same caveats as `FromDatum::from_datum(...)`
+    /// Same caveats as `FromDatum::from_datum(...)`. The returned value may point into
+    /// `memory_context`, as a `&str` does, so the context must stay live while the value is used.
+    /// [`PgMemoryContexts::Transient`] and [`PgMemoryContexts::Owned`] contexts are deleted before
+    /// this returns. Pass them only for a type that copies its value out, such as `String`.
     unsafe fn from_datum_in_memory_context(
         mut memory_context: PgMemoryContexts,
         datum: pg_sys::Datum,
@@ -99,6 +114,16 @@ pub trait FromDatum: Sized {
     /// a `Result` around an `Option`, as a Datum can be null.  It's intended to be used in
     /// situations where the caller needs to know whether the type conversion succeeded or failed.
     ///
+    /// ## Errors
+    ///
+    /// Returns [`TryFromDatumError::IncompatibleTypes`] if `type_oid` is InvalidOid, or if
+    /// [`IntoDatum::is_compatible_with`] rejects `type_oid` and it either names no type or is not
+    /// binary coercible to [`IntoDatum::type_oid`].
+    ///
+    /// [`IntoDatum::type_oid`] itself can raise an ERROR: `PgBox<T>` and `#[derive(PostgresType)]`
+    /// types look their type up by name among the extension's types, and the extension may have no
+    /// type of that name.
+    ///
     /// ## Safety
     ///
     /// Same caveats as `FromDatum::from_datum(...)`
@@ -111,19 +136,20 @@ pub trait FromDatum: Sized {
     where
         Self: IntoDatum,
     {
-        if !is_binary_coercible::<Self>(type_oid) {
-            Err(TryFromDatumError::IncompatibleTypes {
-                rust_type: std::any::type_name::<Self>(),
-                rust_oid: Self::type_oid(),
-                datum_type: lookup_type_name(type_oid),
-                datum_oid: type_oid,
-            })
-        } else {
-            Ok(FromDatum::from_polymorphic_datum(datum, is_null, type_oid))
-        }
+        check_compatible::<Self>(type_oid)?;
+        Ok(FromDatum::from_polymorphic_datum(datum, is_null, type_oid))
     }
 
     /// A version of `try_from_datum` that switches to the given context to convert from Datum
+    ///
+    /// ## Errors
+    ///
+    /// The same as [`FromDatum::try_from_datum`].
+    ///
+    /// ## Safety
+    ///
+    /// Same caveats as [`FromDatum::from_datum_in_memory_context`], including how long
+    /// `memory_context` must stay live.
     #[inline]
     unsafe fn try_from_datum_in_memory_context(
         memory_context: PgMemoryContexts,
@@ -134,29 +160,58 @@ pub trait FromDatum: Sized {
     where
         Self: IntoDatum,
     {
-        if !is_binary_coercible::<Self>(type_oid) {
-            Err(TryFromDatumError::IncompatibleTypes {
-                rust_type: std::any::type_name::<Self>(),
-                rust_oid: Self::type_oid(),
-                datum_type: lookup_type_name(type_oid),
-                datum_oid: type_oid,
-            })
-        } else {
-            Ok(FromDatum::from_datum_in_memory_context(memory_context, datum, is_null, type_oid))
-        }
+        check_compatible::<Self>(type_oid)?;
+        Ok(FromDatum::from_datum_in_memory_context(memory_context, datum, is_null, type_oid))
     }
 }
 
-fn is_binary_coercible<T: IntoDatum>(type_oid: pg_sys::Oid) -> bool {
-    T::is_compatible_with(type_oid) || unsafe { pg_sys::IsBinaryCoercible(type_oid, T::type_oid()) }
+/// Returns [`TryFromDatumError::IncompatibleTypes`] unless `T` can read a value of type
+/// `type_oid`, as [`FromDatum::try_from_datum`] describes.
+fn check_compatible<T: IntoDatum>(type_oid: pg_sys::Oid) -> Result<(), TryFromDatumError> {
+    if is_binary_coercible::<T>(type_oid) { Ok(()) } else { Err(incompatible::<T>(type_oid)) }
 }
 
-/// Retrieves a Postgres type name given its Oid
+fn incompatible<T: IntoDatum>(type_oid: pg_sys::Oid) -> TryFromDatumError {
+    TryFromDatumError::IncompatibleTypes {
+        rust_type: std::any::type_name::<T>(),
+        rust_oid: T::type_oid(),
+        datum_type: lookup_type_name(type_oid),
+        datum_oid: type_oid,
+    }
+}
+
+/// Can `T` read a value of type `type_oid`? Returns false, without raising an ERROR, for
+/// InvalidOid and for an OID that names no type.
+fn is_binary_coercible<T: IntoDatum>(type_oid: pg_sys::Oid) -> bool {
+    // InvalidOid names no type, but it equals `T::type_oid()` when T's type does not exist, as
+    // for `Array<Array<i32>>` (int4[] has no array type), and IsBinaryCoercible accepts it for
+    // `anyelement`.
+    if type_oid == pg_sys::Oid::INVALID {
+        return false;
+    }
+    T::is_compatible_with(type_oid)
+        // SAFETY: both functions take the OIDs by value and only look them up. get_typtype
+        // returns '\0' for an OID with no pg_type row, for which IsBinaryCoercible would raise
+        // an ERROR.
+        || unsafe {
+            pg_sys::get_typtype(type_oid) != 0 && pg_sys::IsBinaryCoercible(type_oid, T::type_oid())
+        }
+}
+
+/// Retrieves a Postgres type name given its Oid: `-` for InvalidOid and `???` for an OID that
+/// names no type.
 pub(crate) fn lookup_type_name(oid: pg_sys::Oid) -> String {
+    // The bindings type the flag as u32. format_type_extended takes bits16 before PG19 and
+    // uint16 since; both are u16.
+    const ALLOW_INVALID: u16 = {
+        assert!(pg_sys::FORMAT_TYPE_ALLOW_INVALID <= u16::MAX as u32);
+        pg_sys::FORMAT_TYPE_ALLOW_INVALID as u16
+    };
     unsafe {
-        // SAFETY: nothing to concern ourselves with other than just calling into Postgres FFI
-        // and Postgres will raise an ERROR if we pass it an invalid Oid, so it'll never return a null
-        let cstr_name = pg_sys::format_type_extended(oid, -1, 0);
+        // SAFETY: format_type_extended takes the OID by value. FORMAT_TYPE_ALLOW_INVALID makes
+        // it name an invalid or unknown OID instead of raising an ERROR, and without
+        // FORMAT_TYPE_INVALID_AS_NULL it always returns a palloc'd C string, never null.
+        let cstr_name = pg_sys::format_type_extended(oid, -1, ALLOW_INVALID);
         let cstr = CStr::from_ptr(cstr_name);
         let typname = cstr.to_string_lossy().to_string();
         pg_sys::pfree(cstr_name as _); // don't leak the palloc'd cstr_name
@@ -205,7 +260,18 @@ impl FromDatum for pg_sys::TransactionId {
         is_null: bool,
         _typoid: pg_sys::Oid,
     ) -> Option<Self> {
-        if is_null { None } else { datum.value().try_into().ok().map(Self::from_inner) }
+        if is_null {
+            None
+        } else {
+            // A Datum read from a tuple holds the xid sign-extended, and one from
+            // TransactionIdGetDatum holds it zero-extended; both keep it in the low 32 bits.
+            // SAFETY: FromDatum's caller provides a valid non-null datum of this PostgreSQL type.
+            // Where this conversion is a guarded native call, the guard panics off the
+            // backend thread.
+            #[allow(unused_unsafe, reason = "pure where it is a macro or translated")]
+            let value = unsafe { pg_sys::DatumGetTransactionId!(datum).get() };
+            Some(Self::from_inner(value))
+        }
     }
 }
 
@@ -420,9 +486,19 @@ impl<'a> FromDatum for &'a str {
     }
 }
 
+/// Borrow a text value as `str`, panicking if the database encoding lets it hold bytes that are
+/// not UTF-8 and it does.
+///
+/// # Safety
+///
+/// The same as [`text_to_rust_str_unchecked`], except that the payload need not be UTF-8.
+///
+/// [`text_to_rust_str_unchecked`]: crate::varlena::text_to_rust_str_unchecked
 // This is not marked inline on purpose, to allow it to be in a single code section
 // which is then branch-predicted on every time by the CPU.
-unsafe fn convert_varlena_to_str_memoized<'a>(varlena: *const pg_sys::varlena) -> &'a str {
+pub(crate) unsafe fn convert_varlena_to_str_memoized<'a>(
+    varlena: *const pg_sys::varlena,
+) -> &'a str {
     match *crate::UTF8DATABASE {
         crate::Utf8Compat::Yes => varlena::text_to_rust_str_unchecked(varlena),
         crate::Utf8Compat::Maybe => varlena::text_to_rust_str(varlena)
@@ -624,7 +700,18 @@ impl FromDatum for () {
 }
 
 /// for user types
+///
+/// `from_polymorphic_datum` boxes the Datum's pointer, which can refer to a PostgreSQL struct
+/// passed as `internal`. `from_datum_in_memory_context` copies `size_of::<T>()` bytes into the
+/// memory context instead.
+///
+/// `try_from_datum` and `try_from_datum_in_memory_context` also return
+/// [`TryFromDatumError::IncompatibleTypes`] for a type whose values a copy of `size_of::<T>()`
+/// bytes cannot hold, as [`UnboxDatum::can_unbox`] decides for array elements: a variable-length
+/// type, a type passed by value, or a fixed-length type of another size.
 impl<T> FromDatum for PgBox<T, AllocatedByPostgres> {
+    const POINTS_INTO_DATUM: bool = true;
+
     #[inline]
     unsafe fn from_polymorphic_datum(
         datum: pg_sys::Datum,
@@ -647,13 +734,62 @@ impl<T> FromDatum for PgBox<T, AllocatedByPostgres> {
     where
         Self: Sized,
     {
+        assert!(
+            align_of::<T>() <= pg_sys::MAXIMUM_ALIGNOF as usize,
+            "palloc cannot align a copy for {}",
+            std::any::type_name::<T>()
+        );
         memory_context.switch_to(|context| {
             if is_null || datum.is_null() {
                 None
             } else {
+                // SAFETY: the caller passes a Datum that points to a `T`, so its
+                // `size_of::<T>()` bytes are readable. The copy is a palloc chunk holding those
+                // bytes, which palloc aligns to MAXALIGN, enough for `T` as asserted above, and it
+                // does not point into the Datum, as `POINTS_INTO_DATUM` requires.
                 let copied = context.copy_ptr_into(datum.cast_mut_ptr(), std::mem::size_of::<T>());
                 Some(PgBox::<T>::from_pg(copied))
             }
         })
+    }
+
+    unsafe fn try_from_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        type_oid: pg_sys::Oid,
+    ) -> Result<Option<Self>, TryFromDatumError>
+    where
+        Self: IntoDatum,
+    {
+        check_pgbox_layout::<T>(type_oid)?;
+        Ok(unsafe { Self::from_polymorphic_datum(datum, is_null, type_oid) })
+    }
+
+    unsafe fn try_from_datum_in_memory_context(
+        memory_context: PgMemoryContexts,
+        datum: pg_sys::Datum,
+        is_null: bool,
+        type_oid: pg_sys::Oid,
+    ) -> Result<Option<Self>, TryFromDatumError>
+    where
+        Self: IntoDatum,
+    {
+        check_pgbox_layout::<T>(type_oid)?;
+        Ok(unsafe { Self::from_datum_in_memory_context(memory_context, datum, is_null, type_oid) })
+    }
+}
+
+/// Checks that `PgBox<T>` can read a value of type `type_oid`: that the types are compatible,
+/// and that [`UnboxDatum::can_unbox`] accepts the type's length and pass-by-value flag.
+fn check_pgbox_layout<T>(type_oid: pg_sys::Oid) -> Result<(), TryFromDatumError> {
+    check_compatible::<PgBox<T>>(type_oid)?;
+    let (mut typlen, mut typbyval) = (0, false);
+    // SAFETY: get_typlenbyval takes the OID by value and writes both out-parameters. It raises
+    // an ERROR for an OID that names no type, which check_compatible has already rejected.
+    unsafe { pg_sys::get_typlenbyval(type_oid, &mut typlen, &mut typbyval) };
+    if <PgBox<T> as UnboxDatum>::can_unbox(typlen, typbyval) {
+        Ok(())
+    } else {
+        Err(incompatible::<PgBox<T>>(type_oid))
     }
 }

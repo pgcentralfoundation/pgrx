@@ -189,14 +189,12 @@ impl<'a> PgTrigger<'a> {
 
     /// The name of the schema of the table that caused the trigger invocation
     pub fn table_name(&self) -> Result<String, PgTriggerError> {
-        let relation = self.relation()?;
-        Ok(relation.name().to_string())
+        Ok(self.relation()?.name())
     }
 
     /// The name of the schema of the table that caused the trigger invocation
     pub fn table_schema(&self) -> Result<String, PgTriggerError> {
-        let relation = self.relation()?;
-        Ok(relation.namespace().to_string())
+        Ok(self.relation()?.namespace())
     }
 
     /// The arguments from the CREATE TRIGGER statement

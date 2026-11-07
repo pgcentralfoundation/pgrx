@@ -182,6 +182,8 @@ Cargo.toml  example.control  sql  src
 
 `cargo pgrx new <extname>` is an easy way to get started creating a new extension. It's similar to `cargo new <name>`, but does the additional things necessary to support building a Rust Postgres extension.
 
+The extension's name is the name of the one `.control` file next to `Cargo.toml`. `cargo pgrx` ignores files whose names start with `.`, such as editor lock files, and stops with an error if it finds more than one `.control` file.
+
 If you'd like to create a "background worker" instead, specify the `--bgworker` argument.
 
 `cargo pgrx new` does not initialize the directory as a git repo, but it does create a `.gitignore` file in case you decide to do so.

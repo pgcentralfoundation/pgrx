@@ -85,32 +85,46 @@ pub fn get_property(manifest_path: &Path, name: &str) -> eyre::Result<Option<Str
     Ok(None)
 }
 
+/// Find the crate's one `.control` file, whose stem names the extension. This counts files as
+/// `pg_module_magic!` does when it records the extension that `rust_regtypein` looks types up in:
+/// names that start with `.`, such as editor lock files, and entries that are not files or links
+/// to files do not count.
 pub(crate) fn find_control_file(manifest_path: &Path) -> eyre::Result<(PathBuf, String)> {
     let parent = manifest_path
         .parent()
         .ok_or_else(|| eyre!("could not get parent of `{}`", manifest_path.display()))?;
 
-    for f in (std::fs::read_dir(parent).wrap_err_with(|| {
-        eyre!("cannot open current directory `{}` for reading", parent.display())
-    })?)
-    .flatten()
-    {
-        let f_path = f.path();
-        if f_path.extension() == Some("control".as_ref()) {
-            let file_stem = f_path
-                .file_stem()
-                .ok_or_else(|| eyre!("could not get file stem of `{}`", f_path.display()))?;
-            let file_stem = file_stem
-                .to_str()
-                .ok_or_else(|| {
-                    eyre!("could not get file stem as String from `{}`", f_path.display())
-                })?
-                .to_string();
-            return Ok((f_path, file_stem));
+    let controls = std::fs::read_dir(parent)
+        .wrap_err_with(|| {
+            eyre!("cannot open current directory `{}` for reading", parent.display())
+        })?
+        .flatten()
+        .map(|f| f.path())
+        .filter(|path| {
+            path.extension() == Some("control".as_ref())
+                && !path.file_name().is_some_and(|name| name.as_encoded_bytes().starts_with(b"."))
+                && std::fs::metadata(path).is_ok_and(|metadata| metadata.is_file())
+        })
+        .collect::<Vec<_>>();
+    let f_path = match controls.as_slice() {
+        [] => return Err(eyre!("control file not found in `{}`", manifest_path.display())),
+        [control] => control.clone(),
+        _ => {
+            return Err(eyre!(
+                "found {} control files in `{}`; an extension crate needs exactly one",
+                controls.len(),
+                parent.display()
+            ));
         }
-    }
-
-    Err(eyre!("control file not found in `{}`", manifest_path.display()))
+    };
+    let file_stem = f_path
+        .file_stem()
+        .ok_or_else(|| eyre!("could not get file stem of `{}`", f_path.display()))?;
+    let file_stem = file_stem
+        .to_str()
+        .ok_or_else(|| eyre!("could not get file stem as String from `{}`", f_path.display()))?
+        .to_string();
+    Ok((f_path, file_stem))
 }
 
 fn determine_git_hash() -> eyre::Result<Option<String>> {
@@ -132,5 +146,31 @@ fn determine_git_hash() -> eyre::Result<Option<String>> {
             ))
         }
         Err(e) => Err(e).wrap_err("problem running `git` to determine the current revision hash"),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::find_control_file;
+
+    #[test]
+    #[cfg(unix)]
+    fn find_control_file_counts_one_visible_file() {
+        use std::os::unix::fs::symlink;
+
+        let dir = tempfile::tempdir().unwrap();
+        let manifest = dir.path().join("Cargo.toml");
+        assert!(find_control_file(&manifest).is_err());
+
+        std::fs::write(dir.path().join("ext.control"), "").unwrap();
+        // An Emacs lock file, a link to a file that does not exist
+        symlink("user@host.1234:5678", dir.path().join(".#ext.control")).unwrap();
+        symlink("missing.control", dir.path().join("dangling.control")).unwrap();
+        let (path, name) = find_control_file(&manifest).unwrap();
+        assert_eq!((path, name.as_str()), (dir.path().join("ext.control"), "ext"));
+
+        std::fs::write(dir.path().join("ext_old.control"), "").unwrap();
+        let error = find_control_file(&manifest).unwrap_err().to_string();
+        assert!(error.starts_with("found 2 control files"), "{error}");
     }
 }
