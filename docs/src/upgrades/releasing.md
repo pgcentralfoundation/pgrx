@@ -132,7 +132,10 @@ left out of a release by accident. It checks before compiling.
 | `cargo pgrx package --no-assemble-unreleased` | Leaves them out |
 
 If your main branch always has fragments waiting, use `--no-assemble-unreleased` for packages built
-from it. `cargo pgrx install --sudo` builds a package internally, and behaves like `install`: it
+from it. RPM and DEB packages built from [`[package.metadata.rpm]` or
+`[package.metadata.deb]`](../extension/package.md) hold the package's whole extension directory, so
+the same flags apply to them. Avoid `--assemble-unreleased` there: it would ship a temporary version
+in a distribution package. `cargo pgrx install --sudo` builds a package internally, and behaves like `install`: it
 assembles fragments unless you pass `--no-assemble-unreleased`.
 
 ## Scripting a Release
