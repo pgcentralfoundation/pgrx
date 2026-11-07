@@ -1,0 +1,1 @@
+CREATE FUNCTION "farewell"("name" TEXT) RETURNS TEXT STRICT LANGUAGE c AS 'MODULE_PATHNAME', 'farewell_wrapper';

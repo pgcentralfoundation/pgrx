@@ -1946,6 +1946,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "migration_fragments"
+version = "1.1.0"
+dependencies = [
+ "pgrx",
+ "pgrx-tests",
+]
+
+[[package]]
 name = "minimal-lexical"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"

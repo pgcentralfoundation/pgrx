@@ -347,6 +347,11 @@ jobs:
       - name: Run range example regression tests
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo pgrx regress pg$PG_VER --manifest-path=pgrx-examples/range/Cargo.toml
 
+      - name: Lint and run the migration_fragments example upgrade test
+        run: |
+          CARGO_TARGET_DIR="$(pwd)/target" cargo pgrx migrate check --deny-mixed-objects --manifest-path=pgrx-examples/migration_fragments/Cargo.toml
+          CARGO_TARGET_DIR="$(pwd)/target" cargo pgrx regress pg$PG_VER --manifest-path=pgrx-examples/migration_fragments/Cargo.toml
+
       - name: Run `cargo pgrx schema` against the versioned_custom_libname_so example
         run: cd pgrx-examples/versioned_custom_libname_so && cargo pgrx schema pg$PG_VER
 

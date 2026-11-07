@@ -1,0 +1,65 @@
+-- A new database goes straight to the ephemeral version, using the copy of the base schema
+-- `cargo pgrx install` made for it.
+DROP EXTENSION migration_fragments;
+CREATE EXTENSION migration_fragments;
+SELECT extversion FROM pg_extension WHERE extname = 'migration_fragments';
+ extversion 
+------------
+ 1.1.1
+(1 row)
+
+CREATE TEMP TABLE fresh_install AS
+SELECT pg_describe_object(classid, objid, objsubid) AS member
+  FROM pg_depend
+ WHERE refclassid = 'pg_extension'::regclass
+   AND refobjid = (SELECT oid FROM pg_extension WHERE extname = 'migration_fragments')
+   AND deptype = 'e';
+-- Now the path an existing database takes. `migration_fragments--1.1.0.sql` is generated from
+-- today's code, so it already has what the fragments add. Taking those objects out again leaves
+-- what a database created from the real 1.1.0 release has.
+DROP EXTENSION migration_fragments;
+CREATE EXTENSION migration_fragments VERSION '1.1.0';
+ALTER EXTENSION migration_fragments DROP FUNCTION shout(text);
+DROP FUNCTION shout(text);
+ALTER EXTENSION migration_fragments DROP TABLE greeting_log;
+DROP TABLE greeting_log;
+-- This runs all three fragments. It can only succeed if they ran in dependency order, because
+-- fragment 98 needs the table from fragment 102.
+ALTER EXTENSION migration_fragments UPDATE;
+SELECT extversion FROM pg_extension WHERE extname = 'migration_fragments';
+ extversion 
+------------
+ 1.1.1
+(1 row)
+
+SELECT shout('hello');
+ shout 
+-------
+ HELLO
+(1 row)
+
+-- An upgraded database has to end up with the same objects as a new one. Both queries should
+-- return nothing.
+CREATE TEMP TABLE upgraded AS
+SELECT pg_describe_object(classid, objid, objsubid) AS member
+  FROM pg_depend
+ WHERE refclassid = 'pg_extension'::regclass
+   AND refobjid = (SELECT oid FROM pg_extension WHERE extname = 'migration_fragments')
+   AND deptype = 'e';
+SELECT member FROM fresh_install EXCEPT SELECT member FROM upgraded;
+ member 
+--------
+(0 rows)
+
+SELECT member FROM upgraded EXCEPT SELECT member FROM fresh_install;
+ member 
+--------
+(0 rows)
+
+-- An index belongs to its table rather than to the extension, so the comparison above can't see it.
+SELECT indexname FROM pg_indexes WHERE tablename = 'greeting_log';
+      indexname       
+----------------------
+ greeting_log_shouted
+(1 row)
+

@@ -1,0 +1,6 @@
+comment = 'migration_fragments:  Upgrade scripts assembled from SQL fragments'
+default_version = '@CARGO_VERSION@'
+module_pathname = 'migration_fragments'
+relocatable = false
+superuser = true
+trusted = false
