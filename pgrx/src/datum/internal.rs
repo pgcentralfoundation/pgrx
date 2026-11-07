@@ -41,10 +41,11 @@ impl Internal {
         )))
     }
 
-    /// Returns true if the internal value is initialized. If false, this is a null pointer.
+    /// Returns true if this holds a non-null pointer. Returns false for SQL `NULL` and for a null
+    /// pointer, which PostgreSQL passes for some `internal` arguments that are not SQL `NULL`.
     #[inline(always)]
     pub fn initialized(&self) -> bool {
-        self.0.is_some()
+        self.0.is_some_and(|datum| !datum.is_null())
     }
 
     /// Return a reference to the memory pointed to by this [`Internal`], as `Some(&T)`, unless the
@@ -121,8 +122,8 @@ impl Internal {
         self.get_or_insert_with(|| T::default())
     }
 
-    /// Inserts a value computed from `f` into the internal if it is `None`, then returns a mutable reference
-    /// to the contained value.
+    /// Inserts a value computed from `f` into the internal if it is not initialized, then returns a
+    /// mutable reference to the contained value.
     ///
     /// ## Safety
     ///
@@ -133,12 +134,12 @@ impl Internal {
     where
         F: FnOnce() -> T,
     {
-        let ptr = self.0.get_or_insert_with(|| {
-            let result = f();
-
-            PgMemoryContexts::CurrentMemoryContext.leak_and_drop_on_delete(result).into()
-        });
-        &mut *(ptr.cast_mut_ptr::<T>())
+        match self.0 {
+            // SAFETY: the caller ensures that a non-null datum points to a `T`.
+            Some(datum) if !datum.is_null() => unsafe { &mut *datum.cast_mut_ptr::<T>() },
+            // SAFETY: `insert` only dereferences the pointer to the `T` it allocates.
+            _ => unsafe { self.insert(f()) },
+        }
     }
 
     /// Returns the contained `Option<pg_sys::Datum>`
