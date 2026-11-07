@@ -120,6 +120,9 @@ pub mod pg_sys;
 
 // and re-export these
 pub use pg_sys::PgBuiltInOids;
+pub use pg_sys::cmacros;
+#[allow(unused_imports)]
+pub use pg_sys::cmacros::*;
 pub use pg_sys::elog::PgLogLevel;
 pub use pg_sys::errcodes::PgSqlErrorCode;
 pub use pg_sys::oids::PgOid;
@@ -127,7 +130,7 @@ pub use pg_sys::panic::pgrx_extern_c_guard;
 pub use pg_sys::pg_try::PgTryBuilder;
 pub use pg_sys::utils::name_data_to_str;
 pub use pg_sys::{
-    FATAL, PANIC, check_for_interrupts, debug1, debug2, debug3, debug4, debug5, ereport,
+    CHECK_FOR_INTERRUPTS, FATAL, PANIC, debug1, debug2, debug3, debug4, debug5, ereport,
     ereport_domain, error, function_name, info, log, notice, warning,
 };
 
@@ -143,72 +146,30 @@ mod seal {
 pub mod pg_magic_func_support {
     use core::ffi::CStr;
 
+    /// Lets `pg_magic_func!` name `OnceLock` through pgrx, so it also expands in no_std crates.
+    #[doc(hidden)]
+    pub use std::sync::OnceLock;
+
     use crate::pg_sys;
 
-    pub const fn default_magic() -> pg_sys::Pg_magic_struct {
-        let len = ::core::mem::size_of::<pg_sys::Pg_magic_struct>() as i32;
-        let version = pg_sys::PG_VERSION_NUM as i32 / 100;
-        let funcmaxargs = pg_sys::FUNC_MAX_ARGS as i32;
-        let indexmaxkeys = pg_sys::INDEX_MAX_KEYS as i32;
-        let namedatalen = pg_sys::NAMEDATALEN as i32;
-        let float8byval = cfg!(target_pointer_width = "64") as i32;
-        #[cfg(any(
-            feature = "pg15",
-            feature = "pg16",
-            feature = "pg17",
-            feature = "pg18",
-            feature = "pg19"
-        ))]
-        let abi_extra = abi_extra();
+    static EXTENSION_NAME: OnceLock<Result<&'static CStr, &'static str>> = OnceLock::new();
 
-        pg_sys::Pg_magic_struct {
-            len,
-            #[cfg(not(any(feature = "pg18", feature = "pg19")))]
-            version,
-            #[cfg(not(any(feature = "pg18", feature = "pg19")))]
-            funcmaxargs,
-            #[cfg(not(any(feature = "pg18", feature = "pg19")))]
-            indexmaxkeys,
-            #[cfg(not(any(feature = "pg18", feature = "pg19")))]
-            namedatalen,
-            #[cfg(not(any(feature = "pg18", feature = "pg19")))]
-            float8byval,
-            #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
-            abi_extra,
-            #[cfg(any(feature = "pg18", feature = "pg19"))]
-            abi_fields: pg_sys::Pg_abi_values {
-                version,
-                funcmaxargs,
-                indexmaxkeys,
-                namedatalen,
-                float8byval,
-                abi_extra,
-            },
-            #[cfg(any(feature = "pg18", feature = "pg19"))]
-            name: ::core::ptr::null(),
-            #[cfg(any(feature = "pg18", feature = "pg19"))]
-            version: ::core::ptr::null(),
-        }
+    /// Record the name of the extension this library belongs to, or why it is unknown.
+    pub fn set_extension_name(name: Result<&'static CStr, &'static str>) {
+        // PostgreSQL may call `Pg_magic_func` more than once; the name never changes.
+        let _ = EXTENSION_NAME.set(name);
     }
 
-    #[cfg(any(
-        feature = "pg15",
-        feature = "pg16",
-        feature = "pg17",
-        feature = "pg18",
-        feature = "pg19"
-    ))]
-    const fn abi_extra() -> [::core::ffi::c_char; 32] {
-        // We'll use what the bindings tell us, but if it ain't "PostgreSQL" then we'll
-        // raise a compilation error unless the `unsafe-postgres` feature is set.
-        let magic = pg_sys::FMGR_ABI_EXTRA.to_bytes_with_nul();
-        let mut abi = [0 as ::core::ffi::c_char; 32];
-        let mut i = 0;
-        while i < magic.len() {
-            abi[i] = magic[i] as ::core::ffi::c_char;
-            i += 1;
-        }
-        abi
+    /// The name that [`pg_magic_func!`](crate::pg_magic_func) recorded for this library's extension.
+    pub(crate) fn extension_name() -> Result<&'static CStr, &'static str> {
+        EXTENSION_NAME.get().copied().unwrap_or(Err(
+            "this library's `Pg_magic_func` did not record its extension; use `pg_module_magic!()`",
+        ))
+    }
+
+    /// Copy metadata initialized by this installation's original C PG_MODULE_MAGIC_DATA.
+    pub fn default_magic() -> pg_sys::Pg_magic_struct {
+        pg_sys::__pgrx_module_magic_data()
     }
 
     #[allow(unused_mut, unused_variables)]
@@ -241,10 +202,7 @@ pub mod pg_magic_func_support {
 // that we're trying to be built against some other kind of "postgres" that has its own ABI name.
 //
 // Unless the compiling user explicitly told us that they're aware of this via `--features unsafe-postgres`.
-#[cfg(all(
-    any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"),
-    not(feature = "unsafe-postgres")
-))]
+#[cfg(not(feature = "unsafe-postgres"))]
 const _: () = {
     use core::ffi::CStr;
     // to appease `const`
@@ -272,11 +230,17 @@ const _: () = {
 /// <div class="example-wrap" style="display:inline-block">
 /// <pre class="ignore" style="white-space:normal;font:inherit;">
 ///
-/// **Note**: Every [`pgrx`][crate] extension **must** have this macro called at top level (usually `src/lib.rs`) to be valid. You can use `pg_module_magic!()`, `pg_module_magic!(name, version)` or `pg_module_magic!(name = c"custom_name", version = c"1.0.0")`
+/// **Note**: Every [`pgrx`][crate] extension **must** have this macro called at top level
+/// (usually `src/lib.rs`) to be valid. You can use `pg_module_magic!()`,
+/// `pg_module_magic!(name, version)` or `pg_module_magic!(name = c"custom_name", version =
+/// c"1.0.0")`
 ///
 /// </pre></div>
 ///
-/// This calls [`pg_magic_func!()`](pg_magic_func).
+/// This calls [`pg_magic_func!()`](pg_magic_func), which also records the extension that
+/// [`rust_regtypein`] looks the library's types up in. That extension is
+/// named by the one `.control` file next to the crate's `Cargo.toml`, counted as `cargo pgrx`
+/// counts them, when the crate compiles.
 #[macro_export]
 macro_rules! pg_module_magic {
     ($($key:ident $(= $value:expr)?),*) => {
@@ -329,15 +293,38 @@ macro_rules! pg_magic_func {
         #[allow(non_snake_case, unexpected_cfgs)]
         #[doc(hidden)]
         pub extern "C" fn Pg_magic_func() -> &'static ::pgrx::pg_sys::Pg_magic_struct {
+            /// Private immutable module metadata containing only native scalar storage and
+            /// null or static C string pointers from the original initializer and field controls.
             #[repr(transparent)]
-            struct AssertSync<T>(T);
-            unsafe impl<T> Sync for AssertSync<T> {}
+            struct ModuleMagic(
+                /// Preserve the compiler-proved native record and its immutable pointed-to strings.
+                ::pgrx::pg_sys::Pg_magic_struct,
+            );
+            /// Permit publication of metadata independent of PostgreSQL backend state.
+            // SAFETY: this fixed private type is constructed only below. Native defaults and
+            // const field controls contain no backend-owned or thread-local pointers; all pointed
+            // strings have static immutable storage. Moving the record cannot invalidate them.
+            unsafe impl Send for ModuleMagic {}
+            /// Share the immutable metadata record from its static storage.
+            // SAFETY: OnceLock publishes one initialized record, and neither this function nor
+            // PostgreSQL mutates it. Every reachable string remains immutable for the module's life.
+            unsafe impl Sync for ModuleMagic {}
 
             // since Postgres calls this first, register our panic handler now
             // so we don't unwind into C / Postgres
             ::pgrx::pg_sys::panic::register_pg_guard_panic_hook();
 
-            static MY_MAGIC: AssertSync<::pgrx::pg_sys::Pg_magic_struct> = {
+            // so `rust_regtypein` can find the types this library's extension created
+            ::pgrx::pg_magic_func_support::set_extension_name(
+                ::pgrx::pgrx_macros::__pgrx_extension_name!(),
+            );
+
+            /// PostgreSQL 18 and later keep the returned pointer, so the record needs static
+            /// storage. Its defaults come from the C initializer, which const code cannot read,
+            /// so the first call builds it.
+            static MY_MAGIC: ::pgrx::pg_magic_func_support::OnceLock<ModuleMagic> =
+                ::pgrx::pg_magic_func_support::OnceLock::new();
+            let magic = MY_MAGIC.get_or_init(|| {
                 let mut magic = ::pgrx::pg_magic_func_support::default_magic();
                 #[allow(unused_macros)]
                 macro_rules! field_update {
@@ -384,20 +371,18 @@ macro_rules! pg_magic_func {
                         });
                     };
                     (name = $name:expr) => {
-                        let name: &'static ::core::ffi::CStr = $name;
+                        let name: &'static ::core::ffi::CStr = const { $name };
                         magic = ::pgrx::pg_magic_func_support::with_name(magic, name);
                     };
                     (version = $version:expr) => {
-                        let version: &'static ::core::ffi::CStr = $version;
+                        let version: &'static ::core::ffi::CStr = const { $version };
                         magic = ::pgrx::pg_magic_func_support::with_version(magic, version);
                     };
                 }
                 $(field_update!($key $(= $value)?);)*
-                AssertSync(magic)
-            };
-
-            // return the magic
-            &MY_MAGIC.0
+                ModuleMagic(magic)
+            });
+            &magic.0
         }
     };
 }

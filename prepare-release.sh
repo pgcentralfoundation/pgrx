@@ -34,14 +34,18 @@ else
     cargo install --path cargo-pgrx --locked || exit $?
     cargo pgrx init || exit $?
 
-    # exit early if the script fails 
-    ./update-versions.sh "${NEW_VERSION}" || exit $?
+    # exit early if the script fails, including when the C macro documentation
+    # snapshot would miss a supported PostgreSQL version
+    PGRX_PG_SYS_RELEASE_REQUIRE_ALL_VERSIONS=1 ./update-versions.sh "${NEW_VERSION}" || exit $?
 
     # format the code -- sometimes the bindgen bindings files are wonky
     cargo fmt --all
 
     # sanity check the diffs, but not Cargo.lock files cuz ugh
     # git diff -- . ':(exclude)Cargo.lock'
+
+    # the C macro documentation snapshot can gain files, which `commit -a` skips
+    git add -A pgrx-pg-sys/src/include || exit $?
 
     # send it all to github
     git commit -a -m "Update version to ${NEW_VERSION}" || exit $?

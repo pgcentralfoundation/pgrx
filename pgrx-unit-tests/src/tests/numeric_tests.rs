@@ -114,22 +114,7 @@ mod tests {
         // assert_eq!(f32::try_from(AnyNumeric::try_from(f32::MAX).unwrap()).unwrap(), f32::MAX);
         // assert_eq!(f64::try_from(AnyNumeric::try_from(f64::MAX).unwrap()).unwrap(), f64::MAX);
 
-        // -/+Infinity isn't supported in these versions of Postgres
-        #[cfg(feature = "pg13")]
-        {
-            assert_eq!(AnyNumeric::try_from(f32::INFINITY).err(),
-                       Some(pgrx::numeric::Error::ConversionNotSupported(String::from("cannot convert infinity to numeric"))));
-            assert_eq!(AnyNumeric::try_from(f32::NEG_INFINITY).err(),
-                       Some(pgrx::numeric::Error::ConversionNotSupported(String::from("cannot convert infinity to numeric"))));
-            assert_eq!(AnyNumeric::try_from(f64::INFINITY).err(),
-                       Some(pgrx::numeric::Error::ConversionNotSupported(String::from("cannot convert infinity to numeric"))));
-            assert_eq!(AnyNumeric::try_from(f64::NEG_INFINITY).err(),
-                       Some(pgrx::numeric::Error::ConversionNotSupported(String::from("cannot convert infinity to numeric"))));
-        }
-        
-        
-        // but it is in these
-        #[cfg(any(feature = "pg14", feature="pg15"))]
+        #[cfg(feature = "pg15")]
         {
             assert_eq!(f32::try_from(AnyNumeric::try_from(f32::INFINITY).unwrap()).unwrap(), f32::INFINITY);
             assert_eq!(f64::try_from(AnyNumeric::try_from(f64::INFINITY).unwrap()).unwrap(), f64::INFINITY);

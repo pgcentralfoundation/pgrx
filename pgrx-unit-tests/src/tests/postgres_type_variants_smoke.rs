@@ -58,9 +58,7 @@ pub struct SmokeVarlena {
 impl PgVarlenaInOutFuncs for SmokeVarlena {
     fn input(input: &CStr) -> PgVarlena<Self> {
         let a: u32 = input.to_str().expect("utf-8").parse().expect("number");
-        let mut v = PgVarlena::<Self>::new();
-        v.a = a;
-        v
+        PgVarlena::from(SmokeVarlena { a })
     }
     fn output(&self, buffer: &mut StringInfo) {
         buffer.push_str(&self.a.to_string());

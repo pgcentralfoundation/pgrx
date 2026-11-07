@@ -21,18 +21,7 @@ pub unsafe extern "C-unwind" fn _PG_init() {
     pg_sys::post_parse_analyze_hook = Some(parse_analyze_hook);
 }
 
-#[cfg(feature = "pg13")]
-#[pg_guard(unsafe_entry_thread)]
-unsafe extern "C-unwind" fn parse_analyze_hook(
-    pstate: *mut pg_sys::ParseState,
-    query: *mut pg_sys::Query,
-) {
-    do_the_hook(pstate);
-    if let Some(prev_hook) = PREV_POST_PARSE_ANALYZE_HOOK {
-        pg_guard_ffi_boundary(|| prev_hook(pstate, query));
-    }
-}
-#[cfg(not(any(feature = "pg13", feature = "pg19")))]
+#[cfg(not(feature = "pg19"))]
 #[pg_guard(unsafe_entry_thread)]
 unsafe extern "C-unwind" fn parse_analyze_hook(
     pstate: *mut pg_sys::ParseState,

@@ -21,7 +21,7 @@ cargo pgrx new [OPTIONS] <NAME>
   `tests/pg_regress/expected/setup.out`
 - An initially empty `sql/` directory for extension SQL files
 
-The current template supports `pg13` through `pg19` and defaults to `pg13`.
+The current template supports `pg15` through `pg19` and defaults to `pg15`.
 Select another configured version explicitly or adjust the default feature.
 
 ```bash

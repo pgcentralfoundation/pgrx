@@ -48,6 +48,24 @@ mod tests {
         assert_eq!(vec, Ok(Some(vec![b'b', b'y', b't', b'e', b's'])));
     }
 
+    /// Allocate a fresh bytea through the migrated slice-to-Datum header and payload macros.
+    #[pg_extern]
+    fn generated_bytea_copy(input: &[u8]) -> Vec<u8> {
+        input.to_vec()
+    }
+
+    /// Let PostgreSQL decode and encode copied empty, short and all-byte payloads independently.
+    #[pg_test]
+    fn test_generated_bytea_payload_copy() {
+        for length in [0, 1, 3, 256, 1024] {
+            let hex: String = (0..length).map(|index| format!("{:02x}", index % 256)).collect();
+            let query = format!(
+                "SELECT encode(tests.generated_bytea_copy(decode('{hex}', 'hex')), 'hex');"
+            );
+            assert_eq!(Spi::get_one::<String>(&query), Ok(Some(hex)));
+        }
+    }
+
     #[pg_extern]
     fn return_vec_subvec(bytes: Vec<u8>) -> Vec<u8> {
         bytes[1..=3].to_vec()

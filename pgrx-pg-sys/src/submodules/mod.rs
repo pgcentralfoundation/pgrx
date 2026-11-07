@@ -14,7 +14,6 @@ pub mod elog;
 pub mod cmp;
 pub mod errcodes;
 pub mod ffi;
-pub mod htup;
 pub mod oids;
 pub mod panic;
 pub mod pg_try;
@@ -30,7 +29,6 @@ mod sql_translatable;
 pub use datum::Datum;
 pub use transaction_id::{MultiXactId, TransactionId};
 
-pub use htup::*;
 pub use oids::*;
 pub use pg_try::*;
 pub use utils::*;

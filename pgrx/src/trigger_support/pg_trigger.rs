@@ -7,13 +7,16 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+#![allow(
+    unused_unsafe,
+    reason = "docs.rs builds replace generated C macros with shells, some of which need no unsafe"
+)]
 use crate::heap_tuple::PgHeapTuple;
 use crate::pg_sys;
 use crate::pgbox::AllocatedByPostgres;
 use crate::rel::PgRelation;
 use crate::trigger_support::{
     PgTriggerError, PgTriggerLevel, PgTriggerOperation, PgTriggerWhen, TriggerEvent, TriggerTuple,
-    called_as_trigger,
 };
 use std::ffi::c_char;
 
@@ -62,7 +65,12 @@ impl<'a> PgTrigger<'a> {
     pub unsafe fn from_fcinfo(
         fcinfo: &'a pg_sys::FunctionCallInfoBaseData,
     ) -> Result<Self, PgTriggerError> {
-        if !called_as_trigger(fcinfo as *const _ as *mut _) {
+        // SAFETY: the caller establishes valid call storage and any non-null context node.
+        if unsafe {
+            pg_sys::CALLED_AS_TRIGGER!(fcinfo as *const _ as *mut pg_sys::FunctionCallInfoBaseData)
+                .get()
+        } == 0
+        {
             return Err(PgTriggerError::NotTrigger);
         }
 
@@ -185,14 +193,12 @@ impl<'a> PgTrigger<'a> {
 
     /// The name of the schema of the table that caused the trigger invocation
     pub fn table_name(&self) -> Result<String, PgTriggerError> {
-        let relation = self.relation()?;
-        Ok(relation.name().to_string())
+        Ok(self.relation()?.name())
     }
 
     /// The name of the schema of the table that caused the trigger invocation
     pub fn table_schema(&self) -> Result<String, PgTriggerError> {
-        let relation = self.relation()?;
-        Ok(relation.namespace().to_string())
+        Ok(self.relation()?.namespace())
     }
 
     /// The arguments from the CREATE TRIGGER statement

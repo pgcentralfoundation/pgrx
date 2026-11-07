@@ -16,9 +16,11 @@ use crate as pg_sys;
 /// of the provided `pg_sys::NameData`
 #[inline]
 pub fn name_data_to_str(name_data: &pg_sys::NameData) -> &str {
-    fn transmute<const N: usize>(x: &[core::ffi::c_char; N]) -> &[core::ffi::c_uchar; N] {
-        unsafe { std::mem::transmute(x) }
-    }
-
-    core::ffi::CStr::from_bytes_until_nul(transmute(&name_data.data)).unwrap().to_str().unwrap()
+    // SAFETY: c_char and u8 have the same size and alignment, every byte is a
+    // valid u8, and the slice reborrows the shared NameData for its lifetime.
+    // (pgrx-pg-sys cannot invoke the generated NameStr!; see PgNode::node_tag.)
+    let bytes = unsafe {
+        core::slice::from_raw_parts(name_data.data.as_ptr().cast::<u8>(), name_data.data.len())
+    };
+    core::ffi::CStr::from_bytes_until_nul(bytes).unwrap().to_str().unwrap()
 }

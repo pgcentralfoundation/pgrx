@@ -50,14 +50,6 @@ function.
 
 ## Interesting Notes
 
-### To Infinity and... oh, seriously?
-
-Postgres versions less than v14 don't know how to represent -/+Infinity as a numeric.  pgrx accounts for this
-through some `#[cfg]` feature flags and the `Error::ConversionNotSupported` error variant.  :(  We also try 
-to optimize checks for -/+Infinity on lesser Postgres versions just to avoid lots of conversion overhead.
-
-If it weren't for this, we could support `From<f32/f64> for AnyNumeric` instead of `TryFrom`.
-
 ### Precision and Scale Slider Bars
 
 Postgres says the scale of a numeric can be between [-1000..1000], but the SQL standard requires it to be between 

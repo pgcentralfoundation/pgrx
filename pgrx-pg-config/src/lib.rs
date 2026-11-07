@@ -472,12 +472,41 @@ impl PgConfig {
         Ok(self.run("--cppflags")?.into())
     }
 
+    /// Compiler flags recorded by the selected PostgreSQL installation.
+    /// Macro inspection and native adapter compilation reuse these arithmetic and ABI options
+    /// so generated Rust follows the same C invocation profile as the installed server.
+    pub fn cflags(&self) -> eyre::Result<OsString> {
+        Ok(self.run("--cflags")?.into())
+    }
+
+    /// Read historical compiler flags when the selected metadata actually contains that property.
+    /// Explicit AS_ENV configurations may omit CFLAGS while still describing a usable current
+    /// binding invocation. Only that owned absence returns `None`; subprocess errors remain errors,
+    /// and successful empty or `not recorded` values remain available for callers to classify.
+    pub fn optional_cflags(&self) -> eyre::Result<Option<OsString>> {
+        if let Some(properties) = &self.known_props {
+            return Ok(properties.get("--cflags").map(OsString::from));
+        }
+        let bytes = self.run_subprocess("--cflags")?;
+        #[cfg(unix)]
+        {
+            use std::os::unix::ffi::OsStringExt;
+            Ok(Some(OsString::from_vec(bytes.trim_ascii().to_vec())))
+        }
+        #[cfg(not(unix))]
+        {
+            Ok(Some(decode_from_bytes(&bytes).trim().into()))
+        }
+    }
+
     pub fn extension_dir(&self) -> eyre::Result<PathBuf> {
         let mut path = self.sharedir()?;
         path.push("extension");
         Ok(path)
     }
 
+    /// Read a pg_config property from recorded metadata or a successful subprocess; reject
+    /// partial stdout on failure so macro profiles cannot use incomplete flags.
     fn run(&self, arg: &str) -> eyre::Result<String> {
         if let Some(known_props) = &self.known_props {
             // we have some known properties, so use them.  We'll return an `ErrorKind::InvalidData`
@@ -492,14 +521,29 @@ impl PgConfig {
                 })
                 .cloned()?)
         } else {
-            // we don't have any known properties, so fall through to asking the `pg_config`
-            // that's either in the environment or on the PATH
-            let pg_config = self.pg_config.clone().unwrap_or_else(|| {
-                std::env::var("PG_CONFIG").unwrap_or_else(|_| "pg_config".to_string()).into()
-            });
+            let stdout = self.run_subprocess(arg)?;
+            Ok(decode_from_bytes(&stdout).trim().to_string())
+        }
+    }
 
-            match Command::new(&pg_config).arg(arg).output() {
-                Ok(output) => Ok(decode_from_bytes(&output.stdout).trim().to_string()),
+    /// Keep subprocess status handling shared while allowing compiler flags to retain native Unix
+    /// bytes until their consumer explicitly validates the required UTF-8 argument interface.
+    fn run_subprocess(&self, arg: &str) -> eyre::Result<Vec<u8>> {
+        let pg_config = self.pg_config.clone().unwrap_or_else(|| {
+            std::env::var("PG_CONFIG").unwrap_or_else(|_| "pg_config".to_string()).into()
+        });
+
+        match Command::new(&pg_config).arg(arg).output() {
+                Ok(output) if output.status.success() => {
+                    Ok(output.stdout)
+                }
+                Ok(output) => Err(eyre::eyre!(
+                    "{} {} failed ({}): {}",
+                    pg_config.display(),
+                    arg,
+                    output.status,
+                    decode_from_bytes(&output.stderr).trim(),
+                )),
                 Err(e) => match e.kind() {
                     ErrorKind::NotFound => Err(e).wrap_err_with(|| {
                         let pg_config_str = pg_config.display().to_string();
@@ -518,7 +562,6 @@ impl PgConfig {
                     _ => Err(e.into()),
                 },
             }
-        }
     }
 }
 
@@ -594,7 +637,11 @@ impl Pgrx {
             Ok(pg_config) => {
                 // we have an environment variable that tells us the pg_config to use
                 let mut pgrx = Self::default();
-                pgrx.push(PgConfig::new(pg_config.into(), pgrx.base_port, pgrx.base_testing_port));
+                pgrx.push(Self::supported_config(PgConfig::new(
+                    pg_config.into(),
+                    pgrx.base_port,
+                    pgrx.base_testing_port,
+                ))?);
                 Ok(pgrx)
             }
             Err(_) => {
@@ -609,23 +656,36 @@ impl Pgrx {
                 };
 
                 match toml::from_str::<ConfigToml>(&std::fs::read_to_string(&path)?) {
-                    Ok(configs) => {
-                        let mut pgrx = Self::new(
-                            configs.base_port.unwrap_or(BASE_POSTGRES_PORT_NO),
-                            configs.base_testing_port.unwrap_or(BASE_POSTGRES_TESTING_PORT_NO),
-                        );
-
-                        for (_, v) in configs.configs {
-                            pgrx.push(PgConfig::new(v, pgrx.base_port, pgrx.base_testing_port));
-                        }
-                        Ok(pgrx)
-                    }
+                    Ok(configs) => Ok(Self::from_config_toml(configs)),
                     Err(e) => {
                         Err(e).wrap_err_with(|| format!("Could not read `{}`", path.display()))
                     }
                 }
             }
         }
+    }
+
+    fn from_config_toml(configs: ConfigToml) -> Self {
+        let mut pgrx = Self::new(
+            configs.base_port.unwrap_or(BASE_POSTGRES_PORT_NO),
+            configs.base_testing_port.unwrap_or(BASE_POSTGRES_TESTING_PORT_NO),
+        );
+
+        for (label, path) in configs.configs {
+            // Ignore retired installations before querying potentially stale pg_config paths.
+            if pgrx.is_feature_flag(&label) {
+                pgrx.push(PgConfig::new(path, pgrx.base_port, pgrx.base_testing_port));
+            }
+        }
+        pgrx
+    }
+
+    fn supported_config(pg_config: PgConfig) -> eyre::Result<PgConfig> {
+        let major = pg_config.major_version()?;
+        if !is_supported_major_version(major) {
+            return Err(eyre!("Postgres `pg{major}` is not supported by pgrx"));
+        }
+        Ok(pg_config)
     }
 
     pub fn push(&mut self, pg_config: PgConfig) {
@@ -638,8 +698,10 @@ impl Pgrx {
     /// `PGRX_PG_CONFIG_AS_ENV` is set to a value that isn't `"false"`then this function will return
     /// a one-element iterator that represents that single "pg_config".
     ///
-    /// Otherwise, we'll follow the rules of [`PgConfigSelector::All`] being everything in `$PGRX_HOME/config.toml`,
-    /// [`PgConfigSelector::Specific`] being that specific version from `$PGRX_HOME/config.toml`, and
+    /// Otherwise, we'll follow the rules of [`PgConfigSelector::All`] being supported versions
+    /// in `$PGRX_HOME/config.toml`,
+    /// [`PgConfigSelector::Specific`] being that specific version from
+    /// `$PGRX_HOME/config.toml`, and
     /// [`PgConfigSelector::Environment`] being the one described in the environment.
     pub fn iter(
         &self,
@@ -647,7 +709,7 @@ impl Pgrx {
     ) -> impl std::iter::Iterator<Item = eyre::Result<PgConfig>> {
         match (which, PgConfig::is_in_environment()) {
             (PgConfigSelector::All, true) | (PgConfigSelector::Environment, _) => {
-                vec![PgConfig::from_env()].into_iter()
+                vec![PgConfig::from_env().and_then(Self::supported_config)].into_iter()
             }
 
             (PgConfigSelector::All, _) => {
@@ -658,13 +720,20 @@ impl Pgrx {
                         .cmp(&b.major_version().expect("no major version"))
                 });
 
-                configs.into_iter().map(|c| Ok(c.clone())).collect::<Vec<_>>().into_iter()
+                configs
+                    .into_iter()
+                    .map(|c| Self::supported_config(c.clone()))
+                    .collect::<Vec<_>>()
+                    .into_iter()
             }
             (PgConfigSelector::Specific(label), _) => vec![self.get(label)].into_iter(),
         }
     }
 
     pub fn get(&self, label: &str) -> eyre::Result<PgConfig> {
+        if !self.is_feature_flag(label) {
+            return Err(eyre!("Postgres `{label}` is not supported by pgrx"));
+        }
         for pg_config in self.pg_configs.iter() {
             if pg_config.label()? == label {
                 return Ok(pg_config.clone());
@@ -674,7 +743,7 @@ impl Pgrx {
     }
 
     /// Returns true if the specified `label` represents a Postgres version number feature flag,
-    /// such as `pg14` or `pg15`
+    /// such as `pg15` or `pg16`
     pub fn is_feature_flag(&self, label: &str) -> bool {
         for pgver in SUPPORTED_VERSIONS() {
             if label == format!("pg{}", pgver.major) {
@@ -708,7 +777,8 @@ impl Pgrx {
     /// Get the postmaster stub directory
     ///
     /// We isolate postmaster stubs to an independent directory instead of alongside the postmaster
-    /// because in the case of `cargo pgrx install` the `pg_config` may not necessarily be one managed
+    /// because in the case of `cargo pgrx install` the `pg_config` may not necessarily be one
+    /// managed
     /// by pgrx.
     pub fn postmaster_stub_dir() -> Result<PathBuf, std::io::Error> {
         let mut stub_dir = Self::home()?;
@@ -726,8 +796,6 @@ impl Pgrx {
 #[allow(non_snake_case)]
 pub fn SUPPORTED_VERSIONS() -> Vec<PgVersion> {
     vec![
-        PgVersion::new(13, PgMinorVersion::Latest, None),
-        PgVersion::new(14, PgMinorVersion::Latest, None),
         PgVersion::new(15, PgMinorVersion::Latest, None),
         PgVersion::new(16, PgMinorVersion::Latest, None),
         PgVersion::new(17, PgMinorVersion::Latest, None),
@@ -908,6 +976,43 @@ fn does_db_exist(pg_config: &PgConfig, dbname: &str) -> eyre::Result<bool> {
 }
 
 #[test]
+fn config_ignores_retired_installations_without_querying_their_paths() {
+    let supported_path = PathBuf::from("unused-pg15-pg-config");
+    let configs = ConfigToml {
+        base_port: Some(30000),
+        base_testing_port: Some(33000),
+        configs: HashMap::from([
+            ("pg13".into(), PathBuf::from("missing-pg13-pg-config")),
+            ("pg14".into(), PathBuf::from("missing-pg14-pg-config")),
+            ("pg15".into(), supported_path.clone()),
+        ]),
+    };
+
+    let pgrx = Pgrx::from_config_toml(configs);
+    assert_eq!(pgrx.pg_configs.len(), 1);
+    assert_eq!(pgrx.pg_configs[0].path(), Some(supported_path));
+    assert_eq!(pgrx.pg_configs[0].base_port, 30000);
+    assert_eq!(pgrx.pg_configs[0].base_testing_port, 33000);
+    for label in ["pg13", "pg14"] {
+        let err = pgrx.get(label).expect_err("retired labels must fail before querying paths");
+        assert!(err.to_string().contains("not supported"));
+    }
+}
+
+#[test]
+fn selected_configs_require_a_supported_major_version() {
+    for major in [13, 14] {
+        let config = PgConfig::from(PgVersion::new(major, PgMinorVersion::Release(1), None));
+        let err = Pgrx::supported_config(config).expect_err("retired major should be rejected");
+        assert!(err.to_string().contains("not supported"));
+    }
+    for major in 15..=19 {
+        let config = PgConfig::from(PgVersion::new(major, PgMinorVersion::Release(1), None));
+        assert_eq!(Pgrx::supported_config(config).unwrap().major_version().unwrap(), major);
+    }
+}
+
+#[test]
 fn parse_version() {
     // Check some valid version strings
     let versions = [
@@ -937,6 +1042,85 @@ fn parse_version() {
         PgConfig::parse_version_str("PostgreSQL 12.f").expect_err("Parsed invalid version string");
     let _ =
         PgConfig::parse_version_str("PostgreSQL .53").expect_err("Parsed invalid version string");
+}
+
+/// Explicitly absent AS_ENV CFLAGS remain distinct from present empty or recorded metadata.
+#[test]
+fn optional_compiler_flags_preserve_owned_property_absence() {
+    let mut config = PgConfig { known_props: Some(BTreeMap::new()), ..PgConfig::default() };
+    assert_eq!(config.optional_cflags().unwrap(), None);
+    for flags in ["", "not recorded", "/IC:\\postgres\\include /O2"] {
+        config.known_props.as_mut().unwrap().insert("--cflags".into(), flags.into());
+        assert_eq!(config.optional_cflags().unwrap(), Some(OsString::from(flags)));
+    }
+}
+
+/// Recorded flags retain their exact quoting, while the strict query still rejects absent metadata.
+#[test]
+fn compiler_flags_from_known_properties_preserve_the_recorded_value() {
+    let flags = "-O2 -fwrapv -isysroot '/sdk with spaces'";
+    let config = PgConfig {
+        known_props: Some(BTreeMap::from([("--cflags".into(), flags.into())])),
+        ..PgConfig::default()
+    };
+    assert_eq!(config.cflags().unwrap(), OsString::from(flags));
+    assert!(
+        PgConfig { known_props: Some(BTreeMap::new()), ..PgConfig::default() }.cflags().is_err()
+    );
+}
+
+/// Runs `query` against a pg_config that is the shell script `script`.
+///
+/// Tests run on parallel threads. A process forked by one test keeps every file another test
+/// has open for writing until it execs, and executing such a file fails with ETXTBSY on Linux.
+/// A short-lived shell writes the script, so this process never holds a descriptor that a
+/// concurrently forked child could inherit.
+#[cfg(all(test, unix))]
+fn with_pg_config_script<T>(script: &str, query: impl FnOnce(PgConfig) -> T) -> T {
+    use std::sync::atomic::{AtomicU64, Ordering};
+
+    static NEXT: AtomicU64 = AtomicU64::new(0);
+    let path = std::env::temp_dir().join(format!(
+        "pgrx-pg-config-{}-{}",
+        std::process::id(),
+        NEXT.fetch_add(1, Ordering::Relaxed)
+    ));
+    let status = Command::new("/bin/sh")
+        .args(["-c", r#"printf '%s' "$2" > "$1" && chmod 700 "$1""#, "sh"])
+        .arg(&path)
+        .arg(script)
+        .status()
+        .unwrap();
+    assert!(status.success(), "could not write {}", path.display());
+    let result = query(PgConfig::new_with_defaults(path.clone()));
+    std::fs::remove_file(path).unwrap();
+    result
+}
+
+/// Preserve invalid native Unix flag bytes for explicit rejection by UTF-8 compiler consumers.
+#[cfg(unix)]
+#[test]
+fn optional_compiler_flags_do_not_lossily_rewrite_native_bytes() {
+    let flags = with_pg_config_script("#!/bin/sh\nprintf '\\377\\n'\n", |config| {
+        config.optional_cflags().unwrap().unwrap()
+    });
+    assert!(flags.to_str().is_none(), "invalid bytes must remain unavailable as UTF-8 flags");
+}
+
+/// Checks that a failing pg_config reports its status and stderr without accepting partial
+/// stdout as compiler flags.
+#[cfg(unix)]
+#[test]
+fn failed_pg_config_queries_do_not_accept_partial_stdout() {
+    let result = with_pg_config_script(
+        "#!/bin/sh\nprintf 'partial flags\\n'\nprintf 'query failed\\n' >&2\nexit 7\n",
+        |config| config.cflags(),
+    );
+    let error = result.expect_err("nonzero pg_config status must reject its stdout").to_string();
+    assert!(error.contains("--cflags"), "{error}");
+    assert!(error.contains("7"), "{error}");
+    assert!(error.contains("query failed"), "{error}");
+    assert!(!error.contains("partial flags"), "{error}");
 }
 
 #[test]

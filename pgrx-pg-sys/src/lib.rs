@@ -11,11 +11,32 @@
 
 #[cfg(
     // no features at all will cause problems
-    not(any(feature = "pg13", feature = "pg14", feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))
+    not(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))
 )]
-std::compile_error!(
-    "exactly one feature must be provided (pg13, pg14, pg15, pg16, pg17, pg18, pg19)"
-);
+std::compile_error!("exactly one feature must be provided (pg15, pg16, pg17, pg18, pg19)");
+
+/// C expression semantics and storage capabilities used by generated PostgreSQL macros.
+#[doc(hidden)]
+#[path = "c_macros/support.rs"]
+pub mod __pgrx_c_macros;
+
+/// Public paths to the selected generated bindings, isolated from handwritten
+/// crate-root helpers so macro expansions use the declarations they verified.
+/// This namespace is public only because exported macros expand in other crates.
+#[doc(hidden)]
+pub mod __pgrx_c_bindings {
+    #[cfg(feature = "pg15")]
+    pub use crate::include::pg15::*;
+    #[cfg(feature = "pg16")]
+    pub use crate::include::pg16::*;
+    #[cfg(feature = "pg17")]
+    pub use crate::include::pg17::*;
+    #[cfg(feature = "pg18")]
+    pub use crate::include::pg18::*;
+    #[cfg(feature = "pg19")]
+    pub use crate::include::pg19::*;
+    pub use crate::{Datum, MultiXactId, Oid, PgNode, TransactionId};
+}
 
 mod cshim;
 mod cstr;

@@ -104,97 +104,31 @@ pub unsafe fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usi
     }
 }
 
-/// Is the specified argument for a `PG_FUNCTION_INFO_V1` function NULL?
-///
-/// # Safety
-///
-/// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
-/// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
-#[inline]
-pub unsafe fn pg_arg_is_null(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> bool {
-    pg_get_nullable_datum(fcinfo, num).isnull
-}
-
-/// Get a numbered argument for a `PG_FUNCTION_INFO_V1` function as an Option containing a
-/// [`pg_sys::Datum`].
-///
-/// If the specified argument Datum is NULL, returns [`Option::None`].
-///
-/// # Safety
-///
-/// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
-/// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
-#[inline]
-pub unsafe fn pg_getarg_datum(
-    fcinfo: pg_sys::FunctionCallInfo,
-    num: usize,
-) -> Option<pg_sys::Datum> {
-    if pg_arg_is_null(fcinfo, num) { None } else { Some(pg_get_nullable_datum(fcinfo, num).value) }
-}
-
-/// Get a numbered argument for a `PG_FUNCTION_INFO_V1` function as a raw [`pg_sys::Datum`].
-///
-/// # Safety
-///
-/// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
-/// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
-#[inline]
-pub unsafe fn pg_getarg_datum_raw(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> pg_sys::Datum {
-    pg_get_nullable_datum(fcinfo, num).value
-}
-
 /// Returns the [`pg_sys::NullableDatum`] for a given arg.
 ///
 /// # Safety
 ///
-/// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
-/// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
+/// `fcinfo` must designate an initialized FunctionCallInfoBaseData followed by
+/// its `nargs` initialized NullableDatum arguments. That allocation must stay
+/// live and readable for this call. This adapter checks `num` against `nargs`.
 #[inline]
 pub unsafe fn pg_get_nullable_datum(
     fcinfo: pg_sys::FunctionCallInfo,
     num: usize,
 ) -> pg_sys::NullableDatum {
     let _nullptr_check = ptr::NonNull::new(fcinfo).expect("fcinfo pointer must be non-null");
+    // SAFETY: the caller provides an initialized fcinfo followed by its nargs
+    // initialized arguments, and `num < nargs` keeps the read inside them.
+    // Copying the NullableDatum keeps a pass-by-reference argument's pointer,
+    // which FromDatum implementations dereference, with its own provenance.
+    // Rebuilding it from the integer `PG_GETARG_DATUM!(..).get()` would rely on
+    // exposed provenance instead.
     unsafe {
-        let nargs = (*fcinfo).nargs;
-        let args_ptr: *const pg_sys::NullableDatum = ptr::addr_of!((*fcinfo).args).cast();
-        let args = slice::from_raw_parts(args_ptr, nargs as _);
-        args[num]
+        let nargs =
+            usize::try_from((*fcinfo).nargs).expect("fcinfo argument count must be non-negative");
+        assert!(num < nargs, "function argument index out of bounds");
+        ptr::addr_of!((*fcinfo).args).cast::<pg_sys::NullableDatum>().add(num).read()
     }
-}
-
-/// Modifies the specified `fcinfo` struct to indicate that its return value is null.
-///
-/// # Examples
-///
-/// ```rust,no_run
-/// use pgrx::pg_return_null;
-/// use pgrx::prelude::*;
-/// fn foo(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-///     return unsafe { pg_return_null(fcinfo) };
-/// }
-/// ```
-///
-/// # Safety
-///
-/// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
-/// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
-#[inline]
-pub unsafe fn pg_return_null(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-    let fcinfo = unsafe { fcinfo.as_mut() }.unwrap();
-    fcinfo.isnull = true;
-    pg_sys::Datum::from(0)
-}
-
-/// Get the collation the function call should use
-///
-/// # Safety
-///
-/// This function is unsafe as we cannot ensure the `fcinfo` argument is a valid
-/// [`pg_sys::FunctionCallInfo`] pointer.  This is your responsibility.
-pub unsafe fn pg_get_collation(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Oid {
-    let fcinfo = unsafe { fcinfo.as_mut() }.unwrap();
-    fcinfo.fncollation
 }
 
 /// # Safety
@@ -204,23 +138,6 @@ pub unsafe fn pg_get_collation(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Oid 
 #[inline]
 pub unsafe fn pg_getarg_type(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> pg_sys::Oid {
     pg_sys::get_fn_expr_argtype(fcinfo.as_ref().unwrap().flinfo, num as std::os::raw::c_int)
-}
-
-/// Indicates that a `PG_FUNCTION_INFO_V1` function is returning a SQL "void".
-///
-/// # Example
-///
-/// ```rust,no_run
-/// use pgrx::pg_return_void;
-/// use pgrx::prelude::*;
-///
-/// fn foo(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-///     pg_return_void()
-/// }
-///```
-#[inline]
-pub fn pg_return_void() -> pg_sys::Datum {
-    pg_sys::Datum::from(0)
 }
 
 /// Retrieve the `.flinfo.fn_extra` pointer (as a PgBox'd type) from [`pg_sys::FunctionCallInfo`].
@@ -326,18 +243,20 @@ unsafe fn direct_function_call_as_datum_internal(
     args: &[Option<pg_sys::Datum>],
 ) -> Option<pg_sys::Datum> {
     let nargs: i16 = args.len().try_into().expect("too many args passed to function");
-    let fcinfo = pg_sys::palloc0(
-        std::mem::size_of::<pg_sys::FunctionCallInfoBaseData>()
-            + std::mem::size_of::<pg_sys::NullableDatum>() * args.len(),
-    )
-    .cast::<pg_sys::FunctionCallInfoBaseData>();
+    let fcinfo = pg_sys::palloc0(pg_sys::SizeForFunctionCallInfo!(nargs).get() as usize)
+        .cast::<pg_sys::FunctionCallInfoBaseData>();
 
-    (*fcinfo).flinfo = std::ptr::null_mut();
-    (*fcinfo).context = std::ptr::null_mut();
-    (*fcinfo).resultinfo = std::ptr::null_mut();
-    (*fcinfo).fncollation = pg_sys::InvalidOid;
-    (*fcinfo).isnull = false;
-    (*fcinfo).nargs = nargs;
+    // SAFETY: palloc0 allocated the complete initialized fcinfo and its argument array.
+    unsafe {
+        pg_sys::InitFunctionCallInfoData!(
+            *fcinfo,
+            std::ptr::null_mut::<pg_sys::FmgrInfo>(),
+            nargs,
+            pg_sys::Oid::INVALID,
+            std::ptr::null_mut::<pg_sys::Node>(),
+            std::ptr::null_mut::<pg_sys::Node>()
+        );
+    }
 
     let args_ptr: *mut pg_sys::NullableDatum = ptr::addr_of_mut!((*fcinfo).args).cast();
     // This block is necessary for soundness. This way, we confine the slice's lifetime
@@ -371,41 +290,70 @@ pub unsafe fn direct_pg_extern_function_call_as_datum(
     direct_function_call_as_datum_internal(|fcinfo| pg_guard_ffi_boundary(|| func(fcinfo)), args)
 }
 
-#[inline]
-pub unsafe fn srf_is_first_call(fcinfo: pg_sys::FunctionCallInfo) -> bool {
-    (*(*fcinfo).flinfo).fn_extra.is_null()
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use core::mem::{offset_of, size_of};
 
-#[inline]
-#[deprecated(since = "0.12.0", note = "you want pg_sys::init_MultiFuncCall")]
-pub unsafe fn srf_first_call_init(
-    fcinfo: pg_sys::FunctionCallInfo,
-) -> *mut pg_sys::FuncCallContext {
-    pg_sys::init_MultiFuncCall(fcinfo)
-}
+    /// Rust-owned storage shaped like PostgreSQL's `SizeForFunctionCallInfo(2)`.
+    struct TwoArgCall {
+        words: Vec<u64>,
+    }
 
-#[inline]
-#[deprecated(since = "0.12.0", note = "you want pg_sys::per_MultiFuncCall")]
-pub unsafe fn srf_per_call_setup(fcinfo: pg_sys::FunctionCallInfo) -> *mut pg_sys::FuncCallContext {
-    pg_sys::per_MultiFuncCall(fcinfo)
-}
+    impl TwoArgCall {
+        fn new(first: pg_sys::NullableDatum) -> Self {
+            let args = offset_of!(pg_sys::FunctionCallInfoBaseData, args);
+            let len = args + 2 * size_of::<pg_sys::NullableDatum>();
+            let mut words = vec![0_u64; len.div_ceil(size_of::<u64>())];
+            let fcinfo = words.as_mut_ptr().cast::<pg_sys::FunctionCallInfoBaseData>();
+            // SAFETY: the zeroed, 8-aligned buffer covers the header and both
+            // arguments; every field is a raw pointer, integer, or bool.
+            unsafe {
+                (*fcinfo).nargs = 2;
+                let argv = ptr::addr_of_mut!((*fcinfo).args).cast::<pg_sys::NullableDatum>();
+                argv.write(first);
+                argv.add(1)
+                    .write(pg_sys::NullableDatum { value: pg_sys::Datum::null(), isnull: true });
+            }
+            TwoArgCall { words }
+        }
 
-#[inline]
-pub unsafe fn srf_return_next(
-    fcinfo: pg_sys::FunctionCallInfo,
-    funcctx: *mut pg_sys::FuncCallContext,
-) {
-    (*funcctx).call_cntr += 1;
-    (*((*fcinfo).resultinfo as *mut pg_sys::ReturnSetInfo)).isDone =
-        pg_sys::ExprDoneCond::ExprMultipleResult;
-}
+        fn fcinfo(&mut self) -> pg_sys::FunctionCallInfo {
+            self.words.as_mut_ptr().cast()
+        }
+    }
 
-#[inline]
-pub unsafe fn srf_return_done(
-    fcinfo: pg_sys::FunctionCallInfo,
-    funcctx: *mut pg_sys::FuncCallContext,
-) {
-    pg_sys::end_MultiFuncCall(fcinfo, funcctx);
-    (*((*fcinfo).resultinfo as *mut pg_sys::ReturnSetInfo)).isDone =
-        pg_sys::ExprDoneCond::ExprEndResult;
+    /// Pins that the argument's pointer is returned and readable. A native run cannot tell
+    /// whether the copy kept the pointer's own provenance or took exposed provenance through
+    /// an integer round trip. Miri can with `-Zmiri-strict-provenance`, which rejects the
+    /// integer-to-pointer conversion. Select a configured version's feature, as in
+    /// `MIRIFLAGS=-Zmiri-strict-provenance cargo +nightly miri test -p pgrx
+    /// --no-default-features --features pg18 --lib fcinfo`.
+    #[test]
+    fn nullable_datum_returns_the_argument_pointer() {
+        let target = 0x5a5a_5a5a_u64;
+        let pointer = ptr::addr_of!(target).cast_mut();
+        let mut call = TwoArgCall::new(pg_sys::NullableDatum {
+            value: pg_sys::Datum::from(pointer),
+            isnull: false,
+        });
+        // SAFETY: `call` holds an initialized two-argument fcinfo.
+        let (first, second) = unsafe {
+            (pg_get_nullable_datum(call.fcinfo(), 0), pg_get_nullable_datum(call.fcinfo(), 1))
+        };
+        assert!(!first.isnull);
+        assert_eq!(first.value.cast_mut_ptr::<u64>(), pointer);
+        // SAFETY: the copied Datum is the pointer to `target`, which is still live.
+        assert_eq!(unsafe { *first.value.cast_mut_ptr::<u64>() }, target);
+        assert!(second.isnull);
+    }
+
+    #[test]
+    #[should_panic(expected = "function argument index out of bounds")]
+    fn nullable_datum_rejects_an_index_past_nargs() {
+        let mut call =
+            TwoArgCall::new(pg_sys::NullableDatum { value: pg_sys::Datum::null(), isnull: true });
+        // SAFETY: `call` holds an initialized two-argument fcinfo; index 2 is checked.
+        unsafe { pg_get_nullable_datum(call.fcinfo(), 2) };
+    }
 }

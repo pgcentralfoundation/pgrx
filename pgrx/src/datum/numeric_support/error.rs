@@ -22,7 +22,7 @@ pub enum Error {
     #[error("{0}")]
     Invalid(String),
 
-    /// Postgres versions less than 14 do not support `Infinity` and `-Infinity` values
+    /// PostgreSQL does not support this conversion, such as NaN or infinity to an integer.
     #[error("{0}")]
     ConversionNotSupported(String),
 }

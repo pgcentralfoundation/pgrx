@@ -40,8 +40,6 @@ edition = "2024"
 crate-type = ["cdylib", "rlib"]
 
 [features]
-pg13 = []
-pg14 = []
 pg15 = []
 pg16 = []
 pg17 = []

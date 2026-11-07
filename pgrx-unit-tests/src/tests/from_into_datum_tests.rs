@@ -15,7 +15,9 @@ mod tests {
     use std::error::Error;
     use std::ffi::CStr;
 
+    use pgrx::datum::TryFromDatumError;
     use pgrx::prelude::*;
+    use pgrx::{AllocatedByRust, Array, PgMemoryContexts};
 
     #[pg_test]
     fn test_incompatible_datum_returns_error() {
@@ -30,6 +32,85 @@ mod tests {
         assert_eq!(
             "Postgres type boolean (Oid(16)) is not compatible with the Rust type alloc::string::String (Oid(25))",
             result.unwrap_err().to_string()
+        );
+    }
+
+    #[pg_test]
+    fn test_unknown_type_oid_returns_error() {
+        // No type has this OID: PostgreSQL assigns OIDs upward from 16384 and wraps only after
+        // exhausting the 32-bit range.
+        let unknown = pg_sys::Oid::from(u32::MAX);
+        let incompatible =
+            |rust_type: &'static str, rust_oid| TryFromDatumError::IncompatibleTypes {
+                rust_type,
+                rust_oid,
+                datum_type: "???".to_owned(),
+                datum_oid: unknown,
+            };
+
+        let result = unsafe { i32::try_from_datum(pg_sys::Datum::from(0), false, unknown) };
+        assert_eq!(result, Err(incompatible("i32", pg_sys::INT4OID)));
+
+        let result = unsafe {
+            String::try_from_datum_in_memory_context(
+                PgMemoryContexts::CurrentMemoryContext,
+                pg_sys::Datum::from(0),
+                false,
+                unknown,
+            )
+        };
+        assert_eq!(result, Err(incompatible(std::any::type_name::<String>(), pg_sys::TEXTOID)));
+
+        // PgHeapTuple's compatibility check looks the type up itself.
+        let result = unsafe {
+            PgHeapTuple::<AllocatedByRust>::try_from_datum(pg_sys::Datum::from(0), false, unknown)
+        };
+        assert_eq!(
+            result.map(|tuple| tuple.map(|_| ())),
+            Err(incompatible(
+                std::any::type_name::<PgHeapTuple<AllocatedByRust>>(),
+                pg_sys::RECORDOID
+            ))
+        );
+    }
+
+    #[pg_test]
+    fn test_invalid_type_oid_returns_error() {
+        let incompatible =
+            |rust_type: &'static str, rust_oid| TryFromDatumError::IncompatibleTypes {
+                rust_type,
+                rust_oid,
+                datum_type: "-".to_owned(),
+                datum_oid: pg_sys::Oid::INVALID,
+            };
+
+        let result =
+            unsafe { i32::try_from_datum(pg_sys::Datum::from(0), false, pg_sys::Oid::INVALID) };
+        assert_eq!(result, Err(incompatible("i32", pg_sys::INT4OID)));
+
+        let result = unsafe {
+            PgHeapTuple::<AllocatedByRust>::try_from_datum(
+                pg_sys::Datum::from(0),
+                false,
+                pg_sys::Oid::INVALID,
+            )
+        };
+        assert_eq!(
+            result.map(|tuple| tuple.map(|_| ())),
+            Err(incompatible(
+                std::any::type_name::<PgHeapTuple<AllocatedByRust>>(),
+                pg_sys::RECORDOID
+            ))
+        );
+
+        // int4[] has no array type, so this `T`'s type_oid() is InvalidOid too. Accepting the
+        // match would read each int4 element as a pointer to an array.
+        let datum = vec![7_i32, 8].into_datum().expect("an array datum");
+        let result =
+            unsafe { Array::<Array<i32>>::try_from_datum(datum, false, pg_sys::Oid::INVALID) };
+        assert_eq!(
+            result.map(|array| array.map(|array| array.len())),
+            Err(incompatible(std::any::type_name::<Array<Array<i32>>>(), pg_sys::Oid::INVALID))
         );
     }
 

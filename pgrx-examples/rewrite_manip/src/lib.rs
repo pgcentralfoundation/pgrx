@@ -23,7 +23,7 @@ fn demo_change_var_nodes(old_varno: i32, new_varno: i32) -> i32 {
             1,
             pg_sys::INT4OID,
             -1,
-            pg_sys::InvalidOid,
+            pg_sys::Oid::INVALID,
             0,
         );
 
@@ -40,7 +40,7 @@ fn demo_change_var_nodes(old_varno: i32, new_varno: i32) -> i32 {
 #[pg_extern]
 fn demo_offset_var_nodes(offset: i32) -> i32 {
     unsafe {
-        let var = pg_sys::makeVar(1, 1, pg_sys::INT4OID, -1, pg_sys::InvalidOid, 0);
+        let var = pg_sys::makeVar(1, 1, pg_sys::INT4OID, -1, pg_sys::Oid::INVALID, 0);
 
         pg_sys::OffsetVarNodes(var as *mut pg_sys::Node, offset, 0);
 
@@ -58,7 +58,7 @@ fn demo_range_table_entry_used(varno: i32, check_rt_index: i32) -> bool {
             1,
             pg_sys::INT4OID,
             -1,
-            pg_sys::InvalidOid,
+            pg_sys::Oid::INVALID,
             0,
         );
 
@@ -76,7 +76,7 @@ fn demo_increment_var_sublevels_up(initial_level: i32, delta: i32) -> i32 {
             1,
             pg_sys::INT4OID,
             -1,
-            pg_sys::InvalidOid,
+            pg_sys::Oid::INVALID,
             initial_level as pg_sys::Index,
         );
 

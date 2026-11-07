@@ -595,6 +595,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "clang"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b2ed30b30e1e17966b55ddd0b9dd2758fd824f0a6da6875c8abb17e6aba47c28"
+dependencies = [
+ "clang-sys",
+ "libc",
+]
+
+[[package]]
 name = "clang-sys"
 version = "1.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1164,6 +1174,12 @@ name = "find-msvc-tools"
 version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5baebc0774151f905a1a2cc41989300b1e6fbb29aff0ceffa1064fdd3088d582"
+
+[[package]]
+name = "fixedbitset"
+version = "0.5.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1d674e81391d1e1ab681a28d99df07927c6d4aa5b027d7da16ba32d1d21ecd99"
 
 [[package]]
 name = "flate2"
@@ -2400,6 +2416,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220"
 
 [[package]]
+name = "petgraph"
+version = "0.8.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8701b58ea97060d5e5b155d383a69952a60943f0e6dfe30b04c287beb0b27455"
+dependencies = [
+ "fixedbitset",
+ "hashbrown 0.15.5",
+ "indexmap 2.14.0",
+ "serde",
+]
+
+[[package]]
 name = "pglz_inspect"
 version = "0.0.0"
 dependencies = [
@@ -2442,16 +2470,42 @@ name = "pgrx-bindgen"
 version = "0.19.3"
 dependencies = [
  "bindgen",
- "cc",
- "clang-sys",
  "eyre",
+ "pgrx-c-macros",
  "pgrx-pg-config",
  "proc-macro2",
  "quote",
  "regex",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
  "shlex 2.0.1",
  "syn 2.0.117",
+ "toml 1.1.2+spec-1.1.0",
  "walkdir",
+]
+
+[[package]]
+name = "pgrx-c-macros"
+version = "0.19.3"
+dependencies = [
+ "bindgen",
+ "clang",
+ "clang-sys",
+ "clap",
+ "eyre",
+ "petgraph",
+ "pgrx-pg-config",
+ "proc-macro2",
+ "quote",
+ "ring",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
+ "shlex 2.0.1",
+ "syn 2.0.117",
+ "tempfile",
+ "thiserror 2.0.18",
 ]
 
 [[package]]
@@ -2492,7 +2546,11 @@ dependencies = [
  "pgrx-bindgen",
  "pgrx-macros",
  "pgrx-sql-entity-graph",
+ "proc-macro2",
+ "quote",
  "serde",
+ "serde_json",
+ "syn 2.0.117",
 ]
 
 [[package]]

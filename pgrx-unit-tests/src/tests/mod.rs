@@ -26,9 +26,14 @@ mod datetime_tests;
 mod default_arg_value_tests;
 mod derive_pgtype_lifetimes;
 mod enum_type_tests;
+mod extension_type_oid_tests;
 mod fcinfo_tests;
 mod fn_call_tests;
 mod from_into_datum_tests;
+/// Exercise byte-order macros across builtin and guarded native C definitions.
+mod generated_c_builtin_tests;
+/// Exercise generated macros whose complete expansions reference PostgreSQL backend symbols.
+mod generated_c_macro_tests;
 mod geo_tests;
 mod guc_tests;
 mod heap_tuple;
@@ -51,6 +56,7 @@ mod pg_operator_tests;
 mod pg_try_tests;
 mod pgbox_tests;
 mod pgrx_module_qualification;
+mod pgvarlena_tests;
 mod postgres_reexport_tests;
 mod postgres_type_tests;
 mod postgres_type_variants_smoke;
@@ -66,7 +72,9 @@ mod spi_tests;
 mod sql_translatable_signature_tests;
 mod srf_tests;
 mod struct_type_tests;
+mod text_encoding_tests;
 mod trigger_tests;
+mod tupdesc_tests;
 #[cfg(test)]
 mod type_ident_tests;
 mod uuid_tests;

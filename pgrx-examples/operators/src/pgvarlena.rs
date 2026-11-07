@@ -47,12 +47,18 @@ pub struct PgVarlenaThing {
     b: u64,
     c: i32,
     d: [u8; 5],
+    /// `PgVarlena` stores every byte of the value, and a padding byte's value is unspecified.
+    /// This field fills the 7 bytes that alignment would otherwise leave as padding, so the
+    /// stored bytes are always the same for equal values.
+    _pad: [u8; 7],
 }
 
+// The fields cover every byte, so the type has no padding.
+const _: () = assert!(size_of::<PgVarlenaThing>() == 8 + 8 + 4 + 5 + 7);
+
 impl PgVarlenaThing {
-    #[allow(dead_code)]
     pub fn new(a: u64, b: u64, c: i32, d: [u8; 5]) -> Self {
-        Self { a, b, c, d }
+        Self { a, b, c, d, _pad: [0; 7] }
     }
 }
 
@@ -70,21 +76,19 @@ impl PgVarlenaInOutFuncs for PgVarlenaThing {
         Self: Copy + Sized,
     {
         let s = input.to_str().unwrap();
-        let mut result: PgVarlena<PgVarlenaThing> = PgVarlena::new();
 
         // parsing a string in this format:  1;2;3;[1,2,3,4,5]
 
         let mut parts = s.split(';');
-        result.a = parts.next().unwrap().parse().unwrap();
-        result.b = parts.next().unwrap().parse().unwrap();
-        result.c = parts.next().unwrap().parse().unwrap();
+        let a = parts.next().unwrap().parse().unwrap();
+        let b = parts.next().unwrap().parse().unwrap();
+        let c = parts.next().unwrap().parse().unwrap();
 
         let d = parts.next().unwrap();
         let d = d.trim_start_matches('[');
         let d = d.trim_end_matches(']');
         let d = d.split(',').map(|e| e.parse().unwrap()).collect::<Vec<u8>>();
-        result.d = [d[0], d[1], d[2], d[3], d[4]];
-        result
+        PgVarlena::from(PgVarlenaThing::new(a, b, c, [d[0], d[1], d[2], d[3], d[4]]))
     }
 
     fn output(&self, buffer: &mut StringInfo) {

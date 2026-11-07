@@ -90,11 +90,11 @@ impl PgVarlenaInOutFuncs for MyType {
         let mut iter = input.to_str().unwrap().split(',');
         let (a, b, c) = (iter.next(), iter.next(), iter.next());
 
-        let mut result = PgVarlena::<MyType>::new();
-        result.a = f32::from_str(a.unwrap()).expect("a is not a valid f32");
-        result.b = f32::from_str(b.unwrap()).expect("b is not a valid f32");
-        result.c = i64::from_str(c.unwrap()).expect("c is not a valid i64");
-        result
+        PgVarlena::from(MyType {
+            a: f32::from_str(a.unwrap()).expect("a is not a valid f32"),
+            b: f32::from_str(b.unwrap()).expect("b is not a valid f32"),
+            c: i64::from_str(c.unwrap()).expect("c is not a valid i64"),
+        })
     }
 
     // Output ourselves as text into the provided `StringInfo` buffer
@@ -105,7 +105,7 @@ impl PgVarlenaInOutFuncs for MyType {
 
 #[pg_extern]
 fn do_a_thing(mut input: PgVarlena<MyType>) -> PgVarlena<MyType> {
-    input.c += 99;  // performs a copy-on-write on the backing varlena pointer
+    input.c += 99;  // changes the Rust copy; the returned Datum is a new varlena
     input
 }
 ```
