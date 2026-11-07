@@ -207,7 +207,7 @@ pub fn assemble_release_upgrade_script(params: AssembleParams<'_>) -> eyre::Resu
             &control_path,
             target_ver_str,
         )?;
-        let display_control = crate::command::install::format_display_path(&control_path)?;
+        let display_control = control_path.display().to_string();
         println!(
             "{} default_version = '{}' in {}",
             "     Updated".bold().green(),
@@ -244,10 +244,11 @@ impl CommandExecute for Assemble {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let features = clap_cargo::Features::default();
-        let (package_manifest, package_manifest_path) = get_package_manifest(
+        let (package_manifest, package_manifest_path, _) = get_package_manifest(
             &features,
             self.package.as_deref(),
             self.manifest_path.as_deref(),
+            &[],
         )?;
 
         let (_, extname) = find_control_file(&package_manifest_path)?;

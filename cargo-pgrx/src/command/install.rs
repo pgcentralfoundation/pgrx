@@ -277,6 +277,7 @@ pub(crate) fn install_extension(
         package_manifest_path,
         &extname,
         &extdir,
+        target_dir,
         unreleased_mode,
         &mut output_tracking,
     )?;

@@ -377,10 +377,11 @@ impl CommandExecute for Check {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let features = clap_cargo::Features::default();
-        let (package_manifest, package_manifest_path) = get_package_manifest(
+        let (package_manifest, package_manifest_path, _) = get_package_manifest(
             &features,
             self.package.as_deref(),
             self.manifest_path.as_deref(),
+            &[],
         )?;
 
         let crate_dir = package_manifest_path.parent().unwrap_or_else(|| Path::new("."));

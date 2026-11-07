@@ -71,6 +71,7 @@ pub(crate) fn handle_unreleased_fragments(
     package_manifest_path: &Path,
     extname: &str,
     extdir: &Path,
+    target_dir: &Path,
     mode: UnreleasedFragmentMode,
     output_tracking: &mut Vec<PathBuf>,
 ) -> eyre::Result<()> {
@@ -131,7 +132,8 @@ pub(crate) fn handle_unreleased_fragments(
             })?;
             output_tracking.push(dest_sql_file.clone());
 
-            let display_dest = crate::command::install::format_display_path(&dest_sql_file)?;
+            let display_dest =
+                crate::command::install::format_display_path(&dest_sql_file, target_dir);
             println!(
                 "{} unreleased fragments for {} -> {} into {}",
                 "  Assembling".bold().green(),
@@ -143,7 +145,8 @@ pub(crate) fn handle_unreleased_fragments(
             let dest_control = extdir.join(format!("{extname}.control"));
             if dest_control.exists() {
                 version::update_control_file_default_version(&dest_control, &target_ver_str)?;
-                let display_control = crate::command::install::format_display_path(&dest_control)?;
+                let display_control =
+                    crate::command::install::format_display_path(&dest_control, target_dir);
                 println!(
                     "{} default_version = '{}' in {}",
                     "     Updated".bold().green(),
@@ -167,8 +170,10 @@ pub(crate) fn handle_unreleased_fragments(
                             )
                         })?;
                         output_tracking.push(dest_base_sql.clone());
-                        let display_base =
-                            crate::command::install::format_display_path(&dest_base_sql)?;
+                        let display_base = crate::command::install::format_display_path(
+                            &dest_base_sql,
+                            target_dir,
+                        );
                         println!(
                             "{} base schema for {} at {}",
                             "    Installed".bold().green(),
@@ -256,6 +261,7 @@ version = \"0.25.0\"
             &manifest_path,
             "my_ext",
             &extdir,
+            temp.path(),
             UnreleasedFragmentMode::Disallow,
             &mut tracking,
         );
@@ -296,6 +302,7 @@ version = \"0.25.0\"
             &manifest_path,
             "my_ext",
             &extdir,
+            temp.path(),
             UnreleasedFragmentMode::Skip,
             &mut tracking,
         );
@@ -343,6 +350,7 @@ version = \"0.25.0\"
             &manifest_path,
             "my_ext",
             &extdir,
+            temp.path(),
             UnreleasedFragmentMode::AssembleEphemeral,
             &mut tracking,
         )
@@ -402,6 +410,7 @@ version = \"0.25.0\"
             &manifest_path,
             "my_ext",
             &extdir,
+            temp.path(),
             UnreleasedFragmentMode::AssembleEphemeral,
             &mut tracking,
         )
