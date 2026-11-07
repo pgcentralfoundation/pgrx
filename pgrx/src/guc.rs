@@ -190,6 +190,13 @@ pub struct GucSetting<T: GucValue> {
 unsafe impl<T: GucValue> Sync for GucSetting<T> {}
 
 impl<T: GucValue> GucSetting<T> {
+    /// Returns the setting's current value.
+    ///
+    /// # Panics
+    ///
+    /// Panics if called from any thread other than the one pgrx treats as the
+    /// active Postgres thread, even though `GucSetting` is `Sync`. Read the
+    /// value on that thread and pass it to any thread you spawn.
     pub fn get(&self) -> T {
         pg_sys::submodules::thread_check::check_active_thread();
         unsafe { GucValue::from_raw(self.value.get()) }
