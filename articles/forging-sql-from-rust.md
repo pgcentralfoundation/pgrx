@@ -213,7 +213,7 @@ Here's some fun ideas we pondered (and, in some cases, tried):
 
 ## The (longish) short of it
 
-We're going to produce a binary during the build. We'll have macros output some foreign functions, then the binary will re-export and call them to build up a structure representing our extension. `cargo-pgrx pgrx schema`'s job will be to orcestrate that.
+We're going to produce a binary during the build. We'll have macros output some foreign functions, then the binary will re-export and call them to build up a structure representing our extension. `cargo-pgrx pgrx schema`'s job will be to orchestrate that.
 
 Roughly, we're slipping into the build process this way:
 
