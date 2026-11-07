@@ -11,6 +11,7 @@ This directory contains examples of how to work with various aspects of `pgrx`.
 - [errors/](errors/):  Error handling using Postgres or Rust errors/panics
 - [memory_contexts/](memory_contexts/):  PgMemoryContext lifecycle and SRF/bgworker memory patterns
 - [operators/](operators/):  Creating operator functions and associated `CREATE OPERATOR/OPERATOR CLASS/OPERATOR FAMILY` DDL
+- [parallel_scan_lwlock/](parallel_scan_lwlock/):  LWLocks in dynamic shared memory, shared by the workers of a parallel foreign scan
 - [postgres_type_variants/](postgres_type_variants/):  Side-by-side examples of the four PostgresType in/out paths and related derives
 - [shmem/](shmem/):  Postgres Shared Memory support
 - [schemas/](schemas/):  How `pgrx` uses Postgres schemas

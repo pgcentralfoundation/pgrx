@@ -1,4 +1,6 @@
-//! Supports both parallel and non-parallel scans, avoiding code duplication.
+//! A foreign data wrapper whose tables return the values of a counter. A parallel scan shares
+//! one counter among all its participants, guarded by a [ParallelScanLwLock] in dynamic shared
+//! memory (DSM).
 //!
 //! Initialization:
 //! * [_PG_init] for startup initialization
@@ -10,15 +12,16 @@
 //! * [pgrx_get_foreign_plan] processes clauses and constructs an executable plan
 //!
 //! Sequential scan execution:
-//! * [pgrx_begin_foreign_scan] prepares the execution, initializing executable expressions
-//! * [pgrx_iterate_foreign_scan] fetches the next row from the block, advancing to the next if necessary
+//! * [pgrx_begin_foreign_scan] creates the scan state, with the counter in local memory
+//! * [pgrx_iterate_foreign_scan] returns the next counter value
 //! * [pgrx_end_foreign_scan] cleans up on scan complete
 //!
 //! Parallel scan execution:
-//! * [pgrx_begin_foreign_scan] prepares the execution, initializing executable expressions
-//! * [pgrx_estimate_dsm_foreign_scan] calculates the amount of shared memory needed for the block list (prefiltered by temporal index)
-//! * [pgrx_initialize_dsm_foreign_scan] creates the shared memory locks in the allocated DSM
-//! * [pgrx_initialize_worker_foreign_scan] saves the pointer to the mapped shared memory in the worker process space
+//! * [pgrx_begin_foreign_scan] creates the scan state, with the counter in local memory
+//! * [pgrx_estimate_dsm_foreign_scan] calculates the amount of shared memory needed for the counter
+//! * [pgrx_initialize_dsm_foreign_scan] moves the counter and its lock into the allocated DSM
+//! * [pgrx_initialize_worker_foreign_scan] points each worker's lock at the counter in the DSM
+//! * [pgrx_shutdown_foreign_scan] is the last chance to use the counter before the DSM goes away
 //! * See `Sequential scan execution` above
 //!
 //! Other support functions:
@@ -48,16 +51,19 @@
 mod routine;
 
 use crate::routine::*;
+use pgrx::guc::{GucContext, GucFlags, GucRegistry, GucSetting};
 use pgrx::lwlock::scan::*;
 use pgrx::pg_sys::*;
 use pgrx::*;
 use std::ffi::{CStr, c_void};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 pg_module_magic!(name, version);
 
 static SCAN_COUNTER_LOCKS: ParallelScanLwLockTranche =
     ParallelScanLwLockTranche::new(c"scan_counter_lock");
+
+static WAIT_FOR_PARTICIPANTS: GucSetting<bool> = GucSetting::<bool>::new(false);
 
 #[pg_guard]
 pub extern "C-unwind" fn _PG_init() {
@@ -65,6 +71,14 @@ pub extern "C-unwind" fn _PG_init() {
         pgrx::error!("this extension must be loaded via shared_preload_libraries.");
     }
     pg_shmem_init!(SCAN_COUNTER_LOCKS);
+    GucRegistry::define_bool_guc(
+        c"parallel_scan_lwlock.wait_for_participants",
+        c"Hold each participant's first row until all planned participants have one.",
+        c"Makes every launched parallel worker return rows, which the tests rely on.",
+        &WAIT_FOR_PARTICIPANTS,
+        GucContext::Userset,
+        GucFlags::default(),
+    );
 }
 
 // CREATE FOREIGN DATA WRAPPER counter_fdw HANDLER counter_handler VALIDATOR counter_validator;
@@ -77,6 +91,7 @@ pub extern "C-unwind" fn _PG_init() {
 #[pg_extern]
 fn counter_handler() -> CounterFdwRoutine {
     CounterFdwRoutine(FdwRoutine {
+        type_: NodeTag::T_FdwRoutine,
         GetForeignRelSize: Some(pgrx_get_foreign_rel_size),
         GetForeignPaths: Some(pgrx_get_foreign_paths),
         GetForeignPlan: Some(pgrx_get_foreign_plan),
@@ -91,7 +106,7 @@ fn counter_handler() -> CounterFdwRoutine {
         InitializeWorkerForeignScan: Some(pgrx_initialize_worker_foreign_scan),
         ShutdownForeignScan: Some(pgrx_shutdown_foreign_scan),
         ImportForeignSchema: Some(pgrx_import_foreign_schema),
-        ..EMPTY_FDW
+        ..Default::default()
     })
 }
 
@@ -108,13 +123,13 @@ fn counter_validator(_fcinfo: pg_sys::FunctionCallInfo) {
 #[pg_guard]
 unsafe extern "C-unwind" fn pgrx_get_foreign_rel_size(
     _root: *mut PlannerInfo,
-    _baserel: *mut RelOptInfo,
+    baserel: *mut RelOptInfo,
     _foreigntableid: Oid,
 ) {
     let expected_query_rows = 1_000_000f64; // Arbitrary
     unsafe {
-        (*_baserel).tuples = expected_query_rows;
-        (*_baserel).rows = expected_query_rows;
+        (*baserel).tuples = expected_query_rows;
+        (*baserel).rows = expected_query_rows;
     }
 }
 
@@ -127,71 +142,36 @@ unsafe extern "C-unwind" fn pgrx_get_foreign_paths(
     // Just some arbitrary cost estimates
     let startup_cost = 100f64;
     let total_cost = 1_000_000_000f64;
-
-    unsafe {
-        let sequential_path = create_foreignscan_path(
+    let foreign_path = |total_cost| unsafe {
+        create_foreignscan_path(
             root,
             baserel,
             std::ptr::null_mut(), // Use default target
             (*baserel).rows,
-            #[cfg(not(any(
-                feature = "pg13",
-                feature = "pg14",
-                feature = "pg15",
-                feature = "pg16",
-                feature = "pg17"
-            )))]
+            #[cfg(any(feature = "pg18", feature = "pg19"))]
             0, // disabled_nodes
             startup_cost,
             total_cost,
             std::ptr::null_mut(), // pathkeys
             std::ptr::null_mut(), // no outer rel
             std::ptr::null_mut(), // no extra plan
-            #[cfg(not(any(
-                feature = "pg13",
-                feature = "pg14",
-                feature = "pg15",
-                feature = "pg16"
-            )))]
+            #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
             std::ptr::null_mut(), // fdw_restrictinfo
             std::ptr::null_mut(), // no fdw_private data while planning
-        );
-        add_path(baserel, sequential_path as *mut Path);
+        )
+    };
 
-        let work_factor = max_parallel_workers_per_gather as f64;
-        let parallel_path = create_foreignscan_path(
-            root,
-            baserel,
-            std::ptr::null_mut(), // Use default target
-            (*baserel).rows,
-            #[cfg(not(any(
-                feature = "pg13",
-                feature = "pg14",
-                feature = "pg15",
-                feature = "pg16",
-                feature = "pg17"
-            )))]
-            0, // disabled_nodes
-            startup_cost,
-            total_cost / work_factor,
-            std::ptr::null_mut(), // pathkeys
-            std::ptr::null_mut(), // no outer rel
-            std::ptr::null_mut(), // no extra plan
-            #[cfg(not(any(
-                feature = "pg13",
-                feature = "pg14",
-                feature = "pg15",
-                feature = "pg16"
-            )))]
-            std::ptr::null_mut(), // fdw_restrictinfo
-            std::ptr::null_mut(), // no fdw_private data while planning
-        );
+    unsafe {
+        add_path(baserel, foreign_path(total_cost).cast());
+
+        let workers = max_parallel_workers_per_gather;
+        let parallel_path = foreign_path(total_cost / f64::from(workers));
         // Path might not be parallel_safe if parallel execution is disabled via max_parallel_workers_per_gather=0,
         // failing an assertion in add_partial_path
         if (*parallel_path).path.parallel_safe {
             (*parallel_path).path.parallel_aware = true;
-            (*parallel_path).path.parallel_workers = max_parallel_workers_per_gather;
-            add_partial_path(baserel, parallel_path as *mut Path);
+            (*parallel_path).path.parallel_workers = workers;
+            add_partial_path(baserel, parallel_path.cast());
         }
     }
 }
@@ -221,13 +201,35 @@ unsafe extern "C-unwind" fn pgrx_get_foreign_plan(
     }
 }
 
+/// The state that a scan's participants share through the lock.
+#[derive(Clone, Copy, Default)]
+struct Counter {
+    /// The next value to return.
+    next: i64,
+    /// Participants the leader planned for, and how many have taken a value. Used only when
+    /// `parallel_scan_lwlock.wait_for_participants` is on.
+    planned: u32,
+    started: u32,
+}
+
+// SAFETY: `Counter` holds only integers, which mean the same in every process.
+unsafe impl PGRXSharedMemory for Counter {}
+
 struct CounterScanState {
-    /// The shared counter where values are taken from
-    counter_lock: ParallelScanLwLock<i64>,
-    /// The number of participants (including the leader when `parallel_leader_participation=true`)
-    concurrency: u64,
-    /// Rows produced by this process since the scan (re)started.
-    produced_rows: u64,
+    counter: ParallelScanLwLock<Counter>,
+    /// Whether this process has taken a value since the scan (re)started.
+    started: bool,
+}
+
+/// Returns the scan state that [pgrx_begin_foreign_scan] stored in `node`.
+///
+/// # Safety
+///
+/// `node` must be a scan of this FDW that began, and the returned reference must be the only one.
+unsafe fn scan_state<'a>(node: *mut ForeignScanState) -> &'a mut CounterScanState {
+    // SAFETY: the caller guarantees that `fdw_state` holds a live `CounterScanState`, which
+    // `pgrx_begin_foreign_scan` leaked into the executor's memory context.
+    unsafe { &mut *(*node).fdw_state.cast() }
 }
 
 #[pg_guard]
@@ -236,14 +238,12 @@ unsafe extern "C-unwind" fn pgrx_begin_foreign_scan(
     _eflags: ::std::os::raw::c_int,
 ) {
     let scan_state = CounterScanState {
-        counter_lock: SCAN_COUNTER_LOCKS.lock_for(0i64),
-        concurrency: 1, // Yet unknown
-        produced_rows: 0u64,
+        counter: SCAN_COUNTER_LOCKS.lock_for(Counter::default()),
+        started: false,
     };
     unsafe {
-        (*foreign_scan_state).fdw_state = PgMemoryContexts::CurrentMemoryContext
-            .leak_and_drop_on_delete(scan_state)
-            as *mut ::std::os::raw::c_void
+        (*foreign_scan_state).fdw_state =
+            PgMemoryContexts::CurrentMemoryContext.leak_and_drop_on_delete(scan_state).cast()
     };
 }
 
@@ -252,73 +252,66 @@ unsafe extern "C-unwind" fn pgrx_iterate_foreign_scan(
     node: *mut ForeignScanState,
 ) -> *mut TupleTableSlot {
     unsafe {
-        let scan_state = &mut *((*node).fdw_state as *mut CounterScanState);
+        let scan_state = scan_state(node);
 
         let slot = (*node).ss.ss_ScanTupleSlot;
         assert!(!slot.is_null());
         (*(*slot).tts_ops).clear.unwrap()(slot);
 
-        // Hack for testing the DSM LWLocks: let other participant workers do some of the work by
-        // limiting how much a single worker can produce ahead of others (up to 150% of its share).
-        // This was made to avoid that the participant leader finished the query before the
-        // parallel workers started up.
-        let mut too_much_ahead_compared_to_other_participants = true;
-        while too_much_ahead_compared_to_other_participants {
-            too_much_ahead_compared_to_other_participants = {
-                let count = (*scan_state.counter_lock.shared()).cast_unsigned();
-                let share = count * 3 / 2 / scan_state.concurrency.max(1);
-                let self_produced = scan_state.produced_rows;
-                self_produced > share
-            };
-            if too_much_ahead_compared_to_other_participants {
-                std::thread::sleep(Duration::from_millis(10));
-            }
+        let value = {
+            let mut counter = scan_state.counter.exclusive();
+            let value = counter.next;
+            counter.next += 1;
+            value
+        };
+        if !std::mem::replace(&mut scan_state.started, true) && WAIT_FOR_PARTICIPANTS.get() {
+            wait_for_participants(&mut scan_state.counter);
         }
 
-        let column_count = (*(*slot).tts_tupleDescriptor).natts as usize;
         assert_eq!(
-            column_count, 1,
+            (*(*slot).tts_tupleDescriptor).natts,
+            1,
             "Foreign table column count should be always = 1 in this example"
         );
-        let nulls = std::slice::from_raw_parts_mut((*slot).tts_isnull, column_count);
-        let values: &mut [Datum] = std::slice::from_raw_parts_mut((*slot).tts_values, column_count);
+        *(*slot).tts_isnull = false;
+        *(*slot).tts_values =
+            value.into_datum().expect("Unexpected conversion error from i64 to Datum");
+        ExecStoreVirtualTuple(slot)
+    }
+}
 
-        let current_value = {
-            let mut counter = scan_state.counter_lock.exclusive();
-            let current_value = *counter;
-            *counter += 1;
-            current_value
-        };
-        scan_state.produced_rows += 1;
-
-        (*nulls)[0] = false;
-        (*values)[0] =
-            current_value.into_datum().expect("Unexpected conversion error from i64 to Datum");
-
-        let slot = &mut *slot;
-        assert!(!slot.tts_tupleDescriptor.is_null());
-        assert!(slot.tts_flags & TTS_FLAG_EMPTY as u16 != 0);
-        slot.tts_flags &= !(TTS_FLAG_EMPTY as u16);
-        slot.tts_nvalid = (*slot.tts_tupleDescriptor).natts as i16;
-        slot
+/// Holds this participant's first row until every participant the leader planned for has taken
+/// a value, so that no participant reaches the query's `LIMIT` before the others start.
+///
+/// Gives up after 30 seconds, in case PostgreSQL launched fewer workers than planned.
+fn wait_for_participants(counter: &mut ParallelScanLwLock<Counter>) {
+    counter.exclusive().started += 1;
+    let deadline = Instant::now() + Duration::from_secs(30);
+    while Instant::now() < deadline {
+        let Counter { planned, started, .. } = *counter.share();
+        if started >= planned {
+            return;
+        }
+        check_for_interrupts!();
+        std::thread::sleep(Duration::from_millis(1));
     }
 }
 
 #[pg_guard]
-unsafe extern "C-unwind" fn pgrx_end_foreign_scan(foreign_scan_state: *mut ForeignScanState) {
-    unsafe {
-        let _scan_state = &mut *((*foreign_scan_state).fdw_state as *mut CounterScanState);
-        // Nothing to clean-up, as our fdw state is quite naive
-    }
+unsafe extern "C-unwind" fn pgrx_end_foreign_scan(_foreign_scan_state: *mut ForeignScanState) {
+    // Nothing to clean up. A parallel scan's DSM may be gone by now, so this must not use the
+    // counter.
 }
 
 #[pg_guard]
 unsafe extern "C-unwind" fn pgrx_re_scan_foreign_scan(foreign_scan_state: *mut ForeignScanState) {
-    unsafe {
-        let scan_state = &mut *((*foreign_scan_state).fdw_state as *mut CounterScanState);
-        *scan_state.counter_lock.exclusive() = 0i64;
-        scan_state.produced_rows = 0;
+    let scan_state = unsafe { scan_state(foreign_scan_state) };
+    // A parallel scan resets the shared counter in pgrx_reinitialize_dsm_foreign_scan instead:
+    // PostgreSQL can call this function in the leader after the new workers took values.
+    if let ParallelScanLwLockExclusiveGuard::Local(counter) = scan_state.counter.exclusive() {
+        *counter = Counter::default();
     }
+    scan_state.started = false;
 }
 
 #[pg_guard]
@@ -335,7 +328,7 @@ unsafe extern "C-unwind" fn pgrx_estimate_dsm_foreign_scan(
     _foreign_scan_state: *mut ForeignScanState,
     _pcxt: *mut ParallelContext,
 ) -> Size {
-    ParallelScanLwLock::<i64>::mem_size()
+    ParallelScanLwLock::<Counter>::mem_size()
 }
 
 #[pg_guard]
@@ -346,17 +339,18 @@ unsafe extern "C-unwind" fn pgrx_initialize_dsm_foreign_scan(
 ) {
     debug1!("Initializing parallel foreign scan leader (PID: {}) DSM", std::process::id());
     unsafe {
-        let scan_state = &mut *((*foreign_scan_state).fdw_state as *mut CounterScanState);
+        let scan_state = scan_state(foreign_scan_state);
 
-        // Inform all participants about concurrency (check the example test for the reason behind this)
-        let workers =
-            u64::try_from((*pcxt).nworkers_launched).expect("negative number of parallel workers");
-        scan_state.concurrency =
-            (workers + u64::from(pg_sys::parallel_leader_participation)).max(1);
+        // Workers launch after this function returns, so count the planned ones.
+        let workers = u32::try_from((*pcxt).nworkers).expect("negative number of parallel workers");
+        scan_state.counter.exclusive().planned =
+            workers + u32::from(pg_sys::parallel_leader_participation);
 
         // IMPORTANT! The lock is still local here: move it to the DSM and let parallel workers
-        // receive a copy of the handle instead of the state itself
-        scan_state.counter_lock.initialize_dsm_and_register_leader(shared_mem);
+        // receive a copy of the handle instead of the state itself.
+        // SAFETY: PostgreSQL sized `shared_mem` with pgrx_estimate_dsm_foreign_scan, and nothing
+        // uses the counter after pgrx_shutdown_foreign_scan, when the DSM may go away.
+        scan_state.counter.initialize_dsm_and_register_leader(shared_mem);
     }
 }
 
@@ -366,11 +360,10 @@ unsafe extern "C-unwind" fn pgrx_reinitialize_dsm_foreign_scan(
     _pcxt: *mut ParallelContext,
     _coordinate: *mut ::std::os::raw::c_void,
 ) {
-    unsafe {
-        let scan_state = &mut *((*node).fdw_state as *mut CounterScanState);
-        *(scan_state.counter_lock.exclusive()) = 0i64;
-        scan_state.produced_rows = 0;
-    }
+    let scan_state = unsafe { scan_state(node) };
+    let mut counter = scan_state.counter.exclusive();
+    counter.next = 0;
+    counter.started = 0;
 }
 
 #[pg_guard]
@@ -381,19 +374,19 @@ unsafe extern "C-unwind" fn pgrx_initialize_worker_foreign_scan(
 ) {
     debug1!("Initializing parallel foreign scan worker (PID: {}) DSM", std::process::id());
     unsafe {
-        let scan_state = &mut *((*foreign_scan_state).fdw_state as *mut CounterScanState);
+        let scan_state = scan_state(foreign_scan_state);
 
-        // IMPORTANT! Register the handle to the state in the DSM wor the parallel worker
-        scan_state.counter_lock.register_parallel_worker(coordinate);
-
-        // Not necessary, should have received a copy from the leader initial state
-        scan_state.produced_rows = 0u64;
+        // IMPORTANT! Point this worker's lock at the counter the leader moved into the DSM.
+        // SAFETY: the leader initialized `coordinate` in pgrx_initialize_dsm_foreign_scan, and
+        // nothing uses the counter after pgrx_shutdown_foreign_scan.
+        scan_state.counter.register_parallel_worker(coordinate);
     }
 }
 
 #[pg_guard]
 unsafe extern "C-unwind" fn pgrx_shutdown_foreign_scan(_node: *mut ForeignScanState) {
-    // Nothing to do here
+    // PostgreSQL may destroy the DSM right after this returns. Copy anything that EXPLAIN or
+    // pgrx_end_foreign_scan needs out of the counter here; this example needs nothing.
 }
 
 #[pg_guard]
@@ -449,9 +442,8 @@ mod tests {
         assert_parallel_scan_yields_distinct_counters(ParallelLeaderParticipation::On);
     }
 
-    fn assert_parallel_scan_yields_distinct_counters(
-        leader_participation: ParallelLeaderParticipation,
-    ) {
+    /// Creates the foreign table and forces parallel plans that return rows from every worker.
+    fn set_up_parallel_scan(leader_participation: ParallelLeaderParticipation) {
         let leader_participation = match leader_participation {
             ParallelLeaderParticipation::On => true,
             ParallelLeaderParticipation::Off => false,
@@ -463,29 +455,35 @@ mod tests {
             SET LOCAL parallel_setup_cost = 0;
             SET LOCAL parallel_tuple_cost = 0;
             SET LOCAL max_parallel_workers_per_gather = {PARALLEL_WORKERS};
-            SET LOCAL parallel_leader_participation = {leader_participation};"
+            SET LOCAL parallel_leader_participation = {leader_participation};
+            SET LOCAL parallel_scan_lwlock.wait_for_participants = on;"
         ))
-            .unwrap();
+        .unwrap();
+    }
+
+    fn explain_analyze(statement: &str) -> serde_json::Value {
+        Spi::connect_mut(|client| {
+            client
+                .update(&format!("EXPLAIN (ANALYZE, VERBOSE, FORMAT JSON) {statement}"), None, &[])?
+                .first()
+                .get_one::<pgrx::Json>()
+        })
+        .unwrap()
+        .unwrap()
+        .0
+    }
+
+    fn assert_parallel_scan_yields_distinct_counters(
+        leader_participation: ParallelLeaderParticipation,
+    ) {
+        set_up_parallel_scan(leader_participation);
 
         // EXPLAIN ANALYZE executes a CREATE TABLE AS, so the plan describes the same parallel
         // execution that produced the rows checked below. We read the EXPLAIN (FORMAT JSON) to
         // find out how many rows produced each parallel worker.
-        let plan = Spi::connect_mut(|client| {
-            client
-                .update(
-                    &format!(
-                        "EXPLAIN (ANALYZE, VERBOSE, FORMAT JSON)
-                        CREATE TABLE tests.scanned AS SELECT counter FROM tests.my_counter LIMIT {ROWS_LIMIT}"
-                    ),
-                    None,
-                    &[],
-                )?
-                .first()
-                .get_one::<pgrx::Json>()
-        })
-            .unwrap()
-            .unwrap()
-            .0;
+        let plan = explain_analyze(&format!(
+            "CREATE TABLE tests.scanned AS SELECT counter FROM tests.my_counter LIMIT {ROWS_LIMIT}"
+        ));
 
         let gather = find_plan_node(&plan[0]["Plan"], "Gather")
             .unwrap_or_else(|| panic!("missing Gather node: {plan}"));
@@ -503,12 +501,52 @@ mod tests {
         assert_eq!(worker_rows.len() as u64, PARALLEL_WORKERS, "{plan}");
         assert!(
             worker_rows.iter().all(|&rows| rows > 0.0),
-            "each worker should produce at least one row"
+            "each worker should produce at least one row: {plan}"
         );
 
         let counts =
             Spi::get_two::<i64, i64>("SELECT count(*), count(DISTINCT counter) FROM tests.scanned");
         assert_eq!(counts, Ok((Some(ROWS_LIMIT as i64), Some(ROWS_LIMIT as i64))));
+    }
+
+    /// A parallel scan on the inner side of a nested loop runs once per outer row. Each rescan
+    /// reinitializes the DSM and launches new workers, which must find the counter reset.
+    #[pg_test]
+    fn parallel_rescans_restart_the_counter() {
+        set_up_parallel_scan(ParallelLeaderParticipation::On);
+        const LOOPS: i64 = 2;
+        const ROWS: i64 = 1000;
+        let plan = explain_analyze(&format!(
+            "CREATE TABLE tests.rescanned AS
+             SELECT g, counter FROM generate_series(1, {LOOPS}) g,
+             LATERAL (SELECT counter FROM tests.my_counter LIMIT {ROWS} + 0 * g) s"
+        ));
+        let gather = find_plan_node(&plan[0]["Plan"], "Gather")
+            .unwrap_or_else(|| panic!("missing Gather node: {plan}"));
+        assert_eq!(gather["Actual Loops"], LOOPS, "{plan}");
+        assert_eq!(gather["Workers Launched"], PARALLEL_WORKERS, "{plan}");
+
+        // Each participant's first row holds one of the first values taken after the reset, so
+        // every loop starts below the number of participants. Without the reset, the second loop
+        // would start at ROWS or above.
+        let participants = PARALLEL_WORKERS as i64 + 1;
+        let loops = Spi::connect(|client| {
+            client
+                .select(
+                    "SELECT count(*), count(DISTINCT counter), min(counter)
+                     FROM tests.rescanned GROUP BY g ORDER BY g",
+                    None,
+                    &[],
+                )?
+                .map(|row| Ok((row.get::<i64>(1)?, row.get::<i64>(2)?, row.get::<i64>(3)?)))
+                .collect::<Result<Vec<_>, pgrx::spi::SpiError>>()
+        })
+        .unwrap();
+        assert_eq!(loops.len() as i64, LOOPS, "{plan}");
+        for (rows, distinct, min) in loops {
+            assert_eq!((rows, distinct), (Some(ROWS), Some(ROWS)), "{plan}");
+            assert!(min.is_some_and(|min| min < participants), "loop started at {min:?}: {plan}");
+        }
     }
 
     fn find_plan_node<'a>(
@@ -531,68 +569,3 @@ pub mod pg_test {
         vec!["shared_preload_libraries='parallel_scan_lwlock'"]
     }
 }
-
-pub static EMPTY_FDW: FdwRoutine = FdwRoutine {
-    type_: NodeTag::T_FdwRoutine,
-    GetForeignRelSize: None,
-    GetForeignPaths: None,
-    GetForeignPlan: None,
-    BeginForeignScan: None,
-    IterateForeignScan: None,
-    ReScanForeignScan: None,
-    EndForeignScan: None,
-    GetForeignJoinPaths: None,
-    GetForeignUpperPaths: None,
-    AddForeignUpdateTargets: None,
-    PlanForeignModify: None,
-    BeginForeignModify: None,
-    ExecForeignInsert: None,
-    ExecForeignUpdate: None,
-    ExecForeignDelete: None,
-    EndForeignModify: None,
-    BeginForeignInsert: None,
-    EndForeignInsert: None,
-    IsForeignRelUpdatable: None,
-    PlanDirectModify: None,
-    BeginDirectModify: None,
-    IterateDirectModify: None,
-    EndDirectModify: None,
-    GetForeignRowMarkType: None,
-    RefetchForeignRow: None,
-    RecheckForeignScan: None,
-    ExplainForeignScan: None,
-    ExplainForeignModify: None,
-    ExplainDirectModify: None,
-    AnalyzeForeignTable: None,
-    #[cfg(not(any(
-        feature = "pg13",
-        feature = "pg14",
-        feature = "pg15",
-        feature = "pg16",
-        feature = "pg17",
-        feature = "pg18",
-    )))]
-    ImportForeignStatistics: None,
-    ImportForeignSchema: None,
-    IsForeignScanParallelSafe: None,
-    EstimateDSMForeignScan: None,
-    InitializeDSMForeignScan: None,
-    ReInitializeDSMForeignScan: None,
-    InitializeWorkerForeignScan: None,
-    ShutdownForeignScan: None,
-    ReparameterizeForeignPathByChild: None,
-    #[cfg(not(feature = "pg13"))]
-    ExecForeignBatchInsert: None,
-    #[cfg(not(feature = "pg13"))]
-    ExecForeignTruncate: None,
-    #[cfg(not(feature = "pg13"))]
-    ForeignAsyncConfigureWait: None,
-    #[cfg(not(feature = "pg13"))]
-    ForeignAsyncNotify: None,
-    #[cfg(not(feature = "pg13"))]
-    ForeignAsyncRequest: None,
-    #[cfg(not(feature = "pg13"))]
-    GetForeignModifyBatchSize: None,
-    #[cfg(not(feature = "pg13"))]
-    IsForeignPathAsyncCapable: None,
-};
