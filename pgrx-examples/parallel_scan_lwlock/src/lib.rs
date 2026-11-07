@@ -292,7 +292,9 @@ fn wait_for_participants(counter: &mut ParallelScanLwLock<Counter>) {
         if started >= planned {
             return;
         }
-        check_for_interrupts!();
+        // SAFETY: this runs on the backend thread, from an FDW callback guarded by #[pg_guard],
+        // and holds no lock guard that an error from the interrupt check could skip.
+        unsafe { pg_sys::CHECK_FOR_INTERRUPTS!() };
         std::thread::sleep(Duration::from_millis(1));
     }
 }
