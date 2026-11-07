@@ -87,9 +87,9 @@ jobs:
       # instead of adding one.
       matrix:
         include:
+          # Tests run on the oldest and newest supported versions, where version-specific
+          # code differs most.
           - postgres: 15
-          - postgres: 16
-          - postgres: 17
           - postgres: 18
           - postgres: 19
           - postgres: 18
@@ -98,6 +98,11 @@ jobs:
           # the PG18 tests.
           - postgres: 18
             suite: extras
+          # The versions in between build the tests without running them.
+          - postgres: 16
+            suite: compile
+          - postgres: 17
+            suite: compile
 
     steps:
       - uses: actions/checkout@v4
@@ -223,15 +228,26 @@ jobs:
         run: cargo pgrx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
 
       - name: Run workspace tests
-        if: matrix.suite != 'extras'
+        if: ${{ !matrix.suite }}
         run: |
           CARGO_TARGET_DIR="$(pwd)/target" cargo test --all \
             --features "pg$PG_VER" \
             --no-default-features
 
+      # These are the workspace and cshim test builds that the test jobs run.
+      - name: Build the workspace tests without running them
+        if: matrix.suite == 'compile'
+        run: |
+          CARGO_TARGET_DIR="$(pwd)/target" cargo test --all --no-run \
+            --features "pg$PG_VER" \
+            --no-default-features
+          cargo test --no-run \
+            --features "pg$PG_VER cshim proptest" \
+            --package pgrx-unit-tests --lib
+
       # The workspace run above disables pgrx-c-macros' default `cli` feature.
       - name: Run pgrx-c-macros CLI tests
-        if: matrix.suite != 'extras'
+        if: ${{ !matrix.suite }}
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --package pgrx-c-macros --test cli
 
       # PGDG's server-dev package installs clang 15, and the steps above load the newest
@@ -281,21 +297,21 @@ jobs:
             --target aarch64-unknown-linux-gnu
 
       - name: Run pgrx-unit-tests with cshim enabled
-        if: matrix.suite != 'extras'
+        if: ${{ !matrix.suite }}
         run: |
           cargo test \
             --features "pg$PG_VER cshim proptest" \
             --package pgrx-unit-tests --lib
 
       - name: Run pgrx-unit-tests with cshim disabled
-        if: matrix.suite != 'extras'
+        if: ${{ !matrix.suite }}
         run: |
           cargo test \
             --features "pg$PG_VER proptest" \
             --package pgrx-unit-tests --lib
 
       - name: Run UI tests
-        if: matrix.suite != 'extras' && !matrix.rust
+        if: ${{ !matrix.suite && !matrix.rust }}
         run: |
           cargo test \
             --features "pg$PG_VER proptest" \
@@ -310,21 +326,21 @@ jobs:
             --group-name ci_benching_smoke
 
       - name: Run custom_types without schema generation example tests
-        if: matrix.suite != 'extras'
+        if: ${{ !matrix.suite }}
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/custom_types/Cargo.toml  --features "pg$PG_VER no-schema-generation" --no-default-features
 
       - name: Run range example regression tests
-        if: matrix.suite != 'extras'
+        if: ${{ !matrix.suite }}
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo pgrx regress pg$PG_VER --manifest-path=pgrx-examples/range/Cargo.toml
 
       - name: Lint and run the migration_fragments example upgrade test
-        if: matrix.suite != 'extras'
+        if: ${{ !matrix.suite }}
         run: |
           CARGO_TARGET_DIR="$(pwd)/target" cargo pgrx migrate check --deny-mixed-objects --manifest-path=pgrx-examples/migration_fragments/Cargo.toml
           CARGO_TARGET_DIR="$(pwd)/target" cargo pgrx regress pg$PG_VER --manifest-path=pgrx-examples/migration_fragments/Cargo.toml
 
       - name: Run `cargo pgrx schema` against the versioned_custom_libname_so example
-        if: matrix.suite != 'extras'
+        if: ${{ !matrix.suite }}
         run: cd pgrx-examples/versioned_custom_libname_so && cargo pgrx schema pg$PG_VER
 
   pgrx_tests_arm64:
