@@ -96,9 +96,9 @@ mod tests {
     /// re-initialized by `LWLockInitialize` while another backend is holding it.
     /// Therefore, here we create a private DSM segment for each test to guarantee that it is
     /// initialized exactly once.
-    unsafe fn provide_dsm_for_test(size: usize) -> *mut std::ffi::c_void {
-        let segment = pg_sys::dsm_create(size, 0);
-        pg_sys::dsm_segment_address(segment)
+    fn provide_dsm_for_test(size: usize) -> *mut std::ffi::c_void {
+        // SAFETY: `dsm_create` raises an ERROR instead of returning an invalid segment.
+        unsafe { pg_sys::dsm_segment_address(pg_sys::dsm_create(size, 0)) }
     }
 
     fn init_dsm_lwlock() -> DsmLwLockHandle<bool> {
@@ -181,9 +181,44 @@ mod tests {
         let mut handle = init_scan_lwlock();
         let handle_ref = std::panic::AssertUnwindSafe(&handle);
         let _res = std::panic::catch_unwind(|| {
-            let _lock = handle_ref.shared();
+            let _lock = handle_ref.share();
             panic!("get out")
         });
         let _lock = handle.exclusive();
+    }
+
+    #[pg_test]
+    pub fn scan_test_local_value_moves_to_shared_memory() {
+        use super::SCANLWLOCK;
+        use pgrx::lwlock::scan::ParallelScanLwLockShareGuard;
+        let mut lock = SCANLWLOCK.lock_for(1_i64);
+        *lock.exclusive() += 1;
+        assert!(matches!(lock.share(), ParallelScanLwLockShareGuard::Local(_)));
+        unsafe {
+            let shmem = provide_dsm_for_test(ParallelScanLwLock::<i64>::mem_size());
+            lock.initialize_dsm_and_register_leader(shmem);
+        }
+        assert!(matches!(lock.share(), ParallelScanLwLockShareGuard::Shared(_)));
+        assert_eq!(*lock.share(), 2);
+        *lock.exclusive() += 1;
+        assert_eq!(*lock.share(), 3);
+    }
+
+    #[pg_test]
+    #[should_panic(expected = "DSM LWLock already initialized")]
+    pub fn scan_test_rejects_second_initialization() {
+        let mut lock = init_scan_lwlock();
+        unsafe {
+            let shmem = provide_dsm_for_test(ParallelScanLwLock::<bool>::mem_size());
+            lock.initialize_dsm_and_register_leader(shmem);
+        }
+    }
+
+    #[pg_test]
+    #[should_panic(expected = "uninitialized DSM LWLock tranche")]
+    pub fn dsm_test_uninitialized_tranche_panics() {
+        static UNINITIALIZED: pgrx::lwlock::dsm::DsmLwLockTranche =
+            pgrx::lwlock::dsm::DsmLwLockTranche::new(c"pgrx_tests_uninitialized_tranche");
+        UNINITIALIZED.tranche_id();
     }
 }

@@ -100,7 +100,8 @@ pub use htup::*;
 pub use inoutfuncs::*;
 #[cfg(feature = "cshim")]
 pub use list::old_list::*;
-pub use lwlock::{PgLwLock, PgLwLockExclusiveGuard, PgLwLockShareGuard}; // For backward compatibility with lwlock::* before addition of DSM and parallel scan LWLocks
+// Not a glob, so that `lwlock::dsm` and `lwlock::scan` stay out of the crate root.
+pub use lwlock::{PgLwLock, PgLwLockExclusiveGuard, PgLwLockShareGuard};
 pub use memcxt::*;
 #[cfg(feature = "cshim")]
 pub use namespace::*;
