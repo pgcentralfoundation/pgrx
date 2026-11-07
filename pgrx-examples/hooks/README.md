@@ -15,7 +15,7 @@ work.
 
 ## Principles
 
-This extension will enforce security mesures to avoid human
+This extension will enforce security measures to avoid human
 errors during data suppression commands :
 
 * DELETE commands must have a WHERE clause

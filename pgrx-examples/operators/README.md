@@ -2,7 +2,7 @@
 
 `pgrx` makes defining custom operators for your custom types very simple.  You can either
 manually use the `#[pg_operator]` macro on a function for likely non-standard operators, or you
-can use one or more of the the derive macros `#[derive(PostgresEq, PostgresOrd, PostgresHash)]`
+can use one or more of the derive macros `#[derive(PostgresEq, PostgresOrd, PostgresHash)]`
 if your type is otherwise capable of implementing the equivalent Rust traits.  In that case, `pgrx`
 will generate all the standard equality/comparison SQL (and Rust) functions for you.
 
