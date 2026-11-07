@@ -50,6 +50,9 @@ pub(crate) struct Package {
     pub(crate) features: clap_cargo::Features,
     #[clap(long)]
     pub(crate) target: Option<String>,
+    /// Assemble unreleased SQL fragments directly into the package directory
+    #[clap(long)]
+    pub(crate) assemble_unreleased: bool,
     /// Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
     #[clap(long = "cargo", value_name = "FLAG", allow_hyphen_values = true)]
     pub(crate) cargo: Vec<String>,
@@ -114,6 +117,12 @@ impl Package {
             )?
         };
 
+        let unreleased_mode = if self.assemble_unreleased {
+            crate::command::migrate::UnreleasedFragmentMode::PackageAssemble
+        } else {
+            crate::command::migrate::UnreleasedFragmentMode::Disallow
+        };
+
         let output_files = package_extension(
             self.manifest_path.as_deref(),
             self.package.as_deref(),
@@ -124,6 +133,7 @@ impl Package {
             self.test,
             &self.features,
             self.target.as_deref(),
+            unreleased_mode,
             metadata.target_directory.as_std_path(),
             &cargo_flags,
             self.prefix_dir.clone(),
@@ -167,6 +177,7 @@ pub(crate) fn package_extension(
     is_test: bool,
     features: &clap_cargo::Features,
     target: Option<&str>,
+    unreleased_mode: crate::command::migrate::UnreleasedFragmentMode,
     target_dir: &Path,
     cargo_flags: &[String],
     prefix_dir: Option<PathBuf>,
@@ -189,6 +200,7 @@ pub(crate) fn package_extension(
         Some(out_dir),
         features,
         target,
+        unreleased_mode,
         target_dir,
         cargo_flags,
         prefix_dir,
