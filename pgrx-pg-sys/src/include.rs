@@ -203,12 +203,30 @@ mod internal {
         /// We keep the alias so version-portable code can still say `pg_sys::bits8`.
         pub type bits8 = u8;
 
-        /// PG19 turned `BufferLockMode` into an enum; bindgen emits module-scoped constants.
-        /// Re-export at the crate root for code written against older pgrx bindings.
-        pub const BUFFER_LOCK_UNLOCK: u32 = crate::pg19::BufferLockMode::BUFFER_LOCK_UNLOCK as u32;
-        pub const BUFFER_LOCK_SHARE: u32 = crate::pg19::BufferLockMode::BUFFER_LOCK_SHARE as u32;
-        pub const BUFFER_LOCK_EXCLUSIVE: u32 =
-            crate::pg19::BufferLockMode::BUFFER_LOCK_EXCLUSIVE as u32;
+        /// PG19 made `BufferLockMode` a C enum, so bindgen puts these constants in the
+        /// `BufferLockMode` module. Re-export them at the crate root, where older versions have them.
+        ///
+        /// They keep bindgen's type, `BufferLockMode::Type`, so they can be passed without a cast to
+        /// `LockBuffer`, `LockBufferInternal` and `BufferIsLockedByMeInMode`. That type is `c_uint`
+        /// on Linux and macOS and `c_int` on MSVC, which gives C enums the type `int`. On PG15-18
+        /// these constants are `u32` and `LockBuffer` takes a `c_int`, so code that builds for
+        /// several versions should convert with `as _`.
+        pub use crate::pg19::BufferLockMode::{
+            BUFFER_LOCK_EXCLUSIVE, BUFFER_LOCK_SHARE, BUFFER_LOCK_UNLOCK,
+        };
+
+        // Fails to compile if the re-exports stop matching the mode parameter of the PG19 lock
+        // functions, as the earlier `u32` re-exports did on MSVC.
+        const _: unsafe fn(crate::Buffer) = |buffer| {
+            // SAFETY: never called; the closure exists only to type-check these calls.
+            unsafe {
+                crate::LockBufferInternal(buffer, BUFFER_LOCK_SHARE);
+                crate::BufferIsLockedByMeInMode(buffer, BUFFER_LOCK_EXCLUSIVE);
+                // `LockBuffer` is `static inline` in PG19, so it only exists with the cshim.
+                #[cfg(feature = "cshim")]
+                crate::LockBuffer(buffer, BUFFER_LOCK_UNLOCK);
+            }
+        };
 
         /// PG19 renamed `PageSetChecksumInplace` to `PageSetChecksum`.
         #[inline]
