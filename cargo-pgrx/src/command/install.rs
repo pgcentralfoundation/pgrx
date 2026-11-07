@@ -164,8 +164,6 @@ pub(crate) fn install_extension(
     let manifest = Manifest::from_path(package_manifest_path)?;
     let (control_file, extname) = find_control_file(package_manifest_path)?;
 
-    let versioned_so = get_property(package_manifest_path, "module_pathname")?.is_none();
-
     let build_manifest_path =
         manifest_path_for_build(user_manifest_path, user_package, package_manifest_path);
     let build_command_output =
@@ -221,23 +219,8 @@ pub(crate) fn install_extension(
     }
 
     {
-        let so_name = if versioned_so {
-            let extver = get_version(package_manifest_path, cargo_flags)?;
-            // note: versioned so-name format must agree with pgrx-utils
-            format!("{extname}-{extver}")
-        } else {
-            extname.clone()
-        };
-        // Since Postgres 16, the shared library extension on macOS is `dylib`, not `so`.
-        // Ref https://github.com/postgres/postgres/commit/b55f62abb2c2e07dfae99e19a2b3d7ca9e58dc1a
-        let so_suffix = if cfg!(target_os = "macos") && pg_config.major_version().unwrap() < 16 {
-            ".so"
-        } else {
-            std::env::consts::DLL_SUFFIX
-        };
-        let filename = format!("{so_name}{so_suffix}");
-
-        let dest = pkglibdir.join(&filename);
+        let dest =
+            pkglibdir.join(shared_library_filename(package_manifest_path, pg_config, cargo_flags)?);
 
         // Remove the existing shared libraries if present. This is a workaround for an
         // issue highlighted by the following apple documentation:
@@ -281,6 +264,30 @@ pub(crate) fn install_extension(
 
     println!("{} installing {}", "    Finished".bold().green(), extname);
     Ok(output_tracking)
+}
+
+/// The file name of the extension's shared library in `pkglibdir`.
+pub(crate) fn shared_library_filename(
+    package_manifest_path: &Path,
+    pg_config: &PgConfig,
+    cargo_flags: &[String],
+) -> eyre::Result<String> {
+    let (_, extname) = find_control_file(package_manifest_path)?;
+    let so_name = if get_property(package_manifest_path, "module_pathname")?.is_none() {
+        let extver = get_version(package_manifest_path, cargo_flags)?;
+        // note: versioned so-name format must agree with pgrx-utils
+        format!("{extname}-{extver}")
+    } else {
+        extname
+    };
+    // Since Postgres 16, the shared library extension on macOS is `dylib`, not `so`.
+    // Ref https://github.com/postgres/postgres/commit/b55f62abb2c2e07dfae99e19a2b3d7ca9e58dc1a
+    let so_suffix = if cfg!(target_os = "macos") && pg_config.major_version()? < 16 {
+        ".so"
+    } else {
+        std::env::consts::DLL_SUFFIX
+    };
+    Ok(format!("{so_name}{so_suffix}"))
 }
 
 fn copy_file(

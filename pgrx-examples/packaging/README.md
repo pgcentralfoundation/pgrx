@@ -1,9 +1,9 @@
 This example builds RPM and DEB packages with `cargo pgrx package`.
 
-Its `Cargo.toml` has an empty `[package.metadata.rpm]` section and an empty
-`[package.metadata.deb]` section, so both packages use cargo-pgrx's default
-templates. The package description, license and maintainer come from the
-`description`, `license` and `authors` fields of `[package]`.
+Its `Cargo.toml` has an empty `[package.metadata.rpm]` section, so the RPM uses
+cargo-pgrx's default template. The `[package.metadata.deb]` section overrides the
+`description` and `depends` keys of the default DEB template. The other package
+fields come from the `description`, `license` and `authors` fields of `[package]`.
 
 ```console
 $ cargo pgrx package --pg-config /path/to/pg_config

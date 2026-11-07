@@ -10,7 +10,9 @@
 use crate::CommandExecute;
 use crate::cargo::CargoProfile;
 use crate::command::get::get_property;
-use crate::command::install::{format_display_path, install_extension, warn_if_pg_bench_enabled};
+use crate::command::install::{
+    format_display_path, install_extension, shared_library_filename, warn_if_pg_bench_enabled,
+};
 use crate::manifest::{PgVersionSource, display_version_info};
 use cargo_toml::Manifest;
 use eyre::{WrapErr, eyre};
@@ -58,8 +60,18 @@ pub(crate) struct Package {
     pub(crate) prefix_dir: Option<PathBuf>,
 }
 
+/// Whether [`Package::perform`] also builds the packages declared in `Cargo.toml`.
+/// `cargo pgrx install --sudo` uses `perform` to stage files it copies into place.
+pub(crate) enum DistribPackages {
+    Build,
+    Skip,
+}
+
 impl Package {
-    pub(crate) fn perform(mut self) -> eyre::Result<(PathBuf, Vec<PathBuf>)> {
+    pub(crate) fn perform(
+        mut self,
+        distrib_packages: DistribPackages,
+    ) -> eyre::Result<(PathBuf, Vec<PathBuf>)> {
         warn_if_pg_bench_enabled(&self.features, "package");
         let cargo_flags = std::mem::take(&mut self.cargo);
         let metadata =
@@ -117,8 +129,16 @@ impl Package {
             self.prefix_dir.clone(),
         )?;
 
-        let target_dir = metadata.target_directory.as_std_path();
-        build_distrib_packages(&pg_config, &package_manifest_path, &out_dir, target_dir)?;
+        if matches!(distrib_packages, DistribPackages::Build) {
+            build_distrib_packages(
+                &pg_config,
+                &package_manifest_path,
+                &out_dir,
+                self.target.as_deref(),
+                metadata.target_directory.as_std_path(),
+                &cargo_flags,
+            )?;
+        }
 
         Ok((out_dir, output_files))
     }
@@ -127,7 +147,7 @@ impl Package {
 impl CommandExecute for Package {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        self.perform()?;
+        self.perform(DistribPackages::Build)?;
         Ok(())
     }
 }
@@ -198,7 +218,9 @@ fn build_distrib_packages(
     pg_config: &PgConfig,
     manifest_path: &Path,
     out_dir: &Path,
+    target: Option<&str>,
     target_dir: &Path,
+    cargo_flags: &[String],
 ) -> eyre::Result<Vec<PathBuf>> {
     let cargo_toml = Manifest::<toml::Value>::from_path_with_metadata(manifest_path)
         .wrap_err("couldn't parse manifest metadata")?;
@@ -217,8 +239,18 @@ fn build_distrib_packages(
         return Ok(vec![]);
     }
 
+    // The staged library only runs on the platform that built it.
+    if !cfg!(target_os = "linux") {
+        eprintln!(
+            "{} skipping RPM and DEB packages, which can only be built on Linux",
+            "WARNING:".red().bold()
+        );
+        return Ok(vec![]);
+    }
+
     // Built once and shared by every package kind
-    let vars = Vars::new(pg_config, out_dir, package)?;
+    let lib_file = shared_library_filename(manifest_path, pg_config, cargo_flags)?;
+    let vars = Vars::new(pg_config, out_dir, package, target, lib_file)?;
 
     kinds
         .into_iter()
@@ -293,7 +325,7 @@ license = "${LICENSE}"
 maintainer = "${MAINTAINER}"
 depends = ["postgresql${PG_MAJOR_VERSION}-server"]
 files = [
-  { source = "${BUILD_BASE_PATH}/${PG_PKGLIBDIR}/${NAME}.so", dest = "/usr/pgsql-${PG_MAJOR_VERSION}/lib/${NAME}.so", mode = "0755" },
+  { source = "${BUILD_BASE_PATH}/${PG_PKGLIBDIR}/${LIB_FILE}", dest = "/usr/pgsql-${PG_MAJOR_VERSION}/lib/${LIB_FILE}", mode = "0755" },
 ]
 dirs = [
   { source = "${BUILD_BASE_PATH}/${PG_SHAREDIR}/extension/", dest = "/usr/pgsql-${PG_MAJOR_VERSION}/share/extension/" },
@@ -310,7 +342,7 @@ license = "${LICENSE}"
 maintainer = "${MAINTAINER}"
 depends = ["postgresql-${PG_MAJOR_VERSION}"]
 files = [
-  { source = "${BUILD_BASE_PATH}/${PG_PKGLIBDIR}/${NAME}.so", dest = "/usr/lib/postgresql/${PG_MAJOR_VERSION}/lib/${NAME}.so", mode = "0644" },
+  { source = "${BUILD_BASE_PATH}/${PG_PKGLIBDIR}/${LIB_FILE}", dest = "/usr/lib/postgresql/${PG_MAJOR_VERSION}/lib/${LIB_FILE}", mode = "0644" },
 ]
 dirs = [
   { source = "${BUILD_BASE_PATH}/${PG_SHAREDIR}/extension/", dest = "/usr/share/postgresql/${PG_MAJOR_VERSION}/extension/" },
@@ -343,10 +375,12 @@ impl Vars {
         pg_config: &PgConfig,
         out_dir: &Path,
         package: &cargo_toml::Package<toml::Value>,
+        target: Option<&str>,
+        lib_file: String,
     ) -> eyre::Result<Self> {
         let optional = |value: Option<&str>, reason| value.map(str::to_owned).ok_or(reason);
         Ok(Self(HashMap::from([
-            ("ARCH", Ok(std::env::consts::ARCH.to_owned())),
+            ("ARCH", Ok(package_arch(target).to_owned())),
             ("BUILD_BASE_PATH", Ok(utf8_path(out_dir)?)),
             (
                 "DESCRIPTION",
@@ -361,11 +395,12 @@ impl Vars {
                 ),
             ),
             ("DEB_NAME", Ok(deb_name(package.name()))),
+            ("LIB_FILE", Ok(lib_file)),
             ("NAME", Ok(package.name().to_owned())),
             ("PG_MAJOR_VERSION", Ok(pg_config.major_version()?.to_string())),
             ("PG_PKGLIBDIR", Ok(utf8_path(&pg_config.pkglibdir()?)?)),
             ("PG_SHAREDIR", Ok(utf8_path(&pg_config.sharedir()?)?)),
-            ("VERSION", Ok(package.version().to_owned())),
+            ("VERSION", Ok(package_version(package.version()))),
         ])))
     }
 
@@ -410,6 +445,18 @@ impl Vars {
     }
 }
 
+/// The architecture of the packaged library. `--target` wins over the host, and
+/// arx-pack accepts the first component of the common Linux target triples.
+fn package_arch(target: Option<&str>) -> &str {
+    target.and_then(|t| t.split('-').next()).unwrap_or(std::env::consts::ARCH)
+}
+
+/// RPM rejects `-` in a version, and Debian reads it as a revision that sorts
+/// after the final release. Both formats sort `~` before the final release.
+fn package_version(crate_version: &str) -> String {
+    crate_version.replace('-', "~")
+}
+
 /// Debian package names allow only lowercase letters, digits, `+`, `-` and `.`.
 /// Crate names are ASCII letters, digits, `_` and `-`, so lowercasing and
 /// replacing `_` is enough.
@@ -435,6 +482,7 @@ mod tests {
             ("BUILD_BASE_PATH", Ok(r"C:\Users\me\target\my_ext-pg17".to_owned())),
             ("DEB_NAME", Ok("my-ext".to_owned())),
             ("DESCRIPTION", Ok("My extension".to_owned())),
+            ("LIB_FILE", Ok("my_ext.so".to_owned())),
             ("LICENSE", Err("set `package.license` in Cargo.toml")),
             ("MAINTAINER", Ok("Me".to_owned())),
             ("NAME", Ok("my_ext".to_owned())),
@@ -543,6 +591,54 @@ mod tests {
         let mut value = DistribKind::Deb.with_defaults(&user).unwrap();
         vars().apply(&mut value).unwrap();
         assert_eq!(value["name"].as_str(), Some("postgresql-17-my-ext"));
+    }
+
+    #[test]
+    fn package_arch_follows_the_target() {
+        assert_eq!(package_arch(Some("aarch64-unknown-linux-gnu")), "aarch64");
+        assert_eq!(package_arch(None), std::env::consts::ARCH);
+    }
+
+    #[test]
+    fn package_version_sorts_pre_releases_first() {
+        assert_eq!(package_version("1.2.3"), "1.2.3");
+        assert_eq!(package_version("1.2.3-rc.1"), "1.2.3~rc.1");
+    }
+
+    // The library's file name differs from the crate name, as it does for a
+    // hyphenated crate or a versioned shared library.
+    #[cfg(unix)]
+    #[test]
+    fn builds_packages_from_staged_files() {
+        let out_dir = tempfile::tempdir().unwrap();
+        let out_dir = out_dir.path();
+        let libdir = out_dir.join("usr/lib/postgresql/17/lib");
+        let sharedir = out_dir.join("usr/share/postgresql/17");
+        std::fs::create_dir_all(&libdir).unwrap();
+        std::fs::create_dir_all(sharedir.join("extension")).unwrap();
+        std::fs::write(libdir.join("my_ext-1.0.0.so"), "library").unwrap();
+        std::fs::write(sharedir.join("extension/my_ext.control"), "control").unwrap();
+
+        let mut vars = vars();
+        vars.0.extend([
+            ("BUILD_BASE_PATH", Ok(utf8_path(out_dir).unwrap())),
+            ("DEB_NAME", Ok("my-ext".to_owned())),
+            ("LIB_FILE", Ok("my_ext-1.0.0.so".to_owned())),
+            ("LICENSE", Ok("MIT".to_owned())),
+            ("NAME", Ok("my-ext".to_owned())),
+            ("PG_SHAREDIR", Ok("/usr/share/postgresql/17".to_owned())),
+            ("VERSION", Ok(package_version("1.0.0-rc.1"))),
+        ]);
+
+        let section = toml::Value::Table(toml::Table::new());
+        for (kind, expected) in [
+            (DistribKind::Rpm, "my-ext_17-1.0.0~rc.1-1.x86_64.rpm"),
+            (DistribKind::Deb, "postgresql-17-my-ext_1.0.0~rc.1_amd64.deb"),
+        ] {
+            let path = build_distrib_package(kind, &section, &vars, out_dir, out_dir).unwrap();
+            assert_eq!(path, out_dir.join(expected));
+            assert!(path.is_file(), "{}", path.display());
+        }
     }
 
     #[test]

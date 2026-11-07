@@ -24,7 +24,7 @@ publish = false
 [package.metadata.rpm]
 
 # Any entry in a section will override the default specs
-# see the arx-pack manfiest for the complete list of valid entries
+# see the arx-pack manifest for the complete list of valid entries
 # https://docs.rs/arx-pack/latest/arx_pack/struct.Manifest.html
 [package.metadata.deb]
 description = "This is a debian package !"
