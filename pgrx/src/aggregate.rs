@@ -275,7 +275,6 @@ CREATE AGGREGATE DemoSum (
 use crate::error;
 use crate::memcxt::PgMemoryContexts;
 use crate::pg_sys::{AggCheckCallContext, CurrentMemoryContext, FunctionCallInfo, MemoryContext};
-use crate::pgbox::PgBox;
 
 pub use pgrx_sql_entity_graph::{FinalizeModify, ParallelOption};
 
@@ -416,13 +415,14 @@ where
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
     fn serial(current: Self::State, fcinfo: FunctionCallInfo) -> Vec<u8>;
 
+    /// Rebuilds a state from the bytes that [`Aggregate::serial`] returned.
+    ///
+    /// In a parallel aggregate, PostgreSQL calls this in the leader and passes the result to
+    /// [`Aggregate::combine`] as `other`. PostgreSQL allows serialization only when `State` is the
+    /// SQL `internal` type, such as [`Internal`](crate::datum::Internal).
+    ///
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
-    fn deserial(
-        current: Self::State,
-        _buf: Vec<u8>,
-        _internal: PgBox<Self::State>,
-        fcinfo: FunctionCallInfo,
-    ) -> PgBox<Self::State>;
+    fn deserial(buf: Vec<u8>, fcinfo: FunctionCallInfo) -> Self::State;
 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
     fn moving_state(

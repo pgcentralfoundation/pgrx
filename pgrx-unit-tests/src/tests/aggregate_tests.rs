@@ -156,6 +156,59 @@ impl Aggregate<DemoPercentileDisc> for DemoPercentileDisc {
     }
 }
 
+#[derive(AggregateName)]
+struct ParallelInternalSum;
+
+#[pg_aggregate]
+impl Aggregate<ParallelInternalSum> for ParallelInternalSum {
+    type Args = i32;
+    type State = Internal;
+    type Finalize = i64;
+
+    const PARALLEL: Option<ParallelOption> = Some(ParallelOption::Safe);
+
+    fn state(
+        mut current: Self::State,
+        arg: Self::Args,
+        _fcinfo: pg_sys::FunctionCallInfo,
+    ) -> Self::State {
+        unsafe {
+            *current.get_or_insert_default::<i64>() += i64::from(arg);
+        }
+        current
+    }
+
+    fn combine(
+        mut current: Self::State,
+        other: Self::State,
+        _fcinfo: pg_sys::FunctionCallInfo,
+    ) -> Self::State {
+        let other = unsafe { other.get::<i64>().copied().unwrap_or_default() };
+        unsafe {
+            *current.get_or_insert_default::<i64>() += other;
+        }
+        current
+    }
+
+    fn finalize(
+        current: Self::State,
+        _direct_args: Self::OrderedSetArgs,
+        _fcinfo: pg_sys::FunctionCallInfo,
+    ) -> Self::Finalize {
+        unsafe { current.get::<i64>().copied().unwrap_or_default() }
+    }
+
+    fn serial(current: Self::State, _fcinfo: pg_sys::FunctionCallInfo) -> Vec<u8> {
+        let value = unsafe { current.get::<i64>().copied().unwrap_or_default() };
+        value.to_le_bytes().to_vec()
+    }
+
+    fn deserial(buf: Vec<u8>, _fcinfo: pg_sys::FunctionCallInfo) -> Self::State {
+        let value = i64::from_le_bytes(buf.try_into().expect("serialized i64 state"));
+        Internal::new(value)
+    }
+}
+
 #[pgrx::pg_schema]
 mod demo_schema {
     use pgrx::PostgresType;
@@ -335,6 +388,34 @@ mod tests {
             "SELECT DemoPercentileDisc(0.05) WITHIN GROUP (ORDER BY income) FROM UNNEST(ARRAY [5, 100000000, 6000, 70000, 500]) as income;",
         );
         assert_eq!(retval, Ok(Some(5)));
+    }
+
+    #[pg_test]
+    fn aggregate_parallel_internal_state() -> std::result::Result<(), pgrx::spi::Error> {
+        Spi::run(
+            "CREATE TABLE tests.parallel_internal_sum AS \
+             SELECT generate_series(1, 10000) AS value",
+        )?;
+        Spi::run(
+            "ANALYZE tests.parallel_internal_sum; \
+             SET LOCAL parallel_setup_cost = 0; \
+             SET LOCAL parallel_tuple_cost = 0; \
+             SET LOCAL min_parallel_table_scan_size = 0; \
+             SET LOCAL max_parallel_workers_per_gather = 2",
+        )?;
+        let query = "SELECT ParallelInternalSum(value) FROM tests.parallel_internal_sum";
+        // A partial aggregate serializes its state, and the finalize step deserializes and
+        // combines it. The leader runs the partial plan itself if no worker starts, so the plan
+        // shows that serial, deserial, and combine run without depending on a worker count.
+        let plan = Spi::connect(|client| {
+            client
+                .select(&format!("EXPLAIN (COSTS OFF) {query}"), None, &[])?
+                .map(|row| row.get::<String>(1))
+                .collect::<std::result::Result<Vec<_>, _>>()
+        })?;
+        assert!(plan.iter().flatten().any(|line| line.contains("Partial Aggregate")), "{plan:?}");
+        assert_eq!(Spi::get_one::<i64>(query)?, Some(50_005_000));
+        Ok(())
     }
 
     #[pg_test]

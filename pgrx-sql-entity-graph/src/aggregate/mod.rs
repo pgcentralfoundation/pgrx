@@ -449,15 +449,20 @@ impl PgAggregate {
         let fn_deserial_name = if let Some(found) = fn_deserial {
             let fn_name =
                 Ident::new(&format!("{snake_case_target_ident}_deserial"), found.sig.ident.span());
-            let pg_extern_attr = pg_extern_attr(found);
+            // PostgreSQL requires `(bytea, internal)` and always passes a NULL pointer as the
+            // `internal` argument, so the trait method never sees it. `Internal` is nullable, which
+            // stops `#[pg_extern]` from inferring STRICT from `buf`. A NULL `bytea` holds no state,
+            // so PostgreSQL should skip this call and the combine step instead of passing it in.
+            let mut pg_extern_args = pg_extern_args(found).unwrap_or_default();
+            pg_extern_args.push(super::pg_extern::Attribute::Strict);
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
-                #pg_extern_attr
-                fn #fn_name(this: #type_state_without_self, buf: Vec<u8>, internal: ::pgrx::pgbox::PgBox<#type_state_without_self>, fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pgbox::PgBox<#type_state_without_self> {
+                #[::pgrx::pg_extern(#pg_extern_args)]
+                fn #fn_name(buf: Vec<u8>, _internal: ::pgrx::datum::Internal, fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> #type_state_without_self {
                     unsafe {
                         <#target_path as ::pgrx::aggregate::Aggregate::<#generic_type>>::in_memory_context(
                             fcinfo,
-                            move |_context| <#target_path as ::pgrx::aggregate::Aggregate::<#generic_type>>::deserial(this, buf, internal, fcinfo)
+                            move |_context| <#target_path as ::pgrx::aggregate::Aggregate::<#generic_type>>::deserial(buf, fcinfo)
                         )
                     }
                 }
@@ -465,7 +470,7 @@ impl PgAggregate {
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn deserial(current: #type_state_without_self, _buf: Vec<u8>, _internal: ::pgrx::pgbox::PgBox<#type_state_without_self>, _fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pgbox::PgBox<#type_state_without_self> {
+                fn deserial(_buf: Vec<u8>, _fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> #type_state_without_self {
                     unimplemented!("Call to deserial on an aggregate which does not support it.")
                 }
             });
@@ -1072,6 +1077,20 @@ fn get_target_path(item_impl: &ItemImpl) -> Result<Path, syn::Error> {
 }
 
 fn pg_extern_attr(item: &ImplItemFn) -> syn::Attribute {
+    match pg_extern_args(item) {
+        Some(args) => parse_quote! {
+            #[::pgrx::pg_extern(#args)]
+        },
+        None => parse_quote! {
+            #[::pgrx::pg_extern]
+        },
+    }
+}
+
+/// Parses the arguments of the `#[pgrx(...)]` attribute on `item`, if it has one.
+fn pg_extern_args(
+    item: &ImplItemFn,
+) -> Option<Punctuated<super::pg_extern::Attribute, syn::Token![,]>> {
     let mut found = None;
     for attr in item.attrs.iter() {
         match attr.path().segments.last() {
@@ -1083,22 +1102,8 @@ fn pg_extern_attr(item: &ImplItemFn) -> syn::Attribute {
         };
     }
 
-    let attrs = if let Some(attr) = found {
-        let parser = Punctuated::<super::pg_extern::Attribute, syn::Token![,]>::parse_terminated;
-        let attrs = attr.parse_args_with(parser);
-        attrs.ok()
-    } else {
-        None
-    };
-
-    match attrs {
-        Some(args) => parse_quote! {
-            #[::pgrx::pg_extern(#args)]
-        },
-        None => parse_quote! {
-            #[::pgrx::pg_extern]
-        },
-    }
+    let parser = Punctuated::<super::pg_extern::Attribute, syn::Token![,]>::parse_terminated;
+    found?.parse_args_with(parser).ok()
 }
 
 fn get_impl_type_by_name<'a>(item_impl: &'a ItemImpl, name: &str) -> Option<&'a ImplItemType> {
@@ -1294,7 +1299,7 @@ mod tests {
                     todo!()
                 }
 
-                fn deserial(current: Self::State, _buf: Vec<u8>, _internal: PgBox<Self>) -> PgBox<Self> {
+                fn deserial(_buf: Vec<u8>) -> Self::State {
                     todo!()
                 }
 
@@ -1322,6 +1327,44 @@ mod tests {
         assert_eq!(extern_fn.sig.ident.to_string(), "demo_agg_demo_name_state");
         // It should be possible to generate entity tokens.
         let _ = agg.to_token_stream();
+        Ok(())
+    }
+
+    #[test]
+    fn agg_deserial_has_postgres_signature() -> Result<()> {
+        let tokens: ItemImpl = parse_quote! {
+            #[pg_aggregate]
+            impl Aggregate<DemoName> for DemoAgg {
+                type State = Internal;
+                type Args = i32;
+
+                fn state(current: Self::State, arg: Self::Args) -> Self::State {
+                    todo!()
+                }
+
+                #[pgrx(parallel_safe)]
+                fn deserial(buf: Vec<u8>) -> Self::State {
+                    todo!()
+                }
+            }
+        };
+
+        let agg = PgAggregate::new(tokens)?;
+        let deserial = agg
+            .0
+            .pg_externs
+            .iter()
+            .find(|func| func.sig.ident == "demo_agg_demo_name_deserial")
+            .expect("deserial extern should be generated");
+
+        assert_eq!(deserial.sig.inputs.len(), 3);
+        let signature = deserial.sig.to_token_stream().to_string();
+        assert!(signature.contains("buf : Vec < u8 >"));
+        assert!(signature.contains("_internal : :: pgrx :: datum :: Internal"));
+        assert!(signature.ends_with("-> Internal"));
+        assert!(deserial.attrs.iter().any(|attr| {
+            attr.to_token_stream().to_string().contains("pg_extern (parallel_safe , strict)")
+        }));
         Ok(())
     }
 
