@@ -216,16 +216,31 @@ mod internal {
         };
 
         // Fails to compile if the re-exports stop matching the mode parameter of the PG19 lock
-        // functions, as the earlier `u32` re-exports did on MSVC.
+        // functions, as the earlier `u32` re-exports did on MSVC. `LockBuffer` is `static inline`
+        // in PG19; bindgen's static wrapper for it is compiled into every build, cshim or not.
         const _: unsafe fn(crate::Buffer) = |buffer| {
             // SAFETY: never called; the closure exists only to type-check these calls.
             unsafe {
                 crate::LockBufferInternal(buffer, BUFFER_LOCK_SHARE);
                 crate::BufferIsLockedByMeInMode(buffer, BUFFER_LOCK_EXCLUSIVE);
-                // `LockBuffer` is `static inline` in PG19, so it only exists with the cshim.
-                #[cfg(feature = "cshim")]
                 crate::LockBuffer(buffer, BUFFER_LOCK_UNLOCK);
             }
+        };
+
+        // The index access methods define their lock macros as these modes, which bindgen cannot
+        // evaluate now that they are enum constants, so the generated constants supply them.
+        // PG19 renumbered `BUFFER_LOCK_EXCLUSIVE` from 2 to 3; this fails to compile if a
+        // generated constant ever disagrees with the mode it names.
+        const _: () = {
+            let unlock = BUFFER_LOCK_UNLOCK as i64;
+            let share = BUFFER_LOCK_SHARE as i64;
+            let exclusive = BUFFER_LOCK_EXCLUSIVE as i64;
+            assert!(crate::BT_READ as i64 == share && crate::BT_WRITE as i64 == exclusive);
+            assert!(crate::HASH_READ as i64 == share && crate::HASH_WRITE as i64 == exclusive);
+            assert!(crate::GIN_UNLOCK as i64 == unlock && crate::GIN_SHARE as i64 == share);
+            assert!(crate::GIN_EXCLUSIVE as i64 == exclusive);
+            assert!(crate::GIST_UNLOCK as i64 == unlock && crate::GIST_SHARE as i64 == share);
+            assert!(crate::GIST_EXCLUSIVE as i64 == exclusive);
         };
 
         /// PG19 renamed `PageSetChecksumInplace` to `PageSetChecksum`.
