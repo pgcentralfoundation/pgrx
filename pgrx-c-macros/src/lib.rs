@@ -60,6 +60,8 @@ mod dependencies;
 pub use dependencies::{MacroDependencyGraph, MacroDependencyImpact};
 /// Establish one agreed compiler environment and copied C catalog before expansion or analysis.
 mod frontend;
+/// Index directed edges in both directions and find strongly connected components in a fixed order.
+mod graph;
 pub use frontend::{
     FrontendError, SystemIncludeDirectory, SystemIncludes, c_header_path, compile_native_support,
     inspect, split_recorded_cflags,
