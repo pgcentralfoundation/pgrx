@@ -2,7 +2,8 @@
 
 While developing, you can usually use `cargo pgrx install` and it will take care of everything.
 Some extensions require more configuration than that in order to install on a database server,
-and there are a few caveats to keep in mind.
+and there are a few caveats to keep in mind. To ship an extension to other machines, see
+[Packaging a PGRX Extension](./package.md).
 
 ## You Must Be Superuser
 
