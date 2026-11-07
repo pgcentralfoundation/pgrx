@@ -906,7 +906,9 @@ installing extension
 `./target/[debug | release]/extension_name-PGVER` using the Postgres installation path information from the `pg_config`
 tool on your `$PATH`.
 
-The intent is that you'd then change into that directory and build a tarball or a .deb or .rpm package.
+The intent is that you'd then change into that directory and build a tarball or other package. On Linux,
+`cargo pgrx package` can also build a .deb or .rpm package for you, as described in
+[Building RPM and DEB packages](#building-rpm-and-deb-packages).
 
 The directory structure `cargo pgrx package` creates starts at the root of the filesystem, as a package-manager installed
 version of Postgres is likely to split `pg_config --pkglibdir` and `pg_config --sharedir` into different base paths.
@@ -954,6 +956,131 @@ $ cargo pgrx package --out-dir ./package --prefix-dir /opt/my_extension
 This places the extension assets in `./package/opt/my_extension/`. An absolute prefix is made relative to the package output
 directory. If you omit `--prefix-dir`, the layout follows `pg_config`. On Windows, the package layout uses `lib` and
 `share/extension` regardless of this option.
+
+### Building RPM and DEB packages
+
+On Linux, `cargo pgrx package` can also build distribution packages from the
+packaged files. Add an empty `[package.metadata.rpm]` or `[package.metadata.deb]`
+section to your extension's `Cargo.toml`:
+
+```toml
+[package]
+name = "my_extension"
+version = "1.0.0"
+description = "My Great Extension"
+license = "MIT"
+authors = ["Me, Myself & I"]
+
+[package.metadata.rpm]
+
+[package.metadata.deb]
+```
+
+The matching `.rpm` or `.deb` file is written to the output directory. Each
+section builds one package for the Postgres version selected by `pg_config`.
+An empty section uses the default specs below. The `description`, `license`,
+and first `authors` entry of `[package]` fill in the package fields of the same
+name, so `cargo pgrx package` reports an error if one of them is missing. On
+other platforms, `cargo pgrx package` prints a warning and skips these packages.
+`cargo pgrx install --sudo` never builds them.
+
+The default RPM specs are compatible with the PGDG Postgres packages:
+
+```toml
+name = "${NAME}_${PG_MAJOR_VERSION}"
+version = "${VERSION}"
+arch = "${ARCH}"
+description = "${DESCRIPTION}"
+license = "${LICENSE}"
+maintainer = "${MAINTAINER}"
+depends = ["postgresql${PG_MAJOR_VERSION}-server"]
+files = [
+  { source = "${BUILD_BASE_PATH}/${PG_PKGLIBDIR}/${LIB_FILE}", dest = "/usr/pgsql-${PG_MAJOR_VERSION}/lib/${LIB_FILE}", mode = "0755" },
+]
+dirs = [
+  { source = "${BUILD_BASE_PATH}/${PG_SHAREDIR}/extension/", dest = "/usr/pgsql-${PG_MAJOR_VERSION}/share/extension/" },
+]
+```
+
+To build RPM packages compatible with the SUSE or RHEL Postgres packages, adapt the
+paths in the `files` and `dirs` entries.
+
+The default DEB specs are compatible with both the Debian and the PGDG Postgres packages:
+
+```toml
+name = "postgresql-${PG_MAJOR_VERSION}-${DEB_NAME}"
+version = "${VERSION}"
+arch = "${ARCH}"
+description = "${DESCRIPTION}"
+license = "${LICENSE}"
+maintainer = "${MAINTAINER}"
+depends = ["postgresql-${PG_MAJOR_VERSION}"]
+files = [
+  { source = "${BUILD_BASE_PATH}/${PG_PKGLIBDIR}/${LIB_FILE}", dest = "/usr/lib/postgresql/${PG_MAJOR_VERSION}/lib/${LIB_FILE}", mode = "0644" },
+]
+dirs = [
+  { source = "${BUILD_BASE_PATH}/${PG_SHAREDIR}/extension/", dest = "/usr/share/postgresql/${PG_MAJOR_VERSION}/extension/" },
+]
+```
+
+Any key set in your section replaces the default value for that key as a whole.
+For example, this RPM adds a dependency and installs into Fedora's Postgres
+layout instead of PGDG's:
+
+```toml
+[package.metadata.rpm]
+depends = ["postgresql-server", "postgis"]
+files = [
+  { source = "${BUILD_BASE_PATH}/${PG_PKGLIBDIR}/${LIB_FILE}", dest = "/usr/lib64/pgsql/${LIB_FILE}", mode = "0755" },
+]
+dirs = [
+  { source = "${BUILD_BASE_PATH}/${PG_SHAREDIR}/extension/", dest = "/usr/share/pgsql/extension/" },
+]
+```
+
+String values in these sections can use the following variables:
+
+| Variable              | Value                                                   |
+|-----------------------|---------------------------------------------------------|
+| `${NAME}`             | the crate name                                          |
+| `${DEB_NAME}`         | the crate name in lowercase with `_` replaced by `-`    |
+| `${LIB_FILE}`         | the file name of the extension's shared library         |
+| `${VERSION}`          | the crate version with each `-` replaced by `~`         |
+| `${DESCRIPTION}`      | the crate description                                   |
+| `${LICENSE}`          | the crate license                                       |
+| `${MAINTAINER}`       | the first entry of the crate's `authors`                |
+| `${ARCH}`             | the `--target` or host architecture, such as `x86_64`   |
+| `${PG_MAJOR_VERSION}` | the Postgres major version, such as `17`                |
+| `${PG_PKGLIBDIR}`     | `pg_config --pkglibdir`                                 |
+| `${PG_SHAREDIR}`      | `pg_config --sharedir`                                  |
+| `${BUILD_BASE_PATH}`  | the output directory that holds the packaged files      |
+
+These are not environment variables. Only the names above are recognized.
+
+`${LIB_FILE}` is the file `cargo pgrx package` installed. It follows the extension's
+control file, so it can differ from `${NAME}` for a crate with a hyphenated name or a
+versioned shared library. `${VERSION}` replaces `-` because RPM rejects it in a version
+and Debian would sort `1.0.0-rc.1` after `1.0.0`. Both sort `1.0.0~rc.1` before `1.0.0`.
+
+`${ARCH}` is the first part of a `--target` triple. If the package format doesn't
+recognize it, as with `powerpc64le`, set `arch` in your section.
+
+The default `files` and `dirs` expect the layout from `pg_config`. If you pass
+`--prefix-dir`, override both keys with paths under `${BUILD_BASE_PATH}`.
+
+`dirs` packages every file it finds, and `cargo pgrx package` does not clear the output
+directory between runs. Delete that directory before a release so SQL files from older
+versions are not shipped.
+
+Packages are unsigned, and the RPM release number is always `1`.
+
+`cargo deb` reads `[package.metadata.deb]` too, with different rules, so a section written
+for it can stop `cargo pgrx package` with an error. For example, `depends = "$auto"` is
+rejected here.
+
+An unknown variable or an unterminated `${` is an error. See
+[pgrx-examples/packaging](../pgrx-examples/packaging/) for a complete extension, and
+[the packaging chapter](../docs/src/extension/package.md) of the book for a walkthrough.
 
 ## Inspect your Extension Schema
 

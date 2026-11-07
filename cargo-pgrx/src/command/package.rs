@@ -10,11 +10,15 @@
 use crate::CommandExecute;
 use crate::cargo::CargoProfile;
 use crate::command::get::get_property;
-use crate::command::install::{install_extension, warn_if_pg_bench_enabled};
+use crate::command::install::{
+    format_display_path, install_extension, shared_library_filename, warn_if_pg_bench_enabled,
+};
 use crate::manifest::{PgVersionSource, display_version_info};
 use cargo_toml::Manifest;
 use eyre::{WrapErr, eyre};
+use owo_colors::OwoColorize;
 use pgrx_pg_config::{PgConfig, Pgrx};
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 /// Create an installation package directory.
@@ -56,8 +60,18 @@ pub(crate) struct Package {
     pub(crate) prefix_dir: Option<PathBuf>,
 }
 
+/// Whether [`Package::perform`] also builds the packages declared in `Cargo.toml`.
+/// `cargo pgrx install --sudo` uses `perform` to stage files it copies into place.
+pub(crate) enum DistribPackages {
+    Build,
+    Skip,
+}
+
 impl Package {
-    pub(crate) fn perform(mut self) -> eyre::Result<(PathBuf, Vec<PathBuf>)> {
+    pub(crate) fn perform(
+        mut self,
+        distrib_packages: DistribPackages,
+    ) -> eyre::Result<(PathBuf, Vec<PathBuf>)> {
         warn_if_pg_bench_enabled(&self.features, "package");
         let cargo_flags = std::mem::take(&mut self.cargo);
         let metadata =
@@ -115,6 +129,17 @@ impl Package {
             self.prefix_dir.clone(),
         )?;
 
+        if matches!(distrib_packages, DistribPackages::Build) {
+            build_distrib_packages(
+                &pg_config,
+                &package_manifest_path,
+                &out_dir,
+                self.target.as_deref(),
+                metadata.target_directory.as_std_path(),
+                &cargo_flags,
+            )?;
+        }
+
         Ok((out_dir, output_files))
     }
 }
@@ -122,7 +147,7 @@ impl Package {
 impl CommandExecute for Package {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        self.perform()?;
+        self.perform(DistribPackages::Build)?;
         Ok(())
     }
 }
@@ -187,4 +212,438 @@ pub(crate) fn build_base_path(
     target_dir.push(profile.target_subdir());
     target_dir.push(format!("{extname}-pg{pgver}"));
     Ok(target_dir)
+}
+
+fn build_distrib_packages(
+    pg_config: &PgConfig,
+    manifest_path: &Path,
+    out_dir: &Path,
+    target: Option<&str>,
+    target_dir: &Path,
+    cargo_flags: &[String],
+) -> eyre::Result<Vec<PathBuf>> {
+    let cargo_toml = Manifest::<toml::Value>::from_path_with_metadata(manifest_path)
+        .wrap_err("couldn't parse manifest metadata")?;
+    let package = cargo_toml.package();
+
+    // Quit right away if there's no metadata
+    let Some(metadata) = package.metadata.as_ref() else {
+        return Ok(vec![]);
+    };
+
+    let kinds: Vec<_> = DistribKind::ALL
+        .into_iter()
+        .filter_map(|k| Some((k, metadata.get(k.section())?)))
+        .collect();
+    if kinds.is_empty() {
+        return Ok(vec![]);
+    }
+
+    // The staged library only runs on the platform that built it.
+    if !cfg!(target_os = "linux") {
+        eprintln!(
+            "{} skipping RPM and DEB packages, which can only be built on Linux",
+            "WARNING:".red().bold()
+        );
+        return Ok(vec![]);
+    }
+
+    // Built once and shared by every package kind
+    let lib_file = shared_library_filename(manifest_path, pg_config, cargo_flags)?;
+    let vars = Vars::new(pg_config, out_dir, package, target, lib_file)?;
+
+    kinds
+        .into_iter()
+        .map(|(kind, pkg_metadata)| {
+            build_distrib_package(kind, pkg_metadata, &vars, out_dir, target_dir)
+        })
+        .collect()
+}
+
+// The same Cargo.toml metadata builds one package per Postgres major version
+// and distribution.
+fn build_distrib_package(
+    kind: DistribKind,
+    metadata: &toml::Value,
+    vars: &Vars,
+    out_dir: &Path,
+    target_dir: &Path,
+) -> eyre::Result<PathBuf> {
+    let section = kind.section();
+    let mut metadata = kind
+        .with_defaults(metadata)
+        .wrap_err_with(|| format!("in [package.metadata.{section}]"))?;
+    vars.apply(&mut metadata).wrap_err_with(|| format!("in [package.metadata.{section}]"))?;
+
+    let manifest: arx_pack::Manifest =
+        metadata.try_into().wrap_err_with(|| format!("invalid [package.metadata.{section}]"))?;
+
+    let path = match kind {
+        DistribKind::Rpm => arx_pack::build_rpm(&manifest, out_dir),
+        DistribKind::Deb => arx_pack::build_deb(&manifest, out_dir),
+    }
+    .map_err(|e| eyre!("{e:#}"))?;
+
+    eprintln!(
+        "{} {} package to {}",
+        "     Writing".bold().green(),
+        section.to_uppercase(),
+        format_display_path(&path, target_dir).cyan()
+    );
+
+    Ok(path)
+}
+
+/// A distribution package format, built from `[package.metadata.<section>]`.
+#[derive(Clone, Copy, Debug)]
+enum DistribKind {
+    Rpm,
+    Deb,
+}
+
+impl DistribKind {
+    const ALL: [Self; 2] = [Self::Rpm, Self::Deb];
+
+    fn section(self) -> &'static str {
+        match self {
+            Self::Rpm => "rpm",
+            Self::Deb => "deb",
+        }
+    }
+
+    /// The metadata used when `[package.metadata.<section>]` leaves a key out.
+    /// The paths match the PGDG RPM layout and the Debian/PGDG apt layout.
+    fn default_template(self) -> &'static str {
+        match self {
+            Self::Rpm => {
+                r#"
+name = "${NAME}_${PG_MAJOR_VERSION}"
+version = "${VERSION}"
+arch = "${ARCH}"
+description = "${DESCRIPTION}"
+license = "${LICENSE}"
+maintainer = "${MAINTAINER}"
+depends = ["postgresql${PG_MAJOR_VERSION}-server"]
+files = [
+  { source = "${BUILD_BASE_PATH}/${PG_PKGLIBDIR}/${LIB_FILE}", dest = "/usr/pgsql-${PG_MAJOR_VERSION}/lib/${LIB_FILE}", mode = "0755" },
+]
+dirs = [
+  { source = "${BUILD_BASE_PATH}/${PG_SHAREDIR}/extension/", dest = "/usr/pgsql-${PG_MAJOR_VERSION}/share/extension/" },
+]
+"#
+            }
+            Self::Deb => {
+                r#"
+name = "postgresql-${PG_MAJOR_VERSION}-${DEB_NAME}"
+version = "${VERSION}"
+arch = "${ARCH}"
+description = "${DESCRIPTION}"
+license = "${LICENSE}"
+maintainer = "${MAINTAINER}"
+depends = ["postgresql-${PG_MAJOR_VERSION}"]
+files = [
+  { source = "${BUILD_BASE_PATH}/${PG_PKGLIBDIR}/${LIB_FILE}", dest = "/usr/lib/postgresql/${PG_MAJOR_VERSION}/lib/${LIB_FILE}", mode = "0644" },
+]
+dirs = [
+  { source = "${BUILD_BASE_PATH}/${PG_SHAREDIR}/extension/", dest = "/usr/share/postgresql/${PG_MAJOR_VERSION}/extension/" },
+]
+"#
+            }
+        }
+    }
+
+    /// Overlays the user's section on the default template. Each top-level key
+    /// the user sets replaces the default value as a whole, including arrays
+    /// such as `files` and `depends`.
+    fn with_defaults(self, user: &toml::Value) -> eyre::Result<toml::Value> {
+        let user = user.as_table().ok_or_else(|| eyre!("expected a table"))?;
+        let mut merged: toml::Table = toml::from_str(self.default_template())
+            .expect("default package templates are valid TOML, see `default_templates_parse`");
+        merged.extend(user.iter().map(|(k, v)| (k.clone(), v.clone())));
+        Ok(toml::Value::Table(merged))
+    }
+}
+
+/// The variables allowed in every `[package.metadata.<section>]` of [`DistribKind`].
+///
+/// A variable whose crate field is missing holds the reason instead of a value,
+/// so it is an error only when the metadata actually uses it.
+struct Vars(HashMap<&'static str, Result<String, &'static str>>);
+
+impl Vars {
+    fn new(
+        pg_config: &PgConfig,
+        out_dir: &Path,
+        package: &cargo_toml::Package<toml::Value>,
+        target: Option<&str>,
+        lib_file: String,
+    ) -> eyre::Result<Self> {
+        let optional = |value: Option<&str>, reason| value.map(str::to_owned).ok_or(reason);
+        Ok(Self(HashMap::from([
+            ("ARCH", Ok(package_arch(target).to_owned())),
+            ("BUILD_BASE_PATH", Ok(utf8_path(out_dir)?)),
+            (
+                "DESCRIPTION",
+                optional(package.description(), "set `package.description` in Cargo.toml"),
+            ),
+            ("LICENSE", optional(package.license(), "set `package.license` in Cargo.toml")),
+            (
+                "MAINTAINER",
+                optional(
+                    package.authors().first().map(String::as_str),
+                    "set `package.authors` in Cargo.toml",
+                ),
+            ),
+            ("DEB_NAME", Ok(deb_name(package.name()))),
+            ("LIB_FILE", Ok(lib_file)),
+            ("NAME", Ok(package.name().to_owned())),
+            ("PG_MAJOR_VERSION", Ok(pg_config.major_version()?.to_string())),
+            ("PG_PKGLIBDIR", Ok(utf8_path(&pg_config.pkglibdir()?)?)),
+            ("PG_SHAREDIR", Ok(utf8_path(&pg_config.sharedir()?)?)),
+            ("VERSION", Ok(package_version(package.version()))),
+        ])))
+    }
+
+    /// Expands every `${VAR}` in `src` in a single pass: substituted text is
+    /// never rescanned, so the result does not depend on substitution order.
+    fn expand(&self, src: &str) -> eyre::Result<String> {
+        let mut out = String::with_capacity(src.len());
+        let mut rest = src;
+        while let Some(start) = rest.find("${") {
+            out.push_str(&rest[..start]);
+            let after = &rest[start + 2..];
+            let end = after.find('}').ok_or_else(|| eyre!("unterminated `${{` in {src:?}"))?;
+            let key = &after[..end];
+            let val = self.0.get(key).ok_or_else(|| {
+                eyre!("unknown variable `${{{key}}}` in {src:?}; known variables: {}", self.known())
+            })?;
+            let val = val.as_ref().map_err(|reason| {
+                eyre!("`${{{key}}}` has no value: {reason}, or override the key that uses it")
+            })?;
+            out.push_str(val);
+            rest = &after[end + 1..];
+        }
+        out.push_str(rest);
+        Ok(out)
+    }
+
+    fn known(&self) -> String {
+        let mut keys: Vec<_> = self.0.keys().copied().collect();
+        keys.sort_unstable();
+        keys.join(", ")
+    }
+
+    /// Substitutes inside string values only; keys and other value types are left untouched.
+    fn apply(&self, value: &mut toml::Value) -> eyre::Result<()> {
+        match value {
+            toml::Value::String(s) => *s = self.expand(s)?,
+            toml::Value::Array(a) => a.iter_mut().try_for_each(|v| self.apply(v))?,
+            toml::Value::Table(t) => t.iter_mut().try_for_each(|(_, v)| self.apply(v))?,
+            _ => {}
+        }
+        Ok(())
+    }
+}
+
+/// The architecture of the packaged library. `--target` wins over the host, and
+/// arx-pack accepts the first component of the common Linux target triples.
+fn package_arch(target: Option<&str>) -> &str {
+    target.and_then(|t| t.split('-').next()).unwrap_or(std::env::consts::ARCH)
+}
+
+/// RPM rejects `-` in a version, and Debian reads it as a revision that sorts
+/// after the final release. Both formats sort `~` before the final release.
+fn package_version(crate_version: &str) -> String {
+    crate_version.replace('-', "~")
+}
+
+/// Debian package names allow only lowercase letters, digits, `+`, `-` and `.`.
+/// Crate names are ASCII letters, digits, `_` and `-`, so lowercasing and
+/// replacing `_` is enough.
+fn deb_name(crate_name: &str) -> String {
+    crate_name.to_ascii_lowercase().replace('_', "-")
+}
+
+// Package manifests are UTF-8 TOML, so a lossy conversion would silently
+// produce wrong install paths.
+fn utf8_path(path: &Path) -> eyre::Result<String> {
+    path.to_str()
+        .map(str::to_owned)
+        .ok_or_else(|| eyre!("path is not valid UTF-8: {}", path.display()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn vars() -> Vars {
+        Vars(HashMap::from([
+            ("ARCH", Ok("x86_64".to_owned())),
+            ("BUILD_BASE_PATH", Ok(r"C:\Users\me\target\my_ext-pg17".to_owned())),
+            ("DEB_NAME", Ok("my-ext".to_owned())),
+            ("DESCRIPTION", Ok("My extension".to_owned())),
+            ("LIB_FILE", Ok("my_ext.so".to_owned())),
+            ("LICENSE", Err("set `package.license` in Cargo.toml")),
+            ("MAINTAINER", Ok("Me".to_owned())),
+            ("NAME", Ok("my_ext".to_owned())),
+            ("PG_MAJOR_VERSION", Ok("17".to_owned())),
+            ("PG_PKGLIBDIR", Ok("/usr/lib/postgresql/17/lib".to_owned())),
+            ("PG_SHAREDIR", Ok("/odd/${NAME}/share".to_owned())),
+            ("VERSION", Ok("1.0.0".to_owned())),
+        ]))
+    }
+
+    #[test]
+    fn expands_variables() {
+        assert_eq!(vars().expand("${NAME}_${PG_MAJOR_VERSION}").unwrap(), "my_ext_17");
+        assert_eq!(vars().expand("no variables").unwrap(), "no variables");
+        assert_eq!(vars().expand("").unwrap(), "");
+    }
+
+    #[test]
+    fn does_not_rescan_substituted_text() {
+        assert_eq!(
+            vars().expand("${PG_SHAREDIR}/extension").unwrap(),
+            "/odd/${NAME}/share/extension"
+        );
+    }
+
+    #[test]
+    fn rejects_unknown_variable() {
+        let err = vars().expand("/usr/pgsql-${PG_MAJ OR_VERSION}/lib").unwrap_err().to_string();
+        assert!(err.contains("unknown variable `${PG_MAJ OR_VERSION}`"), "{err}");
+        assert!(err.contains("NAME, PG_MAJOR_VERSION"), "{err}");
+    }
+
+    #[test]
+    fn rejects_unterminated_variable() {
+        let err = vars().expand("${NAME").unwrap_err().to_string();
+        assert!(err.contains("unterminated"), "{err}");
+    }
+
+    #[test]
+    fn missing_crate_field_explains_how_to_fix() {
+        let err = vars().expand("${LICENSE}").unwrap_err().to_string();
+        assert!(err.contains("set `package.license` in Cargo.toml"), "{err}");
+    }
+
+    #[test]
+    fn substitutes_values_not_keys_and_keeps_windows_paths() {
+        let mut value: toml::Value = toml::from_str(
+            r#"
+            "${NAME}" = "${NAME}"
+            mode = 420
+            files = [{ source = "${BUILD_BASE_PATH}/x.so", dest = "/lib/${NAME}.so" }]
+            "#,
+        )
+        .unwrap();
+        vars().apply(&mut value).unwrap();
+
+        let table = value.as_table().unwrap();
+        assert_eq!(table["${NAME}"].as_str(), Some("my_ext"));
+        assert_eq!(table["mode"].as_integer(), Some(420));
+        let file = &table["files"][0];
+        assert_eq!(file["source"].as_str(), Some(r"C:\Users\me\target\my_ext-pg17/x.so"));
+        assert_eq!(file["dest"].as_str(), Some("/lib/my_ext.so"));
+
+        // The backslashes survive a TOML round trip because `toml` escapes them.
+        let reparsed: toml::Value = toml::from_str(&toml::to_string(&value).unwrap()).unwrap();
+        assert_eq!(reparsed, value);
+    }
+
+    #[test]
+    fn default_templates_parse() {
+        let empty = toml::Value::Table(toml::Table::new());
+        let vars =
+            Vars(vars().0.into_iter().map(|(k, v)| (k, Ok(v.unwrap_or_default()))).collect());
+        for kind in DistribKind::ALL {
+            let mut value = kind.with_defaults(&empty).unwrap();
+            vars.apply(&mut value).unwrap();
+            let _: arx_pack::Manifest = value.try_into().unwrap();
+        }
+    }
+
+    #[test]
+    fn user_keys_replace_defaults() {
+        let user: toml::Value = toml::from_str(
+            r#"
+            license = "PostgreSQL"
+            depends = ["postgresql17-server", "postgis35_17"]
+            "#,
+        )
+        .unwrap();
+        let mut value = DistribKind::Rpm.with_defaults(&user).unwrap();
+        vars().apply(&mut value).unwrap();
+
+        let table = value.as_table().unwrap();
+        assert_eq!(table["license"].as_str(), Some("PostgreSQL"));
+        assert_eq!(table["depends"].as_array().unwrap().len(), 2);
+        assert_eq!(table["name"].as_str(), Some("my_ext_17"));
+        assert_eq!(table["files"][0]["dest"].as_str(), Some("/usr/pgsql-17/lib/my_ext.so"));
+    }
+
+    #[test]
+    fn deb_name_is_valid_for_debian() {
+        assert_eq!(deb_name("My_Ext-2"), "my-ext-2");
+
+        // The fixture leaves `${LICENSE}` unset, so the section must provide it.
+        let user: toml::Value = toml::from_str(r#"license = "MIT""#).unwrap();
+        let mut value = DistribKind::Deb.with_defaults(&user).unwrap();
+        vars().apply(&mut value).unwrap();
+        assert_eq!(value["name"].as_str(), Some("postgresql-17-my-ext"));
+    }
+
+    #[test]
+    fn package_arch_follows_the_target() {
+        assert_eq!(package_arch(Some("aarch64-unknown-linux-gnu")), "aarch64");
+        assert_eq!(package_arch(None), std::env::consts::ARCH);
+    }
+
+    #[test]
+    fn package_version_sorts_pre_releases_first() {
+        assert_eq!(package_version("1.2.3"), "1.2.3");
+        assert_eq!(package_version("1.2.3-rc.1"), "1.2.3~rc.1");
+    }
+
+    // The library's file name differs from the crate name, as it does for a
+    // hyphenated crate or a versioned shared library.
+    #[cfg(unix)]
+    #[test]
+    fn builds_packages_from_staged_files() {
+        let out_dir = tempfile::tempdir().unwrap();
+        let out_dir = out_dir.path();
+        let libdir = out_dir.join("usr/lib/postgresql/17/lib");
+        let sharedir = out_dir.join("usr/share/postgresql/17");
+        std::fs::create_dir_all(&libdir).unwrap();
+        std::fs::create_dir_all(sharedir.join("extension")).unwrap();
+        std::fs::write(libdir.join("my_ext-1.0.0.so"), "library").unwrap();
+        std::fs::write(sharedir.join("extension/my_ext.control"), "control").unwrap();
+
+        let mut vars = vars();
+        vars.0.extend([
+            ("BUILD_BASE_PATH", Ok(utf8_path(out_dir).unwrap())),
+            ("DEB_NAME", Ok("my-ext".to_owned())),
+            ("LIB_FILE", Ok("my_ext-1.0.0.so".to_owned())),
+            ("LICENSE", Ok("MIT".to_owned())),
+            ("NAME", Ok("my-ext".to_owned())),
+            ("PG_SHAREDIR", Ok("/usr/share/postgresql/17".to_owned())),
+            ("VERSION", Ok(package_version("1.0.0-rc.1"))),
+        ]);
+
+        let section = toml::Value::Table(toml::Table::new());
+        for (kind, expected) in [
+            (DistribKind::Rpm, "my-ext_17-1.0.0~rc.1-1.x86_64.rpm"),
+            (DistribKind::Deb, "postgresql-17-my-ext_1.0.0~rc.1_amd64.deb"),
+        ] {
+            let path = build_distrib_package(kind, &section, &vars, out_dir, out_dir).unwrap();
+            assert_eq!(path, out_dir.join(expected));
+            assert!(path.is_file(), "{}", path.display());
+        }
+    }
+
+    #[test]
+    fn rejects_non_table_section() {
+        let err = DistribKind::Deb.with_defaults(&toml::Value::Boolean(true)).unwrap_err();
+        assert!(err.to_string().contains("expected a table"), "{err}");
+    }
 }

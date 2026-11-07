@@ -59,7 +59,7 @@ cargo test --no-default-features --features "pg18 pg_test"
 | Promote reviewed regression output | `cargo pgrx regress pg18 --auto` |
 | Run backend benchmarks | `cargo pgrx bench pg18` |
 | Generate all SQL or selected items | `cargo pgrx schema pg18 [ITEM]...` |
-| Create an installation package | `cargo pgrx package` |
+| Stage files for distribution, and build any declared RPM or DEB | `cargo pgrx package` |
 
 `cargo check` skips the final link but still runs build scripts and may require
 configured PostgreSQL headers and build dependencies. It does not validate
@@ -120,7 +120,7 @@ separate clusters and dynamic ports; see [test.md](test.md) for its cleanup.
 - [bench.md](bench.md): backend benchmarks and stored comparisons
 - [install.md](install.md): installation into a chosen PostgreSQL prefix
 - [schema.md](schema.md): full schemas and selected SQL items
-- [package.md](package.md): installation packages and artifact placement
+- [package.md](package.md): staged packages, artifact placement, RPM and DEB builds
 - [new.md](new.md): extension scaffolding
 - [instance-management.md](instance-management.md): start, stop, status, connect
 - [utilities.md](utilities.md): info, get, upgrade, cross

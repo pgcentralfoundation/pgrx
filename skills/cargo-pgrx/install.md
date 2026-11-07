@@ -37,8 +37,9 @@ cargo pgrx install --cargo=--config=./cargo-local.toml
 
 Use `--sudo` only when authorized to install into the chosen prefix. Installation
 can replace files used by other databases or worktrees sharing that prefix.
-For staged distribution files, use [package](package.md), which also provides
-`--prefix-dir`. For interactive development, use [run](run.md).
+For staged distribution files, RPMs, and DEBs, use [package](package.md), which
+also provides `--prefix-dir`. `--sudo` stages files the same way but never builds
+RPM or DEB packages. For interactive development, use [run](run.md).
 
 Building with `pg_bench` includes benchmark functions and their dependencies;
 cargo-pgrx warns about this during install. Keep that feature out of ordinary
