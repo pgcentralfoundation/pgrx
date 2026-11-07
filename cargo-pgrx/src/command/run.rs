@@ -12,6 +12,7 @@ use crate::CommandExecute;
 use crate::cargo::CargoProfile;
 use crate::command::get::get_property;
 use crate::command::install::{install_extension, warn_if_pg_bench_enabled};
+use crate::command::migrate::UnreleasedFragmentMode;
 use crate::command::regress::Regress;
 use crate::command::start::start_postgres;
 use crate::command::stop::stop_postgres;
@@ -56,7 +57,7 @@ pub(crate) struct Run {
     install_only: bool,
     #[clap(long)]
     valgrind: bool,
-    /// Disable automatic assembly of unreleased migration fragments into the installed extension directory
+    /// Don't assemble unreleased SQL fragments into the installed extension
     #[clap(long)]
     no_assemble_unreleased: bool,
     /// Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
@@ -79,7 +80,7 @@ impl From<&Regress> for Run {
             pgcli: false,
             install_only: false,
             valgrind: regress.valgrind,
-            no_assemble_unreleased: false,
+            no_assemble_unreleased: regress.no_assemble_unreleased,
             cargo: regress.cargo.clone(),
         }
     }
@@ -127,11 +128,7 @@ impl Run {
             if self.release { CargoProfile::Release } else { CargoProfile::Dev },
         )?;
 
-        let unreleased_mode = if self.no_assemble_unreleased {
-            crate::command::migrate::UnreleasedFragmentMode::Skip
-        } else {
-            crate::command::migrate::UnreleasedFragmentMode::AssembleEphemeral
-        };
+        let unreleased_mode = UnreleasedFragmentMode::for_development(self.no_assemble_unreleased);
 
         run(
             &pg_config,
@@ -185,7 +182,7 @@ pub(crate) fn run(
     target: Option<&str>,
     target_dir: &Path,
     postgresql_conf: &HashMap<String, String>,
-    unreleased_mode: crate::command::migrate::UnreleasedFragmentMode,
+    unreleased_mode: UnreleasedFragmentMode,
     cargo_flags: &[String],
 ) -> eyre::Result<()> {
     // stop postgres

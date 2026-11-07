@@ -3,31 +3,17 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+use super::MigrateContext;
 use super::fragment::{
-    FragmentDependency, FragmentId, MigrationFragment, topological_sort_fragments,
+    MigrationFragment, load_fragments, prerequisites, topological_sort_fragments,
 };
-use super::resolve_unreleased_dir;
+use super::sql::{ObjectRef, Verb, touched_objects};
 use crate::CommandExecute;
-use crate::manifest::get_package_manifest;
 use eyre::{Context, eyre};
 use owo_colors::OwoColorize;
-use regex::Regex;
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 use std::process::Command;
-use std::sync::LazyLock;
-
-static LINE_COMMENT_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"--[^\n]*").unwrap());
-static BLOCK_COMMENT_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"/\*[\s\S]*?\*/").unwrap());
-static BACKSLASH_CMD_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\\\w+[^\n]*").unwrap());
-static STMT_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(
-        r"(?i)^(CREATE(?:\s+OR\s+REPLACE)?|ALTER|DROP)\s+([A-Z\s]+?)\s+(?:IF\s+EXISTS\s+)?([^\s(]+)(?:\s*\((.*?)\))?",
-    )
-    .unwrap()
-});
-static DEFAULT_ARG_RE: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?i)\s+(DEFAULT|=)\s+.*$").unwrap());
 
 #[derive(clap::Args, Debug)]
 #[clap(author)]
@@ -53,18 +39,7 @@ pub(crate) struct Check {
     pub(crate) format: LintFormat,
 }
 
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    clap::ValueEnum,
-    Default,
-    serde::Serialize,
-    serde::Deserialize
-)]
-#[serde(rename_all = "lowercase")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, clap::ValueEnum, Default)]
 pub enum LintFormat {
     #[default]
     Text,
@@ -72,7 +47,7 @@ pub enum LintFormat {
     Github,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum LintRule {
     DagCycle,
@@ -80,7 +55,7 @@ pub enum LintRule {
     MixedObjects,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
 pub struct DiagnosticIssue {
     pub file: PathBuf,
     pub filename: String,
@@ -88,97 +63,14 @@ pub struct DiagnosticIssue {
     pub message: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SqlStatement {
-    pub verb: String,
-    pub signature: String,
-    pub raw: String,
-}
-
-/// Extracts (verb, normalized_signature, raw_stmt) from SQL content.
-pub fn extract_statements_and_objects(content: &str) -> Vec<SqlStatement> {
-    let no_line_comments = LINE_COMMENT_RE.replace_all(content, "");
-    let no_block_comments = BLOCK_COMMENT_RE.replace_all(&no_line_comments, "");
-    let cleaned = BACKSLASH_CMD_RE.replace_all(&no_block_comments, "");
-
-    let mut statements = Vec::new();
-    for piece in cleaned.split(';') {
-        let stmt = piece.split_whitespace().collect::<Vec<_>>().join(" ");
-        if stmt.is_empty() {
-            continue;
-        }
-
-        if let Some(caps) = STMT_RE.captures(&stmt) {
-            let verb_match = caps.get(1).map(|m| m.as_str()).unwrap_or("");
-            let obj_type_match = caps.get(2).map(|m| m.as_str()).unwrap_or("");
-            let name_match = caps.get(3).map(|m| m.as_str()).unwrap_or("");
-            let args_match = caps.get(4).map(|m| m.as_str());
-
-            let verb = verb_match.split_whitespace().collect::<Vec<_>>().join(" ").to_uppercase();
-            let obj_type =
-                obj_type_match.split_whitespace().collect::<Vec<_>>().join(" ").to_uppercase();
-            let name = name_match.replace('"', "").to_lowercase();
-
-            let signature = if let Some(args) = args_match
-                && matches!(obj_type.as_str(), "FUNCTION" | "AGGREGATE" | "PROCEDURE")
-            {
-                let mut arg_types = Vec::new();
-                for raw_arg in args.split(',') {
-                    let stripped = DEFAULT_ARG_RE.replace(raw_arg.trim(), "");
-                    let tokens: Vec<&str> = stripped.split_whitespace().collect();
-                    if let Some(&last) = tokens.last() {
-                        let cleaned_type = last.replace('"', "").to_lowercase();
-                        if !cleaned_type.is_empty() {
-                            arg_types.push(cleaned_type);
-                        }
-                    }
-                }
-                format!("{obj_type} {name}({})", arg_types.join(", "))
-            } else {
-                format!("{obj_type} {name}")
-            };
-
-            statements.push(SqlStatement { verb, signature, raw: stmt });
-        }
-    }
-
-    statements
-}
-
-/// Catalogs all objects created or replaced in unreleased migration fragments.
-pub fn catalog_unreleased_objects(fragments: &[MigrationFragment]) -> BTreeMap<String, FragmentId> {
-    let mut catalog = BTreeMap::new();
-    for fragment in fragments {
-        for stmt in extract_statements_and_objects(&fragment.sql_content) {
-            let v = stmt.verb.to_uppercase();
-            if v.contains("CREATE") || v.contains("REPLACE") {
-                catalog.entry(stmt.signature).or_insert_with(|| fragment.id.clone());
-            }
-        }
-    }
-    catalog
-}
-
-/// Identifies fragment files added or modified in git relative to `base_ref`.
-pub fn get_changed_fragment_files(
-    repo_root: &Path,
-    unreleased_dir: &Path,
-    base_ref: &str,
-) -> eyre::Result<Vec<PathBuf>> {
-    let merge_base_out =
-        Command::new("git").args(["merge-base", base_ref, "HEAD"]).current_dir(repo_root).output();
-
-    let diff_ref = match merge_base_out {
-        Ok(out) if out.status.success() => {
-            let s = String::from_utf8_lossy(&out.stdout).trim().to_string();
-            if s.is_empty() { base_ref.to_string() } else { s }
-        }
-        _ => base_ref.to_string(),
-    };
-
+/// Names the fragments in `unreleased_dir` added or modified since they diverged from `base_ref`.
+fn changed_fragment_files(unreleased_dir: &Path, base_ref: &str) -> eyre::Result<BTreeSet<String>> {
+    // `--relative` scopes the diff to the current directory and reports paths relative to it, which
+    // holds however deep inside the repository the crate is.
     let diff_out = Command::new("git")
-        .args(["diff", "--name-only", "--diff-filter=AM", &format!("{diff_ref}...HEAD")])
-        .current_dir(repo_root)
+        .args(["diff", "--relative", "--name-only", "--no-renames", "--diff-filter=AM", "-z"])
+        .arg(format!("{base_ref}...HEAD"))
+        .current_dir(unreleased_dir)
         .output()
         .wrap_err("failed to invoke git diff")?;
 
@@ -186,27 +78,11 @@ pub fn get_changed_fragment_files(
         return Err(eyre!("git diff failed: {}", String::from_utf8_lossy(&diff_out.stderr)));
     }
 
-    let stdout = String::from_utf8_lossy(&diff_out.stdout);
-    let mut changed = Vec::new();
-    let unreleased_canonical =
-        unreleased_dir.canonicalize().unwrap_or_else(|_| unreleased_dir.to_path_buf());
-
-    for line in stdout.lines() {
-        let trimmed = line.trim();
-        if trimmed.is_empty() || !trimmed.ends_with(".sql") {
-            continue;
-        }
-        let full_path = repo_root.join(trimmed);
-        if let Ok(canon) = full_path.canonicalize() {
-            if canon.parent() == Some(&unreleased_canonical) {
-                changed.push(canon);
-            }
-        } else if full_path.parent() == Some(unreleased_dir) {
-            changed.push(full_path);
-        }
-    }
-
-    Ok(changed)
+    Ok(String::from_utf8_lossy(&diff_out.stdout)
+        .split('\0')
+        .filter(|path| path.ends_with(".sql") && !path.contains('/'))
+        .map(str::to_string)
+        .collect())
 }
 
 pub struct LintConfig {
@@ -214,109 +90,96 @@ pub struct LintConfig {
     pub base_ref: Option<String>,
 }
 
+/// For each fragment of a topologically sorted list, every fragment that is guaranteed to run
+/// before it, directly declared or not.
+fn transitive_prerequisites(sorted: &[MigrationFragment]) -> Vec<BTreeSet<usize>> {
+    let mut transitive: Vec<BTreeSet<usize>> = Vec::with_capacity(sorted.len());
+    for direct in prerequisites(sorted) {
+        let inherited: Vec<usize> =
+            direct.iter().flat_map(|&idx| transitive[idx].iter().copied()).collect();
+        let mut all = direct;
+        all.extend(inherited);
+        transitive.push(all);
+    }
+    transitive
+}
+
 pub fn run_lint_checks(
-    repo_root: &Path,
     unreleased_dir: &Path,
     config: &LintConfig,
 ) -> eyre::Result<Vec<DiagnosticIssue>> {
-    if !unreleased_dir.exists() {
-        return Ok(Vec::new());
-    }
-
-    let mut raw_fragments = Vec::new();
-    for entry in std::fs::read_dir(unreleased_dir)
-        .wrap_err_with(|| format!("failed to read directory `{}`", unreleased_dir.display()))?
-    {
-        let entry = entry?;
-        let path = entry.path();
-        if !path.is_file() {
-            continue;
+    let fragments = match topological_sort_fragments(load_fragments(unreleased_dir)?) {
+        Ok(fragments) => fragments,
+        Err(err) => {
+            return Ok(vec![DiagnosticIssue {
+                file: unreleased_dir.to_path_buf(),
+                filename: "unreleased".to_string(),
+                rule: LintRule::DagCycle,
+                message: err.to_string(),
+            }]);
         }
-        let Some(name) = path.file_name().and_then(|n| n.to_str()) else {
-            continue;
-        };
-        if name.starts_with('.') || !name.ends_with(".sql") {
-            continue;
-        }
-        raw_fragments.push(super::fragment::load_fragment(&path)?);
-    }
-
-    let mut issues = Vec::new();
-
-    // 1. DAG cycle check
-    if let Err(err) = topological_sort_fragments(raw_fragments.clone()) {
-        issues.push(DiagnosticIssue {
-            file: unreleased_dir.to_path_buf(),
-            filename: "unreleased".to_string(),
-            rule: LintRule::DagCycle,
-            message: err.to_string(),
-        });
-        return Ok(issues);
-    }
-
-    let catalog = catalog_unreleased_objects(&raw_fragments);
-
-    // 2. Determine which fragments to lint (filtered by git diff if base_ref provided)
-    let fragments_to_lint: Vec<&MigrationFragment> = if let Some(base_ref) = &config.base_ref {
-        let changed_paths = get_changed_fragment_files(repo_root, unreleased_dir, base_ref)?;
-        let changed_filenames: BTreeSet<String> = changed_paths
-            .into_iter()
-            .filter_map(|p| p.file_name().and_then(|f| f.to_str()).map(|s| s.to_string()))
-            .collect();
-
-        raw_fragments.iter().filter(|f| changed_filenames.contains(&f.filename)).collect()
-    } else {
-        raw_fragments.iter().collect()
     };
 
-    // 3. Lint each targeted fragment
-    for fragment in fragments_to_lint {
-        let statements = extract_statements_and_objects(&fragment.sql_content);
-        let mut detected_unreleased_deps = BTreeSet::new();
-        let mut touched_released_objects = Vec::new();
+    // Every fragment feeds the catalog below, but only changed ones are reported.
+    let changed = config
+        .base_ref
+        .as_deref()
+        .map(|base_ref| changed_fragment_files(unreleased_dir, base_ref))
+        .transpose()?;
 
-        for stmt in &statements {
-            if let Some(owner_id) = catalog.get(&stmt.signature) {
-                if owner_id != &fragment.id {
-                    detected_unreleased_deps.insert(owner_id.clone());
-                }
-            } else {
-                let v = stmt.verb.to_uppercase();
-                if v.contains("ALTER") || v.contains("DROP") || v.contains("REPLACE") {
-                    touched_released_objects.push(stmt.signature.clone());
-                }
-            }
-        }
+    let guaranteed_before = transitive_prerequisites(&fragments);
+    let mut issues = Vec::new();
 
-        // Check for undeclared dependencies on unreleased objects
-        for dep_id in &detected_unreleased_deps {
-            let declared = fragment.dependencies.iter().any(|d| match d {
-                FragmentDependency::Id(id) => id == dep_id,
-                FragmentDependency::Filename(fname) => {
-                    super::fragment::parse_fragment_id(fname) == *dep_id
-                }
-            });
+    // Objects created so far, by kind and name, and the index of the fragment creating each.
+    // Walking in assembly order means a fragment can only depend on one that runs before it, so a
+    // fragment that drops an object a later fragment recreates is not told to run after it.
+    let mut created: BTreeMap<(&str, String), Vec<(ObjectRef, usize)>> = BTreeMap::new();
 
-            if !declared {
-                issues.push(DiagnosticIssue {
-                    file: fragment.path.clone(),
-                    filename: fragment.filename.clone(),
-                    rule: LintRule::UndeclaredDependency,
-                    message: format!(
-                        "Fragment touches unreleased object(s) from fragment `{dep_id}` but does not declare '-- depends-on: {dep_id}'"
-                    ),
-                });
-            }
-        }
+    for (idx, fragment) in fragments.iter().enumerate() {
+        let mut owners = BTreeSet::new();
+        let mut released_objects = Vec::new();
 
-        // Check for mixing released and unreleased objects
-        if config.deny_mixed_objects
-            && !touched_released_objects.is_empty()
-            && !detected_unreleased_deps.is_empty()
-        {
-            let owners_str = detected_unreleased_deps
+        for object in touched_objects(&fragment.sql_content) {
+            let same_name = created.entry((object.kind, object.name.clone())).or_default();
+            let earlier: Vec<usize> = same_name
                 .iter()
-                .map(|id| id.to_string())
+                .filter(|(other, _)| other.same_object(&object))
+                .map(|&(_, owner)| owner)
+                .collect();
+
+            if earlier.is_empty() && object.verb != Verb::Create {
+                released_objects.push(object.to_string());
+            }
+            owners.extend(earlier.into_iter().filter(|&owner| fragments[owner].id != fragment.id));
+
+            if object.verb == Verb::Create {
+                same_name.push((object, idx));
+            }
+        }
+
+        if changed.as_ref().is_some_and(|changed| !changed.contains(&fragment.filename)) {
+            continue;
+        }
+
+        for &owner in &owners {
+            if guaranteed_before[idx].contains(&owner) {
+                continue;
+            }
+            let dep_id = &fragments[owner].id;
+            issues.push(DiagnosticIssue {
+                file: fragment.path.clone(),
+                filename: fragment.filename.clone(),
+                rule: LintRule::UndeclaredDependency,
+                message: format!(
+                    "Fragment touches unreleased object(s) from fragment `{dep_id}` but does not declare '-- depends-on: {dep_id}'"
+                ),
+            });
+        }
+
+        if config.deny_mixed_objects && !released_objects.is_empty() && !owners.is_empty() {
+            let owners_str = owners
+                .iter()
+                .map(|&owner| fragments[owner].id.to_string())
                 .collect::<Vec<_>>()
                 .join(", ");
             issues.push(DiagnosticIssue {
@@ -325,7 +188,7 @@ pub fn run_lint_checks(
                 rule: LintRule::MixedObjects,
                 message: format!(
                     "Fragment mixes modifications to already-released objects ({}) with unreleased objects from fragment(s) [{owners_str}]",
-                    touched_released_objects.join(", ")
+                    released_objects.join(", ")
                 ),
             });
         }
@@ -376,21 +239,11 @@ pub fn render_lint_diagnostics(issues: &[DiagnosticIssue], format: LintFormat) -
 impl CommandExecute for Check {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        let features = clap_cargo::Features::default();
-        let (package_manifest, package_manifest_path, _) = get_package_manifest(
-            &features,
-            self.package.as_deref(),
-            self.manifest_path.as_deref(),
-            &[],
-        )?;
-
-        let crate_dir = package_manifest_path.parent().unwrap_or_else(|| Path::new("."));
-        let unreleased_dir = resolve_unreleased_dir(&package_manifest, &package_manifest_path);
-
+        let context = MigrateContext::load(self.package.as_deref(), self.manifest_path.as_deref())?;
         let config =
             LintConfig { deny_mixed_objects: self.deny_mixed_objects, base_ref: self.base };
 
-        let issues = run_lint_checks(crate_dir, &unreleased_dir, &config)?;
+        let issues = run_lint_checks(&context.unreleased_dir, &config)?;
         render_lint_diagnostics(&issues, self.format)?;
 
         Ok(())
@@ -401,117 +254,184 @@ impl CommandExecute for Check {
 mod tests {
     use super::*;
 
-    #[test]
-    fn extracts_statements_and_signatures() {
-        let sql = r#"
--- comment
-\echo loading
-CREATE FUNCTION my_func(a int, b text DEFAULT 'x') RETURNS void AS $$ $$ LANGUAGE sql;
-CREATE OR REPLACE AGGREGATE my_agg(integer) (SFUNC = int4_add);
-ALTER TABLE "Customers" ADD COLUMN age int;
-DROP TYPE IF EXISTS status_t;
-"#;
-        let stmts = extract_statements_and_objects(sql);
-        assert_eq!(stmts.len(), 4);
+    const NO_FLAGS: LintConfig = LintConfig { deny_mixed_objects: false, base_ref: None };
 
-        assert_eq!(stmts[0].verb, "CREATE");
-        assert_eq!(stmts[0].signature, "FUNCTION my_func(int, text)");
-
-        assert_eq!(stmts[1].verb, "CREATE OR REPLACE");
-        assert_eq!(stmts[1].signature, "AGGREGATE my_agg(integer)");
-
-        assert_eq!(stmts[2].verb, "ALTER");
-        assert_eq!(stmts[2].signature, "TABLE customers");
-
-        assert_eq!(stmts[3].verb, "DROP");
-        assert_eq!(stmts[3].signature, "TYPE status_t");
+    fn lint(files: &[(&str, &str)], config: &LintConfig) -> Vec<DiagnosticIssue> {
+        let temp = tempfile::tempdir().unwrap();
+        for (name, sql) in files {
+            std::fs::write(temp.path().join(name), sql).unwrap();
+        }
+        run_lint_checks(temp.path(), config).unwrap()
     }
 
-    #[test]
-    fn catalogs_unreleased_objects_correctly() {
-        let f1 = MigrationFragment {
-            path: PathBuf::from("101.sql"),
-            filename: "101.sql".to_string(),
-            id: FragmentId::Numeric(101),
-            dependencies: vec![],
-            sql_content:
-                "CREATE TABLE t1 (id int); CREATE FUNCTION f1() RETURNS void AS $$ $$ LANGUAGE sql;"
-                    .to_string(),
-        };
-
-        let catalog = catalog_unreleased_objects(&[f1]);
-        assert_eq!(catalog.get("TABLE t1"), Some(&FragmentId::Numeric(101)));
-        assert_eq!(catalog.get("FUNCTION f1()"), Some(&FragmentId::Numeric(101)));
+    fn assert_undeclared(issues: &[DiagnosticIssue], filename: &str, owner: &str) {
+        assert_eq!(issues.len(), 1, "{issues:?}");
+        assert_eq!(issues[0].rule, LintRule::UndeclaredDependency);
+        assert_eq!(issues[0].filename, filename);
+        assert!(
+            issues[0].message.contains(&format!("from fragment `{owner}`")),
+            "{}",
+            issues[0].message
+        );
     }
 
     #[test]
     fn detects_undeclared_dependency() {
-        let temp = tempfile::tempdir().unwrap();
-        let unreleased = temp.path().join("sql/unreleased");
-        std::fs::create_dir_all(&unreleased).unwrap();
-
-        std::fs::write(unreleased.join("101.create.sql"), "CREATE TABLE t1 (id int);").unwrap();
-
-        // 102 modifies t1 without declaring dependency on 101
-        std::fs::write(unreleased.join("102.modify.sql"), "ALTER TABLE t1 ADD COLUMN name text;")
-            .unwrap();
-
-        let config = LintConfig { deny_mixed_objects: false, base_ref: None };
-
-        let issues = run_lint_checks(temp.path(), &unreleased, &config).unwrap();
-        assert_eq!(issues.len(), 1);
-        assert_eq!(issues[0].rule, LintRule::UndeclaredDependency);
-        assert!(issues[0].message.contains("touches unreleased object(s) from fragment `101`"));
+        let issues = lint(
+            &[
+                ("101.create.sql", "CREATE TABLE t1 (id int);"),
+                ("102.modify.sql", "ALTER TABLE t1 ADD COLUMN name text;"),
+            ],
+            &NO_FLAGS,
+        );
+        assert_undeclared(&issues, "102.modify.sql", "101");
     }
 
     #[test]
     fn allows_declared_dependency() {
-        let temp = tempfile::tempdir().unwrap();
-        let unreleased = temp.path().join("sql/unreleased");
-        std::fs::create_dir_all(&unreleased).unwrap();
+        let issues = lint(
+            &[
+                ("101.create.sql", "CREATE TABLE t1 (id int);"),
+                ("102.modify.sql", "-- depends-on: 101\nALTER TABLE t1 ADD COLUMN name text;"),
+            ],
+            &NO_FLAGS,
+        );
+        assert!(issues.is_empty(), "{issues:?}");
+    }
 
-        std::fs::write(unreleased.join("101.create.sql"), "CREATE TABLE t1 (id int);").unwrap();
+    #[test]
+    fn independent_objects_do_not_collide() {
+        for (a, b) in [
+            ("CREATE TABLE IF NOT EXISTS a (id int);", "CREATE TABLE IF NOT EXISTS b (id int);"),
+            ("CREATE MATERIALIZED VIEW a AS SELECT 1;", "CREATE MATERIALIZED VIEW b AS SELECT 2;"),
+            ("CREATE UNIQUE INDEX a ON t1 (x);", "CREATE UNIQUE INDEX b ON t2 (y);"),
+            ("CREATE FUNCTION f(int) RETURNS int;", "CREATE FUNCTION f(text) RETURNS int;"),
+        ] {
+            let issues = lint(&[("101.a.sql", a), ("102.b.sql", b)], &NO_FLAGS);
+            assert!(issues.is_empty(), "{a} / {b}: {issues:?}");
+        }
+    }
 
-        std::fs::write(
-            unreleased.join("102.modify.sql"),
-            "-- depends-on: 101\nALTER TABLE t1 ADD COLUMN name text;",
-        )
-        .unwrap();
+    #[test]
+    fn statements_inside_function_bodies_are_not_objects() {
+        let body = "AS $$ BEGIN PERFORM 1; CREATE TABLE scratch (id int); END $$ LANGUAGE plpgsql;";
+        let issues = lint(
+            &[
+                ("101.a.sql", &format!("CREATE FUNCTION g() RETURNS void {body}")),
+                ("102.b.sql", &format!("CREATE FUNCTION h() RETURNS void {body}")),
+            ],
+            &NO_FLAGS,
+        );
+        assert!(issues.is_empty(), "{issues:?}");
+    }
 
-        let config = LintConfig { deny_mixed_objects: false, base_ref: None };
+    #[test]
+    fn finds_dependencies_through_awkward_spellings() {
+        for (create, touch) in [
+            ("CREATE TABLE IF NOT EXISTS t (id int);", "ALTER TABLE t ADD COLUMN x int;"),
+            ("CREATE TABLE t (id int);", "ALTER TABLE ONLY t ADD COLUMN x int;"),
+            ("CREATE TABLE t (id int);", "CREATE INDEX i ON t (id);"),
+            ("CREATE FUNCTION f(a numeric(10,2)) RETURNS int;", "DROP FUNCTION f(numeric);"),
+            ("CREATE FUNCTION f(a integer) RETURNS int;", "DROP FUNCTION f(int);"),
+            ("CREATE FUNCTION s.f() RETURNS int;", "DROP FUNCTION f();"),
+            ("CREATE FUNCTION f(int) RETURNS int;", "DROP FUNCTION f;"),
+            ("COMMENT ON TABLE t IS 'a -- b';\nCREATE TABLE u (id int);", "DROP TABLE u;"),
+        ] {
+            let issues = lint(&[("101.a.sql", create), ("102.b.sql", touch)], &NO_FLAGS);
+            assert_undeclared(&issues, "102.b.sql", "101");
+        }
+    }
 
-        let issues = run_lint_checks(temp.path(), &unreleased, &config).unwrap();
-        assert!(issues.is_empty());
+    #[test]
+    fn a_transitive_dependency_is_enough() {
+        let issues = lint(
+            &[
+                ("101.a.sql", "CREATE TABLE t (id int);"),
+                ("102.b.sql", "-- depends-on: 101\nALTER TABLE t ADD COLUMN x int;"),
+                ("103.c.sql", "-- depends-on: 102\nALTER TABLE t ADD COLUMN y int;"),
+            ],
+            &NO_FLAGS,
+        );
+        assert!(issues.is_empty(), "{issues:?}");
+    }
+
+    #[test]
+    fn a_drop_followed_by_a_recreate_is_already_ordered() {
+        // Asking 101 to depend on 102 would run the DROP last and lose the function.
+        let issues = lint(
+            &[
+                ("101.a.sql", "DROP FUNCTION f(int);"),
+                ("102.b.sql", "CREATE FUNCTION f(int) RETURNS text;"),
+            ],
+            &NO_FLAGS,
+        );
+        assert!(issues.is_empty(), "{issues:?}");
+    }
+
+    #[test]
+    fn replacing_the_same_function_twice_needs_an_order() {
+        let sql = "CREATE OR REPLACE FUNCTION released() RETURNS int;";
+        let issues = lint(&[("102.b.sql", sql), ("101.a.sql", sql)], &NO_FLAGS);
+        assert_undeclared(&issues, "102.b.sql", "101");
+    }
+
+    #[test]
+    fn fragments_sharing_an_id_are_ordered_by_filename() {
+        let issues = lint(
+            &[
+                ("101.a.sql", "CREATE TABLE t (id int);"),
+                ("101.b.sql", "ALTER TABLE t ADD COLUMN x int;"),
+            ],
+            &NO_FLAGS,
+        );
+        assert!(issues.is_empty(), "{issues:?}");
+    }
+
+    #[test]
+    fn reports_cycles() {
+        let issues = lint(
+            &[("101.a.sql", "-- depends-on: 102\n"), ("102.b.sql", "-- depends-on: 101\n")],
+            &NO_FLAGS,
+        );
+        assert_eq!(issues.len(), 1, "{issues:?}");
+        assert_eq!(issues[0].rule, LintRule::DagCycle);
     }
 
     #[test]
     fn detects_mixed_objects_when_flag_enabled() {
-        let temp = tempfile::tempdir().unwrap();
-        let unreleased = temp.path().join("sql/unreleased");
-        std::fs::create_dir_all(&unreleased).unwrap();
-
-        std::fs::write(
-            unreleased.join("101.create.sql"),
-            "CREATE TABLE unreleased_table (id int);",
-        )
-        .unwrap();
-
-        // 102 modifies unreleased_table (from 101) AND modifies an existing released table (released_table)
-        std::fs::write(
-            unreleased.join("102.mixed.sql"),
-            "-- depends-on: 101\nALTER TABLE unreleased_table ADD COLUMN a int;\nALTER TABLE released_table ADD COLUMN b text;",
-        )
-        .unwrap();
-
         let config = LintConfig { deny_mixed_objects: true, base_ref: None };
-
-        let issues = run_lint_checks(temp.path(), &unreleased, &config).unwrap();
-        assert_eq!(issues.len(), 1);
+        let issues = lint(
+            &[
+                ("101.create.sql", "CREATE TABLE unreleased_table (id int);"),
+                (
+                    "102.mixed.sql",
+                    "-- depends-on: 101\nALTER TABLE unreleased_table ADD COLUMN a int;\nALTER TABLE released_table ADD COLUMN b text;",
+                ),
+            ],
+            &config,
+        );
+        assert_eq!(issues.len(), 1, "{issues:?}");
         assert_eq!(issues[0].rule, LintRule::MixedObjects);
         assert!(
             issues[0]
                 .message
                 .contains("mixes modifications to already-released objects (TABLE released_table)")
         );
+    }
+
+    #[test]
+    fn a_fragments_own_objects_are_not_released() {
+        let config = LintConfig { deny_mixed_objects: true, base_ref: None };
+        let issues = lint(
+            &[
+                ("101.create.sql", "CREATE TABLE a (id int);"),
+                (
+                    "102.own.sql",
+                    "-- depends-on: 101\nCREATE TABLE b (id int);\nALTER TABLE b ADD COLUMN x int;\nALTER TABLE a ADD COLUMN y int;",
+                ),
+            ],
+            &config,
+        );
+        assert!(issues.is_empty(), "{issues:?}");
     }
 }

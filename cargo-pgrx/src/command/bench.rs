@@ -85,6 +85,9 @@ pub(crate) struct Bench {
     /// Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
     #[clap(long = "cargo", value_name = "FLAG", allow_hyphen_values = true)]
     cargo: Vec<String>,
+    /// Don't assemble unreleased SQL fragments into the installed extension
+    #[clap(long)]
+    no_assemble_unreleased: bool,
     #[clap(from_global, action = clap::ArgAction::Count)]
     verbose: u8,
     /// Custom `postgresql.conf` settings in the form of `key=value`
@@ -143,7 +146,9 @@ impl CommandExecute for Bench {
             self.target.as_deref(),
             &target_dir,
             &postgresql_conf,
-            crate::command::migrate::UnreleasedFragmentMode::AssembleEphemeral,
+            crate::command::migrate::UnreleasedFragmentMode::for_development(
+                self.no_assemble_unreleased,
+            ),
             &self.cargo,
         )?;
 

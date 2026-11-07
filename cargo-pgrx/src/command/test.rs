@@ -53,6 +53,9 @@ pub(crate) struct Test {
     /// Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
     #[clap(long = "cargo", value_name = "FLAG", allow_hyphen_values = true)]
     cargo: Vec<String>,
+    /// Don't assemble unreleased SQL fragments into the extension under test
+    #[clap(long)]
+    no_assemble_unreleased: bool,
     #[clap(from_global, action = clap::ArgAction::Count)]
     verbose: u8,
 }
@@ -93,6 +96,7 @@ impl CommandExecute for Test {
                 me.pgdata,
                 target_dir,
                 &me.cargo,
+                me.no_assemble_unreleased,
             )?;
 
             Ok(())
@@ -149,6 +153,7 @@ pub(crate) fn test_extension(
     pgdata: Option<PathBuf>,
     target_dir: &Path,
     cargo_flags: &[String],
+    no_assemble_unreleased: bool,
 ) -> eyre::Result<()> {
     #[cfg(target_os = "windows")]
     if runas.is_some() {
@@ -183,6 +188,11 @@ pub(crate) fn test_extension(
     }
 
     apply_resolved_manifest_to_test_command(&mut command, package_manifest_path);
+
+    // The test framework runs `cargo pgrx install` itself, which reads this.
+    if no_assemble_unreleased {
+        command.env("PGRX_NO_ASSEMBLE_UNRELEASED", "true");
+    }
 
     if let Some(runas) = runas {
         command.env("CARGO_PGRX_TEST_RUNAS", runas);

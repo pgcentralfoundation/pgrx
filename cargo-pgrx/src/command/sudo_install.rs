@@ -59,6 +59,7 @@ impl From<SudoInstall> for Package {
             verbose: value.verbose,
             target: value.target,
             assemble_unreleased: !value.no_assemble_unreleased,
+            no_assemble_unreleased: value.no_assemble_unreleased,
             cargo: value.cargo,
             prefix_dir: value.prefix_dir,
         }
@@ -118,5 +119,36 @@ impl CommandExecute for SudoInstall {
         }
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::command::migrate::UnreleasedFragmentMode;
+
+    fn package_mode(no_assemble_unreleased: bool) -> UnreleasedFragmentMode {
+        let install = SudoInstall {
+            package: None,
+            manifest_path: None,
+            release: false,
+            profile: None,
+            test: false,
+            pg_config: None,
+            out_dir: None,
+            features: Default::default(),
+            target: None,
+            no_assemble_unreleased,
+            verbose: 0,
+            cargo: Vec::new(),
+            prefix_dir: None,
+        };
+        Package::from(install).unreleased_mode()
+    }
+
+    #[test]
+    fn fragments_follow_the_install_flag() {
+        assert_eq!(package_mode(false), UnreleasedFragmentMode::Assemble);
+        assert_eq!(package_mode(true), UnreleasedFragmentMode::Skip);
     }
 }
