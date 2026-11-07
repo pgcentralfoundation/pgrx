@@ -9,6 +9,8 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
 #include "postgres.h"
+#include "datatype/timestamp.h"
+#include "common/scram-common.h"
 #include "pg_config.h"
 
 #include "access/amapi.h"
@@ -477,6 +479,7 @@
 #include "utils/datetime.h"
 #include "utils/datum.h"
 #include "utils/elog.h"
+#include "utils/errcodes.h"
 #include "utils/float.h"
 #include "utils/fmgroids.h"
 #include "utils/fmgrprotos.h"

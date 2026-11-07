@@ -22,7 +22,11 @@ use std::panic::{
 
 use crate::elog::PgLogLevel;
 use crate::errcodes::PgSqlErrorCode;
-use crate::{AsPgCStr, MemoryContextSwitchTo, pfree};
+// `crate::MemoryContextSwitchTo` also names the generated macro. Importing it by that
+// absolute path refers to an include!-expanded macro_export, which rustc rejects as a
+// future incompatibility (rust-lang/rust#52234).
+use crate::port::MemoryContextSwitchTo;
+use crate::{AsPgCStr, pfree};
 
 /// Indicates that something can be reported as a Postgres ERROR, if that's what it might represent.
 pub trait ErrorReportable {

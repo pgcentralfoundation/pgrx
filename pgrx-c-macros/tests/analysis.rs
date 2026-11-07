@@ -1,0 +1,740 @@
+//LICENSE Portions Copyright 2026 PgCentral Foundation, Inc. <contact@pgcentral.org>
+//LICENSE
+//LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+
+//! Test the supported-expression boundary before Rust emission.
+//!
+//! Analysis uses compiler-owned types and the final preprocessor environment to
+//! classify parameters, operands, dependencies, and explicit skips. These tests
+//! check that uncertain syntax remains uncertain, original provenance survives,
+//! and profile-dependent expressions are accepted only with sufficient evidence.
+
+/// Run original C headers through the bounded independent oracle harness.
+#[path = "support/oracle.rs"]
+mod oracle;
+
+use pgrx_c_macros::{
+    AnalysisSession, AnalysisStatus, ConstCapability, EmissionStatus, ExpressionKind,
+    FrontendError, InvocationContract, MacroAnalysis, MacroScanner, ParameterRole, SkipReasonCode,
+    TypeCategory, TypeExpression, analyze, emit, inspect,
+};
+use std::path::PathBuf;
+use std::sync::Mutex;
+
+/// Serialize libclang-backed inspection within this test process because its safe runtime
+/// permits one active owner.
+static SCANNER_LOCK: Mutex<()> = Mutex::new(());
+
+/// Refuse unresolved cast/value ambiguity before creating caller captures, while retaining
+/// compiler-backed names and grouping that cannot be a C type cast.
+#[test]
+fn ambiguous_caller_casts_are_refused_without_rejecting_unambiguous_calls() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let header = fixture("analysis_capture_casts.h");
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    let ambiguous = [
+        "CAPTURE_UNKNOWN_SUBTRACT",
+        "CAPTURE_UNKNOWN_ADD",
+        "CAPTURE_UNKNOWN_MULTIPLY",
+        "CAPTURE_UNKNOWN_AND",
+        "CAPTURE_UNKNOWN_CALL",
+    ];
+    let unambiguous = [
+        "CAPTURE_DIRECT_CALL",
+        "CAPTURE_NESTED_CALL",
+        "CAPTURE_EMPTY_CALL",
+        "CAPTURE_POSTFIX",
+        "CAPTURE_KNOWN_VALUE",
+        "CAPTURE_KNOWN_FUNCTION",
+        "CAPTURE_KNOWN_TYPE",
+    ];
+    let names = ambiguous.into_iter().chain(unambiguous).collect::<Vec<_>>();
+    let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
+    for name in ambiguous {
+        let analysis = session.analyze(name);
+        let AnalysisStatus::Skipped { reason } = &analysis.status else {
+            panic!("unresolved C type/value role must not become a capture: {analysis:?}");
+        };
+        assert_eq!(reason.code, SkipReasonCode::UnsupportedType);
+        assert!(reason.message.contains("UnresolvedId"), "{reason:?}");
+        assert!(reason.tokens.is_some(), "the original ambiguous group must be identified");
+        assert_eq!(analysis.parameters.len(), 1, "no caller operand may be invented");
+        assert!(matches!(emit(&session, name).status, EmissionStatus::Skipped { .. }));
+    }
+    for name in unambiguous {
+        let analysis = session.analyze(name);
+        assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{name}: {analysis:?}");
+    }
+    let checked = oracle::run_c(
+        &frontend.profile().compiler.executable,
+        &header,
+        "typedef unsigned int UnresolvedId;\n_Static_assert(CAPTURE_UNKNOWN_SUBTRACT(0xFFFFFFFFu), \"the original C uses an unsigned cast, not subtraction\");\n",
+        &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        false,
+    );
+    assert!(checked.is_empty());
+}
+
+/// Preserve C23 keyword roles through expansion instead of inventing caller arguments for
+/// unsupported literals, types, or alignment syntax.
+#[test]
+fn c23_keywords_are_not_captured_as_runtime_identifiers() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let header = fixture("analysis_c23_keywords.h");
+    let frontend =
+        match inspect(&scanner, &header, &["-std=c23".into(), "-pedantic-errors".into()], None) {
+            Ok(frontend) => frontend,
+            Err(FrontendError::WithInputs { error, .. })
+                if matches!(&*error, FrontendError::CompilerFailed { diagnostics, .. }
+                    if diagnostics
+                        .lines()
+                        .any(|line| line.ends_with("error: invalid value 'c23' in '-std=c23'"))) =>
+            {
+                eprintln!("C23 keyword probe unavailable: the selected compiler rejects -std=c23");
+                return;
+            }
+            Err(error) => panic!("inspect original definitions under strict C23: {error}"),
+        };
+    let names =
+        ["KEYWORD_TRUE", "KEYWORD_FALSE", "KEYWORD_NULLPTR", "KEYWORD_BOOL", "KEYWORD_ALIGNOF"];
+    let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
+    for name in names {
+        let analysis = session.analyze(name);
+        assert_skip(
+            &analysis,
+            if matches!(name, "KEYWORD_TRUE" | "KEYWORD_FALSE" | "KEYWORD_NULLPTR") {
+                SkipReasonCode::UnsupportedLiteral
+            } else {
+                SkipReasonCode::Statement
+            },
+        );
+        assert!(
+            analysis
+                .parameters
+                .iter()
+                .all(|parameter| { parameter.origin == pgrx_c_macros::ParameterOrigin::Formal }),
+            "keywords must not become caller captures: {analysis:?}"
+        );
+        assert!(matches!(emit(&session, name).status, EmissionStatus::Skipped { .. }));
+    }
+    let checked = oracle::run_c(
+        &frontend.profile().compiler.executable,
+        &header,
+        r#"
+_Static_assert(_Generic(KEYWORD_TRUE(), bool: 1, default: 0), "true has bool type");
+_Static_assert(_Generic(KEYWORD_FALSE(), bool: 1, default: 0), "false has bool type");
+_Static_assert(KEYWORD_BOOL(4) == true, "bool is a cast type");
+_Static_assert(_Generic(KEYWORD_NULLPTR(), typeof(nullptr): 1, default: 0), "nullptr retains its dedicated type");
+_Static_assert(KEYWORD_ALIGNOF() == _Alignof(unsigned long), "alignof is an operator");
+"#,
+        &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        false,
+    );
+    assert!(checked.is_empty());
+}
+
+/// Checks that unconstrained parameters stay open to pointer and floating operands instead of
+/// acquiring an invented integer-only contract.
+#[test]
+fn parameter_metadata_does_not_claim_unproved_integer_only_inputs() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let frontend = inspect(&scanner, &fixture("analysis_scalar.h"), &[], None).unwrap();
+    for name in ["ANALYSIS_MEMBER", "ANALYSIS_ADD", "ANALYSIS_CAST", "ANALYSIS_UNARY"] {
+        let analysis = analyze(&frontend, name);
+        assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{name}: {analysis:?}");
+        let metadata = serde_json::to_value(&analysis.parameters[0]).unwrap();
+        assert!(metadata.get("constraint").is_none(), "{name}: {metadata}");
+    }
+    assert!(
+        oracle::run_c(
+            &frontend.profile().compiler.executable,
+            &fixture("analysis_scalar.h"),
+            "_Static_assert(_Generic(ANALYSIS_ADD(1.25, 2.0), double: 1, default: 0), \"floating invocation is valid C\");\n",
+            &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+            false,
+        )
+        .is_empty()
+    );
+}
+
+/// Resolve fixture input relative to the crate, keeping tests independent of the invocation
+/// directory.
+fn fixture(name: &str) -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures").join(name)
+}
+
+/// Require the expected structured rejection, including the reason used to explain unsupported
+/// C syntax.
+fn assert_skip(analysis: &MacroAnalysis, expected: SkipReasonCode) {
+    let AnalysisStatus::Skipped { reason } = &analysis.status else {
+        panic!("{} must be skipped as {expected:?}: {analysis:?}", analysis.name);
+    };
+    assert_eq!(reason.code, expected, "{}: {}", analysis.name, reason.message);
+    assert!(!reason.message.is_empty());
+    if let Some(provenance) = &analysis.provenance {
+        assert!(reason.spans.contains(provenance), "skip must retain its original physical span");
+    }
+    assert!(analysis.expression.is_none(), "skips must not look like analyzed candidates");
+}
+
+/// Checks that complete integer expressions are candidates with value roles.
+#[test]
+fn complete_integer_expressions_are_candidates_with_value_roles() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let header = fixture("analysis_scalar.h");
+    let frontend = inspect(&scanner, &header, &[], None).expect("inspect original scalar header");
+    for name in [
+        "ANALYSIS_ID",
+        "ANALYSIS_ADD",
+        "ANALYSIS_UNARY",
+        "ANALYSIS_PRECEDENCE",
+        "ANALYSIS_CAST",
+        "ANALYSIS_LITERAL",
+        "ANALYSIS_ENUM",
+        "ANALYSIS_BOOL_CAST",
+        "ANALYSIS_UNUSED",
+        "ANALYSIS_REPEAT",
+        "ANALYSIS_COMMENT",
+        "ANALYSIS_UNSIGNED_LITERAL",
+        "ANALYSIS_LAZY",
+        "ANALYSIS_CHOOSE",
+        "ANALYSIS_CHAR",
+        "ANALYSIS_COMMA",
+        "ANALYSIS_EMPTY",
+    ] {
+        let analysis = analyze(&frontend, name);
+        assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{name}: {analysis:?}");
+        assert!(analysis.expression.is_some(), "{name} has a complete analyzed expression");
+        assert_eq!(analysis.invocation, InvocationContract::ParenthesizedScalarExpressions);
+        assert_eq!(analysis.const_capability, ConstCapability::NotEstablished);
+        assert!(analysis.dependencies.is_empty());
+        assert!(analysis.provenance.is_some());
+        for parameter in &analysis.parameters {
+            if parameter.uses.is_empty() {
+                assert_eq!(parameter.roles, [ParameterRole::Unused]);
+            } else {
+                assert_eq!(parameter.roles, [ParameterRole::Value]);
+                assert!(parameter.uses.iter().all(|usage| usage.grouped));
+            }
+        }
+    }
+    assert_eq!(analyze(&frontend, "ANALYSIS_REPEAT").parameters[0].uses.len(), 2);
+    assert!(analyze(&frontend, "ANALYSIS_UNUSED").parameters[0].uses.is_empty());
+    let empty = analyze(&frontend, "ANALYSIS_EMPTY");
+    let empty = empty.expression.unwrap();
+    assert!(matches!(empty.syntax.nodes[empty.syntax.root].kind, ExpressionKind::Empty));
+    assert!(matches!(empty.types[empty.syntax.root], TypeExpression::Void));
+    let comma = analyze(&frontend, "ANALYSIS_COMMA");
+    let comma = comma.expression.unwrap();
+    assert!(
+        comma.syntax.nodes.iter().any(|node| matches!(node.kind, ExpressionKind::Comma { .. }))
+    );
+    assert!(matches!(comma.types[comma.syntax.root], TypeExpression::Parameter { index: 1 }));
+
+    // Concrete instantiations are checked by C, without constructing an expected syntax tree.
+    // In particular the cast result does not constrain the original input to FrontByte.
+    let original = oracle::run_c(
+        &frontend.profile().compiler.executable,
+        &header,
+        r#"
+#define EXPECT_TYPE(value, type) _Static_assert(_Generic((value), type: 1, default: 0), #value)
+EXPECT_TYPE(ANALYSIS_CAST(-1), FrontByte);
+EXPECT_TYPE(ANALYSIS_BOOL_CAST(-1), _Bool);
+EXPECT_TYPE(ANALYSIS_LITERAL(0U), unsigned long);
+EXPECT_TYPE(ANALYSIS_UNSIGNED_LITERAL(0U), unsigned long long);
+EXPECT_TYPE(ANALYSIS_ENUM(0), int);
+_Static_assert(ANALYSIS_CAST(-1) == 255, "cast value");
+_Static_assert(ANALYSIS_BOOL_CAST(-1) == 1, "bool value");
+_Static_assert(ANALYSIS_LITERAL(0U) == 255UL, "unsigned long value");
+_Static_assert(ANALYSIS_UNSIGNED_LITERAL(0U) == 18446744073709551615ULL, "unsigned long long value");
+_Static_assert(ANALYSIS_ENUM(0) == 7, "enum constant value");
+_Static_assert(ANALYSIS_PRECEDENCE(4) == 20, "operator precedence");
+"#,
+        &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        false,
+    );
+    assert!(original.is_empty());
+}
+
+/// Checks that unsupported forms have stable reasons and original source spans.
+#[test]
+fn unsupported_forms_have_stable_reasons_and_original_source_spans() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let frontend = inspect(&scanner, &fixture("analysis_scalar.h"), &[], None).unwrap();
+    for (name, code) in [
+        ("ANALYSIS_UNGROUPED", SkipReasonCode::InvocationGrouping),
+        ("ANALYSIS_ROOT_UNGROUPED", SkipReasonCode::InvocationGrouping),
+        ("ANALYSIS_CONTROL_FLOW", SkipReasonCode::Statement),
+        ("ANALYSIS_SIZEOF", SkipReasonCode::InvocationGrouping),
+        ("ANALYSIS_FLOAT", SkipReasonCode::UnsupportedLiteral),
+        ("ANALYSIS_UNKNOWN", SkipReasonCode::UnknownIdentifier),
+        ("ANALYSIS_STRINGIFY", SkipReasonCode::Stringification),
+        ("ANALYSIS_PASTE", SkipReasonCode::TokenPaste),
+        ("ANALYSIS_VARIADIC", SkipReasonCode::Variadic),
+        ("ANALYSIS_AMBIGUOUS", SkipReasonCode::ProvenanceAmbiguous),
+        ("ANALYSIS_OBJECT", SkipReasonCode::NotFunctionLike),
+        ("ANALYSIS_LITERAL_TOO_LARGE", SkipReasonCode::LiteralOutOfRange),
+    ] {
+        assert_skip(&analyze(&frontend, name), code);
+    }
+    let absent = analyze(&frontend, "ANALYSIS_NOT_DEFINED");
+    assert_skip(&absent, SkipReasonCode::NotActive);
+    assert!(absent.provenance.is_none());
+
+    let statement = analyze(&frontend, "ANALYSIS_STATEMENT");
+    assert!(matches!(statement.status, AnalysisStatus::Candidate));
+    assert_eq!(statement.invocation, InvocationContract::Statements);
+    assert_eq!(statement.const_capability, ConstCapability::RuntimeOnly);
+    let expression = statement.expression.unwrap();
+    assert!(expression.syntax.statement_body.is_some());
+    assert!(matches!(expression.types[expression.syntax.root], TypeExpression::Void));
+
+    let deep = inspect(&scanner, &fixture("analysis_budget.h"), &[], None).unwrap();
+    assert_skip(&analyze(&deep, "ANALYSIS_DEEP"), SkipReasonCode::BudgetExceeded);
+}
+
+/// Checks that typed expression candidates preserve parameters and original C expression types.
+#[test]
+fn typed_expression_candidates_preserve_parameters_and_original_c_expression_types() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let header = fixture("analysis_scalar.h");
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    for name in [
+        "ANALYSIS_POINTER",
+        "ANALYSIS_MEMBER",
+        "ANALYSIS_SUBSCRIPT",
+        "ANALYSIS_MUTATION",
+        "ANALYSIS_ASSIGN",
+        "ANALYSIS_VARIABLE",
+        "ANALYSIS_CALL",
+    ] {
+        let analysis = analyze(&frontend, name);
+        assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{name}: {analysis:?}");
+        let expression = analysis.expression.as_ref().expect("candidate retains its shared IR");
+        assert!(
+            expression.syntax.nodes.iter().any(|node| match (&node.kind, name) {
+                (ExpressionKind::Dereference { .. }, "ANALYSIS_POINTER") => true,
+                (ExpressionKind::Member { field, indirect: true, .. }, "ANALYSIS_MEMBER") =>
+                    field == "field",
+                (ExpressionKind::Index { .. }, "ANALYSIS_SUBSCRIPT") => true,
+                (
+                    ExpressionKind::Update { increment: true, postfix: false, .. },
+                    "ANALYSIS_MUTATION",
+                ) => true,
+                (ExpressionKind::Assignment { operator: None, .. }, "ANALYSIS_ASSIGN") => true,
+                (ExpressionKind::Identifier { name: symbol }, "ANALYSIS_VARIABLE") =>
+                    symbol == "front_const_variable",
+                (ExpressionKind::Call { arguments, .. }, "ANALYSIS_CALL") => arguments.len() == 1,
+                _ => false,
+            }),
+            "{name} must preserve its C operation in the shared IR"
+        );
+        if matches!(name, "ANALYSIS_POINTER" | "ANALYSIS_MEMBER" | "ANALYSIS_SUBSCRIPT") {
+            assert!(matches!(expression.types[expression.syntax.root], TypeExpression::Deferred));
+        }
+        assert_eq!(analysis.parameters.len(), 1);
+        assert!(analysis.parameters[0].uses.iter().all(|usage| usage.grouped));
+        assert_eq!(analysis.invocation, InvocationContract::ParenthesizedScalarExpressions);
+    }
+    let checked = oracle::run_c(
+        &frontend.profile().compiler.executable,
+        &header,
+        r#"
+#define TYPE_IS(value, type) _Static_assert(_Generic((value), type: 1, default: 0), #value)
+void verify_original_types(void) {
+    int value = 0;
+    int array[3] = {0};
+    struct { int field; } record = {0};
+    TYPE_IS(ANALYSIS_POINTER(&value), int);
+    TYPE_IS(ANALYSIS_MEMBER(&record), int);
+    TYPE_IS(ANALYSIS_SUBSCRIPT(array), int);
+    TYPE_IS(ANALYSIS_MUTATION(value), int);
+    TYPE_IS(ANALYSIS_ASSIGN(value), int);
+    TYPE_IS(ANALYSIS_VARIABLE(value), int);
+    TYPE_IS(ANALYSIS_CALL(value), int);
+}
+
+"#,
+        &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        false,
+    );
+    assert!(checked.is_empty());
+}
+
+/// Checks that type argument casts retain deferred types and concrete pointer casts use
+/// compiler facts.
+#[test]
+fn type_argument_casts_retain_deferred_types_and_concrete_pointer_casts_use_compiler_facts() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let scalar = inspect(&scanner, &fixture("analysis_scalar.h"), &[], None).unwrap();
+    for name in [
+        "ANALYSIS_TYPE_PARAMETER",
+        "ANALYSIS_FORMAL_CALL",
+        "ANALYSIS_ALIGN_APPLICATION",
+        "ANALYSIS_UPDATE_APPLICATION",
+    ] {
+        let analysis = analyze(&scalar, name);
+        assert_skip(&analysis, SkipReasonCode::TypeParameter);
+        let AnalysisStatus::Skipped { reason } = analysis.status else {
+            panic!("a formal application must not guess the formal's C namespace: {analysis:?}");
+        };
+        assert!(reason.message.contains("cast type or callable value"), "{reason:?}");
+        assert!(
+            analysis.parameters.iter().all(|parameter| parameter.roles == [ParameterRole::Unknown])
+        );
+    }
+    assert!(
+        oracle::run_c(
+            &scalar.profile().compiler.executable,
+            &fixture("analysis_scalar.h"),
+            r#"
+typedef int (*AnalysisCallback)(int);
+extern AnalysisCallback analysis_callback;
+_Static_assert(_Generic(ANALYSIS_TYPE_PARAMETER(unsigned char,257), unsigned char: 1, default: 0), "formal application can be a cast");
+_Static_assert(_Generic(ANALYSIS_TYPE_PARAMETER(analysis_function,7), int: 1, default: 0), "the same replacement can call a function");
+_Static_assert(_Generic(ANALYSIS_FORMAL_CALL(unsigned char,257), unsigned char: 1, default: 0), "a callback-shaped formal can be a cast type");
+_Static_assert(_Generic(ANALYSIS_FORMAL_CALL(analysis_function,7), int: 1, default: 0), "a callback-shaped formal can call a function");
+_Static_assert(_Generic(ANALYSIS_ALIGN_APPLICATION(unsigned char,257), unsigned char: 1, default: 0), "bare alignment permits a cast type family");
+_Static_assert(_Generic(ANALYSIS_ALIGN_APPLICATION(analysis_callback,7), int: 1, default: 0), "GNU alignment permits the same replacement to call a function pointer value");
+extern long *analysis_pointer_function(long);
+_Static_assert(sizeof(ANALYSIS_UPDATE_APPLICATION(long, analysis_pointer_function, 1)) > 0, "a formal applied after a cast update can call a function");
+"#,
+            &scalar.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+            false,
+        )
+        .is_empty()
+    );
+    let analysis = analyze(&scalar, "ANALYSIS_PROVEN_TYPE_PARAMETER");
+    assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{analysis:?}");
+    let expression = analysis.expression.as_ref().expect("candidate retains its shared IR");
+    let (cast, operand) = expression
+        .syntax
+        .nodes
+        .iter()
+        .enumerate()
+        .find_map(|(index, node)| match node.kind {
+            ExpressionKind::TypeParameterCast {
+                parameter: 0,
+                pointers: 0,
+                is_const: false,
+                operand,
+            } => Some((index, operand)),
+            _ => None,
+        })
+        .expect("the type argument remains a symbolic cast, not a sampled signature");
+    assert!(matches!(expression.types[cast], TypeExpression::Deferred));
+    assert!(matches!(expression.syntax.nodes[operand].kind, ExpressionKind::Group { .. }));
+    assert_eq!(analysis.parameters[0].roles, [ParameterRole::Type]);
+    assert_eq!(analysis.parameters[0].uses.len(), 2);
+    assert_eq!(analysis.parameters[1].uses.len(), 1);
+    assert!(analysis.parameters[1].uses[0].grouped);
+
+    let header = fixture("expression_oracle.h");
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    let analysis = analyze(&frontend, "EXPR_POINTER_CAST");
+    assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{analysis:?}");
+    let expression = analysis.expression.as_ref().unwrap();
+    let TypeExpression::External { ty } = &expression.types[expression.syntax.root] else {
+        panic!("the concrete pointer cast needs its original compiler type: {expression:?}");
+    };
+    assert_eq!(ty.category, TypeCategory::Pointer);
+    assert_eq!(ty.canonical_spelling, "char *");
+    let checked = oracle::run_c(
+        &frontend.profile().compiler.executable,
+        &header,
+        "_Static_assert(_Generic(EXPR_POINTER_CAST((void *) 0), char *: 1, default: 0), \"original cast type\");\n",
+        &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        false,
+    );
+    assert!(checked.is_empty());
+}
+
+/// A formal measured as a type and also used as a value or member name is refused in either
+/// source order, rather than emitted as a type fragment in an operand position.
+#[test]
+fn type_measurements_keep_earlier_operand_roles_of_the_same_formal() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let header = fixture("analysis_type_roles.h");
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    let cases = [
+        ("ROLE_VALUE_THEN_ALIGN", 0, ParameterRole::Value),
+        ("ROLE_ALIGN_THEN_VALUE", 0, ParameterRole::Value),
+        ("ROLE_MEMBER_THEN_SIZE", 1, ParameterRole::Identifier),
+        ("ROLE_SIZE_THEN_MEMBER", 1, ParameterRole::Identifier),
+        ("ROLE_ALIGN_SUBTRACT", 0, ParameterRole::Value),
+    ];
+    let names = cases.iter().map(|(name, ..)| *name).collect::<Vec<_>>();
+    let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
+    for (name, parameter, operand_role) in cases {
+        let analysis = session.analyze(name);
+        assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{name}: {analysis:?}");
+        let roles = &analysis.parameters[parameter].roles;
+        assert!(
+            roles.contains(&ParameterRole::Type) && roles.contains(&operand_role),
+            "{name}: {roles:?}"
+        );
+        let EmissionStatus::Skipped { reason } = emit(&session, name).status else {
+            panic!("{name}: a type fragment cannot fill an operand hole");
+        };
+        assert_eq!(reason.code, SkipReasonCode::UnsupportedType, "{name}: {reason:?}");
+        assert!(reason.message.contains("incompatible type and operand roles"), "{reason:?}");
+    }
+    let checked = oracle::run_c(
+        &frontend.profile().compiler.executable,
+        &header,
+        r#"
+long role_value = 10;
+struct RoleRecord role_record = { 3 };
+_Static_assert(sizeof(ROLE_VALUE_THEN_ALIGN(role_value)) == sizeof(__SIZE_TYPE__), "GNU alignment of a value");
+_Static_assert(sizeof(ROLE_ALIGN_THEN_VALUE(role_value)) == sizeof(__SIZE_TYPE__), "GNU alignment of a value");
+_Static_assert(sizeof(ROLE_MEMBER_THEN_SIZE(&role_record, RoleField)) == sizeof(__SIZE_TYPE__), "a member and a typedef can share a name");
+_Static_assert(sizeof(ROLE_SIZE_THEN_MEMBER(&role_record, RoleField)) == sizeof(__SIZE_TYPE__), "a member and a typedef can share a name");
+_Static_assert(sizeof(ROLE_ALIGN_SUBTRACT(role_value, role_value)) == sizeof(__SIZE_TYPE__), "GNU alignment of a value");
+_Static_assert(sizeof(ROLE_ALIGN_SUBTRACT(long, role_value)) == sizeof(__SIZE_TYPE__), "the same replacement casts a type");
+"#,
+        &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        false,
+    );
+    assert!(checked.is_empty());
+}
+
+/// A `restrict`-qualified pointer still measures and casts as one pointer, while an array of
+/// pointers is refused rather than measured as one.
+#[test]
+fn concrete_type_operands_keep_restrict_pointers_and_refuse_pointer_arrays() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let header = fixture("analysis_declarators.h");
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    let restricted =
+        ["DECLARATOR_RESTRICT_SIZE", "DECLARATOR_GNU_RESTRICT_SIZE", "DECLARATOR_RESTRICT_CAST"];
+    let names = restricted.into_iter().chain(["DECLARATOR_POINTER_ARRAY_SIZE"]).collect::<Vec<_>>();
+    let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
+    for name in restricted {
+        let emission = emit(&session, name);
+        assert!(matches!(emission.status, EmissionStatus::Emitted { .. }), "{name}: {emission:?}");
+    }
+    let analysis = session.analyze("DECLARATOR_POINTER_ARRAY_SIZE");
+    assert!(matches!(analysis.status, AnalysisStatus::Skipped { .. }), "{analysis:?}");
+    let checked = oracle::run_c(
+        &frontend.profile().compiler.executable,
+        &header,
+        r#"
+_Static_assert(DECLARATOR_RESTRICT_SIZE(3) == 3 * sizeof(char *), "restrict keeps one pointer");
+_Static_assert(DECLARATOR_GNU_RESTRICT_SIZE(3) == 3 * sizeof(char *), "restrict keeps one pointer");
+_Static_assert(DECLARATOR_POINTER_ARRAY_SIZE(1) == 4 * sizeof(char *), "an array is not one pointer");
+"#,
+        &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        false,
+    );
+    assert!(checked.is_empty(), "{checked}");
+}
+
+/// A typedef name is never a caller-scope value: `sizeof(T[N])` measures an array type, not
+/// an element of a caller operand named `T`.
+#[test]
+fn typedef_names_never_become_caller_operands() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let header = fixture("analysis_declarators.h");
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    let arrays = [
+        "DECLARATOR_TYPEDEF_ARRAY_SIZE",
+        "DECLARATOR_RECORD_ARRAY_SIZE",
+        "DECLARATOR_DEPENDENT_ARRAY_SIZE",
+        "DECLARATOR_TYPEDEF_POINTER_ARRAY_SIZE",
+        "DECLARATOR_POINTER_ARRAY_SIZE",
+    ];
+    let names = arrays.into_iter().chain(["DECLARATOR_TYPE_AS_VALUE"]).collect::<Vec<_>>();
+    let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
+    for name in names {
+        let analysis = session.analyze(name);
+        let expected = if arrays.contains(&name) {
+            SkipReasonCode::UnevaluatedExpression
+        } else {
+            SkipReasonCode::UnsupportedType
+        };
+        assert_skip(&analysis, expected);
+        assert_eq!(analysis.parameters.len(), 1, "{name}: no caller operand may be invented");
+        assert!(matches!(emit(&session, name).status, EmissionStatus::Skipped { .. }), "{name}");
+    }
+    let checked = oracle::run_c(
+        &frontend.profile().compiler.executable,
+        &header,
+        r#"
+_Static_assert(DECLARATOR_TYPEDEF_ARRAY_SIZE(1) == 4 * sizeof(DeclaratorInt), "the whole array is measured");
+_Static_assert(DECLARATOR_RECORD_ARRAY_SIZE(1) == 2 * sizeof(DeclaratorPair), "the whole array is measured");
+_Static_assert(DECLARATOR_DEPENDENT_ARRAY_SIZE(1) == 4 * sizeof(DeclaratorInt), "the whole array is measured");
+_Static_assert(DECLARATOR_TYPEDEF_POINTER_ARRAY_SIZE(1) == 4 * sizeof(DeclaratorInt *), "the whole array is measured");
+"#,
+        &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        false,
+    );
+    assert!(checked.is_empty(), "{checked}");
+}
+
+/// Checks that ungrouped parameter uses require atomic arguments without changing the C body.
+#[test]
+fn ungrouped_parameter_uses_require_atomic_arguments_without_changing_the_c_body() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let header = fixture("expression_oracle.h");
+    let frontend = inspect(&scanner, &header, &[], None).expect("inspect original atomic macro");
+    let analysis = analyze(&frontend, "EXPR_ATOMIC_POW2");
+    assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{analysis:?}");
+    assert_eq!(analysis.invocation, InvocationContract::AtomicArguments);
+    assert_eq!(analysis.parameters[0].uses.len(), 3);
+    assert!(!analysis.parameters[0].uses[0].grouped);
+    assert!(analysis.parameters[0].uses[1..].iter().all(|usage| usage.grouped));
+
+    // Unrestricted C substitution really changes grouping, even though the entire
+    // macro body is parenthesized. The Rust matcher must reject this argument shape.
+    let checked = oracle::run_c(
+        &frontend.profile().compiler.executable,
+        &header,
+        r#"
+_Static_assert(EXPR_ATOMIC_POW2(1 ? 7 : 2) != EXPR_ATOMIC_POW2((1 ? 7 : 2)), "textual argument grouping affects semantics");
+_Static_assert(EXPR_ATOMIC_POW2(16) == EXPR_ATOMIC_POW2((16)), "atomic grouping preserves semantics");
+"#,
+        &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        false,
+    );
+    assert!(checked.is_empty());
+}
+
+/// Checks that dependencies require real preprocessing and use the final active context.
+#[test]
+fn dependencies_require_real_preprocessing_and_use_the_final_active_context() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let header = fixture("analysis_scalar.h");
+    let frontend = inspect(&scanner, &header, &[], None).unwrap();
+    for (name, dependency) in [
+        ("ANALYSIS_LATE_USER", "ANALYSIS_LATE_VALUE"),
+        ("ANALYSIS_NESTED", "ANALYSIS_ADD"),
+        ("ANALYSIS_RECURSIVE", "ANALYSIS_RECURSIVE"),
+        ("ANALYSIS_CYCLE", "ANALYSIS_CYCLE_A"),
+    ] {
+        let analysis = analyze(&frontend, name);
+        assert_skip(&analysis, SkipReasonCode::ExpansionRequired);
+        let observed = analysis.dependencies.iter().find(|item| item.name == dependency).unwrap();
+        assert_eq!(
+            observed.provenance,
+            frontend.environment().active[dependency].definition.provenance
+        );
+        assert!(!observed.uses.is_empty());
+    }
+    let original = oracle::run_c(
+        &frontend.profile().compiler.executable,
+        &header,
+        "_Static_assert(ANALYSIS_LATE_USER(10) == 19, \"late-bound object macro\");\n_Static_assert(ANALYSIS_NESTED(4) == 7, \"nested function macro\");\n_Static_assert(ANALYSIS_UNGROUPED(1 + 2) == 5, \"argument grouping affects the body\");\n_Static_assert(ANALYSIS_ROOT_UNGROUPED(2) * 3 == 5, \"whole replacement grouping affects the caller\");\n",
+        &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        false,
+    );
+    assert!(original.is_empty());
+}
+
+/// Checks that binary literals require c23 and compile under the original c23 profile.
+#[test]
+fn binary_literals_require_c23_and_compile_under_the_original_c23_profile() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let header = fixture("analysis_profile.h");
+    let c11 = inspect(&scanner, &header, &["-std=c11".into(), "-pedantic-errors".into()], None)
+        .expect("inspect original definitions under strict C11");
+    assert_skip(&analyze(&c11, "ANALYSIS_BINARY"), SkipReasonCode::UnsupportedLiteral);
+
+    let c23 = match inspect(
+        &scanner,
+        &header,
+        &["-std=c23".into(), "-pedantic-errors".into()],
+        None,
+    ) {
+        Ok(frontend) => frontend,
+        Err(FrontendError::WithInputs { error, .. })
+            if matches!(&*error, FrontendError::CompilerFailed { diagnostics, .. }
+                if diagnostics
+                    .lines()
+                    .any(|line| line.ends_with("error: invalid value 'c23' in '-std=c23'"))) =>
+        {
+            eprintln!(
+                "C23 positive probe unavailable: {} rejects -std=c23; strict C11 regression passed",
+                c11.profile().compiler.executable.display()
+            );
+            return;
+        }
+        Err(error) => panic!("inspect original definitions under strict C23: {error}"),
+    };
+    assert!(matches!(analyze(&c23, "ANALYSIS_BINARY").status, AnalysisStatus::Candidate));
+    let checked = oracle::run_c(
+        &c23.profile().compiler.executable,
+        &header,
+        "_Static_assert(ANALYSIS_BINARY(1) == 2, \"binary literals are valid in C23\");\n",
+        &c23.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        false,
+    );
+    assert!(checked.is_empty());
+}
+
+/// Checks that original C shadowing demonstrates the fixed binding invocation boundary.
+#[test]
+fn original_c_shadowing_demonstrates_the_fixed_binding_invocation_boundary() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let header = fixture("analysis_profile.h");
+    let frontend = inspect(&scanner, &header, &[], None).expect("inspect header bindings");
+    for name in ["ANALYSIS_BINDING_ENUM", "ANALYSIS_BINDING_TYPE"] {
+        let analysis = analyze(&frontend, name);
+        assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{analysis:?}");
+        assert_eq!(analysis.invocation, InvocationContract::ParenthesizedScalarExpressions);
+    }
+    let checked = oracle::run_c(
+        &frontend.profile().compiler.executable,
+        &header,
+        r#"
+_Static_assert(ANALYSIS_BINDING_ENUM(0) == 7, "inspected enum binding");
+_Static_assert(_Generic(ANALYSIS_BINDING_TYPE(2), int: 1, default: 0), "inspected typedef binding");
+
+static unsigned long shadow_function(int value) { return (unsigned long) value + 100UL; }
+void check_caller_scope(void) {
+    enum { ANALYSIS_HEADER_ENUM = 99 };
+    unsigned long (*AnalysisHeaderType)(int) = shadow_function;
+    _Static_assert(ANALYSIS_BINDING_ENUM(0) == 99, "caller-local enum changes the value");
+    _Static_assert(_Generic(ANALYSIS_BINDING_TYPE(2), unsigned long: 1, default: 0),
+                   "caller-local identifier turns the typedef cast into a function call");
+}
+"#,
+        &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+        false,
+    );
+    assert!(checked.is_empty());
+}
+
+/// Checks that attributed integer typedefs and their aliases need a separate semantic contract.
+#[test]
+fn attributed_integer_typedefs_and_their_aliases_need_a_separate_semantic_contract() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().unwrap();
+    let frontend = inspect(&scanner, &fixture("analysis_profile.h"), &[], None).unwrap();
+    for name in ["AnalysisAttributed", "AnalysisAttributedAlias"] {
+        assert_eq!(frontend.declarations().types[name].category, TypeCategory::Other);
+    }
+    let names = ["ANALYSIS_ATTRIBUTED", "ANALYSIS_ATTRIBUTED_ALIAS"];
+    let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
+    for name in names {
+        assert_skip(&analyze(&frontend, name), SkipReasonCode::UnsupportedType);
+        let emission = emit(&session, name);
+        let EmissionStatus::Skipped { reason } = emission.status else {
+            panic!("unmodeled attributed typedef {name} must not emit: {emission:?}");
+        };
+        assert_eq!(reason.code, SkipReasonCode::UnsupportedType, "{name}: {reason:?}");
+    }
+}

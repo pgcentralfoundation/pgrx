@@ -19,6 +19,8 @@ set -x
 #
 # pgrx-pg-config
 # ├── cargo-pgrx
+# ├── pgrx-c-macros
+# │   └── pgrx-bindgen
 # ├── pgrx-bindgen
 # │   [build-dependencies]
 # │   └── pgrx-pg-sys
@@ -41,6 +43,7 @@ set -x
 
 
 cd $DIR/pgrx-pg-config && cargo publish
+cd $DIR/pgrx-c-macros && cargo publish
 cd $DIR/pgrx-bindgen && cargo publish
 cd $DIR/pgrx-sql-entity-graph && cargo publish
 cd $DIR/pgrx-macros && cargo publish
