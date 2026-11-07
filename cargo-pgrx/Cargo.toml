@@ -37,7 +37,7 @@ toml.workspace = true
 toml_edit.workspace = true
 
 clap = { version = "4.4.2", features = ["env", "suggestions", "cargo", "derive", "wrap_help"] }
-crates-index = { version = "3", features = ["sparse"], default-features = false }
+crates-index = { version = "3.6", features = ["sparse"], default-features = false }
 # Keep the resolver off is-terminal 0.4.7, which pulls rustix 0.37 and breaks
 # current nightly via rustc_attrs.
 is-terminal = "=0.4.17"
