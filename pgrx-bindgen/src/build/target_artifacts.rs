@@ -266,6 +266,7 @@ pub(super) fn import(
             // An import compiles no C, so this build applies and drops no CFLAGS.
             cflags_dropped: Vec::new(),
             runtime_cfg: manifest.runtime_cfg,
+            snapshot: None,
         },
     ))
 }
@@ -462,7 +463,7 @@ fn integrity(files: &BTreeMap<String, Vec<u8>>) -> eyre::Result<BTreeMap<String,
 }
 
 /// Render a content digest without platform-dependent or randomized hasher behavior.
-fn sha256(bytes: &[u8]) -> String {
+pub(super) fn sha256(bytes: &[u8]) -> String {
     let mut digest = String::with_capacity(64);
     for byte in Sha256::digest(bytes) {
         write!(&mut digest, "{byte:02x}").expect("String formatting");
@@ -699,6 +700,7 @@ mod tests {
                 "pgrx_c_size_type=\"unsigned_long\"".into(),
                 "pgrx_c_ptrdiff_type=\"long\"".into(),
             ],
+            snapshot: None,
         };
         (directory, domain, macros)
     }

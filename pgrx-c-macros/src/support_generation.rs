@@ -301,6 +301,34 @@ pub fn support_alignment_profile(
     Ok(rust)
 }
 
+/// List the C integer typedefs published in `__pgrx_c_types` with their runtime marker names.
+fn integer_typedef_markers(
+    frontend: &FrontendOutput,
+) -> impl Iterator<Item = (&str, &'static str)> {
+    frontend.declarations().types.keys().filter_map(|name| {
+        integer_typedef_marker(frontend, name).map(|marker| (name.as_str(), marker))
+    })
+}
+
+/// The runtime marker of `name`'s `__pgrx_c_types` alias, if it has one.
+///
+/// Only typedef names that form Rust identifiers and whose size matches the
+/// target's layout for their integer kind have an alias.
+pub(crate) fn integer_typedef_marker(
+    frontend: &FrontendOutput,
+    name: &str,
+) -> Option<&'static str> {
+    let ty = frontend.declarations().types.get(name)?;
+    let TypeCategory::Integer(kind) = ty.category else { return None };
+    // C type spellings with spaces or declarator syntax are not typedef
+    // identifiers and cannot form a Rust alias. Share the emitter's checks
+    // for names, including special tokens that raw identifiers cannot fix.
+    crate::emit::rust_identifier(name)?;
+    let layout = frontend.profile().target.integers.get(&kind)?;
+    (ty.size == Some(u64::from(layout.bits / 8)) && !ty.is_const && !ty.is_volatile)
+        .then(|| crate::emit::marker(kind))
+}
+
 /// Generate numeric input adapters for pg-sys's own opaque integer types.
 ///
 /// The C declarations establish each identity independently. Rust's `Oid` and
@@ -310,21 +338,9 @@ pub fn support_alignment_profile(
 pub fn pg_sys_integer_bridges(frontend: &FrontendOutput) -> Result<String, SupportProfileError> {
     let mut rust = support_abi_assertions(frontend.profile())?;
     rust.push_str("/// C integer identities established from this installation's typedef declarations.\n#[doc(hidden)]\n#[allow(non_camel_case_types)]\npub mod __pgrx_c_types {\n");
-    for (name, ty) in &frontend.declarations().types {
-        let TypeCategory::Integer(kind) = ty.category else { continue };
-        // C type spellings with spaces or declarator syntax are not typedef
-        // identifiers and cannot form a Rust alias. Share the emitter's checks
-        // for names, including special tokens that raw identifiers cannot fix.
-        if crate::emit::rust_identifier(name).is_none() {
-            continue;
-        }
-        let Some(layout) = frontend.profile().target.integers.get(&kind) else { continue };
-        if ty.size != Some(u64::from(layout.bits / 8)) || ty.is_const || ty.is_volatile {
-            continue;
-        }
+    for (name, marker) in integer_typedef_markers(frontend) {
         rust.push_str(&format!(
-            "/// Preserve the compiler-established rank and width of C `{name}`.\npub type r#{name} = crate::__pgrx_c_macros::{};\n",
-            crate::emit::marker(kind),
+            "/// Preserve the compiler-established rank and width of C `{name}`.\npub type r#{name} = crate::__pgrx_c_macros::{marker};\n",
         ));
     }
     rust.push_str("}\n");

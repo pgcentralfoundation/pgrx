@@ -22,9 +22,9 @@
 mod oracle;
 
 use pgrx_c_macros::{
-    AnalysisSession, AnalysisStatus, BindingCatalog, ConstCapability, EmissionStatus,
-    InvocationContract, MacroEmission, MacroScanner, ParameterOrigin, SkipReasonCode, emit,
-    emit_support_with_bindings, inspect,
+    AnalysisSession, AnalysisStatus, BindingCatalog, ConstCapability, DocumentedResult,
+    EmissionStatus, InvocationContract, MacroEmission, MacroScanner, ParameterOrigin,
+    SkipReasonCode, documentation_shell_support, emit, emit_support_with_bindings, inspect,
 };
 use std::fs;
 use std::io::Read;
@@ -80,7 +80,7 @@ fn fixture(name: &str) -> PathBuf {
 /// Assemble emitted macro definitions for the consumer, failing the test if an expected
 /// candidate is skipped.
 fn source(emission: &MacroEmission) -> &str {
-    let EmissionStatus::Emitted { rust, const_capability } = &emission.status else {
+    let EmissionStatus::Emitted { rust, const_capability, .. } = &emission.status else {
         panic!("{} must emit: {emission:?}", emission.analysis.name);
     };
     assert_eq!(*const_capability, ConstCapability::RuntimeOnly);
@@ -170,6 +170,100 @@ fn emitted_macros_keep_provenance_occurrences_names_and_structured_skips() {
     assert!(matches!(pointer.analysis.status, AnalysisStatus::Candidate));
     assert!(value_body(source(&pointer)).contains("::dereference("));
     assert!(source(&pointer).contains("::pointee("));
+}
+
+/// Checks that documentation shells keep each macro's documentation, show its accepted
+/// invocation forms, and expand to their documented result. `documentation_oracle`
+/// compiles shells against the real macros.
+#[test]
+fn documentation_shells_show_invocation_forms() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let frontend =
+        inspect(&scanner, &fixture("documentation_shells.h"), &["-fwrapv".into()], None).unwrap();
+    let names = ["SHELL_ADD", "SHELL_UNGROUPED", "SHELL_CAPTURE", "SHELL_RETURN"];
+    let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
+    let shells = documentation_shell_support();
+    // Shared paragraph macros return one doc line each; expand references to them
+    // so shell docs can be compared with the generated macro's own doc comments.
+    let support = syn::parse_file(&shells).unwrap();
+    let shared = support
+        .items
+        .iter()
+        .filter_map(|item| {
+            let syn::Item::Macro(item) = item else { return None };
+            let name = item.ident.as_ref()?.to_string();
+            let body = item.mac.tokens.clone().into_iter().find_map(|token| match token {
+                proc_macro2::TokenTree::Group(group)
+                    if group.delimiter() == proc_macro2::Delimiter::Brace =>
+                {
+                    Some(group.stream())
+                }
+                _ => None,
+            })?;
+            let literal = syn::parse2::<syn::LitStr>(body).ok()?;
+            Some((format!("#[doc = crate::{name}!()]"), format!("///{}", literal.value())))
+        })
+        .collect::<std::collections::BTreeMap<_, _>>();
+    assert!(shared.contains_key("#[doc = crate::__pgrx_c_doc_safety!()]"));
+    let mut forms = Vec::new();
+    let mut results = Vec::new();
+    for name in names {
+        let emission = emit(&session, name);
+        let EmissionStatus::Emitted { rust, documentation, .. } = &emission.status else {
+            panic!("{name} must emit: {emission:?}");
+        };
+        let location = documentation.location.as_deref();
+        assert!(location.is_some_and(|location| location.starts_with("documentation_shells.h:")));
+        let shell = documentation.render_shell(location, "").unwrap();
+        // The shell carries exactly the generated macro's documentation.
+        let docs = |source: &str| {
+            source
+                .lines()
+                .map(str::trim_start)
+                .filter_map(|line| match shared.get(line) {
+                    Some(paragraph) => Some(paragraph.clone()),
+                    None => line.starts_with("///").then(|| line.to_owned()),
+                })
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(docs(&shell), docs(rust), "{name}");
+        assert!(shell.contains("#[doc = crate::__pgrx_c_doc_safety!()]"), "{name}");
+        assert!(!shell.contains("__pgrx_emit_"), "{name}: shells name no internal arms");
+        assert_eq!(
+            shell.matches("$crate::__pgrx_c_documentation_shell!(").count(),
+            documentation.forms.len(),
+            "{name}: every arm uses the shared expansion"
+        );
+        syn::parse_file(&shell).unwrap();
+        forms.push(documentation.forms.clone());
+        results.push(documentation.result.clone());
+    }
+    assert_eq!(
+        forms,
+        [
+            vec!["$left:expr, $right:expr $(,)?".to_owned()],
+            vec!["@__pgrx_c_expression; $value:expr $(,)?".to_owned()],
+            vec!["$value:expr, $scope:expr $(,)?".to_owned()],
+            vec![
+                "@__pgrx_c_statement; $condition:expr $(,)?".to_owned(),
+                "@__pgrx_c_statement; @__pgrx_c_return_as [$__pgrx_c_return:ty]; $condition:expr $(,)?"
+                    .to_owned(),
+            ],
+        ]
+    );
+    // Expression shells wrap a witness of the real value arm's type; a body
+    // whose every path returns from the caller keeps the diverging placeholder.
+    let witness = |result: &DocumentedResult| match result {
+        DocumentedResult::Value { witness } => witness.clone(),
+        result => panic!("expected a value witness: {result:?}"),
+    };
+    assert!(witness(&results[0]).contains("add::<"), "{:?}", results[0]);
+    assert!(witness(&results[0]).contains("(@native [$left])"));
+    assert!(witness(&results[0]).contains("(@native [$right])"));
+    assert!(witness(&results[1]).contains("(@native [$value])"));
+    assert!(witness(&results[2]).contains("(@native [$scope])"));
+    assert_eq!(results[3], DocumentedResult::Diverges);
 }
 
 /// Check actual emitted Rustdoc uses one argument for a capture and plural arguments for a formal plus capture.

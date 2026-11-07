@@ -2266,6 +2266,7 @@ dependencies = [
  "sha2",
  "shlex 2.0.1",
  "syn",
+ "toml 1.1.2+spec-1.1.0",
  "walkdir",
 ]
 

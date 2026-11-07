@@ -6,6 +6,7 @@
 #LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
 set -euo pipefail
+source tools/docsrs-target.sh
 
 PG_VER="${PG_VER:-15}"
 PG_FEATURE="pg${PG_VER#pg}"
@@ -46,7 +47,9 @@ if [[ -n "${lock_path}" ]]; then
 fi
 
 echo "Running docs.rs-style rustdoc check for pgrx with ${PG_FEATURE} cshim"
-host="$(rustc "+${TOOLCHAIN}" -vV | awk '/^host:/ { print $2 }')"
+# The committed C macro snapshot builds only for pgrx-pg-sys's docs.rs target.
+docsrs_target="${DOCSRS_TARGET:-$(documented_target)}"
+require_target_toolchain "${TOOLCHAIN}" "${docsrs_target}"
 rustdoc_cmd=(
     cargo "+${TOOLCHAIN}" rustdoc
     -p pgrx
@@ -56,16 +59,8 @@ rustdoc_cmd=(
     -Zrustdoc-map
     -Zhost-config
     -Ztarget-applies-to-host
+    --target "${docsrs_target}"
 )
-
-docsrs_target="${DOCSRS_TARGET:-}"
-if [[ -z "${docsrs_target}" && "${host}" == "x86_64-unknown-linux-gnu" ]]; then
-    docsrs_target="x86_64-unknown-linux-gnu"
-fi
-
-if [[ -n "${docsrs_target}" ]]; then
-    rustdoc_cmd+=(--target "${docsrs_target}")
-fi
 
 docsrs_rustdocflags="${RUSTDOCFLAGS:-}"
 docsrs_rustdocflags="${docsrs_rustdocflags:+${docsrs_rustdocflags} }--cfg docsrs -Z unstable-options --emit=html-non-static-files --cap-lints warn"

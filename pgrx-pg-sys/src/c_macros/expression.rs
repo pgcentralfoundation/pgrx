@@ -1129,6 +1129,10 @@ impl<R: Copy> IntoExpression for RecordValue<R> {
 /// This supports C value copying without requiring the whole Rust record to be initialized or `Copy`.
 pub mod record;
 pub use record::{CRawRecord, RawRecordValue, RecordExpression};
+/// Name a C expression type in documentation shells without evaluating anything.
+/// Compiled proofs tie each collapsed helper's result type to this witness.
+pub mod witness;
+pub use witness::type_witness;
 
 /// The binding placeholder for a compiler-proven incomplete record.
 /// It may occur behind a pointer, but cannot be loaded, sized, or indexed.

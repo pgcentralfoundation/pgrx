@@ -14,6 +14,7 @@ DIR=`pwd`
 set -x
 
 ./tools/docsrs-check.sh || exit $?
+./tools/docsrs-typecheck.sh || exit $?
 
 # dependency graph, from roots to facades
 #

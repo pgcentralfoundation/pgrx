@@ -13,7 +13,6 @@ use crate::{
     BindingCatalog, DeclarationCatalog, EnumBinding, IntegerValue, RustBindingType, TargetFacts,
     TypeInfo, TypeShapeKind,
 };
-use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Write;
 
@@ -51,11 +50,13 @@ struct ValidatedEnum<'a> {
     object: Option<(&'a EnumBinding, LoweredType)>,
 }
 
-/// Derive a deterministic nominal marker path from the unqualified compiler enum identity.
+/// Name the nominal marker after the unqualified compiler enum identity, such as
+/// `EnumIdentity_enum__NodeTag`.
 pub(super) fn identity_path(ty: &TypeInfo) -> String {
-    let digest = Sha256::digest(enum_key(ty).as_bytes());
-    let identity = digest.iter().map(|byte| format!("{byte:02x}")).collect::<String>();
-    format!("$crate::__pgrx_c_generated::EnumIdentity_{identity}")
+    format!(
+        "$crate::__pgrx_c_generated::EnumIdentity_{}",
+        super::names::type_spelling(&enum_key(ty))
+    )
 }
 
 /// Validate the full enum catalog before emitting demanded identity and storage bridges.

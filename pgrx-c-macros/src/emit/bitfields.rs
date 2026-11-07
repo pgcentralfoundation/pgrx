@@ -11,7 +11,6 @@
 
 use super::types::{Lowering, rust_path};
 use crate::{BindingCatalog, DeclarationCatalog, FieldInfo, RecordBinding, TypeCategory};
-use sha2::{Digest, Sha256};
 use std::fmt::Write;
 
 /// Private runtime namespace used by same-crate bitfield support items.
@@ -102,21 +101,12 @@ pub(super) fn generate(
     let expression_marker = format!("{EXPRESSION}::CBitfield<{object_marker},{promoted_marker}>");
     let object_storage = object.storage.replace("$crate", "crate");
     let promoted_storage = &object_storage;
-    let layout =
-        declarations.records.get(canonical).ok_or("bitfield record layout is unavailable")?;
-    let layout = serde_json::to_string(layout)
-        .map_err(|error| format!("cannot fingerprint bitfield record layout: {error}"))?;
-    let hash = Sha256::digest(format!(
-        "{canonical}\0{}\0{name}\0{offset}\0{width}\0{layout}\0{}\0{}",
-        record.path.join("::"),
-        field.ty.canonical_spelling,
-        facts.promoted.canonical_spelling
-    ));
-    let suffix = hash[..16].iter().map(|byte| format!("{byte:02x}")).collect::<String>();
-    let place = format!("Bitfield_{suffix}");
-    let prefix = format!("__pgrx_bitfield_{suffix}");
+    let record_name = record.path.last().ok_or("bitfield record has no Rust binding name")?;
+    let record_name = record_name.strip_prefix("r#").unwrap_or(record_name);
+    let place = format!("Bitfield_{}", super::names::join(&[record_name, name]));
+    let helper = |role: &str| super::names::helper("__pgrx_bitfield", role, &[record_name, name]);
     let record_type = &facts.record_type;
-    let alias = format!("{prefix}_unaligned_type");
+    let alias = helper("unaligned_type");
     let declared_c = field.ty.canonical_spelling.replace("const ", "").replace("volatile ", "");
     let promoted_c = &declared_c;
     let mut c_source = format!(
@@ -129,15 +119,22 @@ pub(super) fn generate(
         ("_unaligned", alias.as_str(), ""),
         ("_unaligned_volatile", alias.as_str(), "volatile "),
     ] {
-        writeln!(c_source, "{promoted_c} {prefix}_get{mode}(const {volatile}{c_type} *p) {{ return +(p->{name}); }}").expect("String output");
+        let get = helper(&format!("get{mode}"));
         writeln!(
-            declarations_rust,
-            "fn {prefix}_get{mode}(p: *const {storage}) -> {promoted_storage};"
+            c_source,
+            "{promoted_c} {get}(const {volatile}{c_type} *p) {{ return +(p->{name}); }}"
         )
         .expect("String output");
+        writeln!(declarations_rust, "fn {get}(p: *const {storage}) -> {promoted_storage};")
+            .expect("String output");
         if writable {
-            writeln!(c_source, "{promoted_c} {prefix}_set{mode}({volatile}{c_type} *p, {declared_c} value) {{ return +(p->{name} = value); }}").expect("String output");
-            writeln!(declarations_rust, "fn {prefix}_set{mode}(p: *mut {storage}, value: {object_storage}) -> {promoted_storage};").expect("String output");
+            let set = helper(&format!("set{mode}"));
+            writeln!(c_source, "{promoted_c} {set}({volatile}{c_type} *p, {declared_c} value) {{ return +(p->{name} = value); }}").expect("String output");
+            writeln!(
+                declarations_rust,
+                "fn {set}(p: *mut {storage}, value: {object_storage}) -> {promoted_storage};"
+            )
+            .expect("String output");
         }
     }
     let qualification =
@@ -148,18 +145,26 @@ pub(super) fn generate(
     );
     writeln!(rust, "// SAFETY: Clang and bindgen layout witnesses agree. This projects the record address without a reference or record read.\nunsafe impl<Q: {EXPRESSION}::Qualifier> {EXPRESSION}::Field<{field_marker}, Q> for {EXPRESSION}::CRecord<{storage}> {{ type Output = {place}<{qualification}>; unsafe fn project(base: {EXPRESSION}::Place<Self,Q>) -> Self::Output {{ {place}::<{qualification}> {{ address: <{qualification} as {EXPRESSION}::Qualifier>::from_mut(base.pointer().as_mut_address()), access: {EXPRESSION}::Access {{ volatile: base.access().volatile || {}, unaligned: base.access().unaligned }} }} }} }}", field.ty.is_volatile).expect("String output");
     writeln!(rust,"impl<Q: {EXPRESSION}::Qualifier> {EXPRESSION}::VolatilePlace for {place}<Q> {{ type Qualified = Self; fn qualify_volatile(mut self) -> Self::Qualified {{ self.access.volatile = true; self }} }}").expect("String output");
-    let select_get = select(&format!("{prefix}_get"), "pointer", "self.access");
+    let select_get = select(&helper, "get", "pointer", "self.access");
     writeln!(rust, "// SAFETY: The same-profile C compiler owns bitfield storage reads, including partially initialized neighbor/padding bits. The marker retains declared size and compiler-proved arithmetic promotion.\nunsafe impl<Q: {EXPRESSION}::Qualifier> {EXPRESSION}::ReadPlace for {place}<Q> {{ type Object = {object_marker}; type Type = {expression_marker}; unsafe fn load(self) -> <Self::Type as {EXPRESSION}::CType>::Value {{ let pointer = Q::into_mut(self.address).cast_const(); // SAFETY: The caller establishes the original C field load contract; helpers perform only that field access.\nlet storage = unsafe {{ {select_get} }}; <Self::Type as {EXPRESSION}::CType>::from_storage(storage) }} }}").expect("String output");
     if writable {
-        let select_set = select(&format!("{prefix}_set"), "self.address, value", "self.access");
+        let select_set = select(&helper, "set", "self.address, value", "self.access");
         writeln!(rust, "// SAFETY: Write capability retains ReadWrite qualification. Original C performs declared-base conversion and width narrowing without Rust byte reads.\nunsafe impl {EXPRESSION}::WritePlace for {place}<{EXPRESSION}::ReadWrite> {{ type Assignment = {object_marker}; unsafe fn store(self, value: <Self::Assignment as {EXPRESSION}::CType>::Value) -> <Self::Type as {EXPRESSION}::CType>::Value {{ let value = <Self::Assignment as {EXPRESSION}::CType>::into_storage(value); // SAFETY: The caller establishes writable field storage; this helper evaluates one original-C assignment and returns its narrowed result.\nlet stored = unsafe {{ {select_set} }}; <Self::Type as {EXPRESSION}::CType>::from_storage(stored) }} }}").expect("String output");
     }
     Ok(BitfieldAdapter { rust, c_source })
 }
 
 /// Choose the exact native primitive for the inherited volatile and alignment access flags.
-fn select(function: &str, arguments: &str, access: &str) -> String {
+fn select(
+    helper: &dyn Fn(&str) -> String,
+    operation: &str,
+    arguments: &str,
+    access: &str,
+) -> String {
+    let [plain, volatile, unaligned, unaligned_volatile] =
+        ["", "_volatile", "_unaligned", "_unaligned_volatile"]
+            .map(|mode| helper(&format!("{operation}{mode}")));
     format!(
-        "if {access}.unaligned {{ if {access}.volatile {{ {function}_unaligned_volatile({arguments}) }} else {{ {function}_unaligned({arguments}) }} }} else if {access}.volatile {{ {function}_volatile({arguments}) }} else {{ {function}({arguments}) }}"
+        "if {access}.unaligned {{ if {access}.volatile {{ {unaligned_volatile}({arguments}) }} else {{ {unaligned}({arguments}) }} }} else if {access}.volatile {{ {volatile}({arguments}) }} else {{ {plain}({arguments}) }}"
     )
 }
