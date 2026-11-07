@@ -345,7 +345,7 @@ verifies its value. Bindgen's values
 and types remain unchanged. A disagreement skips the entire macro and records
 the constant, both values, and the skipped macro in the report; with
 `PGRX_MACRO_DEBUG=1`, it also emits a build warning.
-A shared petgraph graph records conservative dependencies among all final active
+A shared dependency graph records conservative dependencies among all final active
 macros, including object macros and external context. Reverse graph traversal
 also skips dependent macros and records their skipped dependencies, with build
 warnings enabled by `PGRX_MACRO_DEBUG=1`. Historical definitions and shadowed

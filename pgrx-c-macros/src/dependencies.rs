@@ -10,11 +10,10 @@
 //! separate, allowing a binding disagreement to seed affected callers without inventing a
 //! macro definition for a declaration constant.
 
+use crate::graph::DiGraph;
 use crate::{
     ExpansionBatch, IntegerConstant, MacroDefinition, MacroEnvironment, MacroKind, TokenKind,
 };
-use petgraph::Direction::{Incoming, Outgoing};
-use petgraph::graph::{DiGraph, NodeIndex};
 use serde::Serialize;
 use std::collections::{BTreeMap, BTreeSet, HashSet, VecDeque};
 
@@ -26,14 +25,15 @@ use std::collections::{BTreeMap, BTreeSet, HashSet, VecDeque};
 /// Prepared sessions also add dependencies synthesized by compiler token pasting.
 #[derive(Clone, Debug)]
 pub struct MacroDependencyGraph {
-    // Nodes remain in lexical name order; no node can be inserted or removed
-    // after construction. This permits borrowed name lookup without duplicating
-    // the name strings in another map.
-    /// Immutable sorted macro nodes and directed caller-to-dependency edges.
-    graph: DiGraph<String, ()>,
+    /// Final active macro names in lexical order. A name's position is its graph node, and
+    /// the set is fixed at construction, so lookup is a binary search.
+    names: Vec<String>,
+    /// Caller-to-dependency edges, added in lexical (caller, dependency) order so that both
+    /// directions list neighbors lexically.
+    graph: DiGraph,
     /// Terminal declaration-constant references kept separate from macro nodes for binding-mismatch
     /// propagation.
-    constant_users: BTreeMap<String, Vec<NodeIndex>>,
+    constant_users: BTreeMap<String, Vec<usize>>,
 }
 
 /// One macro reached by following callers of a seeded dependency.
@@ -58,12 +58,7 @@ impl MacroDependencyGraph {
         batch: &ExpansionBatch,
         constants: &BTreeMap<String, IntegerConstant>,
     ) -> Self {
-        let mut edges = self
-            .graph
-            .raw_edges()
-            .iter()
-            .map(|edge| (edge.source().index(), edge.target().index()))
-            .collect::<BTreeSet<_>>();
+        let mut edges = self.graph.edges().collect::<BTreeSet<_>>();
         let mut users = self
             .constant_users
             .iter()
@@ -73,19 +68,15 @@ impl MacroDependencyGraph {
             let Some(caller) = self.node(name) else { continue };
             for reference in references {
                 if let Some(target) = self.node(reference) {
-                    edges.insert((caller.index(), target.index()));
+                    edges.insert((caller, target));
                 } else if constants.contains_key(reference) {
                     users.entry(reference.clone()).or_default().insert(caller);
                 }
             }
         }
-        let mut graph = self.graph.clone();
-        graph.clear_edges();
-        for (caller, target) in edges.into_iter().rev() {
-            graph.add_edge(NodeIndex::new(caller), NodeIndex::new(target), ());
-        }
         Self {
-            graph,
+            names: self.names.clone(),
+            graph: DiGraph::new(self.names.len(), &edges.into_iter().collect::<Vec<_>>()),
             constant_users: users
                 .into_iter()
                 .map(|(name, users)| (name, users.into_iter().collect()))
@@ -105,16 +96,12 @@ impl MacroDependencyGraph {
         environment: &MacroEnvironment,
         constants: &BTreeMap<String, IntegerConstant>,
     ) -> Self {
-        let mut graph = DiGraph::with_capacity(environment.active.len(), 0);
-        for name in environment.active.keys() {
-            graph.add_node(name.clone());
-        }
-        let mut dependencies = Self { graph, constant_users: BTreeMap::new() };
-        let mut seen = vec![usize::MAX; dependencies.node_count()];
+        let names = environment.active.keys().cloned().collect::<Vec<_>>();
+        let mut constant_users = BTreeMap::<String, Vec<usize>>::new();
+        let mut edges = Vec::new();
+        let mut seen = vec![usize::MAX; names.len()];
         let mut targets = Vec::new();
-        // Petgraph prepends adjacency links. Reversing callers and sorted targets
-        // makes both incoming and outgoing iteration lexical and deterministic.
-        for (caller, active) in environment.active.values().enumerate().rev() {
+        for (caller, active) in environment.active.values().enumerate() {
             let (parameters, body_start) = signature(&active.definition);
             targets.clear();
             for token in &active.definition.tokens[body_start..] {
@@ -123,38 +110,32 @@ impl MacroDependencyGraph {
                 {
                     continue;
                 }
-                if let Some(target) = dependencies.node(&token.spelling) {
-                    if seen[target.index()] != caller {
-                        seen[target.index()] = caller;
+                if let Some(target) = position(&names, &token.spelling) {
+                    if seen[target] != caller {
+                        seen[target] = caller;
                         targets.push(target);
                     }
                 } else if constants.contains_key(&token.spelling) {
-                    let caller = NodeIndex::new(caller);
-                    if let Some(users) = dependencies.constant_users.get_mut(&token.spelling) {
+                    if let Some(users) = constant_users.get_mut(&token.spelling) {
                         // Each caller's tokens are contiguous in this scan, so the
                         // last stored caller deduplicates every repeated enum use.
                         if users.last() != Some(&caller) {
                             users.push(caller);
                         }
                     } else {
-                        dependencies.constant_users.insert(token.spelling.clone(), vec![caller]);
+                        constant_users.insert(token.spelling.clone(), vec![caller]);
                     }
                 }
             }
             targets.sort_unstable();
-            for &target in targets.iter().rev() {
-                dependencies.graph.add_edge(NodeIndex::new(caller), target, ());
-            }
+            edges.extend(targets.iter().map(|&target| (caller, target)));
         }
-        for users in dependencies.constant_users.values_mut() {
-            users.reverse();
-        }
-        dependencies
+        Self { graph: DiGraph::new(names.len(), &edges), names, constant_users }
     }
 
     /// Number of final active macro definitions, including isolated context macros.
     pub fn node_count(&self) -> usize {
-        self.graph.node_count()
+        self.names.len()
     }
 
     /// Number of distinct directed macro references.
@@ -166,23 +147,23 @@ impl MacroDependencyGraph {
     pub fn dependencies(&self, name: &str) -> impl Iterator<Item = &str> + '_ {
         self.node(name)
             .into_iter()
-            .flat_map(|node| self.graph.neighbors_directed(node, Outgoing))
-            .map(|node| self.graph[node].as_str())
+            .flat_map(|node| self.graph.successors(node))
+            .map(|&node| self.names[node].as_str())
     }
 
     /// Macros that name this macro, in lexical order. Unknown names are empty.
     pub fn dependents(&self, name: &str) -> impl Iterator<Item = &str> + '_ {
         self.node(name)
             .into_iter()
-            .flat_map(|node| self.graph.neighbors_directed(node, Incoming))
-            .map(|node| self.graph[node].as_str())
+            .flat_map(|node| self.graph.predecessors(node))
+            .map(|&node| self.names[node].as_str())
     }
 
     /// Macros that name this compiler-owned integer constant, in lexical order.
     /// Formal parameters and active macros shadow the constant. These terminal
     /// references are separate from the macro graph's nodes and edges.
     pub fn constant_users(&self, name: &str) -> impl Iterator<Item = &str> + '_ {
-        self.constant_users.get(name).into_iter().flatten().map(|&node| self.graph[node].as_str())
+        self.constant_users.get(name).into_iter().flatten().map(|&node| self.names[node].as_str())
     }
 
     /// Follow incoming edges from all known roots with one breadth-first traversal.
@@ -195,28 +176,25 @@ impl MacroDependencyGraph {
         let mut visited = vec![false; self.node_count()];
         for root in roots {
             if let Some(node) = self.node(root.as_ref()) {
-                visited[node.index()] = true;
+                visited[node] = true;
             }
         }
         let mut pending = visited
             .iter()
             .enumerate()
             .filter(|(_, seeded)| **seeded)
-            .map(|(index, _)| {
-                let node = NodeIndex::new(index);
-                (node, node)
-            })
+            .map(|(node, _)| (node, node))
             .collect::<VecDeque<_>>();
         let mut impacts = Vec::new();
         while let Some((parent, root)) = pending.pop_front() {
-            for caller in self.graph.neighbors_directed(parent, Incoming) {
-                if std::mem::replace(&mut visited[caller.index()], true) {
+            for &caller in self.graph.predecessors(parent) {
+                if std::mem::replace(&mut visited[caller], true) {
                     continue;
                 }
                 impacts.push(MacroDependencyImpact {
-                    name: self.graph[caller].clone(),
-                    dependency: self.graph[parent].clone(),
-                    root: self.graph[root].clone(),
+                    name: self.names[caller].clone(),
+                    dependency: self.names[parent].clone(),
+                    root: self.names[root].clone(),
                 });
                 pending.push_back((caller, root));
             }
@@ -224,15 +202,14 @@ impl MacroDependencyGraph {
         impacts
     }
 
-    /// Find a macro by binary search over immutable lexical node order without a duplicate name
-    /// index.
-    fn node(&self, name: &str) -> Option<NodeIndex> {
-        self.graph
-            .raw_nodes()
-            .binary_search_by(|node| node.weight.as_str().cmp(name))
-            .ok()
-            .map(NodeIndex::new)
+    fn node(&self, name: &str) -> Option<usize> {
+        position(&self.names, name)
     }
+}
+
+/// Find a macro's node by binary search over lexically sorted names.
+fn position(names: &[String], name: &str) -> Option<usize> {
+    names.binary_search_by(|candidate| candidate.as_str().cmp(name)).ok()
 }
 
 /// Identify signature formals and the replacement-body start so formal names do not create dependency

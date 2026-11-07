@@ -20,6 +20,7 @@ use crate::analysis::{
     AnalysisStatus, AnalyzedExpression, ConstCapability, MacroAnalysis, ResolvedConstant,
     SkipReason, SkipReasonCode, TypeExpression,
 };
+use crate::graph::DiGraph;
 use crate::model::{IntegerKind, IntegerType, IntegerValue, SignedOverflow};
 use crate::syntax::{
     BinaryOperator, ExpressionKind, IntegerLiteral, NodeId, TokenRange, UnaryOperator,
@@ -602,22 +603,25 @@ fn translated_callees(
         .enumerate()
         .map(|(index, analysis)| (analysis.name.as_str(), index))
         .collect::<BTreeMap<_, _>>();
-    let mut graph = petgraph::graph::DiGraph::<(), ()>::with_capacity(translated.len(), 0);
-    let nodes = translated.iter().map(|_| graph.add_node(())).collect::<Vec<_>>();
+    let mut edges = Vec::new();
     for (caller, analysis) in translated.iter().enumerate() {
-        for callee in direct_calls(analysis) {
-            if let Some(&callee) = index.get(callee) {
-                graph.add_edge(nodes[caller], nodes[callee], ());
-            }
-        }
+        edges.extend(
+            direct_calls(analysis)
+                .filter_map(|callee| index.get(callee))
+                .map(|&callee| (caller, callee)),
+        );
     }
+    let graph = DiGraph::new(translated.len(), &edges);
     // Components come in reverse topological order, so callees precede their callers.
-    petgraph::algo::tarjan_scc(&graph)
+    graph
+        .tarjan_scc()
         .into_iter()
-        .filter(|component| {
-            component.len() == 1 && !graph.contains_edge(component[0], component[0])
+        .filter_map(|component| match component[..] {
+            [node] if !graph.successors(node).contains(&node) => {
+                Some(translated[node].name.clone())
+            }
+            _ => None,
         })
-        .map(|component| translated[component[0].index()].name.clone())
         .collect()
 }
 

@@ -451,22 +451,16 @@ impl<'a> PgrxSql<'a> {
     pub fn to_sql(&self) -> eyre::Result<String> {
         let mut full_sql = String::new();
 
-        // NB:  A properly we'd *like* to maintain is that the schema generator outputs
+        // NB:  A property we'd *like* to maintain is that the schema generator outputs
         // consistent results from run-to-run when there are no changes to the schema.
         // This is to improve change detection using simple tools like `diff`.
         //
-        // Historically, we used [`petgraph::algo:toposort`] but its ordering is not at all
-        // consistent.
+        // [`SqlGraph::tarjan_scc`] starts from nodes in index order and follows each node's edges
+        // in insertion order, so its output depends only on the order in which entities and
+        // their dependencies were added to the graph. If schema generation stops being
+        // consistent, look at how the graph is built.
         //
-        // [`petgraph::algo::tarjan_scc`] appears to be consistent, although it's not exactly
-        // clear if this is due to an implementation detail or specifics of the algorithm itself.
-        // (I, eeeebbbbrrrr, am not a graph theory expert)
-        //
-        // In any event, if in the future schema generation stops being consistent, this is the
-        // place to look.
-        //
-        // We have no tests around this as it's really just a property we'd like to have, and
-        // it does seem ensuring it is a bit of black magic.
+        // We have no tests around this as it's really just a property we'd like to have.
         for nodes in self.graph.tarjan_scc().iter().rev() {
             let mut inner_sql = Vec::with_capacity(nodes.len());
 
