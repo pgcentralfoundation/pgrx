@@ -33,8 +33,8 @@ use crate::to_sql::ToSql;
 use crate::to_sql::entity::ToSqlConfigEntity;
 use crate::{ExternArgs, SqlGraphEntity, SqlGraphIdentifier};
 
+use crate::graph::NodeIndex;
 use eyre::{WrapErr, eyre};
-use petgraph::graph::NodeIndex;
 
 /// The output of a [`PgExtern`](crate::pg_extern::PgExtern) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]

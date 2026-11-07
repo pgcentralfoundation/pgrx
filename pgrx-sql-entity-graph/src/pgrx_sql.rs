@@ -16,12 +16,8 @@ Rust to SQL mapping support.
 
 */
 
+use crate::graph::{NodeIndex, SqlGraph};
 use eyre::eyre;
-use petgraph::Direction;
-use petgraph::dot::Dot;
-use petgraph::graph::NodeIndex;
-use petgraph::stable_graph::StableGraph;
-use petgraph::visit::EdgeRef;
 use std::borrow::Cow;
 use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};
 use std::fmt::Debug;
@@ -67,7 +63,7 @@ pub enum SqlGraphRequires {
 #[derive(Debug, Clone)]
 pub struct PgrxSql<'a> {
     pub control: ControlFile,
-    pub graph: StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    pub graph: SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     pub graph_root: NodeIndex,
     pub graph_bootstrap: Option<NodeIndex>,
     pub graph_finalize: Option<NodeIndex>,
@@ -92,7 +88,7 @@ impl<'a> PgrxSql<'a> {
         extension_name: String,
         versioned_so: bool,
     ) -> eyre::Result<Self> {
-        let mut graph = StableGraph::new();
+        let mut graph = SqlGraph::new();
 
         let mut entities = entities.collect::<Vec<_>>();
         entities.sort();
@@ -331,69 +327,73 @@ impl<'a> PgrxSql<'a> {
         Ok(())
     }
 
+    fn to_dot_string(&self) -> String {
+        use std::fmt::Write as _;
+        let mut out = String::new();
+        out.push_str("digraph {\n");
+        for (index, node) in self.graph.nodes().iter().enumerate() {
+            let dot_id = node.dot_identifier();
+            let attr = match node {
+                // Colors derived from https://www.schemecolor.com/touch-of-creativity.php
+                SqlGraphEntity::Schema(_item) => {
+                    format!("label = \"{dot_id}\", weight = 6, shape = \"tab\"")
+                }
+                SqlGraphEntity::Function(_item) => format!(
+                    "label = \"{dot_id}\", penwidth = 0, style = \"filled\", fillcolor = \"#ADC7C6\", weight = 4, shape = \"box\"",
+                ),
+                SqlGraphEntity::Type(_item) => format!(
+                    "label = \"{dot_id}\", penwidth = 0, style = \"filled\", fillcolor = \"#AE9BBD\", weight = 5, shape = \"oval\"",
+                ),
+                SqlGraphEntity::BuiltinType(_item) => {
+                    format!("label = \"{dot_id}\", shape = \"plain\"")
+                }
+                SqlGraphEntity::Enum(_item) => format!(
+                    "label = \"{dot_id}\", penwidth = 0, style = \"filled\", fillcolor = \"#C9A7C8\", weight = 5, shape = \"oval\""
+                ),
+                SqlGraphEntity::Ord(_item) => format!(
+                    "label = \"{dot_id}\", penwidth = 0, style = \"filled\", fillcolor = \"#FFCFD3\", weight = 5, shape = \"diamond\""
+                ),
+                SqlGraphEntity::Hash(_item) => format!(
+                    "label = \"{dot_id}\", penwidth = 0, style = \"filled\", fillcolor = \"#FFE4E0\", weight = 5, shape = \"diamond\""
+                ),
+                SqlGraphEntity::Aggregate(_item) => format!(
+                    "label = \"{dot_id}\", penwidth = 0, style = \"filled\", fillcolor = \"#FFE4E0\", weight = 5, shape = \"diamond\""
+                ),
+                SqlGraphEntity::Trigger(_item) => format!(
+                    "label = \"{dot_id}\", penwidth = 0, style = \"filled\", fillcolor = \"#FFE4E0\", weight = 5, shape = \"diamond\""
+                ),
+                SqlGraphEntity::CustomSql(_item) => {
+                    format!("label = \"{dot_id}\", weight = 3, shape = \"signature\"")
+                }
+                SqlGraphEntity::ExtensionRoot(_item) => {
+                    format!("label = \"{dot_id}\", shape = \"cylinder\"")
+                }
+            };
+            let _ = writeln!(out, "    {index} [ {attr} ]");
+        }
+
+        for edge in self.graph.all_edges() {
+            let attr = match edge.data {
+                SqlGraphRequires::By => r#"color = "gray""#,
+                SqlGraphRequires::ByArg => r#"color = "black""#,
+                SqlGraphRequires::ByReturn => r#"dir = "back", color = "black""#,
+            };
+            let _ =
+                writeln!(out, "    {} -> {} [ {attr} ]", edge.source.index(), edge.target.index());
+        }
+        out.push_str("}\n");
+        out
+    }
+
     // NOTE: this signature is demanded by the codegen we embed via cargo-pgrx
     pub fn to_dot(&self, file: impl AsRef<Path> + Debug) -> eyre::Result<()> {
-        use std::fs::{File, create_dir_all};
-        use std::io::Write;
-        let generated = Dot::with_attr_getters(
-            &self.graph,
-            &[petgraph::dot::Config::EdgeNoLabel, petgraph::dot::Config::NodeNoLabel],
-            &|_graph, edge| {
-                match edge.weight() {
-                    SqlGraphRequires::By => r#"color = "gray""#,
-                    SqlGraphRequires::ByArg => r#"color = "black""#,
-                    SqlGraphRequires::ByReturn => r#"dir = "back", color = "black""#,
-                }
-                .to_owned()
-            },
-            &|_graph, (_index, node)| {
-                let dot_id = node.dot_identifier();
-                match node {
-                    // Colors derived from https://www.schemecolor.com/touch-of-creativity.php
-                    SqlGraphEntity::Schema(_item) => {
-                        format!("label = \"{dot_id}\", weight = 6, shape = \"tab\"")
-                    }
-                    SqlGraphEntity::Function(_item) => format!(
-                        "label = \"{dot_id}\", penwidth = 0, style = \"filled\", fillcolor = \"#ADC7C6\", weight = 4, shape = \"box\"",
-                    ),
-                    SqlGraphEntity::Type(_item) => format!(
-                        "label = \"{dot_id}\", penwidth = 0, style = \"filled\", fillcolor = \"#AE9BBD\", weight = 5, shape = \"oval\"",
-                    ),
-                    SqlGraphEntity::BuiltinType(_item) => {
-                        format!("label = \"{dot_id}\", shape = \"plain\"")
-                    }
-                    SqlGraphEntity::Enum(_item) => format!(
-                        "label = \"{dot_id}\", penwidth = 0, style = \"filled\", fillcolor = \"#C9A7C8\", weight = 5, shape = \"oval\""
-                    ),
-                    SqlGraphEntity::Ord(_item) => format!(
-                        "label = \"{dot_id}\", penwidth = 0, style = \"filled\", fillcolor = \"#FFCFD3\", weight = 5, shape = \"diamond\""
-                    ),
-                    SqlGraphEntity::Hash(_item) => format!(
-                        "label = \"{dot_id}\", penwidth = 0, style = \"filled\", fillcolor = \"#FFE4E0\", weight = 5, shape = \"diamond\""
-                    ),
-                    SqlGraphEntity::Aggregate(_item) => format!(
-                        "label = \"{dot_id}\", penwidth = 0, style = \"filled\", fillcolor = \"#FFE4E0\", weight = 5, shape = \"diamond\""
-                    ),
-                    SqlGraphEntity::Trigger(_item) => format!(
-                        "label = \"{dot_id}\", penwidth = 0, style = \"filled\", fillcolor = \"#FFE4E0\", weight = 5, shape = \"diamond\""
-                    ),
-                    SqlGraphEntity::CustomSql(_item) => {
-                        format!("label = \"{dot_id}\", weight = 3, shape = \"signature\"")
-                    }
-                    SqlGraphEntity::ExtensionRoot(_item) => {
-                        format!("label = \"{dot_id}\", shape = \"cylinder\"")
-                    }
-                }
-            },
-        );
+        let generated = self.to_dot_string();
         let path = Path::new(file.as_ref());
 
-        let parent = path.parent();
-        if let Some(parent) = parent {
-            create_dir_all(parent)?;
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent)?;
         }
-        let mut out = File::create(path)?;
-        write!(out, "{generated:?}")?;
+        std::fs::write(path, generated)?;
         Ok(())
     }
 
@@ -467,7 +467,7 @@ impl<'a> PgrxSql<'a> {
         //
         // We have no tests around this as it's really just a property we'd like to have, and
         // it does seem ensuring it is a bit of black magic.
-        for nodes in petgraph::algo::tarjan_scc(&self.graph).iter().rev() {
+        for nodes in self.graph.tarjan_scc().iter().rev() {
             let mut inner_sql = Vec::with_capacity(nodes.len());
 
             for node in self.connected_component_emit_order(nodes) {
@@ -510,11 +510,11 @@ impl<'a> PgrxSql<'a> {
 
         for &node in nodes {
             for edge in self.graph.edges(node) {
-                if edge.weight() != &SqlGraphRequires::By {
+                if edge.data != SqlGraphRequires::By {
                     continue;
                 }
 
-                let dependent = edge.target();
+                let dependent = edge.target;
                 if !remaining_explicit_dependencies.contains_key(&dependent) {
                     continue;
                 }
@@ -542,9 +542,7 @@ impl<'a> PgrxSql<'a> {
 
         while !ready.is_empty() {
             ready.sort_unstable_by(|left, right| {
-                self.graph[*left]
-                    .cmp(&self.graph[*right])
-                    .then_with(|| left.index().cmp(&right.index()))
+                self.graph[*left].cmp(&self.graph[*right]).then_with(|| left.cmp(right))
             });
             let next = ready.remove(0);
             ordered.push(next);
@@ -762,7 +760,7 @@ impl<'a> PgrxSql<'a> {
         let keep = self.collect_transitive_deps(targets);
 
         let mut body = String::new();
-        for nodes in petgraph::algo::tarjan_scc(&self.graph).iter().rev() {
+        for nodes in self.graph.tarjan_scc().iter().rev() {
             let ordered = self.connected_component_emit_order(nodes);
             let mut block = Vec::new();
 
@@ -1004,7 +1002,7 @@ impl<'a> PgrxSql<'a> {
             }
         }
         while let Some(node) = queue.pop_front() {
-            for predecessor in self.graph.neighbors_directed(node, Direction::Incoming) {
+            for predecessor in self.graph.incoming_neighbors(node) {
                 if visited.insert(predecessor) {
                     queue.push_back(predecessor);
                 }
@@ -1015,7 +1013,7 @@ impl<'a> PgrxSql<'a> {
 }
 
 fn build_base_edges<'a>(
-    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    graph: &mut SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     index: NodeIndex,
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
@@ -1032,7 +1030,7 @@ fn build_base_edges<'a>(
 
 #[allow(clippy::type_complexity)]
 fn initialize_extension_sqls<'a>(
-    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    graph: &mut SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     root: NodeIndex,
     extension_sqls: Vec<ExtensionSqlEntity<'a>>,
 ) -> eyre::Result<(HashMap<ExtensionSqlEntity<'a>, NodeIndex>, Option<NodeIndex>, Option<NodeIndex>)>
@@ -1144,7 +1142,7 @@ pub fn find_positioning_ref_target<'a, 'b>(
 }
 
 fn connect_extension_sqls<'a>(
-    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    graph: &mut SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     extension_sqls: &HashMap<ExtensionSqlEntity<'a>, NodeIndex>,
     schemas: &HashMap<SchemaEntity<'a>, NodeIndex>,
     types: &HashMap<PostgresTypeEntity<'a>, NodeIndex>,
@@ -1193,7 +1191,7 @@ fn connect_extension_sqls<'a>(
 }
 
 fn initialize_schemas<'a>(
-    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    graph: &mut SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
     schemas: Vec<SchemaEntity<'a>>,
@@ -1214,7 +1212,7 @@ fn initialize_schemas<'a>(
 }
 
 fn connect_schemas<'a>(
-    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    graph: &mut SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     schemas: &HashMap<SchemaEntity<'a>, NodeIndex>,
     root: NodeIndex,
 ) {
@@ -1224,7 +1222,7 @@ fn connect_schemas<'a>(
 }
 
 fn initialize_enums<'a>(
-    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    graph: &mut SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
@@ -1241,7 +1239,7 @@ fn initialize_enums<'a>(
 }
 
 fn connect_enums<'a>(
-    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    graph: &mut SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     enums: &HashMap<PostgresEnumEntity<'a>, NodeIndex>,
     schemas: &HashMap<SchemaEntity<'a>, NodeIndex>,
 ) {
@@ -1258,7 +1256,7 @@ fn connect_enums<'a>(
 }
 
 fn initialize_types<'a>(
-    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    graph: &mut SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
@@ -1275,7 +1273,7 @@ fn initialize_types<'a>(
 }
 
 fn connect_types<'a>(
-    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    graph: &mut SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     types: &HashMap<PostgresTypeEntity<'a>, NodeIndex>,
     schemas: &HashMap<SchemaEntity<'a>, NodeIndex>,
     externs: &HashMap<PgExternEntity<'a>, NodeIndex>,
@@ -1331,7 +1329,7 @@ fn connect_types<'a>(
 }
 
 fn initialize_externs<'a>(
-    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    graph: &mut SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
@@ -1416,7 +1414,7 @@ fn initialize_externs<'a>(
 }
 
 fn connect_externs<'a>(
-    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    graph: &mut SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     externs: &HashMap<PgExternEntity<'a>, NodeIndex>,
     hashes: &HashMap<PostgresHashEntity<'a>, NodeIndex>,
     schemas: &HashMap<SchemaEntity<'a>, NodeIndex>,
@@ -1571,7 +1569,7 @@ fn connect_externs<'a>(
 }
 
 fn initialize_ords<'a>(
-    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    graph: &mut SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
@@ -1588,7 +1586,7 @@ fn initialize_ords<'a>(
 }
 
 fn connect_ords<'a>(
-    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    graph: &mut SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     ords: &HashMap<PostgresOrdEntity<'a>, NodeIndex>,
     schemas: &HashMap<SchemaEntity<'a>, NodeIndex>,
     types: &HashMap<PostgresTypeEntity<'a>, NodeIndex>,
@@ -1637,7 +1635,7 @@ fn connect_ords<'a>(
 }
 
 fn initialize_hashes<'a>(
-    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    graph: &mut SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
@@ -1654,7 +1652,7 @@ fn initialize_hashes<'a>(
 }
 
 fn connect_hashes<'a>(
-    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    graph: &mut SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     hashes: &HashMap<PostgresHashEntity<'a>, NodeIndex>,
     schemas: &HashMap<SchemaEntity<'a>, NodeIndex>,
     types: &HashMap<PostgresTypeEntity<'a>, NodeIndex>,
@@ -1682,7 +1680,7 @@ fn connect_hashes<'a>(
 }
 
 fn initialize_aggregates<'a>(
-    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    graph: &mut SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
@@ -1786,7 +1784,7 @@ fn initialize_aggregates<'a>(
 }
 
 fn connect_aggregate<'a>(
-    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    graph: &mut SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     item: &PgAggregateEntity<'a>,
     index: NodeIndex,
     schemas: &HashMap<SchemaEntity<'a>, NodeIndex>,
@@ -1986,7 +1984,7 @@ fn connect_aggregate<'a>(
 }
 
 fn connect_aggregates<'a>(
-    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    graph: &mut SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     aggregates: &HashMap<PgAggregateEntity<'a>, NodeIndex>,
     schemas: &HashMap<SchemaEntity<'a>, NodeIndex>,
     types: &HashMap<PostgresTypeEntity<'a>, NodeIndex>,
@@ -2012,7 +2010,7 @@ fn connect_aggregates<'a>(
 }
 
 fn initialize_triggers<'a>(
-    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    graph: &mut SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
@@ -2030,7 +2028,7 @@ fn initialize_triggers<'a>(
 }
 
 fn connect_triggers<'a>(
-    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    graph: &mut SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     triggers: &HashMap<PgTriggerEntity<'a>, NodeIndex>,
     schemas: &HashMap<SchemaEntity<'a>, NodeIndex>,
 ) {
@@ -2047,7 +2045,7 @@ fn connect_triggers<'a>(
 }
 
 fn make_schema_connection<'a>(
-    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    graph: &mut SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     _kind: &str,
     index: NodeIndex,
     _rust_identifier: &str,
@@ -2066,7 +2064,7 @@ fn make_schema_connection<'a>(
 }
 
 fn make_extern_connection<'a>(
-    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    graph: &mut SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     _kind: &str,
     index: NodeIndex,
     _rust_identifier: &str,
@@ -2187,7 +2185,7 @@ fn unresolved_type_ident(
 }
 
 fn initialize_resolved_type<'a>(
-    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    graph: &mut SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     builtin_types: &mut HashMap<String, NodeIndex>,
     type_ident: &str,
     type_origin: TypeOrigin,
@@ -2214,7 +2212,7 @@ fn initialize_resolved_type<'a>(
 }
 
 fn connect_resolved_type<'a>(
-    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    graph: &mut SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     index: NodeIndex,
     requires: SqlGraphRequires,
     type_ident: &str,
@@ -2248,7 +2246,7 @@ fn connect_resolved_type<'a>(
 }
 
 fn make_type_or_enum_connection<'a>(
-    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
+    graph: &mut SqlGraph<SqlGraphEntity<'a>, SqlGraphRequires>,
     index: NodeIndex,
     type_ident: &str,
     types: &HashMap<PostgresTypeEntity<'a>, NodeIndex>,

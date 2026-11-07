@@ -18,13 +18,13 @@
 */
 use crate::aggregate::options::{FinalizeModify, ParallelOption};
 use crate::fmt;
+use crate::graph::NodeIndex;
 use crate::metadata::{SqlArrayMapping, SqlMapping};
 use crate::pgrx_sql::PgrxSql;
 use crate::to_sql::ToSql;
 use crate::to_sql::entity::ToSqlConfigEntity;
 use crate::{SqlGraphEntity, SqlGraphIdentifier, UsedTypeEntity};
 use eyre::{WrapErr, eyre};
-use petgraph::graph::NodeIndex;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct AggregateTypeEntity<'a> {

@@ -14,5 +14,8 @@
 mod framework;
 
 pub use framework::*;
+/// The `postgres` crate used by [`client()`], so callers can name its types without
+/// depending on a matching version of `postgres` themselves.
+pub use postgres;
 #[cfg(feature = "proptest")]
 pub mod proptest;

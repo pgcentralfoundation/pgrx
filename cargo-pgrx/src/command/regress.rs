@@ -11,11 +11,12 @@ use crate::CommandExecute;
 use crate::command::get::get_property;
 use crate::command::run::Run;
 use crate::command::start::collect_postgresql_conf_settings;
-use crate::manifest::get_package_manifest;
+use crate::manifest::{get_package_manifest, pg_config_and_version};
 use owo_colors::OwoColorize;
-use pgrx_pg_config::{PgConfig, createdb, dropdb, is_supported_major_version};
+use pgrx_pg_config::{PgConfig, Pgrx, createdb, dropdb, is_supported_major_version};
 use std::collections::HashSet;
 use std::env::temp_dir;
+use std::fmt;
 use std::fs::{DirEntry, File};
 use std::io::{BufRead, BufReader, Write};
 use std::path::{Path, PathBuf};
@@ -165,22 +166,6 @@ impl Regress {
         Ok(files)
     }
 
-    fn list_results_outputs(
-        &self,
-        manifest_path: &Path,
-        include_setup: bool,
-    ) -> eyre::Result<Vec<DirEntry>> {
-        let results = manifest_path_to_results_output_path(manifest_path);
-        if !results.exists() {
-            std::fs::create_dir(&results)?;
-        }
-        let mut files = std::fs::read_dir(results)?.collect::<Result<Vec<_>, _>>()?;
-
-        Self::organize_files(&mut files, "out", include_setup);
-
-        Ok(files)
-    }
-
     fn organize_files(files: &mut Vec<DirEntry>, only: &str, include_setup: bool) {
         // remove any files that don't have `only` as the extension
         files.retain(|entry| {
@@ -265,8 +250,8 @@ impl Regress {
         pgregress_path: &Path,
         dbname: &str,
         test_files: &[&DirEntry],
+        version_skipped: &[VersionSkippedTest],
         output_files: &[&DirEntry],
-        include_setup: bool,
         run: u32,
     ) -> eyre::Result<bool> {
         let output_names = output_files.iter().map(|e| make_test_name(e)).collect::<HashSet<_>>();
@@ -277,6 +262,9 @@ impl Regress {
         let ready_tests: Vec<&DirEntry> = ready_tests.into_iter().copied().collect();
 
         // Report skipped tests in the same style as PASS/FAIL
+        for skipped in version_skipped {
+            println!("{} {} ({})", "SKIP".bold().yellow(), skipped.name, skipped.directive);
+        }
         for new_test in &new_tests {
             let name = make_test_name(new_test);
             println!(
@@ -286,7 +274,7 @@ impl Regress {
                 "--add".bold().white()
             );
         }
-        let skipped_cnt = new_tests.len();
+        let skipped_cnt = version_skipped.len() + new_tests.len();
 
         if ready_tests.is_empty() {
             println!("passed=0 failed=0 skipped={skipped_cnt}");
@@ -307,33 +295,31 @@ impl Regress {
             print_regression_diffs(manifest_path, self.verbose, run, self.repeat);
 
             if self.auto {
-                // Promote actual output to expected for failed tests
-                let results_files = self.list_results_outputs(manifest_path, include_setup)?;
-
+                // Promote actual output to expected for failed tests.  Only consider tests that
+                // ran in this invocation: `results/` may still hold output from earlier runs of
+                // tests that were filtered out or skipped, possibly on another Postgres version.
                 println!();
-                for entry in results_files {
-                    let filename = entry
-                        .file_name()
-                        .to_str()
-                        .expect("filename should be valid UTF8")
-                        .to_owned();
+                for test in &ready_tests {
+                    let filename = format!("{}.out", make_test_name(test));
+                    let result_path =
+                        manifest_path_to_results_output_path(manifest_path).join(&filename);
                     let expected_path =
-                        manifest_path_to_expected_tests_output_path(manifest_path).join(filename);
+                        manifest_path_to_expected_tests_output_path(manifest_path).join(&filename);
 
-                    if !expected_path.exists() {
+                    if !result_path.exists() || !expected_path.exists() {
                         continue;
                     }
 
-                    let src = std::fs::read_to_string(entry.path())?;
+                    let src = std::fs::read_to_string(&result_path)?;
                     let dst = std::fs::read_to_string(&expected_path)?;
                     if src != dst {
                         println!(
                             "{} {}'s output to {}",
                             "   Promoting".bold().yellow(),
-                            make_test_name(&entry).bold().bright_red(),
+                            make_test_name(test).bold().bright_red(),
                             expected_path.display().bold().cyan()
                         );
-                        std::fs::copy(entry.path(), &expected_path)?;
+                        std::fs::copy(&result_path, &expected_path)?;
                     }
                 }
             }
@@ -382,6 +368,7 @@ impl CommandExecute for Regress {
         // install the extension
         let (pg_config, dbname) = Run::from(&self).install(false, &postgresql_conf)?;
         let pgregress_path = pg_config.pg_regress_path()?;
+        let pg_major = pg_config.major_version()?;
 
         let mut any_failed = false;
 
@@ -420,6 +407,7 @@ impl CommandExecute for Regress {
                     &dbname,
                     add_name,
                     created_db,
+                    pg_major,
                 );
             }
 
@@ -442,7 +430,13 @@ impl CommandExecute for Regress {
                     );
                     std::process::exit(1);
                 }
+            }
 
+            // tests skipped on this Postgres version are reported, not run, and don't need
+            // expected output
+            let (test_files, version_skipped) = partition_version_skipped(test_files, pg_major)?;
+
+            if self.test_filter.is_some() {
                 // When the user explicitly filters, error if any matched test
                 // has no expected output (they should use --add first)
                 let output_names = output_files.iter().map(make_test_name).collect::<HashSet<_>>();
@@ -468,8 +462,8 @@ impl CommandExecute for Regress {
                 &pgregress_path,
                 &dbname,
                 &test_files.iter().collect::<Vec<_>>(),
+                &version_skipped,
                 &output_files.iter().collect::<Vec<_>>(),
-                created_db, // include_setup
                 run,
             )?;
 
@@ -510,10 +504,7 @@ impl Regress {
         super::reject_removed_pg_version(args.first().map(String::as_str))
             .map_err(|err| err.to_string())?;
         fn is_supported_pg_version_label(label: &str) -> bool {
-            label
-                .strip_prefix("pg")
-                .and_then(|major| major.parse::<u16>().ok())
-                .is_some_and(is_supported_major_version)
+            parse_pg_major(label).is_some_and(is_supported_major_version)
         }
 
         match args {
@@ -542,6 +533,7 @@ impl Regress {
         dbname: &str,
         add_name: &str,
         created_db: bool,
+        pg_major: u16,
     ) -> eyre::Result<()> {
         let test_files = self.list_sql_tests(manifest_path, created_db)?;
         let expected_outputs = self.list_expected_outputs(manifest_path, created_db)?;
@@ -558,6 +550,18 @@ impl Regress {
             std::process::exit(1);
         };
 
+        if let Some(directive) = read_version_directive(test_file)?
+            && directive.skips(pg_major)
+        {
+            eprintln!(
+                "{} test `{}` does not run on pg{pg_major} ({directive}). \
+                Bootstrap it with a Postgres version it runs on.",
+                "       ERROR".bold().red(),
+                add_name.bold().cyan(),
+            );
+            std::process::exit(1);
+        }
+
         // Check if the test already has expected output
         if expected_outputs.iter().any(|e| make_test_name(e) == add_name) {
             eprintln!(
@@ -571,8 +575,13 @@ impl Regress {
 
         // Run setup.sql first if it exists (--add always starts with a fresh DB)
         let setup_files = self.list_sql_tests(manifest_path, true)?;
-        let setup_entry = setup_files.iter().find(|e| make_test_name(e) == "setup");
-        if let Some(setup_entry) = setup_entry {
+        let setup_entry = setup_files.into_iter().find(|e| make_test_name(e) == "setup");
+        let (setup_entry, setup_skipped) =
+            partition_version_skipped(setup_entry.into_iter().collect(), pg_major)?;
+        for skipped in &setup_skipped {
+            println!("{} {} ({})", "SKIP".bold().yellow(), skipped.name, skipped.directive);
+        }
+        if let Some(setup_entry) = setup_entry.first() {
             // Check if setup already has expected output; if not, bootstrap it too
             let setup_has_output = expected_outputs.iter().any(|e| make_test_name(e) == "setup");
             if !setup_has_output {
@@ -640,12 +649,38 @@ impl Regress {
             return Ok(());
         }
 
+        // Resolve the Postgres version the same way `install` would, without installing
+        let pg_major = Pgrx::from_config().and_then(|pgrx| {
+            let (manifest, _, _) = get_package_manifest(
+                &self.features,
+                self.package.as_deref(),
+                self.manifest_path.as_deref(),
+                &self.cargo,
+            )?;
+            let (pg_config, _) = pg_config_and_version(
+                &pgrx,
+                &manifest,
+                self.pg_version.clone(),
+                Some(&mut self.features.clone()),
+                false,
+            )?;
+            pg_config.major_version()
+        });
+        let pg_major = match pg_major {
+            Ok(pg_major) => Some(pg_major),
+            Err(e) => {
+                println!("Not evaluating version directives: {e}");
+                None
+            }
+        };
+
         // List test files (without setup, then report)
         let test_files = self.list_sql_tests(manifest_path, false)?;
         let output_files = self.list_expected_outputs(manifest_path, false)?;
         let output_names = output_files.iter().map(make_test_name).collect::<HashSet<_>>();
 
         let mut ready = Vec::new();
+        let mut version_skipped = Vec::new();
         let mut skipped = Vec::new();
         for entry in &test_files {
             let name = make_test_name(entry);
@@ -654,7 +689,12 @@ impl Regress {
             {
                 continue;
             }
-            if output_names.contains(&name) {
+            if let Some(pg_major) = pg_major
+                && let Some(directive) = read_version_directive(entry)?
+                && directive.skips(pg_major)
+            {
+                version_skipped.push(format!("{name} ({directive})"));
+            } else if output_names.contains(&name) {
                 ready.push(name);
             } else {
                 skipped.push(name);
@@ -663,6 +703,15 @@ impl Regress {
 
         if !ready.is_empty() {
             println!("Would run {} tests: {}", ready.len(), ready.join(", "),);
+        }
+        if let Some(pg_major) = pg_major
+            && !version_skipped.is_empty()
+        {
+            println!(
+                "Would skip {} tests on pg{pg_major}: {}",
+                version_skipped.len(),
+                version_skipped.join(", "),
+            );
         }
         if !skipped.is_empty() {
             println!(
@@ -678,6 +727,115 @@ impl Regress {
 
         Ok(())
     }
+}
+
+/// A comment line in a test's `.sql` file that restricts the Postgres major versions the test
+/// runs on, such as `-- pgrx-regress-skip pg15 pg16` or `-- pgrx-regress-only pg17 pg18`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+enum VersionDirective {
+    Skip(Vec<u16>),
+    Only(Vec<u16>),
+}
+
+impl VersionDirective {
+    const SKIP: &str = "pgrx-regress-skip";
+    const ONLY: &str = "pgrx-regress-only";
+
+    /// Find the directive in a test's SQL.  Directives must be on their own line.  When there are
+    /// several, the last one applies.  A version label must look like `pg17`; one that names a
+    /// major version pgrx doesn't support is accepted so test files remain valid as support
+    /// for old and new versions changes.
+    fn parse(sql: &str) -> Result<Option<Self>, String> {
+        let mut directive = None;
+        for (idx, line) in sql.lines().enumerate() {
+            let Some(comment) = line.trim().strip_prefix("--") else {
+                continue;
+            };
+            let mut words = comment.split_whitespace();
+            let (keyword, make): (_, fn(Vec<u16>) -> Self) = match words.next() {
+                Some(Self::SKIP) => (Self::SKIP, Self::Skip),
+                Some(Self::ONLY) => (Self::ONLY, Self::Only),
+                _ => continue,
+            };
+            let lineno = idx + 1;
+            let versions = words
+                .map(|word| {
+                    parse_pg_major(word).ok_or_else(|| {
+                        format!(
+                            "line {lineno}: invalid Postgres version `{word}` in `{keyword}`, expected a label such as `pg17`"
+                        )
+                    })
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+            if versions.is_empty() {
+                return Err(format!(
+                    "line {lineno}: `{keyword}` needs at least one Postgres version, such as `pg17`"
+                ));
+            }
+            directive = Some(make(versions));
+        }
+        Ok(directive)
+    }
+
+    fn skips(&self, pg_major: u16) -> bool {
+        match self {
+            Self::Skip(versions) => versions.contains(&pg_major),
+            Self::Only(versions) => !versions.contains(&pg_major),
+        }
+    }
+}
+
+impl fmt::Display for VersionDirective {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let (kind, versions) = match self {
+            Self::Skip(versions) => ("skip", versions),
+            Self::Only(versions) => ("only", versions),
+        };
+        f.write_str(kind)?;
+        versions.iter().try_for_each(|major| write!(f, " pg{major}"))
+    }
+}
+
+/// Parse a `pgNN` label into its major version.
+fn parse_pg_major(label: &str) -> Option<u16> {
+    let digits = label.strip_prefix("pg")?;
+    if digits.is_empty() || !digits.bytes().all(|b| b.is_ascii_digit()) {
+        return None;
+    }
+    digits.parse().ok()
+}
+
+/// Read the version directive, if any, from a test's `.sql` file.
+fn read_version_directive(test_file: &DirEntry) -> eyre::Result<Option<VersionDirective>> {
+    let path = test_file.path();
+    // directives are ASCII, and test files need not be UTF-8
+    let sql = std::fs::read(&path)?;
+    VersionDirective::parse(&String::from_utf8_lossy(&sql))
+        .map_err(|message| eyre::eyre!("{}: {message}", path.display()))
+}
+
+/// A test whose version directive excludes the target Postgres version.
+struct VersionSkippedTest {
+    name: String,
+    directive: VersionDirective,
+}
+
+/// Split `test_files` into the tests that run on `pg_major` and those its directives skip.
+fn partition_version_skipped(
+    test_files: Vec<DirEntry>,
+    pg_major: u16,
+) -> eyre::Result<(Vec<DirEntry>, Vec<VersionSkippedTest>)> {
+    let mut runnable = Vec::with_capacity(test_files.len());
+    let mut skipped = Vec::new();
+    for test_file in test_files {
+        match read_version_directive(&test_file)? {
+            Some(directive) if directive.skips(pg_major) => {
+                skipped.push(VersionSkippedTest { name: make_test_name(&test_file), directive })
+            }
+            _ => runnable.push(test_file),
+        }
+    }
+    Ok((runnable, skipped))
 }
 
 fn run_tests(
@@ -1018,7 +1176,69 @@ fn is_git_repo(git: &Path) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::Regress;
+    use super::{Regress, VersionDirective};
+
+    #[test]
+    fn version_directive_absent() {
+        assert_eq!(VersionDirective::parse("SELECT 1;\n-- a comment\n"), Ok(None));
+    }
+
+    #[test]
+    fn version_directive_skip_and_only() {
+        let skip = VersionDirective::parse("SELECT 1;\n-- pgrx-regress-skip pg15 pg16\n")
+            .unwrap()
+            .unwrap();
+        assert_eq!(skip, VersionDirective::Skip(vec![15, 16]));
+        assert!(skip.skips(15) && skip.skips(16) && !skip.skips(17));
+        assert_eq!(skip.to_string(), "skip pg15 pg16");
+
+        let only = VersionDirective::parse("  --pgrx-regress-only   pg17 pg18  \nSELECT 1;")
+            .unwrap()
+            .unwrap();
+        assert_eq!(only, VersionDirective::Only(vec![17, 18]));
+        assert!(only.skips(16) && !only.skips(17) && !only.skips(18) && only.skips(19));
+        assert_eq!(only.to_string(), "only pg17 pg18");
+    }
+
+    #[test]
+    fn version_directive_must_be_on_its_own_line() {
+        assert_eq!(VersionDirective::parse("SELECT 1; -- pgrx-regress-skip pg15"), Ok(None));
+    }
+
+    #[test]
+    fn version_directive_last_one_applies() {
+        let sql = "-- pgrx-regress-skip pg15\nSELECT 1;\n-- pgrx-regress-only pg18\n";
+        assert_eq!(VersionDirective::parse(sql), Ok(Some(VersionDirective::Only(vec![18]))));
+    }
+
+    #[test]
+    fn version_directive_accepts_unsupported_versions() {
+        let directive = VersionDirective::parse("-- pgrx-regress-skip pg13 pg25").unwrap().unwrap();
+        assert_eq!(directive, VersionDirective::Skip(vec![13, 25]));
+        assert!(!directive.skips(17));
+    }
+
+    #[test]
+    fn version_directive_rejects_malformed_versions() {
+        for word in ["p9999", "PG17", "17", "pg", "pg+17", "pg1y", "pg99999"] {
+            let sql = format!("SELECT 1;\n-- pgrx-regress-skip pg17 {word}\n");
+            assert_eq!(
+                VersionDirective::parse(&sql),
+                Err(format!(
+                    "line 2: invalid Postgres version `{word}` in `pgrx-regress-skip`, expected a label such as `pg17`"
+                ))
+            );
+        }
+    }
+
+    #[test]
+    fn version_directive_requires_a_version() {
+        assert_eq!(
+            VersionDirective::parse("-- pgrx-regress-only"),
+            Err("line 1: `pgrx-regress-only` needs at least one Postgres version, such as `pg17`"
+                .into())
+        );
+    }
 
     fn strings(args: &[&str]) -> Vec<String> {
         args.iter().map(|arg| (*arg).to_string()).collect()

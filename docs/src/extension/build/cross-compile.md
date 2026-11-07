@@ -298,7 +298,7 @@ and cannot be used by itself as a target bundle.
 
 An additional caveat (one that is unrelated to the document's completeness) is that the cross-compilation process is highly specific to your Linux distribution, unfortunately. This guide covers Debian (where it's easy) and Fedora (where it's hard). The Debian steps should apply to any `apt`-using distribution, and most of the Fedora steps will apply to other distributions with minimal conversion.
 
-# System reqirements
+# System requirements
 
 1. Postgres headers configured for the target (which we'll talk about shortly).
 2. A cross compilation toolchain (which we'll also talk about shortly).
@@ -344,7 +344,7 @@ And so on, that should give you ideas.
 
 First off, if you're on Debian (and probably other `apt`-using distributions) this should be pretty easy -- just `sudo apt install crossbuild-essential-arm64` if you want to cross-compile *to* aarch64 (*from* x86_64), and `sudo apt install crossbuild-essential-amd64` if you want to cross-compile *to* x86_64 (*from* aarch64). If that's you, you're done with this step, and can move on to the next section.
 
-Otherwise, you're going to have to do this the hard way, which means providing a cross-compile toolchain. Unfortunately, there are some extra wrinkles, as we need bindings generated to be as identical as possible to the the ones that will be generated in non-cross settings.
+Otherwise, you're going to have to do this the hard way, which means providing a cross-compile toolchain. Unfortunately, there are some extra wrinkles, as we need bindings generated to be as identical as possible to the ones that will be generated in non-cross settings.
 
 In particular, this means you should try to ensure that the version of glibc and the linux headers for the cross-compilation toolchain are... reasonably close to reality.
 

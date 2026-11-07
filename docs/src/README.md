@@ -35,7 +35,7 @@ It may assume familiarity with C and SQL work, but as long as you have written
 [CREATE TYPE]: https://www.postgresql.org/docs/current/sql-createtype.html
 
 ## Table of Contents
-- [Working with PGRX](./extension/README.md)
+- [Working with PGRX](./extension.md)
 - [Basics of Postgres Internals](./pg-internal.md)
 - [Contributing](./contributing.md)
 - [Articles](./articles.md)

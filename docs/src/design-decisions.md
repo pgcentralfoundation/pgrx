@@ -39,7 +39,7 @@ ensures certain SQL<-->Postgres<-->Rust invariants are maintained, which include
 return values.
 
 Finally, pgrx wants to improve the day-to-day extension development experience.  `cargo-pgrx` is the Cargo plugin that 
-does the heavy lifting of manging Postgres instances for running and testing an extension.
+does the heavy lifting of managing Postgres instances for running and testing an extension.
 
 ## Non-Goals
 
