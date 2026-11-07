@@ -10,6 +10,7 @@
 use crate::CommandExecute;
 use crate::cargo::CargoProfile;
 use crate::command::get::{find_control_file, get_property};
+use crate::command::migrate::{UnreleasedFragmentMode, plan_unreleased_fragments};
 use crate::command::sudo_install::SudoInstall;
 use crate::manifest::{PgVersionSource, display_version_info};
 use cargo_metadata::{CrateType, Message as CargoMessage};
@@ -57,8 +58,8 @@ pub(crate) struct Install {
     pub(crate) features: clap_cargo::Features,
     #[clap(long)]
     pub(crate) target: Option<String>,
-    /// Disable automatic assembly of unreleased migration fragments into the installed extension directory
-    #[clap(long)]
+    /// Don't assemble unreleased SQL fragments into the installed extension
+    #[clap(long, env = "PGRX_NO_ASSEMBLE_UNRELEASED")]
     pub(crate) no_assemble_unreleased: bool,
     /// Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
     #[clap(long = "cargo", value_name = "FLAG", allow_hyphen_values = true)]
@@ -108,11 +109,7 @@ impl CommandExecute for Install {
         );
 
         display_version_info(&pg_config, &PgVersionSource::PgConfig(pg_config.label()?));
-        let unreleased_mode = if self.no_assemble_unreleased {
-            crate::command::migrate::UnreleasedFragmentMode::Skip
-        } else {
-            crate::command::migrate::UnreleasedFragmentMode::AssembleEphemeral
-        };
+        let unreleased_mode = UnreleasedFragmentMode::for_development(self.no_assemble_unreleased);
         install_extension(
             self.manifest_path.as_deref(),
             self.package.as_deref(),
@@ -164,7 +161,7 @@ pub(crate) fn install_extension(
     base_directory: Option<PathBuf>,
     features: &clap_cargo::Features,
     target: Option<&str>,
-    unreleased_mode: crate::command::migrate::UnreleasedFragmentMode,
+    unreleased_mode: UnreleasedFragmentMode,
     target_dir: &Path,
     cargo_flags: &[String],
     prefix_directory: Option<PathBuf>,
@@ -173,6 +170,14 @@ pub(crate) fn install_extension(
 
     let manifest = Manifest::from_path(package_manifest_path)?;
     let (control_file, extname) = find_control_file(package_manifest_path)?;
+
+    let unreleased_fragments = plan_unreleased_fragments(
+        &manifest,
+        package_manifest_path,
+        &extname,
+        unreleased_mode,
+        cargo_flags,
+    )?;
 
     let build_manifest_path =
         manifest_path_for_build(user_manifest_path, user_package, package_manifest_path);
@@ -272,13 +277,12 @@ pub(crate) fn install_extension(
         cargo_flags,
     )?;
 
-    crate::command::migrate::handle_unreleased_fragments(
-        &manifest,
+    unreleased_fragments.apply(
         package_manifest_path,
         &extname,
         &extdir,
         target_dir,
-        unreleased_mode,
+        cargo_flags,
         &mut output_tracking,
     )?;
 
@@ -665,7 +669,7 @@ pub(crate) fn format_display_path(path: &Path, target_dir: &Path) -> String {
         .to_string()
 }
 
-fn filter_contents(
+pub(crate) fn filter_contents(
     manifest_path: &Path,
     mut input: String,
     cargo_flags: &[String],

@@ -10,6 +10,7 @@ This directory contains examples of how to work with various aspects of `pgrx`.
 - [custom_types/](custom_types/): Create your own custom Postgres types backed by Rust structs/enums
 - [errors/](errors/):  Error handling using Postgres or Rust errors/panics
 - [memory_contexts/](memory_contexts/):  PgMemoryContext lifecycle and SRF/bgworker memory patterns
+- [migration_fragments/](migration_fragments/):  Upgrade scripts assembled from one small SQL file per change
 - [operators/](operators/):  Creating operator functions and associated `CREATE OPERATOR/OPERATOR CLASS/OPERATOR FAMILY` DDL
 - [packaging/](packaging/):  Building RPM and DEB packages with `cargo pgrx package`
 - [parallel_scan_lwlock/](parallel_scan_lwlock/):  LWLocks in dynamic shared memory, shared by the workers of a parallel foreign scan

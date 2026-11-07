@@ -3,27 +3,25 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-use super::fragment::collect_fragments_from_dir;
-use super::resolve_unreleased_dir;
-use super::version::{parse_version_lossy, resolve_prev_version, resolve_target_version};
+use super::MigrateContext;
+use super::fragment::{assemble_sql_content, collect_fragments_from_dir, fragment_marker};
+use super::version::{
+    ExtVersion, existing_upgrade_scripts, resolve_prev_version, resolve_target_version,
+};
 use crate::CommandExecute;
-use crate::command::get::find_control_file;
-use crate::manifest::get_package_manifest;
-use eyre::eyre;
+use eyre::{Context, eyre};
 use owo_colors::OwoColorize;
-use pgrx_pg_config::cargo::PgrxManifestExt;
-use serde::{Deserialize, Serialize};
-use std::fmt;
+use serde::Serialize;
 use std::path::{Path, PathBuf};
 
 /// Inspect extension migration plan without modifying disk state
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Info {
-    /// Target release version (e.g. 0.26.0). Defaults to package.version in Cargo.toml if greater than existing sql/ releases, or derives the next patch version
+    /// Target release version (e.g. 0.26.0). Defaults to the extension's current version if it's newer than every script in sql/, or else the next patch version
     pub(crate) target_version: Option<String>,
 
-    /// Previous release version to upgrade from (e.g. 0.25.9). Defaults to latest target version in sql/
+    /// Previous release version to upgrade from (e.g. 0.25.9). Defaults to the latest released version in sql/
     #[clap(long)]
     pub(crate) prev_version: Option<String>,
 
@@ -47,123 +45,86 @@ pub(crate) struct Info {
     pub(crate) verbose: u8,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
-#[serde(transparent)]
-pub struct ExtensionName(pub String);
+/// Everything an assembly would do. `assemble`, `assemble --dry-run` and `info` all work from one
+/// of these, so what they report can't drift from what's done.
+#[derive(Debug, Serialize)]
+pub(crate) struct MigratePlan {
+    pub(crate) extension_name: String,
+    pub(crate) target_version: ExtVersion,
+    pub(crate) prev_version: ExtVersion,
+    pub(crate) output_file: PathBuf,
+    pub(crate) is_empty: bool,
+    pub(crate) fragments: Vec<FragmentInfo>,
+    /// The assembled upgrade script
+    #[serde(skip)]
+    pub(crate) script: String,
+}
 
-impl fmt::Display for ExtensionName {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.0)
+#[derive(Debug, Serialize)]
+pub(crate) struct FragmentInfo {
+    pub(crate) filename: String,
+    pub(crate) id: String,
+    pub(crate) dependencies: Vec<String>,
+    #[serde(skip)]
+    pub(crate) path: PathBuf,
+}
+
+pub(crate) fn build_migrate_plan(
+    context: &MigrateContext,
+    target_version: Option<&str>,
+    prev_version: Option<&str>,
+    output_dir: Option<&Path>,
+) -> eyre::Result<MigratePlan> {
+    let extname = &context.extname;
+    let current = &context.current_version;
+    let scripts = existing_upgrade_scripts(&context.sql_dir, extname)?;
+
+    let target = resolve_target_version(&scripts, target_version, current)?;
+    let prev = resolve_prev_version(&scripts, &target, prev_version, current)?;
+
+    let fragments = collect_fragments_from_dir(&context.unreleased_dir)?;
+
+    // A script ending at or before `prev` is already on the path to `prev`, so a fragment in one of
+    // them shipped in that release, and assembling it again would apply it twice. This is a fragment
+    // left behind after copying a stable branch's script. A pre-release script ends after `prev` and
+    // legitimately shares its fragments with the final release.
+    for script in scripts.iter().filter(|script| script.target <= prev) {
+        let sql = std::fs::read_to_string(&script.path)
+            .wrap_err_with(|| format!("failed to read `{}`", script.path.display()))?;
+        if let Some(shipped) =
+            fragments.iter().find(|f| sql.lines().any(|line| line == fragment_marker(&f.filename)))
+        {
+            return Err(eyre!(
+                "`{}` already shipped in `{}`. Delete the fragment so it isn't applied twice.",
+                shipped.filename,
+                script.path.display()
+            ));
+        }
     }
-}
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
-#[serde(transparent)]
-pub struct TargetVersion(pub String);
+    let script = assemble_sql_content(extname, &target.to_string(), &fragments);
 
-impl fmt::Display for TargetVersion {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.0)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
-#[serde(transparent)]
-pub struct PredecessorVersion(pub String);
-
-impl fmt::Display for PredecessorVersion {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.0)
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SqlDir<'a>(pub &'a Path);
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct UnreleasedDir<'a>(pub &'a Path);
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct OutputDir<'a>(pub &'a Path);
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct PlanDirectories<'a> {
-    pub sql_dir: SqlDir<'a>,
-    pub unreleased_dir: UnreleasedDir<'a>,
-    pub output_dir: Option<OutputDir<'a>>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct MigratePlan {
-    pub extension_name: ExtensionName,
-    pub target_version: TargetVersion,
-    pub prev_version: PredecessorVersion,
-    pub output_file: PathBuf,
-    pub is_empty: bool,
-    pub fragments: Vec<FragmentInfo>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct FragmentInfo {
-    pub filename: String,
-    pub id: String,
-    pub dependencies: Vec<String>,
-}
-
-pub struct PlanRequest<'a> {
-    pub extname: &'a str,
-    pub dirs: PlanDirectories<'a>,
-    pub target_version: Option<&'a str>,
-    pub prev_version: Option<&'a str>,
-    pub manifest_version: Option<&'a str>,
-}
-
-pub fn build_migrate_plan(req: PlanRequest<'_>) -> eyre::Result<MigratePlan> {
-    let target_ver_str = resolve_target_version(
-        req.dirs.sql_dir.0,
-        req.extname,
-        req.target_version,
-        req.manifest_version,
-    )?;
-
-    let target_ver = parse_version_lossy(&target_ver_str)
-        .ok_or_else(|| eyre!("invalid semver for target version `{target_ver_str}`"))?;
-
-    let prev_ver_str = resolve_prev_version(
-        req.dirs.sql_dir.0,
-        req.extname,
-        &target_ver,
-        req.prev_version,
-        req.manifest_version,
-    )?;
-
-    let fragments = collect_fragments_from_dir(req.dirs.unreleased_dir.0)?;
-    let is_empty = fragments.is_empty();
-
-    let out_dir = req.dirs.output_dir.map(|d| d.0).unwrap_or(req.dirs.sql_dir.0);
-    let output_file =
-        out_dir.join(format!("{}--{}--{}.sql", req.extname, prev_ver_str, target_ver_str));
-
-    let fragment_infos = fragments
-        .into_iter()
-        .map(|f| FragmentInfo {
-            filename: f.filename,
-            id: f.id.to_string(),
-            dependencies: f.dependencies.into_iter().map(|d| d.to_string()).collect(),
-        })
-        .collect();
-
+    let out_dir = output_dir.unwrap_or(&context.sql_dir);
     Ok(MigratePlan {
-        extension_name: ExtensionName(req.extname.to_string()),
-        target_version: TargetVersion(target_ver_str.to_string()),
-        prev_version: PredecessorVersion(prev_ver_str),
-        output_file,
-        is_empty,
-        fragments: fragment_infos,
+        extension_name: extname.clone(),
+        output_file: out_dir.join(format!("{extname}--{prev}--{target}.sql")),
+        target_version: target,
+        prev_version: prev,
+        is_empty: fragments.is_empty(),
+        fragments: fragments
+            .into_iter()
+            .map(|f| FragmentInfo {
+                id: f.id.to_string(),
+                dependencies: f.dependencies.iter().map(ToString::to_string).collect(),
+                filename: f.filename,
+                path: f.path,
+            })
+            .collect(),
+        script,
     })
 }
 
-pub fn render_plan_text(plan: &MigratePlan) {
+pub(crate) fn render_plan_text(plan: &MigratePlan) {
     println!(
         "{} {} ({} -> {})",
         "Extension:".bold(),
@@ -194,31 +155,13 @@ pub fn render_plan_text(plan: &MigratePlan) {
 impl CommandExecute for Info {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        let features = clap_cargo::Features::default();
-        let (package_manifest, package_manifest_path, _) = get_package_manifest(
-            &features,
-            self.package.as_deref(),
-            self.manifest_path.as_deref(),
-            &[],
+        let context = MigrateContext::load(self.package.as_deref(), self.manifest_path.as_deref())?;
+        let plan = build_migrate_plan(
+            &context,
+            self.target_version.as_deref(),
+            self.prev_version.as_deref(),
+            self.output_dir.as_deref(),
         )?;
-
-        let (_, extname) = find_control_file(&package_manifest_path)?;
-        let crate_dir = package_manifest_path.parent().unwrap_or_else(|| Path::new("."));
-        let sql_dir = crate_dir.join("sql");
-        let unreleased_dir = resolve_unreleased_dir(&package_manifest, &package_manifest_path);
-        let manifest_pkg_ver = package_manifest.package_version().ok();
-
-        let plan = build_migrate_plan(PlanRequest {
-            extname: &extname,
-            dirs: PlanDirectories {
-                sql_dir: SqlDir(&sql_dir),
-                unreleased_dir: UnreleasedDir(&unreleased_dir),
-                output_dir: self.output_dir.as_deref().map(OutputDir),
-            },
-            target_version: self.target_version.as_deref(),
-            prev_version: self.prev_version.as_deref(),
-            manifest_version: manifest_pkg_ver.as_deref(),
-        })?;
 
         if self.json {
             println!("{}", serde_json::to_string_pretty(&plan)?);
@@ -227,80 +170,5 @@ impl CommandExecute for Info {
         }
 
         Ok(())
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use std::fs;
-
-    #[test]
-    fn build_migrate_plan_serializes_json_properly() {
-        let temp = tempfile::tempdir().unwrap();
-        let sql_dir = temp.path().join("sql");
-        let unreleased_dir = sql_dir.join("unreleased");
-        fs::create_dir_all(&unreleased_dir).unwrap();
-
-        fs::write(sql_dir.join("test_ext--0.25.0--0.25.9.sql"), "-- old").unwrap();
-        fs::write(unreleased_dir.join("5903.rename_test.sql"), "SELECT 1;").unwrap();
-        fs::write(unreleased_dir.join("6221.unfielded.sql"), "-- depends-on: 5903\nSELECT 2;")
-            .unwrap();
-
-        let plan = build_migrate_plan(PlanRequest {
-            extname: "test_ext",
-            dirs: PlanDirectories {
-                sql_dir: SqlDir(&sql_dir),
-                unreleased_dir: UnreleasedDir(&unreleased_dir),
-                output_dir: None,
-            },
-            target_version: Some("0.26.0"),
-            prev_version: None,
-            manifest_version: Some("0.26.0"),
-        })
-        .unwrap();
-
-        assert_eq!(plan.extension_name.0, "test_ext");
-        assert_eq!(plan.prev_version.0, "0.25.9");
-        assert_eq!(plan.target_version.0, "0.26.0");
-        assert!(!plan.is_empty);
-        assert_eq!(plan.fragments.len(), 2);
-        assert_eq!(plan.fragments[0].filename, "5903.rename_test.sql");
-        assert_eq!(plan.fragments[1].filename, "6221.unfielded.sql");
-        assert_eq!(plan.fragments[1].dependencies, vec!["5903"]);
-
-        let json = serde_json::to_string(&plan).unwrap();
-        assert!(json.contains(r#""extension_name":"test_ext""#));
-        assert!(json.contains(r#""prev_version":"0.25.9""#));
-        assert!(json.contains(r#""target_version":"0.26.0""#));
-        assert!(json.contains(r#""is_empty":false"#));
-    }
-
-    #[test]
-    fn build_migrate_plan_defaults_target_version_when_manifest_is_older() {
-        let temp = tempfile::tempdir().unwrap();
-        let sql_dir = temp.path().join("sql");
-        let unreleased_dir = sql_dir.join("unreleased");
-        fs::create_dir_all(&unreleased_dir).unwrap();
-
-        fs::write(sql_dir.join("test_ext--0.25.0--0.25.9.sql"), "-- old").unwrap();
-        fs::write(unreleased_dir.join("1.test.sql"), "SELECT 1;").unwrap();
-
-        // When manifest is 0.25.6 and sql has 0.25.9, default target version should be 0.25.10
-        let plan = build_migrate_plan(PlanRequest {
-            extname: "test_ext",
-            dirs: PlanDirectories {
-                sql_dir: SqlDir(&sql_dir),
-                unreleased_dir: UnreleasedDir(&unreleased_dir),
-                output_dir: None,
-            },
-            target_version: None,
-            prev_version: None,
-            manifest_version: Some("0.25.6"),
-        })
-        .unwrap();
-
-        assert_eq!(plan.target_version.0, "0.25.10");
-        assert_eq!(plan.prev_version.0, "0.25.9");
     }
 }

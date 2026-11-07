@@ -107,6 +107,10 @@ pub(crate) struct Regress {
     /// Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
     #[clap(long = "cargo", value_name = "FLAG", allow_hyphen_values = true)]
     pub(crate) cargo: Vec<String>,
+
+    /// Don't assemble unreleased SQL fragments into the installed extension
+    #[clap(long)]
+    pub(crate) no_assemble_unreleased: bool,
 }
 
 impl Regress {

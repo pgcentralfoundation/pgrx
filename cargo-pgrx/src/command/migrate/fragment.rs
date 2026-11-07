@@ -103,7 +103,7 @@ pub fn parse_depends_on(content: &str) -> Vec<FragmentDependency> {
     deps
 }
 
-pub fn load_fragment(path: &Path) -> eyre::Result<MigrationFragment> {
+fn load_fragment(path: &Path) -> eyre::Result<MigrationFragment> {
     let filename = path
         .file_name()
         .and_then(|f| f.to_str())
@@ -119,7 +119,8 @@ pub fn load_fragment(path: &Path) -> eyre::Result<MigrationFragment> {
     Ok(MigrationFragment { path: path.to_path_buf(), filename, id, dependencies, sql_content })
 }
 
-pub fn collect_fragments_from_dir(unreleased_dir: &Path) -> eyre::Result<Vec<MigrationFragment>> {
+/// Reads every fragment in `unreleased_dir`, in no particular order.
+pub fn load_fragments(unreleased_dir: &Path) -> eyre::Result<Vec<MigrationFragment>> {
     if !unreleased_dir.exists() {
         return Ok(Vec::new());
     }
@@ -128,8 +129,7 @@ pub fn collect_fragments_from_dir(unreleased_dir: &Path) -> eyre::Result<Vec<Mig
     for entry in fs::read_dir(unreleased_dir)
         .wrap_err_with(|| format!("failed to read directory `{}`", unreleased_dir.display()))?
     {
-        let entry = entry?;
-        let path = entry.path();
+        let path = entry?.path();
         if !path.is_file() {
             continue;
         }
@@ -145,7 +145,50 @@ pub fn collect_fragments_from_dir(unreleased_dir: &Path) -> eyre::Result<Vec<Mig
         fragments.push(load_fragment(&path)?);
     }
 
-    topological_sort_fragments(fragments)
+    Ok(fragments)
+}
+
+pub fn collect_fragments_from_dir(unreleased_dir: &Path) -> eyre::Result<Vec<MigrationFragment>> {
+    topological_sort_fragments(load_fragments(unreleased_dir)?)
+}
+
+/// For each fragment, the indices of the fragments it declares as prerequisites.
+pub fn prerequisites(fragments: &[MigrationFragment]) -> Vec<BTreeSet<usize>> {
+    let mut id_map: HashMap<&FragmentId, Vec<usize>> = HashMap::new();
+    let mut filename_map: HashMap<&str, usize> = HashMap::new();
+
+    for (idx, fragment) in fragments.iter().enumerate() {
+        id_map.entry(&fragment.id).or_default().push(idx);
+        filename_map.insert(&fragment.filename, idx);
+    }
+
+    fragments
+        .iter()
+        .enumerate()
+        .map(|(idx, fragment)| {
+            let mut prerequisite_indices = BTreeSet::new();
+            for dep in &fragment.dependencies {
+                let targets = match dep {
+                    FragmentDependency::Id(id) => id_map.get(id).map(Vec::as_slice),
+                    FragmentDependency::Filename(name) => {
+                        filename_map.get(name.as_str()).map(std::slice::from_ref)
+                    }
+                };
+
+                let Some(targets) = targets else {
+                    tracing::debug!(
+                        "fragment `{}` declares prerequisite `{}`, which was not found in unreleased fragments (assuming already applied in previous release)",
+                        fragment.filename,
+                        dep
+                    );
+                    continue;
+                };
+
+                prerequisite_indices.extend(targets.iter().filter(|&&target| target != idx));
+            }
+            prerequisite_indices
+        })
+        .collect()
 }
 
 pub fn topological_sort_fragments(
@@ -156,54 +199,13 @@ pub fn topological_sort_fragments(
     }
 
     let n = fragments.len();
-    let mut id_map: HashMap<FragmentId, Vec<usize>> = HashMap::new();
-    let mut filename_map: HashMap<String, usize> = HashMap::new();
-
-    for (idx, fragment) in fragments.iter().enumerate() {
-        id_map.entry(fragment.id.clone()).or_default().push(idx);
-        filename_map.insert(fragment.filename.clone(), idx);
-    }
 
     // in_degree: number of unresolved prerequisites for each fragment index
     let mut in_degree = vec![0usize; n];
     // dependents: adjacency list: prerequisite index -> list of dependent fragment indices
     let mut dependents: Vec<Vec<usize>> = vec![Vec::new(); n];
 
-    for (idx, fragment) in fragments.iter().enumerate() {
-        let mut prerequisite_indices = BTreeSet::new();
-
-        for dep in &fragment.dependencies {
-            let mut found = false;
-            match dep {
-                FragmentDependency::Id(id) => {
-                    if let Some(target_indices) = id_map.get(id) {
-                        for &target_idx in target_indices {
-                            if target_idx != idx {
-                                prerequisite_indices.insert(target_idx);
-                            }
-                        }
-                        found = true;
-                    }
-                }
-                FragmentDependency::Filename(name) => {
-                    if let Some(&target_idx) = filename_map.get(name) {
-                        if target_idx != idx {
-                            prerequisite_indices.insert(target_idx);
-                        }
-                        found = true;
-                    }
-                }
-            }
-
-            if !found {
-                tracing::debug!(
-                    "fragment `{}` declares prerequisite `{}`, which was not found in unreleased fragments (assuming already applied in previous release)",
-                    fragment.filename,
-                    dep
-                );
-            }
-        }
-
+    for (idx, prerequisite_indices) in prerequisites(&fragments).into_iter().enumerate() {
         in_degree[idx] = prerequisite_indices.len();
         for prereq_idx in prerequisite_indices {
             dependents[prereq_idx].push(idx);
@@ -255,15 +257,21 @@ pub fn topological_sort_fragments(
     Ok(result)
 }
 
-pub fn format_echo_header(extname: &str, target_version: &str) -> String {
+fn format_echo_header(extname: &str, target_version: &str) -> String {
     format!(
         "\\echo Use \"ALTER EXTENSION {extname} UPDATE TO '{target_version}'\" to load this file. \\quit\n"
     )
 }
 
-pub fn format_fragment_banner(filename: &str) -> String {
+/// The line that marks a fragment inside an assembled script.
+pub fn fragment_marker(filename: &str) -> String {
+    format!("-- Fragment: {filename}")
+}
+
+fn format_fragment_banner(filename: &str) -> String {
     let sep = "-- ============================================================================";
-    format!("\n{sep}\n-- Fragment: {filename}\n{sep}\n")
+    let marker = fragment_marker(filename);
+    format!("\n{sep}\n{marker}\n{sep}\n")
 }
 
 pub fn assemble_sql_content(

@@ -13,6 +13,7 @@ use crate::command::get::get_property;
 use crate::command::install::{
     format_display_path, install_extension, shared_library_filename, warn_if_pg_bench_enabled,
 };
+use crate::command::migrate::UnreleasedFragmentMode;
 use crate::manifest::{PgVersionSource, display_version_info};
 use cargo_toml::Manifest;
 use eyre::{WrapErr, eyre};
@@ -50,9 +51,12 @@ pub(crate) struct Package {
     pub(crate) features: clap_cargo::Features,
     #[clap(long)]
     pub(crate) target: Option<String>,
-    /// Assemble unreleased SQL fragments directly into the package directory
-    #[clap(long)]
+    /// Assemble unreleased SQL fragments into the package instead of refusing to build it
+    #[clap(long, conflicts_with = "no_assemble_unreleased")]
     pub(crate) assemble_unreleased: bool,
+    /// Build the package without unreleased SQL fragments instead of refusing to build it
+    #[clap(long)]
+    pub(crate) no_assemble_unreleased: bool,
     /// Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
     #[clap(long = "cargo", value_name = "FLAG", allow_hyphen_values = true)]
     pub(crate) cargo: Vec<String>,
@@ -71,10 +75,21 @@ pub(crate) enum DistribPackages {
 }
 
 impl Package {
+    pub(crate) fn unreleased_mode(&self) -> UnreleasedFragmentMode {
+        if self.assemble_unreleased {
+            UnreleasedFragmentMode::Assemble
+        } else if self.no_assemble_unreleased {
+            UnreleasedFragmentMode::Skip
+        } else {
+            UnreleasedFragmentMode::Disallow
+        }
+    }
+
     pub(crate) fn perform(
         mut self,
         distrib_packages: DistribPackages,
     ) -> eyre::Result<(PathBuf, Vec<PathBuf>)> {
+        let unreleased_mode = self.unreleased_mode();
         warn_if_pg_bench_enabled(&self.features, "package");
         let cargo_flags = std::mem::take(&mut self.cargo);
         let metadata =
@@ -115,12 +130,6 @@ impl Package {
                 self.target.as_deref(),
                 metadata.target_directory.as_std_path(),
             )?
-        };
-
-        let unreleased_mode = if self.assemble_unreleased {
-            crate::command::migrate::UnreleasedFragmentMode::PackageAssemble
-        } else {
-            crate::command::migrate::UnreleasedFragmentMode::Disallow
         };
 
         let output_files = package_extension(
@@ -177,7 +186,7 @@ pub(crate) fn package_extension(
     is_test: bool,
     features: &clap_cargo::Features,
     target: Option<&str>,
-    unreleased_mode: crate::command::migrate::UnreleasedFragmentMode,
+    unreleased_mode: UnreleasedFragmentMode,
     target_dir: &Path,
     cargo_flags: &[String],
     prefix_dir: Option<PathBuf>,
