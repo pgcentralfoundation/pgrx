@@ -20,9 +20,10 @@ be trusted. It needs no Postgres installation, so it's quick to run on every pul
 
 **Dependency cycles.** Two fragments that depend on each other can't be ordered.
 
-**Undeclared dependencies.** If fragment B touches an object an earlier fragment A creates, B has to
-declare `-- depends-on: A`, directly or through another fragment. They might run in the right order
-today by luck of the numbering, and a backport or a renumbered pull request would change that.
+**Undeclared dependencies.** If fragment B touches an object fragment A creates, B has to declare
+`-- depends-on: A`, directly or through another fragment. When A has the higher number, B would run
+first and fail. When A has the lower number they run in the right order by luck, and a backport or a
+renumbered pull request would change that. The check catches both.
 
 ```console
 $ cargo pgrx migrate check
@@ -35,12 +36,15 @@ Two fragments that replace the same function also need an order, since the last 
 
 **Mixed fragments**, with `--deny-mixed-objects`. A fragment that touches both released objects and
 unreleased ones [can't be backported](./fragments.md#keeping-released-and-unreleased-changes-apart).
+An object counts as unreleased only if some fragment creates it with a plain `CREATE`, because
+`CREATE OR REPLACE` is also how a released function is changed.
 
 ## Options
 
-- `--base <REF>` reports only fragments added or changed since this branch left `<REF>`, so old
-  fragments don't fail unrelated pull requests. It reads committed changes, so commit first when
-  you run it locally.
+- `--base <REF>` reports only problems that involve a fragment added or changed since this branch
+  left `<REF>`, so old fragments don't fail unrelated pull requests. A conflict between a new
+  fragment and an old one is still reported, even when it's the old file that needs the fix. It
+  reads committed changes, so commit first when you run it locally.
 - `--format <text|json|github>` chooses the output. `github` writes workflow annotations.
 
 ## What It Can't See
@@ -53,7 +57,8 @@ function body never counts as a statement. That also means it's blind to:
 - Renames. An object is known by the name it was created with.
 - Schemas. It compares unqualified names, because the `search_path` isn't known until the script
   runs. Objects with the same name in two schemas look like one object.
-- Misspelled dependencies, which look like fragments from an earlier release.
+- A misspelled dependency between fragments that don't touch the same object. It looks like a
+  fragment from an earlier release.
 
 Passing the check means the order is declared. It doesn't mean the SQL works, which takes a
 [real upgrade test](./testing.md).

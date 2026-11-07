@@ -46,9 +46,14 @@ impl ExtVersion {
             .ok_or_else(|| eyre!("`{arg}` is not a version cargo-pgrx can order"))
     }
 
-    fn next_patch(&self) -> Self {
-        let semver = Version::new(self.semver.major, self.semver.minor, self.semver.patch + 1);
-        Self { label: semver.to_string(), semver }
+    pub(crate) fn next_patch(&self) -> eyre::Result<Self> {
+        let patch = self
+            .semver
+            .patch
+            .checked_add(1)
+            .ok_or_else(|| eyre!("there is no patch version after `{self}`"))?;
+        let semver = Version::new(self.semver.major, self.semver.minor, patch);
+        Ok(Self { label: semver.to_string(), semver })
     }
 
     fn is_prerelease(&self) -> bool {
@@ -122,8 +127,8 @@ pub(crate) fn existing_upgrade_scripts(
 }
 
 /// The version after `latest`: `current` once it has moved past `latest`, or else the next patch.
-pub(crate) fn next_version(latest: &ExtVersion, current: &ExtVersion) -> ExtVersion {
-    if current > latest { current.clone() } else { latest.next_patch() }
+pub(crate) fn next_version(latest: &ExtVersion, current: &ExtVersion) -> eyre::Result<ExtVersion> {
+    if current > latest { Ok(current.clone()) } else { latest.next_patch() }
 }
 
 pub(crate) fn resolve_target_version(
@@ -133,7 +138,7 @@ pub(crate) fn resolve_target_version(
 ) -> eyre::Result<ExtVersion> {
     match (explicit, scripts.last()) {
         (Some(target), _) => ExtVersion::from_arg(target),
-        (None, Some(latest)) => Ok(next_version(&latest.target, current)),
+        (None, Some(latest)) => next_version(&latest.target, current),
         (None, None) => Ok(current.clone()),
     }
 }
@@ -235,9 +240,18 @@ mod tests {
     #[test]
     fn next_version_prefers_a_current_version_ahead_of_sql() {
         let latest = version("0.25.0");
-        assert_eq!(next_version(&latest, &version("0.26.0")), version("0.26.0"));
-        assert_eq!(next_version(&latest, &version("0.25.0")), version("0.25.1"));
-        assert_eq!(next_version(&version("0.25.9"), &version("0.25.6")), version("0.25.10"));
+        assert_eq!(next_version(&latest, &version("0.26.0")).unwrap(), version("0.26.0"));
+        assert_eq!(next_version(&latest, &version("0.25.0")).unwrap(), version("0.25.1"));
+        assert_eq!(
+            next_version(&version("0.25.9"), &version("0.25.6")).unwrap(),
+            version("0.25.10")
+        );
+    }
+
+    #[test]
+    fn the_largest_patch_has_no_successor() {
+        let last = version("0.1.18446744073709551615");
+        assert!(next_version(&last, &last).is_err());
     }
 
     #[test]

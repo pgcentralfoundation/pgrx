@@ -103,7 +103,7 @@ pub fn parse_depends_on(content: &str) -> Vec<FragmentDependency> {
     deps
 }
 
-pub fn load_fragment(path: &Path) -> eyre::Result<MigrationFragment> {
+fn load_fragment(path: &Path) -> eyre::Result<MigrationFragment> {
     let filename = path
         .file_name()
         .and_then(|f| f.to_str())
@@ -257,7 +257,7 @@ pub fn topological_sort_fragments(
     Ok(result)
 }
 
-pub fn format_echo_header(extname: &str, target_version: &str) -> String {
+fn format_echo_header(extname: &str, target_version: &str) -> String {
     format!(
         "\\echo Use \"ALTER EXTENSION {extname} UPDATE TO '{target_version}'\" to load this file. \\quit\n"
     )
@@ -268,7 +268,7 @@ pub fn fragment_marker(filename: &str) -> String {
     format!("-- Fragment: {filename}")
 }
 
-pub fn format_fragment_banner(filename: &str) -> String {
+fn format_fragment_banner(filename: &str) -> String {
     let sep = "-- ============================================================================";
     let marker = fragment_marker(filename);
     format!("\n{sep}\n{marker}\n{sep}\n")

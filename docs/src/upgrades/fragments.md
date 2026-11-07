@@ -79,8 +79,8 @@ add_vector_index, 102.add_greeting_log.sql`. Dependencies carry through, so a fr
 on 102 doesn't need to repeat what 102 depends on.
 
 A dependency that isn't in the directory is assumed to have shipped in an earlier release, which
-means a misspelled ID is silently ignored too. [`cargo pgrx migrate check`](./ci.md) catches most
-of the resulting mistakes.
+means a misspelled ID is silently ignored too. [`cargo pgrx migrate check`](./ci.md) still catches
+the mistake whenever the two fragments touch the same object.
 
 ## Keeping Released and Unreleased Changes Apart
 
@@ -95,7 +95,9 @@ and a second, depending on the unreleased work, for the rest:
 - `230.parallel_safe_index_stats.sql` starts with `-- depends-on: 215` and stays on the main
   branch.
 
-`cargo pgrx migrate check --deny-mixed-objects` flags fragments that mix the two.
+`cargo pgrx migrate check --deny-mixed-objects` flags fragments that mix the two. Create new objects
+with a plain `CREATE`, which is also what `cargo pgrx schema` generates: the check reads
+`CREATE OR REPLACE` as possibly changing an object that has already shipped.
 
 ## Trying an Upgrade During Development
 

@@ -4,11 +4,12 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use super::MigrateContext;
-use super::fragment::{assemble_sql_content, collect_fragments_from_dir};
+use super::fragment::{assemble_sql_content, collect_fragments_from_dir, fragment_marker};
 use super::version::{
     ExtVersion, existing_upgrade_scripts, resolve_prev_version, resolve_target_version,
 };
 use crate::CommandExecute;
+use eyre::{Context, eyre};
 use owo_colors::OwoColorize;
 use serde::Serialize;
 use std::path::{Path, PathBuf};
@@ -82,6 +83,25 @@ pub(crate) fn build_migrate_plan(
     let prev = resolve_prev_version(&scripts, &target, prev_version, current)?;
 
     let fragments = collect_fragments_from_dir(&context.unreleased_dir)?;
+
+    // A script ending at or before `prev` is already on the path to `prev`, so a fragment in one of
+    // them shipped in that release, and assembling it again would apply it twice. This is a fragment
+    // left behind after copying a stable branch's script. A pre-release script ends after `prev` and
+    // legitimately shares its fragments with the final release.
+    for script in scripts.iter().filter(|script| script.target <= prev) {
+        let sql = std::fs::read_to_string(&script.path)
+            .wrap_err_with(|| format!("failed to read `{}`", script.path.display()))?;
+        if let Some(shipped) =
+            fragments.iter().find(|f| sql.lines().any(|line| line == fragment_marker(&f.filename)))
+        {
+            return Err(eyre!(
+                "`{}` already shipped in `{}`. Delete the fragment so it isn't applied twice.",
+                shipped.filename,
+                script.path.display()
+            ));
+        }
+    }
+
     let script = assemble_sql_content(extname, &target.to_string(), &fragments);
 
     let out_dir = output_dir.unwrap_or(&context.sql_dir);

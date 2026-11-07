@@ -46,6 +46,8 @@ previous version defaults to the newest non-pre-release script older than the ta
   have nothing left to write. Delete the script yourself if you mean to rebuild it.
 - Write an upgrade with no fragments, unless you pass `--allow-empty`.
 - Guess a previous version it can't determine.
+- Include a fragment that already shipped, which it recognizes in any script on the path to the
+  previous version.
 
 `--dry-run` reports the same plan and the same errors without writing anything.
 
@@ -100,7 +102,7 @@ To ship a fix from a `0.25.x` branch:
    byte-for-byte identical on both branches.
 3. On `0.25.x`, set the patch version and run `cargo pgrx migrate assemble`, as for any release.
 4. On the main branch, copy the new script into `sql/` and delete the fragments it consumed.
-   Otherwise the next release from the main branch would apply them a second time.
+   `cargo pgrx migrate assemble` refuses to include them in the next release if you forget.
 
 A fragment with a `depends-on` can only be backported once what it depends on is on that branch.
 Nothing warns you otherwise: a missing dependency looks like one from an earlier release. A

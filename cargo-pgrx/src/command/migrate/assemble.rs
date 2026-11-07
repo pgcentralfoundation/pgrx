@@ -65,7 +65,7 @@ pub(crate) struct Assemble {
 #[derive(Debug, PartialEq, Eq)]
 enum ControlUpdate {
     /// `--update-control` wasn't passed.
-    None,
+    NotRequested,
     /// `default_version` is `@CARGO_VERSION@`, which already resolves to the target. Writing a
     /// literal over it would stop the extension version following `Cargo.toml` from now on.
     FollowsCargo,
@@ -79,7 +79,7 @@ impl Assemble {
         plan: &MigratePlan,
     ) -> eyre::Result<ControlUpdate> {
         if !self.update_control {
-            return Ok(ControlUpdate::None);
+            return Ok(ControlUpdate::NotRequested);
         }
 
         let default_version = get_property(&context.manifest_path, "default_version")?;
@@ -170,7 +170,7 @@ fn apply_plan(
     );
 
     match control_update {
-        ControlUpdate::None => {}
+        ControlUpdate::NotRequested => {}
         ControlUpdate::FollowsCargo => eprintln!(
             "{} default_version follows Cargo.toml in {}",
             "    Unchanged".bold().green(),

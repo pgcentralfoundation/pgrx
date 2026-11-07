@@ -40,7 +40,7 @@ pub(crate) struct Check {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, clap::ValueEnum, Default)]
-pub enum LintFormat {
+pub(crate) enum LintFormat {
     #[default]
     Text,
     Json,
@@ -49,18 +49,18 @@ pub enum LintFormat {
 
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
 #[serde(rename_all = "snake_case")]
-pub enum LintRule {
+enum LintRule {
     DagCycle,
     UndeclaredDependency,
     MixedObjects,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
-pub struct DiagnosticIssue {
-    pub file: PathBuf,
-    pub filename: String,
-    pub rule: LintRule,
-    pub message: String,
+struct DiagnosticIssue {
+    file: PathBuf,
+    filename: String,
+    rule: LintRule,
+    message: String,
 }
 
 /// Names the fragments in `unreleased_dir` added or modified since they diverged from `base_ref`.
@@ -85,9 +85,9 @@ fn changed_fragment_files(unreleased_dir: &Path, base_ref: &str) -> eyre::Result
         .collect())
 }
 
-pub struct LintConfig {
-    pub deny_mixed_objects: bool,
-    pub base_ref: Option<String>,
+struct LintConfig {
+    deny_mixed_objects: bool,
+    base_ref: Option<String>,
 }
 
 /// For each fragment of a topologically sorted list, every fragment that is guaranteed to run
@@ -104,7 +104,7 @@ fn transitive_prerequisites(sorted: &[MigrationFragment]) -> Vec<BTreeSet<usize>
     transitive
 }
 
-pub fn run_lint_checks(
+fn run_lint_checks(
     unreleased_dir: &Path,
     config: &LintConfig,
 ) -> eyre::Result<Vec<DiagnosticIssue>> {
@@ -120,49 +120,74 @@ pub fn run_lint_checks(
         }
     };
 
-    // Every fragment feeds the catalog below, but only changed ones are reported.
     let changed = config
         .base_ref
         .as_deref()
         .map(|base_ref| changed_fragment_files(unreleased_dir, base_ref))
         .transpose()?;
 
-    let guaranteed_before = transitive_prerequisites(&fragments);
-    let mut issues = Vec::new();
+    Ok(lint_sorted(&fragments, changed.as_ref(), config.deny_mixed_objects))
+}
 
-    // Objects created so far, by kind and name, and the index of the fragment creating each.
-    // Walking in assembly order means a fragment can only depend on one that runs before it, so a
-    // fragment that drops an object a later fragment recreates is not told to run after it.
-    let mut created: BTreeMap<(&str, String), Vec<(ObjectRef, usize)>> = BTreeMap::new();
+/// Lints fragments in assembly order. With `changed`, an issue is reported only if it involves a
+/// changed fragment, on either side.
+fn lint_sorted(
+    fragments: &[MigrationFragment],
+    changed: Option<&BTreeSet<String>>,
+    deny_mixed_objects: bool,
+) -> Vec<DiagnosticIssue> {
+    let touched: Vec<Vec<ObjectRef>> =
+        fragments.iter().map(|fragment| touched_objects(&fragment.sql_content)).collect();
+
+    // Every fragment that creates each object, wherever it falls in the order, so that a fragment
+    // touching an object a later fragment creates is caught as surely as one touching an earlier
+    // fragment's.
+    let mut creators: BTreeMap<(&str, &str), Vec<(&ObjectRef, usize)>> = BTreeMap::new();
+    for (idx, objects) in touched.iter().enumerate() {
+        for object in objects.iter().filter(|o| matches!(o.verb, Verb::Create | Verb::Replace)) {
+            creators.entry((object.kind, object.name.as_str())).or_default().push((object, idx));
+        }
+    }
+
+    let is_changed =
+        |idx: usize| changed.is_none_or(|changed| changed.contains(&fragments[idx].filename));
+    let guaranteed_before = transitive_prerequisites(fragments);
+    let mut issues = Vec::new();
 
     for (idx, fragment) in fragments.iter().enumerate() {
         let mut owners = BTreeSet::new();
         let mut released_objects = Vec::new();
 
-        for object in touched_objects(&fragment.sql_content) {
-            let same_name = created.entry((object.kind, object.name.clone())).or_default();
-            let earlier: Vec<usize> = same_name
-                .iter()
-                .filter(|(other, _)| other.same_object(&object))
-                .map(|&(_, owner)| owner)
+        for object in &touched[idx] {
+            let same: Vec<(&ObjectRef, usize)> = creators
+                .get(&(object.kind, object.name.as_str()))
+                .into_iter()
+                .flatten()
+                .filter(|(creator, _)| creator.same_object(object))
+                .copied()
                 .collect();
 
-            if earlier.is_empty() && object.verb != Verb::Create {
+            // Only a plain CREATE proves an object is new. CREATE OR REPLACE may be changing
+            // something that already shipped.
+            if object.verb != Verb::Create && !same.iter().any(|(c, _)| c.verb == Verb::Create) {
                 released_objects.push(object.to_string());
             }
-            owners.extend(earlier.into_iter().filter(|&owner| fragments[owner].id != fragment.id));
 
-            if object.verb == Verb::Create {
-                same_name.push((object, idx));
+            for &(_, owner) in &same {
+                if owner == idx || fragments[owner].id == fragment.id {
+                    continue;
+                }
+                // An earlier creator has to stay earlier. A later one is a problem for an ALTER,
+                // which needs the object to exist. A DROP before a later CREATE is how a released
+                // object gets recreated, and two creations are reported from the later side.
+                if owner < idx || object.verb == Verb::Alter {
+                    owners.insert(owner);
+                }
             }
-        }
-
-        if changed.as_ref().is_some_and(|changed| !changed.contains(&fragment.filename)) {
-            continue;
         }
 
         for &owner in &owners {
-            if guaranteed_before[idx].contains(&owner) {
+            if guaranteed_before[idx].contains(&owner) || !(is_changed(idx) || is_changed(owner)) {
                 continue;
             }
             let dep_id = &fragments[owner].id;
@@ -176,7 +201,11 @@ pub fn run_lint_checks(
             });
         }
 
-        if config.deny_mixed_objects && !released_objects.is_empty() && !owners.is_empty() {
+        if deny_mixed_objects
+            && is_changed(idx)
+            && !released_objects.is_empty()
+            && !owners.is_empty()
+        {
             let owners_str = owners
                 .iter()
                 .map(|&owner| fragments[owner].id.to_string())
@@ -194,10 +223,10 @@ pub fn run_lint_checks(
         }
     }
 
-    Ok(issues)
+    issues
 }
 
-pub fn render_lint_diagnostics(issues: &[DiagnosticIssue], format: LintFormat) -> eyre::Result<()> {
+fn render_lint_diagnostics(issues: &[DiagnosticIssue], format: LintFormat) -> eyre::Result<()> {
     match format {
         LintFormat::Text => {
             if issues.is_empty() {
@@ -340,6 +369,72 @@ mod tests {
             let issues = lint(&[("101.a.sql", create), ("102.b.sql", touch)], &NO_FLAGS);
             assert_undeclared(&issues, "102.b.sql", "101");
         }
+    }
+
+    #[test]
+    fn a_fragment_needing_a_later_one_is_caught() {
+        // 98 sorts before 102, so without a declaration the index would be created first.
+        for header in ["", "-- depends-on: 120\n"] {
+            let issues = lint(
+                &[
+                    ("98.index.sql", &format!("{header}CREATE INDEX i ON greeting_log (x);")),
+                    ("102.add_greeting_log.sql", "CREATE TABLE greeting_log (x int);"),
+                ],
+                &NO_FLAGS,
+            );
+            assert_undeclared(&issues, "98.index.sql", "102");
+        }
+
+        let issues = lint(
+            &[
+                ("98.index.sql", "-- depends-on: 102\nCREATE INDEX i ON greeting_log (x);"),
+                ("102.add_greeting_log.sql", "CREATE TABLE greeting_log (x int);"),
+            ],
+            &NO_FLAGS,
+        );
+        assert!(issues.is_empty(), "{issues:?}");
+    }
+
+    fn sorted(files: &[(&str, &str)]) -> Vec<MigrationFragment> {
+        let temp = tempfile::tempdir().unwrap();
+        for (name, sql) in files {
+            std::fs::write(temp.path().join(name), sql).unwrap();
+        }
+        topological_sort_fragments(load_fragments(temp.path()).unwrap()).unwrap()
+    }
+
+    #[test]
+    fn a_changed_fragment_is_reported_whichever_side_it_is_on() {
+        let sql = "CREATE OR REPLACE FUNCTION f() RETURNS int;";
+        let fragments = sorted(&[("98.new.sql", sql), ("102.existing.sql", sql)]);
+
+        let changed = BTreeSet::from(["98.new.sql".to_string()]);
+        assert_undeclared(
+            &lint_sorted(&fragments, Some(&changed), false),
+            "102.existing.sql",
+            "98",
+        );
+
+        let unrelated = BTreeSet::from(["7.other.sql".to_string()]);
+        assert!(lint_sorted(&fragments, Some(&unrelated), false).is_empty());
+    }
+
+    #[test]
+    fn replacing_a_released_function_counts_as_touching_released_objects() {
+        let config = LintConfig { deny_mixed_objects: true, base_ref: None };
+        let issues = lint(
+            &[
+                ("101.a.sql", "CREATE TABLE unreleased_t (id int);"),
+                (
+                    "102.b.sql",
+                    "-- depends-on: 101\nCREATE OR REPLACE FUNCTION released_fn() RETURNS int;\nALTER TABLE unreleased_t ADD COLUMN x int;",
+                ),
+            ],
+            &config,
+        );
+        assert_eq!(issues.len(), 1, "{issues:?}");
+        assert_eq!(issues[0].rule, LintRule::MixedObjects);
+        assert!(issues[0].message.contains("FUNCTION released_fn()"), "{}", issues[0].message);
     }
 
     #[test]

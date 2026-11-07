@@ -289,13 +289,43 @@ fn a_first_release_asks_for_the_previous_version() {
 }
 
 #[test]
-fn a_target_older_than_the_crate_is_refused() {
+fn a_target_older_than_every_known_version_needs_a_previous_version() {
     let fixture = Fixture::new("0.26.0");
     fixture.fragment("101.init.sql", "CREATE TABLE t (id int);\n");
 
-    let (success, stdout, _) = fixture.migrate(&["assemble", "0.25.0"]);
+    // There's nothing older than 0.25.0 to start from, and 0.26.0 would make a downgrade.
+    let (success, stdout, stderr) = fixture.migrate(&["assemble", "0.25.0"]);
     assert!(!success, "{stdout}");
+    assert!(stderr.contains("--prev-version"), "{stderr}");
     assert!(fixture.released_scripts().is_empty());
+
+    let (success, stdout, stderr) =
+        fixture.migrate(&["assemble", "0.25.0", "--prev-version", "0.26.0"]);
+    assert!(!success, "{stdout}");
+    assert!(stderr.contains("must be older than the target"), "{stderr}");
+}
+
+#[test]
+fn a_fragment_that_already_shipped_is_refused() {
+    let fixture = Fixture::new("0.26.0");
+    fixture.fragment("101.fix.sql", "CREATE TABLE t (id int);\n");
+    // A stable branch released 101 in 0.25.1, and its script was copied here, but the fragment
+    // wasn't deleted.
+    let (success, _, stderr) = fixture.migrate(&[
+        "assemble",
+        "0.25.1",
+        "--prev-version",
+        "0.25.0",
+        "--preserve-fragments",
+    ]);
+    assert!(success, "{stderr}");
+
+    for args in [&["assemble"][..], &["assemble", "--dry-run"], &["info"]] {
+        let (success, stdout, stderr) = fixture.migrate(args);
+        assert!(!success, "{args:?} should refuse: {stdout}");
+        assert!(stderr.contains("101.fix.sql") && stderr.contains("already shipped"), "{stderr}");
+    }
+    assert_eq!(fixture.released_scripts(), ["my_ext--0.25.0--0.25.1.sql"]);
 }
 
 #[test]

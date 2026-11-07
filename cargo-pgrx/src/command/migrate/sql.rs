@@ -13,8 +13,9 @@ use std::fmt;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Verb {
-    /// `CREATE`, with or without `OR REPLACE`
     Create,
+    /// `CREATE OR REPLACE`, which can either create an object or change one that already exists
+    Replace,
     Alter,
     Drop,
 }
@@ -378,8 +379,7 @@ impl Cursor<'_> {
 fn parse_statement(tokens: &[Token]) -> Vec<ObjectRef> {
     let mut cursor = Cursor { tokens };
     let verb = if cursor.eat_word("create") {
-        cursor.eat_words(&["or", "replace"]);
-        Verb::Create
+        if cursor.eat_words(&["or", "replace"]) { Verb::Replace } else { Verb::Create }
     } else if cursor.eat_word("alter") {
         Verb::Alter
     } else if cursor.eat_word("drop") {
@@ -515,8 +515,10 @@ mod tests {
     #[test]
     fn reads_the_verb_kind_and_name() {
         let object = only("CREATE OR REPLACE FUNCTION my_func(a int) RETURNS void LANGUAGE sql;");
-        assert_eq!(object.verb, Verb::Create);
+        assert_eq!(object.verb, Verb::Replace);
         assert_eq!(object.to_string(), "FUNCTION my_func(int4)");
+
+        assert_eq!(only("CREATE TABLE t (id int)").verb, Verb::Create);
 
         assert_eq!(only("ALTER TABLE t ADD COLUMN x int").verb, Verb::Alter);
         assert_eq!(only("DROP TYPE IF EXISTS status_t").verb, Verb::Drop);

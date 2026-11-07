@@ -148,7 +148,7 @@ pub(crate) enum UnreleasedFragments {
     NotEnabled,
     /// The package opted in but this install has nothing to add.
     NothingToAssemble,
-    Assemble(EphemeralUpgrade),
+    Assemble(Box<EphemeralUpgrade>),
 }
 
 pub(crate) struct EphemeralUpgrade {
@@ -216,17 +216,16 @@ pub(crate) fn plan_unreleased_fragments(
 
     let current = current_version(manifest_path, cargo_flags)?;
     let (prev, target) = match scripts.last() {
-        Some(latest) => {
-            let target = version::next_version(&latest.target, &current);
-            (latest.target.clone(), target)
-        }
-        None => {
-            let target = version::next_version(&current, &current);
-            (current.clone(), target)
-        }
+        Some(latest) => (latest.target.clone(), version::next_version(&latest.target, &current)?),
+        None => (current.clone(), current.next_patch()?),
     };
 
-    Ok(UnreleasedFragments::Assemble(EphemeralUpgrade { current, prev, target, fragments }))
+    Ok(UnreleasedFragments::Assemble(Box::new(EphemeralUpgrade {
+        current,
+        prev,
+        target,
+        fragments,
+    })))
 }
 
 /// The first line of every file assembled for an installation only, which is how a later install
@@ -234,13 +233,22 @@ pub(crate) fn plan_unreleased_fragments(
 const EPHEMERAL_MARKER: &str =
     "-- Ephemeral: assembled by cargo-pgrx from unreleased SQL fragments.\n";
 
-/// Removes what a previous install assembled. Those fragments may have changed, or be gone
-/// entirely after a branch switch, and a stale script stays on the update path until it's removed.
-fn remove_ephemeral_files(extname: &str, extdir: &Path) -> eyre::Result<()> {
+/// Finds what a previous install assembled in `extdir`. Those fragments may have changed, or be
+/// gone entirely after a branch switch, and a stale script stays on the update path until it's
+/// removed.
+pub(crate) fn ephemeral_files(extname: &str, extdir: &Path) -> eyre::Result<Vec<PathBuf>> {
+    let entries = match fs::read_dir(extdir) {
+        Ok(entries) => entries,
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => return Ok(Vec::new()),
+        Err(err) => {
+            return Err(err)
+                .wrap_err_with(|| format!("failed to read directory `{}`", extdir.display()));
+        }
+    };
+
     let prefix = format!("{extname}--");
-    for entry in fs::read_dir(extdir)
-        .wrap_err_with(|| format!("failed to read directory `{}`", extdir.display()))?
-    {
+    let mut found = Vec::new();
+    for entry in entries {
         let path = entry?.path();
         let is_extension_sql = path
             .file_name()
@@ -256,9 +264,16 @@ fn remove_ephemeral_files(extname: &str, extdir: &Path) -> eyre::Result<()> {
             .wrap_err_with(|| format!("failed to read `{}`", path.display()))?;
 
         if head == EPHEMERAL_MARKER.as_bytes() {
-            fs::remove_file(&path)
-                .wrap_err_with(|| format!("failed to remove `{}`", path.display()))?;
+            found.push(path);
         }
+    }
+    Ok(found)
+}
+
+fn remove_ephemeral_files(extname: &str, extdir: &Path) -> eyre::Result<()> {
+    for path in ephemeral_files(extname, extdir)? {
+        fs::remove_file(&path)
+            .wrap_err_with(|| format!("failed to remove `{}`", path.display()))?;
     }
     Ok(())
 }
