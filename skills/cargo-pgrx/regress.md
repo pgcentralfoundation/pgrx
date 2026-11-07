@@ -74,6 +74,11 @@ changes, then rerun without promotion to verify the new expectations. A run
 that encountered failures still exits unsuccessfully even if `--auto` copied
 its results into expected files.
 
+A test containing a `-- pgrx-regress-skip pg15 pg16` or
+`-- pgrx-regress-only pg17` line is reported as `SKIP` on other versions, even
+when selected explicitly. It needs no expected output there and cannot be
+bootstrapped with `--add` on such a version. Malformed labels are an error.
+
 Unfiltered runs skip tests without expected output; explicitly selecting one
 reports an error directing you to `--add`. Bootstrap new tests with `--add`,
 which runs setup, generates output, and stages the new expected files when in
