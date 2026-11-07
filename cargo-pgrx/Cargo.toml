@@ -36,6 +36,7 @@ regex.workspace = true
 toml.workspace = true
 toml_edit.workspace = true
 
+arx-pack = "0.3.7" # RPM and DEB packages for `cargo pgrx package`
 clap = { version = "4.4.2", features = ["env", "suggestions", "cargo", "derive", "wrap_help"] }
 crates-index = { version = "3.6", features = ["sparse"], default-features = false }
 # Keep the resolver off is-terminal 0.4.7, which pulls rustix 0.37 and breaks
