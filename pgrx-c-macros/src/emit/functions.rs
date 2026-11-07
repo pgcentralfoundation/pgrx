@@ -29,8 +29,26 @@ pub(super) struct FunctionAdapters {
     pub c_source: String,
     /// Macro-facing binding replacements indexed by the original C function name.
     pub bindings: BTreeMap<String, FunctionBinding>,
+    /// Bindings without a generated call wrapper. They witness the native storage of a
+    /// function whose address is used, and must not be called.
+    pub identities: BTreeSet<String>,
     /// Linkage and prototype failures retained for dependent lowering diagnostics.
     pub unsupported: BTreeMap<String, String>,
+}
+
+impl FunctionAdapters {
+    /// Why a call to `name` is refused: its adapter was rejected, or only an address
+    /// witness was generated, with no call wrapper. Its function may still have a bindgen
+    /// binding, which cannot prove the native-transport signatures that get adapters.
+    /// Demand planning marks every function a renderable root calls, so the second case
+    /// only guards a call that planning did not see.
+    pub fn call_refusal(&self, name: &str) -> Option<&str> {
+        self.unsupported.get(name).map(String::as_str).or_else(|| {
+            self.identities
+                .contains(name)
+                .then_some("only an address witness was generated, with no call wrapper")
+        })
+    }
 }
 
 /// Emit required thunks for static inline declarations and ABI-sensitive value transport.
@@ -50,6 +68,7 @@ pub(super) fn generate(
         rust: String::new(),
         c_source: String::new(),
         bindings: BTreeMap::new(),
+        identities: BTreeSet::new(),
         unsupported: BTreeMap::new(),
     };
     for name in used_functions {
@@ -72,6 +91,9 @@ pub(super) fn generate(
             Ok((rust, c_source, binding)) => {
                 result.rust.push_str(&rust);
                 result.c_source.push_str(&c_source);
+                if !called_functions.contains(name) {
+                    result.identities.insert(name.clone());
+                }
                 result.bindings.insert(name.clone(), binding);
                 if result.rust.len() + result.c_source.len() > OUTPUT_LIMIT {
                     return Err("generated inline adapters exceed the source budget".into());

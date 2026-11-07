@@ -69,7 +69,8 @@ macro_rules! expression_tree_walker {
         )
     };
 }
-/// Typed call adapter for C inline function get_leftop from nodeFuncs.h:72 (PostgreSQL 15), nodeFuncs.h:82 (PostgreSQL 16–17), nodeFuncs.h:84 (PostgreSQL 18–19)
+#[cfg(feature = "pg15")]
+/// Typed call adapter for C inline function get_leftop from nodeFuncs.h:72 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline Node *
@@ -113,7 +114,50 @@ macro_rules! get_leftop {
         )
     };
 }
-/// Typed call adapter for C inline function get_notclausearg from nodeFuncs.h:123 (PostgreSQL 15), nodeFuncs.h:133 (PostgreSQL 16–17), nodeFuncs.h:135 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C inline function get_leftop from nodeFuncs.h:82 (PostgreSQL 16–17), nodeFuncs.h:84 (PostgreSQL 18–19)
+///
+/// ```c
+/// static inline Node *
+/// get_leftop(const void *clause)
+/// {
+/// 	const OpExpr *expr = (const OpExpr *) clause;
+///
+/// 	if (expr->args != NIL)
+/// 		return (Node *) linitial(expr->args);
+/// 	else
+/// 		return NULL;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! get_leftop {
+    ($clause:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$clause;
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::Node
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
+            }
+        )
+    };
+}
+/// C inline function get_notclausearg from nodeFuncs.h:123 (PostgreSQL 15), nodeFuncs.h:133 (PostgreSQL 16–17), nodeFuncs.h:135 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline Expr *
@@ -124,7 +168,7 @@ macro_rules! get_leftop {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -132,27 +176,26 @@ macro_rules! get_leftop {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! get_notclausearg {
     ($notclause:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$notclause;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::__pgrx_c_bindings::Expr
-                            >,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::Expr
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
 }
-/// Typed call adapter for C inline function get_rightop from nodeFuncs.h:84 (PostgreSQL 15), nodeFuncs.h:94 (PostgreSQL 16–17), nodeFuncs.h:96 (PostgreSQL 18–19)
+#[cfg(feature = "pg15")]
+/// Typed call adapter for C inline function get_rightop from nodeFuncs.h:84 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline Node *
@@ -192,6 +235,49 @@ macro_rules! get_rightop {
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         >>()
                 )
+            }
+        )
+    };
+}
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C inline function get_rightop from nodeFuncs.h:94 (PostgreSQL 16–17), nodeFuncs.h:96 (PostgreSQL 18–19)
+///
+/// ```c
+/// static inline Node *
+/// get_rightop(const void *clause)
+/// {
+/// 	const OpExpr *expr = (const OpExpr *) clause;
+///
+/// 	if (list_length(expr->args) >= 2)
+/// 		return (Node *) lsecond(expr->args);
+/// 	else
+/// 		return NULL;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! get_rightop {
+    ($clause:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$clause;
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::Node
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };

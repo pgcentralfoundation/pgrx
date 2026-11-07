@@ -64,7 +64,7 @@ macro_rules! BITMAPLEN {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function BITMAPLEN from htup_details.h:598 (PostgreSQL 18), htup_details.h:584 (PostgreSQL 19)
+/// C inline function BITMAPLEN from htup_details.h:598 (PostgreSQL 18), htup_details.h:584 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline int
@@ -75,7 +75,7 @@ macro_rules! BITMAPLEN {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -83,18 +83,14 @@ macro_rules! BITMAPLEN {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BITMAPLEN {
     ($NATTS:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$NATTS;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CInt
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CInt>()
             }
         )
     };
@@ -179,7 +175,7 @@ macro_rules! GETSTRUCT {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function GETSTRUCT from htup_details.h:732 (PostgreSQL 18), htup_details.h:718 (PostgreSQL 19)
+/// C inline function GETSTRUCT from htup_details.h:732 (PostgreSQL 18), htup_details.h:718 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void *
@@ -190,7 +186,7 @@ macro_rules! GETSTRUCT {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -198,20 +194,18 @@ macro_rules! GETSTRUCT {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! GETSTRUCT {
     ($tuple:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tuple;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CVoid,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CVoid,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
@@ -245,7 +239,7 @@ macro_rules! HEAP_LOCKED_UPGRADED {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HEAP_LOCKED_UPGRADED from htup_details.h:254 (PostgreSQL 18–19)
+/// C inline function HEAP_LOCKED_UPGRADED from htup_details.h:254 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -259,26 +253,18 @@ macro_rules! HEAP_LOCKED_UPGRADED {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HEAP_LOCKED_UPGRADED {
     ($infomask:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$infomask;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -312,7 +298,7 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
     };
 }
 #[cfg(feature = "pg18")]
-/// Typed call adapter for C inline function HEAP_XMAX_IS_EXCL_LOCKED from htup_details.h:272 (PostgreSQL 18)
+/// C inline function HEAP_XMAX_IS_EXCL_LOCKED from htup_details.h:272 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline bool
@@ -323,32 +309,24 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
     ($infomask:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$infomask;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function HEAP_XMAX_IS_EXCL_LOCKED from htup_details.h:272 (PostgreSQL 19)
+/// C inline function HEAP_XMAX_IS_EXCL_LOCKED from htup_details.h:272 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -359,26 +337,18 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
     ($infomask:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$infomask;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -412,7 +382,7 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
     };
 }
 #[cfg(feature = "pg18")]
-/// Typed call adapter for C inline function HEAP_XMAX_IS_KEYSHR_LOCKED from htup_details.h:278 (PostgreSQL 18)
+/// C inline function HEAP_XMAX_IS_KEYSHR_LOCKED from htup_details.h:278 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline bool
@@ -423,32 +393,24 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
     ($infomask:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$infomask;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function HEAP_XMAX_IS_KEYSHR_LOCKED from htup_details.h:278 (PostgreSQL 19)
+/// C inline function HEAP_XMAX_IS_KEYSHR_LOCKED from htup_details.h:278 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -459,26 +421,18 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
     ($infomask:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$infomask;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -512,7 +466,7 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HEAP_XMAX_IS_LOCKED_ONLY from htup_details.h:229 (PostgreSQL 18–19)
+/// C inline function HEAP_XMAX_IS_LOCKED_ONLY from htup_details.h:229 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -524,26 +478,18 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
     ($infomask:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$infomask;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -577,7 +523,7 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
     };
 }
 #[cfg(feature = "pg18")]
-/// Typed call adapter for C inline function HEAP_XMAX_IS_SHR_LOCKED from htup_details.h:266 (PostgreSQL 18)
+/// C inline function HEAP_XMAX_IS_SHR_LOCKED from htup_details.h:266 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline bool
@@ -588,32 +534,24 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
     ($infomask:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$infomask;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function HEAP_XMAX_IS_SHR_LOCKED from htup_details.h:266 (PostgreSQL 19)
+/// C inline function HEAP_XMAX_IS_SHR_LOCKED from htup_details.h:266 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -624,26 +562,18 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
     ($infomask:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$infomask;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -677,7 +607,7 @@ macro_rules! HeapTupleAllFixed {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleAllFixed from htup_details.h:760 (PostgreSQL 18), htup_details.h:746 (PostgreSQL 19)
+/// C inline function HeapTupleAllFixed from htup_details.h:760 (PostgreSQL 18), htup_details.h:746 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -688,26 +618,18 @@ macro_rules! HeapTupleAllFixed {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleAllFixed {
     ($tuple:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tuple;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -789,7 +711,7 @@ macro_rules! HeapTupleClearHeapOnly {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleClearHeapOnly from htup_details.h:802 (PostgreSQL 18), htup_details.h:788 (PostgreSQL 19)
+/// C inline function HeapTupleClearHeapOnly from htup_details.h:802 (PostgreSQL 18), htup_details.h:788 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -800,24 +722,18 @@ macro_rules! HeapTupleClearHeapOnly {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleClearHeapOnly {
     ($tuple:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$tuple;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$tuple;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -897,7 +813,7 @@ macro_rules! HeapTupleClearHotUpdated {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleClearHotUpdated from htup_details.h:784 (PostgreSQL 18), htup_details.h:770 (PostgreSQL 19)
+/// C inline function HeapTupleClearHotUpdated from htup_details.h:784 (PostgreSQL 18), htup_details.h:770 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -908,24 +824,18 @@ macro_rules! HeapTupleClearHotUpdated {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleClearHotUpdated {
     ($tuple:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$tuple;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$tuple;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -957,7 +867,7 @@ macro_rules! HeapTupleHasExternal {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHasExternal from htup_details.h:766 (PostgreSQL 18), htup_details.h:752 (PostgreSQL 19)
+/// C inline function HeapTupleHasExternal from htup_details.h:766 (PostgreSQL 18), htup_details.h:752 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -968,26 +878,18 @@ macro_rules! HeapTupleHasExternal {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHasExternal {
     ($tuple:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tuple;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -1021,7 +923,7 @@ macro_rules! HeapTupleHasNulls {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHasNulls from htup_details.h:742 (PostgreSQL 18), htup_details.h:728 (PostgreSQL 19)
+/// C inline function HeapTupleHasNulls from htup_details.h:742 (PostgreSQL 18), htup_details.h:728 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1032,26 +934,18 @@ macro_rules! HeapTupleHasNulls {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHasNulls {
     ($tuple:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tuple;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -1085,7 +979,7 @@ macro_rules! HeapTupleHasVarWidth {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHasVarWidth from htup_details.h:754 (PostgreSQL 18), htup_details.h:740 (PostgreSQL 19)
+/// C inline function HeapTupleHasVarWidth from htup_details.h:754 (PostgreSQL 18), htup_details.h:740 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1096,26 +990,18 @@ macro_rules! HeapTupleHasVarWidth {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHasVarWidth {
     ($tuple:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tuple;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -1180,7 +1066,7 @@ macro_rules! HeapTupleHeaderClearHeapOnly {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderClearHeapOnly from htup_details.h:571 (PostgreSQL 18), htup_details.h:557 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderClearHeapOnly from htup_details.h:571 (PostgreSQL 18), htup_details.h:557 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1191,24 +1077,18 @@ macro_rules! HeapTupleHeaderClearHeapOnly {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderClearHeapOnly {
     ($tup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$tup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$tup;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -1271,7 +1151,7 @@ macro_rules! HeapTupleHeaderClearHotUpdated {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderClearHotUpdated from htup_details.h:553 (PostgreSQL 18), htup_details.h:539 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderClearHotUpdated from htup_details.h:553 (PostgreSQL 18), htup_details.h:539 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1282,24 +1162,18 @@ macro_rules! HeapTupleHeaderClearHotUpdated {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderClearHotUpdated {
     ($tup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$tup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$tup;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -1364,7 +1238,7 @@ macro_rules! HeapTupleHeaderClearMatch {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderClearMatch from htup_details.h:722 (PostgreSQL 18), htup_details.h:708 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderClearMatch from htup_details.h:722 (PostgreSQL 18), htup_details.h:708 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -1375,24 +1249,18 @@ macro_rules! HeapTupleHeaderClearMatch {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderClearMatch {
     ($tup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$tup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$tup;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -1481,7 +1349,7 @@ macro_rules! HeapTupleHeaderGetDatumLength {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderGetDatumLength from htup_details.h:496 (PostgreSQL 18), htup_details.h:482 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderGetDatumLength from htup_details.h:496 (PostgreSQL 18), htup_details.h:482 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline uint32
@@ -1492,7 +1360,7 @@ macro_rules! HeapTupleHeaderGetDatumLength {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1500,18 +1368,14 @@ macro_rules! HeapTupleHeaderGetDatumLength {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderGetDatumLength {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_types::uint32
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::uint32>()
             }
         )
     };
@@ -1633,7 +1497,7 @@ macro_rules! HeapTupleHeaderGetRawCommandId {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderGetRawCommandId from htup_details.h:419 (PostgreSQL 18), htup_details.h:405 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderGetRawCommandId from htup_details.h:419 (PostgreSQL 18), htup_details.h:405 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline CommandId
@@ -1644,26 +1508,20 @@ macro_rules! HeapTupleHeaderGetRawCommandId {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderGetRawCommandId {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_types::CommandId
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_types::CommandId
+                >()
             }
         )
     };
@@ -1726,7 +1584,7 @@ macro_rules! HeapTupleHeaderGetRawXmax {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderGetRawXmax from htup_details.h:381 (PostgreSQL 18), htup_details.h:367 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderGetRawXmax from htup_details.h:381 (PostgreSQL 18), htup_details.h:367 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TransactionId
@@ -1737,28 +1595,20 @@ macro_rules! HeapTupleHeaderGetRawXmax {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderGetRawXmax {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedInt,
-                            $crate::__pgrx_c_bindings::TransactionId
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_types::TransactionId
+                >()
             }
         )
     };
@@ -1821,7 +1671,7 @@ macro_rules! HeapTupleHeaderGetRawXmin {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderGetRawXmin from htup_details.h:322 (PostgreSQL 18–19)
+/// C inline function HeapTupleHeaderGetRawXmin from htup_details.h:322 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline TransactionId
@@ -1832,28 +1682,20 @@ macro_rules! HeapTupleHeaderGetRawXmin {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderGetRawXmin {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedInt,
-                            $crate::__pgrx_c_bindings::TransactionId
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_types::TransactionId
+                >()
             }
         )
     };
@@ -2078,7 +1920,7 @@ macro_rules! HeapTupleHeaderGetTypMod {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderGetTypMod from htup_details.h:520 (PostgreSQL 18), htup_details.h:506 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderGetTypMod from htup_details.h:520 (PostgreSQL 18), htup_details.h:506 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline int32
@@ -2089,26 +1931,18 @@ macro_rules! HeapTupleHeaderGetTypMod {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderGetTypMod {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_types::int32
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::int32>()
             }
         )
     };
@@ -2171,7 +2005,7 @@ macro_rules! HeapTupleHeaderGetTypeId {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderGetTypeId from htup_details.h:508 (PostgreSQL 18), htup_details.h:494 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderGetTypeId from htup_details.h:508 (PostgreSQL 18), htup_details.h:494 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Oid
@@ -2182,28 +2016,18 @@ macro_rules! HeapTupleHeaderGetTypeId {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderGetTypeId {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedInt,
-                            $crate::__pgrx_c_bindings::Oid
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::Oid>()
             }
         )
     };
@@ -2301,7 +2125,7 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderGetUpdateXid from htup_details.h:401 (PostgreSQL 18), htup_details.h:387 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderGetUpdateXid from htup_details.h:401 (PostgreSQL 18), htup_details.h:387 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TransactionId
@@ -2317,7 +2141,7 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2332,13 +2156,9 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedInt,
-                            $crate::__pgrx_c_bindings::TransactionId
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_types::TransactionId
+                >()
             }
         )
     };
@@ -2432,7 +2252,7 @@ macro_rules! HeapTupleHeaderGetXmin {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderGetXmin from htup_details.h:328 (PostgreSQL 18–19)
+/// C inline function HeapTupleHeaderGetXmin from htup_details.h:328 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline TransactionId
@@ -2444,7 +2264,7 @@ macro_rules! HeapTupleHeaderGetXmin {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2452,20 +2272,16 @@ macro_rules! HeapTupleHeaderGetXmin {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderGetXmin {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedInt,
-                            $crate::__pgrx_c_bindings::TransactionId
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_types::TransactionId
+                >()
             }
         )
     };
@@ -2595,7 +2411,7 @@ macro_rules! HeapTupleHeaderGetXvac {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderGetXvac from htup_details.h:446 (PostgreSQL 18), htup_details.h:432 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderGetXvac from htup_details.h:446 (PostgreSQL 18), htup_details.h:432 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TransactionId
@@ -2609,7 +2425,7 @@ macro_rules! HeapTupleHeaderGetXvac {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2617,20 +2433,16 @@ macro_rules! HeapTupleHeaderGetXvac {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderGetXvac {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedInt,
-                            $crate::__pgrx_c_bindings::TransactionId
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_types::TransactionId
+                >()
             }
         )
     };
@@ -2691,7 +2503,7 @@ macro_rules! HeapTupleHeaderHasMatch {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderHasMatch from htup_details.h:710 (PostgreSQL 18), htup_details.h:696 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderHasMatch from htup_details.h:710 (PostgreSQL 18), htup_details.h:696 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2702,26 +2514,18 @@ macro_rules! HeapTupleHeaderHasMatch {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderHasMatch {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -2772,7 +2576,7 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
     ($tup:expr $(,)?) => {
@@ -2789,7 +2593,7 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderIndicatesMovedPartitions from htup_details.h:484 (PostgreSQL 18), htup_details.h:470 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderIndicatesMovedPartitions from htup_details.h:484 (PostgreSQL 18), htup_details.h:470 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2800,7 +2604,7 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -2808,18 +2612,14 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -2853,7 +2653,7 @@ macro_rules! HeapTupleHeaderIsHeapOnly {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderIsHeapOnly from htup_details.h:559 (PostgreSQL 18), htup_details.h:545 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderIsHeapOnly from htup_details.h:559 (PostgreSQL 18), htup_details.h:545 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2864,26 +2664,18 @@ macro_rules! HeapTupleHeaderIsHeapOnly {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderIsHeapOnly {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -2917,7 +2709,7 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderIsHotUpdated from htup_details.h:538 (PostgreSQL 18), htup_details.h:524 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderIsHotUpdated from htup_details.h:538 (PostgreSQL 18), htup_details.h:524 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -2931,32 +2723,24 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderIsHotUpdated {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
-#[cfg(feature = "pg15")]
-/// C macro HeapTupleHeaderIsSpeculative from htup_details.h:429 (PostgreSQL 15)
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
+/// C macro HeapTupleHeaderIsSpeculative from htup_details.h:429 (PostgreSQL 15), htup_details.h:433 (PostgreSQL 16–17)
 ///
 /// ```text
 /// #define HeapTupleHeaderIsSpeculative( tup ) ( ( ItemPointerGetOffsetNumberNoCheck ( & ( tup ) -> t_ctid ) == SpecTokenOffsetNumber ) )
@@ -2966,40 +2750,6 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-#[macro_export]
-macro_rules! HeapTupleHeaderIsSpeculative {
-    ($tup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$tup;
-                (
-                    (
-                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::__pgrx_c_macros::expression::type_witness::<
-                                $crate::__pgrx_c_macros::CInt
-                            >()
-                        )
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro HeapTupleHeaderIsSpeculative from htup_details.h:433 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define HeapTupleHeaderIsSpeculative( tup ) ( ( ItemPointerGetOffsetNumberNoCheck ( & ( tup ) -> t_ctid ) == SpecTokenOffsetNumber ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderIsSpeculative {
     ($tup:expr $(,)?) => {
@@ -3020,7 +2770,7 @@ macro_rules! HeapTupleHeaderIsSpeculative {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderIsSpeculative from htup_details.h:465 (PostgreSQL 18), htup_details.h:451 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderIsSpeculative from htup_details.h:465 (PostgreSQL 18), htup_details.h:451 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -3031,26 +2781,18 @@ macro_rules! HeapTupleHeaderIsSpeculative {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderIsSpeculative {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -3272,8 +3014,8 @@ macro_rules! HeapTupleHeaderSetDatumLength {
         )
     };
 }
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderSetDatumLength from htup_details.h:502 (PostgreSQL 18), htup_details.h:488 (PostgreSQL 19)
+#[cfg(feature = "pg18")]
+/// Typed call adapter for C inline function HeapTupleHeaderSetDatumLength from htup_details.h:502 (PostgreSQL 18)
 ///
 /// ```c
 /// static inline void
@@ -3303,6 +3045,37 @@ macro_rules! HeapTupleHeaderSetDatumLength {
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
             }
         )
+    };
+}
+#[cfg(feature = "pg19")]
+/// C inline function HeapTupleHeaderSetDatumLength from htup_details.h:488 (PostgreSQL 19)
+///
+/// ```c
+/// static inline void
+/// HeapTupleHeaderSetDatumLength(HeapTupleHeaderData *tup, uint32 len)
+/// {
+/// 	SET_VARSIZE(tup, len);
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! HeapTupleHeaderSetDatumLength {
+    ($tup:expr, $len:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$tup;
+            let _ = &$len;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -3361,7 +3134,7 @@ macro_rules! HeapTupleHeaderSetHeapOnly {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderSetHeapOnly from htup_details.h:565 (PostgreSQL 18), htup_details.h:551 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderSetHeapOnly from htup_details.h:565 (PostgreSQL 18), htup_details.h:551 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -3372,24 +3145,18 @@ macro_rules! HeapTupleHeaderSetHeapOnly {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderSetHeapOnly {
     ($tup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$tup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$tup;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -3448,7 +3215,7 @@ macro_rules! HeapTupleHeaderSetHotUpdated {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderSetHotUpdated from htup_details.h:547 (PostgreSQL 18), htup_details.h:533 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderSetHotUpdated from htup_details.h:547 (PostgreSQL 18), htup_details.h:533 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -3459,24 +3226,18 @@ macro_rules! HeapTupleHeaderSetHotUpdated {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderSetHotUpdated {
     ($tup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$tup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$tup;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -3535,7 +3296,7 @@ macro_rules! HeapTupleHeaderSetMatch {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderSetMatch from htup_details.h:716 (PostgreSQL 18), htup_details.h:702 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderSetMatch from htup_details.h:716 (PostgreSQL 18), htup_details.h:702 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -3546,24 +3307,18 @@ macro_rules! HeapTupleHeaderSetMatch {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderSetMatch {
     ($tup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$tup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$tup;
+            ()
+        })
     };
 }
 #[cfg(feature = "pg15")]
@@ -3659,7 +3414,7 @@ macro_rules! HeapTupleHeaderSetMovedPartitions {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderSetMovedPartitions {
     ($tup:expr $(,)?) => {
@@ -3672,7 +3427,7 @@ macro_rules! HeapTupleHeaderSetMovedPartitions {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderSetMovedPartitions from htup_details.h:490 (PostgreSQL 18), htup_details.h:476 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderSetMovedPartitions from htup_details.h:490 (PostgreSQL 18), htup_details.h:476 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -3683,7 +3438,7 @@ macro_rules! HeapTupleHeaderSetMovedPartitions {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -3691,16 +3446,14 @@ macro_rules! HeapTupleHeaderSetMovedPartitions {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderSetMovedPartitions {
     ($tup:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$tup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$tup;
+            ()
+        })
     };
 }
 /// C macro HeapTupleHeaderSetNatts from htup_details.h:533 (PostgreSQL 15), htup_details.h:537 (PostgreSQL 16–17), htup_details.h:585 (PostgreSQL 18), htup_details.h:571 (PostgreSQL 19)
@@ -3925,7 +3678,7 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderSetSpeculativeToken from htup_details.h:478 (PostgreSQL 18), htup_details.h:464 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderSetSpeculativeToken from htup_details.h:478 (PostgreSQL 18), htup_details.h:464 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -3936,7 +3689,7 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -3948,13 +3701,11 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
 #[macro_export]
 macro_rules! HeapTupleHeaderSetSpeculativeToken {
     ($tup:expr, $token:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$tup;
-                let _ = &$token;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$tup;
+            let _ = &$token;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -4020,7 +3771,7 @@ macro_rules! HeapTupleHeaderSetTypMod {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderSetTypMod from htup_details.h:526 (PostgreSQL 18), htup_details.h:512 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderSetTypMod from htup_details.h:526 (PostgreSQL 18), htup_details.h:512 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -4031,25 +3782,19 @@ macro_rules! HeapTupleHeaderSetTypMod {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderSetTypMod {
     ($tup:expr, $typmod:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$tup;
-                let _ = &$typmod;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$tup;
+            let _ = &$typmod;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -4115,7 +3860,7 @@ macro_rules! HeapTupleHeaderSetTypeId {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderSetTypeId from htup_details.h:514 (PostgreSQL 18), htup_details.h:500 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderSetTypeId from htup_details.h:514 (PostgreSQL 18), htup_details.h:500 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -4126,25 +3871,19 @@ macro_rules! HeapTupleHeaderSetTypeId {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderSetTypeId {
     ($tup:expr, $datum_typeid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$tup;
-                let _ = &$datum_typeid;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$tup;
+            let _ = &$datum_typeid;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -4210,7 +3949,7 @@ macro_rules! HeapTupleHeaderSetXmax {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderSetXmax from htup_details.h:387 (PostgreSQL 18), htup_details.h:373 (PostgreSQL 19)
+/// C inline function HeapTupleHeaderSetXmax from htup_details.h:387 (PostgreSQL 18), htup_details.h:373 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -4221,25 +3960,19 @@ macro_rules! HeapTupleHeaderSetXmax {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderSetXmax {
     ($tup:expr, $xid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$tup;
-                let _ = &$xid;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$tup;
+            let _ = &$xid;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -4305,7 +4038,7 @@ macro_rules! HeapTupleHeaderSetXmin {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderSetXmin from htup_details.h:335 (PostgreSQL 18–19)
+/// C inline function HeapTupleHeaderSetXmin from htup_details.h:335 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline void
@@ -4316,25 +4049,19 @@ macro_rules! HeapTupleHeaderSetXmin {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderSetXmin {
     ($tup:expr, $xid:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$tup;
-                let _ = &$xid;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$tup;
+            let _ = &$xid;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -4735,7 +4462,7 @@ macro_rules! HeapTupleHeaderXminCommitted {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderXminCommitted from htup_details.h:341 (PostgreSQL 18–19)
+/// C inline function HeapTupleHeaderXminCommitted from htup_details.h:341 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -4746,26 +4473,18 @@ macro_rules! HeapTupleHeaderXminCommitted {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderXminCommitted {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -4799,7 +4518,7 @@ macro_rules! HeapTupleHeaderXminFrozen {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderXminFrozen from htup_details.h:354 (PostgreSQL 18–19)
+/// C inline function HeapTupleHeaderXminFrozen from htup_details.h:354 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -4810,26 +4529,18 @@ macro_rules! HeapTupleHeaderXminFrozen {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderXminFrozen {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -4863,7 +4574,7 @@ macro_rules! HeapTupleHeaderXminInvalid {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleHeaderXminInvalid from htup_details.h:347 (PostgreSQL 18–19)
+/// C inline function HeapTupleHeaderXminInvalid from htup_details.h:347 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -4875,26 +4586,18 @@ macro_rules! HeapTupleHeaderXminInvalid {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleHeaderXminInvalid {
     ($tup:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tup;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -4928,7 +4631,7 @@ macro_rules! HeapTupleIsHeapOnly {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleIsHeapOnly from htup_details.h:790 (PostgreSQL 18), htup_details.h:776 (PostgreSQL 19)
+/// C inline function HeapTupleIsHeapOnly from htup_details.h:790 (PostgreSQL 18), htup_details.h:776 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -4939,26 +4642,18 @@ macro_rules! HeapTupleIsHeapOnly {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleIsHeapOnly {
     ($tuple:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tuple;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -4992,7 +4687,7 @@ macro_rules! HeapTupleIsHotUpdated {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleIsHotUpdated from htup_details.h:772 (PostgreSQL 18), htup_details.h:758 (PostgreSQL 19)
+/// C inline function HeapTupleIsHotUpdated from htup_details.h:772 (PostgreSQL 18), htup_details.h:758 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -5003,26 +4698,18 @@ macro_rules! HeapTupleIsHotUpdated {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleIsHotUpdated {
     ($tuple:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tuple;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -5056,7 +4743,7 @@ macro_rules! HeapTupleNoNulls {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleNoNulls from htup_details.h:748 (PostgreSQL 18), htup_details.h:734 (PostgreSQL 19)
+/// C inline function HeapTupleNoNulls from htup_details.h:748 (PostgreSQL 18), htup_details.h:734 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -5067,26 +4754,18 @@ macro_rules! HeapTupleNoNulls {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleNoNulls {
     ($tuple:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$tuple;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -5164,7 +4843,7 @@ macro_rules! HeapTupleSetHeapOnly {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleSetHeapOnly from htup_details.h:796 (PostgreSQL 18), htup_details.h:782 (PostgreSQL 19)
+/// C inline function HeapTupleSetHeapOnly from htup_details.h:796 (PostgreSQL 18), htup_details.h:782 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -5175,24 +4854,18 @@ macro_rules! HeapTupleSetHeapOnly {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleSetHeapOnly {
     ($tuple:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$tuple;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$tuple;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -5268,7 +4941,7 @@ macro_rules! HeapTupleSetHotUpdated {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function HeapTupleSetHotUpdated from htup_details.h:778 (PostgreSQL 18), htup_details.h:764 (PostgreSQL 19)
+/// C inline function HeapTupleSetHotUpdated from htup_details.h:778 (PostgreSQL 18), htup_details.h:764 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -5279,24 +4952,18 @@ macro_rules! HeapTupleSetHotUpdated {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! HeapTupleSetHotUpdated {
     ($tuple:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$tuple;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$tuple;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
@@ -5491,7 +5158,7 @@ macro_rules! fastgetattr {
         )
     };
 }
-/// Typed call adapter for C inline function heap_getattr from htup_details.h:792 (PostgreSQL 15), htup_details.h:796 (PostgreSQL 16–17), htup_details.h:908 (PostgreSQL 18), htup_details.h:894 (PostgreSQL 19)
+/// C inline function heap_getattr from htup_details.h:792 (PostgreSQL 15), htup_details.h:796 (PostgreSQL 16–17), htup_details.h:908 (PostgreSQL 18), htup_details.h:894 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Datum
@@ -5510,7 +5177,7 @@ macro_rules! fastgetattr {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -5518,7 +5185,7 @@ macro_rules! fastgetattr {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! heap_getattr {
     ($tup:expr, $attnum:expr, $tupleDesc:expr, $isnull:expr $(,)?) => {
@@ -5528,13 +5195,7 @@ macro_rules! heap_getattr {
                 let _ = &$attnum;
                 let _ = &$tupleDesc;
                 let _ = &$isnull;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLong,
-                            $crate::__pgrx_c_bindings::Datum
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::Datum>()
             }
         )
     };

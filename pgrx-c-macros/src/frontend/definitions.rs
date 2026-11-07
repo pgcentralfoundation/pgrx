@@ -8,13 +8,20 @@
 //! adapters still need proof that an original definition exists, so this module performs one
 //! bounded reparse with bodies enabled. Only definitions whose linkage, storage class, and
 //! complete signature match the first catalog are admitted to native support generation.
+//!
+//! The same parse records the preprocessing history used to retain a definition's body for
+//! translation: the body's active tokens, and proof that every macro it names expands at the
+//! end of the translation unit exactly as it did inside the definition.
 
 use super::{FrontendError, type_info};
 use crate::{
-    DeclarationLinkage, FrontendOutput, InlineFunctionDefinition, MacroScanner, SourceSpan,
+    ActiveMacro, DeclarationLinkage, FrontendOutput, InlineFunctionDefinition, MacroKind,
+    MacroScanner, SourceSpan, TokenKind, splice_length, unspliced, without_splices,
 };
+use clang::source::File;
 use clang::{Entity, EntityKind, EntityVisitResult, Index, Linkage, StorageClass, TypeKind};
-use std::collections::{BTreeMap, BTreeSet};
+use std::borrow::Cow;
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::path::{Path, PathBuf};
 
 /// Bound declaration or expression candidates before constructing a compiler proof batch.
@@ -55,7 +62,9 @@ pub(super) fn prove(
         .chain(profile.arguments.iter().cloned())
         .collect::<Vec<_>>();
     let mut parser = index.parser(&profile.header);
-    parser.arguments(&arguments).skip_function_bodies(false);
+    // The preprocessing record supplies macro definitions, top-level expansions and skipped
+    // conditional text for body retention.
+    parser.arguments(&arguments).skip_function_bodies(false).detailed_preprocessing_record(true);
     let unit = parser
         .parse()
         .map_err(|source| crate::Error::Parse { header: profile.header.clone(), source })?;
@@ -76,22 +85,65 @@ pub(super) fn prove(
             errors.join("\n")
         )));
     }
-    let mut definitions = BTreeMap::new();
-    let mut files = BTreeMap::new();
-    let mut remaining = MAX_SOURCE_BYTES;
-    // Clang names a file found through a relative search path relative to the
-    // process working directory, which inspection recorded with the profile.
-    let directory = std::env::current_dir().map_err(|error| {
-        FrontendError::Environment(format!("could not check working directory: {error}"))
-    })?;
-    if directory != profile.inputs.current_directory {
-        return Err(FrontendError::Environment(
-            "working directory changed after inspection".into(),
-        ));
-    }
+    let mut history = MacroHistory {
+        active: &frontend.environment().active,
+        last_definition: HashMap::new(),
+        expansions: HashMap::new(),
+        popped: None,
+    };
+    let mut files = HashSet::new();
+    files.extend(unit.get_file(&profile.header));
+    let mut admitted = Vec::new();
+    let mut seen = BTreeSet::new();
+    // libclang visits the whole preprocessing record, in translation-unit order, before
+    // declarations, so positions order macro definitions and expansions only.
+    let mut position = 0_usize;
     unit.get_entity().visit_children(|entity, _| {
-        if entity.get_kind() != EntityKind::FunctionDecl {
-            return EntityVisitResult::Continue;
+        position += 1;
+        match entity.get_kind() {
+            EntityKind::InclusionDirective => {
+                files.extend(entity.get_file());
+                return EntityVisitResult::Continue;
+            }
+            EntityKind::MacroDefinition => {
+                if let Some(name) = entity.get_name() {
+                    let location = entity.get_location().and_then(|at| {
+                        let location = at.get_spelling_location();
+                        Some((location.file?, location.offset))
+                    });
+                    history.last_definition.insert(name, Recorded { position, location });
+                }
+                return EntityVisitResult::Continue;
+            }
+            EntityKind::MacroExpansion => {
+                // A file and offset name a place in the file's first entry. Records from a
+                // later entry of the same file would replace the first entry's records.
+                let Some(at) = entity.get_location() else {
+                    return EntityVisitResult::Continue;
+                };
+                let location = at.get_spelling_location();
+                if let Some(file) = location.file
+                    && file.get_offset_location(location.offset) == at
+                {
+                    // The definition this expansion used, which push and pop pragmas can
+                    // make differ from the last one recorded.
+                    let definition = entity
+                        .get_reference()
+                        .and_then(|definition| definition.get_location())
+                        .and_then(|at| {
+                            let location = at.get_spelling_location();
+                            Some((location.file?, location.offset))
+                        });
+                    history
+                        .expansions
+                        .entry(file)
+                        .or_default()
+                        .insert(location.offset, Recorded { position, location: definition });
+                }
+                return EntityVisitResult::Continue;
+            }
+            EntityKind::FunctionDecl => {}
+            _ => return EntityVisitResult::Continue,
         }
         let Some(name) = entity.get_name().filter(|name| candidates.contains(name.as_str())) else {
             return EntityVisitResult::Continue;
@@ -99,7 +151,7 @@ pub(super) fn prove(
         // An entry exists only after a matching complete definition proof. Its
         // forward declarations share that same definition: charging/copying it
         // again could exhaust the budget and replace valid retained text with None.
-        if definitions.contains_key(&name) {
+        if seen.contains(&name) {
             return EntityVisitResult::Continue;
         }
         if !entity.is_inline_function()
@@ -123,20 +175,105 @@ pub(super) fn prove(
             && ty.get_calling_convention().map(|convention| format!("{convention:?}"))
                 == expected.calling_convention
         {
-            let definition = entity.get_definition().unwrap_or(entity);
-            definitions.insert(name, source(definition, &directory, &mut files, &mut remaining));
+            seen.insert(name.clone());
+            admitted.push((name, entity.get_definition().unwrap_or(entity)));
         }
         EntityVisitResult::Continue
     });
+    history.popped = popped_names(files.iter().map(|file| file.get_path()), &profile.arguments);
+    let mut definitions = BTreeMap::new();
+    let mut sources = HashMap::new();
+    let mut remaining = MAX_SOURCE_BYTES;
+    // Clang names a file found through a relative search path relative to the
+    // process working directory, which inspection recorded with the profile.
+    let directory = std::env::current_dir().map_err(|error| {
+        FrontendError::Environment(format!("could not check working directory: {error}"))
+    })?;
+    if directory != profile.inputs.current_directory {
+        return Err(FrontendError::Environment(
+            "working directory changed after inspection".into(),
+        ));
+    }
+    for (name, definition) in admitted {
+        let source = source(definition, &directory, &mut sources, &mut remaining, &history);
+        definitions.insert(name, source);
+    }
     Ok(definitions)
 }
 
-/// Copy physical original source once per header and retain only bounded definition text.
-fn source(
-    definition: Entity<'_>,
+/// The names that `pop_macro` pragmas in these files and in the `-D` definitions among
+/// `arguments` restore, or `None` when a file cannot be read, a pragma's operand is not a
+/// plain string literal, or a text has a `??/` trigraph or a carriage return outside a CR-LF
+/// line end.
+///
+/// libclang records neither pragma, so the files' text is searched, including text the
+/// preprocessor skipped, comments and `_Pragma` strings. Clang writes each `-D` definition
+/// into its predefines text, where a `_Pragma` in the replacement list pops a macro
+/// wherever the definition is expanded, so those definitions are searched too. Line splices
+/// are removed first, as Clang removes them before it reads a pragma. With trigraphs
+/// enabled, `??/` is a backslash, and Clang also ends a line at a bare carriage return, so
+/// such a text could splice a name in a way the search does not model. A pragma whose name
+/// is formed by token pasting cannot be seen.
+fn popped_names(
+    files: impl IntoIterator<Item = PathBuf>,
+    arguments: &[String],
+) -> Option<HashSet<String>> {
+    const POP: &[u8] = b"pop_macro";
+    // A `-D` operand is joined to the option or follows it.
+    let previous = std::iter::once(None).chain(arguments.iter().map(Some));
+    let definitions = arguments.iter().zip(previous).filter_map(|(argument, previous)| {
+        if previous.is_some_and(|previous| previous == "-D") {
+            Some(argument.as_str())
+        } else {
+            argument.strip_prefix("-D")
+        }
+    });
+    let texts = files
+        .into_iter()
+        .map(|file| std::fs::read(file).ok())
+        .chain(definitions.map(|definition| Some(definition.as_bytes().to_vec())));
+    let mut names = HashSet::new();
+    for text in texts {
+        let text = text?;
+        if text.windows(3).any(|window| window == b"??/") || has_bare_carriage_return(&text) {
+            return None;
+        }
+        let text = without_splices(&text);
+        let mut rest = text.as_ref();
+        while let Some(at) = rest.windows(POP.len()).position(|window| window == POP) {
+            rest = &rest[at + POP.len()..];
+            // `("NAME")`, or `(\"NAME\")` inside a `_Pragma` string.
+            let operand = rest.trim_ascii_start().strip_prefix(b"(")?.trim_ascii_start();
+            let operand = operand.strip_prefix(b"\\").unwrap_or(operand).strip_prefix(b"\"")?;
+            let length = operand
+                .iter()
+                .take_while(|&&byte| byte.is_ascii_alphanumeric() || byte == b'_')
+                .count();
+            let after = &operand[length..];
+            if length == 0 || !after.strip_prefix(b"\\").unwrap_or(after).starts_with(b"\"") {
+                return None;
+            }
+            names.insert(String::from_utf8_lossy(&operand[..length]).into_owned());
+        }
+    }
+    Some(names)
+}
+
+/// Read physical original source once per header and retain only bounded definition text.
+///
+/// A header's bytes are read from its file, which need not be UTF-8 and may contain NUL
+/// bytes. Definition text that is not UTF-8 is retained lossily, to document the native
+/// call adapter. libclang also spells the body's tokens lossily, which could change a
+/// literal, so such a definition has no body.
+///
+/// Headers are cached by Clang's file identity, so a definition is read from the file Clang
+/// parsed however its span spells that file's path.
+fn source<'tu>(
+    definition: Entity<'tu>,
     directory: &Path,
-    files: &mut BTreeMap<PathBuf, Option<String>>,
+    files: &mut HashMap<File<'tu>, Option<Vec<u8>>>,
     remaining: &mut usize,
+    history: &MacroHistory<'tu, '_>,
 ) -> Option<InlineFunctionDefinition> {
     let range = definition.get_range()?;
     let provenance = SourceSpan::from_range(range, directory).ok()??;
@@ -144,18 +281,24 @@ fn source(
     let end = range.get_end().get_spelling_location();
     let file = start.file?;
     let size = usize::try_from(end.offset.checked_sub(start.offset)?).ok()?;
-    let source = if size <= MAX_DEFINITION_BYTES && size <= *remaining {
-        let contents = files.entry(provenance.file.clone()).or_insert_with(|| file.get_contents());
-        let text = contents.as_ref().and_then(|contents| {
-            contents.get(usize::try_from(start.offset).ok()?..usize::try_from(end.offset).ok()?)
-        });
-        text.map(|text| {
-            *remaining -= size;
-            text.to_owned()
-        })
+    let contents = if size <= MAX_DEFINITION_BYTES && size <= *remaining {
+        files.entry(file).or_insert_with(|| std::fs::read(file.get_path()).ok()).as_deref()
     } else {
         None
     };
+    let text = contents
+        .and_then(|contents| {
+            contents.get(usize::try_from(start.offset).ok()?..usize::try_from(end.offset).ok()?)
+        })
+        .map(String::from_utf8_lossy);
+    let exact = matches!(text, Some(Cow::Borrowed(_)));
+    // Replacement characters can make the text longer than its bytes.
+    let source = text
+        .filter(|text| text.len() <= MAX_DEFINITION_BYTES && text.len() <= *remaining)
+        .map(|text| {
+            *remaining -= text.len();
+            text.into_owned()
+        });
     Some(InlineFunctionDefinition {
         provenance,
         parameters: definition
@@ -164,6 +307,445 @@ fn source(
             .into_iter()
             .map(|parameter| parameter.get_name().filter(|name| !name.is_empty()))
             .collect(),
+        body: contents
+            .filter(|_| exact && source.is_some())
+            .and_then(|contents| body_tokens(definition, file, contents, history)),
         source,
     })
+}
+
+/// Recover the tokens the preprocessor read for a definition's body, without its braces.
+/// `bytes` are the contents of the definition's file.
+///
+/// Conditional directives, through the end of their logical lines, and the text they
+/// skipped are removed; any other directive makes the body unavailable, as does a trigraph
+/// or a carriage return that is not part of a CR-LF line end. Every remaining
+/// token must belong to one of the compiler's statements or be a `;` between them, so a
+/// statement that ends inside a macro argument cannot leave a fragment behind. The tokens
+/// must expand at the end of the translation unit as they did in the definition.
+///
+/// Offsets, skipped ranges and expansion records describe the first entry of a file the
+/// preprocessor entered more than once, so a definition in a later entry has no body.
+fn body_tokens<'tu>(
+    definition: Entity<'tu>,
+    file: File<'tu>,
+    bytes: &[u8],
+    history: &MacroHistory<'tu, '_>,
+) -> Option<Vec<crate::Token>> {
+    let body = definition
+        .get_children()
+        .into_iter()
+        .find(|child| child.get_kind() == EntityKind::CompoundStmt)?;
+    let located = |at: clang::source::SourceLocation<'tu>| {
+        let location = at.get_spelling_location();
+        (location.file == Some(file)).then_some(location)
+    };
+    let all = body.get_range()?.tokenize();
+    let (open, rest) = all.split_first()?;
+    let (close, inner) = rest.split_last()?;
+    if unspliced(open.get_spelling()) != "{" || unspliced(close.get_spelling()) != "}" {
+        return None;
+    }
+    // Tokens are lexed in the entry that holds the definition.
+    let opened = located(open.get_location())?;
+    if file.get_offset_location(opened.offset) != open.get_location() {
+        return None;
+    }
+    // The line handling below ends lines only at newlines and splices them only with a
+    // backslash. Clang also ends a line at a bare carriage return, and with trigraphs
+    // enabled `??/` is a backslash and `??=` a `#`.
+    let start = usize::try_from(opened.offset).ok()?;
+    let end = usize::try_from(located(close.get_location())?.offset).ok()?;
+    let text = bytes.get(start..end)?;
+    if text.windows(3).any(|window| window[..2] == *b"??" && b"=(/)'<!>-".contains(&window[2]))
+        || has_bare_carriage_return(text)
+    {
+        return None;
+    }
+    let skipped = file
+        .get_skipped_ranges()
+        .into_iter()
+        .filter_map(|range| {
+            Some(located(range.get_start())?.offset..located(range.get_end())?.offset)
+        })
+        .collect::<Vec<_>>();
+    let mut active = Vec::new();
+    // Tokens before this offset belong to the last directive. A skipped range ends with
+    // the directive that closes it, not with that directive's logical line.
+    let mut directive_end = 0;
+    for (index, token) in inner.iter().enumerate() {
+        let location = located(token.get_location())?;
+        let offset = usize::try_from(location.offset).ok()?;
+        if offset < directive_end {
+            continue;
+        }
+        let skipped = skipped.iter().any(|range| range.contains(&location.offset));
+        let spelling = unspliced(token.get_spelling());
+        if matches!(spelling.as_str(), "#" | "%:") {
+            // A conditional directive only selects tokens. Any other directive, or a `#`
+            // this check cannot place at the start of a line, changes or hides
+            // preprocessing state inside the body. A token that follows a splice begins
+            // at the backslash, so this offset is where the directive's line starts.
+            directive_end = logical_line_end(bytes, offset)?;
+            let name = inner
+                .get(index + 1)
+                .filter(|next| {
+                    located(next.get_location())
+                        .is_some_and(|next| (next.offset as usize) < directive_end)
+                })
+                .map(|next| unspliced(next.get_spelling()));
+            let conditional = starts_line(bytes, offset)
+                && name.as_deref().is_some_and(|name| {
+                    matches!(
+                        name,
+                        "if" | "ifdef"
+                            | "ifndef"
+                            | "elif"
+                            | "elifdef"
+                            | "elifndef"
+                            | "else"
+                            | "endif"
+                    )
+                });
+            if !skipped && !conditional {
+                return None;
+            }
+            continue;
+        }
+        if skipped {
+            continue;
+        }
+        let kind = match token.get_kind() {
+            clang::token::TokenKind::Comment => continue,
+            clang::token::TokenKind::Identifier => TokenKind::Identifier,
+            clang::token::TokenKind::Keyword => TokenKind::Keyword,
+            clang::token::TokenKind::Literal => TokenKind::Literal,
+            clang::token::TokenKind::Punctuation => TokenKind::Punctuation,
+        };
+        active.push((location.offset, crate::Token { kind, spelling }));
+    }
+    if !history.expands_unchanged(file, &active) {
+        return None;
+    }
+    // Statement extents end just past their last token. Account for every active token.
+    let mut position = 0;
+    for statement in body.get_children() {
+        let range = statement.get_range()?;
+        let (start, end) = (located(range.get_start())?.offset, located(range.get_end())?.offset);
+        while active.get(position).is_some_and(|(offset, _)| *offset < start) {
+            if active[position].1.spelling != ";" {
+                return None;
+            }
+            position += 1;
+        }
+        if active.get(position).is_none_or(|(offset, _)| *offset != start) {
+            return None;
+        }
+        while active.get(position).is_some_and(|(offset, _)| *offset < end) {
+            position += 1;
+        }
+    }
+    if active[position..].iter().any(|(_, token)| token.spelling != ";") {
+        return None;
+    }
+    Some(active.into_iter().map(|(_, token)| token).collect())
+}
+
+/// Whether only blanks separate `offset` from the start of its logical line.
+fn starts_line(contents: &[u8], offset: usize) -> bool {
+    let before = contents[..offset].trim_ascii_end();
+    let blanks = &contents[before.len()..offset];
+    let mut newlines = blanks.iter().filter(|&&byte| byte == b'\n');
+    if newlines.next().is_none() {
+        return before.is_empty();
+    }
+    // A backslash before the first newline splices it away.
+    !before.ends_with(b"\\") || newlines.next().is_some()
+}
+
+/// Whether `text` has a carriage return that does not start a CR-LF line end. Clang ends a
+/// line there, but line handling here ends lines only at newlines.
+fn has_bare_carriage_return(text: &[u8]) -> bool {
+    text.iter()
+        .enumerate()
+        .any(|(index, &byte)| byte == b'\r' && text.get(index + 1) != Some(&b'\n'))
+}
+
+/// The offset of the newline that ends the logical line containing `start`, or the end
+/// of the file.
+///
+/// Translation phases 2 and 3 run before directives: a line splice joins lines, and a
+/// comment, which can span lines, is one space. A literal ends at its closing quote or at
+/// the end of the line. An unterminated comment has no end.
+fn logical_line_end(contents: &[u8], start: usize) -> Option<usize> {
+    let mut at = start;
+    // The bytes from `start` and their offsets, without line splices.
+    let mut bytes = std::iter::from_fn(|| {
+        while let Some(length) = contents.get(at..).and_then(splice_length) {
+            at += length;
+        }
+        let byte = *contents.get(at)?;
+        at += 1;
+        Some((at - 1, byte))
+    })
+    .peekable();
+    while let Some((offset, byte)) = bytes.next() {
+        match byte {
+            b'\n' => return Some(offset),
+            b'/' if bytes.next_if(|&(_, next)| next == b'*').is_some() => {
+                let mut star = false;
+                loop {
+                    let (_, byte) = bytes.next()?;
+                    if star && byte == b'/' {
+                        break;
+                    }
+                    star = byte == b'*';
+                }
+            }
+            b'/' if bytes.next_if(|&(_, next)| next == b'/').is_some() => {
+                return Some(
+                    bytes.find(|&(_, byte)| byte == b'\n').map_or(contents.len(), |(end, _)| end),
+                );
+            }
+            b'"' | b'\'' => {
+                while let Some((end, next)) = bytes.next() {
+                    match next {
+                        b'\n' => return Some(end),
+                        b'\\' => {
+                            bytes.next();
+                        }
+                        quote if quote == byte => break,
+                        _ => {}
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+    Some(contents.len())
+}
+
+/// Preprocessing history of the definition parse, in translation-unit order.
+struct MacroHistory<'tu, 'a> {
+    /// Final active definitions, which later expansion of a retained body uses.
+    active: &'a BTreeMap<String, ActiveMacro>,
+    /// The last definition of each macro name, at its own location.
+    last_definition: HashMap<String, Recorded<'tu>>,
+    /// Each top-level macro expansion in the first entry of its file, by file and offset of
+    /// its name, with the location of the definition it used.
+    expansions: HashMap<File<'tu>, HashMap<u32, Recorded<'tu>>>,
+    /// Names a `pop_macro` pragma can restore, or `None` for every name.
+    popped: Option<HashSet<String>>,
+}
+
+/// A preprocessing record's position in the translation unit and a macro definition's
+/// physical location: the record's own for a definition, and the definition used by an
+/// expansion.
+struct Recorded<'tu> {
+    /// Order among preprocessing records.
+    position: usize,
+    /// File and offset of the definition's name, when it has a physical source.
+    location: Option<(File<'tu>, u32)>,
+}
+
+/// Prove that body macros keep their meaning at the end of the translation unit.
+impl<'tu> MacroHistory<'tu, '_> {
+    /// Whether body tokens at these offsets expand at the end of the translation unit exactly
+    /// as they did in the definition.
+    ///
+    /// A name expanded in the definition, and every macro it reaches, must be unchanged since.
+    /// A name active at the end but not expanded must lie in the arguments of an expanded
+    /// function-like invocation, which dropped or stringified it, and be unchanged since that
+    /// invocation; the unchanged invocation treats it the same way at the end. Any other name
+    /// must never have been defined as a macro.
+    fn expands_unchanged(&self, file: File<'tu>, tokens: &[(u32, crate::Token)]) -> bool {
+        let expansions = self.expansions.get(&file);
+        // Each open invocation records the parenthesis depth that closes it and its position.
+        let mut invocations = Vec::<(usize, usize)>::new();
+        let mut depth = 0_usize;
+        let mut pending = None;
+        for (offset, token) in tokens {
+            let name = token.spelling.as_str();
+            match name {
+                "(" => {
+                    depth += 1;
+                    if let Some(position) = pending.take() {
+                        invocations.push((depth, position));
+                    }
+                    continue;
+                }
+                ")" => {
+                    if invocations.last().is_some_and(|&(closing, _)| closing == depth) {
+                        invocations.pop();
+                    }
+                    depth = depth.saturating_sub(1);
+                    continue;
+                }
+                _ => pending = None,
+            }
+            if !matches!(token.kind, TokenKind::Identifier | TokenKind::Keyword) {
+                continue;
+            }
+            if crate::expansion::dynamic_builtin(name) {
+                return false;
+            }
+            match expansions.and_then(|expansions| expansions.get(offset)) {
+                Some(expansion) => {
+                    let position = expansion.position;
+                    // `unchanged` ties the active definition to the last one recorded; the
+                    // expansion must have used that same definition, which a pop formed by
+                    // token pasting could otherwise make differ.
+                    if !self.unchanged(name, position, &mut HashSet::new())
+                        || expansion.location.is_none()
+                        || expansion.location != self.last_definition[name].location
+                    {
+                        return false;
+                    }
+                    if self.active[name].definition.kind == MacroKind::FunctionLike {
+                        pending = Some(position);
+                    }
+                }
+                None if self.active.contains_key(name) => {
+                    let Some(&(_, position)) = invocations.last() else { return false };
+                    if !self.unchanged(name, position, &mut HashSet::new()) {
+                        return false;
+                    }
+                }
+                // Nested expansions are not recorded, so a name that was ever a macro
+                // could have been expanded when a macro's result was rescanned.
+                None if self.last_definition.contains_key(name) => return false,
+                None => {}
+            }
+        }
+        true
+    }
+
+    /// Whether `name` and each macro its replacement list names have the definition at
+    /// `position` that is active at the end of the translation unit.
+    ///
+    /// Undefinitions are not recorded. A macro whose active definition at the end is its
+    /// last recorded definition, made before `position`, had that definition at `position`
+    /// too: undefining it later would leave it undefined or redefined at the end. Only a
+    /// `pop_macro` pragma can restore a definition without recording one, so a name that
+    /// a pop can restore is refused. Push and pop pragmas are not recorded, so the active
+    /// definition must also be that last definition by location. Token pasting can form
+    /// names this check cannot see.
+    fn unchanged(&self, name: &str, position: usize, visited: &mut HashSet<String>) -> bool {
+        if !visited.insert(name.to_owned()) {
+            return true;
+        }
+        if self.popped.as_ref().is_none_or(|popped| popped.contains(name)) {
+            return false;
+        }
+        let (Some(last), Some(active)) = (self.last_definition.get(name), self.active.get(name))
+        else {
+            return false;
+        };
+        let defined_last = last.location.is_some_and(|(file, offset)| {
+            active.definition.location.as_ref().is_some_and(|location| {
+                location.offset == offset && location.file == file.get_path()
+            })
+        });
+        if last.position >= position || active.definition.builtin || !defined_last {
+            return false;
+        }
+        let tokens = &active.definition.tokens;
+        let (parameters, replacement) = match active.definition.kind {
+            MacroKind::ObjectLike => (HashSet::new(), tokens.get(1..).unwrap_or_default()),
+            MacroKind::FunctionLike => {
+                let Some(close) = tokens.iter().position(|token| token.spelling == ")") else {
+                    return false;
+                };
+                (
+                    tokens[..close]
+                        .iter()
+                        .skip(2)
+                        .filter(|token| token.spelling != ",")
+                        .map(|token| token.spelling.as_str())
+                        .chain(["__VA_ARGS__", "__VA_OPT__"])
+                        .collect(),
+                    &tokens[close + 1..],
+                )
+            }
+        };
+        replacement.iter().all(|token| {
+            let spelling = token.spelling.as_str();
+            if matches!(spelling, "##" | "%:%:") {
+                return false;
+            }
+            if !matches!(token.kind, TokenKind::Identifier | TokenKind::Keyword)
+                || parameters.contains(spelling)
+                || spelling == name
+            {
+                return true;
+            }
+            if crate::expansion::dynamic_builtin(spelling) {
+                return false;
+            }
+            !(self.last_definition.contains_key(spelling) || self.active.contains_key(spelling))
+                || self.unchanged(spelling, position, visited)
+        })
+    }
+}
+
+/// Check the pop pragma search on raw source text.
+#[cfg(test)]
+mod tests {
+    use super::popped_names;
+
+    /// Pop pragmas name what they restore, also inside `_Pragma` and in a `-D` definition;
+    /// any other mention of the pragma name leaves every name unproved.
+    #[test]
+    fn pop_pragmas_name_restored_macros() {
+        let directory = tempfile::tempdir().unwrap();
+        let file = |name: &str, text: &str| {
+            let path = directory.path().join(name);
+            std::fs::write(&path, text).unwrap();
+            path
+        };
+        let pragmas = file(
+            "pragmas.h",
+            "#pragma pop_macro(\"A\")\n#pragma pop_macro ( \"B_1\" )\n_Pragma(\"pop_macro(\\\"C\\\")\")\n",
+        );
+        let plain = file("plain.h", "#pragma push_macro(\"D\")\n");
+        let names = popped_names([pragmas.clone(), plain.clone()], &[]).unwrap();
+        assert_eq!(names, ["A", "B_1", "C"].map(String::from).into());
+        // Only `-D` operands, joined or separate, reach the predefines text.
+        let arguments = [
+            "-DE=_Pragma(\"pop_macro(\\\"E\\\")\")",
+            "-D",
+            "F=_Pragma(\"pop_macro(\\\"F\\\")\")",
+            "-Ipop_macro",
+        ]
+        .map(String::from);
+        let names = popped_names([plain], &arguments).unwrap();
+        assert_eq!(names, ["E", "F"].map(String::from).into());
+        let comment = file("comment.h", "/* see pop_macro */\n");
+        assert_eq!(popped_names([pragmas.clone(), comment], &[]), None);
+        assert_eq!(popped_names([pragmas.clone()], &["-DG=pop_macro".into()]), None);
+        assert_eq!(popped_names([pragmas, directory.path().join("missing.h")], &[]), None);
+    }
+
+    /// Line splices are removed before the search, in the pragma's name and its operand.
+    /// A `??/` trigraph or a bare carriage return could splice in ways the search does not
+    /// model, so it leaves every name unproved.
+    #[test]
+    fn pop_pragmas_are_found_across_splices() {
+        let directory = tempfile::tempdir().unwrap();
+        let file = |name: &str, text: &str| {
+            let path = directory.path().join(name);
+            std::fs::write(&path, text).unwrap();
+            path
+        };
+        let spliced = file(
+            "spliced.h",
+            "#pragma pop_mac\\\nro(\"A\")\r\n#pragma pop_ma\\ \t\r\ncro(\"B\\\n_1\")\r\n",
+        );
+        let names = popped_names([spliced.clone()], &[]).unwrap();
+        assert_eq!(names, ["A", "B_1"].map(String::from).into());
+        let trigraph = file("trigraph.h", "/* ??/ */\n");
+        assert_eq!(popped_names([spliced.clone(), trigraph], &[]), None);
+        let carriage = file("carriage.h", "#define X 1\r#define Y 2\n");
+        assert_eq!(popped_names([spliced, carriage], &[]), None);
+    }
 }

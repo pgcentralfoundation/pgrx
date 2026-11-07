@@ -51,11 +51,11 @@ pg::if_c_macro! { CStringGetDatum {
     ///
     /// # Safety
     /// The caller must run on the PostgreSQL backend thread.
-    #[allow(unused_unsafe, reason = "PG15 defines CStringGetDatum as a pure macro")]
+    #[allow(unused_unsafe, reason = "this conversion is pure where it is a macro or translated")]
     unsafe fn tagged_const_cstring(value: *const core::ffi::c_char) {
         use pg::cmacros::c::{CChar, Pointer, ReadOnly};
         // SAFETY: CStringGetDatum converts the address without reading it; the
-        // caller supplies the guarded call's backend-thread requirement.
+        // caller supplies any guarded call's backend-thread requirement.
         let _datum = unsafe { pg::CStringGetDatum!(Pointer::<CChar, ReadOnly>::new(value)) };
     }
 }}

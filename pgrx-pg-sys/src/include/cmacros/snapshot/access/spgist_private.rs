@@ -449,7 +449,7 @@ macro_rules! SGITDATUM {
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SGITDATUM {
     ($x:expr, $s:expr $(,)?) => {
@@ -1799,7 +1799,7 @@ macro_rules! SGNTDATUM {
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SGNTDATUM {
     ($x:expr, $s:expr $(,)?) => {
@@ -2527,8 +2527,7 @@ macro_rules! SpGistPageGetFreeSpace {
         )
     };
 }
-#[cfg(feature = "pg15")]
-/// C macro SpGistPageGetMeta from spgist_private.h:124 (PostgreSQL 15)
+/// C macro SpGistPageGetMeta from spgist_private.h:124 (PostgreSQL 15–19)
 ///
 /// ```text
 /// #define SpGistPageGetMeta( p ) ( ( SpGistMetaPageData * ) PageGetContents ( p ) )
@@ -2542,42 +2541,6 @@ macro_rules! SpGistPageGetFreeSpace {
 /// # Panics
 ///
 /// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! SpGistPageGetMeta {
-    ($p:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$p;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::__pgrx_c_bindings::SpGistMetaPageData
-                                >,
-                                $crate::__pgrx_c_macros::expression::ReadWrite
-                            >>()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro SpGistPageGetMeta from spgist_private.h:124 (PostgreSQL 16–19)
-///
-/// ```text
-/// #define SpGistPageGetMeta( p ) ( ( SpGistMetaPageData * ) PageGetContents ( p ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! SpGistPageGetMeta {
     ($p:expr $(,)?) => {
@@ -2635,44 +2598,8 @@ macro_rules! SpGistPageGetOpaque {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro SpGistPageGetOpaque from spgist_private.h:78 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define SpGistPageGetOpaque( page ) ( ( SpGistPageOpaque ) PageGetSpecialPointer ( page ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! SpGistPageGetOpaque {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::__pgrx_c_bindings::SpGistPageOpaqueData
-                                >,
-                                $crate::__pgrx_c_macros::expression::ReadWrite
-                            >>()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro SpGistPageGetOpaque from spgist_private.h:78 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro SpGistPageGetOpaque from spgist_private.h:78 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define SpGistPageGetOpaque( page ) ( ( SpGistPageOpaque ) PageGetSpecialPointer ( page ) )
@@ -2769,70 +2696,8 @@ macro_rules! SpGistPageIsDeleted {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro SpGistPageIsDeleted from spgist_private.h:80 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define SpGistPageIsDeleted( page ) ( SpGistPageGetOpaque ( page ) -> flags & SPGIST_DELETED )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! SpGistPageIsDeleted {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::bitand(
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::expression::load(
-                                    $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field_flags,
-                                        _,
-                                        _
-                                    >(
-                                        $crate::__pgrx_c_macros::expression::pointee(
-                                            (
-                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                    true,
-                                                    _
-                                                >(
-                                                    $crate::__pgrx_c_macros::expression::type_witness::<
-                                                        $crate::__pgrx_c_macros::expression::CPointer<
-                                                            $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::__pgrx_c_bindings::SpGistPageOpaqueData
-                                                            >,
-                                                            $crate::__pgrx_c_macros::expression::ReadWrite
-                                                        >>()
-                                                )
-                                            )
-                                        )
-                                    )
-                                )
-                            ),
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::__pgrx_c_bindings::SPGIST_DELETED as i32
-                                )
-                            )
-                        )
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro SpGistPageIsDeleted from spgist_private.h:80 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro SpGistPageIsDeleted from spgist_private.h:80 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define SpGistPageIsDeleted( page ) ( SpGistPageGetOpaque ( page ) -> flags & SPGIST_DELETED )
@@ -2955,70 +2820,8 @@ macro_rules! SpGistPageIsLeaf {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro SpGistPageIsLeaf from spgist_private.h:81 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define SpGistPageIsLeaf( page ) ( SpGistPageGetOpaque ( page ) -> flags & SPGIST_LEAF )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! SpGistPageIsLeaf {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::bitand(
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::expression::load(
-                                    $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field_flags,
-                                        _,
-                                        _
-                                    >(
-                                        $crate::__pgrx_c_macros::expression::pointee(
-                                            (
-                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                    true,
-                                                    _
-                                                >(
-                                                    $crate::__pgrx_c_macros::expression::type_witness::<
-                                                        $crate::__pgrx_c_macros::expression::CPointer<
-                                                            $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::__pgrx_c_bindings::SpGistPageOpaqueData
-                                                            >,
-                                                            $crate::__pgrx_c_macros::expression::ReadWrite
-                                                        >>()
-                                                )
-                                            )
-                                        )
-                                    )
-                                )
-                            ),
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::__pgrx_c_bindings::SPGIST_LEAF as i32
-                                )
-                            )
-                        )
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro SpGistPageIsLeaf from spgist_private.h:81 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro SpGistPageIsLeaf from spgist_private.h:81 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define SpGistPageIsLeaf( page ) ( SpGistPageGetOpaque ( page ) -> flags & SPGIST_LEAF )
@@ -3141,70 +2944,8 @@ macro_rules! SpGistPageIsMeta {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro SpGistPageIsMeta from spgist_private.h:79 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define SpGistPageIsMeta( page ) ( SpGistPageGetOpaque ( page ) -> flags & SPGIST_META )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! SpGistPageIsMeta {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::bitand(
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::expression::load(
-                                    $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field_flags,
-                                        _,
-                                        _
-                                    >(
-                                        $crate::__pgrx_c_macros::expression::pointee(
-                                            (
-                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                    true,
-                                                    _
-                                                >(
-                                                    $crate::__pgrx_c_macros::expression::type_witness::<
-                                                        $crate::__pgrx_c_macros::expression::CPointer<
-                                                            $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::__pgrx_c_bindings::SpGistPageOpaqueData
-                                                            >,
-                                                            $crate::__pgrx_c_macros::expression::ReadWrite
-                                                        >>()
-                                                )
-                                            )
-                                        )
-                                    )
-                                )
-                            ),
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::__pgrx_c_bindings::SPGIST_META as i32
-                                )
-                            )
-                        )
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro SpGistPageIsMeta from spgist_private.h:79 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro SpGistPageIsMeta from spgist_private.h:79 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define SpGistPageIsMeta( page ) ( SpGistPageGetOpaque ( page ) -> flags & SPGIST_META )
@@ -3327,70 +3068,8 @@ macro_rules! SpGistPageStoresNulls {
         )
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17"))]
-/// C macro SpGistPageStoresNulls from spgist_private.h:82 (PostgreSQL 16–17)
-///
-/// ```text
-/// #define SpGistPageStoresNulls( page ) ( SpGistPageGetOpaque ( page ) -> flags & SPGIST_NULLS )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! SpGistPageStoresNulls {
-    ($page:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$page;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::bitand(
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::expression::load(
-                                    $crate::__pgrx_c_macros::expression::project::<
-                                        $crate::__pgrx_c_generated::Field_flags,
-                                        _,
-                                        _
-                                    >(
-                                        $crate::__pgrx_c_macros::expression::pointee(
-                                            (
-                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                    true,
-                                                    _
-                                                >(
-                                                    $crate::__pgrx_c_macros::expression::type_witness::<
-                                                        $crate::__pgrx_c_macros::expression::CPointer<
-                                                            $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::__pgrx_c_bindings::SpGistPageOpaqueData
-                                                            >,
-                                                            $crate::__pgrx_c_macros::expression::ReadWrite
-                                                        >>()
-                                                )
-                                            )
-                                        )
-                                    )
-                                )
-                            ),
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::__pgrx_c_bindings::SPGIST_NULLS as i32
-                                )
-                            )
-                        )
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg18", feature = "pg19"))]
-/// C macro SpGistPageStoresNulls from spgist_private.h:82 (PostgreSQL 18–19)
+#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
+/// C macro SpGistPageStoresNulls from spgist_private.h:82 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define SpGistPageStoresNulls( page ) ( SpGistPageGetOpaque ( page ) -> flags & SPGIST_NULLS )

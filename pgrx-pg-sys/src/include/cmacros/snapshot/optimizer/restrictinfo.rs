@@ -2,7 +2,7 @@
 // C macros from restrictinfo.h.
 
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function clause_sides_match_join from restrictinfo.h:72 (PostgreSQL 18–19)
+/// C inline function clause_sides_match_join from restrictinfo.h:72 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline bool
@@ -28,7 +28,7 @@
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -45,11 +45,7 @@ macro_rules! clause_sides_match_join {
                 let _ = &$rinfo;
                 let _ = &$outerrelids;
                 let _ = &$innerrelids;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };

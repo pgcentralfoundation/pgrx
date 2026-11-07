@@ -1377,7 +1377,7 @@ macro_rules! ARR_SIZE {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ARR_SIZE {
     ($a:expr $(,)?) => {
@@ -1650,8 +1650,7 @@ macro_rules! PG_GETARG_EXPANDED_ARRAYX {
         )
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg19"))]
-/// C macro PG_RETURN_ARRAYTYPE_P from array.h:265 (PostgreSQL 15, 19)
+/// C macro PG_RETURN_ARRAYTYPE_P from array.h:265 (PostgreSQL 15–19)
 ///
 /// ```text
 /// #define PG_RETURN_ARRAYTYPE_P( x ) PG_RETURN_POINTER ( x )
@@ -1676,34 +1675,8 @@ macro_rules! PG_RETURN_ARRAYTYPE_P {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro PG_RETURN_ARRAYTYPE_P from array.h:265 (PostgreSQL 16–18)
-///
-/// ```text
-/// #define PG_RETURN_ARRAYTYPE_P( x ) PG_RETURN_POINTER ( x )
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_caller_returns!()]
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! PG_RETURN_ARRAYTYPE_P {
-    ($x:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-    (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-#[cfg(feature = "pg15")]
-/// C macro PG_RETURN_EXPANDED_ARRAY from array.h:271 (PostgreSQL 15)
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C macro PG_RETURN_EXPANDED_ARRAY from array.h:271 (PostgreSQL 15–18)
 ///
 /// ```text
 /// #define PG_RETURN_EXPANDED_ARRAY( x ) PG_RETURN_DATUM ( EOHPGetRWDatum ( & ( x ) -> hdr ) )
@@ -1728,8 +1701,8 @@ macro_rules! PG_RETURN_EXPANDED_ARRAY {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro PG_RETURN_EXPANDED_ARRAY from array.h:271 (PostgreSQL 16–19)
+#[cfg(feature = "pg19")]
+/// C macro PG_RETURN_EXPANDED_ARRAY from array.h:271 (PostgreSQL 19)
 ///
 /// ```text
 /// #define PG_RETURN_EXPANDED_ARRAY( x ) PG_RETURN_DATUM ( EOHPGetRWDatum ( & ( x ) -> hdr ) )

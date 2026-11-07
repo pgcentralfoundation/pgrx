@@ -66,38 +66,45 @@ unsafe fn return_next_null(
     unsafe { pg::SRF_RETURN_NEXT_NULL!(context, fcinfo) }
 }
 
-// These actual generated macros call pgrx-guarded native functions. Type-check
+// These actual generated macros can call pgrx-guarded native functions. Type-check
 // their public expansions here; executing them requires the backend test harness.
+// The integer, boolean and pointer conversions are C macros on PG15. Later versions
+// define them as inline functions, which the generator translates to pure Rust where
+// it can and otherwise calls natively, so these callers keep their `unsafe` blocks.
 
-/// Type-check an actual generated integer return whose guarded native conversion requires a
-/// backend.
+/// Type-check an actual generated integer return whose conversion can be a guarded
+/// native call.
 ///
 /// # Safety
 /// Must run on the backend thread under the generated native-call contract.
+#[allow(unused_unsafe, reason = "this conversion is pure where it is a macro or translated")]
 unsafe fn return_int32(value: i32) -> pg::Datum {
-    // SAFETY: The caller meets the generated guard's backend-thread obligation;
+    // SAFETY: The caller meets any generated guard's backend-thread obligation;
     // Int32GetDatum accepts every int32 and only converts its value.
     unsafe { pg::PG_RETURN_INT32!(value) }
 }
 
-/// Type-check an actual generated boolean return through its guarded native conversion.
+/// Type-check an actual generated boolean return whose conversion can be a guarded
+/// native call.
 ///
 /// # Safety
 /// Must run on the backend thread under the generated native-call contract.
+#[allow(unused_unsafe, reason = "this conversion is pure where it is a macro or translated")]
 unsafe fn return_bool(value: bool) -> pg::Datum {
     // SAFETY: BoolGetDatum accepts both bool values; the caller supplies the thread.
     unsafe { pg::PG_RETURN_BOOL!(value) }
 }
 
-/// Type-check a pointer return without dereferencing the pointer or executing its backend
-/// guard.
+/// Type-check a pointer return without dereferencing the pointer or executing a backend
+/// guard its conversion can have.
 ///
 /// # Safety
 /// Must run on the backend thread. Any subsequent pointer use must separately
 /// establish the pointee's allocation, lifetime, initialization and aliasing.
+#[allow(unused_unsafe, reason = "this conversion is pure where it is a macro or translated")]
 unsafe fn return_pointer(value: *mut i32) -> pg::Datum {
     // SAFETY: PointerGetDatum converts this pointer without dereferencing it;
-    // the caller establishes the guard's backend-thread requirement.
+    // the caller establishes any guard's backend-thread requirement.
     unsafe { pg::PG_RETURN_POINTER!(value) }
 }
 

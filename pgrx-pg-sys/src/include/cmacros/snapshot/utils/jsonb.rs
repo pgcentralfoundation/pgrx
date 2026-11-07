@@ -38,7 +38,7 @@ macro_rules! DatumGetJsonbP {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function DatumGetJsonbP from jsonb.h:373 (PostgreSQL 16–18), jsonb.h:400 (PostgreSQL 19)
+/// C inline function DatumGetJsonbP from jsonb.h:373 (PostgreSQL 16–18), jsonb.h:400 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Jsonb *
@@ -49,7 +49,7 @@ macro_rules! DatumGetJsonbP {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -57,22 +57,20 @@ macro_rules! DatumGetJsonbP {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetJsonbP {
     ($d:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$d;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::__pgrx_c_bindings::Jsonb
-                            >,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::Jsonb
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
@@ -114,7 +112,7 @@ macro_rules! DatumGetJsonbPCopy {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function DatumGetJsonbPCopy from jsonb.h:379 (PostgreSQL 16–18), jsonb.h:406 (PostgreSQL 19)
+/// C inline function DatumGetJsonbPCopy from jsonb.h:379 (PostgreSQL 16–18), jsonb.h:406 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Jsonb *
@@ -125,7 +123,7 @@ macro_rules! DatumGetJsonbPCopy {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -133,22 +131,20 @@ macro_rules! DatumGetJsonbPCopy {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetJsonbPCopy {
     ($d:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$d;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::__pgrx_c_bindings::Jsonb
-                            >,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::Jsonb
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
@@ -456,8 +452,7 @@ macro_rules! JBE_OFFLENFLD {
         )
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro JB_ROOT_COUNT from jsonb.h:227 (PostgreSQL 15), jsonb.h:219 (PostgreSQL 16–18)
+/// C macro JB_ROOT_COUNT from jsonb.h:227 (PostgreSQL 15), jsonb.h:219 (PostgreSQL 16–18), jsonb.h:221 (PostgreSQL 19)
 ///
 /// ```text
 /// #define JB_ROOT_COUNT( jbp_ ) ( * ( uint32 * ) VARDATA ( jbp_ ) & JB_CMASK )
@@ -503,55 +498,7 @@ macro_rules! JB_ROOT_COUNT {
         )
     };
 }
-#[cfg(feature = "pg19")]
-/// C macro JB_ROOT_COUNT from jsonb.h:221 (PostgreSQL 19)
-///
-/// ```text
-/// #define JB_ROOT_COUNT( jbp_ ) ( * ( uint32 * ) VARDATA ( jbp_ ) & JB_CMASK )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! JB_ROOT_COUNT {
-    ($jbp_:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$jbp_;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::bitand(
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::expression::dereference(
-                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::type_witness::<
-                                            $crate::__pgrx_c_macros::expression::CPointer<
-                                                $crate::__pgrx_c_macros::CUnsignedInt,
-                                                $crate::__pgrx_c_macros::expression::ReadWrite
-                                            >>()
-                                    )
-                                )
-                            ),
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::__pgrx_c_bindings::JB_CMASK as i32
-                                )
-                            )
-                        )
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro JB_ROOT_IS_ARRAY from jsonb.h:230 (PostgreSQL 15), jsonb.h:222 (PostgreSQL 16–18)
+/// C macro JB_ROOT_IS_ARRAY from jsonb.h:230 (PostgreSQL 15), jsonb.h:222 (PostgreSQL 16–18), jsonb.h:224 (PostgreSQL 19)
 ///
 /// ```text
 /// #define JB_ROOT_IS_ARRAY( jbp_ ) ( ( * ( uint32 * ) VARDATA ( jbp_ ) & JB_FARRAY ) != 0 )
@@ -582,40 +529,7 @@ macro_rules! JB_ROOT_IS_ARRAY {
         )
     };
 }
-#[cfg(feature = "pg19")]
-/// C macro JB_ROOT_IS_ARRAY from jsonb.h:224 (PostgreSQL 19)
-///
-/// ```text
-/// #define JB_ROOT_IS_ARRAY( jbp_ ) ( ( * ( uint32 * ) VARDATA ( jbp_ ) & JB_FARRAY ) != 0 )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! JB_ROOT_IS_ARRAY {
-    ($jbp_:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$jbp_;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::CInt
-                        >()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro JB_ROOT_IS_OBJECT from jsonb.h:229 (PostgreSQL 15), jsonb.h:221 (PostgreSQL 16–18)
+/// C macro JB_ROOT_IS_OBJECT from jsonb.h:229 (PostgreSQL 15), jsonb.h:221 (PostgreSQL 16–18), jsonb.h:223 (PostgreSQL 19)
 ///
 /// ```text
 /// #define JB_ROOT_IS_OBJECT( jbp_ ) ( ( * ( uint32 * ) VARDATA ( jbp_ ) & JB_FOBJECT ) != 0 )
@@ -646,40 +560,7 @@ macro_rules! JB_ROOT_IS_OBJECT {
         )
     };
 }
-#[cfg(feature = "pg19")]
-/// C macro JB_ROOT_IS_OBJECT from jsonb.h:223 (PostgreSQL 19)
-///
-/// ```text
-/// #define JB_ROOT_IS_OBJECT( jbp_ ) ( ( * ( uint32 * ) VARDATA ( jbp_ ) & JB_FOBJECT ) != 0 )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! JB_ROOT_IS_OBJECT {
-    ($jbp_:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$jbp_;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::CInt
-                        >()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro JB_ROOT_IS_SCALAR from jsonb.h:228 (PostgreSQL 15), jsonb.h:220 (PostgreSQL 16–18)
+/// C macro JB_ROOT_IS_SCALAR from jsonb.h:228 (PostgreSQL 15), jsonb.h:220 (PostgreSQL 16–18), jsonb.h:222 (PostgreSQL 19)
 ///
 /// ```text
 /// #define JB_ROOT_IS_SCALAR( jbp_ ) ( ( * ( uint32 * ) VARDATA ( jbp_ ) & JB_FSCALAR ) != 0 )
@@ -693,38 +574,6 @@ macro_rules! JB_ROOT_IS_OBJECT {
 /// # Panics
 ///
 /// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! JB_ROOT_IS_SCALAR {
-    ($jbp_:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$jbp_;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::CInt
-                        >()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(feature = "pg19")]
-/// C macro JB_ROOT_IS_SCALAR from jsonb.h:222 (PostgreSQL 19)
-///
-/// ```text
-/// #define JB_ROOT_IS_SCALAR( jbp_ ) ( ( * ( uint32 * ) VARDATA ( jbp_ ) & JB_FSCALAR ) != 0 )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! JB_ROOT_IS_SCALAR {
     ($jbp_:expr $(,)?) => {
@@ -911,7 +760,7 @@ macro_rules! JsonbPGetDatum {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function JsonbPGetDatum from jsonb.h:385 (PostgreSQL 16–18), jsonb.h:412 (PostgreSQL 19)
+/// C inline function JsonbPGetDatum from jsonb.h:385 (PostgreSQL 16–18), jsonb.h:412 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Datum
@@ -922,7 +771,7 @@ macro_rules! JsonbPGetDatum {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -930,20 +779,14 @@ macro_rules! JsonbPGetDatum {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! JsonbPGetDatum {
     ($p:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$p;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLong,
-                            $crate::__pgrx_c_bindings::Datum
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::Datum>()
             }
         )
     };
@@ -1003,7 +846,7 @@ macro_rules! PG_GETARG_JSONB_P {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_JSONB_P {
     ($x:expr, $fcinfo:expr $(,)?) => {
@@ -1079,7 +922,7 @@ macro_rules! PG_GETARG_JSONB_P_COPY {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_JSONB_P_COPY {
     ($x:expr, $fcinfo:expr $(,)?) => {
@@ -1100,8 +943,7 @@ macro_rules! PG_GETARG_JSONB_P_COPY {
         )
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg19"))]
-/// C macro PG_RETURN_JSONB_P from jsonb.h:76 (PostgreSQL 15), jsonb.h:420 (PostgreSQL 19)
+/// C macro PG_RETURN_JSONB_P from jsonb.h:76 (PostgreSQL 15), jsonb.h:393 (PostgreSQL 16–18), jsonb.h:420 (PostgreSQL 19)
 ///
 /// ```text
 /// #define PG_RETURN_JSONB_P( x ) PG_RETURN_POINTER ( x )
@@ -1117,32 +959,6 @@ macro_rules! PG_GETARG_JSONB_P_COPY {
 /// # Panics
 ///
 /// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! PG_RETURN_JSONB_P {
-    ($x:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-    (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro PG_RETURN_JSONB_P from jsonb.h:393 (PostgreSQL 16–18)
-///
-/// ```text
-/// #define PG_RETURN_JSONB_P( x ) PG_RETURN_POINTER ( x )
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_caller_returns!()]
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_JSONB_P {
     ($x:expr $(,)?) => {

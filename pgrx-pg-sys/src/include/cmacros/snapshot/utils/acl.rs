@@ -2873,7 +2873,7 @@ macro_rules! ACL_SIZE {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ACL_SIZE {
     ($ACL:expr $(,)?) => {
@@ -2891,8 +2891,7 @@ macro_rules! ACL_SIZE {
         )
     };
 }
-#[cfg(feature = "pg15")]
-/// C macro DatumGetAclItemP from acl.h:116 (PostgreSQL 15)
+/// C macro DatumGetAclItemP from acl.h:116 (PostgreSQL 15–19)
 ///
 /// ```text
 /// #define DatumGetAclItemP( X ) ( ( AclItem * ) DatumGetPointer ( X ) )
@@ -2906,42 +2905,6 @@ macro_rules! ACL_SIZE {
 /// # Panics
 ///
 /// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! DatumGetAclItemP {
-    ($X:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$X;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::__pgrx_c_bindings::AclItem
-                                >,
-                                $crate::__pgrx_c_macros::expression::ReadWrite
-                            >>()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro DatumGetAclItemP from acl.h:116 (PostgreSQL 16–19)
-///
-/// ```text
-/// #define DatumGetAclItemP( X ) ( ( AclItem * ) DatumGetPointer ( X ) )
-/// ```
-///
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetAclItemP {
     ($X:expr $(,)?) => {
@@ -3033,8 +2996,7 @@ macro_rules! DatumGetAclPCopy {
         )
     };
 }
-#[cfg(feature = "pg15")]
-/// C macro PG_GETARG_ACLITEM_P from acl.h:117 (PostgreSQL 15)
+/// C macro PG_GETARG_ACLITEM_P from acl.h:117 (PostgreSQL 15–19)
 ///
 /// ```text
 /// #define PG_GETARG_ACLITEM_P( n ) DatumGetAclItemP ( PG_GETARG_DATUM ( n ) )
@@ -3050,45 +3012,6 @@ macro_rules! DatumGetAclPCopy {
 /// # Panics
 ///
 /// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! PG_GETARG_ACLITEM_P {
-    ($n:expr, $fcinfo:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$n;
-                let _ = &$fcinfo;
-                (
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::type_witness::<
-                            $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::__pgrx_c_bindings::AclItem
-                                >,
-                                $crate::__pgrx_c_macros::expression::ReadWrite
-                            >>()
-                    )
-                )
-            }
-        )
-    };
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro PG_GETARG_ACLITEM_P from acl.h:117 (PostgreSQL 16–19)
-///
-/// ```text
-/// #define PG_GETARG_ACLITEM_P( n ) DatumGetAclItemP ( PG_GETARG_DATUM ( n ) )
-/// ```
-///
-///
-/// Rust callers supply 2 arguments: the 1 original C parameter, followed by explicit caller-scope operands in this order: `fcinfo`. Each operand must preserve its C type and place requirements.
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_ACLITEM_P {
     ($n:expr, $fcinfo:expr $(,)?) => {
@@ -3187,8 +3110,7 @@ macro_rules! PG_GETARG_ACL_P_COPY {
         )
     };
 }
-#[cfg(any(feature = "pg15", feature = "pg19"))]
-/// C macro PG_RETURN_ACLITEM_P from acl.h:118 (PostgreSQL 15, 19)
+/// C macro PG_RETURN_ACLITEM_P from acl.h:118 (PostgreSQL 15–19)
 ///
 /// ```text
 /// #define PG_RETURN_ACLITEM_P( x ) PG_RETURN_POINTER ( x )
@@ -3213,34 +3135,7 @@ macro_rules! PG_RETURN_ACLITEM_P {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro PG_RETURN_ACLITEM_P from acl.h:118 (PostgreSQL 16–18)
-///
-/// ```text
-/// #define PG_RETURN_ACLITEM_P( x ) PG_RETURN_POINTER ( x )
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_caller_returns!()]
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! PG_RETURN_ACLITEM_P {
-    ($x:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-    (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-#[cfg(any(feature = "pg15", feature = "pg19"))]
-/// C macro PG_RETURN_ACL_P from acl.h:124 (PostgreSQL 15, 19)
+/// C macro PG_RETURN_ACL_P from acl.h:124 (PostgreSQL 15–19)
 ///
 /// ```text
 /// #define PG_RETURN_ACL_P( x ) PG_RETURN_POINTER ( x )
@@ -3256,32 +3151,6 @@ macro_rules! PG_RETURN_ACLITEM_P {
 /// # Panics
 ///
 /// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! PG_RETURN_ACL_P {
-    ($x:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-    (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18"))]
-/// C macro PG_RETURN_ACL_P from acl.h:124 (PostgreSQL 16–18)
-///
-/// ```text
-/// #define PG_RETURN_ACL_P( x ) PG_RETURN_POINTER ( x )
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_caller_returns!()]
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_ACL_P {
     ($x:expr $(,)?) => {

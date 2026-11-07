@@ -54,7 +54,7 @@ macro_rules! appendStringInfoCharMacro {
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function initReadOnlyStringInfo from stringinfo.h:129 (PostgreSQL 17), stringinfo.h:156 (PostgreSQL 18–19)
+/// C inline function initReadOnlyStringInfo from stringinfo.h:129 (PostgreSQL 17), stringinfo.h:156 (PostgreSQL 18–19)
 ///
 /// ```c
 /// static inline void
@@ -68,15 +68,11 @@ macro_rules! appendStringInfoCharMacro {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! initReadOnlyStringInfo {
     ($str:expr, $data:expr, $len:expr $(,)?) => {
@@ -85,7 +81,7 @@ macro_rules! initReadOnlyStringInfo {
                 let _ = &$str;
                 let _ = &$data;
                 let _ = &$len;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
+                ()
             }
         )
     };

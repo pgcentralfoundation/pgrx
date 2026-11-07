@@ -650,7 +650,7 @@ macro_rules! NormalTransactionIdPrecedes {
         )
     };
 }
-/// Typed call adapter for C inline function ReadNextTransactionId from transam.h:314 (PostgreSQL 15–18), transam.h:374 (PostgreSQL 19)
+/// C inline function ReadNextTransactionId from transam.h:314 (PostgreSQL 15–18), transam.h:374 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TransactionId
@@ -661,7 +661,7 @@ macro_rules! NormalTransactionIdPrecedes {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -669,19 +669,15 @@ macro_rules! NormalTransactionIdPrecedes {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! ReadNextTransactionId {
     () => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedInt,
-                            $crate::__pgrx_c_bindings::TransactionId
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_types::TransactionId
+                >()
             }
         )
     };
@@ -778,7 +774,7 @@ macro_rules! TransactionIdEquals {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function TransactionIdFollows from transam.h:296 (PostgreSQL 19)
+/// C inline function TransactionIdFollows from transam.h:296 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -795,7 +791,7 @@ macro_rules! TransactionIdEquals {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -803,7 +799,7 @@ macro_rules! TransactionIdEquals {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! TransactionIdFollows {
     ($id1:expr, $id2:expr $(,)?) => {
@@ -811,17 +807,13 @@ macro_rules! TransactionIdFollows {
             @value {
                 let _ = &$id1;
                 let _ = &$id2;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function TransactionIdFollowsOrEquals from transam.h:311 (PostgreSQL 19)
+/// C inline function TransactionIdFollowsOrEquals from transam.h:311 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -838,7 +830,7 @@ macro_rules! TransactionIdFollows {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -846,7 +838,7 @@ macro_rules! TransactionIdFollows {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! TransactionIdFollowsOrEquals {
     ($id1:expr, $id2:expr $(,)?) => {
@@ -854,11 +846,7 @@ macro_rules! TransactionIdFollowsOrEquals {
             @value {
                 let _ = &$id1;
                 let _ = &$id2;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
@@ -917,7 +905,8 @@ macro_rules! TransactionIdIsValid {
         )
     };
 }
-/// Typed call adapter for C inline function TransactionIdOlder from transam.h:333 (PostgreSQL 15–18), transam.h:393 (PostgreSQL 19)
+#[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]
+/// C inline function TransactionIdOlder from transam.h:333 (PostgreSQL 15–18)
 ///
 /// ```c
 /// static inline TransactionId
@@ -936,7 +925,7 @@ macro_rules! TransactionIdIsValid {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -944,7 +933,7 @@ macro_rules! TransactionIdIsValid {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! TransactionIdOlder {
     ($a:expr, $b:expr $(,)?) => {
@@ -952,19 +941,58 @@ macro_rules! TransactionIdOlder {
             @value {
                 let _ = &$a;
                 let _ = &$b;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedInt,
-                            $crate::__pgrx_c_bindings::TransactionId
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_types::TransactionId
+                >()
             }
         )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function TransactionIdPrecedes from transam.h:262 (PostgreSQL 19)
+/// C inline function TransactionIdOlder from transam.h:393 (PostgreSQL 19)
+///
+/// ```c
+/// static inline TransactionId
+/// TransactionIdOlder(TransactionId a, TransactionId b)
+/// {
+/// 	if (!TransactionIdIsValid(a))
+/// 		return b;
+///
+/// 	if (!TransactionIdIsValid(b))
+/// 		return a;
+///
+/// 	if (TransactionIdPrecedes(a, b))
+/// 		return a;
+/// 	return b;
+/// }
+/// ```
+///
+///
+#[doc = crate::__pgrx_c_doc_inline_body!()]
+///
+/// # Safety
+///
+#[doc = crate::__pgrx_c_doc_safety!()]
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! TransactionIdOlder {
+    ($a:expr, $b:expr $(,)?) => {
+        $crate::__pgrx_c_documentation_shell!(
+            @value {
+                let _ = &$a;
+                let _ = &$b;
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_types::TransactionId
+                >()
+            }
+        )
+    };
+}
+#[cfg(feature = "pg19")]
+/// C inline function TransactionIdPrecedes from transam.h:262 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -985,7 +1013,7 @@ macro_rules! TransactionIdOlder {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -993,7 +1021,7 @@ macro_rules! TransactionIdOlder {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! TransactionIdPrecedes {
     ($id1:expr, $id2:expr $(,)?) => {
@@ -1001,17 +1029,13 @@ macro_rules! TransactionIdPrecedes {
             @value {
                 let _ = &$id1;
                 let _ = &$id2;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function TransactionIdPrecedesOrEquals from transam.h:281 (PostgreSQL 19)
+/// C inline function TransactionIdPrecedesOrEquals from transam.h:281 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline bool
@@ -1028,7 +1052,7 @@ macro_rules! TransactionIdPrecedes {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1036,7 +1060,7 @@ macro_rules! TransactionIdPrecedes {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! TransactionIdPrecedesOrEquals {
     ($id1:expr, $id2:expr $(,)?) => {
@@ -1044,11 +1068,7 @@ macro_rules! TransactionIdPrecedesOrEquals {
             @value {
                 let _ = &$id1;
                 let _ = &$id2;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };

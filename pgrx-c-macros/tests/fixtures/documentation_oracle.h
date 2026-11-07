@@ -2,6 +2,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -119,3 +120,19 @@ extern int doc_global;
 #define DOC_MAYBE_RETURN(condition) \
     do { if (condition) return 0; } while (0)
 #define DOC_RETURN(condition) if (condition) return -1; else return 1
+
+/* Static inline functions whose bodies are translated, and macros that call them. */
+static inline unsigned short DOC_INLINE_VALUE(int value) { return value + 1; }
+static inline DocWord DOC_INLINE_WORD(DocWord word) { return word * 2; }
+static inline void DOC_INLINE_STORE(int *pointer, int value) { *pointer = value; }
+static inline double DOC_INLINE_REAL(int value) { return value * 2; }
+static inline DocState DOC_INLINE_STATE(const DocRecord *record) { return record->inner.state; }
+static inline char *DOC_INLINE_NAME(DocName *name) { return name->data; }
+static inline bool DOC_INLINE_BUSY(const DocRecord *record) { return record->inner.state == DOC_BUSY; }
+#define DOC_INLINE_NESTED(value) (DOC_INLINE_VALUE(value) + 1)
+#define DOC_INLINE_STORE_CALL(pointer, value) DOC_INLINE_STORE(pointer, value)
+#define DOC_INLINE_WORD_CALL(word) DOC_INLINE_WORD(word)
+#define DOC_INLINE_REAL_CALL(value) DOC_INLINE_REAL(value)
+#define DOC_INLINE_STATE_CALL(record) DOC_INLINE_STATE(record)
+#define DOC_INLINE_NAME_CALL(name) DOC_INLINE_NAME(name)
+#define DOC_INLINE_BUSY_CALL(record) DOC_INLINE_BUSY(record)

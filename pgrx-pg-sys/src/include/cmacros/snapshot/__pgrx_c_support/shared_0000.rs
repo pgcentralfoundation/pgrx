@@ -912,6 +912,8 @@ pub mod __pgrx_c_generated {
     include!("native_0035.rs");
     include!("native_0036.rs");
     include!("native_0037.rs");
+    include!("native_0038.rs");
+    include!("native_0039.rs");
 }
 /// Explicit callback typedef identities validated against the current C profile.
 #[doc(hidden)]
@@ -954,10 +956,8 @@ macro_rules! __pgrx_c_operand {
     (@check_safety; (@macro [$($path:tt)*] [$($arguments:tt)*])) => {
         $($path)* !(@__pgrx_c_check_safety; $($arguments)*)
     };
-    (@check_safety; (@compiled $value:tt $place:tt $read:tt [$($size:tt)*])) => {
-        {
-            let _ = $($size)*;
-        }
+    (@check_safety; (@compiled $value:tt $place:tt $read:tt $size:tt [$($checks:tt)*])) => {
+        $($checks)*
     };
     (@value [$floats:tt]; (@native [$expression:expr])) => {
         $crate::__pgrx_c_macros::expression::profile_input::<$floats, _>($expression)
@@ -1056,19 +1056,19 @@ macro_rules! __pgrx_c_operand {
     (@discard [$floats:tt]; (@macro [$($path:tt)*] [$($arguments:tt)*])) => {
         $($path)* !(@__pgrx_c_discard; $($arguments)*)
     };
-    (@value [$floats:tt]; (@compiled [$($value:tt)*] $place:tt $read:tt $size:tt)) => {
+    (@value [$floats:tt]; (@compiled [$($value:tt)*] $place:tt $read:tt $size:tt $checks:tt)) => {
         $($value)*
     };
-    (@place; (@compiled $value:tt [$($place:tt)*] $read:tt $size:tt)) => {
+    (@place; (@compiled $value:tt [$($place:tt)*] $read:tt $size:tt $checks:tt)) => {
         $($place)*
     };
-    (@read_place; (@compiled $value:tt $place:tt [$($read:tt)*] $size:tt)) => {
+    (@read_place; (@compiled $value:tt $place:tt [$($read:tt)*] $size:tt $checks:tt)) => {
         $($read)*
     };
-    (@size; (@compiled $value:tt $place:tt $read:tt [$($size:tt)*])) => {
+    (@size; (@compiled $value:tt $place:tt $read:tt [$($size:tt)*] $checks:tt)) => {
         $($size)*
     };
-    (@discard [$floats:tt]; (@compiled [$($value:tt)*] $place:tt $read:tt $size:tt)) => {
+    (@discard [$floats:tt]; (@compiled [$($value:tt)*] $place:tt $read:tt $size:tt $checks:tt)) => {
         {
             let _ = $($value)*;
         }

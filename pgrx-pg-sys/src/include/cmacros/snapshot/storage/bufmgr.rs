@@ -390,7 +390,7 @@ macro_rules! BufferGetPage {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function BufferGetPage from bufmgr.h:357 (PostgreSQL 16), bufmgr.h:406 (PostgreSQL 17), bufmgr.h:416 (PostgreSQL 18), bufmgr.h:467 (PostgreSQL 19)
+/// C inline function BufferGetPage from bufmgr.h:357 (PostgreSQL 16), bufmgr.h:406 (PostgreSQL 17), bufmgr.h:416 (PostgreSQL 18), bufmgr.h:467 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Page
@@ -401,7 +401,7 @@ macro_rules! BufferGetPage {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -409,23 +409,18 @@ macro_rules! BufferGetPage {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! BufferGetPage {
     ($buffer:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$buffer;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CChar,
-                                ::core::ffi::c_char
-                            >,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::CChar,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
@@ -621,7 +616,7 @@ macro_rules! BufferIsValid {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function LockBuffer from bufmgr.h:333 (PostgreSQL 19)
+/// C inline function LockBuffer from bufmgr.h:333 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -635,7 +630,7 @@ macro_rules! BufferIsValid {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -647,13 +642,11 @@ macro_rules! BufferIsValid {
 #[macro_export]
 macro_rules! LockBuffer {
     ($buffer:expr, $mode:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$buffer;
-                let _ = &$mode;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$buffer;
+            let _ = &$mode;
+            ()
+        })
     };
 }
 /// C macro RelationGetNumberOfBlocks from bufmgr.h:219 (PostgreSQL 15), bufmgr.h:230 (PostgreSQL 16), bufmgr.h:280 (PostgreSQL 17), bufmgr.h:283 (PostgreSQL 18), bufmgr.h:309 (PostgreSQL 19)

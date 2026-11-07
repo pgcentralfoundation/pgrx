@@ -791,6 +791,7 @@ mod tests {
                     const_capability: ConstCapability::RuntimeOnly,
                     documentation: Box::new(documentation(name)),
                 },
+                fallback: None,
             }
         }
     }

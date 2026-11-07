@@ -129,6 +129,7 @@ impl<'a> AnalysisSession<'a> {
             ExpansionLimits::default(),
             session.expansions.results.len(),
         );
+        inline::expand_bodies(scanner, frontend, &mut session.inline_roots)?;
         session.verify_inputs()?;
         Ok(session)
     }
@@ -212,6 +213,12 @@ impl<'a> AnalysisSession<'a> {
     pub fn verify_inputs(&self) -> Result<(), FrontendError> {
         crate::expansion::verify_environment(self.frontend)?;
         crate::frontend::verify_input_files(self.inputs())
+    }
+
+    /// Analyze an inline function root as a guarded call to the original function, for when
+    /// its translated definition cannot be emitted.
+    pub(crate) fn analyze_inline_call(&self, name: &str) -> Option<MacroAnalysis> {
+        self.inline_roots.get(name)?.analyze_call(self.frontend, name, &self.integer_constants)
     }
 
     /// Analyze a prepared invocation, restore original formal names, and translate preprocessing

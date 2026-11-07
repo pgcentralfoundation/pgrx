@@ -227,7 +227,7 @@ macro_rules! float4_lt {
         )
     };
 }
-/// Typed call adapter for C inline function float4_max from float.h:344 (PostgreSQL 15), float.h:345 (PostgreSQL 16–18), float.h:327 (PostgreSQL 19)
+/// C inline function float4_max from float.h:344 (PostgreSQL 15), float.h:345 (PostgreSQL 16–18), float.h:327 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline float4
@@ -238,7 +238,7 @@ macro_rules! float4_lt {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -254,11 +254,9 @@ macro_rules! float4_max {
             @value {
                 let _ = &$val1;
                 let _ = &$val2;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CFloat
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CFloat
+                >()
             }
         )
     };
@@ -305,7 +303,7 @@ macro_rules! float4_mi {
         )
     };
 }
-/// Typed call adapter for C inline function float4_min from float.h:332 (PostgreSQL 15), float.h:333 (PostgreSQL 16–18), float.h:315 (PostgreSQL 19)
+/// C inline function float4_min from float.h:332 (PostgreSQL 15), float.h:333 (PostgreSQL 16–18), float.h:315 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline float4
@@ -316,7 +314,7 @@ macro_rules! float4_mi {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -332,11 +330,9 @@ macro_rules! float4_min {
             @value {
                 let _ = &$val1;
                 let _ = &$val2;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CFloat
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CFloat
+                >()
             }
         )
     };
@@ -511,7 +507,7 @@ macro_rules! float8_div {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function float8_div from float.h:229 (PostgreSQL 19)
+/// C inline function float8_div from float.h:229 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline float8
@@ -522,7 +518,7 @@ macro_rules! float8_div {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -530,7 +526,7 @@ macro_rules! float8_div {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! float8_div {
     ($val1:expr, $val2:expr $(,)?) => {
@@ -538,11 +534,9 @@ macro_rules! float8_div {
             @value {
                 let _ = &$val1;
                 let _ = &$val2;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CDouble
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CDouble
+                >()
             }
         )
     };
@@ -775,7 +769,7 @@ macro_rules! float8_lt {
         )
     };
 }
-/// Typed call adapter for C inline function float8_max from float.h:350 (PostgreSQL 15), float.h:351 (PostgreSQL 16–18), float.h:333 (PostgreSQL 19)
+/// C inline function float8_max from float.h:350 (PostgreSQL 15), float.h:351 (PostgreSQL 16–18), float.h:333 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline float8
@@ -786,7 +780,7 @@ macro_rules! float8_lt {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -802,11 +796,9 @@ macro_rules! float8_max {
             @value {
                 let _ = &$val1;
                 let _ = &$val2;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CDouble
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CDouble
+                >()
             }
         )
     };
@@ -855,7 +847,7 @@ macro_rules! float8_mi {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function float8_mi from float.h:157 (PostgreSQL 19)
+/// C inline function float8_mi from float.h:157 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline float8
@@ -866,7 +858,7 @@ macro_rules! float8_mi {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -874,7 +866,7 @@ macro_rules! float8_mi {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! float8_mi {
     ($val1:expr, $val2:expr $(,)?) => {
@@ -882,11 +874,9 @@ macro_rules! float8_mi {
             @value {
                 let _ = &$val1;
                 let _ = &$val2;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CDouble
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CDouble
+                >()
             }
         )
     };
@@ -935,7 +925,7 @@ macro_rules! float8_mi_safe {
         )
     };
 }
-/// Typed call adapter for C inline function float8_min from float.h:338 (PostgreSQL 15), float.h:339 (PostgreSQL 16–18), float.h:321 (PostgreSQL 19)
+/// C inline function float8_min from float.h:338 (PostgreSQL 15), float.h:339 (PostgreSQL 16–18), float.h:321 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline float8
@@ -946,7 +936,7 @@ macro_rules! float8_mi_safe {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -962,11 +952,9 @@ macro_rules! float8_min {
             @value {
                 let _ = &$val1;
                 let _ = &$val2;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CDouble
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CDouble
+                >()
             }
         )
     };
@@ -1017,7 +1005,7 @@ macro_rules! float8_mul {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function float8_mul from float.h:191 (PostgreSQL 19)
+/// C inline function float8_mul from float.h:191 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline float8
@@ -1028,7 +1016,7 @@ macro_rules! float8_mul {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1036,7 +1024,7 @@ macro_rules! float8_mul {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! float8_mul {
     ($val1:expr, $val2:expr $(,)?) => {
@@ -1044,11 +1032,9 @@ macro_rules! float8_mul {
             @value {
                 let _ = &$val1;
                 let _ = &$val2;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CDouble
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CDouble
+                >()
             }
         )
     };
@@ -1179,7 +1165,7 @@ macro_rules! float8_pl {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function float8_pl from float.h:127 (PostgreSQL 19)
+/// C inline function float8_pl from float.h:127 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline float8
@@ -1190,7 +1176,7 @@ macro_rules! float8_pl {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1198,7 +1184,7 @@ macro_rules! float8_pl {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! float8_pl {
     ($val1:expr, $val2:expr $(,)?) => {
@@ -1206,11 +1192,9 @@ macro_rules! float8_pl {
             @value {
                 let _ = &$val1;
                 let _ = &$val2;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CDouble
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CDouble
+                >()
             }
         )
     };

@@ -272,7 +272,7 @@ macro_rules! DatumGetTSQuery {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function DatumGetTSQuery from ts_type.h:268 (PostgreSQL 16–18), ts_type.h:269 (PostgreSQL 19)
+/// C inline function DatumGetTSQuery from ts_type.h:268 (PostgreSQL 16–18), ts_type.h:269 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TSQuery
@@ -283,7 +283,7 @@ macro_rules! DatumGetTSQuery {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -291,22 +291,20 @@ macro_rules! DatumGetTSQuery {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetTSQuery {
     ($X:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$X;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::__pgrx_c_bindings::TSQueryData
-                            >,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TSQueryData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
@@ -348,7 +346,7 @@ macro_rules! DatumGetTSQueryCopy {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function DatumGetTSQueryCopy from ts_type.h:274 (PostgreSQL 16–18), ts_type.h:275 (PostgreSQL 19)
+/// C inline function DatumGetTSQueryCopy from ts_type.h:274 (PostgreSQL 16–18), ts_type.h:275 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TSQuery
@@ -359,7 +357,7 @@ macro_rules! DatumGetTSQueryCopy {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -367,22 +365,20 @@ macro_rules! DatumGetTSQueryCopy {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetTSQueryCopy {
     ($X:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$X;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::__pgrx_c_bindings::TSQueryData
-                            >,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TSQueryData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
@@ -424,7 +420,7 @@ macro_rules! DatumGetTSVector {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function DatumGetTSVector from ts_type.h:134 (PostgreSQL 16–19)
+/// C inline function DatumGetTSVector from ts_type.h:134 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline TSVector
@@ -435,7 +431,7 @@ macro_rules! DatumGetTSVector {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -443,22 +439,20 @@ macro_rules! DatumGetTSVector {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetTSVector {
     ($X:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$X;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::__pgrx_c_bindings::TSVectorData
-                            >,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TSVectorData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
@@ -500,7 +494,7 @@ macro_rules! DatumGetTSVectorCopy {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function DatumGetTSVectorCopy from ts_type.h:140 (PostgreSQL 16–19)
+/// C inline function DatumGetTSVectorCopy from ts_type.h:140 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline TSVector
@@ -511,7 +505,7 @@ macro_rules! DatumGetTSVectorCopy {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -519,22 +513,20 @@ macro_rules! DatumGetTSVectorCopy {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! DatumGetTSVectorCopy {
     ($X:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$X;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::__pgrx_c_bindings::TSVectorData
-                            >,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TSVectorData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };
@@ -861,7 +853,7 @@ macro_rules! PG_GETARG_TSQUERY {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_TSQUERY {
     ($n:expr, $fcinfo:expr $(,)?) => {
@@ -937,7 +929,7 @@ macro_rules! PG_GETARG_TSQUERY_COPY {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_TSQUERY_COPY {
     ($n:expr, $fcinfo:expr $(,)?) => {
@@ -1013,7 +1005,7 @@ macro_rules! PG_GETARG_TSVECTOR {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_TSVECTOR {
     ($n:expr, $fcinfo:expr $(,)?) => {
@@ -1089,7 +1081,7 @@ macro_rules! PG_GETARG_TSVECTOR_COPY {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_GETARG_TSVECTOR_COPY {
     ($n:expr, $fcinfo:expr $(,)?) => {
@@ -1110,8 +1102,7 @@ macro_rules! PG_GETARG_TSVECTOR_COPY {
         )
     };
 }
-#[cfg(feature = "pg15")]
-/// C macro PG_RETURN_TSQUERY from ts_type.h:258 (PostgreSQL 15)
+/// C macro PG_RETURN_TSQUERY from ts_type.h:258 (PostgreSQL 15), ts_type.h:288 (PostgreSQL 16–18), ts_type.h:289 (PostgreSQL 19)
 ///
 /// ```text
 /// #define PG_RETURN_TSQUERY( x ) return TSQueryGetDatum ( x )
@@ -1136,34 +1127,7 @@ macro_rules! PG_RETURN_TSQUERY {
         $crate::__pgrx_c_documentation_shell!()
     };
 }
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro PG_RETURN_TSQUERY from ts_type.h:288 (PostgreSQL 16–18), ts_type.h:289 (PostgreSQL 19)
-///
-/// ```text
-/// #define PG_RETURN_TSQUERY( x ) return TSQueryGetDatum ( x )
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_caller_returns!()]
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! PG_RETURN_TSQUERY {
-    ($x:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-    (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-#[cfg(feature = "pg15")]
-/// C macro PG_RETURN_TSVECTOR from ts_type.h:139 (PostgreSQL 15)
+/// C macro PG_RETURN_TSVECTOR from ts_type.h:139 (PostgreSQL 15), ts_type.h:154 (PostgreSQL 16–19)
 ///
 /// ```text
 /// #define PG_RETURN_TSVECTOR( x ) return TSVectorGetDatum ( x )
@@ -1179,32 +1143,6 @@ macro_rules! PG_RETURN_TSQUERY {
 /// # Panics
 ///
 /// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! PG_RETURN_TSVECTOR {
-    ($x:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-    (@__pgrx_c_return_as [$__pgrx_c_return:ty]; $x:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!()
-    };
-}
-#[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// C macro PG_RETURN_TSVECTOR from ts_type.h:154 (PostgreSQL 16–19)
-///
-/// ```text
-/// #define PG_RETURN_TSVECTOR( x ) return TSVectorGetDatum ( x )
-/// ```
-///
-///
-#[doc = crate::__pgrx_c_doc_caller_returns!()]
-///
-/// # Safety
-///
-#[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! PG_RETURN_TSVECTOR {
     ($x:expr $(,)?) => {
@@ -1553,7 +1491,7 @@ macro_rules! TSQueryGetDatum {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function TSQueryGetDatum from ts_type.h:280 (PostgreSQL 16–18), ts_type.h:281 (PostgreSQL 19)
+/// C inline function TSQueryGetDatum from ts_type.h:280 (PostgreSQL 16–18), ts_type.h:281 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline Datum
@@ -1564,7 +1502,7 @@ macro_rules! TSQueryGetDatum {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1572,20 +1510,14 @@ macro_rules! TSQueryGetDatum {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! TSQueryGetDatum {
     ($X:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$X;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLong,
-                            $crate::__pgrx_c_bindings::Datum
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::Datum>()
             }
         )
     };
@@ -1625,7 +1557,7 @@ macro_rules! TSVectorGetDatum {
     };
 }
 #[cfg(any(feature = "pg16", feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function TSVectorGetDatum from ts_type.h:146 (PostgreSQL 16–19)
+/// C inline function TSVectorGetDatum from ts_type.h:146 (PostgreSQL 16–19)
 ///
 /// ```c
 /// static inline Datum
@@ -1636,7 +1568,7 @@ macro_rules! TSVectorGetDatum {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -1644,20 +1576,14 @@ macro_rules! TSVectorGetDatum {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! TSVectorGetDatum {
     ($X:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$X;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLong,
-                            $crate::__pgrx_c_bindings::Datum
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_types::Datum>()
             }
         )
     };

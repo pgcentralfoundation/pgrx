@@ -178,17 +178,32 @@ lists. Active C macros win any name collision; no function adapter is inserted i
 the actual macro inventory or preprocessing environment, and `list` still shows
 only original macro definitions.
 
-An inline adapter calls the original function through its verified prototype,
-evaluates each argument once, and preserves C conversions, pointer qualifiers and
-the actual return type. `.get()` extracts native storage, including `()` for a void
-return. When a macro becomes an inline function, its return rank or evaluation
-rules can therefore change with PostgreSQL. Predicate callers can use `.is_true()`
-for either C `int` or C `bool`; this explicitly converts truth without changing
-`.get()` or the original C identity. Native calls retain generated FFI guards and
-require the original function's unsafe caller contract.
+An inline adapter evaluates each argument once and preserves C conversions,
+pointer qualifiers and the actual return type. When the analyzer supports every
+statement of the definition's body, and no macro the body reaches is defined
+again after the definition, even identically, the adapter translates that body;
+otherwise it calls the original function through its verified prototype. When the
+preprocessor enters a header more than once, as for a template included twice,
+only functions its first entry defines are translated. A translation evaluates
+every argument before its
+body runs, and the arguments' temporaries live until it finishes, as they do for a
+call. Generated calls to a translated function expand its translation. `.get()`
+extracts native storage, including `()` for a void return. When a macro becomes
+an inline function, its return rank or evaluation rules can therefore change with
+PostgreSQL, and so can whether a call needs `unsafe`. Whether a body is translated
+also depends on the build and on the libclang that inspects it. An
+`--enable-cassert` build's `Assert` reports its file and line, which keeps a body
+that uses it native. Some libclang releases locate a statement that starts with a
+macro at the macro's definition, which also keeps the body native. Predicate
+callers can use `.is_true()` for either C `int` or C `bool`; this explicitly
+converts truth without changing `.get()` or the original C identity. Native calls
+retain generated FFI guards and require the original function's unsafe caller
+contract.
 
 `emit` writes Rust source to stdout and skip reasons to stderr. JSON output contains
-the compilation profile, analysis, source, and structured skips. Emitted source
+the compilation profile, analysis, source, and structured skips. An inline function
+whose translation could not be rendered, for example because bindgen and Clang
+disagree about a constant it uses, records that reason as `fallback`. Emitted source
 uses `$crate::__pgrx_c_macros`, provided by `pgrx-pg-sys`, and includes a target guard.
 Each generated macro's `///` doc comments include its source location and full unexpanded
 C macro definition in a fenced `text` block. As in `list` output, whitespace is normalized
@@ -582,9 +597,11 @@ emitting a reference; callers must supply the catalog from the defining crate's
 generated bindings. The catalog describes only those bindings: it cannot claim a
 generated callback signature, function address getter, or field or offset
 adapter. `emit_with_bindings` generates none of these, so it skips a macro that
-needs one. It also skips a call whose C prototype passes or returns plain `char`,
-an enum or a record by value. The catalog's Rust storage for such a function
-cannot prove its call ABI, and only a generated C adapter can make that call.
+needs one. Nor can the catalog mark an inline function as translated, so a call
+from `emit_with_bindings` output never expands a translated body. It also skips
+a call whose C prototype passes or returns plain `char`, an enum or a record by
+value. The catalog's Rust storage for such a function cannot prove its call ABI,
+and only a generated C adapter can make that call.
 Output from `emit_with_bindings` can still name a C enum's generated identity,
 which only the support from `generate_with_bindings` defines.
 Generators should use `generate_with_bindings` to prepare the macro set and its

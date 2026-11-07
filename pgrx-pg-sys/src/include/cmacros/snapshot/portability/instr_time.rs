@@ -1244,7 +1244,7 @@ macro_rules! pg_clock_gettime_ns {
     };
 }
 #[cfg(feature = "pg19")]
-/// Typed call adapter for C inline function pg_current_timing_clock_source from instr_time.h:185 (PostgreSQL 19)
+/// C inline function pg_current_timing_clock_source from instr_time.h:185 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline TimingClockSourceType
@@ -1259,28 +1259,22 @@ macro_rules! pg_clock_gettime_ns {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! pg_current_timing_clock_source {
     () => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CEnumObject<
-                            $crate::__pgrx_c_generated::EnumIdentity_TimingClockSourceType,
-                            $crate::__pgrx_c_macros::CUnsignedInt,
-                            u32
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CEnumObject<
+                        $crate::__pgrx_c_generated::EnumIdentity_TimingClockSourceType,
+                        $crate::__pgrx_c_macros::CUnsignedInt,
+                        u32
+                    >>()
             }
         )
     };

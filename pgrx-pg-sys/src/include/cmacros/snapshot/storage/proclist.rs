@@ -334,7 +334,7 @@ macro_rules! proclist_delete_offset {
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16"))]
-/// Typed call adapter for C inline function proclist_init from proclist.h:28 (PostgreSQL 15–16)
+/// C inline function proclist_init from proclist.h:28 (PostgreSQL 15–16)
 ///
 /// ```c
 /// static inline void
@@ -345,28 +345,22 @@ macro_rules! proclist_delete_offset {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! proclist_init {
     ($list:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$list;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$list;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function proclist_init from proclist.h:28 (PostgreSQL 17–19)
+/// C inline function proclist_init from proclist.h:28 (PostgreSQL 17–19)
 ///
 /// ```c
 /// static inline void
@@ -377,7 +371,7 @@ macro_rules! proclist_init {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -385,20 +379,18 @@ macro_rules! proclist_init {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! proclist_init {
     ($list:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$list;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$list;
+            ()
+        })
     };
 }
 #[cfg(feature = "pg15")]
-/// Typed call adapter for C inline function proclist_is_empty from proclist.h:37 (PostgreSQL 15)
+/// C inline function proclist_is_empty from proclist.h:37 (PostgreSQL 15)
 ///
 /// ```c
 /// static inline bool
@@ -409,32 +401,24 @@ macro_rules! proclist_init {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! proclist_is_empty {
     ($list:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$list;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
 #[cfg(feature = "pg16")]
-/// Typed call adapter for C inline function proclist_is_empty from proclist.h:37 (PostgreSQL 16)
+/// C inline function proclist_is_empty from proclist.h:37 (PostgreSQL 16)
 ///
 /// ```c
 /// static inline bool
@@ -445,32 +429,24 @@ macro_rules! proclist_is_empty {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
 #[doc = crate::__pgrx_c_doc_safety!()]
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! proclist_is_empty {
     ($list:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$list;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
 #[cfg(any(feature = "pg17", feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function proclist_is_empty from proclist.h:37 (PostgreSQL 17–19)
+/// C inline function proclist_is_empty from proclist.h:37 (PostgreSQL 17–19)
 ///
 /// ```c
 /// static inline bool
@@ -481,7 +457,7 @@ macro_rules! proclist_is_empty {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -489,23 +465,19 @@ macro_rules! proclist_is_empty {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! proclist_is_empty {
     ($list:expr $(,)?) => {
         $crate::__pgrx_c_documentation_shell!(
             @value {
                 let _ = &$list;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::CBool
-                    >()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<$crate::__pgrx_c_macros::CBool>()
             }
         )
     };
 }
-/// Typed call adapter for C inline function proclist_node_get from proclist.h:47 (PostgreSQL 15–19)
+/// C inline function proclist_node_get from proclist.h:47 (PostgreSQL 15–19)
 ///
 /// ```c
 /// static inline proclist_node *
@@ -518,7 +490,7 @@ macro_rules! proclist_is_empty {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -526,7 +498,7 @@ macro_rules! proclist_is_empty {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! proclist_node_get {
     ($procno:expr, $node_offset:expr $(,)?) => {
@@ -534,15 +506,13 @@ macro_rules! proclist_node_get {
             @value {
                 let _ = &$procno;
                 let _ = &$node_offset;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::__pgrx_c_macros::expression::type_witness::<
-                        $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::__pgrx_c_bindings::proclist_node
-                            >,
-                            $crate::__pgrx_c_macros::expression::ReadWrite
-                        >>()
-                )
+                $crate::__pgrx_c_macros::expression::type_witness::<
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::proclist_node
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    >>()
             }
         )
     };

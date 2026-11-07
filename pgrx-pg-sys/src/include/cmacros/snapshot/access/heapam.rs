@@ -34,7 +34,7 @@ macro_rules! HeapScanIsValid {
     };
 }
 #[cfg(any(feature = "pg18", feature = "pg19"))]
-/// Typed call adapter for C inline function heap_execute_freeze_tuple from heapam.h:440 (PostgreSQL 18), heapam.h:532 (PostgreSQL 19)
+/// C inline function heap_execute_freeze_tuple from heapam.h:440 (PostgreSQL 18), heapam.h:532 (PostgreSQL 19)
 ///
 /// ```c
 /// static inline void
@@ -54,7 +54,7 @@ macro_rules! HeapScanIsValid {
 /// ```
 ///
 ///
-#[doc = crate::__pgrx_c_doc_inline_call!()]
+#[doc = crate::__pgrx_c_doc_inline_body!()]
 ///
 /// # Safety
 ///
@@ -62,17 +62,15 @@ macro_rules! HeapScanIsValid {
 ///
 /// # Panics
 ///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
 macro_rules! heap_execute_freeze_tuple {
     ($tuple:expr, $frz:expr $(,)?) => {
-        $crate::__pgrx_c_documentation_shell!(
-            @value {
-                let _ = &$tuple;
-                let _ = &$frz;
-                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(())
-            }
-        )
+        $crate::__pgrx_c_documentation_shell!(@value {
+            let _ = &$tuple;
+            let _ = &$frz;
+            ()
+        })
     };
 }
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17", feature = "pg18"))]

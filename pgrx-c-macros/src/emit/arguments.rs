@@ -382,7 +382,7 @@ pub(super) fn shared(exports: &BTreeSet<String>, operands: bool) -> Result<Strin
          (@check_safety; (@literal $argument:tt)) => {};\n\
          (@check_safety; (@unused)) => {};\n\
          (@check_safety; (@macro [$($path:tt)*] [$($arguments:tt)*])) => { $($path)* !(@__pgrx_c_check_safety; $($arguments)*) };\n\
-         (@check_safety; (@compiled $value:tt $place:tt $read:tt [$($size:tt)*])) => { { let _ = $($size)*; } };\n\
+         (@check_safety; (@compiled $value:tt $place:tt $read:tt $size:tt [$($checks:tt)*])) => { $($checks)* };\n\
          (@value [$floats:tt]; (@native [$expression:expr])) => { $crate::__pgrx_c_macros::expression::profile_input::<$floats, _>($expression) };\n\
          (@place; (@native [$expression:expr])) => { $crate::__pgrx_c_macros::expression::native_place(::core::ptr::addr_of_mut!($expression)) };\n\
          (@read_place; (@native [$expression:expr])) => { $crate::__pgrx_c_macros::expression::native_const_place(::core::ptr::addr_of!($expression)) };\n\
@@ -403,11 +403,11 @@ pub(super) fn shared(exports: &BTreeSet<String>, operands: bool) -> Result<Strin
          (@read_place; (@macro [$($path:tt)*] [$($arguments:tt)*])) => { $($path)* !(@__pgrx_c_read_place; $($arguments)*) };\n\
          (@size; (@macro [$($path:tt)*] [$($arguments:tt)*])) => { $($path)* !(@__pgrx_c_size; $($arguments)*) };\n\
          (@discard [$floats:tt]; (@macro [$($path:tt)*] [$($arguments:tt)*])) => { $($path)* !(@__pgrx_c_discard; $($arguments)*) };\n\
-         (@value [$floats:tt]; (@compiled [$($value:tt)*] $place:tt $read:tt $size:tt)) => { $($value)* };\n\
-         (@place; (@compiled $value:tt [$($place:tt)*] $read:tt $size:tt)) => { $($place)* };\n\
-         (@read_place; (@compiled $value:tt $place:tt [$($read:tt)*] $size:tt)) => { $($read)* };\n\
-         (@size; (@compiled $value:tt $place:tt $read:tt [$($size:tt)*])) => { $($size)* };\n\
-         (@discard [$floats:tt]; (@compiled [$($value:tt)*] $place:tt $read:tt $size:tt)) => { { let _ = $($value)*; } };\n\
+         (@value [$floats:tt]; (@compiled [$($value:tt)*] $place:tt $read:tt $size:tt $checks:tt)) => { $($value)* };\n\
+         (@place; (@compiled $value:tt [$($place:tt)*] $read:tt $size:tt $checks:tt)) => { $($place)* };\n\
+         (@read_place; (@compiled $value:tt $place:tt [$($read:tt)*] $size:tt $checks:tt)) => { $($read)* };\n\
+         (@size; (@compiled $value:tt $place:tt $read:tt [$($size:tt)*] $checks:tt)) => { $($size)* };\n\
+         (@discard [$floats:tt]; (@compiled [$($value:tt)*] $place:tt $read:tt $size:tt $checks:tt)) => { { let _ = $($value)*; } };\n\
          ($($invalid:tt)*) => { ::core::compile_error!(\"invalid C macro operand context\") };\n}\n"
     );
     if rust.len() > MAX_EMISSION_BYTES {
