@@ -890,4 +890,94 @@ mod tests {
         assert_eq!(result, 10_000);
         Ok(())
     }
+
+    /// Build a two-attribute Dog tuple with `scritches` set to 3.
+    fn scritched_dog()
+    -> (pgrx::PgTupleDesc<'static>, pgrx::PgBox<pg_sys::HeapTupleData, AllocatedByRust>) {
+        let tupdesc = pgrx::PgTupleDesc::for_composite_type("Dog").unwrap();
+        let mut dog = PgHeapTuple::new_composite_type("Dog").unwrap();
+        dog.set_by_name("scritches", 3_i32).unwrap();
+        let tuple = pgrx::htup::composite_row_type_make_tuple(dog.into_composite_datum().unwrap());
+        (tupdesc, tuple)
+    }
+
+    #[pg_test(error = "no attribute")]
+    fn test_htup_heap_getattr_rejects_attno_past_tupdesc() {
+        let (tupdesc, tuple) = scritched_dog();
+        let scritches = NonZeroUsize::new(2).unwrap();
+        assert_eq!(pgrx::htup::heap_getattr::<i32, _>(&tuple, scritches, &tupdesc), Some(3));
+
+        let past_end = NonZeroUsize::new(3).unwrap();
+        let _ = pgrx::htup::heap_getattr::<i32, _>(&tuple, past_end, &tupdesc);
+    }
+
+    #[pg_test(error = "no attribute")]
+    fn test_htup_heap_getattr_datum_ex_rejects_attno_past_tupdesc() {
+        let (tupdesc, tuple) = scritched_dog();
+        // SAFETY: `tuple` owns this HeapTupleData and outlives the borrowed view.
+        let borrowed = unsafe { pgrx::PgBox::<pg_sys::HeapTupleData>::from_pg(tuple.as_ptr()) };
+        let scritches = NonZeroUsize::new(2).unwrap();
+        let attr = pgrx::htup::heap_getattr_datum_ex(&borrowed, scritches, &tupdesc);
+        assert_eq!(attr.into_value::<i32>(), 3);
+
+        let past_end = NonZeroUsize::new(3).unwrap();
+        let _ = pgrx::htup::heap_getattr_datum_ex(&borrowed, past_end, &tupdesc);
+    }
+
+    /// Read a by-value attribute of each width, plus a varlena, from tuples with and without a
+    /// NULL. Reading twice without NULLs makes the second pass use the offsets that the first
+    /// pass cached in the descriptor.
+    #[pg_test]
+    fn test_heap_tuple_reads_each_by_value_width() {
+        Spi::run(
+            r#"CREATE TYPE FetchWidths AS (b bool, c "char", s int2, i int4, l int8, t text)"#,
+        )
+        .unwrap();
+        let mut row = PgHeapTuple::new_composite_type("FetchWidths").unwrap();
+        row.set_by_name("b", true).unwrap();
+        row.set_by_name("c", -3_i8).unwrap();
+        row.set_by_name("s", -2_i16).unwrap();
+        row.set_by_name("i", -4_i32).unwrap();
+        row.set_by_name("t", "text").unwrap();
+
+        // `l` is NULL, so reads check the NULL bitmap before calling nocachegetattr.
+        assert_eq!(row.get_by_name::<i64>("l").unwrap(), None);
+        assert_eq!(row.get_by_name::<i8>("c").unwrap(), Some(-3));
+        assert_eq!(row.get_by_name::<String>("t").unwrap().as_deref(), Some("text"));
+
+        row.set_by_name("l", -8_i64).unwrap();
+        for _ in 0..2 {
+            assert_eq!(row.get_by_name::<bool>("b").unwrap(), Some(true));
+            assert_eq!(row.get_by_name::<i8>("c").unwrap(), Some(-3));
+            assert_eq!(row.get_by_name::<i16>("s").unwrap(), Some(-2));
+            assert_eq!(row.get_by_name::<i32>("i").unwrap(), Some(-4));
+            assert_eq!(row.get_by_name::<i64>("l").unwrap(), Some(-8));
+            assert_eq!(row.get_by_name::<String>("t").unwrap().as_deref(), Some("text"));
+        }
+    }
+
+    /// A row stored before `ALTER TYPE ... ADD ATTRIBUTE` has fewer attributes than the
+    /// descriptor, so reading the new attribute goes through getmissingattr.
+    #[pg_test]
+    fn test_heap_getattr_reads_attribute_added_after_the_row() -> Result<(), spi::Error> {
+        Spi::run(
+            "CREATE TYPE GrowingDog AS (name text, scritches int4);
+             CREATE TABLE growing_dogs (dog GrowingDog);
+             INSERT INTO growing_dogs VALUES (ROW('Nami', 7));
+             ALTER TYPE GrowingDog ADD ATTRIBUTE age int4 CASCADE;",
+        )?;
+        let scritches = NonZeroUsize::new(2).unwrap();
+        let age = NonZeroUsize::new(3).unwrap();
+        Spi::connect(|client| {
+            let row = client.select("SELECT dog FROM growing_dogs", None, &[])?.first();
+            let datum = row.get_datum_by_ordinal(1)?.expect("stored dog is not NULL");
+
+            // SAFETY: `datum` is a live GrowingDog composite read from the SPI tuple.
+            let dog = unsafe { PgHeapTuple::from_composite_datum(datum) };
+            assert_eq!(dog.len(), 3);
+            assert_eq!(dog.get_by_index::<i32>(scritches)?, Some(7));
+            assert_eq!(dog.get_by_index::<i32>(age)?, None);
+            Ok(())
+        })
+    }
 }

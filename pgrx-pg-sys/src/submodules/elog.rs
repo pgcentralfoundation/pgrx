@@ -426,12 +426,6 @@ macro_rules! ereport {
     };
 }
 
-/// Is an interrupt pending?
-#[inline]
-pub fn interrupt_pending() -> bool {
-    unsafe { crate::InterruptPending != 0 }
-}
-
 /// Send some kind of message to Postgres similar to the ereport macro, while specifying
 /// a text domain, analogous to Postgres' `ereport_domain` C macro.
 ///
@@ -569,20 +563,6 @@ macro_rules! ereport_domain {
                 .set_domain($domain)
                 $(.set_detail($detail))?
                 .report($loglevel);
-        }
-    };
-}
-
-/// If an interrupt is pending (perhaps a user-initiated "cancel query" message to this backend),
-/// this will safely abort the current transaction
-#[macro_export]
-macro_rules! check_for_interrupts {
-    () => {
-        #[allow(unused_unsafe)]
-        unsafe {
-            if $crate::InterruptPending != 0 {
-                $crate::ProcessInterrupts();
-            }
         }
     };
 }

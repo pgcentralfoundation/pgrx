@@ -9,7 +9,6 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Helper functions for working with Postgres `enum` types
 
-use crate::pg_sys::GETSTRUCT;
 use crate::{PgLogLevel, PgSqlErrorCode, ereport, pg_sys};
 
 pub fn lookup_enum_by_oid(enumval: pg_sys::Oid) -> (String, pg_sys::Oid, f32) {
@@ -30,7 +29,8 @@ pub fn lookup_enum_by_oid(enumval: pg_sys::Oid) -> (String, pg_sys::Oid, f32) {
         );
     }
 
-    let en = unsafe { GETSTRUCT(tup) } as pg_sys::Form_pg_enum;
+    // SAFETY: the successful syscache lookup pins the initialized pg_enum tuple until release.
+    let en = unsafe { pg_sys::GETSTRUCT!(tup).get() }.cast::<pg_sys::FormData_pg_enum>();
     let en = unsafe { en.as_ref() }.unwrap();
     let result = (
         unsafe {
@@ -53,7 +53,7 @@ pub fn lookup_enum_by_oid(enumval: pg_sys::Oid) -> (String, pg_sys::Oid, f32) {
 pub fn lookup_enum_by_label(typname: &str, label: &str) -> pg_sys::Datum {
     let enumtypoid = crate::regtypein(typname);
 
-    if enumtypoid == pg_sys::InvalidOid {
+    if enumtypoid == pg_sys::Oid::INVALID {
         panic!("could not locate type oid for type: {typname}");
     }
 
@@ -81,11 +81,12 @@ pub fn lookup_enum_by_label(typname: &str, label: &str) -> pg_sys::Datum {
     }
 }
 
+/// # Safety
+/// `tup` must be a pinned, initialized pg_enum syscache tuple until this read completes.
 unsafe fn extract_enum_oid(tup: *mut pg_sys::HeapTupleData) -> pg_sys::Oid {
-    let en = {
-        // SAFETY:  the caller has assured us that `tup` is a valid HeapTupleData pointer
-        GETSTRUCT(tup) as pg_sys::Form_pg_enum
-    };
-    let en = en.as_ref().unwrap();
-    en.oid
+    // SAFETY: the caller keeps the pg_enum tuple pinned and initialized for this access.
+    unsafe {
+        let en = pg_sys::GETSTRUCT!(tup).get().cast::<pg_sys::FormData_pg_enum>();
+        (*en).oid
+    }
 }

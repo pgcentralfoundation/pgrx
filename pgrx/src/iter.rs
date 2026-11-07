@@ -11,7 +11,6 @@
 use core::{iter, ptr};
 
 use crate::callconv::{BoxRet, CallCx, RetAbi};
-use crate::fcinfo::{pg_return_null, srf_is_first_call, srf_return_done, srf_return_next};
 use crate::ptr::PointerExt;
 use crate::{IntoDatum, IntoHeapTuple, PgMemoryContexts, pg_sys};
 use pgrx_sql_entity_graph::metadata::{
@@ -215,10 +214,6 @@ where
         };
         IterRet(step)
     }
-
-    unsafe fn finish_call_fcinfo(fcinfo: pg_sys::FunctionCallInfo) {
-        unsafe { TableIterator::<(T,)>::finish_call_fcinfo(fcinfo) }
-    }
 }
 
 unsafe impl<Row> RetAbi for TableIterator<'_, Row>
@@ -230,8 +225,8 @@ where
 
     unsafe fn check_fcinfo_and_prepare(fcinfo: pg_sys::FunctionCallInfo) -> CallCx {
         unsafe {
-            if srf_is_first_call(fcinfo) {
-                let fn_call_cx = pg_sys::init_MultiFuncCall(fcinfo);
+            if pg_sys::SRF_IS_FIRSTCALL!(fcinfo).get() != 0 {
+                let fn_call_cx = pg_sys::SRF_FIRSTCALL_INIT!(fcinfo).get();
                 CallCx::WrappedFn((*fn_call_cx).multi_call_memory_ctx)
             } else {
                 CallCx::RestoreCx
@@ -263,8 +258,13 @@ where
 
         unsafe {
             let fcx = deref_fcx(fcinfo);
-            srf_return_next(fcinfo, fcx);
-            <Row as RetAbi>::box_ret_in_fcinfo(fcinfo, value.to_ret())
+            // SAFETY: the initialized SRF context and ReturnSetInfo belong to this call.
+            // The macro records the next row before invoking the row's return conversion.
+            pg_sys::SRF_RETURN_NEXT!(
+                fcx,
+                <Row as RetAbi>::box_ret_in_fcinfo(fcinfo, value.to_ret()),
+                fcinfo
+            );
         }
     }
 
@@ -290,13 +290,6 @@ where
             Some(value) => Step::Once(value),
         })
     }
-
-    unsafe fn finish_call_fcinfo(fcinfo: pg_sys::FunctionCallInfo) {
-        unsafe {
-            let fcx = deref_fcx(fcinfo);
-            srf_return_done(fcinfo, fcx)
-        }
-    }
 }
 
 /// How iterators are returned
@@ -312,13 +305,25 @@ enum Step<T: RetAbi> {
 pub(crate) unsafe fn empty_srf(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
     unsafe {
         let fcx = deref_fcx(fcinfo);
-        srf_return_done(fcinfo, fcx);
-        pg_return_null(fcinfo)
+        // SAFETY: the initialized SRF context belongs to fcinfo and is no longer used.
+        pg_sys::SRF_RETURN_DONE!(fcx, fcinfo);
     }
 }
 
-/// "per_MultiFuncCall" but no FFI cost
-pub(crate) unsafe fn deref_fcx(fcinfo: pg_sys::FunctionCallInfo) -> *mut pg_sys::FuncCallContext {
+/// Return the SRF's `FuncCallContext`, as `SRF_PERCALL_SETUP` does.
+///
+/// PostgreSQL 15 through 19 define `per_MultiFuncCall` in funcapi.c as
+/// `return (FuncCallContext *) fcinfo->flinfo->fn_extra;`. It is an exported
+/// function, so `SRF_PERCALL_SETUP!` makes a guarded FFI call (a thread check and a
+/// `sigsetjmp`) every time; this runs several times per returned row.
+///
+/// # Safety
+///
+/// `fcinfo` and its `flinfo` must be live. The result is the `FuncCallContext` only
+/// after `SRF_FIRSTCALL_INIT!` has stored it in `fn_extra`.
+#[inline]
+unsafe fn deref_fcx(fcinfo: pg_sys::FunctionCallInfo) -> *mut pg_sys::FuncCallContext {
+    // SAFETY: the caller guarantees that fcinfo and its flinfo are live.
     unsafe { (*(*fcinfo).flinfo).fn_extra.cast() }
 }
 
@@ -419,7 +424,11 @@ macro_rules! impl_table_iter {
                 unsafe {
                     let fcx = deref_fcx(fcinfo);
                     let heap_tuple = ret.into_heap_tuple((*fcx).tuple_desc);
-                    pg_sys::HeapTupleHeaderGetDatum((*heap_tuple).t_data)
+                    // C return conversion rebuilds the tuple pointer with the provenance
+                    // that HeapTupleGetDatum! exposed, as `Datum::from(.get() as usize)` does.
+                    pg_sys::__pgrx_c_macros::expression_result::return_value::<pg_sys::Datum, _>(
+                        pg_sys::HeapTupleGetDatum!(heap_tuple).into_value(),
+                    )
                 }
             }
 

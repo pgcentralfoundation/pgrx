@@ -144,8 +144,10 @@ impl<'a> PgTupleDesc<'a> {
     /// wrap the `pg_sys::TupleDesc` contained by the specified `PgRelation`
     pub fn from_relation(parent: &PgRelation) -> PgTupleDesc<'_> {
         PgTupleDesc {
-            // SAFETY:  `parent` is a Rust reference, and as such its rd_att attribute will be property initialized
-            tupdesc: Some(unsafe { PgBox::from_pg(parent.rd_att) }),
+            // SAFETY: parent keeps this initialized relation descriptor alive for the returned borrow.
+            tupdesc: Some(unsafe {
+                PgBox::from_pg(pg_sys::RelationGetDescr!(parent.as_ptr()).get())
+            }),
             parent: Some(parent),
             need_release: false,
             need_pfree: false,
@@ -186,7 +188,7 @@ impl<'a> PgTupleDesc<'a> {
     /// of its name.
     pub fn for_composite_type_by_oid(typoid: pg_sys::Oid) -> Option<PgTupleDesc<'a>> {
         unsafe {
-            if typoid == pg_sys::InvalidOid {
+            if typoid == pg_sys::Oid::INVALID {
                 return None;
             }
 
@@ -227,7 +229,11 @@ impl<'a> PgTupleDesc<'a> {
         if i >= self.len() {
             None
         } else {
-            Some(tupdesc_get_attr(self.tupdesc.as_ref().unwrap(), i))
+            let tupdesc = self.tupdesc.as_ref().unwrap().as_ptr();
+            // SAFETY: i is in bounds, and self keeps the descriptor alive for this borrow.
+            let attr = unsafe { tupdesc_attr(tupdesc, i) };
+            // SAFETY: the address is the initialized in-bounds attribute in this descriptor.
+            Some(unsafe { &*attr })
         }
     }
 
@@ -268,7 +274,8 @@ impl Drop for PgTupleDesc<'_> {
         if self.tupdesc.is_some() {
             let tupdesc = self.tupdesc.take().unwrap();
             if self.need_release {
-                unsafe { release_tupdesc(tupdesc.as_ptr()) }
+                // SAFETY: This owner holds the descriptor reference released by this branch.
+                unsafe { pg_sys::ReleaseTupleDesc!(tupdesc.as_ptr()) }
             } else if self.need_pfree {
                 unsafe { pg_sys::pfree(tupdesc.as_ptr() as void_mut_ptr) }
             }
@@ -276,34 +283,54 @@ impl Drop for PgTupleDesc<'_> {
     }
 }
 
-pub unsafe fn release_tupdesc(ptr: pg_sys::TupleDesc) {
-    if (*ptr).tdrefcount >= 0 {
-        pg_sys::DecrTupleDescRefCount(ptr)
-    }
-}
-
-/// `attno` is 0-based
+/// Return attribute `i` of `tupdesc`, as `TupleDescAttr(tupdesc, i)` does.
+///
+/// PG15-17 define `TupleDescAttr` as the macro `(&(tupdesc)->attrs[(i)])`, which translates to
+/// pure Rust.
+///
+/// # Safety
+///
+/// `tupdesc` must be live and `i` less than its attribute count.
 #[cfg(any(feature = "pg15", feature = "pg16", feature = "pg17"))]
 #[inline]
-fn tupdesc_get_attr(
-    tupdesc: &PgBox<pg_sys::TupleDescData>,
-    attno: usize,
-) -> &pg_sys::FormData_pg_attribute {
-    let atts = unsafe { tupdesc.attrs.as_slice(tupdesc.natts as usize) };
-    &atts[attno]
+pub(crate) unsafe fn tupdesc_attr(
+    tupdesc: pg_sys::TupleDesc,
+    i: usize,
+) -> *mut pg_sys::FormData_pg_attribute {
+    // SAFETY: the caller supplies a live descriptor and an index below natts, a C int.
+    unsafe { pg_sys::TupleDescAttr!(tupdesc, i as core::ffi::c_int).get() }
 }
 
-/// `attno` is 0-based
+/// Return attribute `i` of `tupdesc`, as `TupleDescAttr(tupdesc, i)` does.
+///
+/// PG18 and PG19 store the `FormData_pg_attribute` array after `natts` `CompactAttribute`s.
+/// Their static inline `TupleDescAttr` returns `&TupleDescAttrAddress(tupdesc)[i]`, where
+/// `TupleDescAttrAddress(desc)` is `(char *) desc + offsetof(TupleDescData, compact_attrs) +
+/// desc->natts * sizeof(CompactAttribute)`. The header undefines that macro right after the
+/// function, so the generated `TupleDescAttr!` is a guarded native call; this per-attribute
+/// lookup computes the address in Rust instead.
+///
+/// # Safety
+///
+/// `tupdesc` must be live and `i` less than its attribute count.
 #[cfg(any(feature = "pg18", feature = "pg19"))]
 #[inline]
-fn tupdesc_get_attr(
-    tupdesc: &PgBox<pg_sys::TupleDescData>,
-    attno: usize,
-) -> &pg_sys::FormData_pg_attribute {
-    let att_pointer =
-        unsafe { tupdesc.compact_attrs.as_ptr().add(tupdesc.natts.try_into().unwrap()).cast() };
-    let atts = unsafe { std::slice::from_raw_parts(att_pointer, tupdesc.natts as usize) };
-    &atts[attno]
+pub(crate) unsafe fn tupdesc_attr(
+    tupdesc: pg_sys::TupleDesc,
+    i: usize,
+) -> *mut pg_sys::FormData_pg_attribute {
+    // SAFETY: the caller supplies a live descriptor, whose allocation holds natts compact
+    // attributes followed by natts attributes, and an index below natts. The raw place
+    // projection keeps the descriptor's provenance for those trailing arrays.
+    unsafe {
+        let natts = usize::try_from((*tupdesc).natts).expect("natts must be non-negative");
+        let attrs = core::ptr::addr_of_mut!((*tupdesc).compact_attrs)
+            .cast::<pg_sys::CompactAttribute>()
+            .add(natts)
+            .cast::<pg_sys::FormData_pg_attribute>();
+        debug_assert!(attrs.is_aligned());
+        attrs.add(i)
+    }
 }
 
 pub struct TupleDescIterator<'a> {

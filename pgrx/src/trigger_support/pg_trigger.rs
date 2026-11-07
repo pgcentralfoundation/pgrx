@@ -13,7 +13,6 @@ use crate::pgbox::AllocatedByPostgres;
 use crate::rel::PgRelation;
 use crate::trigger_support::{
     PgTriggerError, PgTriggerLevel, PgTriggerOperation, PgTriggerWhen, TriggerEvent, TriggerTuple,
-    called_as_trigger,
 };
 use std::ffi::c_char;
 
@@ -62,7 +61,12 @@ impl<'a> PgTrigger<'a> {
     pub unsafe fn from_fcinfo(
         fcinfo: &'a pg_sys::FunctionCallInfoBaseData,
     ) -> Result<Self, PgTriggerError> {
-        if !called_as_trigger(fcinfo as *const _ as *mut _) {
+        // SAFETY: the caller establishes valid call storage and any non-null context node.
+        if unsafe {
+            pg_sys::CALLED_AS_TRIGGER!(fcinfo as *const _ as *mut pg_sys::FunctionCallInfoBaseData)
+                .get()
+        } == 0
+        {
             return Err(PgTriggerError::NotTrigger);
         }
 

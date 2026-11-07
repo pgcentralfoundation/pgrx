@@ -17,10 +17,6 @@ use pgrx_pg_sys::PgTryBuilder;
 use pgrx_pg_sys::errcodes::PgSqlErrorCode;
 use std::panic::{RefUnwindSafe, UnwindSafe};
 
-// taken from /include/datatype/timestamp.h
-const MIN_TIMESTAMP_USEC: i64 = -211_813_488_000_000_000;
-const END_TIMESTAMP_USEC: i64 = 9_223_371_331_200_000_000 - 1; // dec by 1 to accommodate exclusive range match pattern
-
 /// A safe wrapper around Postgres `TIMESTAMP WITH TIME ZONE` type, backed by a [`pg_sys::Timestamp`] integer value.
 #[derive(Debug, Copy, Clone)]
 #[repr(transparent)]
@@ -38,11 +34,16 @@ impl TryFrom<pg_sys::TimestampTz> for TimestampWithTimeZone {
     type Error = FromTimeError;
 
     fn try_from(value: pg_sys::TimestampTz) -> Result<Self, Self::Error> {
-        match value {
-            i64::MIN | i64::MAX | MIN_TIMESTAMP_USEC..=END_TIMESTAMP_USEC => {
-                Ok(TimestampWithTimeZone(value))
-            }
-            _ => Err(FromTimeError::MicrosOutOfBounds),
+        // timestamp.h uses an exclusive END_TIMESTAMP bound for finite values.
+        // Its infinity sentinels are valid independently of that finite range.
+        let value =
+            pg_sys::__pgrx_c_macros::CValue::<pg_sys::__pgrx_c_types::TimestampTz>::new(value as _);
+        if pg_sys::TIMESTAMP_NOT_FINITE!(value).get() != 0
+            || pg_sys::IS_VALID_TIMESTAMP!(value).get() != 0
+        {
+            Ok(TimestampWithTimeZone(value.get() as _))
+        } else {
+            Err(FromTimeError::MicrosOutOfBounds)
         }
     }
 }
@@ -91,7 +92,7 @@ impl From<Timestamp> for TimestampWithTimeZone {
 
 impl IntoDatum for TimestampWithTimeZone {
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(pg_sys::Datum::from(self.0))
+        self.0.into_datum()
     }
     fn type_oid() -> pg_sys::Oid {
         pg_sys::TIMESTAMPTZOID
@@ -116,8 +117,8 @@ impl FromDatum for TimestampWithTimeZone {
 }
 
 impl TimestampWithTimeZone {
-    const NEG_INFINITY: pg_sys::TimestampTz = pg_sys::TimestampTz::MIN;
-    const INFINITY: pg_sys::TimestampTz = pg_sys::TimestampTz::MAX;
+    const NEG_INFINITY: pg_sys::TimestampTz = pg_sys::DT_NOBEGIN as _;
+    const INFINITY: pg_sys::TimestampTz = pg_sys::DT_NOEND as _;
 
     /// Construct a new [`TimestampWithTimeZone`] from its constituent parts.
     ///
@@ -265,13 +266,21 @@ impl TimestampWithTimeZone {
     /// Does this [`TimestampWithTimeZone`] represent positive infinity?
     #[inline]
     pub fn is_infinity(&self) -> bool {
-        self.0 == Self::INFINITY
+        pg_sys::TIMESTAMP_IS_NOEND!(pg_sys::__pgrx_c_macros::CValue::<
+            pg_sys::__pgrx_c_types::TimestampTz,
+        >::new(self.0 as _))
+        .get()
+            != 0
     }
 
     /// Does this [`TimestampWithTimeZone`] represent negative infinity?
     #[inline]
     pub fn is_neg_infinity(&self) -> bool {
-        self.0 == Self::NEG_INFINITY
+        pg_sys::TIMESTAMP_IS_NOBEGIN!(pg_sys::__pgrx_c_macros::CValue::<
+            pg_sys::__pgrx_c_types::TimestampTz,
+        >::new(self.0 as _))
+        .get()
+            != 0
     }
 
     /// Extract the `month`
@@ -351,7 +360,11 @@ impl TimestampWithTimeZone {
     }
 
     pub fn is_finite(&self) -> bool {
-        !matches!(self.0, pg_sys::TimestampTz::MIN | pg_sys::TimestampTz::MAX)
+        pg_sys::TIMESTAMP_NOT_FINITE!(pg_sys::__pgrx_c_macros::CValue::<
+            pg_sys::__pgrx_c_types::TimestampTz,
+        >::new(self.0 as _))
+        .get()
+            == 0
     }
 
     /// Truncate [`TimestampWithTimeZone`] to specified units

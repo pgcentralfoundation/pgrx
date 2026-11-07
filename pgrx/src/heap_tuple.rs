@@ -11,10 +11,7 @@
 //!
 //! [`PgHeapTuple`]s also describe composite types as defined by [`pgrx::composite_type!()`][crate::composite_type].
 use crate::datum::{UnboxDatum, lookup_type_name};
-use crate::{
-    AllocatedByPostgres, AllocatedByRust, heap_getattr_raw, pg_sys, trigger_fired_by_delete,
-    trigger_fired_by_insert, trigger_fired_by_update, trigger_fired_for_statement,
-};
+use crate::{AllocatedByPostgres, AllocatedByRust, heap_getattr_raw, pg_sys};
 
 use crate::datum::{FromDatum, IntoDatum, TryFromDatumError};
 use crate::{PgBox, PgMemoryContexts, PgTupleDesc, TriggerTuple, WhoAllocated};
@@ -120,7 +117,7 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByPostgres> {
         trigger_data: &'mcx pg_sys::TriggerData,
         which_tuple: TriggerTuple,
     ) -> Option<PgHeapTuple<'mcx, AllocatedByPostgres>> {
-        if trigger_fired_for_statement(trigger_data.tg_event) {
+        if pg_sys::TRIGGER_FIRED_FOR_STATEMENT!(trigger_data.tg_event).get() != 0 {
             // there is no HeapTuple for a statement-level trigger as such triggers aren't run
             // per-row
             return None;
@@ -128,17 +125,17 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByPostgres> {
 
         let tuple = match which_tuple {
             TriggerTuple::New => {
-                if trigger_fired_by_insert(trigger_data.tg_event) {
+                if pg_sys::TRIGGER_FIRED_BY_INSERT!(trigger_data.tg_event).get() != 0 {
                     trigger_data.tg_trigtuple
-                } else if trigger_fired_by_update(trigger_data.tg_event) {
+                } else if pg_sys::TRIGGER_FIRED_BY_UPDATE!(trigger_data.tg_event).get() != 0 {
                     trigger_data.tg_newtuple
                 } else {
                     return None;
                 }
             }
             TriggerTuple::Old => {
-                if trigger_fired_by_update(trigger_data.tg_event)
-                    || trigger_fired_by_delete(trigger_data.tg_event)
+                if pg_sys::TRIGGER_FIRED_BY_UPDATE!(trigger_data.tg_event).get() != 0
+                    || pg_sys::TRIGGER_FIRED_BY_DELETE!(trigger_data.tg_event).get() != 0
                 {
                     trigger_data.tg_trigtuple
                 } else {
@@ -296,13 +293,20 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByRust> {
     pub unsafe fn from_composite_datum(composite: pg_sys::Datum) -> Self {
         let htup_header =
             pg_sys::pg_detoast_datum(composite.cast_mut_ptr()) as pg_sys::HeapTupleHeader;
-        let tup_type = crate::heap_tuple_header_get_type_id(htup_header);
-        let tup_typmod = crate::heap_tuple_header_get_typmod(htup_header);
+        // SAFETY: Detoasting the caller's valid composite produces a live aligned,
+        // initialized tuple header; this reads its type Oid without transferring ownership.
+        let tup_type =
+            pg_sys::Oid::from(unsafe { pg_sys::HeapTupleHeaderGetTypeId!(htup_header).get() });
+        // SAFETY: The detoasted composite header remains live and initialized;
+        // this reads only its typmod field.
+        let tup_typmod = unsafe { pg_sys::HeapTupleHeaderGetTypMod!(htup_header).get() };
         let tupdesc = pg_sys::lookup_rowtype_tupdesc(tup_type, tup_typmod);
 
         let mut data = PgBox::<pg_sys::HeapTupleData>::alloc0();
 
-        data.t_len = crate::heap_tuple_header_get_datum_length(htup_header) as u32;
+        // SAFETY: The live detoasted header has its initialized length field;
+        // data is a separately initialized owned HeapTupleData allocation.
+        data.t_len = unsafe { pg_sys::HeapTupleHeaderGetDatumLength!(htup_header).get() };
         data.t_data = htup_header;
 
         Self { tuple: data, tupdesc: PgTupleDesc::from_pg(tupdesc) }
@@ -348,7 +352,9 @@ impl<'mcx> PgHeapTuple<'mcx, AllocatedByRust> {
                     // if the attribute's type is an array and our incoming value is a composite
                     // then we need to ensure that the `att.atttypid` is the same as the array type
                     // of `value`'s type
-                    if pg_sys::type_is_array(att.atttypid) && value.composite_type_oid().is_some() {
+                    if pg_sys::type_is_array!(att.atttypid).get() != 0
+                        && value.composite_type_oid().is_some()
+                    {
                         let array_of_composite_type_oid = value.composite_type_oid().unwrap();
 
                         if att.atttypid != array_of_composite_type_oid {

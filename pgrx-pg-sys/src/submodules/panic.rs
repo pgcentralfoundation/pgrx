@@ -22,10 +22,6 @@ use std::panic::{
 
 use crate::elog::PgLogLevel;
 use crate::errcodes::PgSqlErrorCode;
-// `crate::MemoryContextSwitchTo` also names the generated macro. Importing it by that
-// absolute path refers to an include!-expanded macro_export, which rustc rejects as a
-// future incompatibility (rust-lang/rust#52234).
-use crate::port::MemoryContextSwitchTo;
 use crate::{AsPgCStr, pfree};
 
 /// Indicates that something can be reported as a Postgres ERROR, if that's what it might represent.
@@ -614,10 +610,10 @@ unsafe fn do_ereport(ereport: ErrorReportWithLevel) {
             // that Postgres will clean up for us in the event of an ERROR, and we know it'll live long
             // enough for Postgres to use `file` and `funcname`, which it expects to be `const char *`s
 
-            let prev_cxt = MemoryContextSwitchTo(crate::ErrorContext);
+            let prev_cxt = crate::MemoryContextSwitchTo(crate::ErrorContext);
             let file = ereport.file().as_pg_cstr();
             let funcname = ereport.function_name().as_pg_cstr();
-            MemoryContextSwitchTo(prev_cxt);
+            crate::MemoryContextSwitchTo(prev_cxt);
 
             // do not leak the Rust `ErrorReportWithLocation` instance
             drop(ereport);

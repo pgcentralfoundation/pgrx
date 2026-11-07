@@ -27,7 +27,14 @@ fn delete_must_have_a_where(query: PgBox<pg_sys::Query>) {
 }
 
 fn only_superusers_can_truncate(pstmt: PgBox<pg_sys::PlannedStmt>) {
-    if !unsafe { pgrx::is_a(pstmt.utilityStmt, pg_sys::NodeTag::T_TruncateStmt) } {
+    if pstmt.utilityStmt.is_null()
+        // SAFETY: a non-null utilityStmt belongs to the live PlannedStmt and
+        // starts with an initialized NodeTag. Only its tag field is loaded.
+        // The tag's integer type follows the C enum's compatible type, which
+        // differs between targets (unsigned on Unix, int on MSVC), so widen both sides.
+        || i64::from(unsafe { pg_sys::nodeTag!(pstmt.utilityStmt).get() })
+            != pg_sys::NodeTag::T_TruncateStmt as i64
+    {
         return ();
     }
 
@@ -180,6 +187,18 @@ pub unsafe extern "C-unwind" fn _PG_init() {
 #[pg_schema]
 mod tests {
     use pgrx::prelude::*;
+
+    /// A missing utility statement must return before loading a node tag.
+    #[pg_test]
+    fn null_utility_statement_is_not_truncate() {
+        // SAFETY: PlannedStmt consists of pointers, integers, booleans, and the
+        // NodeTag enum whose zero value is T_Invalid. CmdType's zero value is
+        // CMD_UNKNOWN, as is PG19's PLAN_STMT_UNKNOWN plan origin. Zero
+        // initialization is valid, and utilityStmt remains NULL throughout this
+        // call. The backend context owns the allocation after into_pg_boxed.
+        let statement = unsafe { PgBox::<pg_sys::PlannedStmt>::alloc0() }.into_pg_boxed();
+        super::only_superusers_can_truncate(statement);
+    }
 
     #[pg_test]
     fn test_delete_with_where() {

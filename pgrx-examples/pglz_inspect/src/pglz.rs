@@ -13,6 +13,7 @@
 use core::fmt;
 use core::mem::MaybeUninit;
 use pgrx::pg_sys;
+use pgrx::pg_sys::__pgrx_c_macros::CValue;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Strategy {
@@ -45,14 +46,12 @@ impl fmt::Display for PglzError {
 
 impl std::error::Error for PglzError {}
 
-/// Upper bound on compressed output size for a given input length. Mirrors the C macro `PGLZ_MAX_OUTPUT(_dlen)` which is `(_dlen) + 4`. Saturates at `usize::MAX` instead of overflowing.
-pub const fn max_output(input_len: usize) -> usize {
-    input_len.saturating_add(4)
-}
-
-/// Raw FFI helper. Does NOT validate; caller must ensure:
-/// - `src.len() <= i32::MAX`
-/// - `dest` is valid for writes of at least `max_output(src.len())` bytes.
+/// Compress into storage whose capacity has already been checked.
+///
+/// # Safety
+/// The caller runs on PostgreSQL's initialized backend thread, provides
+/// `src.len() <= i32::MAX`, and grants exclusive write access to `dest` for at
+/// least `PGLZ_MAX_OUTPUT(src.len())` bytes using a C size_t length.
 ///
 /// Never constructs a `&mut [u8]` over uninitialized memory — works in pointer-space only.
 #[inline]
@@ -61,19 +60,26 @@ unsafe fn compress_raw(
     dest: *mut u8,
     strategy: Strategy,
 ) -> Result<Option<usize>, PglzError> {
-    let strat = match strategy {
-        // SAFETY: PGLZ_strategy_{default,always} are extern `*const PGLZ_Strategy` pointing to global PGLZ_Strategy structs valid for the backend's lifetime.
-        Strategy::Default => pg_sys::PGLZ_strategy_default,
-        Strategy::Always => pg_sys::PGLZ_strategy_always,
+    // SAFETY: the initialized backend supplies immutable global strategies that
+    // remain valid for every compression call.
+    let strat = unsafe {
+        match strategy {
+            Strategy::Default => pg_sys::PGLZ_strategy_default,
+            Strategy::Always => pg_sys::PGLZ_strategy_always,
+        }
     };
-    let cap = max_output(src.len());
+    let cap =
+        pg_sys::PGLZ_MAX_OUTPUT!(CValue::<pg_sys::__pgrx_c_types::size_t>::new(src.len() as _))
+            .get() as usize;
     // SAFETY: src is a valid slice; dest is valid for `cap` writes (caller contract); strat is a valid PGLZ_Strategy pointer. PGLZ is pure (no palloc, no elog).
-    let ret = pg_sys::pglz_compress(
-        src.as_ptr() as *const ::core::ffi::c_char,
-        src.len() as i32,
-        dest as *mut ::core::ffi::c_char,
-        strat,
-    );
+    let ret = unsafe {
+        pg_sys::pglz_compress(
+            src.as_ptr() as *const ::core::ffi::c_char,
+            src.len() as i32,
+            dest as *mut ::core::ffi::c_char,
+            strat,
+        )
+    };
     if ret < 0 {
         Ok(None)
     } else {
@@ -83,10 +89,12 @@ unsafe fn compress_raw(
     }
 }
 
-/// Raw FFI helper. Does NOT validate; caller must ensure:
-/// - `src.len() <= i32::MAX`
-/// - `rawsize <= i32::MAX`
-/// - `dest` is valid for writes of at least `rawsize` bytes.
+/// Decompress into storage whose capacity has already been checked.
+///
+/// # Safety
+/// The caller runs on PostgreSQL's initialized backend thread, provides
+/// `src.len() <= i32::MAX` and `rawsize <= i32::MAX`, and grants exclusive write
+/// access to `dest` for at least `rawsize` bytes.
 #[inline]
 unsafe fn decompress_raw(
     src: &[u8],
@@ -95,13 +103,15 @@ unsafe fn decompress_raw(
     check_complete: bool,
 ) -> Result<usize, PglzError> {
     // SAFETY: src is a valid slice; dest is valid for `rawsize` writes (caller contract). PGLZ is pure.
-    let ret = pg_sys::pglz_decompress(
-        src.as_ptr() as *const ::core::ffi::c_char,
-        src.len() as i32,
-        dest as *mut ::core::ffi::c_char,
-        rawsize as i32,
-        check_complete,
-    );
+    let ret = unsafe {
+        pg_sys::pglz_decompress(
+            src.as_ptr() as *const ::core::ffi::c_char,
+            src.len() as i32,
+            dest as *mut ::core::ffi::c_char,
+            rawsize as i32,
+            check_complete,
+        )
+    };
     if ret < 0 {
         Err(PglzError::Decompress)
     } else {
@@ -110,7 +120,7 @@ unsafe fn decompress_raw(
     }
 }
 
-/// Compress `src` into a caller-provided uninitialized buffer. Returns the number of bytes written, or `Ok(None)` if PGLZ rejected the input (incompressible per heuristics). `dest.len()` must be at least [`max_output(src.len())`](max_output); otherwise returns `Err(BufferTooSmall)`.
+/// Compress `src` into a caller-provided uninitialized buffer. Returns the number of bytes written, or `Ok(None)` if PGLZ rejected the input (incompressible per heuristics). `dest.len()` must be at least `PGLZ_MAX_OUTPUT(src.len())`, evaluated with a C size_t length; otherwise returns `Err(BufferTooSmall)`.
 ///
 /// Prefer this over [`compress`] in hot loops to reuse a single buffer across many calls and avoid per-call allocation. Use `Vec::with_capacity(cap)` + [`Vec::spare_capacity_mut`] to obtain the destination slice; PGLZ only writes into the returned prefix and never reads from `dest`, so leaving the buffer uninitialized is sound and avoids a wasteful zero-fill.
 pub fn compress_into(
@@ -121,7 +131,9 @@ pub fn compress_into(
     if src.len() > i32::MAX as usize {
         return Err(PglzError::InputTooLarge);
     }
-    let cap = max_output(src.len());
+    let cap =
+        pg_sys::PGLZ_MAX_OUTPUT!(CValue::<pg_sys::__pgrx_c_types::size_t>::new(src.len() as _))
+            .get() as usize;
     if dest.len() < cap {
         return Err(PglzError::BufferTooSmall);
     }
@@ -153,7 +165,9 @@ pub fn compress(src: &[u8], strategy: Strategy) -> Result<Option<Vec<u8>>, PglzE
     if src.len() > i32::MAX as usize {
         return Err(PglzError::InputTooLarge);
     }
-    let cap = max_output(src.len());
+    let cap =
+        pg_sys::PGLZ_MAX_OUTPUT!(CValue::<pg_sys::__pgrx_c_types::size_t>::new(src.len() as _))
+            .get() as usize;
     let mut dest: Vec<u8> = Vec::new();
     dest.try_reserve_exact(cap).map_err(|_| PglzError::Allocation)?;
     // SAFETY: dest has capacity >= cap; pointer is valid for cap writes. We never construct a slice/reference over the uninitialized capacity — only the raw pointer crosses the FFI boundary, and PGLZ is write-only into that buffer.
