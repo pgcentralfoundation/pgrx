@@ -7,6 +7,10 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+#![allow(
+    unused_unsafe,
+    reason = "docs.rs builds replace generated C macros with shells, some of which need no unsafe"
+)]
 use crate::heap_tuple::PgHeapTuple;
 use crate::pg_sys;
 use crate::pgbox::AllocatedByPostgres;

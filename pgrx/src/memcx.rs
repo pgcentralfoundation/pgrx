@@ -1,4 +1,8 @@
 //! Memory Contexts in PostgreSQL, now with lifetimes.
+#![allow(
+    unused_unsafe,
+    reason = "docs.rs builds replace generated C macros with shells, some of which need no unsafe"
+)]
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable,
 };

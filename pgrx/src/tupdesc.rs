@@ -8,6 +8,10 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Provides a safe wrapper around Postgres' `pg_sys::TupleDescData` struct
+#![allow(
+    unused_unsafe,
+    reason = "docs.rs builds replace generated C macros with shells, some of which need no unsafe"
+)]
 use crate::{PgRelation, pg_sys, regtypein, void_mut_ptr};
 
 use pgrx_pg_sys::PgTryBuilder;

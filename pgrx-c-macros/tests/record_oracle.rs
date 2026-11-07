@@ -16,6 +16,10 @@
     any(target_arch = "x86_64", target_arch = "aarch64"),
     any(target_os = "linux", target_os = "macos"),
 ))]
+#![cfg_attr(
+    not(target_os = "macos"),
+    allow(unused_mut, reason = "only macOS adds its SDK path to the compiler arguments")
+)]
 
 /// Reuse the binding build's collector so fixture tests reconcile exactly the Rust facts used
 /// in production generation.

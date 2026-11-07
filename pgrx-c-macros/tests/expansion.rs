@@ -17,11 +17,12 @@ mod oracle;
 #[path = "support/script.rs"]
 mod script;
 
+#[cfg(unix)]
+use pgrx_c_macros::probe_integer_object_constants;
 use pgrx_c_macros::{
     ActiveProvenance, AnalysisSession, AnalysisStatus, ExpandedMacro, ExpansionBatch,
     ExpansionLimits, ExpansionResult, ExpansionSkipCode, FrontendError, FrontendOutput,
     MacroScanner, SkipReasonCode, inspect, prepare_expansions, prepare_expansions_with_limits,
-    probe_integer_object_constants,
 };
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;

@@ -8,6 +8,10 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 //! Helper functions for working with Postgres `ItemPointerData` (`tid`) type
+#![allow(
+    unused_unsafe,
+    reason = "docs.rs builds replace generated C macros with shells, some of which need no unsafe"
+)]
 
 use crate::PgMemoryContexts;
 use crate::datum::{FromDatum, IntoDatum};

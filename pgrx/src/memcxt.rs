@@ -15,6 +15,10 @@
 //! An enum-based interface (`PgMemoryContexts`) around Postgres' various `MemoryContext`s provides
 //! simple accessibility to working with MemoryContexts in a compiler-checked manner
 //!
+#![allow(
+    unused_unsafe,
+    reason = "docs.rs builds replace generated C macros with shells, some of which need no unsafe"
+)]
 use crate::pg_sys;
 use crate::pg_sys::AsPgCStr;
 use core::ptr;

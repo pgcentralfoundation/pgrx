@@ -242,6 +242,10 @@ where
         })
     }
 
+    #[allow(
+        unused_variables,
+        reason = "the docs.rs shell of SRF_RETURN_NEXT! ignores its arguments"
+    )]
     unsafe fn box_ret_in_fcinfo(fcinfo: pg_sys::FunctionCallInfo, ret: Self::Ret) -> pg_sys::Datum {
         let value = unsafe {
             match ret.0 {
@@ -302,6 +306,7 @@ enum Step<T: RetAbi> {
     Init(T, T::Item),
 }
 
+#[allow(unused_variables, reason = "the docs.rs shell of SRF_RETURN_DONE! ignores its arguments")]
 pub(crate) unsafe fn empty_srf(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
     unsafe {
         let fcx = deref_fcx(fcinfo);
