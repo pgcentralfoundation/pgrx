@@ -203,7 +203,7 @@ impl Aggregate<ParallelInternalSum> for ParallelInternalSum {
         value.to_le_bytes().to_vec()
     }
 
-    fn deserial(buf: Vec<u8>, _internal: Internal, _fcinfo: pg_sys::FunctionCallInfo) -> Internal {
+    fn deserial(buf: Vec<u8>, _fcinfo: pg_sys::FunctionCallInfo) -> Self::State {
         let value = i64::from_le_bytes(buf.try_into().expect("serialized i64 state"));
         Internal::new(value)
     }
@@ -391,18 +391,31 @@ mod tests {
     }
 
     #[pg_test]
-    fn aggregate_parallel_internal_deserial() {
-        let signature = Spi::get_one::<String>(
-            "SELECT oidvectortypes(proargtypes) FROM pg_proc \
-             WHERE proname = 'parallel_internal_sum_parallel_internal_sum_deserial'",
-        );
-        assert_eq!(signature, Ok(Some("bytea, internal".into())));
-
-        let value = Spi::get_one::<i64>(
-            "SELECT ParallelInternalSum(value) \
-             FROM UNNEST(ARRAY [1, 1, 2]) AS value",
-        );
-        assert_eq!(value, Ok(Some(4)));
+    fn aggregate_parallel_internal_state() -> std::result::Result<(), pgrx::spi::Error> {
+        Spi::run(
+            "CREATE TABLE tests.parallel_internal_sum AS \
+             SELECT generate_series(1, 10000) AS value",
+        )?;
+        Spi::run(
+            "ANALYZE tests.parallel_internal_sum; \
+             SET LOCAL parallel_setup_cost = 0; \
+             SET LOCAL parallel_tuple_cost = 0; \
+             SET LOCAL min_parallel_table_scan_size = 0; \
+             SET LOCAL max_parallel_workers_per_gather = 2",
+        )?;
+        let query = "SELECT ParallelInternalSum(value) FROM tests.parallel_internal_sum";
+        // A partial aggregate serializes its state, and the finalize step deserializes and
+        // combines it. The leader runs the partial plan itself if no worker starts, so the plan
+        // shows that serial, deserial, and combine run without depending on a worker count.
+        let plan = Spi::connect(|client| {
+            client
+                .select(&format!("EXPLAIN (COSTS OFF) {query}"), None, &[])?
+                .map(|row| row.get::<String>(1))
+                .collect::<std::result::Result<Vec<_>, _>>()
+        })?;
+        assert!(plan.iter().flatten().any(|line| line.contains("Partial Aggregate")), "{plan:?}");
+        assert_eq!(Spi::get_one::<i64>(query)?, Some(50_005_000));
+        Ok(())
     }
 
     #[pg_test]
