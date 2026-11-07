@@ -12,6 +12,7 @@ This directory contains examples of how to work with various aspects of `pgrx`.
 - [memory_contexts/](memory_contexts/):  PgMemoryContext lifecycle and SRF/bgworker memory patterns
 - [operators/](operators/):  Creating operator functions and associated `CREATE OPERATOR/OPERATOR CLASS/OPERATOR FAMILY` DDL
 - [packaging/](packaging/):  Building RPM and DEB packages with `cargo pgrx package`
+- [parallel_scan_lwlock/](parallel_scan_lwlock/):  LWLocks in dynamic shared memory, shared by the workers of a parallel foreign scan
 - [postgres_type_variants/](postgres_type_variants/):  Side-by-side examples of the four PostgresType in/out paths and related derives
 - [shmem/](shmem/):  Postgres Shared Memory support
 - [schemas/](schemas/):  How `pgrx` uses Postgres schemas
