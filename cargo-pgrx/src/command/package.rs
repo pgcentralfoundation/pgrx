@@ -702,7 +702,12 @@ mod tests {
 
     #[test]
     fn resolves_relative_sources_against_the_manifest_dir() {
-        let mut manifest = arx_pack::Manifest::from_toml_str(
+        // Paths such as `/src` are relative to the current drive on Windows, so build absolute
+        // ones from the temporary directory.
+        let manifest_dir = std::env::temp_dir().join("my_ext");
+        let staged = utf8_path(&manifest_dir.join("staged").join("my_ext.so")).unwrap();
+        // A TOML literal string keeps Windows backslashes as they are.
+        let mut manifest = arx_pack::Manifest::from_toml_str(&format!(
             r#"
             name = "my-ext"
             version = "1.0.0"
@@ -711,20 +716,21 @@ mod tests {
             description = "My extension"
             license = "MIT"
             files = [
-              { source = "/staged/my_ext.so", dest = "/lib/my_ext.so", mode = "0755" },
-              { source = "../LICENSE", dest = "/doc/copyright", mode = "0644" },
+              {{ source = '{staged}', dest = "/lib/my_ext.so", mode = "0755" }},
+              {{ source = "../LICENSE", dest = "/doc/copyright", mode = "0644" }},
             ]
-            dirs = [{ source = "sql/", dest = "/share/extension/" }]
-            scripts = { postinst = "packaging/postinst" }
+            dirs = [{{ source = "sql/", dest = "/share/extension/" }}]
+            scripts = {{ postinst = "packaging/postinst" }}
             "#,
-        )
+        ))
         .unwrap();
-        resolve_relative_sources(&mut manifest, Path::new("/src/my_ext")).unwrap();
+        resolve_relative_sources(&mut manifest, &manifest_dir).unwrap();
 
-        assert_eq!(manifest.files[0].source, "/staged/my_ext.so");
-        assert_eq!(manifest.files[1].source, "/src/my_ext/../LICENSE");
-        assert_eq!(manifest.dirs[0].source, "/src/my_ext/sql/");
-        assert_eq!(manifest.scripts.postinst.as_deref(), Some("/src/my_ext/packaging/postinst"));
+        let resolved = |path: &str| utf8_path(&manifest_dir.join(path)).unwrap();
+        assert_eq!(manifest.files[0].source, staged);
+        assert_eq!(manifest.files[1].source, resolved("../LICENSE"));
+        assert_eq!(manifest.dirs[0].source, resolved("sql/"));
+        assert_eq!(manifest.scripts.postinst, Some(resolved("packaging/postinst")));
         assert_eq!(manifest.scripts.preinst, None);
     }
 
