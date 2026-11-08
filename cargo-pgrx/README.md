@@ -624,7 +624,7 @@ $ cargo pgrx bench --help
 Usage: cargo pgrx bench [OPTIONS] [ARGS]...
 
 Arguments:
-  [ARGS]...  Positional arguments: [pgXX] [benchname] [env: PG_VERSION=]
+  [ARGS]...  Positional arguments: `[pgXX] [benchname]` [env: PG_VERSION=]
 
 Options:
       --dbname <DBNAME>

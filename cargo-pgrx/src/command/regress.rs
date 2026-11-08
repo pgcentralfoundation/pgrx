@@ -27,7 +27,7 @@ use std::process::{Command, ExitStatus, Stdio};
 #[derive(clap::Args, Debug, Clone)]
 #[clap(author)]
 pub(crate) struct Regress {
-    /// Positional arguments: [pgXX] [testname]...
+    /// Positional arguments: `[pgXX] [testname]...`
     ///
     /// `cargo pgrx regress` — run all tests against the default pg version
     /// `cargo pgrx regress <testname>...` — run the tests whose names contain any of the testnames, in that order

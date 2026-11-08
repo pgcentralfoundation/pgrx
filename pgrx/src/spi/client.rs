@@ -54,13 +54,12 @@ impl<'conn> SpiClient<'conn> {
     /// Use [`SpiClient::update`] for those cases — it switches the rest of
     /// the transaction to writable SPI execution.
     ///
-    /// Whether the underlying `SPI_execute*` call is invoked with
-    /// `read_only = true` is decided by [`Spi::is_xact_still_immutable`].
-    /// Once any prior statement in this transaction has been executed via
-    /// [`SpiClient::update`] (or [`Spi::mark_mutable`] has been called
-    /// directly), subsequent `select` calls in the same transaction will
-    /// *also* run with `read_only = false` — pgrx does not flip the SPI
-    /// mode back inside one transaction.  This matches the Postgres
+    /// The underlying `SPI_execute*` call is invoked with `read_only = true`
+    /// only while the current transaction has no assigned `TransactionId`.
+    /// Once one is assigned, by a prior [`SpiClient::update`] or by any other
+    /// write in this transaction, subsequent `select` calls in the same
+    /// transaction will *also* run with `read_only = false` — pgrx does not
+    /// flip the SPI mode back inside one transaction.  This matches the Postgres
     /// guidance that mixing read-only and read-write SPI commands in a
     /// single function is unwise.
     pub fn select<'mcx, Q: Query<'conn>>(
@@ -80,10 +79,9 @@ impl<'conn> SpiClient<'conn> {
     /// that uses a locking clause (`FOR UPDATE`, `FOR SHARE`, `SKIP
     /// LOCKED`, `NOWAIT`) or that calls a function whose volatility
     /// requires a writable snapshot.  The first call in a transaction
-    /// invokes [`Spi::mark_mutable`], which forces a real `TransactionId`
-    /// to be assigned; from that point forward `SPI_execute*` is invoked
-    /// with `read_only = false` and the rest of the transaction's SPI
-    /// runs writable.
+    /// forces a real `TransactionId` to be assigned; from that point
+    /// forward `SPI_execute*` is invoked with `read_only = false` and the
+    /// rest of the transaction's SPI runs writable.
     ///
     /// If you only need a plain `SELECT` and don't intend to write or
     /// lock, prefer [`SpiClient::select`] — it leaves the transaction in

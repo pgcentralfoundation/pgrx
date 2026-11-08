@@ -347,7 +347,7 @@ impl PgConfig {
         }
     }
 
-    /// Return a clone of this config that always returns `port` from [`test_port()`].
+    /// Return a clone of this config that always returns `port` from [`test_port()`](Self::test_port).
     pub fn with_test_port(mut self, port: u16) -> Self {
         self.test_port_override = Some(port);
         self
