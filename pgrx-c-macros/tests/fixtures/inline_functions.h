@@ -11,6 +11,18 @@ static inline int *WrapNext(int *value) { return value + 1; }
 static inline void WrapStore(int *target, int value) { *target = value; }
 /* A parameter named after a Rust keyword. */
 static inline unsigned int WrapKeyword(unsigned int type) { return type * 2u; }
+/* Translations that write a global, directly and through the translation they call. */
+extern int WrapCounter;
+static inline int WrapBump(int amount)
+{
+	WrapCounter += amount;
+	return WrapCounter;
+}
+static inline int WrapBumpTwice(int amount)
+{
+	WrapBump(amount);
+	return WrapBump(amount);
+}
 /* Translated, but its enum parameter needs native transport. */
 static inline int WrapShadeRank(WrapShade shade) { return (int) shade * 10; }
 /* No generated adapter calls a function with this calling convention, so the next body

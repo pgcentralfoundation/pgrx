@@ -12,7 +12,7 @@ mod ffi {
     }
 }
 
-/// Times a generated function checked its thread.
+/// Times a generated function checked its thread. Only those that touch a global check.
 static CHECKS: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
 
 /// Count thread checks instead of comparing threads.
@@ -29,7 +29,8 @@ mod wrapped {
 /// Print each generated function's result and the number of thread checks.
 fn main() {
     let mut values = [0_i32; 2];
-    // SAFETY: the functions only add, multiply, and write through a pointer to `values`.
+    // SAFETY: the functions add, multiply, write through a pointer to `values`, and update
+    // the fixture's global on this thread.
     unsafe {
         println!("add\t{}", wrapped::WrapAdd(2, 3));
         let next: *mut i32 = wrapped::WrapNext(values.as_mut_ptr());
@@ -38,6 +39,8 @@ fn main() {
         println!("store\t{}", values[1]);
         let doubled: u32 = wrapped::WrapKeyword(21);
         println!("keyword\t{doubled}");
+        println!("bump\t{}", wrapped::WrapBump(2));
+        println!("bump twice\t{}", wrapped::WrapBumpTwice(1));
     }
     println!("checks\t{}", CHECKS.load(std::sync::atomic::Ordering::Relaxed));
 }

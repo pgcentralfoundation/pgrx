@@ -2,8 +2,9 @@
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
 //! A translated static inline function gets a Rust function with its binding's name and
-//! signature that runs the translation after the catalog's thread check. Functions whose
-//! translation falls back, or whose values need native transport, keep their binding.
+//! signature that runs the translation, after the catalog's thread check when the translation
+//! touches a global. Functions whose translation falls back, or whose values need native
+//! transport, keep their binding.
 
 #![cfg(all(
     target_pointer_width = "64",
@@ -37,8 +38,16 @@ fn is_builtin_oid(name: &str) -> bool {
 }
 
 /// Inline functions the fixture selects.
-const NAMES: &[&str] =
-    &["WrapAdd", "WrapNext", "WrapStore", "WrapKeyword", "WrapShadeRank", "WrapNative"];
+const NAMES: &[&str] = &[
+    "WrapAdd",
+    "WrapNext",
+    "WrapStore",
+    "WrapKeyword",
+    "WrapBump",
+    "WrapBumpTwice",
+    "WrapShadeRank",
+    "WrapNative",
+];
 
 /// The fixture header.
 fn header() -> PathBuf {
@@ -51,13 +60,16 @@ fn guard(bindings: &str) -> String {
     let mut file = syn::parse_file(bindings).unwrap();
     let mut items = Vec::new();
     for item in std::mem::take(&mut file.items) {
-        let syn::Item::ForeignMod(block) = item else {
+        let syn::Item::ForeignMod(mut block) = item else {
             items.push(item);
             continue;
         };
-        for item in &block.items {
-            let syn::ForeignItem::Fn(function) = item else { panic!("unexpected {item:?}") };
-            let syn::ItemForeignMod { unsafety, abi, .. } = &block;
+        let (functions, statics) = std::mem::take(&mut block.items)
+            .into_iter()
+            .partition::<Vec<_>, _>(|item| matches!(item, syn::ForeignItem::Fn(_)));
+        let syn::ItemForeignMod { unsafety, abi, .. } = &block;
+        for item in &functions {
+            let syn::ForeignItem::Fn(function) = item else { unreachable!() };
             let syn::Signature { ident, inputs, output, .. } = &function.sig;
             let arguments = inputs.iter().map(|input| match input {
                 syn::FnArg::Typed(input) => &input.pat,
@@ -69,6 +81,10 @@ fn guard(bindings: &str) -> String {
                     unsafe { crate::ffi::pg_guard_ffi_boundary(move || #ident(#(#arguments),*)) }
                 }
             });
+        }
+        if !statics.is_empty() {
+            block.items = statics;
+            items.push(syn::Item::ForeignMod(block));
         }
     }
     file.items = items;
@@ -92,6 +108,7 @@ fn translated_inline_functions_replace_their_bindings() {
         .clang_args(&frontend.profile().arguments)
         .allowlist_type("Wrap.*")
         .allowlist_function("Wrap.*")
+        .allowlist_var("Wrap.*")
         .wrap_static_fns(true)
         .wrap_static_fns_path(directory.join("wrappers"))
         .wrap_static_fns_suffix("__pgrx_cshim")
@@ -125,9 +142,11 @@ fn translated_inline_functions_replace_their_bindings() {
     assert!(generate_with_bindings(&session, NAMES, &catalog).unwrap().functions.is_empty());
     catalog.ffi_boundary = boundary;
     let generated = generate_with_bindings(&session, NAMES, &catalog).unwrap();
-    for name in ["WrapAdd", "WrapNext", "WrapStore", "WrapKeyword"] {
+    for name in ["WrapAdd", "WrapNext", "WrapStore", "WrapKeyword", "WrapBump", "WrapBumpTwice"] {
         assert!(generated.functions.contains(&format!("pub unsafe fn {name}(")), "{name}");
     }
+    // Only the two translations that write the global check the thread.
+    assert_eq!(generated.functions.matches("thread_check()").count(), 2);
     assert!(generated.functions.contains("r#type: u32"), "keyword parameter");
     for name in ["WrapShadeRank", "WrapNative"] {
         assert!(!generated.functions.contains(&format!("fn {name}(")), "{name}");
@@ -156,9 +175,12 @@ fn translated_inline_functions_replace_their_bindings() {
         &rust,
         &profile.compiler.executable,
         &header(),
-        &generated.support.c_source,
+        &format!("{}\nint WrapCounter = 5;\n", generated.support.c_source),
         &arguments,
     );
-    assert_eq!(output, "add\t5\nnext\t1\nstore\t7\nkeyword\t42\nchecks\t4\n");
+    assert_eq!(
+        output,
+        "add\t5\nnext\t1\nstore\t7\nkeyword\t42\nbump\t7\nbump twice\t9\nchecks\t2\n"
+    );
     session.verify_inputs().expect("original profile stayed unchanged");
 }

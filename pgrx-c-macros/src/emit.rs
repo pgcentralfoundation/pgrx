@@ -114,7 +114,8 @@ pub struct BindingCatalog {
     pub ffi_boundary: Option<Vec<String>>,
     /// Optional crate-relative function that panics off the thread allowed to call
     /// PostgreSQL. When it and [`Self::ffi_boundary`] are set, batch generation also renders
-    /// [`MacroGeneration::functions`], which replace guarded bindings and keep this check.
+    /// [`MacroGeneration::functions`], which replace guarded bindings and run this check
+    /// before a translation that reads or writes a C global.
     #[serde(skip)]
     pub thread_check: Option<Vec<String>>,
 }

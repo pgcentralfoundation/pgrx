@@ -72,9 +72,11 @@ installations, keep its `unsafe` block and allow `unused_unsafe`, as [the
 Every native call goes through pgrx's FFI guard, which checks the thread and
 calls `sigsetjmp` each time. Where PostgreSQL defines a static inline function
 and the build translates its body, `pgrx::pg_sys::NAME(...)` runs that
-translation, as `NAME!` does, with the binding's name and signature. It checks
-the thread but calls no `sigsetjmp` of its own; the PostgreSQL functions the body
-calls keep their guards. Otherwise `pg_sys::NAME(...)` is the guarded binding.
+translation, as `NAME!` does, with the binding's name and signature. It calls no
+`sigsetjmp` of its own; the PostgreSQL functions the body calls keep their guards,
+which check the thread. It checks the thread itself only when the body reads or
+writes a PostgreSQL global, so other translations, like the macros, can run on any
+thread. Otherwise `pg_sys::NAME(...)` is the guarded binding.
 `pgrx_pg_sys::NAME(...)`, named through `pgrx-pg-sys` directly, is always the
 guarded binding. For example, `pg_sys::MemoryContextSwitchTo` and
 `pg_sys::heap_getattr` used to be Rust ports, and on PG15–19 now run the

@@ -1,9 +1,10 @@
 //! PostgreSQL bindings and macros generated from the selected server headers.
 //!
 //! Where this build translates a static inline function's body, `pg_sys::NAME` runs that
-//! translation in Rust after checking for the backend thread, rather than calling the C
-//! function through a guarded binding. The PostgreSQL functions the body calls keep their
-//! guards. `pgrx_pg_sys::NAME` is always the guarded binding.
+//! translation in Rust rather than calling the C function through a guarded binding. The
+//! PostgreSQL functions the body calls keep their guards, and a body that reads or writes a
+//! PostgreSQL global first checks for the backend thread. `pgrx_pg_sys::NAME` is always the
+//! guarded binding.
 
 pub use pgrx_pg_sys::*;
 

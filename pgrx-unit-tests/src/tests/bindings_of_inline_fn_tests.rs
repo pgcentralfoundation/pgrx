@@ -67,7 +67,7 @@ mod tests {
         }
     }
 
-    /// A translated inline function keeps the guarded binding's thread check.
+    /// A translated inline function that writes a PostgreSQL global checks the thread.
     #[pg_test]
     fn test_translated_inline_fn_panics_off_the_backend_thread() {
         // SAFETY: switching to the current context on the backend thread changes nothing.
