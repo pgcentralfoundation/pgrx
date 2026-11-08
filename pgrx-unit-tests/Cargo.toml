@@ -53,7 +53,7 @@ thiserror.workspace = true
 
 paste = "1"
 proptest = { version = "1", optional = true }
-rand = "0.10.1"
+rand = "0.10.3"
 
 [dependencies.pgrx]
 path = "../pgrx"
@@ -65,7 +65,7 @@ path = "../pgrx-tests"
 version = "=0.20.0-beta.0"
 
 [dev-dependencies]
-trybuild = "1.0.116"
+trybuild = "1.0.122"
 
 [lints.rust]
 unused_lifetimes = "deny"

@@ -55,11 +55,11 @@ regex.workspace = true
 shlex.workspace = true
 thiserror.workspace = true
 
-postgres = "0.19.13"
+postgres = "0.19.14"
 proptest = { version = "1", optional = true }
 tempfile = "3.27.0"
-sysinfo = "0.39.3"
-rand = "0.10.1"
+sysinfo = "0.40.1"
+rand = "0.10.3"
 
 [dependencies.pgrx] # Not unified in workspace due to default-features key
 path = "../pgrx"

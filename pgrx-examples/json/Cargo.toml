@@ -29,7 +29,7 @@ pg_test = []
 
 [dependencies]
 pgrx = { path = "../../pgrx" }
-serde_json = "1.0.150"
+serde_json = "1.0.154"
 
 [dev-dependencies]
 pgrx-tests = { path = "../../pgrx-tests" }

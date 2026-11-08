@@ -43,7 +43,7 @@ impl PgrxManifestExt for Manifest {
     fn package_version(&self) -> eyre::Result<String> {
         match &self.package {
             Some(package) => match &package.version {
-                cargo_toml::Inheritable::Set(version) => Ok(version.to_owned()),
+                cargo_toml::Inheritable::Set(version) => Ok(version.to_owned().to_string()),
                 // This should be impossible to hit, since we use
                 // `Manifest::from_path`, which calls `complete_from_path`,
                 // which is documented as resolving these. That said, I

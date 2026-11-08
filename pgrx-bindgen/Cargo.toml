@@ -23,6 +23,6 @@ syn.workspace = true
 toml.workspace = true
 walkdir.workspace = true
 
-bindgen = { version = "0.72.1", default-features = false, features = ["runtime"] }
-quote = "1.0.45"
+bindgen = { version = "0.73.2", default-features = false, features = ["runtime"] }
+quote = "1.0.47"
 shlex = "2.0" # shell lexing, also used by many of our deps
