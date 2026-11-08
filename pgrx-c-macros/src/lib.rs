@@ -183,12 +183,16 @@ pub struct SourceSpan {
 impl SourceSpan {
     /// Convert Clang exclusive endpoints into an inclusive physical line span for auditing and module
     /// grouping.
+    ///
+    /// File locations place a macro-generated definition at its expansion. Before LLVM 19,
+    /// libclang's spelling locations did the same, but they now point into the macro's own
+    /// definition, which can leave a range's endpoints in different files.
     pub(crate) fn from_range(
         range: clang::source::SourceRange<'_>,
         directory: &Path,
     ) -> Result<Option<Self>, String> {
-        let start = range.get_start().get_spelling_location();
-        let end = range.get_end().get_spelling_location();
+        let start = range.get_start().get_file_location();
+        let end = range.get_end().get_file_location();
         let (Some(file), Some(end_file)) = (start.file, end.file) else {
             if start.file.is_none() && end.file.is_none() {
                 return Ok(None);
@@ -201,7 +205,7 @@ impl SourceSpan {
         }
         // Clang's range end is exclusive. Locating its final byte handles a range
         // that ends at column one of the next line without including that line.
-        let last = file.get_offset_location(end.offset - 1).get_spelling_location();
+        let last = file.get_offset_location(end.offset - 1).get_file_location();
         if start.line == 0 || last.line < start.line {
             return Err("source range has invalid line numbers".into());
         }
@@ -601,7 +605,7 @@ fn collect_macro_inventory(
         // The latter originate in its synthetic buffer, which has no physical file.
         let builtin = entity.is_builtin_macro()
             || entity.get_location().is_some_and(|location| {
-                location.get_spelling_location().file.is_none()
+                location.get_file_location().file.is_none()
                     && location.get_presumed_location().0 == "<built-in>"
             });
         macros.push(MacroDefinition {
@@ -672,9 +676,9 @@ pub(crate) fn splice_length(text: &[u8]) -> Option<usize> {
     ends.into_iter().find(|end| line.starts_with(end)).map(|end| 1 + blanks + end.len())
 }
 
-/// Copy the physical spelling location used for diagnostics and provenance ownership checks.
+/// Copy the physical file location used for diagnostics and provenance ownership checks.
 fn source_location(location: clang::source::SourceLocation<'_>) -> Option<SourceLocation> {
-    let location = location.get_spelling_location();
+    let location = location.get_file_location();
     Some(SourceLocation {
         file: location.file?.get_path(),
         line: location.line,

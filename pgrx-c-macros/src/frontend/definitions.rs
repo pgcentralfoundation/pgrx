@@ -108,7 +108,7 @@ pub(super) fn prove(
             EntityKind::MacroDefinition => {
                 if let Some(name) = entity.get_name() {
                     let location = entity.get_location().and_then(|at| {
-                        let location = at.get_spelling_location();
+                        let location = at.get_file_location();
                         Some((location.file?, location.offset))
                     });
                     history.last_definition.insert(name, Recorded { position, location });
@@ -121,7 +121,7 @@ pub(super) fn prove(
                 let Some(at) = entity.get_location() else {
                     return EntityVisitResult::Continue;
                 };
-                let location = at.get_spelling_location();
+                let location = at.get_file_location();
                 if let Some(file) = location.file
                     && file.get_offset_location(location.offset) == at
                 {
@@ -131,7 +131,7 @@ pub(super) fn prove(
                         .get_reference()
                         .and_then(|definition| definition.get_location())
                         .and_then(|at| {
-                            let location = at.get_spelling_location();
+                            let location = at.get_file_location();
                             Some((location.file?, location.offset))
                         });
                     history
@@ -277,8 +277,8 @@ fn source<'tu>(
 ) -> Option<InlineFunctionDefinition> {
     let range = definition.get_range()?;
     let provenance = SourceSpan::from_range(range, directory).ok()??;
-    let start = range.get_start().get_spelling_location();
-    let end = range.get_end().get_spelling_location();
+    let start = range.get_start().get_file_location();
+    let end = range.get_end().get_file_location();
     let file = start.file?;
     let size = usize::try_from(end.offset.checked_sub(start.offset)?).ok()?;
     let contents = if size <= MAX_DEFINITION_BYTES && size <= *remaining {
@@ -337,7 +337,7 @@ fn body_tokens<'tu>(
         .into_iter()
         .find(|child| child.get_kind() == EntityKind::CompoundStmt)?;
     let located = |at: clang::source::SourceLocation<'tu>| {
-        let location = at.get_spelling_location();
+        let location = at.get_file_location();
         (location.file == Some(file)).then_some(location)
     };
     let all = body.get_range()?.tokenize();
