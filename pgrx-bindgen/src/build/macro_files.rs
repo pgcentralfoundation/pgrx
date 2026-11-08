@@ -12,7 +12,7 @@
 //! collide with indexes, directories, keywords, or reserved support files.
 
 use eyre::{WrapErr, eyre};
-use pgrx_c_macros::{EmissionStatus, MacroAnalysis, MacroEmission};
+use pgrx_c_macros::{EmissionStatus, MacroAnalysis, MacroEmission, ServerHeaderRoots};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Write;
 use std::path::{Component, Path, PathBuf};
@@ -72,8 +72,8 @@ impl MacroFiles {
 pub(super) struct HeaderPaths<'a> {
     /// Server include directory as configured.
     root: &'a Path,
-    /// Canonical form of `root`, resolved on first use.
-    canonical_root: Option<PathBuf>,
+    /// Physical directories holding `root`'s headers, resolved on first use.
+    roots: Option<ServerHeaderRoots>,
     /// Relative paths already resolved for each provenance file.
     resolved: BTreeMap<PathBuf, PathBuf>,
 }
@@ -82,7 +82,7 @@ pub(super) struct HeaderPaths<'a> {
 impl<'a> HeaderPaths<'a> {
     /// Prepare a resolver without touching the filesystem, so empty output needs no root.
     pub(super) fn new(root: &'a Path) -> Self {
-        Self { root, canonical_root: None, resolved: BTreeMap::new() }
+        Self { root, roots: None, resolved: BTreeMap::new() }
     }
 
     /// Return the macro's defining header relative to the root.
@@ -94,19 +94,19 @@ impl<'a> HeaderPaths<'a> {
         if let Some(relative) = self.resolved.get(&provenance.file) {
             return Ok(relative.clone());
         }
-        if self.canonical_root.is_none() {
-            self.canonical_root = Some(self.root.canonicalize().wrap_err_with(|| {
+        if self.roots.is_none() {
+            self.roots = Some(ServerHeaderRoots::new(self.root).wrap_err_with(|| {
                 format!("could not resolve PostgreSQL header root {}", self.root.display())
             })?);
         }
-        let root = self.canonical_root.as_ref().expect("initialized header root");
+        let roots = self.roots.as_ref().expect("initialized header roots");
         let canonical = provenance.file.canonicalize().wrap_err_with(|| {
             format!("could not resolve macro header {}", provenance.file.display())
         })?;
-        let relative = canonical
-            .strip_prefix(root)
-            .wrap_err_with(|| {
-                format!("macro {} comes from outside the PostgreSQL header root", analysis.name)
+        let relative = roots
+            .relative(&canonical)
+            .ok_or_else(|| {
+                eyre!("macro {} comes from outside the PostgreSQL header root", analysis.name)
             })?
             .to_owned();
         self.resolved.insert(provenance.file.clone(), relative.clone());

@@ -327,7 +327,7 @@ impl PostgresConfig {
         header: Option<&Path>,
         extra_clang_args: &[String],
     ) -> Result<PostgresInventory, PostgresError> {
-        let server_include_dir = canonicalize_header_path(&self.server_include_dir)?;
+        let server_headers = ServerHeaderRoots::new(&self.server_include_dir)?;
         let default_header;
         let header = match header {
             Some(header) => header,
@@ -346,7 +346,7 @@ impl PostgresConfig {
         let mut sources = HashMap::new();
         for definition in macros {
             let postgres = if let Some(span) = &definition.provenance {
-                owns_source(&span.file, &server_include_dir, &mut sources)?
+                owns_source(&span.file, &server_headers, &mut sources)?
             } else {
                 false
             };
@@ -445,7 +445,7 @@ pub fn postgres_inline_function_names(
     inspected: &FrontendOutput,
     server_include_dir: &Path,
 ) -> Result<Vec<String>, PostgresError> {
-    let root = canonicalize_header_path(server_include_dir)?;
+    let roots = ServerHeaderRoots::new(server_include_dir)?;
     let mut sources = HashMap::new();
     let mut names = Vec::new();
     for (name, function) in &inspected.declarations().function_signatures {
@@ -458,7 +458,7 @@ pub fn postgres_inline_function_names(
             continue;
         }
         if let Some(definition) = &function.definition
-            && owns_source(&definition.provenance.file, &root, &mut sources)?
+            && owns_source(&definition.provenance.file, &roots, &mut sources)?
         {
             names.push(name.clone());
         }
@@ -472,13 +472,13 @@ fn postgres_macro_names(
     server_include_dir: &Path,
     kind: MacroKind,
 ) -> Result<Vec<String>, PostgresError> {
-    let root = canonicalize_header_path(server_include_dir)?;
+    let roots = ServerHeaderRoots::new(server_include_dir)?;
     let mut sources = HashMap::new();
     let mut owned_history = HashSet::new();
     for definition in &inspected.inventory().macros {
         if definition.kind == kind
             && let Some(span) = &definition.provenance
-            && owns_source(&span.file, &root, &mut sources)?
+            && owns_source(&span.file, &roots, &mut sources)?
         {
             owned_history.insert(definition.name.as_str());
         }
@@ -490,7 +490,7 @@ fn postgres_macro_names(
         }
         let owned = match &active.provenance {
             ActiveProvenance::Resolved => match &active.definition.provenance {
-                Some(span) => owns_source(&span.file, &root, &mut sources)?,
+                Some(span) => owns_source(&span.file, &roots, &mut sources)?,
                 None => false,
             },
             ActiveProvenance::Ambiguous(_) | ActiveProvenance::Unresolved => {
@@ -504,17 +504,53 @@ fn postgres_macro_names(
     Ok(names)
 }
 
+/// The physical directories that hold one PostgreSQL server header tree.
+///
+/// This is the canonical server include directory and, when it differs, the directory that
+/// physically holds its `postgres.h`. A package manager can present the server include
+/// directory as a tree of per-file symlinks, as Homebrew does under `/opt/homebrew/include`,
+/// so every header resolves outside that directory. A header symlinked in from anywhere else
+/// still resolves outside both roots, so a symlink cannot promote an external definition.
+#[derive(Debug)]
+pub struct ServerHeaderRoots(Vec<PathBuf>);
+
+impl ServerHeaderRoots {
+    /// Resolve the roots of the server include directory that pgrx inspects.
+    pub fn new(server_include_dir: &Path) -> Result<Self, PostgresError> {
+        let mut roots = vec![canonicalize_header_path(server_include_dir)?];
+        let postgres_h = server_include_dir.join("postgres.h");
+        match postgres_h.canonicalize() {
+            Ok(physical) => {
+                if let Some(directory) = physical.parent()
+                    && !roots.iter().any(|root| directory.starts_with(root))
+                {
+                    roots.push(directory.to_path_buf());
+                }
+            }
+            // Fixture header trees need not contain the real server headers.
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+            Err(source) => return Err(PostgresError::HeaderPath { path: postgres_h, source }),
+        }
+        Ok(Self(roots))
+    }
+
+    /// The path of a canonical header below one of these roots, or `None` outside all of them.
+    pub fn relative<'a>(&self, canonical: &'a Path) -> Option<&'a Path> {
+        self.0.iter().find_map(|root| canonical.strip_prefix(root).ok())
+    }
+}
+
 /// Check canonical physical source ownership while caching repeated header resolutions across the
 /// macro inventory.
 fn owns_source(
     file: &Path,
-    root: &Path,
+    roots: &ServerHeaderRoots,
     cache: &mut HashMap<PathBuf, bool>,
 ) -> Result<bool, PostgresError> {
     if let Some(owned) = cache.get(file) {
         return Ok(*owned);
     }
-    let owned = canonicalize_header_path(file)?.starts_with(root);
+    let owned = roots.relative(&canonicalize_header_path(file)?).is_some();
     cache.insert(file.to_path_buf(), owned);
     Ok(owned)
 }
@@ -619,6 +655,45 @@ mod tests {
                 );
             }
         }
+    }
+
+    /// Homebrew presents the server include directory as real directories of per-file symlinks
+    /// into its Cellar. Those headers belong to the server tree, at their usual relative paths,
+    /// while a header symlinked in from outside the installation still does not.
+    #[cfg(unix)]
+    #[test]
+    fn server_header_roots_follow_per_file_symlinks_but_not_external_headers() {
+        use std::os::unix::fs::symlink;
+        let directory = tempfile::tempdir().unwrap();
+        let cellar = directory.path().join("Cellar/postgresql@18/18.6/include/postgresql/server");
+        let external = directory.path().join("elsewhere/extra.h");
+        let linked = directory.path().join("include/postgresql@18/server");
+        for header in ["postgres.h", "access/htup.h"] {
+            let physical = cellar.join(header);
+            std::fs::create_dir_all(physical.parent().unwrap()).unwrap();
+            std::fs::write(&physical, "").unwrap();
+            std::fs::create_dir_all(linked.join(header).parent().unwrap()).unwrap();
+            symlink(&physical, linked.join(header)).unwrap();
+        }
+        std::fs::create_dir_all(external.parent().unwrap()).unwrap();
+        std::fs::write(&external, "").unwrap();
+        symlink(&external, linked.join("extra.h")).unwrap();
+
+        let roots = ServerHeaderRoots::new(&linked).unwrap();
+        let relative = |header: &str| {
+            let canonical = linked.join(header).canonicalize().unwrap();
+            roots.relative(&canonical).map(Path::to_path_buf)
+        };
+        assert_eq!(relative("postgres.h"), Some(PathBuf::from("postgres.h")));
+        assert_eq!(relative("access/htup.h"), Some(PathBuf::from("access/htup.h")));
+        assert_eq!(relative("extra.h"), None);
+
+        // An ordinary tree, or one reached through a directory symlink, has a single root.
+        let roots = ServerHeaderRoots::new(&cellar).unwrap();
+        assert_eq!(roots.0, vec![cellar.canonicalize().unwrap()]);
+        let directory_link = directory.path().join("opt-server");
+        symlink(&cellar, &directory_link).unwrap();
+        assert_eq!(ServerHeaderRoots::new(&directory_link).unwrap().0, roots.0);
     }
 
     /// Cache publication is stable under racing writers, survives owners, and refuses content
