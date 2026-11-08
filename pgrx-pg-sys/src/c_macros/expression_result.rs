@@ -11,7 +11,7 @@
 //! apply C assignment conversion before extraction, including pointer qualifier
 //! and source-proved null-constant rules.
 
-use super::{CInteger, CValue, IntoCValue, expression::*, sealed};
+use super::{CInteger, CSize, CValue, IntoCValue, expression::*, sealed};
 
 /// Native result extraction, including C void, for the sealed value families.
 pub trait NativeResult: CExprValue {
@@ -114,6 +114,30 @@ impl<V: NativeResult> CExpression<V> {
     /// Extract the evaluated family's native storage at an explicit boundary without promising a C ABI.
     pub fn get(self) -> V::Native {
         self.0.native()
+    }
+}
+/// Extract a result of the target's C `size_t` type as a Rust size.
+impl CExpression<CValue<CSize>> {
+    /// Extract this result as a `usize`, keeping every bit.
+    ///
+    /// This applies to results whose C type is the target's `size_t` type, such
+    /// as `size_t`, `Size`, and `uintptr_t`. That type has `usize`'s width and is
+    /// unsigned. `usize::from` performs the same conversion. A result of another
+    /// C type, such as `int`, does not have this method. Other unsigned types of
+    /// that width can share `size_t`'s C type on some targets but not others:
+    /// since PostgreSQL 18, `uint64` is `unsigned long` like `size_t` on Linux,
+    /// but `unsigned long long` on macOS. Use this method for sizes and addresses.
+    pub fn get_usize(self) -> usize {
+        // The assertion beside `CSize` proves it has `usize`'s width and is
+        // unsigned, so this cast is lossless and inverts `size_value`.
+        self.0.get() as usize
+    }
+}
+/// Convert a result of the target's C `size_t` type to a Rust size.
+impl From<CExpression<CValue<CSize>>> for usize {
+    /// Extract the result as [`CExpression::get_usize`] does.
+    fn from(value: CExpression<CValue<CSize>>) -> Self {
+        value.get_usize()
     }
 }
 /// Convert a scalar result to a Rust condition using C's zero/null test.
@@ -224,6 +248,14 @@ mod tests {
         assert_eq!(result.get(), 7);
         let _: CValue<CInt> = result.into_value();
         assert_eq!(finish(()).get(), ());
+    }
+
+    /// Size results convert to `usize` through both `get_usize` and `From`, keeping every bit.
+    #[test]
+    fn size_results_extract_as_usize() {
+        assert_eq!(finish(input(usize::MAX)).get_usize(), usize::MAX);
+        assert_eq!(finish(input(0_usize)).get_usize(), 0);
+        assert_eq!(usize::from(finish(input(33_usize))), 33);
     }
 
     /// Verify return conversion narrows integers and tests Boolean truth before native result extraction.
