@@ -82,6 +82,7 @@ EOF
     utils/sortsupport.h \
     utils/spccache.h \
     utils/syscache.h \
+    utils/timeout.h \
     utils/tuplesort.h \
     utils/tuplestore.h \
     utils/typcache.h \
