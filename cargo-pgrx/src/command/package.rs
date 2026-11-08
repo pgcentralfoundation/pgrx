@@ -152,6 +152,7 @@ impl Package {
             build_distrib_packages(
                 &pg_config,
                 &package_manifest_path,
+                metadata.workspace_root.as_std_path(),
                 &out_dir,
                 self.target.as_deref(),
                 metadata.target_directory.as_std_path(),
@@ -238,6 +239,7 @@ pub(crate) fn build_base_path(
 fn build_distrib_packages(
     pg_config: &PgConfig,
     manifest_path: &Path,
+    workspace_root: &Path,
     out_dir: &Path,
     target: Option<&str>,
     target_dir: &Path,
@@ -269,14 +271,18 @@ fn build_distrib_packages(
         return Ok(vec![]);
     }
 
+    // Cargo reports the manifest of a package by its absolute path.
+    let manifest_dir = manifest_path.parent().expect("a manifest path names a file in a directory");
+
     // Built once and shared by every package kind
     let lib_file = shared_library_filename(manifest_path, pg_config, cargo_flags)?;
-    let vars = Vars::new(pg_config, out_dir, package, target, lib_file)?;
+    let vars =
+        Vars::new(pg_config, out_dir, manifest_dir, workspace_root, package, target, lib_file)?;
 
     kinds
         .into_iter()
         .map(|(kind, pkg_metadata)| {
-            build_distrib_package(kind, pkg_metadata, &vars, out_dir, target_dir)
+            build_distrib_package(kind, pkg_metadata, &vars, manifest_dir, out_dir, target_dir)
         })
         .collect()
 }
@@ -287,6 +293,7 @@ fn build_distrib_package(
     kind: DistribKind,
     metadata: &toml::Value,
     vars: &Vars,
+    manifest_dir: &Path,
     out_dir: &Path,
     target_dir: &Path,
 ) -> eyre::Result<PathBuf> {
@@ -296,8 +303,9 @@ fn build_distrib_package(
         .wrap_err_with(|| format!("in [package.metadata.{section}]"))?;
     vars.apply(&mut metadata).wrap_err_with(|| format!("in [package.metadata.{section}]"))?;
 
-    let manifest: arx_pack::Manifest =
+    let mut manifest: arx_pack::Manifest =
         metadata.try_into().wrap_err_with(|| format!("invalid [package.metadata.{section}]"))?;
+    resolve_relative_sources(&mut manifest, manifest_dir)?;
 
     let path = match kind {
         DistribKind::Rpm => arx_pack::build_rpm(&manifest, out_dir),
@@ -313,6 +321,32 @@ fn build_distrib_package(
     );
 
     Ok(path)
+}
+
+/// Resolves each relative host path in `manifest` against `manifest_dir`, the directory that
+/// holds the crate's `Cargo.toml`, as Cargo resolves the paths in a manifest. arx-pack would
+/// otherwise read them relative to whichever directory `cargo pgrx` runs in.
+fn resolve_relative_sources(
+    manifest: &mut arx_pack::Manifest,
+    manifest_dir: &Path,
+) -> eyre::Result<()> {
+    let scripts = &mut manifest.scripts;
+    let sources = manifest
+        .files
+        .iter_mut()
+        .map(|file| &mut file.source)
+        .chain(manifest.dirs.iter_mut().map(|dir| &mut dir.source))
+        .chain(
+            [&mut scripts.preinst, &mut scripts.postinst, &mut scripts.prerm, &mut scripts.postrm]
+                .into_iter()
+                .flatten(),
+        );
+    for source in sources {
+        if Path::new(source.as_str()).is_relative() {
+            *source = utf8_path(&manifest_dir.join(&*source))?;
+        }
+    }
+    Ok(())
 }
 
 /// A distribution package format, built from `[package.metadata.<section>]`.
@@ -395,14 +429,20 @@ impl Vars {
     fn new(
         pg_config: &PgConfig,
         out_dir: &Path,
+        manifest_dir: &Path,
+        workspace_root: &Path,
         package: &cargo_toml::Package<toml::Value>,
         target: Option<&str>,
         lib_file: String,
     ) -> eyre::Result<Self> {
         let optional = |value: Option<&str>, reason| value.map(str::to_owned).ok_or(reason);
+        // Absolute, so that a relative `--out-dir` still names the directory below the one
+        // `cargo pgrx` runs in after relative sources resolve against `manifest_dir`.
+        let out_dir = std::path::absolute(out_dir)
+            .wrap_err_with(|| format!("couldn't resolve {}", out_dir.display()))?;
         Ok(Self(HashMap::from([
             ("ARCH", Ok(package_arch(target).to_owned())),
-            ("BUILD_BASE_PATH", Ok(utf8_path(out_dir)?)),
+            ("BUILD_BASE_PATH", Ok(utf8_path(&out_dir)?)),
             (
                 "DESCRIPTION",
                 optional(package.description(), "set `package.description` in Cargo.toml"),
@@ -417,11 +457,13 @@ impl Vars {
             ),
             ("DEB_NAME", Ok(deb_name(package.name()))),
             ("LIB_FILE", Ok(lib_file)),
+            ("MANIFEST_DIR", Ok(utf8_path(manifest_dir)?)),
             ("NAME", Ok(package.name().to_owned())),
             ("PG_MAJOR_VERSION", Ok(pg_config.major_version()?.to_string())),
             ("PG_PKGLIBDIR", Ok(utf8_path(&pg_config.pkglibdir()?)?)),
             ("PG_SHAREDIR", Ok(utf8_path(&pg_config.sharedir()?)?)),
             ("VERSION", Ok(package_version(package.version()))),
+            ("WORKSPACE_ROOT", Ok(utf8_path(workspace_root)?)),
         ])))
     }
 
@@ -506,11 +548,13 @@ mod tests {
             ("LIB_FILE", Ok("my_ext.so".to_owned())),
             ("LICENSE", Err("set `package.license` in Cargo.toml")),
             ("MAINTAINER", Ok("Me".to_owned())),
+            ("MANIFEST_DIR", Ok("/src/my_ext".to_owned())),
             ("NAME", Ok("my_ext".to_owned())),
             ("PG_MAJOR_VERSION", Ok("17".to_owned())),
             ("PG_PKGLIBDIR", Ok("/usr/lib/postgresql/17/lib".to_owned())),
             ("PG_SHAREDIR", Ok("/odd/${NAME}/share".to_owned())),
             ("VERSION", Ok("1.0.0".to_owned())),
+            ("WORKSPACE_ROOT", Ok("/src".to_owned())),
         ]))
     }
 
@@ -656,10 +700,76 @@ mod tests {
             (DistribKind::Rpm, "my-ext_17-1.0.0~rc.1-1.x86_64.rpm"),
             (DistribKind::Deb, "postgresql-17-my-ext_1.0.0~rc.1_amd64.deb"),
         ] {
-            let path = build_distrib_package(kind, &section, &vars, out_dir, out_dir).unwrap();
+            let path =
+                build_distrib_package(kind, &section, &vars, out_dir, out_dir, out_dir).unwrap();
             assert_eq!(path, out_dir.join(expected));
             assert!(path.is_file(), "{}", path.display());
         }
+    }
+
+    #[test]
+    fn resolves_relative_sources_against_the_manifest_dir() {
+        let mut manifest = arx_pack::Manifest::from_toml_str(
+            r#"
+            name = "my-ext"
+            version = "1.0.0"
+            arch = "x86_64"
+            maintainer = "Me"
+            description = "My extension"
+            license = "MIT"
+            files = [
+              { source = "/staged/my_ext.so", dest = "/lib/my_ext.so", mode = "0755" },
+              { source = "../LICENSE", dest = "/doc/copyright", mode = "0644" },
+            ]
+            dirs = [{ source = "sql/", dest = "/share/extension/" }]
+            scripts = { postinst = "packaging/postinst" }
+            "#,
+        )
+        .unwrap();
+        resolve_relative_sources(&mut manifest, Path::new("/src/my_ext")).unwrap();
+
+        assert_eq!(manifest.files[0].source, "/staged/my_ext.so");
+        assert_eq!(manifest.files[1].source, "/src/my_ext/../LICENSE");
+        assert_eq!(manifest.dirs[0].source, "/src/my_ext/sql/");
+        assert_eq!(manifest.scripts.postinst.as_deref(), Some("/src/my_ext/packaging/postinst"));
+        assert_eq!(manifest.scripts.preinst, None);
+    }
+
+    // `cargo test` runs in the cargo-pgrx directory, which has no `copyright` file, so the
+    // package builds only if the relative source is read from the manifest directory.
+    #[cfg(unix)]
+    #[test]
+    fn reads_relative_sources_from_the_manifest_dir() {
+        let out_dir = tempfile::tempdir().unwrap();
+        let manifest_dir = tempfile::tempdir().unwrap();
+        std::fs::write(out_dir.path().join("my_ext.so"), "library").unwrap();
+        std::fs::write(manifest_dir.path().join("copyright"), "MIT").unwrap();
+
+        let mut vars = vars();
+        vars.0.extend([
+            ("BUILD_BASE_PATH", Ok(utf8_path(out_dir.path()).unwrap())),
+            ("LICENSE", Ok("MIT".to_owned())),
+        ]);
+        let section: toml::Value = toml::from_str(
+            r#"
+            files = [
+              { source = "${BUILD_BASE_PATH}/${LIB_FILE}", dest = "/lib/${LIB_FILE}", mode = "0644" },
+              { source = "copyright", dest = "/usr/share/doc/${NAME}/copyright", mode = "0644" },
+            ]
+            dirs = []
+            "#,
+        )
+        .unwrap();
+        let path = build_distrib_package(
+            DistribKind::Deb,
+            &section,
+            &vars,
+            manifest_dir.path(),
+            out_dir.path(),
+            out_dir.path(),
+        )
+        .unwrap();
+        assert!(path.is_file(), "{}", path.display());
     }
 
     #[test]

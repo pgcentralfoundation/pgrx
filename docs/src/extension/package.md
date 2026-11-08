@@ -142,6 +142,18 @@ dirs = [
 directory's contents. Packages are built with the [`arx-pack`] crate, and its [`Manifest`] documents
 every key a section accepts, including `conflicts`, `provides`, `replaces`, and maintainer scripts.
 
+A relative `source`, or a relative path to a maintainer script, is read from the crate's directory,
+the one that holds its `Cargo.toml`, wherever you run `cargo pgrx package`. This DEB also ships the
+workspace's license:
+
+```toml
+[package.metadata.deb]
+files = [
+  { source = "${BUILD_BASE_PATH}/${PG_PKGLIBDIR}/${LIB_FILE}", dest = "/usr/lib/postgresql/${PG_MAJOR_VERSION}/lib/${LIB_FILE}", mode = "0644" },
+  { source = "${WORKSPACE_ROOT}/LICENSE", dest = "/usr/share/doc/postgresql-${PG_MAJOR_VERSION}-${DEB_NAME}/LICENSE", mode = "0644" },
+]
+```
+
 [`arx-pack`]: https://crates.io/crates/arx-pack
 [`Manifest`]: https://docs.rs/arx-pack/latest/arx_pack/struct.Manifest.html
 
@@ -162,6 +174,10 @@ an error.
 | `${PG_PKGLIBDIR}`     | `pg_config --pkglibdir`                                        |
 | `${PG_SHAREDIR}`      | `pg_config --sharedir`                                         |
 | `${BUILD_BASE_PATH}`  | The output directory that holds the staged files               |
+| `${MANIFEST_DIR}`     | The directory that holds the crate's `Cargo.toml`              |
+| `${WORKSPACE_ROOT}`   | The root directory of the crate's Cargo workspace              |
+
+`${BUILD_BASE_PATH}`, `${MANIFEST_DIR}` and `${WORKSPACE_ROOT}` are absolute paths.
 
 Use `${LIB_FILE}` for the library rather than building its name from `${NAME}`. The two differ for a
 crate with a hyphenated name or for a versioned shared library.

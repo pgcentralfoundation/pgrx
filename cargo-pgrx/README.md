@@ -1017,8 +1017,16 @@ String values in these sections can use the following variables:
 | `${PG_PKGLIBDIR}`     | `pg_config --pkglibdir`                                 |
 | `${PG_SHAREDIR}`      | `pg_config --sharedir`                                  |
 | `${BUILD_BASE_PATH}`  | the output directory that holds the packaged files      |
+| `${MANIFEST_DIR}`     | the directory that holds the crate's `Cargo.toml`       |
+| `${WORKSPACE_ROOT}`   | the root directory of the crate's Cargo workspace       |
 
 These are not environment variables. Only the names above are recognized.
+`${BUILD_BASE_PATH}`, `${MANIFEST_DIR}` and `${WORKSPACE_ROOT}` are absolute paths.
+
+A relative `source` in `files` or `dirs`, or a relative path to a maintainer script,
+is read from the crate's directory, the one that holds its `Cargo.toml`, wherever you
+run `cargo pgrx package`. For example, `{ source = "${WORKSPACE_ROOT}/LICENSE", ... }`
+or `{ source = "../LICENSE", ... }` ships a license kept at the root of a workspace.
 
 `${LIB_FILE}` is the file `cargo pgrx package` installed. It follows the extension's
 control file, so it can differ from `${NAME}` for a crate with a hyphenated name or a
