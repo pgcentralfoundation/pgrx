@@ -342,6 +342,74 @@ impl<'a> Renderer<'a> {
         ))
     }
 
+    /// Refuse a body that converts a value as if by assignment to a type C reaches only
+    /// through a cast. PostgreSQL's MSVC atomics, for example, pass `&ptr->value`, a pointer to
+    /// `uint32`, where `InterlockedExchange` takes a pointer to `LONG`. The runtime admits only
+    /// C's implicit conversions, and the types of a translated function's body do not depend
+    /// on its caller, so no call would compile.
+    ///
+    /// Prototyped call arguments, simple assignments, initializers and returns convert this
+    /// way. A conversion is refused only when compiler facts prove the types incompatible.
+    pub(super) fn check_own_conversions(&self) -> Result<(), SkipReason> {
+        use super::demands::{Compatibility, call_parameters, possible_null_constant};
+        use crate::syntax::Statement;
+        let expression = self.analysis.expression.as_ref().expect("candidate expression");
+        let body = expression.syntax.statement_body.as_ref().expect("statement body");
+        let declarations = self.frontend.declarations();
+        let target = &self.frontend.profile().target;
+        let compatibility = Compatibility::new(declarations, target);
+        let convert = |node: NodeId, ty: &TypeInfo| {
+            let Some(source) = &self.objects[node] else { return Ok(()) };
+            let null = possible_null_constant(&expression.syntax, node);
+            if compatibility.implicit(source, ty, null) != Some(false) {
+                return Ok(());
+            }
+            Err(skip(
+                self.analysis,
+                SkipReasonCode::UnsupportedType,
+                format!("C does not implicitly convert `{}` to `{}`", source.spelling, ty.spelling),
+                Some(expression.syntax.nodes[node].tokens),
+            ))
+        };
+        for node in &expression.syntax.nodes {
+            match &node.kind {
+                ExpressionKind::Call { callee, arguments } => {
+                    let parameters = call_parameters(
+                        declarations,
+                        &expression.syntax,
+                        &self.objects,
+                        &compatibility,
+                        *callee,
+                    );
+                    for (argument, parameter) in arguments.iter().zip(parameters.unwrap_or(&[])) {
+                        convert(*argument, parameter)?;
+                    }
+                }
+                ExpressionKind::Assignment { operator: None, place, value } => {
+                    if let Some(place) = &self.objects[*place] {
+                        convert(*value, place)?;
+                    }
+                }
+                _ => {}
+            }
+        }
+        let result = &declarations.function_signatures[&self.analysis.name].signature.result;
+        for statement in body.walk() {
+            match statement {
+                Statement::Declaration { type_name, initializer: Some(initializer), .. } => {
+                    if let Some(ty) =
+                        crate::analysis::resolve_type_info(type_name, declarations, target)
+                    {
+                        convert(*initializer, &ty)?;
+                    }
+                }
+                Statement::Return { expression, .. } => convert(*expression, result)?,
+                _ => {}
+            }
+        }
+        Ok(())
+    }
+
     /// Lower a translated function's argument for its parameter's initialization.
     ///
     /// Converting the argument to its parameter type is a call boundary, not part of the

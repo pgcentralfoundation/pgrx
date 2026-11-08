@@ -26,7 +26,8 @@ mod oracle;
 mod rust_oracle;
 
 use pgrx_c_macros::{
-    AnalysisSession, EmissionStatus, MacroScanner, generate_with_bindings, inspect,
+    AnalysisSession, BindingCatalog, EmissionStatus, FrontendOutput, IntegerKind, MacroGeneration,
+    MacroScanner, generate_with_bindings, inspect,
 };
 use std::path::PathBuf;
 
@@ -47,6 +48,9 @@ const NAMES: &[&str] = &[
     "WrapBumpTwice",
     "WrapShadeRank",
     "WrapNative",
+    "WrapAtomicExchange32",
+    "WrapAtomicExchange64",
+    "WrapAtomicRead32",
 ];
 
 /// The fixture header.
@@ -91,16 +95,24 @@ fn guard(bindings: &str) -> String {
     quote::quote!(#file).to_string()
 }
 
-#[test]
-fn translated_inline_functions_replace_their_bindings() {
-    let scanner = MacroScanner::new().expect("libclang must be available");
-    let mut arguments = oracle::native_arguments();
-    arguments.push("-std=c17".into());
-    let frontend = inspect(&scanner, &header(), &arguments, None).expect("inspect definitions");
+/// Prepare the fixture's inline function roots.
+fn prepare<'a>(scanner: &'a MacroScanner, frontend: &'a FrontendOutput) -> AnalysisSession<'a> {
+    AnalysisSession::prepare_with_inline_functions(
+        scanner,
+        frontend,
+        &[] as &[String],
+        &[] as &[String],
+        NAMES,
+    )
+    .expect("prepare roots")
+}
+
+/// Bind the fixture as production does, calling static inline functions through bindgen's C
+/// wrappers.
+fn bind(frontend: &FrontendOutput) -> String {
     let directory =
         std::env::temp_dir().join(format!("pgrx-inline-functions-{}", std::process::id()));
     std::fs::create_dir_all(&directory).unwrap();
-    // Production bindings call static inline functions through bindgen's C wrappers.
     let bindings = bindgen::Builder::default()
         .rust_target(bindgen::RustTarget::stable(85, 0).unwrap())
         .rust_edition(bindgen::RustEdition::Edition2024)
@@ -119,20 +131,44 @@ fn translated_inline_functions_replace_their_bindings() {
         .expect("generate bindings")
         .to_string();
     std::fs::remove_dir_all(&directory).unwrap();
-    let session = AnalysisSession::prepare_with_inline_functions(
-        &scanner,
-        &frontend,
-        &[] as &[String],
-        &[] as &[String],
-        NAMES,
-    )
-    .expect("prepare roots");
-    let mut catalog = binding_symbols::collect_bindings(
-        &syn::parse_file(&bindings).unwrap(),
+    bindings
+}
+
+/// Catalog the bindings with production's storage collector, without a thread check or guard.
+fn catalog(
+    frontend: &FrontendOutput,
+    session: &AnalysisSession<'_>,
+    bindings: &str,
+) -> BindingCatalog {
+    binding_symbols::collect_bindings(
+        &syn::parse_file(bindings).unwrap(),
         session.integer_constants(),
         frontend.declarations(),
         &frontend.profile().target,
-    );
+    )
+}
+
+/// The atomic bodies that pass an incompatible pointer keep their native calls, and their
+/// macros' reports say why. The body that passes a compatible pointer is translated.
+fn assert_atomics(generated: &MacroGeneration) {
+    assert!(generated.functions.contains("pub unsafe fn WrapAtomicRead32("));
+    for name in ["WrapAtomicExchange32", "WrapAtomicExchange64"] {
+        assert!(!generated.functions.contains(&format!("fn {name}(")), "{name}");
+        let emission = generated.macros.iter().find(|emission| emission.analysis.name == name);
+        let reason = emission.and_then(|emission| emission.fallback.as_ref()).expect(name);
+        assert!(reason.message.contains("does not implicitly convert"), "{name}: {reason:?}");
+    }
+}
+
+#[test]
+fn translated_inline_functions_replace_their_bindings() {
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let mut arguments = oracle::native_arguments();
+    arguments.push("-std=c17".into());
+    let frontend = inspect(&scanner, &header(), &arguments, None).expect("inspect definitions");
+    let session = prepare(&scanner, &frontend);
+    let bindings = bind(&frontend);
+    let mut catalog = catalog(&frontend, &session, &bindings);
     // The functions need both the thread check they keep and the guard the translations'
     // native calls keep.
     catalog.ffi_boundary = Some(vec!["ffi".into(), "pg_guard_ffi_boundary".into()]);
@@ -151,6 +187,7 @@ fn translated_inline_functions_replace_their_bindings() {
     for name in ["WrapShadeRank", "WrapNative"] {
         assert!(!generated.functions.contains(&format!("fn {name}(")), "{name}");
     }
+    assert_atomics(&generated);
 
     let support = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("../pgrx-pg-sys/src/c_macros/support.rs")
@@ -183,4 +220,23 @@ fn translated_inline_functions_replace_their_bindings() {
         "add\t5\nnext\t1\nstore\t7\nkeyword\t42\nbump\t7\nbump twice\t9\nchecks\t2\n"
     );
     session.verify_inputs().expect("original profile stayed unchanged");
+    // libclang allows one runtime per process, so the LLP64 case shares this test's scanner.
+    llp64_atomic_bodies_keep_their_native_calls(&scanner);
+}
+
+/// Where `long` has the width of `unsigned int`, as on Windows, C still converts neither
+/// atomic body's pointer argument implicitly. Inspecting the header needs no Windows SDK.
+fn llp64_atomic_bodies_keep_their_native_calls(scanner: &MacroScanner) {
+    let arguments = ["--target=x86_64-pc-windows-msvc".into(), "-std=c17".into()];
+    let frontend = inspect(scanner, &header(), &arguments, None).expect("inspect definitions");
+    let target = &frontend.profile().target;
+    assert_eq!(
+        target.integers[&IntegerKind::Long].bits,
+        target.integers[&IntegerKind::UnsignedInt].bits
+    );
+    let session = prepare(scanner, &frontend);
+    let mut catalog = catalog(&frontend, &session, &bind(&frontend));
+    catalog.thread_check = Some(vec!["thread_check".into()]);
+    catalog.ffi_boundary = Some(vec!["ffi".into(), "pg_guard_ffi_boundary".into()]);
+    assert_atomics(&generate_with_bindings(&session, NAMES, &catalog).unwrap());
 }

@@ -34,5 +34,26 @@ static inline int WrapNative(int value)
 	WRAP_HELPER(&value);
 	return value;
 }
+/* PostgreSQL's MSVC atomics pass a pointer to unsigned storage where `Interlocked*` takes
+ * a pointer to `long` or `long long`. C converts neither pointer without a cast, so these
+ * two bodies keep the native call. The third passes a compatible pointer. */
+typedef struct WrapAtomic32 { volatile unsigned int value; } WrapAtomic32;
+typedef struct WrapAtomic64 { volatile unsigned long long value; } WrapAtomic64;
+extern long WrapExchange32(volatile long *target, long value);
+extern long long WrapExchange64(volatile long long *target, long long value);
+extern unsigned int WrapLoad32(volatile unsigned int *source);
+static inline unsigned int WrapAtomicExchange32(volatile WrapAtomic32 *ptr, unsigned int value)
+{
+	return WrapExchange32(&ptr->value, value);
+}
+static inline unsigned long long WrapAtomicExchange64(volatile WrapAtomic64 *ptr,
+													  unsigned long long value)
+{
+	return WrapExchange64(&ptr->value, value);
+}
+static inline unsigned int WrapAtomicRead32(volatile WrapAtomic32 *ptr)
+{
+	return WrapLoad32(&ptr->value);
+}
 
 #endif

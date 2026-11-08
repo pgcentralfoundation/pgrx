@@ -90,6 +90,7 @@ pub(super) fn render_inline(
         return refuse("a translated void function cannot return", body.return_tokens);
     }
     renderer.check_own_floats()?;
+    renderer.check_own_conversions()?;
     let count = analysis.parameters.len();
     let Some((parameters, statements)) = body.statements.split_at_checked(count) else {
         return refuse("a translated function body lacks its parameter declarations", None);

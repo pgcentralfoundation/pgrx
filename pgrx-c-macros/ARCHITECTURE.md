@@ -507,7 +507,13 @@ match ends, as a call keeps them until its statement ends. The parameter locals
 are then initialized from the bound values. In a value-returning function every
 path must return, and `return` breaks out of a labeled block, converted to the
 result type; a void body has no `return` and evaluates to `()`. Rust hygiene keeps
-caller tokens from seeing the locals, so no local-name guard applies. A body the
+caller tokens from seeing the locals, so no local-name guard applies. The
+renderer refuses a body that converts a value as if by assignment, in a
+prototyped call argument, a simple assignment, an initializer or a `return`,
+where compiler facts prove C needs a cast. PostgreSQL's MSVC atomics, for
+example, pass a pointer to `uint32` where `InterlockedExchange` takes a pointer
+to `LONG`. The runtime implements only C's implicit conversions, and the body's
+types do not depend on its caller, so no call would compile. A body the
 analyzer or renderer refuses falls back to the call root. A renderer refusal is
 kept as the emission's `fallback` reason in the report, without the token range
 that would index the translated body. Demand planning covers the call root of
