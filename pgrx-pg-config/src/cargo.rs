@@ -8,6 +8,7 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 use std::path::Path;
+use std::process::Command;
 
 use cargo_toml::Manifest;
 use eyre::eyre;
@@ -78,4 +79,71 @@ impl PgrxManifestExt for Manifest {
 /// Helper functions to read `Cargo.toml` and remap error to `eyre::Result`.
 pub fn read_manifest<T: AsRef<Path>>(path: T) -> eyre::Result<Manifest> {
     Manifest::from_path(path).map_err(|err| eyre!("Couldn't parse manifest: {err}"))
+}
+
+/// Keep a Cargo command from inheriting the variables that `cargo run` and `cargo test` set to
+/// describe the running package, such as `CARGO_MANIFEST_DIR`, `CARGO_PKG_NAME` and `OUT_DIR`.
+///
+/// Cargo checks a build script's `rerun-if-env-changed` variables against its own environment.
+/// Started from a test binary, a nested Cargo would see that binary's package variables, which
+/// differ for every test binary, so a build script that tracks one (`ring`'s does) reruns and
+/// its crate and every crate above it rebuild on each call. Cargo sets these variables itself
+/// for each crate it builds, so the nested build never needs the inherited values.
+pub fn remove_package_env(command: &mut Command) {
+    for (name, _) in std::env::vars_os() {
+        if name.to_str().is_some_and(is_package_env) {
+            command.env_remove(name);
+        }
+    }
+}
+
+/// Whether Cargo sets this variable to describe one package or binary rather than to configure
+/// Cargo itself.
+fn is_package_env(name: &str) -> bool {
+    matches!(
+        name,
+        "CARGO_MANIFEST_DIR"
+            | "CARGO_MANIFEST_PATH"
+            | "CARGO_MANIFEST_LINKS"
+            | "CARGO_CRATE_NAME"
+            | "CARGO_BIN_NAME"
+            | "CARGO_PRIMARY_PACKAGE"
+            | "CARGO_TARGET_TMPDIR"
+            | "CARGO_RUSTC_CURRENT_DIR"
+            | "OUT_DIR"
+    ) || name.starts_with("CARGO_PKG_")
+        || name.starts_with("CARGO_BIN_EXE_")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::is_package_env;
+
+    #[test]
+    fn package_env_excludes_cargo_configuration() {
+        for name in [
+            "CARGO_MANIFEST_DIR",
+            "CARGO_PKG_NAME",
+            "CARGO_PKG_VERSION_MAJOR",
+            "CARGO_CRATE_NAME",
+            "CARGO_BIN_EXE_cargo-pgrx",
+            "CARGO_TARGET_TMPDIR",
+            "OUT_DIR",
+        ] {
+            assert!(is_package_env(name), "{name}");
+        }
+        // Configuration that a nested Cargo must keep.
+        for name in [
+            "CARGO",
+            "CARGO_HOME",
+            "CARGO_TARGET_DIR",
+            "CARGO_INCREMENTAL",
+            "CARGO_PROFILE_DEV_DEBUG",
+            "CARGO_BUILD_TARGET",
+            "CARGO_TERM_COLOR",
+            "CARGO_NET_OFFLINE",
+        ] {
+            assert!(!is_package_env(name), "{name}");
+        }
+    }
 }
