@@ -26,14 +26,12 @@ set -x
 # │   [build-dependencies]
 # │   └── pgrx-pg-sys
 # │       └── pgrx
-# │           ├── pgrx-bench
 # │           └── pgrx-tests
 # └── pgrx-tests
 #
 # pgrx-sql-entity-graph
 # ├── cargo-pgrx
 # ├── pgrx
-# │   ├── pgrx-bench
 # │   └── pgrx-tests
 # ├── pgrx-macros
 # │   ├── pgrx
