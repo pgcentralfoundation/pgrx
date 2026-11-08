@@ -22,15 +22,15 @@ pub struct TransactionId(u32);
 
 impl TransactionId {
     /// Invalid transaction identity from the selected PostgreSQL headers.
-    pub const INVALID: Self = Self(crate::InvalidTransactionId);
+    pub const INVALID: Self = Self(crate::include::InvalidTransactionId);
     /// Bootstrap transaction identity from the selected PostgreSQL headers.
-    pub const BOOTSTRAP: Self = Self(crate::BootstrapTransactionId);
+    pub const BOOTSTRAP: Self = Self(crate::include::BootstrapTransactionId);
     /// Frozen transaction identity from the selected PostgreSQL headers.
-    pub const FROZEN: Self = Self(crate::FrozenTransactionId);
+    pub const FROZEN: Self = Self(crate::include::FrozenTransactionId);
     /// First normal transaction identity from the selected PostgreSQL headers.
-    pub const FIRST_NORMAL: Self = Self(crate::FirstNormalTransactionId);
+    pub const FIRST_NORMAL: Self = Self(crate::include::FirstNormalTransactionId);
     /// Maximum transaction identity from the selected PostgreSQL headers.
-    pub const MAX: Self = Self(crate::MaxTransactionId);
+    pub const MAX: Self = Self(crate::include::MaxTransactionId);
 
     pub const fn from_inner(xid: u32) -> Self {
         Self(xid)

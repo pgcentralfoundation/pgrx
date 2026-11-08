@@ -151,11 +151,10 @@ so code that supports both needs a `cfg` split.
 
 ### Changed constants and version-specific items
 
-`InvalidTransactionId`, `BootstrapTransactionId`, `FrozenTransactionId`,
-`FirstNormalTransactionId`, and `MaxTransactionId` are now the bindgen `u32`
-constants rather than `TransactionId`s; use the matching `pg_sys::TransactionId`
-constants, such as `TransactionId::FIRST_NORMAL`. `pg_sys::InvalidOid` is still
-an `Oid`.
+Constants that PostgreSQL defines as casts to `Oid`, `RelFileNumber`,
+`TransactionId`, or `MultiXactId` have pgrx's wrapper types: `pg_sys::InvalidOid`
+is an `Oid`, `pg_sys::FirstNormalTransactionId` is a `TransactionId`, and so on.
+Generated macros accept them with their original C types.
 `pg_sys::VARHDRSZ` is now C `int` (`i32`) instead of `usize`, so convert it
 explicitly where you need a size. `pg_sys::SizeOfPageHeaderData` is now a
 `usize` constant rather than a `const fn`; drop the call parentheses.

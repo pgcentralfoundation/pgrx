@@ -47,13 +47,32 @@ fn checked_newtype_inputs_keep_their_c_integer_identity() {
     assert_eq!(value.get(), 3_u32);
 }
 
-/// Checks that `InvalidOid` stays an `Oid`, which generated macros accept as C `Oid`.
+/// Checks that constants PostgreSQL casts to `Oid`, `RelFileNumber`, `TransactionId` or
+/// `MultiXactId` keep pgrx's wrapper types, which generated macros accept as those C types.
 #[test]
-fn invalid_oid_is_an_oid() {
+fn wrapper_typed_constants_keep_their_types() {
     let invalid: pg::Oid = pg::InvalidOid;
     assert_eq!(invalid, pg::Oid::INVALID);
     assert!(!pg::OidIsValid!(pg::InvalidOid).is_true());
     assert!(pg::OidIsValid!(pg::BOOLOID).is_true());
+    #[cfg(not(feature = "pg15"))]
+    {
+        let invalid: pg::RelFileNumber = pg::InvalidRelFileNumber;
+        assert_eq!(invalid, pg::Oid::INVALID);
+    }
+    let xids: [pg::TransactionId; 5] = [
+        pg::InvalidTransactionId,
+        pg::BootstrapTransactionId,
+        pg::FrozenTransactionId,
+        pg::FirstNormalTransactionId,
+        pg::MaxTransactionId,
+    ];
+    assert_eq!(xids.map(pg::TransactionId::into_inner), [0, 1, 2, 3, u32::MAX]);
+    assert!(!pg::TransactionIdIsNormal!(pg::FrozenTransactionId).is_true());
+    assert!(pg::TransactionIdIsNormal!(pg::FirstNormalTransactionId).is_true());
+    let multis: [pg::MultiXactId; 3] =
+        [pg::InvalidMultiXactId, pg::FirstMultiXactId, pg::MaxMultiXactId];
+    assert_eq!(multis.map(pg::MultiXactId::into_inner), [0, 1, u32::MAX]);
 }
 
 /// Checks that public macro expansion repeats the selected Max operand exactly as the C
