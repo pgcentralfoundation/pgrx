@@ -142,9 +142,10 @@ not modify. Documentation-only changes need reference, wording, and diff review.
   combinations such as `cshim` and `proptest`; use the applicable CI commands for
   those. Check affected FFI against the actual target headers and server,
   including a new beta when changing beta support.
-- Run `cargo fmt --all -- --check` for Rust changes and `git diff --check` before
-  committing. Keep existing tests meaningful; do not skip a failing check or
-  weaken an assertion to make the result pass.
+- Agents must run `cargo fmt --all` before committing or pushing anything to this
+  repository, whatever the change, and `git diff --check` before committing.
+  Keep existing tests meaningful; do not skip a failing check or weaken an
+  assertion to make the result pass.
 - Use isolated test data and an isolated `PGRX_HOME` for database experiments.
   `cargo pgrx regress` can reuse a running instance and recreate a database;
   establish that both belong to the task before using it. Do not access or
