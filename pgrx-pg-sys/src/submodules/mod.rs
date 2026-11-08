@@ -7,6 +7,7 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+pub mod align;
 pub mod datum;
 pub mod transaction_id;
 #[macro_use]
@@ -26,6 +27,7 @@ pub mod utils;
 // Various SqlTranslatable mappings for SQL generation
 mod sql_translatable;
 
+pub use align::*;
 pub use datum::Datum;
 pub use transaction_id::{MultiXactId, TransactionId};
 

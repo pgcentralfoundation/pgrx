@@ -144,6 +144,15 @@ turns out to be `1.2.0`, `sql/` has a script from `1.1.0` to `1.2.0` and nothing
 database needs `DROP EXTENSION` and a fresh `CREATE EXTENSION`, so keep the extension in databases
 you can rebuild.
 
+A database created from a development install also reports the temporary version. Its
+`pg_extension.extversion` is `1.1.1`, not the version in `Cargo.toml`, and that includes the
+databases `cargo pgrx test` creates. Code that compares `extversion` with
+`env!("CARGO_PKG_VERSION")`, for example to wait until `ALTER EXTENSION ... UPDATE` has run, sees a
+mismatch in every one of them. Compare `extversion` with `default_version` from
+`pg_available_extensions` instead, which names the temporary version in a development install and
+the released version in a released one. That view reads every control file in the extension
+directory, so look it up once rather than on every pass of a loop.
+
 ### Leaving Fragments Out
 
 Every installing command takes `--no-assemble-unreleased`. It also skips reading the fragments, so

@@ -464,6 +464,12 @@ impl IntoDatum for pg_sys::Datum {
     fn type_oid() -> pg_sys::Oid {
         pg_sys::INT8OID
     }
+
+    /// A raw Datum can hold a value of any type, and only `unsafe` code can read what it points
+    /// to, so it can read every type, including each element of an array as `Array<Datum>`.
+    fn is_compatible_with(_other: pg_sys::Oid) -> bool {
+        true
+    }
 }
 
 #[cfg(test)]

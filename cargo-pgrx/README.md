@@ -901,6 +901,7 @@ Options:
       --cargo <FLAG>                   Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
       --assemble-unreleased            Assemble unreleased SQL fragments into the package instead of refusing to build it
       --no-assemble-unreleased         Build the package without unreleased SQL fragments instead of refusing to build it
+      --no-distrib-packages            Skip the RPM and DEB packages that `[package.metadata.rpm]` and `[package.metadata.deb]` declare
       --prefix-dir <PREFIX_DIR>        The directory within out_dir to put extension assets (default is based on pg_config path)
   -h, --help                           Print help
   -V, --version                        Print version
@@ -945,7 +946,8 @@ An empty section uses the default specs below. The `description`, `license`,
 and first `authors` entry of `[package]` fill in the package fields of the same
 name, so `cargo pgrx package` reports an error if one of them is missing. On
 other platforms, `cargo pgrx package` prints a warning and skips these packages.
-`cargo pgrx install --sudo` never builds them.
+`cargo pgrx install --sudo` never builds them, and `cargo pgrx package
+--no-distrib-packages` skips them when only the staged files are needed.
 
 The default RPM specs are compatible with the PGDG Postgres packages:
 

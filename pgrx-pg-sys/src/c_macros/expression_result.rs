@@ -11,7 +11,7 @@
 //! apply C assignment conversion before extraction, including pointer qualifier
 //! and source-proved null-constant rules.
 
-use super::{CInteger, CSize, CValue, IntoCValue, expression::*, sealed};
+use super::{CInteger, CSize, CUnsignedInt, CValue, IntoCValue, expression::*, sealed};
 
 /// Native result extraction, including C void, for the sealed value families.
 pub trait NativeResult: CExprValue {
@@ -140,6 +140,58 @@ impl From<CExpression<CValue<CSize>>> for usize {
         value.get_usize()
     }
 }
+/// Convert a result of C type `unsigned int`, which is `Oid`'s C type, to an `Oid`.
+///
+/// Like [`CExpression::get_usize`], this goes by the result's C type, so it accepts any
+/// `unsigned int` result, not only one that PostgreSQL declares as `Oid`.
+impl From<CExpression<CValue<CUnsignedInt>>> for crate::Oid {
+    /// Keep the result's 32 bits, as a C assignment to an `Oid` does.
+    fn from(value: CExpression<CValue<CUnsignedInt>>) -> Self {
+        crate::Oid::from_u32(value.get())
+    }
+}
+/// Convert a result of C type `unsigned int`, which is `TransactionId`'s C type, to a
+/// `TransactionId`.
+///
+/// Like [`CExpression::get_usize`], this goes by the result's C type, so it accepts any
+/// `unsigned int` result, not only one that PostgreSQL declares as `TransactionId`.
+impl From<CExpression<CValue<CUnsignedInt>>> for crate::TransactionId {
+    /// Keep the result's 32 bits, as a C assignment to a `TransactionId` does.
+    fn from(value: CExpression<CValue<CUnsignedInt>>) -> Self {
+        crate::TransactionId::from_inner(value.get())
+    }
+}
+/// Convert a result of `Datum`'s C type to a `Datum`.
+impl From<CExpression<CValue<<crate::Datum as IntoCValue>::Kind>>> for crate::Datum {
+    /// Take back the provenance that a pointer exposed when it became the integer, as a C cast
+    /// from `Datum` to a pointer does, so Rust may read through the result.
+    fn from(value: CExpression<CValue<<crate::Datum as IntoCValue>::Kind>>) -> Self {
+        crate::Datum::from(core::ptr::with_exposed_provenance_mut::<()>(value.get() as usize))
+    }
+}
+/// Convert an integer result to a Rust integer type, checking that the value fits.
+impl<K: CInteger> CExpression<CValue<K>> {
+    /// Extract this integer result as `T`, panicking if the value does not fit.
+    ///
+    /// Use this where a result's C type differs between PostgreSQL versions, such as
+    /// `PageGetMaxOffsetNumber`, whose result is `size_t` on PG15 and `OffsetNumber` on PG16
+    /// and later. `.get() as T` builds against both but truncates without a check, and Clippy
+    /// reports it as an unnecessary cast where the types already match.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the value does not fit in `T`.
+    #[track_caller]
+    pub fn get_as<T: TryFrom<K::Repr>>(self) -> T {
+        let value = self.0.get();
+        match T::try_from(value) {
+            Ok(converted) => converted,
+            Err(_) => {
+                panic!("C macro result {value:?} does not fit in {}", core::any::type_name::<T>())
+            }
+        }
+    }
+}
 /// Convert a scalar result to a Rust condition using C's zero/null test.
 impl<V: Truth> CExpression<V> {
     /// Test this already evaluated scalar without repeating its operands.
@@ -256,6 +308,33 @@ mod tests {
         assert_eq!(finish(input(usize::MAX)).get_usize(), usize::MAX);
         assert_eq!(finish(input(0_usize)).get_usize(), 0);
         assert_eq!(usize::from(finish(input(33_usize))), 33);
+    }
+
+    /// Integer results convert to any Rust integer type that holds the value.
+    #[test]
+    fn integer_results_extract_as_any_type_that_fits() {
+        assert_eq!(finish(input(300_i32)).get_as::<u16>(), 300);
+        assert_eq!(finish(input(-1_i32)).get_as::<i64>(), -1);
+        assert_eq!(finish(input(7_usize)).get_as::<u16>(), 7);
+    }
+
+    /// `unsigned int` results convert to the pgrx types whose C type it is, and a Datum
+    /// result to a Datum that keeps its pointer.
+    #[test]
+    fn id_and_datum_results_convert_to_pgrx_types() {
+        assert_eq!(crate::Oid::from(finish(input(crate::Oid::from_u32(42)))).to_u32(), 42);
+        let xid = crate::TransactionId::from_inner(u32::MAX);
+        assert_eq!(crate::TransactionId::from(finish(input(xid))), xid);
+        let mut value = 7_u8;
+        let datum = crate::Datum::from(finish(input(crate::Datum::from(&raw mut value))));
+        assert_eq!(datum.cast_mut_ptr::<u8>(), &raw mut value);
+    }
+
+    /// A value that does not fit panics instead of truncating.
+    #[test]
+    #[should_panic(expected = "does not fit in u16")]
+    fn integer_results_reject_a_type_that_cannot_hold_the_value() {
+        finish(input(-1_i32)).get_as::<u16>();
     }
 
     /// Verify return conversion narrows integers and tests Boolean truth before native result extraction.

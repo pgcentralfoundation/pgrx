@@ -2075,7 +2075,8 @@ fn write_content_stable(path: &Path, content: &[u8]) -> eyre::Result<()> {
 fn add_blocklists(bind: bindgen::Builder, major_version: u16) -> bindgen::Builder {
     let bind = if major_version < 16 {
         // PG15's unprototyped tree callbacks have explicit guarded ABI
-        // declarations. On later versions these names are generated C macros.
+        // declarations. On later versions these names are generated C macros,
+        // and port.rs wraps the functions they expand to under the same names.
         bind.blocklist_function("expression_tree_walker")
             .blocklist_function("planstate_tree_walker")
             .blocklist_function("query_or_expression_tree_walker")
@@ -2083,6 +2084,10 @@ fn add_blocklists(bind: bindgen::Builder, major_version: u16) -> bindgen::Builde
             .blocklist_function("range_table_entry_walker")
             .blocklist_function("range_table_walker")
             .blocklist_function("raw_expression_tree_walker")
+            .blocklist_function("expression_tree_mutator")
+            .blocklist_function("query_tree_mutator")
+            .blocklist_function("range_table_mutator")
+            .blocklist_function("query_or_expression_tree_mutator")
     } else {
         bind
     };

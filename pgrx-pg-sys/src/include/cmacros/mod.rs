@@ -18,8 +18,8 @@
 /// Bindgen stores C `char *` as `*mut c_char`, which is the same Rust type as
 /// `*mut i8` or `*mut u8`. Those raw pointers keep the `signed char *` or
 /// `unsigned char *` identity, so tag a plain-char pointer such as `Page` with
-/// `Pointer::<CChar>::new(page)`, or `Pointer::<CChar, ReadOnly>` for a
-/// `*const c_char`. Tagging reads nothing and grants no access.
+/// `Pointer::from(page)`, which also converts a `*const c_char` to a read-only
+/// pointer. Tagging reads nothing and grants no access.
 pub mod c {
     pub use crate::__pgrx_c_macros::expression::{CDouble, CFloat, Pointer, ReadOnly, ReadWrite};
     pub use crate::__pgrx_c_macros::{

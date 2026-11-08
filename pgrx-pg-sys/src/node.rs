@@ -50,6 +50,33 @@ pub trait PgNode: crate::seal::Sealed + Sized {
         self.node_tag() == tag
     }
 
+    /// Test the node at `node` against a PostgreSQL node kind, as `IsA()` does. A NULL `node`
+    /// never matches.
+    ///
+    /// # Safety
+    ///
+    /// `node` must be NULL or point to a live `Self` whose node tag is initialized.
+    #[doc(alias = "IsA")]
+    #[inline]
+    unsafe fn is_a_ptr(node: *const Self, tag: crate::NodeTag) -> bool {
+        // SAFETY: the caller passes NULL or a pointer to a live, tagged node.
+        unsafe { node.as_ref() }.is_some_and(|node| node.is_a(tag))
+    }
+
+    /// Cast the node at `node` to `Self` when its tag allows, as [`PgNode::try_cast`] does for a
+    /// reference. A NULL `node` gives `None`. The result is `node` itself, so it keeps whatever
+    /// permission to write `node` had.
+    ///
+    /// # Safety
+    ///
+    /// `node` must be NULL or point to a live `T` whose node tag is initialized.
+    #[inline]
+    unsafe fn try_cast_ptr<T: PgNode>(node: *mut T) -> Option<*mut Self> {
+        // SAFETY: the caller passes NULL or a pointer to a live, tagged node.
+        let node_ref = unsafe { node.as_ref() }?;
+        Self::try_cast(node_ref).map(|_| node.cast())
+    }
+
     /// Return this node's stored tag.
     #[inline]
     fn node_tag(&self) -> crate::NodeTag {
@@ -104,6 +131,28 @@ mod tests {
 
         assert_eq!(next.type_, crate::NodeTag::T_RangeTblRef);
         assert_eq!(next.rtindex, 9);
+    }
+
+    #[test]
+    fn raw_pointers_treat_null_as_no_match() {
+        let mut rt = crate::RangeTblRef { type_: crate::NodeTag::T_RangeTblRef, rtindex: 9 };
+        let node = (&raw mut rt).cast::<crate::Node>();
+
+        // SAFETY: `node` points to `rt`, a live node, or is NULL.
+        unsafe {
+            assert!(crate::Node::is_a_ptr(node, crate::NodeTag::T_RangeTblRef));
+            assert!(!crate::Node::is_a_ptr(node, crate::NodeTag::T_Var));
+            assert!(!crate::Node::is_a_ptr(core::ptr::null(), crate::NodeTag::T_RangeTblRef));
+
+            let cast = crate::RangeTblRef::try_cast_ptr(node).expect("the tag matches");
+            assert_eq!(cast, &raw mut rt, "the cast keeps the address");
+            (*cast).rtindex = 10;
+            assert!(crate::Var::try_cast_ptr(node).is_none());
+            assert!(
+                crate::RangeTblRef::try_cast_ptr(core::ptr::null_mut::<crate::Node>()).is_none()
+            );
+        }
+        assert_eq!(rt.rtindex, 10);
     }
 
     #[test]

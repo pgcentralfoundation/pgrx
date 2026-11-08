@@ -54,6 +54,7 @@ pub mod guc;
 pub mod heap_tuple;
 pub mod htup;
 pub mod inoutfuncs;
+mod interrupts;
 pub mod itemptr;
 pub mod iter;
 pub mod layout;
@@ -120,6 +121,7 @@ pub use xid::*;
 pub mod pg_sys;
 
 // and re-export these
+pub use interrupts::check_for_interrupts;
 pub use pg_sys::PgBuiltInOids;
 pub use pg_sys::cmacros;
 #[allow(unused_imports)]

@@ -21,7 +21,7 @@ with its original PostgreSQL name and extract the result at the Rust boundary:
 | `pgrx::varsize_any(ptr)` | `pgrx::VARSIZE_ANY!(ptr).get() as usize` |
 | `pgrx::vardata_any(ptr)` | `pgrx::VARDATA_ANY!(ptr).get()` |
 | `pgrx::set_varsize(ptr, len)` | `pgrx::SET_VARSIZE!(ptr, len)` |
-| `check_for_interrupts!()` | `pgrx::CHECK_FOR_INTERRUPTS!()` |
+| `check_for_interrupts!()` | `pgrx::check_for_interrupts()`, or `pgrx::CHECK_FOR_INTERRUPTS!()` |
 
 Keep the caller's length checks, resource lifetimes, and backend-thread
 restrictions. For example, `VARSIZE_ANY!` reads raw storage, and
@@ -32,7 +32,8 @@ even where the helper it replaces was safe. In particular, `check_for_interrupts
 `pgrx::itemptr::item_pointer_set_all`, and `FcInfo::srf_is_initialized` were safe,
 while `CHECK_FOR_INTERRUPTS!`, `INTERRUPTS_PENDING_CONDITION!`,
 `HeapTupleHeaderGetDatumLength!`, `ItemPointerSet!`, and `SRF_IS_FIRSTCALL!` are
-not. `ItemPointerSet!` can also be a native call that panics off the backend
+not. `pgrx::check_for_interrupts()` remains safe: it panics off the backend thread
+before reading any backend state, and then runs `CHECK_FOR_INTERRUPTS!`. `ItemPointerSet!` can also be a native call that panics off the backend
 thread, depending on the version, the build and libclang; the safe
 `u64_to_item_pointer` and `new_item_pointer` build an item pointer in Rust instead.
 On Windows,
@@ -43,9 +44,10 @@ On Windows,
 Statement macros yield `()`, so they do not need `.get()`. Return macros return
 from the enclosing Rust function or closure; replace the complete return site.
 
-The old `pgrx::is_a` helper accepted NULL. Preserve that short-circuit before
-loading a tag with `nodeTag!`, or call `PgNode::is_a` on a reference; a generated
-C field access requires valid storage. Application-level ownership and error
+The old `pgrx::is_a` helper accepted NULL. `PgNode::is_a_ptr` does too, and
+`PgNode::try_cast_ptr` casts a raw node pointer that may be NULL. Otherwise preserve
+that short-circuit before loading a tag with `nodeTag!`, or call `PgNode::is_a` on a
+reference; a generated C field access requires valid storage. Application-level ownership and error
 adapters retain their Rust contracts.
 
 PostgreSQL sometimes changes a macro into a static inline function. The
@@ -87,24 +89,28 @@ say whether its macro translates the body or calls the native function.
 A function parameter applies C's assignment rules, which are stricter than the
 explicit casts inside many macros. Pass each operand with the parameter's C
 type. In particular, tag a bindgen `char *` such as `pg_sys::Page` with
-`Pointer::<CChar>`, as described [below](#choose-the-c-identity-of-an-input);
-`PageGetItem!(Pointer::<CChar>::new(page), item_id)` then works whether
+`Pointer::from`, as described [below](#choose-the-c-identity-of-an-input);
+`PageGetItem!(Pointer::from(page), item_id)` then works whether
 `PageGetItem` is a macro (PG15) or a function taking `Page` (PG16 and later).
 
 The selected header still determines argument and result types. A size result
 can change from C `int` to `size_t`; `.get() as usize` is an explicit Rust size
 conversion in either case. Where the result is `size_t` in every version you
 build against, `.get_usize()` converts it without a cast; it does not compile
-for an `int` result. For predicates that change from C `int` to `bool`,
+for an `int` result. `.get_as::<T>()` converts any integer result to the Rust
+integer type `T` and panics if the value does not fit. Use it where the result
+type differs between versions, as `PageGetMaxOffsetNumber!`'s does: `size_t` on
+PG15 and `OffsetNumber` later. Clippy reports `.get() as T` as an unnecessary
+cast where the types already match. For predicates that change from C `int` to `bool`,
 use `.is_true()` to obtain a Rust condition with C's zero/null semantics. A
 function adapter evaluates each argument once, while a C macro keeps its
 original argument repetition. Generated docs distinguish the two and show the
 original definition. Genuine signature changes can still require caller changes.
 
-Generated macros are runtime code. The removed `const fn` ports
-`pg_sys::TYPEALIGN` and `pg_sys::MAXALIGN` have no `const` replacement; in a
-constant, compute the alignment in Rust, for example
-`len.next_multiple_of(pg_sys::MAXIMUM_ALIGNOF as usize)`.
+Generated macros are runtime code. In place of the removed `const fn` ports
+`pg_sys::TYPEALIGN` and `pg_sys::MAXALIGN`, use `pg_sys::typealign` and
+`pg_sys::maxalign` in a constant. They and the rest of `pg_sys::align`, such as
+`maxalign_down` and `bufferalign`, take and return `usize` and are `const fn`.
 
 ### Other removed helpers
 
@@ -126,7 +132,7 @@ yourself where the input is not already known to be valid.
 | `pgrx::itemptr::item_pointer_get_block_number`, `item_pointer_get_offset_number` | `ItemPointerGetBlockNumber!`, `ItemPointerGetOffsetNumber!` | Asserted a valid item pointer in every build |
 | `pgrx::itemptr::item_pointer_get_block_number_no_check`, `item_pointer_get_offset_number_no_check`, `item_pointer_set_all`, `item_pointer_is_valid` | `ItemPointerGetBlockNumberNoCheck!`, `ItemPointerGetOffsetNumberNoCheck!`, `ItemPointerSet!`, `ItemPointerIsValid!`; or the safe `item_pointer_get_both`, `u64_to_item_pointer`, and `new_item_pointer` | None |
 | `pgrx::trigger_support::called_as_trigger`, `trigger_fired_by_insert` and the other `trigger_fired_*` helpers | `CALLED_AS_TRIGGER!`, `TRIGGER_FIRED_BY_INSERT!`, and so on | `called_as_trigger` required a non-NULL `fcinfo` |
-| `pgrx::nodes::is_a` | `nodeTag!` or `PgNode::is_a` | Accepted NULL |
+| `pgrx::nodes::is_a` | `PgNode::is_a_ptr`, which also accepts NULL; `nodeTag!` or `PgNode::is_a` | Accepted NULL |
 | `pgrx::tupdesc::release_tupdesc(tupdesc)` | `ReleaseTupleDesc!(tupdesc)` | None |
 | `pg_sys::rt_fetch`, `pg_sys::planner_rt_fetch` | `rt_fetch!`, `planner_rt_fetch!` | Panicked on a non-pointer list or an index out of bounds |
 | PG15 page and buffer ports, such as `pg_sys::PageGetItem`, `BufferGetPage`, `BufferGetPageSize`, and `BufferIsValid`; `pg_sys::BufferGetBlock` and `BufferIsLocal` | The macro with the same name | `BufferIsValid` and `BufferGetPageSize` asserted a valid buffer |
@@ -142,20 +148,22 @@ yourself where the input is not already known to be valid.
 C macros that read an implicit `fcinfo` variable take it as their last argument,
 as in `PG_ARGISNULL!(n, fcinfo)`. The `.get()` of a macro that yields a C `Datum`,
 such as `PG_GETARG_DATUM!` or `HeapTupleGetDatum!`, is an integer that exposes the
-pointer's provenance. `pg_sys::Datum::from(..get() as usize)` takes that
+pointer's provenance. `pg_sys::Datum::from` the macro's result takes that
 provenance back, as a C cast from `Datum` to a pointer does, so Rust may read
-through the result. For a function argument, `pg_get_nullable_datum` also checks
+through the result. Likewise `pg_sys::Oid::from` and `pg_sys::TransactionId::from`
+take a C `unsigned int` result, such as `HeapTupleHeaderGetTypeId!`'s. These go by
+the result's C type, as `get_usize` does, so any result of that type converts. For a function argument, `pg_get_nullable_datum` also checks
 the argument index and returns the pointer without the integer round trip.
 
 PostgreSQL 16 turned the tree walkers and mutators into macros that cast their
-callback. On PG16 and later, `pg_sys::expression_tree_walker`,
-`pg_sys::expression_tree_mutator`, and the other walkers and mutators exist only
-as generated macros. The removed pgrx wrappers existed for the walkers on PG16
-and later and for `expression_tree_mutator` on PG18 and PG19. Call the `_impl`
-function the macros expand to, such as `pg_sys::expression_tree_walker_impl`, or
-the macro with the callback wrapper shown
-[below](#keep-postgresql-calls-on-the-backend-thread). PG15 keeps the functions,
-so code that supports both needs a `cfg` split.
+callback. `pg_sys::expression_tree_walker`, `pg_sys::expression_tree_mutator`,
+and the other walkers and mutators are still functions on every supported
+version, each with one typed signature, so code that supports PG15 and later
+needs no `cfg` split. On PG15 they are PostgreSQL's functions, and on PG16 and
+later they call the `_impl` function the macro expands to, such as
+`pg_sys::expression_tree_walker_impl`. The generated macros remain available on
+PG16 and later, with the callback wrapper shown
+[below](#keep-postgresql-calls-on-the-backend-thread).
 
 ### Changed constants and version-specific items
 
@@ -308,14 +316,14 @@ documented invocation requirements. The public input vocabulary lives in
 
 Plain-char pointers need a tag as well. Bindgen stores C `char *`, including
 `Page` and C strings, as `*mut c_char`, which Rust cannot distinguish from
-`*mut i8` or `*mut u8`. Tag such a pointer with `Pointer::<CChar>`, or with
-`Pointer::<CChar, ReadOnly>` for a `*const c_char`. The tag reads nothing and
+`*mut i8` or `*mut u8`. Tag such a pointer with `Pointer::from`, which turns a
+`*const c_char` into a read-only pointer. The tag reads nothing and
 grants no access. Unlike a cast, it still requires a plain-char pointee, so a
 pointer to another type is rejected:
 
 ```rust
 use core::ffi::c_void;
-use pgrx::{cmacros::c::{CChar, Pointer}, pg_sys};
+use pgrx::{cmacros::c::Pointer, pg_sys};
 
 /// Locate an item's tuple data on a page.
 ///
@@ -325,15 +333,16 @@ use pgrx::{cmacros::c::{CChar, Pointer}, pg_sys};
 unsafe fn item_data(page: pg_sys::Page, item_id: pg_sys::ItemId) -> *mut c_void {
     // SAFETY: the caller establishes the page, item, and backend-thread contract.
     // PG19 returns void * instead of Item, so the result is cast for both.
-    unsafe { pgrx::PageGetItem!(Pointer::<CChar>::new(page), item_id).get().cast() }
+    unsafe { pgrx::PageGetItem!(Pointer::from(page), item_id).get().cast() }
 }
 ```
 
 A pointer extracted with `.get()` needs the same tag before it is passed back to
-a generated macro; `.into_value()` keeps it. `Pointer::<CChar>::new` takes the
-inspected plain-char storage. If build flags give plain `char` a different
-signedness from Rust's `c_char`, that storage is the other byte type, and the
-binding pointer needs `.cast()` before tagging.
+a generated macro; `.into_value()` keeps it. `Pointer::from` takes the binding's
+`c_char` pointer, and `Pointer::<CChar>::new` takes the inspected plain-char storage
+directly. If build flags give plain `char` a different signedness from Rust's
+`c_char`, that storage is the other byte type, so prefer `Pointer::from` for
+binding pointers.
 
 Binding constants need the same care: bindgen can store a positive C `int`
 constant in a Rust `u32`. A direct caller operand follows that Rust storage

@@ -47,4 +47,21 @@ extern "C-unwind" fn extern_func_impl_2<'a>() -> bool {
 mod tests {
     #[allow(unused_imports)]
     use crate as pgrx_unit_tests;
+    use pgrx::prelude::*;
+
+    #[pg_test]
+    fn check_for_interrupts_returns_without_a_pending_interrupt() {
+        check_for_interrupts();
+    }
+
+    #[pg_test]
+    fn check_for_interrupts_panics_off_the_backend_thread() {
+        // Record this thread as the backend thread before another one asks.
+        check_for_interrupts();
+        let result = std::thread::spawn(check_for_interrupts).join();
+        assert!(
+            result.is_err(),
+            "check_for_interrupts must refuse a thread other than the backend's"
+        );
+    }
 }
