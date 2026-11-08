@@ -83,8 +83,8 @@ whether it translates the body or calls the native function.
 A function parameter applies C's assignment rules, which are stricter than the
 explicit casts inside many macros. Pass each operand with the parameter's C
 type. In particular, tag a bindgen `char *` such as `pg_sys::Page` with
-`Pointer::<CChar>`, as described [below](#choose-the-c-identity-of-an-input);
-`PageGetItem!(Pointer::<CChar>::new(page), item_id)` then works whether
+`Pointer::from`, as described [below](#choose-the-c-identity-of-an-input);
+`PageGetItem!(Pointer::from(page), item_id)` then works whether
 `PageGetItem` is a macro (PG15) or a function taking `Page` (PG16 and later).
 
 The selected header still determines argument and result types. A size result
@@ -310,14 +310,14 @@ documented invocation requirements. The public input vocabulary lives in
 
 Plain-char pointers need a tag as well. Bindgen stores C `char *`, including
 `Page` and C strings, as `*mut c_char`, which Rust cannot distinguish from
-`*mut i8` or `*mut u8`. Tag such a pointer with `Pointer::<CChar>`, or with
-`Pointer::<CChar, ReadOnly>` for a `*const c_char`. The tag reads nothing and
+`*mut i8` or `*mut u8`. Tag such a pointer with `Pointer::from`, which turns a
+`*const c_char` into a read-only pointer. The tag reads nothing and
 grants no access. Unlike a cast, it still requires a plain-char pointee, so a
 pointer to another type is rejected:
 
 ```rust
 use core::ffi::c_void;
-use pgrx::{cmacros::c::{CChar, Pointer}, pg_sys};
+use pgrx::{cmacros::c::Pointer, pg_sys};
 
 /// Locate an item's tuple data on a page.
 ///
@@ -327,15 +327,16 @@ use pgrx::{cmacros::c::{CChar, Pointer}, pg_sys};
 unsafe fn item_data(page: pg_sys::Page, item_id: pg_sys::ItemId) -> *mut c_void {
     // SAFETY: the caller establishes the page, item, and backend-thread contract.
     // PG19 returns void * instead of Item, so the result is cast for both.
-    unsafe { pgrx::PageGetItem!(Pointer::<CChar>::new(page), item_id).get().cast() }
+    unsafe { pgrx::PageGetItem!(Pointer::from(page), item_id).get().cast() }
 }
 ```
 
 A pointer extracted with `.get()` needs the same tag before it is passed back to
-a generated macro; `.into_value()` keeps it. `Pointer::<CChar>::new` takes the
-inspected plain-char storage. If build flags give plain `char` a different
-signedness from Rust's `c_char`, that storage is the other byte type, and the
-binding pointer needs `.cast()` before tagging.
+a generated macro; `.into_value()` keeps it. `Pointer::from` takes the binding's
+`c_char` pointer, and `Pointer::<CChar>::new` takes the inspected plain-char storage
+directly. If build flags give plain `char` a different signedness from Rust's
+`c_char`, that storage is the other byte type, so prefer `Pointer::from` for
+binding pointers.
 
 Binding constants need the same care: bindgen can store a positive C `int`
 constant in a Rust `u32`. A direct caller operand follows that Rust storage
