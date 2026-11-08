@@ -39,8 +39,6 @@ set -x
 # │   │   └── pgrx
 # │   └── pgrx-tests
 # └── pgrx-pg-sys
-#
-# pgrx-bench does not depend on any other pgrx crate
 
 
 cd $DIR/pgrx-pg-config && cargo publish
