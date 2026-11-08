@@ -57,6 +57,7 @@ pub use crate::spi;
 pub use crate::spi::Spi;
 
 // Logging and Error support
+pub use crate::check_for_interrupts;
 pub use crate::pg_sys::elog::PgLogLevel;
 pub use crate::pg_sys::errcodes::PgSqlErrorCode;
 pub use crate::pg_sys::{

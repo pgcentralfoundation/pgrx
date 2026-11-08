@@ -21,7 +21,7 @@ with its original PostgreSQL name and extract the result at the Rust boundary:
 | `pgrx::varsize_any(ptr)` | `pgrx::VARSIZE_ANY!(ptr).get() as usize` |
 | `pgrx::vardata_any(ptr)` | `pgrx::VARDATA_ANY!(ptr).get()` |
 | `pgrx::set_varsize(ptr, len)` | `pgrx::SET_VARSIZE!(ptr, len)` |
-| `check_for_interrupts!()` | `pgrx::CHECK_FOR_INTERRUPTS!()` |
+| `check_for_interrupts!()` | `pgrx::check_for_interrupts()`, or `pgrx::CHECK_FOR_INTERRUPTS!()` |
 
 Keep the caller's length checks, resource lifetimes, and backend-thread
 restrictions. For example, `VARSIZE_ANY!` reads raw storage, and
@@ -32,7 +32,8 @@ even where the helper it replaces was safe. In particular, `check_for_interrupts
 `pgrx::itemptr::item_pointer_set_all`, and `FcInfo::srf_is_initialized` were safe,
 while `CHECK_FOR_INTERRUPTS!`, `INTERRUPTS_PENDING_CONDITION!`,
 `HeapTupleHeaderGetDatumLength!`, `ItemPointerSet!`, and `SRF_IS_FIRSTCALL!` are
-not. `ItemPointerSet!` can also be a native call that panics off the backend
+not. `pgrx::check_for_interrupts()` remains safe: it panics off the backend thread
+before reading any backend state, and then runs `CHECK_FOR_INTERRUPTS!`. `ItemPointerSet!` can also be a native call that panics off the backend
 thread, depending on the version, the build and libclang; the safe
 `u64_to_item_pointer` and `new_item_pointer` build an item pointer in Rust instead.
 On Windows,
