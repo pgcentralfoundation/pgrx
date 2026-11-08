@@ -26,7 +26,7 @@ pub(crate) struct Check {
     #[clap(long, value_parser)]
     pub(crate) manifest_path: Option<PathBuf>,
 
-    /// Only lint fragments added or modified relative to <REF> (e.g. `main` or `HEAD~1`)
+    /// Only lint fragments added or modified relative to `<REF>` (e.g. `main` or `HEAD~1`)
     #[clap(long = "base", alias = "diff")]
     pub(crate) base: Option<String>,
 

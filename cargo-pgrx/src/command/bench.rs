@@ -35,7 +35,7 @@ const REPORT_BAR_WIDTH: usize = 28;
 #[derive(clap::Args, Debug, Clone)]
 #[clap(author)]
 pub(crate) struct Bench {
-    /// Positional arguments: [pgXX] [benchname]
+    /// Positional arguments: `[pgXX] [benchname]`
     #[clap(env = "PG_VERSION")]
     args: Vec<String>,
 

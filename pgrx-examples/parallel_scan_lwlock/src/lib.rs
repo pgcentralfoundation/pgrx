@@ -4,28 +4,28 @@
 //!
 //! Initialization:
 //! * [_PG_init] for startup initialization
-//! * [counter_handler] for startup registration of FDW handler callbacks
+//! * `counter_handler` for startup registration of FDW handler callbacks
 //!
 //! Scan start:
-//! * [pgrx_get_foreign_rel_size] for table-level estimates
-//! * [pgrx_get_foreign_paths] provides the scan strategies available (just scan and parallel_scan)
-//! * [pgrx_get_foreign_plan] processes clauses and constructs an executable plan
+//! * `pgrx_get_foreign_rel_size` for table-level estimates
+//! * `pgrx_get_foreign_paths` provides the scan strategies available (just scan and parallel_scan)
+//! * `pgrx_get_foreign_plan` processes clauses and constructs an executable plan
 //!
 //! Sequential scan execution:
-//! * [pgrx_begin_foreign_scan] creates the scan state, with the counter in local memory
-//! * [pgrx_iterate_foreign_scan] returns the next counter value
-//! * [pgrx_end_foreign_scan] cleans up on scan complete
+//! * `pgrx_begin_foreign_scan` creates the scan state, with the counter in local memory
+//! * `pgrx_iterate_foreign_scan` returns the next counter value
+//! * `pgrx_end_foreign_scan` cleans up on scan complete
 //!
 //! Parallel scan execution:
-//! * [pgrx_begin_foreign_scan] creates the scan state, with the counter in local memory
-//! * [pgrx_estimate_dsm_foreign_scan] calculates the amount of shared memory needed for the counter
-//! * [pgrx_initialize_dsm_foreign_scan] moves the counter and its lock into the allocated DSM
-//! * [pgrx_initialize_worker_foreign_scan] points each worker's lock at the counter in the DSM
-//! * [pgrx_shutdown_foreign_scan] is the last chance to use the counter before the DSM goes away
+//! * `pgrx_begin_foreign_scan` creates the scan state, with the counter in local memory
+//! * `pgrx_estimate_dsm_foreign_scan` calculates the amount of shared memory needed for the counter
+//! * `pgrx_initialize_dsm_foreign_scan` moves the counter and its lock into the allocated DSM
+//! * `pgrx_initialize_worker_foreign_scan` points each worker's lock at the counter in the DSM
+//! * `pgrx_shutdown_foreign_scan` is the last chance to use the counter before the DSM goes away
 //! * See `Sequential scan execution` above
 //!
 //! Other support functions:
-//! * [counter_validator] called for option validation
+//! * `counter_validator` called for option validation
 //!
 //! # Extension setup example
 //!

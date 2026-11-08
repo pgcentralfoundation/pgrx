@@ -25,7 +25,7 @@ pub(crate) struct Info {
     #[clap(long)]
     pub(crate) prev_version: Option<String>,
 
-    /// Output directory for the assembled upgrade script (defaults to <crate>/sql/)
+    /// Output directory for the assembled upgrade script (defaults to `<crate>/sql/`)
     #[clap(long, value_parser)]
     pub(crate) output_dir: Option<PathBuf>,
 
