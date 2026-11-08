@@ -43,9 +43,10 @@ On Windows,
 Statement macros yield `()`, so they do not need `.get()`. Return macros return
 from the enclosing Rust function or closure; replace the complete return site.
 
-The old `pgrx::is_a` helper accepted NULL. Preserve that short-circuit before
-loading a tag with `nodeTag!`, or call `PgNode::is_a` on a reference; a generated
-C field access requires valid storage. Application-level ownership and error
+The old `pgrx::is_a` helper accepted NULL. `PgNode::is_a_ptr` does too, and
+`PgNode::try_cast_ptr` casts a raw node pointer that may be NULL. Otherwise preserve
+that short-circuit before loading a tag with `nodeTag!`, or call `PgNode::is_a` on a
+reference; a generated C field access requires valid storage. Application-level ownership and error
 adapters retain their Rust contracts.
 
 PostgreSQL sometimes changes a macro into a static inline function. The
@@ -120,7 +121,7 @@ yourself where the input is not already known to be valid.
 | `pgrx::itemptr::item_pointer_get_block_number`, `item_pointer_get_offset_number` | `ItemPointerGetBlockNumber!`, `ItemPointerGetOffsetNumber!` | Asserted a valid item pointer in every build |
 | `pgrx::itemptr::item_pointer_get_block_number_no_check`, `item_pointer_get_offset_number_no_check`, `item_pointer_set_all`, `item_pointer_is_valid` | `ItemPointerGetBlockNumberNoCheck!`, `ItemPointerGetOffsetNumberNoCheck!`, `ItemPointerSet!`, `ItemPointerIsValid!`; or the safe `item_pointer_get_both`, `u64_to_item_pointer`, and `new_item_pointer` | None |
 | `pgrx::trigger_support::called_as_trigger`, `trigger_fired_by_insert` and the other `trigger_fired_*` helpers | `CALLED_AS_TRIGGER!`, `TRIGGER_FIRED_BY_INSERT!`, and so on | `called_as_trigger` required a non-NULL `fcinfo` |
-| `pgrx::nodes::is_a` | `nodeTag!` or `PgNode::is_a` | Accepted NULL |
+| `pgrx::nodes::is_a` | `PgNode::is_a_ptr`, which also accepts NULL; `nodeTag!` or `PgNode::is_a` | Accepted NULL |
 | `pgrx::tupdesc::release_tupdesc(tupdesc)` | `ReleaseTupleDesc!(tupdesc)` | None |
 | `pg_sys::rt_fetch`, `pg_sys::planner_rt_fetch` | `rt_fetch!`, `planner_rt_fetch!` | Panicked on a non-pointer list or an index out of bounds |
 | PG15 page and buffer ports, such as `pg_sys::PageGetItem`, `BufferGetPage`, `BufferGetPageSize`, and `BufferIsValid`; `pg_sys::BufferGetBlock` and `BufferIsLocal` | The macro with the same name | `BufferIsValid` and `BufferGetPageSize` asserted a valid buffer |
