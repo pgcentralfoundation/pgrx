@@ -7,6 +7,7 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+use crate::__pgrx_c_macros::{CUnsignedInt, CValue, expression_result::CExpression};
 use pgrx_sql_entity_graph::metadata::{
     ArgumentError, ReturnsError, ReturnsRef, SqlMappingRef, SqlTranslatable, TypeOrigin,
 };
@@ -64,6 +65,18 @@ impl From<TransactionId> for u32 {
 impl From<TransactionId> for crate::Datum {
     fn from(xid: TransactionId) -> Self {
         xid.into_inner().into()
+    }
+}
+
+/// Convert a C macro result of C type `unsigned int`, which is `TransactionId`'s C type, to a
+/// `TransactionId`.
+///
+/// Like `CExpression::get_usize`, this goes by the result's C type, so it accepts any
+/// `unsigned int` result, not only one that PostgreSQL declares as `TransactionId`.
+impl From<CExpression<CValue<CUnsignedInt>>> for TransactionId {
+    /// Keep the result's 32 bits, as a C assignment to a `TransactionId` does.
+    fn from(value: CExpression<CValue<CUnsignedInt>>) -> Self {
+        TransactionId::from_inner(value.get())
     }
 }
 

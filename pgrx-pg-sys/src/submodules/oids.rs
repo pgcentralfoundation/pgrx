@@ -11,6 +11,7 @@
 use std::fmt;
 
 use crate as pg_sys;
+use crate::__pgrx_c_macros::{CUnsignedInt, CValue, expression_result::CExpression};
 use crate::BuiltinOid;
 use crate::Datum;
 use pgrx_sql_entity_graph::metadata::{
@@ -92,6 +93,17 @@ impl Oid {
 impl Default for Oid {
     fn default() -> Oid {
         Oid::INVALID
+    }
+}
+
+/// Convert a C macro result of C type `unsigned int`, which is `Oid`'s C type, to an `Oid`.
+///
+/// Like `CExpression::get_usize`, this goes by the result's C type, so it accepts any
+/// `unsigned int` result, not only one that PostgreSQL declares as `Oid`.
+impl From<CExpression<CValue<CUnsignedInt>>> for Oid {
+    /// Keep the result's 32 bits, as a C assignment to an `Oid` does.
+    fn from(value: CExpression<CValue<CUnsignedInt>>) -> Self {
+        Oid::from_u32(value.get())
     }
 }
 
