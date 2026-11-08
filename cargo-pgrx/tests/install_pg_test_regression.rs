@@ -269,6 +269,7 @@ fn install_test_extension_handles_mid_stream_schema_sentinel() {
 }
 
 #[test]
+#[ignore = "workspace rustflags rebuild all of pgrx; run with --ignored, as CI's PG18 extras job does"]
 fn install_from_virtual_workspace_auto_detects_manifest_and_preserves_rustflags() {
     // This is the command shape that regressed when cdylib builds moved from
     // `cargo build --lib` to `cargo rustc --lib -- ...`: metadata found the

@@ -1091,6 +1091,13 @@ fn get_cargo_args() -> Vec<String> {
 }
 
 fn cargo_pgrx() -> eyre::Result<Command> {
+    let mut command = cargo_pgrx_command()?;
+    // This test binary's package variables would make every nested Cargo build look changed.
+    pgrx_pg_config::cargo::remove_package_env(&mut command);
+    Ok(command)
+}
+
+fn cargo_pgrx_command() -> eyre::Result<Command> {
     fn var_path(s: &str) -> Option<PathBuf> {
         std::env::var_os(s).map(PathBuf::from)
     }

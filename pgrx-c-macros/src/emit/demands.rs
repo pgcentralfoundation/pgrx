@@ -1769,6 +1769,7 @@ mod tests {
                 crate::IntegerType { kind: IntegerKind::Int, bits: 32, signed: true, rank: 3 },
             )]
             .into(),
+            microsoft_integer_types: None,
             floating_point: Default::default(),
         }
     }

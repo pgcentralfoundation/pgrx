@@ -45,8 +45,8 @@ mod postgres;
 mod postgres_flags;
 pub use postgres::{
     ConfigurationError, LayoutDisagreement, PostgresConfig, PostgresError, PostgresInventory,
-    postgres_function_macro_names, postgres_inline_function_names, postgres_object_macro_names,
-    verify_postgres_configuration,
+    ServerHeaderRoots, postgres_function_macro_names, postgres_inline_function_names,
+    postgres_object_macro_names, verify_postgres_configuration,
 };
 pub use postgres_flags::{
     lower_msvc_runtime_flags, postgres_clang_flags, separate_architecture_flags,
@@ -69,9 +69,9 @@ pub use frontend::{
 /// Parse bounded source syntax while preserving formal holes, grouping, and structural operands.
 mod syntax;
 pub use syntax::{
-    BinaryOperator, Expression, ExpressionKind, ExpressionNode, IntegerLiteral, IntegerSuffix,
-    NodeId, OffsetComponent, OffsetRecord, Statement, StatementBody, StringPart, TokenRange,
-    UnaryOperator,
+    BinaryOperator, Expression, ExpressionKind, ExpressionNode, IntegerLiteral, IntegerSize,
+    IntegerSuffix, MicrosoftIntegerWidth, NodeId, OffsetComponent, OffsetRecord, Statement,
+    StatementBody, StringPart, TokenRange, UnaryOperator,
 };
 /// Describe symbolic C types and invocation contracts before Rust lowering claims support.
 mod analysis;

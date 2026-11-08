@@ -754,7 +754,7 @@ fn probe_values(
 }
 
 /// Render the fundamental C spelling for a verified integer identity in proof source.
-fn c_integer_name(kind: IntegerKind) -> &'static str {
+pub(crate) fn c_integer_name(kind: IntegerKind) -> &'static str {
     match kind {
         IntegerKind::Bool => "_Bool",
         IntegerKind::Char => "char",

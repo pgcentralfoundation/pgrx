@@ -1,4 +1,4 @@
-name: Run PGRX tests
+name: CI
 
 on:
   push:
@@ -6,12 +6,17 @@ on:
       - develop
   pull_request: {}
 
+# A new push to a pull request cancels the pull request's earlier run. Each push to develop
+# gets its own group, so develop runs are never cancelled or queued behind each other.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 env:
   # NB: Don't modify `RUSTFLAGS` here, since it would override the ones
   # configured by `.cargo/config.toml` on macOS.
   RUST_BACKTRACE: 1
   CARGO_INCREMENTAL: "false"
-  SCCACHE_MAX_FRAME_LENGTH: 100000000
   # CARGO_LOG: cargo::core::compiler::fingerprint=info # Uncomment this to output compiler fingerprint info
   TOOL_DIR: ./tools
 
@@ -20,9 +25,6 @@ jobs:
     name: rustfmt, clippy, et al.
     runs-on: ubuntu-22.04
     if: "!contains(github.event.head_commit.message, 'nogha')"
-    env:
-      RUSTC_WRAPPER: sccache
-      SCCACHE_DIR: /home/runner/.cache/sccache
 
     steps:
       - uses: actions/checkout@v4
@@ -30,16 +32,7 @@ jobs:
       - name: Set up prerequisites and environment
         run: |
           sudo apt-get update -y -qq --fix-missing
-          
-          echo ""
-          
-          echo "----- Install / Set up sccache -----"
-          mkdir -p $HOME/.local/bin
-          curl -L https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-x86_64-unknown-linux-musl.tar.gz | tar xz
-          mv -f sccache-v0.2.15-x86_64-unknown-linux-musl/sccache $HOME/.local/bin/sccache
-          chmod +x $HOME/.local/bin/sccache
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-          mkdir -p /home/runner/.cache/sccache
+
           echo ""
 
           "$TOOL_DIR"/rustup.sh
@@ -50,27 +43,12 @@ jobs:
           env
           echo ""
 
-      - name: Cache cargo registry
-        uses: actions/cache@v4
-        continue-on-error: false
+      # Only pushes to develop save caches. Pull requests restore develop's newest cache, so
+      # their caches cannot evict develop's from the repository's cache storage.
+      # The cached ~/.cargo/bin keeps cargo-deny installed between runs.
+      - uses: Swatinem/rust-cache@v2
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-          key: pgrx-lintck-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
-
-      - name: Cache sccache directory
-        uses: actions/cache@v4
-        continue-on-error: false
-        with:
-          path: /home/runner/.cache/sccache
-          key: pgrx-lintck-sccache-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
-
-      - name: Start sccache server
-        run: sccache --start-server
-
-      - name: Print sccache stats (before)
-        run: sccache --show-stats
+          save-if: ${{ github.event_name == 'push' }}
 
       - name: Install rustfmt & clippy
         run: |
@@ -94,26 +72,42 @@ jobs:
             -Drustdoc::broken-intra-doc-links \
             -Drustdoc::invalid-html-tags
 
-      - name: Stop sccache server
-        run: sccache --stop-server || true
-
   pgrx_tests:
-    name: Linux tests & examples
+    name: Linux tests & examples (PG${{ matrix.postgres }}${{ matrix.rust && format(', Rust {0}', matrix.rust) || '' }}${{ matrix.suite == 'compile' && ', build only' || '' }}${{ matrix.suite == 'extras' && ', extras' || '' }})
     needs: lintck
     runs-on: ubuntu-22.04
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
-      RUSTC_WRAPPER: sccache
-      SCCACHE_DIR: /home/runner/.cache/sccache
       PG_VER: ${{ matrix.postgres }}
       RUST_TOOLCHAIN: ${{ matrix.rust || 'stable' }}
+      # The pg_test harness runs the cargo-pgrx installed from this checkout below instead of
+      # building the workspace's copy again.
+      CARGO_PGRX: cargo-pgrx
 
     strategy:
+      # Every entry is listed so each one is its own job. Next to a `postgres` list, an
+      # `include` entry that only adds a key, such as `rust: beta`, joins the matching job
+      # instead of adding one.
       matrix:
-        postgres: [ 15, 16, 17, 18, 19 ]
         include:
+          # Tests run on the oldest and newest supported versions, where version-specific
+          # code differs most.
+          - postgres: 15
+          - postgres: 18
+          - postgres: 19
+          # Checks that one PostgreSQL version covers run in their own job, in parallel with
+          # the PG18 tests.
+          - postgres: 18
+            suite: extras
+          # The versions in between build the tests without running them. So does Rust beta,
+          # since a new compiler almost always breaks the build rather than a test.
           - postgres: 16
-            rust: "beta"
+            suite: compile
+          - postgres: 17
+            suite: compile
+          - postgres: 18
+            rust: beta
+            suite: compile
 
     steps:
       - uses: actions/checkout@v4
@@ -121,17 +115,8 @@ jobs:
       - name: Set up prerequisites and environment
         run: |
           sudo apt-get update -y -qq --fix-missing
-          
+
           echo ""
-          echo "----- Install sccache -----"
-          mkdir -p $HOME/.local/bin
-          curl -L https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-x86_64-unknown-linux-musl.tar.gz | tar xz
-          mv -f sccache-v0.2.15-x86_64-unknown-linux-musl/sccache $HOME/.local/bin/sccache
-          chmod +x $HOME/.local/bin/sccache
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-          mkdir -p /home/runner/.cache/sccache
-          echo ""
-          
           echo "----- Set up dynamic variables -----"
           cat $GITHUB_ENV
           echo ""
@@ -224,54 +209,64 @@ jobs:
       - name: Set up PostgreSQL permissions
         run: sudo chmod a+rwx `/usr/lib/postgresql/$PG_VER/bin/pg_config --pkglibdir` `/usr/lib/postgresql/$PG_VER/bin/pg_config --sharedir`/extension /var/run/postgresql/
 
-      - name: Cache cargo registry
-        uses: actions/cache@v4
-        continue-on-error: false
+      # Third-party crates build the same way for every PostgreSQL version, so every job here
+      # restores the one cache that the PG18 tests job saves on pushes to develop. Pull
+      # requests only restore, so their caches cannot evict develop's. The beta job's
+      # different rustc gives it no matching cache.
+      - uses: Swatinem/rust-cache@v2
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-          key: pgrx-unit-tests-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
-
-      - name: Cache sccache directory
-        uses: actions/cache@v4
-        continue-on-error: false
-        with:
-          path: /home/runner/.cache/sccache
-          key: pgrx-unit-tests-sccache-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
-
-      - name: Start sccache server
-        run: sccache --start-server
-
-      - name: Print sccache stats (before run)
-        run: sccache --show-stats
+          shared-key: linux-tests
+          cache-bin: "false"
+          save-if: ${{ github.event_name == 'push' && matrix.postgres == 18 && !matrix.rust && !matrix.suite }}
 
       - name: Install rustfmt & clippy
         run: |
           rustup component add rustfmt
           rustup component add clippy
 
+      # Building in ./target instead of a temporary directory lets the cache keep
+      # cargo-pgrx's dependencies.
       - name: Install cargo-pgrx
-        run: cargo install --path cargo-pgrx/ --debug --force --locked
+        run: cargo install --path cargo-pgrx/ --debug --force --locked --target-dir target
 
       - name: Run 'cargo pgrx init' against system-level ${{ matrix.postgres }}
         run: cargo pgrx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
 
+      # pgrx-unit-tests runs in the two cshim steps below. Its `proptest` default is a
+      # superset of what this run would test.
       - name: Run workspace tests
+        if: ${{ !matrix.suite }}
         run: |
           CARGO_TARGET_DIR="$(pwd)/target" cargo test --all \
+            --exclude pgrx-unit-tests \
             --features "pg$PG_VER" \
             --no-default-features
 
+      # These are the test builds that the test jobs run.
+      - name: Build the workspace tests without running them
+        if: matrix.suite == 'compile'
+        run: |
+          CARGO_TARGET_DIR="$(pwd)/target" cargo test --all --no-run \
+            --exclude pgrx-unit-tests \
+            --features "pg$PG_VER" \
+            --no-default-features
+          cargo test --no-run \
+            --features "pg$PG_VER cshim proptest" \
+            --package pgrx-unit-tests --lib
+          cargo test --no-run \
+            --features "pg$PG_VER proptest" \
+            --package pgrx-unit-tests
+
       # The workspace run above disables pgrx-c-macros' default `cli` feature.
       - name: Run pgrx-c-macros CLI tests
+        if: ${{ !matrix.suite }}
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --package pgrx-c-macros --test cli
 
       # PGDG's server-dev package installs clang 15, and the steps above load the newest
       # libclang, so only this step covers Ubuntu 22.04's own clang 14. Its own target directory
       # keeps the changed LIBCLANG_PATH from rebuilding the other steps' crates.
       - name: Run pgrx-c-macros tests against clang 14
-        if: matrix.postgres == 18 && matrix.rust == null
+        if: matrix.suite == 'extras'
         env:
           LIBCLANG_PATH: /usr/lib/llvm-14/lib
           CLANG_PATH: /usr/bin/clang-14
@@ -279,7 +274,7 @@ jobs:
 
       # These build isolated fixture crates with synthetic headers, so one job covers them.
       - name: Run binding build harnesses
-        if: matrix.postgres == 18 && matrix.rust == null
+        if: matrix.suite == 'extras'
         run: |
           CARGO_TARGET_DIR="$(pwd)/target" cargo test --package pgrx-bindgen \
             --test macro_build --test shipped_macros -- --include-ignored --test-threads=1
@@ -287,15 +282,13 @@ jobs:
       # Only Miri checks that a pointer Datum keeps its provenance through an integer, and its
       # strict provenance mode makes the fcinfo test reject an integer round trip. In the varlena
       # tests, Miri also reports padding that a typed copy left uninitialized, where a native
-      # run reads whatever the stack held. Miri does not support RUSTC_WRAPPER, so this
-      # step runs without sccache. The nightly is pinned so that a new nightly, or one shipped
-      # without Miri, cannot fail this step on its own.
+      # run reads whatever the stack held. The nightly is pinned so that a new nightly, or one
+      # shipped without Miri, cannot fail this step on its own.
       - name: Check pointer provenance and PgVarlena padding with Miri
-        if: matrix.postgres == 18 && matrix.rust == null
+        if: matrix.suite == 'extras'
         env:
           MIRI_TOOLCHAIN: nightly-2026-10-29
         run: |
-          unset RUSTC_WRAPPER
           rustup toolchain install "$MIRI_TOOLCHAIN" --component miri,rust-src,rustfmt
           cargo "+$MIRI_TOOLCHAIN" miri test --package pgrx-pg-sys \
             --features "pg$PG_VER" --no-default-features --lib datum
@@ -305,82 +298,84 @@ jobs:
             --features "pg$PG_VER" --no-default-features --lib varlena
 
       # Only this step sees the target headers; tests above check that builds without them refuse.
-      - name: Check that cross-compiled pgrx-unit-tests can build
+      # Build scripts still generate bindings and C macros from the aarch64 headers and compile
+      # the aarch64 C shim; checking skips only Rust code generation and linking, which the arm64
+      # job covers natively. Rust beta adds no target-specific coverage, so it skips this.
+      - name: Check that pgrx-unit-tests compiles for aarch64
+        if: matrix.suite != 'extras' && !matrix.rust
         env:
           PGRX_INCLUDEDIR_SERVER_aarch64_unknown_linux_gnu: ${{ steps.arm64-headers.outputs.server }}
         run: |
-          cargo build --tests \
+          cargo check --tests \
             --features "pg$PG_VER" \
             --package pgrx-unit-tests \
             --target aarch64-unknown-linux-gnu
 
       - name: Run pgrx-unit-tests with cshim enabled
+        if: ${{ !matrix.suite }}
         run: |
           cargo test \
             --features "pg$PG_VER cshim proptest" \
             --package pgrx-unit-tests --lib
 
+      # Every pgrx-unit-tests target runs here; its ignored UI tests run in the extras job.
       - name: Run pgrx-unit-tests with cshim disabled
+        if: ${{ !matrix.suite }}
         run: |
           cargo test \
             --features "pg$PG_VER proptest" \
-            --package pgrx-unit-tests --lib
+            --package pgrx-unit-tests
 
-      - name: Run UI tests
-        if: ${{ matrix.rust == null }}
-        run: |
-          cargo test \
-            --features "pg$PG_VER proptest" \
-            --package pgrx-unit-tests --test ui
-
+      # A debug build reuses this job's artifacts; a release build of pgrx took most of the step.
       - name: Smoke test cargo pgrx bench against the benching example
-        if: ${{ matrix.postgres == 16 && matrix.rust == null }}
+        if: matrix.suite == 'extras'
         run: |
           CARGO_TARGET_DIR="$(pwd)/target" cargo pgrx bench pg$PG_VER \
             bench_normalize_phrase \
+            --debug \
             --manifest-path=pgrx-examples/benching/Cargo.toml \
             --group-name ci_benching_smoke
 
+      # These tests are ignored by default because each compiles its own copy of pgrx. Neither
+      # depends on the PostgreSQL version, so they run once, here.
+      - name: Run UI tests
+        if: matrix.suite == 'extras'
+        run: |
+          cargo test \
+            --features "pg$PG_VER proptest" \
+            --package pgrx-unit-tests --test ui -- --ignored
+
+      - name: Run the cargo pgrx install regression from a virtual workspace
+        if: matrix.suite == 'extras'
+        run: cargo test --package cargo-pgrx --test install_pg_test_regression -- --ignored
+
       - name: Run custom_types without schema generation example tests
+        if: ${{ !matrix.suite }}
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo test --manifest-path=pgrx-examples/custom_types/Cargo.toml  --features "pg$PG_VER no-schema-generation" --no-default-features
 
       - name: Run range example regression tests
+        if: ${{ !matrix.suite }}
         run: CARGO_TARGET_DIR="$(pwd)/target" cargo pgrx regress pg$PG_VER --manifest-path=pgrx-examples/range/Cargo.toml
 
       - name: Lint and run the migration_fragments example upgrade test
+        if: ${{ !matrix.suite }}
         run: |
           CARGO_TARGET_DIR="$(pwd)/target" cargo pgrx migrate check --deny-mixed-objects --manifest-path=pgrx-examples/migration_fragments/Cargo.toml
           CARGO_TARGET_DIR="$(pwd)/target" cargo pgrx regress pg$PG_VER --manifest-path=pgrx-examples/migration_fragments/Cargo.toml
 
       - name: Run `cargo pgrx schema` against the versioned_custom_libname_so example
+        if: ${{ !matrix.suite }}
         run: cd pgrx-examples/versioned_custom_libname_so && cargo pgrx schema pg$PG_VER
 
-      # Attempt to make the cache payload slightly smaller.
-      - name: Clean up built PGRX files
-        run: |
-          cd target/debug/deps/
-          for built_file in $(find * -type f -executable -print | grep -v "\.so$"); do
-            base_name=$(echo $built_file | cut -d- -f1);
-            for basefile in "$base_name".*; do
-              [ -f "$basefile" ] || continue;
-              echo "Removing $basefile"
-              rm $basefile
-            done;
-            echo "Removing $built_file"
-            rm $built_file
-          done
-
-      - name: Stop sccache server
-        run: sccache --stop-server || true
-
   pgrx_tests_arm64:
-    name: Linux arm64 native tests
+    name: Linux arm64 native tests (PG${{ matrix.postgres }})
     needs: lintck
     runs-on: ubuntu-24.04-arm
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
       PG_VER: ${{ matrix.postgres }}
       RUST_TOOLCHAIN: 'stable'
+      CARGO_PGRX: cargo-pgrx
 
     # Regression coverage for the `.pgrxsc` ELF-section retention contract on
     # aarch64 Linux. The bug this is guarding against: without LTO, `#[used]`
@@ -451,14 +446,13 @@ jobs:
       - name: Set up PostgreSQL permissions
         run: sudo chmod a+rwx `/usr/lib/postgresql/$PG_VER/bin/pg_config --pkglibdir` `/usr/lib/postgresql/$PG_VER/bin/pg_config --sharedir`/extension /var/run/postgresql/
 
-      - name: Cache cargo registry
-        uses: actions/cache@v4
-        continue-on-error: false
+      # This job finishes well before the x86_64 jobs, so it caches only the registry and
+      # leaves the repository's cache storage to the jobs that set the run's length.
+      - uses: Swatinem/rust-cache@v2
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-          key: pgrx-arm64-cargo-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+          cache-targets: "false"
+          cache-bin: "false"
+          save-if: ${{ github.event_name == 'push' }}
 
       # pgrx-pg-sys's build script formats the bindings it generates with rustfmt.
       - name: Install rustfmt
@@ -499,9 +493,8 @@ jobs:
     runs-on: ubuntu-22.04
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
-      RUSTC_WRAPPER: sccache
-      SCCACHE_DIR: /home/runner/.cache/sccache
       PG_VER: 15
+      CARGO_PGRX: cargo-pgrx
 
     steps:
       - uses: actions/checkout@v4
@@ -509,16 +502,7 @@ jobs:
       - name: Set up prerequisites and environment
         run: |
           sudo apt-get update -y -qq --fix-missing
-          
-          echo ""
-          
-          echo "----- Install / Set up sccache -----"
-          mkdir -p $HOME/.local/bin
-          curl -L https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-x86_64-unknown-linux-musl.tar.gz | tar xz
-          mv -f sccache-v0.2.15-x86_64-unknown-linux-musl/sccache $HOME/.local/bin/sccache
-          chmod +x $HOME/.local/bin/sccache
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-          mkdir -p /home/runner/.cache/sccache
+
           echo ""
 
           cat $GITHUB_ENV
@@ -550,27 +534,13 @@ jobs:
           env
           echo ""
 
-      - name: Cache cargo registry
-        uses: actions/cache@v4
-        continue-on-error: false
+      # This job runs alongside the hour-long test jobs without setting the run's length, so
+      # it caches only the registry and leaves the repository's cache storage to them.
+      - uses: Swatinem/rust-cache@v2
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-          key: pgrx-cargo_init_tests-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
-
-      - name: Cache sccache directory
-        uses: actions/cache@v4
-        continue-on-error: false
-        with:
-          path: /home/runner/.cache/sccache
-          key: pgrx-cargo_init_tests-sccache-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
-
-      - name: Start sccache server
-        run: sccache --start-server
-
-      - name: Print sccache stats (before)
-        run: sccache --show-stats
+          cache-targets: "false"
+          cache-bin: "false"
+          save-if: ${{ github.event_name == 'push' }}
 
       - name: Install rustfmt & clippy
         run: |
@@ -610,30 +580,29 @@ jobs:
       - name: show Cargo.toml
         run: cat /tmp/sample/Cargo.toml
 
+      # Sharing the workspace's target directory reuses the build dependencies and proc
+      # macros that the steps above compiled, where the sample resolves the same versions.
       - name: Test sample
+        env:
+          CARGO_TARGET_DIR: ${{ github.workspace }}/target
         run: cd /tmp/sample && cargo pgrx test pg$PG_VER
 
-      - name: Stop sccache server
-        run: sccache --stop-server || true
-
   build_mac:
-    name: MacOS build & test
+    name: MacOS build & test (${{ matrix.os }}, PG${{ matrix.postgresql }})
     needs: lintck
     runs-on: ${{ matrix.os }}
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
-      RUSTC_WRAPPER: sccache
-      SCCACHE_DIR: /Users/runner/Library/Caches/Mozilla.sccache
-      SCCACHE_IDLE_TIMEOUT: 0
+      CARGO_PGRX: cargo-pgrx
 
     strategy:
       matrix:
         os: [ "macos-26" ] # macos-26 is Apple silicon
-        # Since Postgres 16 on macOS the dynamic library extension is "dylib" (instead of "so" on older versions),
-        # so it's important to test against both versions (with "old" and "new" extensions).
-        #
-        # See https://github.com/pgcentralfoundation/pgrx/pull/1300
-        postgresql: [ 15, 16 ]
+        # The organization runs at most five macOS jobs at once across all of its workflow
+        # runs, so this is a single job. PostgreSQL 16 and later name extension libraries
+        # "dylib" on macOS, and PostgreSQL 15 used "so" (see
+        # https://github.com/pgcentralfoundation/pgrx/pull/1300); this job covers "dylib".
+        postgresql: [ 18 ]
 
     steps:
       - uses: Homebrew/actions/setup-homebrew@main
@@ -654,14 +623,7 @@ jobs:
       - name: Set up prerequisites and environment
         run: |
           echo ""
-          
-          echo "----- Install sccache -----"
-          curl -L https://github.com/mozilla/sccache/releases/download/v0.5.4/sccache-v0.5.4-x86_64-apple-darwin.tar.gz | tar xz
-          mv -f sccache-v0.5.4-x86_64-apple-darwin/sccache /usr/local/bin
-          chmod +x /usr/local/bin/sccache
-          mkdir -p $SCCACHE_DIR
-          sccache --version
-          
+
           echo "----- Getting pre-installed Postgres major version -----"
           PG_VER=$(pg_config --version | awk '{split($2,a,"."); print a[1]}')
           echo "PG_VER=$PG_VER" >> $GITHUB_ENV
@@ -678,37 +640,22 @@ jobs:
           env
           echo ""
 
-
-      - name: Cache sccache directory
-        uses: actions/cache@v4
-        continue-on-error: false
+      # Only pushes to develop save caches. Pull requests restore develop's newest cache, so
+      # their caches cannot evict develop's from the repository's cache storage.
+      - uses: Swatinem/rust-cache@v2
         with:
-          path: /Users/runner/Library/Caches/Mozilla.sccache
-          key: pgrx-sccache-${{matrix.os}}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml', '.cargo/config.toml') }}
-
-      - name: Cache cargo directory
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo
-          key: pgrx-cargo-${{matrix.os}}-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml', '.cargo/config.toml') }}
-
-      - name: Start sccache server
-        run: sccache --start-server
-
-      - name: Print sccache stats
-        run: sccache --show-stats
+          cache-bin: "false"
+          save-if: ${{ github.event_name == 'push' }}
 
       - name: Install rustfmt & clippy
         run: |
           rustup component add rustfmt
           rustup component add clippy
 
+      # Building in ./target instead of a temporary directory lets the cache keep
+      # cargo-pgrx's dependencies.
       - name: Install cargo-pgrx
-        run: cargo install --path cargo-pgrx/ --debug --force --locked
-
-      - name: Print sccache stats
-        run: sccache --show-stats
+        run: cargo install --path cargo-pgrx/ --debug --force --locked --target-dir target
 
       - name: Run 'cargo pgrx init'
         run: |
@@ -721,35 +668,24 @@ jobs:
       # This test compiles only on macOS. It builds both slices of a universal installation, so
       # it needs the other slice's standard library. Its synthetic headers make one job enough.
       - name: Run universal macOS binding build harness
-        if: matrix.postgresql == 16
         run: |
           rustup target add aarch64-apple-darwin x86_64-apple-darwin
           cargo test --package pgrx-bindgen --test macro_build \
             universal_macos_installations_build_both_slices -- --include-ignored --exact --test-threads=1
 
-      - name: Print sccache stats
-        run: sccache --show-stats
-
-      - name: Stop sccache server
-        run: sccache --stop-server || true
-
   build_windows:
-    name: Windows build & test
+    name: Windows build & test (${{ matrix.os }}, PG${{ matrix.postgresql }})
     needs: lintck
     runs-on: ${{ matrix.os }}
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
-      RUSTC_WRAPPER: sccache
-      SCCACHE_DIR: C:\Users\runneradmin\sccache
-      SCCACHE_IDLE_TIMEOUT: 0
       PG_VER: ${{ matrix.postgresql }}
+      CARGO_PGRX: cargo-pgrx
 
     strategy:
-      # Windows runs are slow to repeat, so one version's failure should not hide the other's.
-      fail-fast: false
       matrix:
         os: [ "windows-2022" ]
-        postgresql: [ 15, 17 ]
+        postgresql: [ 18 ]
 
     steps:
       - uses: actions/checkout@v4
@@ -758,59 +694,31 @@ jobs:
         run: |
           Write-Output ""
 
-          echo "----- Install sccache -----"
-          Invoke-WebRequest -Uri "https://github.com/mozilla/sccache/releases/download/v0.5.4/sccache-v0.5.4-x86_64-pc-windows-msvc.tar.gz" -OutFile "sccache.tar.gz"
-          tar -xzvf sccache.tar.gz
-          Move-Item -Force "sccache-v0.5.4-x86_64-pc-windows-msvc\sccache.exe" -Destination "C:\Windows\System32"
-          New-Item -ItemType Directory -Force -Path $env:SCCACHE_DIR | Out-Null
-          sccache --version
-
           rustup update
 
           Write-Output "----- Outputting env -----"
           Get-ChildItem Env:
           Write-Output ""
 
-
-      - name: Cache sccache directory
-        uses: actions/cache@v4
-        continue-on-error: false
+      # Only pushes to develop save caches. Pull requests restore develop's newest cache, so
+      # their caches cannot evict develop's from the repository's cache storage.
+      - uses: Swatinem/rust-cache@v2
         with:
-          path: C:\Users\runneradmin\sccache
-          key: pgrx-sccache-${{matrix.os}}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml', '.cargo/config.toml') }}
+          cache-bin: "false"
+          save-if: ${{ github.event_name == 'push' }}
 
-      - name: Cache cargo directory
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo
-          key: pgrx-cargo-${{matrix.os}}-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml', '.cargo/config.toml') }}
-
-      - name: Start sccache server
-        run: sccache --start-server
-
-      - name: Print sccache stats
-        run: sccache --show-stats
-
+      # Building in ./target instead of a temporary directory lets the cache keep
+      # cargo-pgrx's dependencies.
       - name: Install cargo-pgrx
-        run: cargo install --path cargo-pgrx/ --debug --force --locked
+        run: cargo install --path cargo-pgrx/ --debug --force --locked --target-dir target
 
       - name: Install rustfmt & clippy
         run: |
           rustup component add rustfmt
           rustup component add clippy
 
-      - name: Print sccache stats
-        run: sccache --show-stats
-
       - name: Run 'cargo pgrx init'
         run: cargo pgrx init --pg$env:PG_VER=download
 
       - name: Run tests
         run: cargo test --all --no-default-features --features "pg$env:PG_VER pg_test cshim proptest" --all-targets --no-fail-fast
-
-      - name: Print sccache stats
-        run: sccache --show-stats
-
-      - name: Stop sccache server
-        run: sccache --stop-server || true

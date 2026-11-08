@@ -2078,8 +2078,7 @@ fn write_literal(rust: &mut String, ty: IntegerType, literal: &IntegerLiteral) {
 
     // The immutable session's parser already validated this ASCII spelling.
     // Remove the known suffix length rather than trimming digit-like letters.
-    let suffix_bytes = usize::from(literal.suffix.unsigned) + usize::from(literal.suffix.long);
-    let digits = &literal.spelling[..literal.spelling.len() - suffix_bytes];
+    let digits = &literal.spelling[..literal.spelling.len() - literal.suffix.spelling_len()];
     let magnitude = match literal.radix {
         16 => format!("0x{}", &digits[2..]),
         2 => format!("0b{}", &digits[2..]),

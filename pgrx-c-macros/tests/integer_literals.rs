@@ -27,8 +27,9 @@ mod oracle;
 mod rust_oracle;
 
 use pgrx_c_macros::{
-    AnalysisSession, BindingCatalog, EmissionStatus, FrontendError, FrontendOutput, MacroScanner,
-    emit, emit_support_artifact_with_bindings, inspect,
+    AnalysisSession, AnalysisStatus, BindingCatalog, EmissionStatus, FrontendError, FrontendOutput,
+    IntegerKind, MacroScanner, MicrosoftIntegerTypes, SkipReasonCode, analyze, emit,
+    emit_support_artifact_with_bindings, inspect,
 };
 use std::fmt::Write;
 use std::path::PathBuf;
@@ -67,10 +68,40 @@ const BINARY_CASES: &[(&str, &str)] = &[
     ("INTEGER_BINARY_MAX", "0b1111111111111111111111111111111111111111111111111111111111111111u"),
 ];
 
+/// Microsoft sized suffix spellings from MSVC's headers and each literal's emitted C type
+/// marker and Rust storage on an LLP64 MSVC target.
+const MICROSOFT_CASES: &[(&str, &str)] = &[
+    ("MS_INT8_MAX", "CChar>::new(127i8)"),
+    ("MS_UINT8_MAX", "CUnsignedChar>::new(0xffu8)"),
+    ("MS_INT16_MIN", "CShort>::new(32767i16)"),
+    ("MS_UINT16_MAX", "CUnsignedShort>::new(0xffffu16)"),
+    ("MS_INT32_MIN", "CInt>::new(2147483647i32)"),
+    ("MS_UINT32_MAX", "CUnsignedInt>::new(0xffffffffu32)"),
+    ("MS_INT64_MIN", "CLongLong>::new(9223372036854775807i64)"),
+    ("MS_INT64_MAX", "CLongLong>::new(9223372036854775807i64)"),
+    ("MS_UINT64_MAX", "CUnsignedLongLong>::new(0xffffffffffffffffu64)"),
+    ("MS_OCTAL_UPPER_CASE", "CUnsignedLongLong>::new(0o777u64)"),
+    ("MS_TRAILING_UNSIGNED", "CUnsignedShort>::new(1u16)"),
+];
+
 /// Return the original fixture header whose preprocessing and C definitions supply this test's
 /// semantics.
 fn header() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/integer_literals.h")
+}
+
+/// Return the fixture that spells literals with Microsoft sized suffixes.
+fn microsoft_header() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/microsoft_integer_literals.h")
+}
+
+/// Require a structured refusal with the expected reason.
+fn assert_skip(frontend: &FrontendOutput, name: &str, expected: SkipReasonCode) {
+    let analysis = analyze(frontend, name);
+    let AnalysisStatus::Skipped { reason } = &analysis.status else {
+        panic!("{name} must be skipped as {expected:?}: {analysis:?}");
+    };
+    assert_eq!(reason.code, expected, "{name}: {}", reason.message);
 }
 
 /// Construct the C invocation used for both inspection and the native oracle, so
@@ -202,4 +233,85 @@ fn binary_literals_keep_digits_and_c_types_under_c23() {
         Err(error) => panic!("inspect original literal definitions under C23: {error}"),
     };
     compare_literals(&scanner, &frontend, BINARY_CASES);
+}
+
+/// Inspect the Microsoft-suffix fixture for an MSVC target, which enables Microsoft extensions.
+/// Inspecting this target needs no Windows SDK.
+fn inspect_msvc(scanner: &MacroScanner) -> FrontendOutput {
+    let arguments = ["--target=x86_64-pc-windows-msvc".to_owned()];
+    inspect(scanner, &microsoft_header(), &arguments, None).unwrap()
+}
+
+/// On an MSVC target, Microsoft-suffixed literals emit with the C types Clang gives them and
+/// their original digits, and values that Clang would truncate are refused.
+#[test]
+fn msvc_targets_emit_microsoft_suffixes_with_clang_types() {
+    use IntegerKind::{
+        Char, Int, LongLong, Short, UnsignedChar, UnsignedInt, UnsignedLongLong, UnsignedShort,
+    };
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let frontend = inspect_msvc(&scanner);
+    assert_eq!(
+        frontend.profile().target.microsoft_integer_types,
+        Some(MicrosoftIntegerTypes {
+            signed: [Char, Short, Int, LongLong],
+            unsigned: [UnsignedChar, UnsignedShort, UnsignedInt, UnsignedLongLong],
+        })
+    );
+    let names = MICROSOFT_CASES.iter().map(|&(name, _)| name).collect::<Vec<_>>();
+    let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
+    for &(name, literal) in MICROSOFT_CASES {
+        let rust = emitted(&session, name);
+        assert!(rust.contains(literal), "{name} must contain {literal}: {rust}");
+    }
+    assert_skip(&frontend, "MS_TRUNCATED_INT8", SkipReasonCode::LiteralOutOfRange);
+    assert_skip(&frontend, "MS_TRUNCATED_INT32", SkipReasonCode::LiteralOutOfRange);
+}
+
+/// PostgreSQL 18 reaches MSVC's suffixed `<stdint.h>` limits through `PG_INT32_MIN` and
+/// `PG_INT64_MIN`. On an MSVC target the date and timestamp macros built on them still emit.
+#[test]
+fn msvc_targets_emit_postgres_limits_spelled_with_microsoft_suffixes() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let frontend = inspect_msvc(&scanner);
+    let cases = [
+        ("DATE_IS_NOBEGIN", "CInt>::new(2147483647i32)"),
+        ("TIMESTAMP_IS_NOBEGIN", "CLongLong>::new(9223372036854775807i64)"),
+    ];
+    let session =
+        AnalysisSession::prepare(&scanner, &frontend, &cases.map(|(name, _)| name)).unwrap();
+    for (name, literal) in cases {
+        let rust = emitted(&session, name);
+        assert!(rust.contains(literal), "{name} must contain {literal}: {rust}");
+    }
+}
+
+/// Without Microsoft extensions the compiler rejects these suffixes, so the analyzer refuses
+/// them, including through the PostgreSQL macros built on them, rather than guess a type.
+#[test]
+fn microsoft_suffixes_are_refused_when_the_compiler_rejects_them() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let frontend = inspect(&scanner, &microsoft_header(), &arguments("c11"), None).unwrap();
+    assert_eq!(frontend.profile().target.microsoft_integer_types, None);
+    for &(name, _) in MICROSOFT_CASES {
+        assert_skip(&frontend, name, SkipReasonCode::UnsupportedLiteral);
+    }
+    let session = AnalysisSession::prepare(&scanner, &frontend, &["DATE_IS_NOBEGIN"]).unwrap();
+    let emission = emit(&session, "DATE_IS_NOBEGIN");
+    let EmissionStatus::Skipped { reason } = &emission.status else {
+        panic!("DATE_IS_NOBEGIN must be refused: {emission:?}");
+    };
+    assert_eq!(reason.code, SkipReasonCode::UnsupportedLiteral, "{}", reason.message);
+}
+
+/// Emit one macro and return its Rust without whitespace or formatting commas.
+fn emitted(session: &AnalysisSession<'_>, name: &str) -> String {
+    let emission = emit(session, name);
+    let EmissionStatus::Emitted { rust, .. } = emission.status else {
+        panic!("{name} must emit: {emission:?}");
+    };
+    rust.split_whitespace().collect::<String>().replace(",>", ">")
 }

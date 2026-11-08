@@ -5,6 +5,12 @@ on:
     branches: [ develop ]
   pull_request: {}
 
+# A new push to a pull request cancels the pull request's earlier run. Each push to develop
+# gets its own group, so develop runs are never cancelled or queued behind each other.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
@@ -17,24 +23,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      # Pull requests restore develop's cache without saving their own, so their caches
+      # cannot evict develop's from the repository's cache storage.
       - uses: Swatinem/rust-cache@v2
         with:
           prefix-key: "v1-cargo-pgrx-test--runas"
+          save-if: ${{ github.ref == 'refs/heads/develop' }}
 
       - name: Set up prerequisites and environment
         run: |
           sudo apt-get update -y -qq --fix-missing
-          
+
           echo ""
-          echo "----- Install sccache -----"
-          mkdir -p $HOME/.local/bin
-          curl -L https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-x86_64-unknown-linux-musl.tar.gz | tar xz
-          mv -f sccache-v0.2.15-x86_64-unknown-linux-musl/sccache $HOME/.local/bin/sccache
-          chmod +x $HOME/.local/bin/sccache
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-          mkdir -p /home/runner/.cache/sccache
-          echo ""
-          
           echo "----- Set up dynamic variables -----"
           cat $GITHUB_ENV
           echo ""

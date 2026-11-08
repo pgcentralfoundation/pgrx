@@ -496,13 +496,79 @@ pub struct IntegerLiteral {
     pub suffix: IntegerSuffix,
 }
 
-/// Retain unsignedness and long-rank suffixes for target-dependent C literal type selection.
+/// Retain unsignedness and size suffixes for target-dependent C literal type selection.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct IntegerSuffix {
     /// Whether a U suffix restricts type candidates to unsigned C identities.
     pub unsigned: bool,
-    /// Zero, one, or two `L` characters.
-    pub long: u8,
+    /// The size suffix. Clang accepts at most one, so `L` cannot accompany a Microsoft width.
+    pub size: IntegerSize,
+}
+
+/// The size part of an integer literal suffix.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum IntegerSize {
+    /// No size suffix.
+    Plain,
+    /// One `L`.
+    Long,
+    /// Two adjacent `L` characters of the same case.
+    LongLong,
+    /// A Microsoft sized suffix such as `i32`, which Clang accepts only with Microsoft extensions.
+    Microsoft(MicrosoftIntegerWidth),
+}
+
+/// The width named by a Microsoft `i8`, `i16`, `i32`, or `i64` integer suffix.
+///
+/// Clang also accepts `i128`, which this analyzer leaves unsupported.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum MicrosoftIntegerWidth {
+    /// `i8`
+    Bits8,
+    /// `i16`
+    Bits16,
+    /// `i32`
+    Bits32,
+    /// `i64`
+    Bits64,
+}
+
+impl MicrosoftIntegerWidth {
+    /// Every supported width, in increasing order.
+    pub const ALL: [Self; 4] = [Self::Bits8, Self::Bits16, Self::Bits32, Self::Bits64];
+
+    /// The number of bits this suffix names.
+    pub fn bits(self) -> u32 {
+        match self {
+            Self::Bits8 => 8,
+            Self::Bits16 => 16,
+            Self::Bits32 => 32,
+            Self::Bits64 => 64,
+        }
+    }
+
+    /// The signed suffix spelling, such as `i32`.
+    pub fn spelling(self) -> &'static str {
+        match self {
+            Self::Bits8 => "i8",
+            Self::Bits16 => "i16",
+            Self::Bits32 => "i32",
+            Self::Bits64 => "i64",
+        }
+    }
+}
+
+impl IntegerSuffix {
+    /// The suffix's length in bytes within a literal spelling that the parser accepted.
+    pub(crate) fn spelling_len(self) -> usize {
+        usize::from(self.unsigned)
+            + match self.size {
+                IntegerSize::Plain => 0,
+                IntegerSize::Long => 1,
+                IntegerSize::LongLong => 2,
+                IntegerSize::Microsoft(width) => width.spelling().len(),
+            }
+    }
 }
 
 /// A parser refusal with original token coordinates rather than a partial syntax tree.
@@ -1397,16 +1463,30 @@ fn parse_integer_literal(spelling: &str) -> Result<IntegerLiteral, String> {
     if suffix.contains("lL") || suffix.contains("Ll") {
         return Err("mixed-case long-long suffix is not a supported C integer suffix".into());
     }
-    let suffix = match suffix.to_ascii_lowercase().as_str() {
-        "" => IntegerSuffix { unsigned: false, long: 0 },
-        "u" => IntegerSuffix { unsigned: true, long: 0 },
-        "l" => IntegerSuffix { unsigned: false, long: 1 },
-        "ul" | "lu" => IntegerSuffix { unsigned: true, long: 1 },
-        "ll" => IntegerSuffix { unsigned: false, long: 2 },
-        "ull" | "llu" => IntegerSuffix { unsigned: true, long: 2 },
-        _ => return Err(format!("unsupported integer literal or suffix: {spelling:?}")),
+    let (unsigned, size) = match suffix.to_ascii_lowercase().as_str() {
+        "" => (false, IntegerSize::Plain),
+        "u" => (true, IntegerSize::Plain),
+        "l" => (false, IntegerSize::Long),
+        "ul" | "lu" => (true, IntegerSize::Long),
+        "ll" => (false, IntegerSize::LongLong),
+        "ull" | "llu" => (true, IntegerSize::LongLong),
+        lower => microsoft_suffix(lower)
+            .ok_or_else(|| format!("unsupported integer literal or suffix: {spelling:?}"))?,
     };
+    let suffix = IntegerSuffix { unsigned, size };
     Ok(IntegerLiteral { spelling: spelling.into(), value, radix: radix as u8, suffix })
+}
+
+/// Recognize a lowercased Microsoft sized suffix as Clang lexes one: `i8`, `i16`, `i32`, or
+/// `i64`, with at most one `u` before or after it. Analysis decides whether the profile
+/// accepts these suffixes.
+fn microsoft_suffix(lower: &str) -> Option<(bool, IntegerSize)> {
+    let (unsigned, size) = match lower.strip_prefix('u').or_else(|| lower.strip_suffix('u')) {
+        Some(size) => (true, size),
+        None => (false, lower),
+    };
+    let width = MicrosoftIntegerWidth::ALL.into_iter().find(|width| width.spelling() == size)?;
+    Some((unsigned, IntegerSize::Microsoft(width)))
 }
 
 /// Select the supported integer or basic character literal grammar while retaining the original
@@ -1615,7 +1695,7 @@ fn parse_character_literal(spelling: &str) -> Result<IntegerLiteral, String> {
         spelling: spelling.into(),
         value: u128::from(value),
         radix: 10,
-        suffix: IntegerSuffix { unsigned: false, long: 0 },
+        suffix: IntegerSuffix { unsigned: false, size: IntegerSize::Plain },
     })
 }
 
@@ -1851,6 +1931,43 @@ mod tests {
         }
     }
 
+    /// Microsoft sized suffixes parse with the spellings Clang accepts, such as MSVC's
+    /// `INT32_MIN` digits `2147483647i32`, and the suffix length leaves exactly the digits.
+    #[test]
+    fn microsoft_sized_suffixes_follow_clang_spellings() {
+        use MicrosoftIntegerWidth::{Bits8, Bits16, Bits32, Bits64};
+        for (spelling, digits, value, radix, unsigned, width) in [
+            ("127i8", "127", 127, 10, false, Bits8),
+            ("255ui8", "255", 255, 10, true, Bits8),
+            ("32767i16", "32767", 32767, 10, false, Bits16),
+            ("65535ui16", "65535", 65535, 10, true, Bits16),
+            ("2147483647i32", "2147483647", 2147483647, 10, false, Bits32),
+            ("0xffffffffui32", "0xffffffff", 0xffff_ffff, 16, true, Bits32),
+            ("9223372036854775807i64", "9223372036854775807", i64::MAX as u128, 10, false, Bits64),
+            ("0xffffffffffffffffui64", "0xffffffffffffffff", u64::MAX as u128, 16, true, Bits64),
+            ("0777I64", "0777", 0o777, 8, false, Bits64),
+            ("0xABi8", "0xAB", 0xab, 16, false, Bits8),
+            ("1Ui64", "1", 1, 10, true, Bits64),
+            ("1uI64", "1", 1, 10, true, Bits64),
+            ("1i64u", "1", 1, 10, true, Bits64),
+            ("1I16U", "1", 1, 10, true, Bits16),
+        ] {
+            let literal = parse_integer_literal(spelling).unwrap();
+            assert_eq!(literal.value, value, "{spelling}");
+            assert_eq!(literal.radix, radix, "{spelling}");
+            let size = IntegerSize::Microsoft(width);
+            assert_eq!(literal.suffix, IntegerSuffix { unsigned, size }, "{spelling}");
+            assert_eq!(&spelling[..spelling.len() - literal.suffix.spelling_len()], digits);
+        }
+        // Clang accepts one size suffix and one `u`. This analyzer leaves `i128` unsupported.
+        for literal in [
+            "1i64l", "1li64", "1LLi64", "1i64ll", "1uui64", "1ui64u", "1iu64", "1i128", "1i7",
+            "1i", "1i6", "1i016", "1ui", "1i8i8",
+        ] {
+            assert!(parse_integer_literal(literal).is_err(), "{literal}");
+        }
+    }
+
     /// Checks basic character constants keep c int literal metadata.
     #[test]
     fn basic_character_constants_keep_c_int_literal_metadata() {
@@ -1883,7 +2000,7 @@ mod tests {
             assert_eq!(literal.spelling, spelling);
             assert_eq!(literal.value, value, "{spelling}");
             assert_eq!(literal.radix, 10);
-            assert_eq!(literal.suffix, IntegerSuffix { unsigned: false, long: 0 });
+            assert_eq!(literal.suffix, IntegerSuffix { unsigned: false, size: IntegerSize::Plain });
         }
         for value in 0..=127 {
             assert_eq!(parse_literal(&format!("'\\{value:03o}'")).unwrap().value, value);

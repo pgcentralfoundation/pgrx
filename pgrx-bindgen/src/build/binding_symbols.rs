@@ -1072,6 +1072,7 @@ mod tests {
             ascii_execution_charset: true,
             byte_order: ByteOrder::Little,
             c_standard: Some(201112),
+            microsoft_integer_types: None,
             floating_point: Default::default(),
             integers: [
                 (IntegerKind::UnsignedChar, false, 8, 1),

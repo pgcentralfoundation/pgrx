@@ -30,8 +30,8 @@ mod constants;
 /// Prove closed token pasting and attribute synthesized dependencies with bounded owned
 /// instrumentation.
 mod paste;
-pub(crate) use constants::retain_integer_constants;
 pub use constants::{ObjectIntegerConstants, probe_integer_object_constants};
+pub(crate) use constants::{c_integer_name, retain_integer_constants};
 
 /// Probe-only diagnostic policy that accepts source markers and makes invalid token pasting an error.
 ///

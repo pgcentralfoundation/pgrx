@@ -209,7 +209,10 @@ impl Stdio {
 
 pub(crate) fn cargo() -> std::process::Command {
     let cargo = std::env::var_os("CARGO").unwrap_or_else(|| "cargo".into());
-    std::process::Command::new(cargo)
+    let mut command = std::process::Command::new(cargo);
+    // `cargo pgrx` often runs under `cargo run` or a test binary.
+    pgrx_pg_config::cargo::remove_package_env(&mut command);
+    command
 }
 
 /// Extra `cargo rustc --lib -- ...` arguments that force the linker to retain

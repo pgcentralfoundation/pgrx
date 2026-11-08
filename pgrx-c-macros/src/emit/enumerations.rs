@@ -219,6 +219,7 @@ mod tests {
             )]
             .into_iter()
             .collect(),
+            microsoft_integer_types: None,
             floating_point: Default::default(),
         };
         let integer = TypeInfo {
