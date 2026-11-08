@@ -11,7 +11,7 @@ use std::collections::BTreeMap;
 use cargo_metadata::{Metadata, MetadataCommand};
 use eyre::eyre;
 use owo_colors::*;
-use semver::VersionReq;
+use semver::{Comparator, Op, Prerelease, Version, VersionReq};
 use std::path::Path;
 
 pub(crate) fn metadata(
@@ -42,10 +42,23 @@ pub(crate) fn split_cargo_flags(cargo_flags: &[String]) -> Vec<String> {
     cargo_flags.iter().flat_map(|f| f.split_ascii_whitespace().map(str::to_owned)).collect()
 }
 
+fn compatible_pgrx_versions(cargo_pgrx_version: &Version) -> VersionReq {
+    let major = cargo_pgrx_version.major;
+    VersionReq {
+        comparators: vec![Comparator {
+            op: Op::Tilde,
+            major,
+            minor: (major == 0).then_some(cargo_pgrx_version.minor),
+            patch: None,
+            pre: Prerelease::EMPTY,
+        }],
+    }
+}
+
 #[tracing::instrument(level = "error", skip_all)]
 pub fn validate(path: Option<&Path>, metadata: &Metadata) -> eyre::Result<()> {
-    let cargo_pgrx_version = env!("CARGO_PKG_VERSION");
-    let cargo_pgrx_version_req = VersionReq::parse(&format!("~{cargo_pgrx_version}"))?;
+    let cargo_pgrx_version = Version::parse(env!("CARGO_PKG_VERSION"))?;
+    let cargo_pgrx_version_req = compatible_pgrx_versions(&cargo_pgrx_version);
 
     let pgrx_packages = metadata.packages.iter().filter(|package| {
         package.name == "pgrx"
@@ -95,7 +108,7 @@ pub fn validate(path: Option<&Path>, metadata: &Metadata) -> eyre::Result<()> {
         return Err(eyre!(
             r#"The installed cargo-pgrx {cargo_pgrx_version} is not compatible with the {} in {}:
 {mismatches}
-cargo-pgrx and pgrx library versions must be identical.
+cargo-pgrx {cargo_pgrx_version} requires pgrx {cargo_pgrx_version_req}.
 {help}"#,
             if many == 1 { "dependency" } else { "dependencies" },
             path.map(|p| p.display().to_string())
@@ -109,7 +122,46 @@ cargo-pgrx and pgrx library versions must be identical.
 
 #[cfg(test)]
 mod tests {
-    use super::split_cargo_flags;
+    use super::{compatible_pgrx_versions, split_cargo_flags};
+    use semver::Version;
+
+    fn accepts(cargo_pgrx: &str, pgrx: &str) -> bool {
+        compatible_pgrx_versions(&Version::parse(cargo_pgrx).unwrap())
+            .matches(&Version::parse(pgrx).unwrap())
+    }
+
+    #[test]
+    fn zero_major_accepts_the_whole_patch_series() {
+        assert!(accepts("0.19.3", "0.19.0"));
+        assert!(accepts("0.19.3", "0.19.2"));
+        assert!(accepts("0.19.3", "0.19.3"));
+        assert!(accepts("0.19.0", "0.19.3"));
+    }
+
+    #[test]
+    fn zero_major_rejects_other_minor_series() {
+        assert!(!accepts("0.19.3", "0.18.9"));
+        assert!(!accepts("0.19.3", "0.20.0"));
+    }
+
+    #[test]
+    fn nonzero_major_accepts_the_whole_major_series() {
+        assert!(accepts("1.2.3", "1.0.0"));
+        assert!(accepts("1.2.3", "1.9.9"));
+        assert!(!accepts("1.2.3", "0.19.3"));
+        assert!(!accepts("1.2.3", "2.0.0"));
+    }
+
+    #[test]
+    fn prereleases_are_not_accepted() {
+        assert!(!accepts("0.19.3", "0.19.0-beta.1"));
+    }
+
+    #[test]
+    fn cargo_pgrx_accepts_its_own_version() {
+        let version = Version::parse(env!("CARGO_PKG_VERSION")).unwrap();
+        assert!(compatible_pgrx_versions(&version).matches(&version));
+    }
 
     #[test]
     fn split_cargo_flags_handles_both_forms() {
