@@ -80,6 +80,9 @@ jobs:
     env:
       PG_VER: ${{ matrix.postgres }}
       RUST_TOOLCHAIN: ${{ matrix.rust || 'stable' }}
+      # The pg_test harness runs the cargo-pgrx installed from this checkout below instead of
+      # building the workspace's copy again.
+      CARGO_PGRX: cargo-pgrx
 
     strategy:
       # Every entry is listed so each one is its own job. Next to a `postgres` list, an
@@ -92,16 +95,18 @@ jobs:
           - postgres: 15
           - postgres: 18
           - postgres: 19
-          - postgres: 18
-            rust: beta
           # Checks that one PostgreSQL version covers run in their own job, in parallel with
           # the PG18 tests.
           - postgres: 18
             suite: extras
-          # The versions in between build the tests without running them.
+          # The versions in between build the tests without running them. So does Rust beta,
+          # since a new compiler almost always breaks the build rather than a test.
           - postgres: 16
             suite: compile
           - postgres: 17
+            suite: compile
+          - postgres: 18
+            rust: beta
             suite: compile
 
     steps:
@@ -227,23 +232,30 @@ jobs:
       - name: Run 'cargo pgrx init' against system-level ${{ matrix.postgres }}
         run: cargo pgrx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
 
+      # pgrx-unit-tests runs in the two cshim steps below. Its `proptest` default is a
+      # superset of what this run would test.
       - name: Run workspace tests
         if: ${{ !matrix.suite }}
         run: |
           CARGO_TARGET_DIR="$(pwd)/target" cargo test --all \
+            --exclude pgrx-unit-tests \
             --features "pg$PG_VER" \
             --no-default-features
 
-      # These are the workspace and cshim test builds that the test jobs run.
+      # These are the test builds that the test jobs run.
       - name: Build the workspace tests without running them
         if: matrix.suite == 'compile'
         run: |
           CARGO_TARGET_DIR="$(pwd)/target" cargo test --all --no-run \
+            --exclude pgrx-unit-tests \
             --features "pg$PG_VER" \
             --no-default-features
           cargo test --no-run \
             --features "pg$PG_VER cshim proptest" \
             --package pgrx-unit-tests --lib
+          cargo test --no-run \
+            --features "pg$PG_VER proptest" \
+            --package pgrx-unit-tests
 
       # The workspace run above disables pgrx-c-macros' default `cli` feature.
       - name: Run pgrx-c-macros CLI tests
@@ -286,8 +298,9 @@ jobs:
             --features "pg$PG_VER" --no-default-features --lib varlena
 
       # Only this step sees the target headers; tests above check that builds without them refuse.
+      # Rust beta adds no target-specific coverage, so it skips this.
       - name: Check that cross-compiled pgrx-unit-tests can build
-        if: matrix.suite != 'extras'
+        if: matrix.suite != 'extras' && !matrix.rust
         env:
           PGRX_INCLUDEDIR_SERVER_aarch64_unknown_linux_gnu: ${{ steps.arm64-headers.outputs.server }}
         run: |
@@ -303,19 +316,13 @@ jobs:
             --features "pg$PG_VER cshim proptest" \
             --package pgrx-unit-tests --lib
 
+      # Every pgrx-unit-tests target, including the UI tests, runs here once.
       - name: Run pgrx-unit-tests with cshim disabled
         if: ${{ !matrix.suite }}
         run: |
           cargo test \
             --features "pg$PG_VER proptest" \
-            --package pgrx-unit-tests --lib
-
-      - name: Run UI tests
-        if: ${{ !matrix.suite && !matrix.rust }}
-        run: |
-          cargo test \
-            --features "pg$PG_VER proptest" \
-            --package pgrx-unit-tests --test ui
+            --package pgrx-unit-tests
 
       - name: Smoke test cargo pgrx bench against the benching example
         if: matrix.suite == 'extras'
@@ -351,6 +358,7 @@ jobs:
     env:
       PG_VER: ${{ matrix.postgres }}
       RUST_TOOLCHAIN: 'stable'
+      CARGO_PGRX: cargo-pgrx
 
     # Regression coverage for the `.pgrxsc` ELF-section retention contract on
     # aarch64 Linux. The bug this is guarding against: without LTO, `#[used]`
@@ -469,6 +477,7 @@ jobs:
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
       PG_VER: 15
+      CARGO_PGRX: cargo-pgrx
 
     steps:
       - uses: actions/checkout@v4
@@ -554,7 +563,11 @@ jobs:
       - name: show Cargo.toml
         run: cat /tmp/sample/Cargo.toml
 
+      # Sharing the workspace's target directory reuses the build dependencies and proc
+      # macros that the steps above compiled, where the sample resolves the same versions.
       - name: Test sample
+        env:
+          CARGO_TARGET_DIR: ${{ github.workspace }}/target
         run: cd /tmp/sample && cargo pgrx test pg$PG_VER
 
   build_mac:
@@ -562,6 +575,8 @@ jobs:
     needs: lintck
     runs-on: ${{ matrix.os }}
     if: "!contains(github.event.head_commit.message, 'nogha')"
+    env:
+      CARGO_PGRX: cargo-pgrx
 
     strategy:
       matrix:
@@ -648,6 +663,7 @@ jobs:
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
       PG_VER: ${{ matrix.postgresql }}
+      CARGO_PGRX: cargo-pgrx
 
     strategy:
       matrix:
