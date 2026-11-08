@@ -57,6 +57,9 @@ pub(crate) struct Package {
     /// Build the package without unreleased SQL fragments instead of refusing to build it
     #[clap(long)]
     pub(crate) no_assemble_unreleased: bool,
+    /// Skip the RPM and DEB packages that `[package.metadata.rpm]` and `[package.metadata.deb]` declare
+    #[clap(long)]
+    pub(crate) no_distrib_packages: bool,
     /// Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
     #[clap(long = "cargo", value_name = "FLAG", allow_hyphen_values = true)]
     pub(crate) cargo: Vec<String>,
@@ -65,13 +68,6 @@ pub(crate) struct Package {
     /// The directory within out_dir to put extension assets (default is based on pg_config path)
     #[clap(long, value_parser)]
     pub(crate) prefix_dir: Option<PathBuf>,
-}
-
-/// Whether [`Package::perform`] also builds the packages declared in `Cargo.toml`.
-/// `cargo pgrx install --sudo` uses `perform` to stage files it copies into place.
-pub(crate) enum DistribPackages {
-    Build,
-    Skip,
 }
 
 impl Package {
@@ -85,10 +81,7 @@ impl Package {
         }
     }
 
-    pub(crate) fn perform(
-        mut self,
-        distrib_packages: DistribPackages,
-    ) -> eyre::Result<(PathBuf, Vec<PathBuf>)> {
+    pub(crate) fn perform(mut self) -> eyre::Result<(PathBuf, Vec<PathBuf>)> {
         let unreleased_mode = self.unreleased_mode();
         warn_if_pg_bench_enabled(&self.features, "package");
         let cargo_flags = std::mem::take(&mut self.cargo);
@@ -148,7 +141,7 @@ impl Package {
             self.prefix_dir.clone(),
         )?;
 
-        if matches!(distrib_packages, DistribPackages::Build) {
+        if !self.no_distrib_packages {
             build_distrib_packages(
                 &pg_config,
                 &package_manifest_path,
@@ -167,7 +160,7 @@ impl Package {
 impl CommandExecute for Package {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        self.perform(DistribPackages::Build)?;
+        self.perform()?;
         Ok(())
     }
 }

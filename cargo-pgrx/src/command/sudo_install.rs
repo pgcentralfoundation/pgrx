@@ -5,7 +5,7 @@ use owo_colors::OwoColorize;
 
 use crate::CommandExecute;
 use crate::command::install::Install;
-use crate::command::package::{DistribPackages, Package};
+use crate::command::package::Package;
 
 /// Like `cargo pgrx install`, but uses `sudo` to copy the extension files
 #[derive(Debug, Clone)]
@@ -62,6 +62,8 @@ impl From<SudoInstall> for Package {
             no_assemble_unreleased: value.no_assemble_unreleased,
             cargo: value.cargo,
             prefix_dir: value.prefix_dir,
+            // It stages files to copy into place and never builds RPM or DEB packages.
+            no_distrib_packages: true,
         }
     }
 }
@@ -76,7 +78,7 @@ impl CommandExecute for SudoInstall {
         // the extension as we want it to build out the directory structure in `./target/...`
         // from there we'll use sudo to copy each file created to the actual location on disk
         let package: Package = self.clone().into();
-        let (outdir, output_files) = package.perform(DistribPackages::Skip)?;
+        let (outdir, output_files) = package.perform()?;
 
         eprintln!();
         eprintln!("Using sudo to copy extension files from {}", outdir.display().cyan());

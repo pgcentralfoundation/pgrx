@@ -190,6 +190,8 @@ treat `1.0.0-rc.1` as newer than `1.0.0`. Both sort `1.0.0~rc.1` before `1.0.0`.
 - RPM and DEB packages can only be built on Linux. On other platforms, `cargo pgrx package` prints a
   warning, skips them, and still produces the package directory.
 - `cargo pgrx install --sudo` stages its files the same way but never builds these packages.
+- `--no-distrib-packages` skips these packages for one build, such as a container build that only
+  copies the staged files.
 - `cargo pgrx package` does not clear the output directory between runs, and `dirs` packages every
   file it finds. Delete the directory before a release so SQL files from older versions don't ship.
 - The default `files` and `dirs` expect the layout from `pg_config`. If you pass `--prefix-dir`,
