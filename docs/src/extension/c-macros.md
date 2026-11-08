@@ -142,9 +142,11 @@ yourself where the input is not already known to be valid.
 C macros that read an implicit `fcinfo` variable take it as their last argument,
 as in `PG_ARGISNULL!(n, fcinfo)`. The `.get()` of a macro that yields a C `Datum`,
 such as `PG_GETARG_DATUM!` or `HeapTupleGetDatum!`, is an integer that exposes the
-pointer's provenance. `pg_sys::Datum::from(..get() as usize)` takes that
+pointer's provenance. `pg_sys::Datum::from` the macro's result takes that
 provenance back, as a C cast from `Datum` to a pointer does, so Rust may read
-through the result. For a function argument, `pg_get_nullable_datum` also checks
+through the result. Likewise `pg_sys::Oid::from` and `pg_sys::TransactionId::from`
+take a C `unsigned int` result, such as `HeapTupleHeaderGetTypeId!`'s. These go by
+the result's C type, as `get_usize` does, so any result of that type converts. For a function argument, `pg_get_nullable_datum` also checks
 the argument index and returns the pointer without the integer round trip.
 
 PostgreSQL 16 turned the tree walkers and mutators into macros that cast their
