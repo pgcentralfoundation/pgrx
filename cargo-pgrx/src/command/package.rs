@@ -57,6 +57,9 @@ pub(crate) struct Package {
     /// Build the package without unreleased SQL fragments instead of refusing to build it
     #[clap(long)]
     pub(crate) no_assemble_unreleased: bool,
+    /// Skip the RPM and DEB packages that `[package.metadata.rpm]` and `[package.metadata.deb]` declare
+    #[clap(long)]
+    pub(crate) no_distrib_packages: bool,
     /// Extra cargo flags forwarded to every `cargo` invocation. Repeatable and split on whitespace: `--cargo=--config=foo` or `--cargo "--offline --frozen"`.
     #[clap(long = "cargo", value_name = "FLAG", allow_hyphen_values = true)]
     pub(crate) cargo: Vec<String>,
@@ -65,13 +68,6 @@ pub(crate) struct Package {
     /// The directory within out_dir to put extension assets (default is based on pg_config path)
     #[clap(long, value_parser)]
     pub(crate) prefix_dir: Option<PathBuf>,
-}
-
-/// Whether [`Package::perform`] also builds the packages declared in `Cargo.toml`.
-/// `cargo pgrx install --sudo` uses `perform` to stage files it copies into place.
-pub(crate) enum DistribPackages {
-    Build,
-    Skip,
 }
 
 impl Package {
@@ -85,10 +81,7 @@ impl Package {
         }
     }
 
-    pub(crate) fn perform(
-        mut self,
-        distrib_packages: DistribPackages,
-    ) -> eyre::Result<(PathBuf, Vec<PathBuf>)> {
+    pub(crate) fn perform(mut self) -> eyre::Result<(PathBuf, Vec<PathBuf>)> {
         let unreleased_mode = self.unreleased_mode();
         warn_if_pg_bench_enabled(&self.features, "package");
         let cargo_flags = std::mem::take(&mut self.cargo);
@@ -148,7 +141,7 @@ impl Package {
             self.prefix_dir.clone(),
         )?;
 
-        if matches!(distrib_packages, DistribPackages::Build) {
+        if !self.no_distrib_packages {
             build_distrib_packages(
                 &pg_config,
                 &package_manifest_path,
@@ -167,7 +160,7 @@ impl Package {
 impl CommandExecute for Package {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        self.perform(DistribPackages::Build)?;
+        self.perform()?;
         Ok(())
     }
 }
@@ -709,7 +702,12 @@ mod tests {
 
     #[test]
     fn resolves_relative_sources_against_the_manifest_dir() {
-        let mut manifest = arx_pack::Manifest::from_toml_str(
+        // Paths such as `/src` are relative to the current drive on Windows, so build absolute
+        // ones from the temporary directory.
+        let manifest_dir = std::env::temp_dir().join("my_ext");
+        let staged = utf8_path(&manifest_dir.join("staged").join("my_ext.so")).unwrap();
+        // A TOML literal string keeps Windows backslashes as they are.
+        let mut manifest = arx_pack::Manifest::from_toml_str(&format!(
             r#"
             name = "my-ext"
             version = "1.0.0"
@@ -718,20 +716,21 @@ mod tests {
             description = "My extension"
             license = "MIT"
             files = [
-              { source = "/staged/my_ext.so", dest = "/lib/my_ext.so", mode = "0755" },
-              { source = "../LICENSE", dest = "/doc/copyright", mode = "0644" },
+              {{ source = '{staged}', dest = "/lib/my_ext.so", mode = "0755" }},
+              {{ source = "../LICENSE", dest = "/doc/copyright", mode = "0644" }},
             ]
-            dirs = [{ source = "sql/", dest = "/share/extension/" }]
-            scripts = { postinst = "packaging/postinst" }
+            dirs = [{{ source = "sql/", dest = "/share/extension/" }}]
+            scripts = {{ postinst = "packaging/postinst" }}
             "#,
-        )
+        ))
         .unwrap();
-        resolve_relative_sources(&mut manifest, Path::new("/src/my_ext")).unwrap();
+        resolve_relative_sources(&mut manifest, &manifest_dir).unwrap();
 
-        assert_eq!(manifest.files[0].source, "/staged/my_ext.so");
-        assert_eq!(manifest.files[1].source, "/src/my_ext/../LICENSE");
-        assert_eq!(manifest.dirs[0].source, "/src/my_ext/sql/");
-        assert_eq!(manifest.scripts.postinst.as_deref(), Some("/src/my_ext/packaging/postinst"));
+        let resolved = |path: &str| utf8_path(&manifest_dir.join(path)).unwrap();
+        assert_eq!(manifest.files[0].source, staged);
+        assert_eq!(manifest.files[1].source, resolved("../LICENSE"));
+        assert_eq!(manifest.dirs[0].source, resolved("sql/"));
+        assert_eq!(manifest.scripts.postinst, Some(resolved("packaging/postinst")));
         assert_eq!(manifest.scripts.preinst, None);
     }
 
