@@ -7,6 +7,7 @@
 //LICENSE All rights reserved.
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+use crate::__pgrx_c_macros::{CValue, IntoCValue, expression_result::CExpression};
 use crate::NullableDatum;
 
 /// Postgres defines the "Datum" type as uintptr_t, so bindgen decides it is usize.
@@ -96,6 +97,15 @@ impl Datum {
     #[inline]
     pub fn cast_mut_ptr<T>(self) -> *mut T {
         self.0.cast()
+    }
+}
+
+/// Convert a C macro result of `Datum`'s C type to a `Datum`.
+impl From<CExpression<CValue<<Datum as IntoCValue>::Kind>>> for Datum {
+    /// Take back the provenance that a pointer exposed when it became the integer, as a C cast
+    /// from `Datum` to a pointer does, so Rust may read through the result.
+    fn from(value: CExpression<CValue<<Datum as IntoCValue>::Kind>>) -> Self {
+        Datum::from(core::ptr::with_exposed_provenance_mut::<()>(value.get() as usize))
     }
 }
 
