@@ -144,14 +144,14 @@ through the result. For a function argument, `pg_get_nullable_datum` also checks
 the argument index and returns the pointer without the integer round trip.
 
 PostgreSQL 16 turned the tree walkers and mutators into macros that cast their
-callback. On PG16 and later, `pg_sys::expression_tree_walker`,
-`pg_sys::expression_tree_mutator`, and the other walkers and mutators exist only
-as generated macros. The removed pgrx wrappers existed for the walkers on PG16
-and later and for `expression_tree_mutator` on PG18 and PG19. Call the `_impl`
-function the macros expand to, such as `pg_sys::expression_tree_walker_impl`, or
-the macro with the callback wrapper shown
-[below](#keep-postgresql-calls-on-the-backend-thread). PG15 keeps the functions,
-so code that supports both needs a `cfg` split.
+callback. `pg_sys::expression_tree_walker`, `pg_sys::expression_tree_mutator`,
+and the other walkers and mutators are still functions on every supported
+version, each with one typed signature, so code that supports PG15 and later
+needs no `cfg` split. On PG15 they are PostgreSQL's functions, and on PG16 and
+later they call the `_impl` function the macro expands to, such as
+`pg_sys::expression_tree_walker_impl`. The generated macros remain available on
+PG16 and later, with the callback wrapper shown
+[below](#keep-postgresql-calls-on-the-backend-thread).
 
 ### Changed constants and version-specific items
 
