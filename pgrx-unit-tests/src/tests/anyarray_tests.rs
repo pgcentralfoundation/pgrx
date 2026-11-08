@@ -81,6 +81,16 @@ fn anyarray_value_as_vec_of_string(array: AnyArray) -> String {
 }
 
 #[pg_extern]
+fn anyarray_value_as_vec_of_i64(array: AnyArray) -> String {
+    describe(array.value::<Vec<i64>>())
+}
+
+#[pg_extern]
+fn anyarray_value_as_vec_of_datum_len(array: AnyArray) -> String {
+    describe(array.value::<Vec<pg_sys::Datum>>().map(|datums| datums.map(|datums| datums.len())))
+}
+
+#[pg_extern]
 fn anyarray_value_as_string(array: AnyArray) -> String {
     describe(array.value::<String>())
 }
@@ -303,6 +313,30 @@ mod tests {
             assert_eq!(elements, vec![Some(4), Some(5)]);
             Ok(())
         })
+    }
+
+    #[pg_test]
+    fn test_anyarray_value_reads_compatible_element_types()
+    -> std::result::Result<(), pgrx::spi::Error> {
+        // An array is compatible when its element type is, as a lone value of that type would be.
+        assert_eq!(
+            select_text("SELECT anyarray_value_as_vec_of_i64(ARRAY[-1, 2]::int4[])")?,
+            "Some([-1, 2])"
+        );
+        assert_eq!(
+            select_text("SELECT anyarray_value_as_vec_of_string(ARRAY['a', 'b']::varchar[])")?,
+            r#"Some(["a", "b"])"#
+        );
+        // A raw Datum reads elements of any type.
+        assert_eq!(
+            select_text("SELECT anyarray_value_as_vec_of_datum_len(ARRAY['x', 'y', 'z'])")?,
+            "Some(3)"
+        );
+        assert_eq!(
+            select_text("SELECT anyarray_value_as_vec_of_datum_len(ARRAY[1.5]::numeric[])")?,
+            "Some(1)"
+        );
+        Ok(())
     }
 
     #[pg_test]

@@ -975,9 +975,23 @@ impl<T: IntoDatum> IntoDatum for Array<'_, T> {
         unsafe { pg_sys::get_array_type(T::type_oid()) }
     }
 
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        Self::type_oid() == other || element_is_compatible::<T>(other)
+    }
+
     fn composite_type_oid(&self) -> Option<pg_sys::Oid> {
         Some(unsafe { pg_sys::get_array_type(self.raw.oid()) })
     }
+}
+
+/// Is `array_type` an array whose element type `T` can read? `Array` and `Vec` read each element
+/// with the array's own element layout, so `T` reading an element is as sound as `T` reading a
+/// lone value of the element type, which is what [`IntoDatum::is_compatible_with`] promises.
+fn element_is_compatible<T: IntoDatum>(array_type: pg_sys::Oid) -> bool {
+    // SAFETY: get_element_type takes the OID by value and only looks it up in the type cache. It
+    // returns InvalidOid for an OID that is not an array type or that names no type.
+    let element_type = unsafe { pg_sys::get_element_type(array_type) };
+    element_type != pg_sys::Oid::INVALID && T::is_compatible_with(element_type)
 }
 
 impl<T> FromDatum for Vec<T>
@@ -1107,6 +1121,10 @@ where
 
     fn type_oid() -> pg_sys::Oid {
         unsafe { pg_sys::get_array_type(T::type_oid()) }
+    }
+
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        Self::type_oid() == other || element_is_compatible::<T>(other)
     }
 
     #[allow(clippy::get_first)] // https://github.com/pgcentralfoundation/pgrx/issues/1363
