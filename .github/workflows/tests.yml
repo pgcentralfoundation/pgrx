@@ -73,7 +73,7 @@ jobs:
             -Drustdoc::invalid-html-tags
 
   pgrx_tests:
-    name: Linux tests & examples
+    name: Linux tests & examples (PG${{ matrix.postgres }}${{ matrix.rust && format(', Rust {0}', matrix.rust) || '' }}${{ matrix.suite == 'compile' && ', build only' || '' }}${{ matrix.suite == 'extras' && ', extras' || '' }})
     needs: lintck
     runs-on: ubuntu-22.04
     if: "!contains(github.event.head_commit.message, 'nogha')"
@@ -344,7 +344,7 @@ jobs:
         run: cd pgrx-examples/versioned_custom_libname_so && cargo pgrx schema pg$PG_VER
 
   pgrx_tests_arm64:
-    name: Linux arm64 native tests
+    name: Linux arm64 native tests (PG${{ matrix.postgres }})
     needs: lintck
     runs-on: ubuntu-24.04-arm
     if: "!contains(github.event.head_commit.message, 'nogha')"
@@ -558,7 +558,7 @@ jobs:
         run: cd /tmp/sample && cargo pgrx test pg$PG_VER
 
   build_mac:
-    name: MacOS build & test
+    name: MacOS build & test (${{ matrix.os }}, PG${{ matrix.postgresql }})
     needs: lintck
     runs-on: ${{ matrix.os }}
     if: "!contains(github.event.head_commit.message, 'nogha')"
@@ -642,7 +642,7 @@ jobs:
             universal_macos_installations_build_both_slices -- --include-ignored --exact --test-threads=1
 
   build_windows:
-    name: Windows build & test
+    name: Windows build & test (${{ matrix.os }}, PG${{ matrix.postgresql }})
     needs: lintck
     runs-on: ${{ matrix.os }}
     if: "!contains(github.event.head_commit.message, 'nogha')"
